@@ -360,3 +360,12 @@ bounds.
 
 Reason: Accessory roles must remain configuration data. Firmware services should
 reject invalid role values without hard-coding any role-to-output assignment.
+
+## 2026-06-30 — Firmware config JSON repository validator
+
+Decision: `make check` now runs `tools/validate_config.py`, which validates
+`firmware/configs/config-example.json` against firmware role enums, electrical
+limits, shed priority order, and C default configuration values.
+
+Reason: The JSON vehicle/profile example and C default config must not drift
+apart while configuration remains separate from firmware logic.

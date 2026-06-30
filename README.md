@@ -23,8 +23,9 @@ Do not start PCB layout until the PB-100 schematic freeze checklist is closed.
 make check
 ```
 
-This runs PB-100 artifact validation and firmware host tests. The same command
-runs in GitHub Actions on push and pull request.
+This runs PB-100 artifact validation, firmware config JSON validation, and
+firmware host tests. The same command runs in GitHub Actions on push and pull
+request.
 
 ## Repository structure
 
