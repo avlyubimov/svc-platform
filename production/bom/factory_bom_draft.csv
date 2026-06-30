@@ -9,7 +9,7 @@ Logic,FRAM,MB85RC256/MB85RS class,SMD,1,Factory,Core,Black box/settings
 Logic,IMU,BMI270/ICM42688 class,LGA,1,Factory,Should,Shock/tilt/vibration
 Logic,Lux sensor,VEML7700/OPT3001,SMD,1,Factory,Core,Fog logic
 Logic,Temp sensor,TMP117/NTC,SMD,2,Factory,Core,PCB + power zone temp
-Power,Current sensor,TPS48110 IMON or TI INA226/INA228/INA229,VSSOP/SOIC class,10,Factory,Core,Prefer integrated IMON where accuracy is sufficient
+Power,Current sensor,TPS48110 IMON per output; INA228/INA229 or INA226-class total input monitor,VSSOP/SOIC class,11,Factory,Core,Ten output telemetry paths plus one total input current monitor
 Power,High-side switch/controller,TPS48110AQDGXRQ1-class for all Rev.1 outputs,VSSOP/HTSSOP,10,Factory,Core,Integrated smart switches deferred by ADR-0011
 Power,MOSFET,SIDR626LDP-T1-RE3 or JMSL0606AGQ-13; OUT2 may require TOLL/LFPAK or parallel FET escape path,PowerPAK-SO-8DC/PDFN5x6/TOLL/LFPAK,10,Factory,Core,External FET channels require SOA and thermal validation
 Power,Input reverse MOSFET,IAUTN06S5N008ATMA1 preferred; BUK7S1R2-80M or dual SIDR626LDP alternatives,TOLL/LFPAK88/PowerPAK,1-2,Factory,Core,Single 2.1mOhm MOSFET rejected for 40A thermal

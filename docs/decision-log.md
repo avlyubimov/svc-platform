@@ -185,3 +185,12 @@ current fallback before considering 60 V buck families.
 Reason: The logic rail must tolerate the same transient strategy as the power
 path and must not be confused with accessory USB power. The 1 A budget is enough
 for initial planning but keeps a 100 V higher-current escape path.
+
+## 2026-06-30 — PB-100 current telemetry strategy
+
+Decision: PB-100 Rev.1 uses TPS48110-class `IMON` outputs for per-channel
+current telemetry and a dedicated input shunt monitor for total board current.
+
+Reason: Per-output telemetry supports diagnostics and per-channel limits, while
+the board-level 40 A budget must be enforced from an independent total input
+current measurement.

@@ -17,6 +17,7 @@ It is not a PCB layout package.
 - `docs/can/can-safety.md`
 - `docs/production/component-family-shortlist.md`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
+- `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
@@ -96,6 +97,8 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-budget.csv`
+- `hardware/power-board/PB-100/PB-100-current-telemetry.md`
+- `hardware/power-board/PB-100/PB-100-current-telemetry-map.csv`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-estimates.csv`

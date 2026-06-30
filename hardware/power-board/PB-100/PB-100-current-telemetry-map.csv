@@ -1,0 +1,12 @@
+Measurement,Signal,Range A,Telemetry path,Primary source,Fallback source,Notes
+OUT1 current,OUT1_IMON,0-20,LB ADC,TPS48110 IMON,External current monitor,Configured limit 12A
+OUT2 current,OUT2_IMON,0-30,LB ADC,TPS48110 IMON,External current monitor,Configured limit 18A pulse capture uses test fixture
+OUT3 current,OUT3_IMON,0-15,LB ADC,TPS48110 IMON,External current monitor,Configured limit 8A
+OUT4 current,OUT4_IMON,0-15,LB ADC,TPS48110 IMON,External current monitor,Configured limit 8A
+OUT5 current,OUT5_IMON,0-8,LB ADC,TPS48110 IMON,External current monitor,Configured limit 4A
+OUT6 current,OUT6_IMON,0-15,LB ADC,TPS48110 IMON,External current monitor,Configured limit 8A
+OUT7 current,OUT7_IMON,0-15,LB ADC,TPS48110 IMON,External current monitor,Configured limit 8A
+OUT8 current,OUT8_IMON,0-8,LB ADC,TPS48110 IMON,External current monitor,Configured limit 4A
+OUT9 current,OUT9_IMON,0-8,LB ADC,TPS48110 IMON,External current monitor,Configured limit 4A
+OUT10 current,OUT10_IMON,0-15,LB ADC,TPS48110 IMON,External current monitor,Configured limit 8A
+Total input current,IIN_SENSE,0-60,LB ADC or PB I2C,Dedicated input shunt monitor,Sum of output IMON only for diagnostics,Required for 40A board budget enforcement
