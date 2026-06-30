@@ -71,3 +71,7 @@ excluded from BOM and board output until schematic freeze.
 for concrete MPN symbols and the internal schematic-class pin contracts used for
 non-final class symbols. Validation checks each recorded pin number/name against
 the KiCad symbol library.
+
+`PB100_JPB1_100PIN_PRELIM` is generated from
+`PB-100-b2b-pin-map.csv`; validation checks all 100 connector pin names and
+numbers directly against that map.

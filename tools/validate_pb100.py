@@ -101,6 +101,7 @@ SYMBOL_PIN_EVIDENCE_COLUMNS = (
     "Package",
     "Notes",
 )
+PIN_MAP_EVIDENCE_SYMBOLS = {"PB100_JPB1_100PIN_PRELIM"}
 
 
 def fail(message: str) -> None:
@@ -540,12 +541,44 @@ def validate_symbol_pin_evidence() -> None:
 
         evidence_by_symbol.setdefault(symbol_name, set()).add((pin_number, pin_name))
 
-    missing_evidence = sorted(created_symbols - evidence_by_symbol.keys())
+    missing_evidence = sorted(created_symbols - evidence_by_symbol.keys() - PIN_MAP_EVIDENCE_SYMBOLS)
     if missing_evidence:
         fail(
             f"{path.relative_to(REPO_ROOT)} is missing pin evidence for created symbols: "
             f"{', '.join(missing_evidence)}"
         )
+
+
+def validate_jpb1_symbol_from_pin_map() -> None:
+    worklist_path = PB100_DIR / "PB-100-symbol-capture-worklist.csv"
+    worklist_rows = list(csv.DictReader(worklist_path.open(newline="", encoding="utf-8")))
+    created = any(
+        row["Concrete symbol name"].strip() == "PB100_JPB1_100PIN_PRELIM"
+        and "preliminary symbol created" in row["Pin evidence status"].strip().lower()
+        for row in worklist_rows
+    )
+    if not created:
+        return
+
+    pin_map_path = PB100_DIR / "PB-100-b2b-pin-map.csv"
+    validate_csv(pin_map_path)
+    pin_map_rows = list(csv.DictReader(pin_map_path.open(newline="", encoding="utf-8")))
+    if len(pin_map_rows) != 100:
+        fail(f"{pin_map_path.relative_to(REPO_ROOT)} must contain exactly 100 JPB1 pins")
+
+    symbol_name = "PB100_JPB1_100PIN_PRELIM"
+    symbol_text = read_text(KICAD_DIR / "lib" / "PB100.kicad_sym")
+    block = symbol_block(symbol_text, symbol_name)
+    if not block:
+        fail(f"created B2B symbol is missing from PB100.kicad_sym: {symbol_name}")
+
+    for row in pin_map_rows:
+        pin_number = row["Pin"].strip()
+        pin_name = row["Net"].strip()
+        expected_name = f'(name "{pin_name}"'
+        expected_number = f'(number "{pin_number}"'
+        if not any(expected_name in line and expected_number in line for line in block.splitlines()):
+            fail(f"{symbol_name} is missing JPB1 pin {pin_number} {pin_name}")
 
 
 def validate_net_naming_contract() -> None:
@@ -576,6 +609,7 @@ def main() -> int:
     validate_symbol_capture_worklist()
     validate_symbol_capture_progress()
     validate_symbol_pin_evidence()
+    validate_jpb1_symbol_from_pin_map()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0

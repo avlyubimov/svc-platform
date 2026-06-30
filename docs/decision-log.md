@@ -600,3 +600,13 @@ work remains pending until package pin evidence is reviewed separately.
 Reason: Output-channel schematic capture needs MOSFET symbols now, but the
 input reverse-protection TOLL package and OUT2 escape decision must not be
 locked before SOA, thermal, and assembly evidence closes.
+
+## 2026-06-30 — PB-100 JPB1 preliminary symbol
+
+Decision: PB-100 now has a preliminary `PB100_JPB1_100PIN_PRELIM` symbol
+generated from `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`, and
+`tools/validate_pb100.py` checks all 100 symbol pins against that pin map.
+
+Reason: The PB-100/LB-100 interface can be captured schematically without
+choosing or placing a final mezzanine connector footprint. The pin contract
+remains source-controlled and machine-checked before connector MPN lock.
