@@ -475,3 +475,12 @@ dropped entries.
 Reason: Diagnostics and future service APIs need deterministic logging without
 dynamic allocation before persistent storage or transport-specific logging is
 added.
+
+## 2026-06-30 — Optional PB-100 KiCad ERC validation
+
+Decision: `tools/validate_pb100.py` now runs KiCad schematic ERC for PB-100 when
+`kicad-cli` is available and requires zero reported violations.
+
+Reason: The repository now has a KiCad 10 schematic scaffold. Automated ERC
+should be part of local final-readiness checks without making CI depend on KiCad
+until the CI image explicitly installs it.

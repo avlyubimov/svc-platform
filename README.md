@@ -26,9 +26,9 @@ freeze.
 make check
 ```
 
-This runs PB-100 artifact validation, firmware config JSON validation, and
-firmware host tests. The same command runs in GitHub Actions on push and pull
-request.
+This runs PB-100 artifact validation, KiCad schematic ERC when `kicad-cli` is
+available, firmware config JSON validation, and firmware host tests. The same
+command runs in GitHub Actions on push and pull request.
 
 Current host checks cover PB-100 schematic-planning artifacts, config/schema
 consistency, output safety, battery cutoff, CAN1 TX denial, event dispatch,

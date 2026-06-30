@@ -3,7 +3,10 @@ from __future__ import annotations
 
 import csv
 import json
+import shutil
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 
@@ -105,6 +108,45 @@ def validate_kicad_scaffold() -> None:
     validate_no_layout_artifacts()
 
 
+def validate_kicad_cli_erc() -> None:
+    kicad_cli = shutil.which("kicad-cli")
+    if kicad_cli is None:
+        print("PB-100 KiCad ERC skipped: kicad-cli not found")
+        return
+
+    with tempfile.TemporaryDirectory(prefix="svc-pb100-erc-") as temp_dir:
+        report_path = Path(temp_dir) / "PB-100-erc.json"
+        command = [
+            kicad_cli,
+            "sch",
+            "erc",
+            "--format",
+            "json",
+            "--output",
+            str(report_path),
+            "--exit-code-violations",
+            str(KICAD_DIR / "PB-100.kicad_sch"),
+        ]
+        result = subprocess.run(command, check=False, text=True, capture_output=True)
+        if result.returncode != 0:
+            details = "\n".join(part for part in (result.stdout.strip(), result.stderr.strip()) if part)
+            fail(f"KiCad ERC failed for PB-100 schematic: {details}")
+
+        try:
+            report = json.loads(read_text(report_path))
+        except json.JSONDecodeError as error:
+            fail(f"invalid KiCad ERC JSON report: {error}")
+
+        violations = []
+        for sheet in report.get("sheets", []):
+            violations.extend(sheet.get("violations", []))
+        if violations:
+            fail(f"KiCad ERC reported {len(violations)} PB-100 schematic violations")
+
+        version = report.get("kicad_version", "unknown")
+        print(f"PB-100 KiCad ERC passed with kicad-cli {version}")
+
+
 def validate_no_layout_artifacts() -> None:
     search_roots = (PB100_DIR, PRODUCTION_DIR)
     for search_root in search_roots:
@@ -170,6 +212,7 @@ def main() -> int:
     for csv_path in csv_paths:
         validate_csv(csv_path)
     validate_kicad_scaffold()
+    validate_kicad_cli_erc()
     validate_symbol_library()
     validate_instance_plan()
     validate_net_naming_contract()
