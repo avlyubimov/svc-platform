@@ -59,6 +59,7 @@ Current host-tested services:
 - Role Resolver
 - Rule Engine skeleton
 - Rule condition evaluator
+- In-memory rule runner
 
 ## Phase 5 — BMW K25 integration
 - harness

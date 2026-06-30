@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #include "output_manager.h"
@@ -104,6 +105,81 @@ static void test_output_manager_denial_is_reported(void)
     assert(svc_output_manager_active_mask(&manager) == 0U);
 }
 
+static void test_matching_rule_applies_role_action(void)
+{
+    svc_output_manager_t manager = initialized_output_manager(&svc_default_config);
+    svc_rule_state_t state = {0};
+    svc_rule_state_init(&state);
+    svc_rule_state_apply_event(&state, (svc_event_t){SVC_EVENT_ENGINE_STARTED, SVC_OUTPUT_OUT1, 1U});
+    svc_rule_state_apply_event(&state, (svc_event_t){SVC_EVENT_HIGH_BEAM_ON, SVC_OUTPUT_OUT1, 1U});
+
+    const svc_rule_condition_t conditions[] = {
+        {SVC_RULE_CONDITION_ENGINE_RUNNING, true},
+        {SVC_RULE_CONDITION_HIGH_BEAM, true}
+    };
+    const svc_rule_t rule = {
+        .conditions = conditions,
+        .condition_count = sizeof(conditions) / sizeof(conditions[0]),
+        .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT}
+    };
+
+    const svc_rule_engine_result_t result = svc_rule_engine_evaluate_rule(
+        &svc_default_config,
+        &manager,
+        &state,
+        &rule,
+        1000U,
+        true);
+
+    assert(result.status == SVC_RULE_ENGINE_OK);
+    assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT3)) != 0U);
+}
+
+static void test_unmatched_rule_is_skipped_without_output_change(void)
+{
+    svc_output_manager_t manager = initialized_output_manager(&svc_default_config);
+    svc_rule_state_t state = {0};
+    svc_rule_state_init(&state);
+
+    const svc_rule_condition_t conditions[] = {
+        {SVC_RULE_CONDITION_ENGINE_RUNNING, true},
+        {SVC_RULE_CONDITION_HIGH_BEAM, true}
+    };
+    const svc_rule_t rule = {
+        .conditions = conditions,
+        .condition_count = sizeof(conditions) / sizeof(conditions[0]),
+        .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT}
+    };
+
+    const svc_rule_engine_result_t result = svc_rule_engine_evaluate_rule(
+        &svc_default_config,
+        &manager,
+        &state,
+        &rule,
+        1000U,
+        true);
+
+    assert(result.status == SVC_RULE_ENGINE_SKIPPED_CONDITIONS);
+    assert(svc_output_manager_active_mask(&manager) == 0U);
+}
+
+static void test_null_rule_is_denied(void)
+{
+    svc_output_manager_t manager = initialized_output_manager(&svc_default_config);
+    svc_rule_state_t state = {0};
+    svc_rule_state_init(&state);
+
+    const svc_rule_engine_result_t result = svc_rule_engine_evaluate_rule(
+        &svc_default_config,
+        &manager,
+        &state,
+        NULL,
+        1000U,
+        true);
+
+    assert(result.status == SVC_RULE_ENGINE_DENY_INVALID_ARGUMENT);
+}
+
 int main(void)
 {
     test_enable_role_uses_config_mapping();
@@ -111,5 +187,8 @@ int main(void)
     test_ambiguous_role_is_denied();
     test_missing_role_is_denied();
     test_output_manager_denial_is_reported();
+    test_matching_rule_applies_role_action();
+    test_unmatched_rule_is_skipped_without_output_change();
+    test_null_rule_is_denied();
     return 0;
 }

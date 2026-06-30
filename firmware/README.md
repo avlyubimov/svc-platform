@@ -40,3 +40,4 @@ Current host tests cover:
 - Role Resolver and Rule Engine skeleton for role-based actions through Output
   Manager.
 - Rule condition state tracking for engine, high-beam, and left-indicator events.
+- Rule runner evaluation for matched/unmatched conditions before role actions.

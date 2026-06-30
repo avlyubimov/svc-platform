@@ -79,6 +79,7 @@ RULE_ENGINE_SRCS := \
 	services/config_validator.c \
 	services/output_manager.c \
 	services/power_budget.c \
+	services/rule_condition.c \
 	services/role_resolver.c \
 	services/rule_engine.c \
 	tests/test_rule_engine.c

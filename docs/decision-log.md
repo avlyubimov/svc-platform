@@ -396,3 +396,12 @@ evaluation.
 
 Reason: Rule execution needs an event-derived state layer before JSON rule
 parsing and vehicle-specific logic are added.
+
+## 2026-06-30 — Firmware in-memory rule runner
+
+Decision: Firmware Rule Engine now evaluates in-memory rules by checking
+conditions first and applying role-based actions only when all conditions match.
+
+Reason: The firmware now has an executable path from event-derived state to
+configured role action to Output Manager, without adding JSON parsing or direct
+channel assumptions prematurely.

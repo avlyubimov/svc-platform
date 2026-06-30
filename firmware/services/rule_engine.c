@@ -74,3 +74,32 @@ svc_rule_engine_result_t svc_rule_engine_apply_action(
     }
     return make_result(SVC_RULE_ENGINE_OK, role_result, output_result);
 }
+
+svc_rule_engine_result_t svc_rule_engine_evaluate_rule(
+    const svc_device_config_t *config,
+    svc_output_manager_t *output_manager,
+    const svc_rule_state_t *state,
+    const svc_rule_t *rule,
+    uint32_t measured_total_current_ma,
+    bool telemetry_valid)
+{
+    if (rule == NULL || state == NULL) {
+        return make_result(
+            SVC_RULE_ENGINE_DENY_INVALID_ARGUMENT,
+            (svc_role_resolver_result_t){0},
+            (svc_output_manager_result_t){0});
+    }
+    if (!svc_rule_conditions_match_all(state, rule->conditions, rule->condition_count)) {
+        return make_result(
+            SVC_RULE_ENGINE_SKIPPED_CONDITIONS,
+            (svc_role_resolver_result_t){0},
+            (svc_output_manager_result_t){0});
+    }
+
+    return svc_rule_engine_apply_action(
+        config,
+        output_manager,
+        rule->action,
+        measured_total_current_ma,
+        telemetry_valid);
+}
