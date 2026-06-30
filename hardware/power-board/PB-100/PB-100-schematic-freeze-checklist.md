@@ -39,7 +39,7 @@ this checklist can close.
 | Thermal telemetry | Open | `docs/requirements/pb-100-requirements.md` | PCB and power-zone temperature sensing strategy is selected and mapped to LB-100 |
 | Factory assembly readiness | Conditional | `docs/production/component-family-shortlist.md`, `production/bom/factory_bom_draft.csv` | Critical components have at least two alternatives and assembly-source status is checked |
 | Garage assembly readiness | Conditional | `production/bom/garage_bom_draft.csv` | User-installed items are limited to connectors, fuses, enclosure hardware, and wiring |
-| Bench validation plan | Open | `docs/testing/test-plan.md` | PB-100 bring-up, protection, thermal, current-budget, and CAN1 listen-only tests are explicitly listed |
+| Bench validation plan | Closed | `docs/testing/test-plan.md` | PB-100 bring-up, protection, thermal, current-budget, and CAN1 listen-only tests are explicitly listed |
 
 ## Active blockers
 

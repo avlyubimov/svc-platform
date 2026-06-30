@@ -165,3 +165,13 @@ confirmed.
 Reason: OUT2 is the highest-risk output because the reference compressor load
 can create startup and fault pulses beyond the 18 A continuous current limit.
 The schematic must bound these pulses before PCB layout.
+
+## 2026-06-30 — PB-100 bench validation matrix
+
+Decision: PB-100 bench validation is tracked in `docs/testing/test-plan.md` with
+explicit bring-up, protection, telemetry, thermal, current-budget, B2B, and CAN1
+listen-only tests.
+
+Reason: Schematic freeze requires a testable design, not only a component list.
+The test matrix ties the schematic inputs to bench evidence before any motorcycle
+installation.
