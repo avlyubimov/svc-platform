@@ -25,13 +25,14 @@ static void test_enable_role_uses_config_mapping(void)
     const svc_rule_engine_result_t result = svc_rule_engine_apply_action(
         &svc_default_config,
         &manager,
-        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT},
+        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U},
         1000U,
         true);
 
     assert(result.status == SVC_RULE_ENGINE_OK);
     assert(result.role_result.output_id == SVC_OUTPUT_OUT3);
     assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT3)) != 0U);
+    assert(svc_output_manager_pwm_duty_percent(&manager, SVC_OUTPUT_OUT3) == 100U);
 }
 
 static void test_disable_role_uses_config_mapping(void)
@@ -40,14 +41,14 @@ static void test_disable_role_uses_config_mapping(void)
     assert(svc_rule_engine_apply_action(
         &svc_default_config,
         &manager,
-        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT},
+        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U},
         1000U,
         true).status == SVC_RULE_ENGINE_OK);
 
     const svc_rule_engine_result_t result = svc_rule_engine_apply_action(
         &svc_default_config,
         &manager,
-        (svc_rule_action_t){SVC_RULE_ACTION_DISABLE_ROLE, OUT_ROLE_FOG_LEFT},
+        (svc_rule_action_t){SVC_RULE_ACTION_DISABLE_ROLE, OUT_ROLE_FOG_LEFT, 0U},
         0U,
         true);
 
@@ -64,7 +65,7 @@ static void test_ambiguous_role_is_denied(void)
     const svc_rule_engine_result_t result = svc_rule_engine_apply_action(
         &config,
         &manager,
-        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT},
+        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U},
         1000U,
         true);
 
@@ -81,7 +82,7 @@ static void test_missing_role_is_denied(void)
     const svc_rule_engine_result_t result = svc_rule_engine_apply_action(
         &config,
         &manager,
-        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_DVR},
+        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_DVR, 100U},
         1000U,
         true);
 
@@ -96,13 +97,44 @@ static void test_output_manager_denial_is_reported(void)
     const svc_rule_engine_result_t result = svc_rule_engine_apply_action(
         &svc_default_config,
         &manager,
-        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_CIGARETTE_SOCKET},
+        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_CIGARETTE_SOCKET, 100U},
         30000U,
         true);
 
     assert(result.status == SVC_RULE_ENGINE_DENY_OUTPUT_MANAGER);
     assert(result.output_result.status == SVC_OUTPUT_MANAGER_DENY_BUDGET);
     assert(svc_output_manager_active_mask(&manager) == 0U);
+}
+
+static void test_pwm_role_action_preserves_duty_cycle(void)
+{
+    svc_output_manager_t manager = initialized_output_manager(&svc_default_config);
+
+    const svc_rule_engine_result_t result = svc_rule_engine_apply_action(
+        &svc_default_config,
+        &manager,
+        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 40U},
+        1000U,
+        true);
+
+    assert(result.status == SVC_RULE_ENGINE_OK);
+    assert(result.output_result.pwm_duty_percent == 40U);
+    assert(svc_output_manager_pwm_duty_percent(&manager, SVC_OUTPUT_OUT3) == 40U);
+}
+
+static void test_pwm_role_action_denies_non_pwm_output(void)
+{
+    svc_output_manager_t manager = initialized_output_manager(&svc_default_config);
+
+    const svc_rule_engine_result_t result = svc_rule_engine_apply_action(
+        &svc_default_config,
+        &manager,
+        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_CIGARETTE_SOCKET, 40U},
+        1000U,
+        true);
+
+    assert(result.status == SVC_RULE_ENGINE_DENY_OUTPUT_MANAGER);
+    assert(result.output_result.status == SVC_OUTPUT_MANAGER_DENY_PWM_NOT_ALLOWED);
 }
 
 static void test_matching_rule_applies_role_action(void)
@@ -120,7 +152,7 @@ static void test_matching_rule_applies_role_action(void)
     const svc_rule_t rule = {
         .conditions = conditions,
         .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-        .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT}
+        .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U}
     };
 
     const svc_rule_engine_result_t result = svc_rule_engine_evaluate_rule(
@@ -148,7 +180,7 @@ static void test_unmatched_rule_is_skipped_without_output_change(void)
     const svc_rule_t rule = {
         .conditions = conditions,
         .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-        .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT}
+        .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U}
     };
 
     const svc_rule_engine_result_t result = svc_rule_engine_evaluate_rule(
@@ -187,6 +219,8 @@ int main(void)
     test_ambiguous_role_is_denied();
     test_missing_role_is_denied();
     test_output_manager_denial_is_reported();
+    test_pwm_role_action_preserves_duty_cycle();
+    test_pwm_role_action_denies_non_pwm_output();
     test_matching_rule_applies_role_action();
     test_unmatched_rule_is_skipped_without_output_change();
     test_null_rule_is_denied();

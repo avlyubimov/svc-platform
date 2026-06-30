@@ -30,6 +30,8 @@ state changes.
   then the Output Manager fault path.
 - Rule actions resolve roles first and then call the Output Manager by generic
   output ID.
+- PWM duty-cycle state is owned by the Output Manager. Partial duty is denied
+  when the output configuration has `pwm_allowed = false`.
 
 Initial host-testable implementation:
 

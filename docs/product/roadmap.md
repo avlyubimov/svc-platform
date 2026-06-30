@@ -61,6 +61,7 @@ Current host-tested services:
 - Rule condition evaluator
 - In-memory rule runner
 - Rule text parser
+- Output Manager PWM duty-cycle state
 
 ## Phase 5 — BMW K25 integration
 - harness

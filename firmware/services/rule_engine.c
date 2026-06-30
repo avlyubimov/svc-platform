@@ -53,15 +53,20 @@ svc_rule_engine_result_t svc_rule_engine_apply_action(
 
     svc_output_manager_result_t output_result = {0};
     if (action.type == SVC_RULE_ACTION_ENABLE_ROLE) {
-        output_result = svc_output_manager_request_enable(
+        const uint8_t duty_percent = action.pwm_duty_percent == 0U ? 100U : action.pwm_duty_percent;
+        output_result = svc_output_manager_request_pwm(
             output_manager,
             role_result.output_id,
+            duty_percent,
             measured_total_current_ma,
             telemetry_valid);
     } else if (action.type == SVC_RULE_ACTION_DISABLE_ROLE) {
-        output_result = svc_output_manager_request_disable(
+        output_result = svc_output_manager_request_pwm(
             output_manager,
-            role_result.output_id);
+            role_result.output_id,
+            0U,
+            measured_total_current_ma,
+            telemetry_valid);
     } else {
         return make_result(
             SVC_RULE_ENGINE_DENY_INVALID_ARGUMENT,

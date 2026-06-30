@@ -1,5 +1,7 @@
 #include "output_manager.h"
 
+#include <stddef.h>
+
 #include "config_validator.h"
 
 static bool config_is_valid(const svc_device_config_t *config)
@@ -26,7 +28,8 @@ static svc_output_manager_result_t make_result(
         .status = status,
         .budget_decision = budget_decision,
         .active_output_mask = 0U,
-        .locked_output_mask = 0U
+        .locked_output_mask = 0U,
+        .pwm_duty_percent = 0U
     };
 
     if (manager != NULL) {
@@ -34,6 +37,19 @@ static svc_output_manager_result_t make_result(
         result.locked_output_mask = manager->locked_output_mask;
     }
 
+    return result;
+}
+
+static svc_output_manager_result_t make_output_result(
+    const svc_output_manager_t *manager,
+    svc_output_manager_status_t status,
+    svc_power_budget_decision_t budget_decision,
+    svc_output_id_t output_id)
+{
+    svc_output_manager_result_t result = make_result(manager, status, budget_decision);
+    if (manager != NULL && output_id_is_valid(output_id)) {
+        result.pwm_duty_percent = manager->pwm_duty_percent[(uint8_t)output_id];
+    }
     return result;
 }
 
@@ -48,6 +64,9 @@ bool svc_output_manager_init(
     manager->config = config;
     manager->active_output_mask = 0U;
     manager->locked_output_mask = 0U;
+    for (size_t output_index = 0U; output_index < SVC_OUTPUT_COUNT; ++output_index) {
+        manager->pwm_duty_percent[output_index] = 0U;
+    }
     return true;
 }
 
@@ -66,7 +85,7 @@ svc_output_manager_result_t svc_output_manager_request_enable(
 
     const uint16_t output_mask = output_mask_for_id(output_id);
     if ((manager->locked_output_mask & output_mask) != 0U) {
-        return make_result(manager, SVC_OUTPUT_MANAGER_DENY_LOCKED_OUT, SVC_POWER_BUDGET_ALLOW);
+        return make_output_result(manager, SVC_OUTPUT_MANAGER_DENY_LOCKED_OUT, SVC_POWER_BUDGET_ALLOW, output_id);
     }
 
     const svc_power_budget_result_t budget_result = svc_power_budget_can_enable_output(
@@ -77,11 +96,12 @@ svc_output_manager_result_t svc_output_manager_request_enable(
         telemetry_valid);
 
     if (budget_result.decision != SVC_POWER_BUDGET_ALLOW) {
-        return make_result(manager, SVC_OUTPUT_MANAGER_DENY_BUDGET, budget_result.decision);
+        return make_output_result(manager, SVC_OUTPUT_MANAGER_DENY_BUDGET, budget_result.decision, output_id);
     }
 
     manager->active_output_mask |= output_mask;
-    return make_result(manager, SVC_OUTPUT_MANAGER_OK, budget_result.decision);
+    manager->pwm_duty_percent[(uint8_t)output_id] = 100U;
+    return make_output_result(manager, SVC_OUTPUT_MANAGER_OK, budget_result.decision, output_id);
 }
 
 svc_output_manager_result_t svc_output_manager_request_disable(
@@ -96,7 +116,46 @@ svc_output_manager_result_t svc_output_manager_request_disable(
     }
 
     manager->active_output_mask &= (uint16_t)~output_mask_for_id(output_id);
-    return make_result(manager, SVC_OUTPUT_MANAGER_OK, SVC_POWER_BUDGET_ALLOW);
+    manager->pwm_duty_percent[(uint8_t)output_id] = 0U;
+    return make_output_result(manager, SVC_OUTPUT_MANAGER_OK, SVC_POWER_BUDGET_ALLOW, output_id);
+}
+
+svc_output_manager_result_t svc_output_manager_request_pwm(
+    svc_output_manager_t *manager,
+    svc_output_id_t output_id,
+    uint8_t duty_percent,
+    uint32_t measured_total_current_ma,
+    bool telemetry_valid)
+{
+    if (manager == NULL || !config_is_valid(manager->config)) {
+        return make_result(manager, SVC_OUTPUT_MANAGER_DENY_INVALID_CONFIG, SVC_POWER_BUDGET_DENY_INVALID_CONFIG);
+    }
+    if (!output_id_is_valid(output_id)) {
+        return make_result(manager, SVC_OUTPUT_MANAGER_DENY_INVALID_OUTPUT, SVC_POWER_BUDGET_DENY_INVALID_OUTPUT);
+    }
+    if (duty_percent > 100U) {
+        return make_output_result(manager, SVC_OUTPUT_MANAGER_DENY_INVALID_PWM, SVC_POWER_BUDGET_ALLOW, output_id);
+    }
+    if (duty_percent == 0U) {
+        return svc_output_manager_request_disable(manager, output_id);
+    }
+    if (duty_percent < 100U && !manager->config->outputs[(uint8_t)output_id].pwm_allowed) {
+        return make_output_result(manager, SVC_OUTPUT_MANAGER_DENY_PWM_NOT_ALLOWED, SVC_POWER_BUDGET_ALLOW, output_id);
+    }
+
+    if ((manager->active_output_mask & output_mask_for_id(output_id)) == 0U) {
+        const svc_output_manager_result_t enable_result = svc_output_manager_request_enable(
+            manager,
+            output_id,
+            measured_total_current_ma,
+            telemetry_valid);
+        if (enable_result.status != SVC_OUTPUT_MANAGER_OK) {
+            return enable_result;
+        }
+    }
+
+    manager->pwm_duty_percent[(uint8_t)output_id] = duty_percent;
+    return make_output_result(manager, SVC_OUTPUT_MANAGER_OK, SVC_POWER_BUDGET_ALLOW, output_id);
 }
 
 svc_output_manager_result_t svc_output_manager_apply_fault(
@@ -113,7 +172,8 @@ svc_output_manager_result_t svc_output_manager_apply_fault(
     const uint16_t output_mask = output_mask_for_id(output_id);
     manager->active_output_mask &= (uint16_t)~output_mask;
     manager->locked_output_mask |= output_mask;
-    return make_result(manager, SVC_OUTPUT_MANAGER_OK, SVC_POWER_BUDGET_ALLOW);
+    manager->pwm_duty_percent[(uint8_t)output_id] = 0U;
+    return make_output_result(manager, SVC_OUTPUT_MANAGER_OK, SVC_POWER_BUDGET_ALLOW, output_id);
 }
 
 uint16_t svc_output_manager_active_mask(const svc_output_manager_t *manager)
@@ -124,4 +184,14 @@ uint16_t svc_output_manager_active_mask(const svc_output_manager_t *manager)
 uint16_t svc_output_manager_locked_mask(const svc_output_manager_t *manager)
 {
     return manager == NULL ? 0U : manager->locked_output_mask;
+}
+
+uint8_t svc_output_manager_pwm_duty_percent(
+    const svc_output_manager_t *manager,
+    svc_output_id_t output_id)
+{
+    if (manager == NULL || !output_id_is_valid(output_id)) {
+        return 0U;
+    }
+    return manager->pwm_duty_percent[(uint8_t)output_id];
 }

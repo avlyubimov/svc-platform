@@ -42,3 +42,4 @@ Current host tests cover:
 - Rule condition state tracking for engine, high-beam, and left-indicator events.
 - Rule runner evaluation for matched/unmatched conditions before role actions.
 - Rule text parser for the initial supported JSON rule condition/action grammar.
+- Output Manager PWM duty-cycle ownership and `pwm_allowed` enforcement.

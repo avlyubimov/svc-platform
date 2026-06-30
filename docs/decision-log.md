@@ -414,5 +414,14 @@ Decision: Firmware now has a host-testable rule text parser for
 against the same limited grammar.
 
 Reason: Configuration examples must not accept rule strings that firmware cannot
-understand. PWM values are currently translated to enable/disable role actions
-until duty-cycle output control is implemented.
+understand. The initial grammar established the safe rule-action boundary before
+full duty-cycle output control was added.
+
+## 2026-06-30 — Firmware PWM ownership in Output Manager
+
+Decision: Output Manager now owns per-output PWM duty-cycle state. Rule actions
+can request `0..100` duty; duty `0` disables the output, duty `1..100` enables
+the output, and partial duty is denied when `pwm_allowed` is false.
+
+Reason: PWM requests must remain behind the same safety boundary as on/off
+output state, budget checks, lockout, and role mapping.

@@ -128,6 +128,7 @@ svc_rule_text_status_t svc_rule_text_parse_action(
     }
 
     action->role = role;
+    action->pwm_duty_percent = (uint8_t)pwm_value;
     action->type = pwm_value == 0UL ? SVC_RULE_ACTION_DISABLE_ROLE : SVC_RULE_ACTION_ENABLE_ROLE;
     return SVC_RULE_TEXT_OK;
 }

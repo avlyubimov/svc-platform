@@ -11,7 +11,9 @@ typedef enum {
     SVC_OUTPUT_MANAGER_DENY_INVALID_CONFIG,
     SVC_OUTPUT_MANAGER_DENY_INVALID_OUTPUT,
     SVC_OUTPUT_MANAGER_DENY_LOCKED_OUT,
-    SVC_OUTPUT_MANAGER_DENY_BUDGET
+    SVC_OUTPUT_MANAGER_DENY_BUDGET,
+    SVC_OUTPUT_MANAGER_DENY_INVALID_PWM,
+    SVC_OUTPUT_MANAGER_DENY_PWM_NOT_ALLOWED
 } svc_output_manager_status_t;
 
 typedef struct {
@@ -19,12 +21,14 @@ typedef struct {
     svc_power_budget_decision_t budget_decision;
     uint16_t active_output_mask;
     uint16_t locked_output_mask;
+    uint8_t pwm_duty_percent;
 } svc_output_manager_result_t;
 
 typedef struct {
     const svc_device_config_t *config;
     uint16_t active_output_mask;
     uint16_t locked_output_mask;
+    uint8_t pwm_duty_percent[SVC_OUTPUT_COUNT];
 } svc_output_manager_t;
 
 bool svc_output_manager_init(
@@ -41,9 +45,19 @@ svc_output_manager_result_t svc_output_manager_request_disable(
     svc_output_manager_t *manager,
     svc_output_id_t output_id);
 
+svc_output_manager_result_t svc_output_manager_request_pwm(
+    svc_output_manager_t *manager,
+    svc_output_id_t output_id,
+    uint8_t duty_percent,
+    uint32_t measured_total_current_ma,
+    bool telemetry_valid);
+
 svc_output_manager_result_t svc_output_manager_apply_fault(
     svc_output_manager_t *manager,
     svc_output_id_t output_id);
 
 uint16_t svc_output_manager_active_mask(const svc_output_manager_t *manager);
 uint16_t svc_output_manager_locked_mask(const svc_output_manager_t *manager);
+uint8_t svc_output_manager_pwm_duty_percent(
+    const svc_output_manager_t *manager,
+    svc_output_id_t output_id);

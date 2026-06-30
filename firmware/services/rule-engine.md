@@ -31,8 +31,9 @@ Supported action strings:
 
 - `ROLE.pwm = 0..100`
 
-`0` maps to a disable-role action. Any positive PWM value currently maps to an
-enable-role action; duty-cycle control will be added separately.
+`0` maps to a disable-role action. Any positive PWM value maps to an enable-role
+action with that duty-cycle request. Output Manager enforces whether the target
+output allows partial PWM.
 
 ## Host-testable implementation
 

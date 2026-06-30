@@ -27,6 +27,7 @@ typedef enum {
 typedef struct {
     svc_rule_action_type_t type;
     output_role_t role;
+    uint8_t pwm_duty_percent;
 } svc_rule_action_t;
 
 typedef struct {

@@ -50,6 +50,7 @@ static void test_parse_positive_pwm_as_enable_action(void)
     assert(status == SVC_RULE_TEXT_OK);
     assert(action.type == SVC_RULE_ACTION_ENABLE_ROLE);
     assert(action.role == OUT_ROLE_FOG_LEFT);
+    assert(action.pwm_duty_percent == 100U);
 }
 
 static void test_parse_zero_pwm_as_disable_action(void)
@@ -63,6 +64,7 @@ static void test_parse_zero_pwm_as_disable_action(void)
     assert(status == SVC_RULE_TEXT_OK);
     assert(action.type == SVC_RULE_ACTION_DISABLE_ROLE);
     assert(action.role == OUT_ROLE_FOG_LEFT);
+    assert(action.pwm_duty_percent == 0U);
 }
 
 static void test_reject_unknown_action_role(void)
