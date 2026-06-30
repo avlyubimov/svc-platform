@@ -20,7 +20,7 @@ does not approve schematic freeze or PCB layout.
 ## Preliminary findings
 
 - TPS48110AQDGXRQ1 plus external 60 V MOSFET remains the preferred path for
-  high-current and medium-current channels.
+  all Rev.1 output channels.
 - SIDR626LDP-class MOSFET conduction losses are acceptable as a starting point,
   but SOA and thermal validation are still required for compressor inrush and
   heated-seat steady state.
@@ -29,16 +29,13 @@ does not approve schematic freeze or PCB layout.
 - SM8S33A-class input TVS is compatible with 60 V MOSFET planning but leaves
   limited voltage margin against 60 V absolute maximum ratings.
 - SM8S33A-class input TVS is not automatically compatible with 40 V integrated
-  smart switches. Low-current TPS2HB-class channels require a lower-clamp input
-  protection strategy, local protection, or fallback to the external-controller
-  output architecture.
+  smart switches. ADR-0011 resolves the Rev.1 conflict by moving OUT5, OUT8,
+  and OUT9 to the external-controller output architecture.
 
 ## Schematic blockers added
 
-- Resolve input TVS clamp voltage for any 40 V smart switch connected to the
-  protected battery rail.
-- Confirm whether OUT5/OUT8/OUT9 stay on TPS2HB-class smart switches or move to
-  the external TPS48110 plus MOSFET architecture.
+- Validate the low-current TPS48110 plus MOSFET implementation for OUT5, OUT8,
+  and OUT9.
 - Confirm MOSFET SOA for OUT2 with compressor startup/inrush assumptions.
 - Confirm thermal stack-up for all output classes in the intended enclosure.
 

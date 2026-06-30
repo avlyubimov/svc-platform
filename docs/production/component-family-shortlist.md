@@ -24,8 +24,8 @@ order.
 | LB-100 MCU | STM32H563 | STM32H573; STM32F407 for prototypes only | LQFP-100 preferred | STM32H5 target accepted in ADR-0005 |
 | Vehicle CAN transceiver | NXP TJA1051/TJA1057 | TI TCAN1042-Q1 | SOIC-8 or VSON/HVSON | CAN1 TX remains physically disabled by default |
 | Expansion CAN transceiver | TI TCAN1042-Q1 | NXP TJA1051/TJA1057 | SOIC-8 or VSON/HVSON | CAN2 may transmit for bench or accessory use |
-| High-side output controller | TI TPS4811-Q1 | TI TPS1211-Q1; TI TPS4810-Q1 | VSSOP/HTSSOP class | For high-current outputs with external N-MOSFETs |
-| Smart high-side switch | TI TPS2HB16-Q1 | TI TPS2HB35-Q1; TI TPS1H100-Q1 | HTSSOP class | Candidate for lower-current channels after thermal review |
+| High-side output controller | TI TPS4811-Q1 | TI TPS1211-Q1; TI TPS4810-Q1 | VSSOP/HTSSOP class | Rev.1 baseline for all PB-100 outputs with external N-MOSFETs |
+| Smart high-side switch | TI TPS2HB16-Q1 | TI TPS2HB35-Q1; TI TPS1H100-Q1 | HTSSOP class | Deferred low-current alternate after ADR-0011; requires lower-clamp strategy |
 | Output MOSFET | Infineon OptiMOS automotive 40-60 V | Vishay SQJQ automotive; onsemi F085 automotive | TDSON/PowerPAK/DPAK | Must pass SOA and thermal review per channel |
 | Current monitor | TI INA226 | TI INA228/INA229; integrated IMON from high-side controller | VSSOP/SOIC class | External monitor may be unnecessary on channels with accurate IMON |
 | Logic buck regulator | TI LM5164-Q1 | TI TPS54360B-Q1/TPS54360-Q1 | SOIC/HSOIC PowerPAD | LM5164-Q1 for low-IQ 1 A rail; TPS54360 family for higher 5 V current |
@@ -43,9 +43,9 @@ Detailed candidate MPNs for PB-100 schematic planning are tracked in
 
 The current strategy is:
 
-- High and medium outputs: TPS48110AQDGXRQ1-class high-side controller plus
+- All Rev.1 outputs: TPS48110AQDGXRQ1-class high-side controller plus
   external 60 V N-MOSFET.
-- Low-current outputs: TPS2HB35BQPWPRQ1-class integrated smart high-side switch.
+- Low-current integrated smart switches: deferred alternatives only.
 - Input reverse protection: LM74700QDBVRQ1-class ideal-diode controller.
 - Input transient clamp: SM8S33A-class load-dump TVS.
 

@@ -2,7 +2,7 @@ Protected item,Relevant limit,Protection candidate,Protection value,Preliminary 
 TPS48110 high-side controller,100V absolute family,SM8S33A-class TVS,53.3V clamp,Pass with margin,Confirm pulse waveform and local layout parasitics
 SIDR626LDP output MOSFET,60V VDS,SM8S33A-class TVS,53.3V clamp,Conditional limited margin,Validate transient overshoot or move to 80V MOSFET/lower clamp TVS
 LM74700 reverse controller,65V input range,SM8S33A-class TVS,53.3V clamp,Pass with margin,Confirm LM74700 variant absolute max and external MOSFET stress
-TPS2HB35 smart switch,40V load-dump class,SM8S33A-class TVS,53.3V clamp,Fail for direct protected rail,Use lower clamp rail/local protection or external-controller outputs
-TPS2HB35 smart switch,40V load-dump class,SM8S24A/SMCJ24A-class TVS,about 39V clamp,Conditional tight margin,Validate jump-start/load-dump and derating before schematic freeze
+TPS2HB35 smart switch,40V load-dump class,SM8S33A-class TVS,53.3V clamp,Deferred not Rev.1 baseline,Keep out unless future ADR adds lower clamp strategy
+TPS2HB35 smart switch,40V load-dump class,SM8S24A/SMCJ24A-class TVS,about 39V clamp,Optional future alternate,Validate jump-start load-dump and derating before any future use
 LM5164QDDATQ1 buck,100V input,SM8S33A-class TVS,53.3V clamp,Pass with margin,Confirm final buck input network and EMI components
 TPS54360B-Q1 buck,60V input class,SM8S33A-class TVS,53.3V clamp,Conditional,Confirm exact absolute max/load-dump rating before choosing this alternative

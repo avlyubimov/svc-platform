@@ -13,6 +13,7 @@ It is not a PCB layout package.
 - `docs/adr/ADR-0007-pb-100-high-side-output-switching.md`
 - `docs/adr/ADR-0008-pb-100-current-budget.md`
 - `docs/adr/ADR-0010-pb-100-power-path-candidate-strategy.md`
+- `docs/adr/ADR-0011-pb-100-low-current-output-stage.md`
 - `docs/production/component-family-shortlist.md`
 - `hardware/power-board/PB-100/PB-100-preliminary-validation.md`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
@@ -32,7 +33,7 @@ It is not a PCB layout package.
 |---|---|---:|---:|---|
 | High current | OUT2 | 20 A | 18 A | TPS48110AQDGXRQ1-class controller plus external 60 V N-MOSFET |
 | Medium current | OUT1, OUT3, OUT4, OUT6, OUT7, OUT10 | 10-15 A | 8-12 A | TPS48110AQDGXRQ1-class controller plus external 60 V N-MOSFET |
-| Low current | OUT5, OUT8, OUT9 | 5 A | 4 A | TPS2HB35BQPWPRQ1-class smart high-side switch |
+| Low current | OUT5, OUT8, OUT9 | 5 A | 4 A | TPS48110AQDGXRQ1-class controller plus external 60 V N-MOSFET |
 
 ## Required schematic blocks
 
@@ -99,7 +100,7 @@ Preliminary validation tables:
 - Track schematic-freeze readiness in
   `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`.
 - Validate candidate MPNs in `PB-100-power-path-candidates.csv`.
-- Resolve SM8S33A-class TVS clamp compatibility with 40 V smart switches.
+- Validate ADR-0011 low-current external-controller implementation.
 - Confirm high-side switch/controller thermal limits.
 - Confirm MOSFET SOA for OUT2 compressor startup/inrush.
 - Confirm TVS clamp voltage against high-side controller, MOSFET, and buck

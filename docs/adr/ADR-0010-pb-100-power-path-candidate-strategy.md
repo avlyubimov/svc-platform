@@ -3,6 +3,8 @@
 ## Status
 Accepted
 
+Superseded in part by ADR-0011 for low-current Rev.1 output channels.
+
 ## Context
 PB-100 uses generic high-side outputs. The output set includes one 18 A channel,
 six 8-12 A channels, and three 4 A channels.
@@ -41,3 +43,7 @@ loads at the cost of more schematic complexity and board area.
 
 Low-current channels remain simpler where integrated smart switches are
 appropriate.
+
+ADR-0011 changes the Rev.1 baseline so low-current outputs also use the external
+controller plus MOSFET architecture. Integrated smart switches remain deferred
+alternatives only.

@@ -91,7 +91,8 @@ have initial alternatives.
 Decision: ADR-0010 selects external smart high-side controller plus external
 60 V N-MOSFET for high/medium outputs, integrated smart high-side switches for
 low-current outputs, LM74700-class reverse protection, and SM8S33A-class input
-TVS sizing.
+TVS sizing. The low-current integrated-switch part is later superseded by
+ADR-0011 for the Rev.1 baseline.
 
 Reason: This keeps thermal and SOA margin for compressor, heated-seat, and
 lighting loads while retaining simpler integrated switches for low-current
@@ -115,3 +116,12 @@ PCB layout work.
 Reason: Architecture v1.0 authorizes schematic planning, but PCB layout must
 remain blocked until unresolved protection, thermal, pin-map, BOM, and CAN1
 listen-only implementation evidence is closed.
+
+## 2026-06-30 — PB-100 low-current output stage
+
+Decision: PB-100 Rev.1 uses TPS48110-class external-controller output stages for
+OUT5, OUT8, and OUT9 instead of direct 40 V integrated smart switches.
+
+Reason: This removes the SM8S33A-class TVS clamp conflict with 40 V smart
+switches while keeping low-current channel fuse and current-limit requirements
+unchanged.
