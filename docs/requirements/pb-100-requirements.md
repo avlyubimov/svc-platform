@@ -47,7 +47,7 @@ Profile #001. Physical outputs remain generic.
 Each output must support:
 
 - User-serviceable fuse.
-- Electronic switching.
+- High-side electronic switching.
 - PWM where listed.
 - Current measurement.
 - Overcurrent protection.
@@ -93,6 +93,8 @@ The exact pin map is deferred to schematic freeze.
 - Critical component selections require at least two alternatives.
 - Component availability for JLCPCB/PCBWay assembly must be checked before
   schematic freeze.
+- Initial component-family shortlist is tracked in
+  `docs/production/component-family-shortlist.md`.
 
 ## 9. Acceptance criteria
 

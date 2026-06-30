@@ -187,6 +187,8 @@ The current example configuration is
 - Critical components must have alternatives.
 - Component-family selection must be verified before schematic freeze.
 - Factory BOM and garage BOM remain separate production artifacts.
+- Initial component-family shortlist is tracked in
+  `docs/production/component-family-shortlist.md`.
 
 ## 11. Reference vehicle
 
@@ -220,11 +222,12 @@ stage design.
 
 Architecture v1.0 can be considered frozen only when all items are true:
 
-- ADR-0001 through ADR-0006 are accepted.
+- ADR-0001 through ADR-0007 are accepted.
 - PB-100 requirements are reviewed and accepted.
 - CAN1 read-only hardware policy is preserved in schematic requirements.
 - Output role mapping remains configuration-driven.
 - Critical component families have at least two viable alternatives.
+- Initial component-family shortlist is complete.
 - Factory and garage BOM split remains valid.
 - No KiCad layout work has started before requirements acceptance.
 

@@ -43,3 +43,26 @@ Decision: PB-100 baseline requirements are captured in ADR-0006 and
 
 Reason: Power Board requirements must be explicit before schematic planning and
 must not change later without ADR review.
+
+## 2026-06-30 — STM32H5 product target accepted
+
+Decision: ADR-0005 is accepted. LB-100 product target is STM32H563/H573 class,
+with STM32H563 LQFP-100 preferred for Rev.1 schematic planning.
+
+Reason: STM32H5 provides FDCAN, flash/RAM headroom, modern security features,
+and current supplier availability suitable for the product baseline.
+
+## 2026-06-30 — PB-100 high-side output switching
+
+Decision: PB-100 outputs use high-side switching, captured in ADR-0007.
+
+Reason: Automotive accessories normally share vehicle ground. High-side
+switching gives safer wiring behavior and clearer fault handling.
+
+## 2026-06-30 — Component-family shortlist
+
+Decision: Initial factory-assembly component families are documented in
+`docs/production/component-family-shortlist.md`.
+
+Reason: Architecture freeze needs at least two viable alternatives for critical
+components before schematic planning starts.
