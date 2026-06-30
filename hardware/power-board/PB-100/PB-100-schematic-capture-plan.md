@@ -34,6 +34,10 @@ Reference-to-sheet assignment is tracked in
 Schematic net-domain rules are tracked in
 `hardware/power-board/PB-100/PB-100-schematic-net-domain-plan.csv`.
 
+Schematic-level test point candidates are tracked in
+`hardware/power-board/PB-100/PB-100-test-point-plan.csv`; these rows do not
+lock footprints or placement.
+
 ## Capture order
 
 1. Open `hardware/power-board/PB-100/kicad/PB-100.kicad_pro`.
@@ -48,7 +52,9 @@ Schematic net-domain rules are tracked in
    output net expansion, then copy it to OUT1 through OUT10.
 9. Capture current and thermal telemetry sheets.
 10. Add CAN1 TX-disable hardware with Rev.1 TX route DNP/open.
-11. Run schematic ERC and update the freeze checklist with evidence.
+11. Add schematic test-point candidates from `PB-100-test-point-plan.csv`
+    without locking footprints or placement.
+12. Run schematic ERC and update the freeze checklist with evidence.
 
 ## Schematic rules
 
@@ -71,4 +77,6 @@ Schematic net-domain rules are tracked in
 - Updated PB-100 symbol-to-BOM map.
 - Updated BOM draft synchronized with chosen schematic symbols.
 - Updated readiness dashboard showing closed, conditional, and blocked gates.
+- Updated test-point plan for bring-up, telemetry, output, and CAN1 safety
+  validation points.
 - Updated freeze checklist evidence for all conditional gates.

@@ -825,3 +825,16 @@ expansion against the output matrix, controller template, sheet manifest, and
 Reason: Schematic capture should not rely on hand-expanding repeated output
 channel nets. A machine-checked expansion table keeps the ten-channel capture
 role-agnostic, repeatable, and aligned with the board-to-board interface.
+
+## 2026-06-30 — PB-100 test point plan
+
+Decision: PB-100 now has
+`hardware/power-board/PB-100/PB-100-test-point-plan.csv`, assigning schematic
+test-point references to rails, telemetry, CAN1 safety, and every output
+control/fault/current/fused net. `tools/validate_pb100.py` checks contiguous
+`TP###` refs, sheet ownership, required net coverage, JPB1-facing nets, CAN1 TX
+safety, and the no-footprint/no-placement-lock boundary.
+
+Reason: Bring-up and bench validation need planned measurement points before
+schematic capture. The test-point plan makes validation access explicit without
+starting layout or locking physical pads before schematic freeze.

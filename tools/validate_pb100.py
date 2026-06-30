@@ -266,6 +266,17 @@ VALIDATION_TRACEABILITY_COLUMNS = (
     "Pass condition",
     "Safety constraint",
 )
+TEST_POINT_PLAN_COLUMNS = (
+    "Test point ref",
+    "Net",
+    "Sheet",
+    "Signal class",
+    "Requirement",
+    "Population",
+    "Access intent",
+    "Validation target",
+    "Placement status",
+)
 REQUIRED_NET_PATTERNS = {
     "VBAT_RAW",
     "VBAT_PROT",
@@ -303,6 +314,7 @@ REQUIRED_READINESS_AREAS = {
     "Input power design values",
     "Logic power design values",
     "Input protection contract",
+    "Test point plan",
     "Logic power values",
     "BOM synchronization",
     "Assembly sourcing recheck",
@@ -2311,6 +2323,99 @@ def validate_validation_traceability() -> None:
         )
 
 
+def validate_test_point_plan() -> None:
+    path = PB100_DIR / "PB-100-test-point-plan.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty PB-100 test point plan: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in TEST_POINT_PLAN_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    manifest_rows = list(csv.DictReader((PB100_DIR / "PB-100-kicad-sheet-manifest.csv").open(newline="", encoding="utf-8")))
+    manifest_sheets = {row["Sheet file"].strip() for row in manifest_rows}
+    output_rows = list(csv.DictReader((PB100_DIR / "PB-100-output-channel-matrix.csv").open(newline="", encoding="utf-8")))
+    outputs = {row["Output"].strip() for row in output_rows}
+    b2b_rows = list(csv.DictReader((PB100_DIR / "PB-100-b2b-pin-map.csv").open(newline="", encoding="utf-8")))
+    b2b_nets = {row["Net"].strip() for row in b2b_rows}
+
+    required_nets = {
+        "GND",
+        "VBAT_RAW",
+        "VBAT_REV_PROT",
+        "VBAT_PROT",
+        "IIN_SHUNT_HI",
+        "IIN_SHUNT_LO",
+        "VBAT_SENSE",
+        "IIN_SENSE",
+        "PB_5V_OUT",
+        "PB_PWR_GOOD",
+        "LB_3V3_IO",
+        "TEMP_PCB",
+        "TEMP_PWR_A",
+        "TEMP_PWR_B",
+        "CAN1_TX_DISABLE_CMD",
+        "CAN1_TX_DISABLED_STATUS",
+    }
+    for output in outputs:
+        required_nets.update({f"{output}_CTL", f"{output}_FLT", f"{output}_IMON", f"{output}_FUSED"})
+
+    seen_refs = set()
+    seen_nets = set()
+    for expected_index, row in enumerate(rows, 1):
+        row_number = expected_index + 1
+        test_point_ref = row["Test point ref"].strip()
+        net = row["Net"].strip()
+        sheet = row["Sheet"].strip()
+        if test_point_ref in seen_refs:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate test point ref {test_point_ref}")
+        seen_refs.add(test_point_ref)
+        if test_point_ref != f"TP{expected_index:03d}":
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: test point refs must be "
+                f"contiguous TP###, expected TP{expected_index:03d}"
+            )
+        if net in seen_nets:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate test-point net {net}")
+        seen_nets.add(net)
+        if sheet not in manifest_sheets:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown sheet {sheet}")
+        for column in ("Signal class", "Requirement", "Population", "Access intent", "Validation target", "Placement status"):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        placement_status = row["Placement status"].lower()
+        if "schematic-review only" not in placement_status or "tbd" not in placement_status:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: placement status must remain schematic-review only/TBD")
+        if "final" in placement_status:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: test point placement must not be final")
+        if net == "CAN1_TX_ROUTE":
+            fail("CAN1_TX_ROUTE must not receive a test point in Rev.1 default planning")
+        if net == "CAN1_RX_ROUTE" and "dnp unless" not in row["Population"].lower():
+            fail("CAN1_RX_ROUTE test point row must remain DNP unless CAN1 crosses PB-100")
+        if net.endswith("_CTL") or net.endswith("_FLT") or net.endswith("_IMON"):
+            if net not in b2b_nets:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: {net} is missing from JPB1 pin map")
+        if net.endswith("_FUSED"):
+            if "no pcb test pad locked" not in row["Population"].lower():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: fused outputs must avoid locked PCB test pads")
+            if "high-current" not in row["Access intent"].lower():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: fused outputs need guarded high-current access intent")
+
+    missing_nets = sorted(required_nets - seen_nets)
+    if missing_nets:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required test-point nets: "
+            f"{', '.join(missing_nets)}"
+        )
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -2359,6 +2464,7 @@ def main() -> int:
     validate_can1_safety_verification()
     validate_assembly_sourcing_recheck()
     validate_validation_traceability()
+    validate_test_point_plan()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0

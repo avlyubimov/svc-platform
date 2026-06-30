@@ -75,6 +75,8 @@ Before marking this checklist `Closed`, the review packet must include:
 - Final input-power design value table.
 - Final logic-buck pin template.
 - Final logic-power design value table.
+- Final test-point plan with schematic refs, nets, and no footprint/placement
+  lock before layout authorization.
 - Final instance-symbol map linking every schematic reference to a symbol key.
 - Final sheet-reference map linking every schematic reference to a capture sheet.
 - Final schematic net-domain plan with safety rules.
@@ -92,3 +94,4 @@ Before marking this checklist `Closed`, the review packet must include:
 - Bench validation plan for protection, telemetry, current budget, and CAN1
   listen-only behavior.
 - Validation traceability register covering every conditional freeze gate.
+- Test-point plan covering rails, telemetry, outputs, and CAN1 safety.

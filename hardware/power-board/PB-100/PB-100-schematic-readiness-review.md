@@ -25,6 +25,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv`
 - `hardware/power-board/PB-100/PB-100-validation-traceability.csv`
+- `hardware/power-board/PB-100/PB-100-test-point-plan.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-matrix.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`
@@ -80,6 +81,7 @@ The schematic review packet consists of:
 | Logic power | LM5164 pin template, logic power design values, final buck current budget, EMI parts, UVLO, feedback, and power-good implementation |
 | Current telemetry | INA228 pin template, ADC scaling, filtering, calibration plan, and total-current monitor choice |
 | Thermal telemetry | Final sensor values, placement notes, and derating thresholds |
+| Test points | Bring-up, telemetry, output, fused-output, and CAN1 safety test points are defined without footprint or placement lock |
 | B2B interface | Connector MPN, pin assignment review, and LB-100 MCU resource binding |
 | CAN1 safety | DNP/open TX path, default disable state, status readback, DNP BOM ownership, firmware listen-only behavior, and future ADR hardware-action process |
 | Factory assembly | JLCPCB/PCBWay assembly class, distributor continuity, and alternates for critical MPNs; concrete symbol/footprint status from `PB-100-symbol-mpn-readiness.csv` and `pb100_assembly_sourcing_recheck.csv` |
