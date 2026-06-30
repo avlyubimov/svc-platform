@@ -17,6 +17,7 @@ It is not a PCB layout package.
 - `docs/can/can-safety.md`
 - `docs/production/component-family-shortlist.md`
 - `production/bom/pb100_symbol_bom_map.csv`
+- `production/bom/pb100_assembly_sourcing_recheck.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`
 - `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
@@ -176,3 +177,5 @@ Preliminary validation tables:
   absolute maximum ratings.
 - Confirm connector current ratings and derating.
 - Confirm JLCPCB/PCBWay assembly class for selected MPNs.
+- Close `production/bom/pb100_assembly_sourcing_recheck.csv` rows before
+  schematic freeze.

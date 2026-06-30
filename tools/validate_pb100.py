@@ -237,6 +237,17 @@ CAN1_SAFETY_VERIFICATION_COLUMNS = (
     "Pass condition",
     "Blocked change",
 )
+ASSEMBLY_SOURCING_RECHECK_COLUMNS = (
+    "Symbol key",
+    "Assembly owner",
+    "Preferred MPN or class",
+    "Recheck status",
+    "Recheck source",
+    "Alternate coverage",
+    "Factory action",
+    "Garage action",
+    "Freeze dependency",
+)
 REQUIRED_NET_PATTERNS = {
     "VBAT_RAW",
     "VBAT_PROT",
@@ -274,6 +285,7 @@ REQUIRED_READINESS_AREAS = {
     "Input protection contract",
     "Logic power values",
     "BOM synchronization",
+    "Assembly sourcing recheck",
     "CAN1 safety",
     "CAN1 safety verification",
     "Layout authorization",
@@ -2060,6 +2072,92 @@ def validate_can1_safety_verification() -> None:
         fail("CAN1 future TX process must require future ADR and hardware action")
 
 
+def validate_assembly_sourcing_recheck() -> None:
+    path = REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty assembly sourcing recheck register: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in ASSEMBLY_SOURCING_RECHECK_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    readiness_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-symbol-mpn-readiness.csv").open(newline="", encoding="utf-8"))
+    )
+    critical_readiness = {
+        row["Symbol key"].strip(): row
+        for row in readiness_rows
+        if row["Critical"].strip().lower() == "yes"
+    }
+    bom_rows = list(
+        csv.DictReader((REPO_ROOT / "production" / "bom" / "pb100_symbol_bom_map.csv").open(newline="", encoding="utf-8"))
+    )
+    bom_owner_by_key = {row["Symbol key"].strip(): row["Assembly owner"].strip() for row in bom_rows}
+
+    seen_keys = set()
+    for row_number, row in enumerate(rows, 2):
+        symbol_key = row["Symbol key"].strip()
+        if symbol_key in seen_keys:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate symbol key {symbol_key}")
+        seen_keys.add(symbol_key)
+        if symbol_key not in critical_readiness:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: symbol key {symbol_key} is not critical readiness key")
+        expected_owner = bom_owner_by_key.get(symbol_key)
+        if row["Assembly owner"].strip() != expected_owner:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: assembly owner must be "
+                f"{expected_owner}, got {row['Assembly owner'].strip()}"
+            )
+        for column in ASSEMBLY_SOURCING_RECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if "schematic freeze" not in row["Freeze dependency"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze dependency must reference schematic freeze")
+        row_text = " ".join(row.values()).lower()
+        if symbol_key == "CAN1_TX_DISABLE":
+            if "dnp/open" not in row_text or "no default-populated tx" not in row_text:
+                fail("CAN1_TX_DISABLE sourcing row must keep DNP/open and no default-populated TX explicit")
+        else:
+            if "recheck" not in row_text:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: sourcing row must keep recheck explicit")
+        if row["Assembly owner"].strip() == "Factory":
+            if row["Factory action"].strip() == "N/A":
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: factory row needs Factory action")
+            if row["Garage action"].strip() != "N/A":
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: factory row must use N/A Garage action")
+        elif row["Assembly owner"].strip() == "Garage":
+            if row["Garage action"].strip() == "N/A":
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: garage row needs Garage action")
+            if row["Factory action"].strip() != "N/A":
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: garage row must use N/A Factory action")
+        else:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid assembly owner {row['Assembly owner'].strip()}")
+        if "alternat" not in row["Alternate coverage"].lower() and symbol_key != "CAN1_TX_DISABLE":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: alternate coverage must remain explicit")
+        if symbol_key == "INPUT_REVERSE_FET":
+            if "toll" not in row_text or "40 a" not in row_text:
+                fail("INPUT_REVERSE_FET sourcing row must keep TOLL and 40 A review explicit")
+
+    missing_keys = sorted(critical_readiness.keys() - seen_keys)
+    extra_keys = sorted(seen_keys - critical_readiness.keys())
+    if missing_keys:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing critical sourcing keys: "
+            f"{', '.join(missing_keys)}"
+        )
+    if extra_keys:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} has non-critical sourcing keys: "
+            f"{', '.join(extra_keys)}"
+        )
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -2105,6 +2203,7 @@ def main() -> int:
     validate_input_power_design_values()
     validate_logic_power_design_values()
     validate_can1_safety_verification()
+    validate_assembly_sourcing_recheck()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0

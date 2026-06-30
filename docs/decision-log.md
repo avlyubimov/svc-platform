@@ -783,3 +783,19 @@ Reason: CAN1 safety is a constitutional rule, not a normal design preference.
 A separate checked matrix keeps the physical TX-disable policy visible across
 schematic, BOM, firmware safety, and future-change review before schematic
 freeze.
+
+## 2026-06-30 — PB-100 assembly sourcing recheck register
+
+Decision: PB-100 now has
+`production/bom/pb100_assembly_sourcing_recheck.csv`, covering every critical
+symbol readiness key with factory or garage ownership, recheck source,
+alternate coverage, owner-specific action, and schematic-freeze dependency.
+`tools/validate_pb100.py` checks the register against critical symbol readiness
+and `pb100_symbol_bom_map.csv`, requires factory/garage actions to match BOM
+ownership, keeps recheck language explicit, and preserves CAN1 DNP/open plus
+Q1/TOLL/40 A constraints.
+
+Reason: Component availability and assembly support can change. The design
+should not treat candidate MPNs as locked until JLCPCB/PCBWay, distributor,
+connector, fuse-holder, wire-gauge, and serviceability checks are repeated near
+schematic freeze.

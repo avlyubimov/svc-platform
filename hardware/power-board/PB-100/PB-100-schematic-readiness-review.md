@@ -61,6 +61,7 @@ The schematic review packet consists of:
 - `production/bom/factory_bom_draft.csv`
 - `production/bom/garage_bom_draft.csv`
 - `production/bom/pb100_symbol_bom_map.csv`
+- `production/bom/pb100_assembly_sourcing_recheck.csv`
 
 ## Conditional work before schematic freeze
 
@@ -78,8 +79,8 @@ The schematic review packet consists of:
 | Thermal telemetry | Final sensor values, placement notes, and derating thresholds |
 | B2B interface | Connector MPN, pin assignment review, and LB-100 MCU resource binding |
 | CAN1 safety | DNP/open TX path, default disable state, status readback, DNP BOM ownership, firmware listen-only behavior, and future ADR hardware-action process |
-| Factory assembly | JLCPCB/PCBWay assembly class and alternates for critical MPNs; concrete symbol/footprint status from `PB-100-symbol-mpn-readiness.csv` |
-| Garage assembly | Connector, fuse, enclosure, and harness items remain user-installable |
+| Factory assembly | JLCPCB/PCBWay assembly class, distributor continuity, and alternates for critical MPNs; concrete symbol/footprint status from `PB-100-symbol-mpn-readiness.csv` and `pb100_assembly_sourcing_recheck.csv` |
+| Garage assembly | Connector, fuse, enclosure, harness items, current derating, wire gauge, crimp tooling, and service access remain user-installable |
 
 ## Allowed next work
 
