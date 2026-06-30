@@ -31,6 +31,9 @@ KiCad sheet manifest:
 Reference-to-sheet assignment is tracked in
 `hardware/power-board/PB-100/PB-100-schematic-sheet-reference-map.csv`.
 
+Schematic net-domain rules are tracked in
+`hardware/power-board/PB-100/PB-100-schematic-net-domain-plan.csv`.
+
 ## Capture order
 
 1. Open `hardware/power-board/PB-100/kicad/PB-100.kicad_pro`.

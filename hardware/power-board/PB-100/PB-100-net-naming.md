@@ -70,3 +70,8 @@ Do not use names such as `FOG_LEFT`, `SEAT`, `USB`, `CHIGEE`, `DVR`, or
 | `CAN1_TX_ROUTE` | DNP/open and hardware-gated unless future ADR allows TX |
 
 Any CAN1 TX enable path requires a new ADR and an explicit hardware action.
+
+## Domain plan
+
+Schematic net domains and safety rules are tracked in
+`hardware/power-board/PB-100/PB-100-schematic-net-domain-plan.csv`.

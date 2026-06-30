@@ -667,3 +667,16 @@ child `.kicad_sch` files plus the sheet-reference map.
 Reason: Schematic capture needs a stable file-level scaffold. The manifest
 prevents child sheets from being added, removed, or renamed without updating
 the review package and automated checks.
+
+## 2026-06-30 — PB-100 schematic net-domain plan
+
+Decision: PB-100 now has
+`hardware/power-board/PB-100/PB-100-schematic-net-domain-plan.csv`, defining
+schematic-only net domains, default states, directions, primary sheets, and
+safety rules. Validation requires key power, telemetry, output, and CAN1 safety
+patterns and verifies `CAN1_TX_ROUTE` remains DNP/open unless a future ADR
+changes policy.
+
+Reason: Net naming alone is not enough for schematic capture. The design needs
+machine-checkable intent for power, logic, analog telemetry, generic outputs,
+and vehicle-CAN safety before any schematic freeze review.

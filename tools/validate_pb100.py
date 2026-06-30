@@ -128,6 +128,29 @@ KICAD_SHEET_MANIFEST_COLUMNS = (
     "Status",
     "Capture gate",
 )
+NET_DOMAIN_PLAN_COLUMNS = (
+    "Net pattern",
+    "Domain",
+    "Primary sheet",
+    "Direction",
+    "Default state",
+    "Safety rule",
+)
+REQUIRED_NET_PATTERNS = {
+    "VBAT_RAW",
+    "VBAT_PROT",
+    "PB_5V_OUT",
+    "LB_3V3_IO",
+    "OUTn_CTL",
+    "OUTn_FLT",
+    "OUTn_IMON",
+    "OUTn_LOAD",
+    "OUTn_FUSED",
+    "CAN1_TX_DISABLE_CMD",
+    "CAN1_TX_DISABLED_STATUS",
+    "CAN1_RX_ROUTE",
+    "CAN1_TX_ROUTE",
+}
 
 
 def fail(message: str) -> None:
@@ -831,6 +854,61 @@ def validate_kicad_sheet_manifest() -> None:
         )
 
 
+def validate_net_domain_plan() -> None:
+    path = PB100_DIR / "PB-100-schematic-net-domain-plan.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty schematic net-domain plan: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in NET_DOMAIN_PLAN_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    sheet_manifest_path = PB100_DIR / "PB-100-kicad-sheet-manifest.csv"
+    sheet_manifest_rows = list(csv.DictReader(sheet_manifest_path.open(newline="", encoding="utf-8")))
+    manifest_sheets = {row["Sheet file"].strip() for row in sheet_manifest_rows}
+    seen_patterns = set()
+    for row_number, row in enumerate(rows, 2):
+        net_pattern = row["Net pattern"].strip()
+        if not net_pattern:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty Net pattern")
+        if net_pattern in seen_patterns:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Net pattern {net_pattern}")
+        seen_patterns.add(net_pattern)
+        for forbidden_token in FORBIDDEN_ROLE_TOKENS:
+            if forbidden_token in net_pattern:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: role token in net pattern {net_pattern}")
+        for column in ("Domain", "Direction", "Default state", "Safety rule"):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        primary_sheet = row["Primary sheet"].strip()
+        if primary_sheet not in manifest_sheets:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown Primary sheet {primary_sheet}")
+
+    missing_patterns = sorted(REQUIRED_NET_PATTERNS - seen_patterns)
+    if missing_patterns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required net patterns: "
+            f"{', '.join(missing_patterns)}"
+        )
+
+    can_tx_rows = [row for row in rows if row["Net pattern"].strip() == "CAN1_TX_ROUTE"]
+    if len(can_tx_rows) != 1:
+        fail("CAN1_TX_ROUTE must appear exactly once in schematic net-domain plan")
+    can_tx_row = can_tx_rows[0]
+    default_state = can_tx_row["Default state"].lower()
+    safety_rule = can_tx_row["Safety rule"].lower()
+    if "dnp/open" not in default_state:
+        fail("CAN1_TX_ROUTE default state must remain DNP/open")
+    if "future adr" not in safety_rule:
+        fail("CAN1_TX_ROUTE safety rule must require a future ADR")
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -863,6 +941,7 @@ def main() -> int:
     validate_instance_symbol_map()
     validate_sheet_reference_map()
     validate_kicad_sheet_manifest()
+    validate_net_domain_plan()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0

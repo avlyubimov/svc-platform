@@ -1,0 +1,28 @@
+Net pattern,Domain,Primary sheet,Direction,Default state,Safety rule
+VBAT_RAW,High-current input,input-protection.kicad_sch,Input from harness,Fused by near-battery garage fuse,No PCB layout current geometry before schematic freeze
+VBAT_PROT,High-current protected,input-protection.kicad_sch,Internal protected rail,Present after reverse protection,Must remain protected by reverse MOSFET and input TVS strategy
+VBAT_SENSE,Analog telemetry,input-protection.kicad_sch,PB-100 to LB-100,Scaled battery voltage,Must stay in ADC-safe voltage range
+IIN_SENSE,Analog telemetry,input-protection.kicad_sch,PB-100 to LB-100,Zero-current baseline,Must be derived from total input current path
+PB_5V_OUT,Protected logic power,logic-power.kicad_sch,PB-100 to LB-100,Off until buck valid,Must not be confused with accessory power output
+PB_PWR_GOOD,Logic status,logic-power.kicad_sch,PB-100 to LB-100,Fault/inactive until valid,Must reflect protected logic rail validity
+LB_3V3_IO,Logic reference,b2b-interface.kicad_sch,LB-100 to PB-100,Absent when LB-100 unpowered,PB-100 outputs must default off without valid logic reference
+OUTn_CTL,Output control,outputs-1-10.kicad_sch,LB-100 to PB-100,Pulled low/off,Must remain generic OUTn control and role-mapped by configuration
+OUTn_FLT,Output fault,outputs-1-10.kicad_sch,PB-100 to LB-100,Fault until valid,Must report controller or output fault without role-specific naming
+OUTn_IMON,Output telemetry,outputs-1-10.kicad_sch,PB-100 to LB-100,Zero volts when off,Must be ADC-safe and calibrated per output
+OUTn_LOAD,Output power,outputs-1-10.kicad_sch,PB-100 to harness,Off by default,Must pass fuse current SOA and thermal review
+OUTn_SWITCHED,Output fuse input,outputs-1-10.kicad_sch,PB-100 to fuse,Off by default,Must feed user-serviceable fuse path only
+OUTn_FUSED,Output connector feed,outputs-1-10.kicad_sch,Fuse to harness,Off by default,Must remain generic and fuse-protected
+TEMP_PCB,Analog telemetry,telemetry.kicad_sch,PB-100 to LB-100,Sensor default,Missing stale or implausible telemetry is safe fault
+TEMP_PWR_A,Analog telemetry,telemetry.kicad_sch,PB-100 to LB-100,Sensor default,Missing stale or implausible telemetry is safe fault
+TEMP_PWR_B,Analog telemetry,telemetry.kicad_sch,PB-100 to LB-100,Sensor default,Missing stale or implausible telemetry is safe fault
+PB_ID_ADC,Board identity,telemetry.kicad_sch,PB-100 to LB-100,Revision divider,Must not control safety-critical behavior without validation
+PB_I2C_SCL,Digital monitor bus,telemetry.kicad_sch,LB-100 to PB-100,Pull-up required,Optional monitor bus must not be required for safe output off state
+PB_I2C_SDA,Digital monitor bus,telemetry.kicad_sch,LB-100/PB-100,Pull-up required,Optional monitor bus must not be required for safe output off state
+PB_FAULT,Board fault,telemetry.kicad_sch,PB-100 to LB-100,Fault until valid,Must summarize board-level fault state
+CAN1_TX_DISABLE_CMD,CAN safety,can1-safety.kicad_sch,LB-100 to PB-100,Disable asserted by hardware pull,Default must physically disable vehicle CAN TX path
+CAN1_TX_DISABLED_STATUS,CAN safety,can1-safety.kicad_sch,PB-100 to LB-100,Asserted when disabled,Must report physical disabled state where safety gate crosses PB-100
+CAN1_RX_ROUTE,CAN receive,can1-safety.kicad_sch,PB-100 to LB-100,DNP unless CAN1 crosses PB-100,May be populated independently for listen-only reception
+CAN1_TX_ROUTE,CAN transmit DNP,can1-safety.kicad_sch,LB-100 to PB-100,DNP/open by default,Must remain DNP/open unless a future ADR changes policy
+CAN2_RX_ROUTE,Expansion CAN,can1-safety.kicad_sch,PB-100 to LB-100,DNP by default,Expansion only not vehicle CAN
+CAN2_TX_ROUTE,Expansion CAN,can1-safety.kicad_sch,LB-100 to PB-100,DNP by default,Expansion only not vehicle CAN
+SPARE_*,Reserve,b2b-interface.kicad_sch,Mixed,NC,Must not carry hidden role-specific behavior before schematic review

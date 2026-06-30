@@ -25,6 +25,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-preliminary-validation.md`
 - `hardware/power-board/PB-100/PB-100-net-naming.md`
+- `hardware/power-board/PB-100/PB-100-schematic-net-domain-plan.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-capture-plan.md`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
 - `hardware/power-board/PB-100/PB-100-schematic-readiness-review.md`
