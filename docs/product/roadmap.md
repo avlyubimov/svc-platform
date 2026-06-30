@@ -67,6 +67,7 @@ Current host-tested services:
 - Output Manager PWM duty-cycle state
 - Telemetry Snapshot
 - Telemetry-backed safety/rule wrappers
+- Thermal Protection service
 
 ## Phase 5 — BMW K25 integration
 - harness

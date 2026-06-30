@@ -34,6 +34,8 @@ The map is tied to thermal zones, not accessory roles.
 - Output Manager must derate or shut down outputs based on board and power-zone
   thermal state.
 - Thermal faults must be logged with the affected generic output or board zone.
+- Firmware now has a host-testable Thermal Protection service for initial
+  allow/derate/cutoff decisions before driver integration.
 
 ## Schematic requirements
 

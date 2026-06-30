@@ -5,13 +5,14 @@ and safety services.
 
 ## Initial responsibilities
 
-- Store battery voltage, total input current, and per-output current samples.
+- Store battery voltage, thermal zone temperatures, total input current, and
+  per-output current samples.
 - Track sample validity independently from sample values.
 - Track update timestamps for stale-data checks.
 - Provide power-budget and battery-service input structs.
 - Reject invalid output IDs for per-output current updates.
-- Feed System Safety and Rule Engine wrapper APIs so callers do not pass raw
-  validity flags manually.
+- Feed System Safety, Rule Engine, and Thermal Protection wrapper APIs so callers
+  do not pass raw validity flags manually.
 
 ## Safety contract
 

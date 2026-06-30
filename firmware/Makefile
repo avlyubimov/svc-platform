@@ -18,6 +18,7 @@ RULE_CONDITION_TEST := $(BUILD_DIR)/test_rule_condition
 RULE_ENGINE_TEST := $(BUILD_DIR)/test_rule_engine
 RULE_TEXT_TEST := $(BUILD_DIR)/test_rule_text
 TELEMETRY_TEST := $(BUILD_DIR)/test_telemetry
+THERMAL_SERVICE_TEST := $(BUILD_DIR)/test_thermal_service
 CONFIG_VALIDATOR_SRCS := \
 	core/svc_config_defaults.c \
 	services/battery_service.c \
@@ -27,6 +28,7 @@ CONFIG_VALIDATOR_SRCS := \
 	services/output_manager.c \
 	services/system_safety.c \
 	services/telemetry.c \
+	services/thermal_service.c \
 	tests/test_config_validator.c
 POWER_BUDGET_SRCS := \
 	core/svc_config_defaults.c \
@@ -38,6 +40,8 @@ OUTPUT_MANAGER_SRCS := \
 	services/config_validator.c \
 	services/power_budget.c \
 	services/output_manager.c \
+	services/telemetry.c \
+	services/thermal_service.c \
 	tests/test_output_manager.c
 BATTERY_SERVICE_SRCS := \
 	core/svc_config_defaults.c \
@@ -54,6 +58,8 @@ EVENT_DISPATCHER_SRCS := \
 	services/event_dispatcher.c \
 	services/power_budget.c \
 	services/output_manager.c \
+	services/telemetry.c \
+	services/thermal_service.c \
 	tests/test_event_dispatcher.c
 EVENT_LOG_SRCS := \
 	services/event_log.c \
@@ -70,6 +76,7 @@ SYSTEM_SAFETY_SRCS := \
 	services/output_manager.c \
 	services/system_safety.c \
 	services/telemetry.c \
+	services/thermal_service.c \
 	tests/test_system_safety.c
 ROLE_RESOLVER_SRCS := \
 	core/svc_config_defaults.c \
@@ -77,6 +84,8 @@ ROLE_RESOLVER_SRCS := \
 	services/config_validator.c \
 	services/power_budget.c \
 	services/role_resolver.c \
+	services/telemetry.c \
+	services/thermal_service.c \
 	tests/test_role_resolver.c
 RULE_CONDITION_SRCS := \
 	services/rule_condition.c \
@@ -91,6 +100,7 @@ RULE_ENGINE_SRCS := \
 	services/role_resolver.c \
 	services/rule_engine.c \
 	services/telemetry.c \
+	services/thermal_service.c \
 	tests/test_rule_engine.c
 RULE_TEXT_SRCS := \
 	core/svc_config_defaults.c \
@@ -103,10 +113,16 @@ RULE_TEXT_SRCS := \
 	services/rule_engine.c \
 	services/rule_text.c \
 	services/telemetry.c \
+	services/thermal_service.c \
 	tests/test_rule_text.c
 TELEMETRY_SRCS := \
 	services/telemetry.c \
 	tests/test_telemetry.c
+THERMAL_SERVICE_SRCS := \
+	core/svc_config_defaults.c \
+	services/telemetry.c \
+	services/thermal_service.c \
+	tests/test_thermal_service.c
 HOST_TESTS := \
 	$(CONFIG_VALIDATOR_TEST) \
 	$(POWER_BUDGET_TEST) \
@@ -121,7 +137,8 @@ HOST_TESTS := \
 	$(RULE_CONDITION_TEST) \
 	$(RULE_ENGINE_TEST) \
 	$(RULE_TEXT_TEST) \
-	$(TELEMETRY_TEST)
+	$(TELEMETRY_TEST) \
+	$(THERMAL_SERVICE_TEST)
 
 .PHONY: test clean
 
@@ -140,6 +157,7 @@ test: $(HOST_TESTS)
 	$(RULE_ENGINE_TEST)
 	$(RULE_TEXT_TEST)
 	$(TELEMETRY_TEST)
+	$(THERMAL_SERVICE_TEST)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
@@ -184,6 +202,9 @@ $(RULE_TEXT_TEST): $(RULE_TEXT_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(TELEMETRY_TEST): $(TELEMETRY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
+
+$(THERMAL_SERVICE_TEST): $(THERMAL_SERVICE_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 clean:

@@ -49,3 +49,4 @@ Current host tests cover:
   per-output current samples.
 - Telemetry-backed System Safety and Rule Engine wrappers for stale-data fail
   safe behavior.
+- Thermal Protection allow/derate/cutoff decisions for PB-100 thermal zones.

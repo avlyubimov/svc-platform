@@ -78,7 +78,7 @@ def decimal_amps_to_ma(value: Any, path: str) -> int:
 def parse_defines() -> dict[str, int]:
     defines: dict[str, int] = {}
     for text in (read_text(SVC_CONFIG_PATH), read_text(POWER_BUDGET_PATH)):
-        for name, value in re.findall(r"#define\s+([A-Z0-9_]+)\s+(\d+)U", text):
+        for name, value in re.findall(r"#define\s+([A-Z0-9_]+)\s+(-?\d+)U?", text):
             defines[name] = int(value)
     return defines
 
@@ -181,6 +181,27 @@ def validate_battery(config: dict[str, Any], defines: dict[str, int]) -> None:
     for key, expected_value in expected.items():
         if actual[key] != expected_value:
             fail(f"{key}={actual[key]} does not match C default {expected_value}")
+
+
+def validate_thermal(config: dict[str, Any], defines: dict[str, int]) -> None:
+    thermal = require_dict(config, "thermal")
+    expected = {
+        "warn_c": defines["SVC_DEFAULT_THERMAL_WARN_C"],
+        "cutoff_c": defines["SVC_DEFAULT_THERMAL_CUTOFF_C"],
+        "recovery_c": defines["SVC_DEFAULT_THERMAL_RECOVERY_C"],
+    }
+
+    for zone_key in ("pcb", "power_zone_a", "power_zone_b"):
+        zone = require_dict(thermal, zone_key)
+        actual = {
+            "warn_c": decimal_to_int(zone.get("warn_c"), f"thermal.{zone_key}.warn_c"),
+            "cutoff_c": decimal_to_int(zone.get("cutoff_c"), f"thermal.{zone_key}.cutoff_c"),
+            "recovery_c": decimal_to_int(zone.get("recovery_c"), f"thermal.{zone_key}.recovery_c"),
+        }
+        if not actual["recovery_c"] < actual["warn_c"] < actual["cutoff_c"]:
+            fail(f"thermal.{zone_key} thresholds must satisfy recovery_c < warn_c < cutoff_c")
+        if actual != expected:
+            fail(f"thermal.{zone_key} does not match C defaults: {actual} != {expected}")
 
 
 def validate_power_budget(config: dict[str, Any], defines: dict[str, int]) -> None:
@@ -286,6 +307,7 @@ def main() -> int:
     validate_schema(schema, allowed_roles)
     require_dict(config, "device")
     validate_battery(config, defines)
+    validate_thermal(config, defines)
     validate_power_budget(config, defines)
     validate_outputs(config, allowed_roles)
     validate_rules(config, allowed_roles)

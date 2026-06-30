@@ -7,6 +7,11 @@ const svc_device_config_t svc_default_config = {
         .recovery_mv = SVC_DEFAULT_BATTERY_RECOVERY_MV,
         .shutdown_delay_s = SVC_DEFAULT_BATTERY_SHUTDOWN_DELAY_S
     },
+    .thermal = {
+        {SVC_DEFAULT_THERMAL_WARN_C, SVC_DEFAULT_THERMAL_CUTOFF_C, SVC_DEFAULT_THERMAL_RECOVERY_C},
+        {SVC_DEFAULT_THERMAL_WARN_C, SVC_DEFAULT_THERMAL_CUTOFF_C, SVC_DEFAULT_THERMAL_RECOVERY_C},
+        {SVC_DEFAULT_THERMAL_WARN_C, SVC_DEFAULT_THERMAL_CUTOFF_C, SVC_DEFAULT_THERMAL_RECOVERY_C}
+    },
     .power_budget = {
         .total_current_limit_ma = SVC_DEFAULT_TOTAL_CURRENT_LIMIT_MA,
         .shed_order = {

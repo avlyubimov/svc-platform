@@ -14,6 +14,23 @@
     "recovery_v": 12.4,
     "shutdown_delay_s": 30
   },
+  "thermal": {
+    "pcb": {
+      "warn_c": 85,
+      "cutoff_c": 105,
+      "recovery_c": 75
+    },
+    "power_zone_a": {
+      "warn_c": 85,
+      "cutoff_c": 105,
+      "recovery_c": 75
+    },
+    "power_zone_b": {
+      "warn_c": 85,
+      "cutoff_c": 105,
+      "recovery_c": 75
+    }
+  },
   "power_budget": {
     "total_current_limit_a": 40,
     "shed_priority_order": [

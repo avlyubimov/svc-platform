@@ -57,6 +57,17 @@ static void test_invalid_power_budget_config_is_rejected(void)
     assert(result.output_index == SVC_CONFIG_OUTPUT_INDEX_NONE);
 }
 
+static void test_invalid_thermal_config_is_rejected(void)
+{
+    svc_device_config_t config = svc_default_config;
+    config.thermal[SVC_THERMAL_ZONE_PCB].recovery_c = config.thermal[SVC_THERMAL_ZONE_PCB].warn_c;
+
+    const svc_config_validation_result_t result = svc_config_validate_device(&config);
+
+    assert(result.status == SVC_CONFIG_INVALID_THERMAL);
+    assert(result.output_index == SVC_CONFIG_OUTPUT_INDEX_NONE);
+}
+
 static void test_output_manager_rejects_invalid_role_config(void)
 {
     svc_device_config_t config = svc_default_config;
@@ -83,6 +94,7 @@ int main(void)
     test_none_role_is_valid();
     test_invalid_role_is_rejected_without_role_to_output_assumption();
     test_invalid_battery_config_is_rejected();
+    test_invalid_thermal_config_is_rejected();
     test_invalid_power_budget_config_is_rejected();
     test_output_manager_rejects_invalid_role_config();
     test_system_safety_rejects_invalid_role_config();

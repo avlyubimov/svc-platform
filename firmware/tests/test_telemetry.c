@@ -68,6 +68,31 @@ static void test_output_current_validity_and_invalid_output(void)
     assert(!svc_telemetry_output_current_is_valid(&snapshot, (svc_output_id_t)SVC_OUTPUT_COUNT, 100U, SVC_TELEMETRY_DEFAULT_STALE_MS));
 }
 
+static void test_thermal_validity_and_stale_input(void)
+{
+    svc_telemetry_snapshot_t snapshot = {0};
+    svc_telemetry_snapshot_init(&snapshot);
+
+    assert(svc_telemetry_update_thermal(&snapshot, SVC_THERMAL_ZONE_PWR_A, 85, true, 100U));
+    assert(svc_telemetry_thermal_is_valid(&snapshot, SVC_THERMAL_ZONE_PWR_A, 100U, SVC_TELEMETRY_DEFAULT_STALE_MS));
+
+    const svc_telemetry_thermal_input_t fresh = svc_telemetry_thermal_input(
+        &snapshot,
+        SVC_THERMAL_ZONE_PWR_A,
+        100U,
+        SVC_TELEMETRY_DEFAULT_STALE_MS);
+    assert(fresh.measured_temperature_c == 85);
+    assert(fresh.telemetry_valid);
+
+    const svc_telemetry_thermal_input_t stale = svc_telemetry_thermal_input(
+        &snapshot,
+        SVC_THERMAL_ZONE_PWR_A,
+        1200U,
+        SVC_TELEMETRY_DEFAULT_STALE_MS);
+    assert(stale.measured_temperature_c == 85);
+    assert(!stale.telemetry_valid);
+}
+
 int main(void)
 {
     test_init_marks_all_measurements_invalid();
@@ -75,5 +100,6 @@ int main(void)
     test_invalid_battery_sample_fails_validity_even_when_fresh();
     test_total_current_power_budget_input();
     test_output_current_validity_and_invalid_output();
+    test_thermal_validity_and_stale_input();
     return 0;
 }

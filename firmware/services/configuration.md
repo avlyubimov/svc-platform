@@ -7,6 +7,7 @@ channel constants.
 ## Initial validation
 
 - Battery thresholds must be valid.
+- Thermal thresholds must satisfy `recovery_c < warn_c < cutoff_c`.
 - Power budget and output electrical limits must be valid.
 - Output IDs must remain contiguous `OUT1`..`OUT10`.
 - Output roles must be known enum values.

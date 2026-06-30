@@ -484,3 +484,13 @@ Decision: `tools/validate_pb100.py` now runs KiCad schematic ERC for PB-100 when
 Reason: The repository now has a KiCad 10 schematic scaffold. Automated ERC
 should be part of local final-readiness checks without making CI depend on KiCad
 until the CI image explicitly installs it.
+
+## 2026-06-30 — Firmware thermal protection service
+
+Decision: Firmware now has a host-testable Thermal Protection service for
+PB-100 `TEMP_PCB`, `TEMP_PWR_A`, and `TEMP_PWR_B` zones with allow, derate, and
+cutoff actions plus per-zone cutoff latching.
+
+Reason: PB-100 requirements treat missing, stale, or implausible thermal
+telemetry as a safe fault. Thermal thresholds must remain configuration values
+and must not encode accessory roles.

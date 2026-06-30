@@ -11,6 +11,10 @@
 #define SVC_DEFAULT_BATTERY_CUTOFF_MV 11800U
 #define SVC_DEFAULT_BATTERY_RECOVERY_MV 12400U
 #define SVC_DEFAULT_BATTERY_SHUTDOWN_DELAY_S 30U
+#define SVC_THERMAL_ZONE_COUNT 3U
+#define SVC_DEFAULT_THERMAL_WARN_C 85
+#define SVC_DEFAULT_THERMAL_CUTOFF_C 105
+#define SVC_DEFAULT_THERMAL_RECOVERY_C 75
 
 typedef enum {
     SVC_OUTPUT_OUT1 = 0,
@@ -30,6 +34,12 @@ typedef enum {
     SVC_PRIORITY_B,
     SVC_PRIORITY_C
 } svc_load_priority_t;
+
+typedef enum {
+    SVC_THERMAL_ZONE_PCB = 0,
+    SVC_THERMAL_ZONE_PWR_A,
+    SVC_THERMAL_ZONE_PWR_B
+} svc_thermal_zone_t;
 
 typedef struct {
     svc_output_id_t id;
@@ -53,7 +63,14 @@ typedef struct {
 } svc_battery_config_t;
 
 typedef struct {
+    int16_t warn_c;
+    int16_t cutoff_c;
+    int16_t recovery_c;
+} svc_thermal_zone_config_t;
+
+typedef struct {
     svc_battery_config_t battery;
+    svc_thermal_zone_config_t thermal[SVC_THERMAL_ZONE_COUNT];
     svc_power_budget_config_t power_budget;
     svc_output_config_t outputs[SVC_OUTPUT_COUNT];
 } svc_device_config_t;

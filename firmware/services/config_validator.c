@@ -2,6 +2,7 @@
 
 #include "battery_service.h"
 #include "power_budget.h"
+#include "thermal_service.h"
 
 static svc_config_validation_result_t make_result(
     svc_config_status_t status,
@@ -25,6 +26,9 @@ svc_config_validation_result_t svc_config_validate_device(const svc_device_confi
     }
     if (!svc_battery_config_is_valid(&config->battery)) {
         return make_result(SVC_CONFIG_INVALID_BATTERY, SVC_CONFIG_OUTPUT_INDEX_NONE);
+    }
+    if (!svc_thermal_config_is_valid(config)) {
+        return make_result(SVC_CONFIG_INVALID_THERMAL, SVC_CONFIG_OUTPUT_INDEX_NONE);
     }
     if (!svc_power_budget_validate_config(config)) {
         return make_result(SVC_CONFIG_INVALID_POWER_BUDGET, SVC_CONFIG_OUTPUT_INDEX_NONE);

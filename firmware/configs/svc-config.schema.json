@@ -6,6 +6,7 @@
   "required": [
     "device",
     "battery",
+    "thermal",
     "power_budget",
     "outputs"
   ],
@@ -78,6 +79,26 @@
         "shutdown_delay_s": {
           "type": "integer",
           "minimum": 1
+        }
+      }
+    },
+    "thermal": {
+      "type": "object",
+      "required": [
+        "pcb",
+        "power_zone_a",
+        "power_zone_b"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "pcb": {
+          "$ref": "#/$defs/thermalZone"
+        },
+        "power_zone_a": {
+          "$ref": "#/$defs/thermalZone"
+        },
+        "power_zone_b": {
+          "$ref": "#/$defs/thermalZone"
         }
       }
     },
@@ -227,6 +248,26 @@
       "type": "integer",
       "minimum": 0,
       "maximum": 100
+    },
+    "thermalZone": {
+      "type": "object",
+      "required": [
+        "warn_c",
+        "cutoff_c",
+        "recovery_c"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "warn_c": {
+          "type": "integer"
+        },
+        "cutoff_c": {
+          "type": "integer"
+        },
+        "recovery_c": {
+          "type": "integer"
+        }
+      }
     },
     "rule": {
       "type": "object",
