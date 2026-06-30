@@ -1,0 +1,5 @@
+Case,Current A,Duration,Rds ohm,Temperature multiplier,Estimated conduction W,Estimated conduction energy J,Validation result,Required action
+OUT2 continuous configured limit,18,continuous,0.0021,2.0,1.36,N/A,Steady-state estimate,Validate board and enclosure thermal rise
+OUT2 compressor startup pulse,40,1 s,0.0021,2.0,6.72,6.72,Preliminary envelope only,Confirm FET pulse SOA and controller fully-enhanced behavior
+OUT2 fast inrush transient,80,100 ms,0.0021,2.0,26.88,2.69,Preliminary envelope only,Confirm fuse controller and FET pulse SOA
+OUT2 hard short linear limit,18,10 ms max,N/A,N/A,N/A,N/A,Must fault quickly,Controller must not hold linear current limit indefinitely

@@ -11,7 +11,7 @@ Logic,Lux sensor,VEML7700/OPT3001,SMD,1,Factory,Core,Fog logic
 Logic,Temp sensor,TMP117/NTC,SMD,2,Factory,Core,PCB + power zone temp
 Power,Current sensor,TPS48110 IMON or TI INA226/INA228/INA229,VSSOP/SOIC class,10,Factory,Core,Prefer integrated IMON where accuracy is sufficient
 Power,High-side switch/controller,TPS48110AQDGXRQ1-class for all Rev.1 outputs,VSSOP/HTSSOP,10,Factory,Core,Integrated smart switches deferred by ADR-0011
-Power,MOSFET,SIDR626LDP-T1-RE3 or JMSL0606AGQ-13,PowerPAK-SO-8DC/PDFN5x6,10,Factory,Core,External FET channels require SOA and thermal validation
+Power,MOSFET,SIDR626LDP-T1-RE3 or JMSL0606AGQ-13; OUT2 may require TOLL/LFPAK or parallel FET escape path,PowerPAK-SO-8DC/PDFN5x6/TOLL/LFPAK,10,Factory,Core,External FET channels require SOA and thermal validation
 Power,Input reverse MOSFET,IAUTN06S5N008ATMA1 preferred; BUK7S1R2-80M or dual SIDR626LDP alternatives,TOLL/LFPAK88/PowerPAK,1-2,Factory,Core,Single 2.1mOhm MOSFET rejected for 40A thermal
 Power,TVS protection,SM8S33A class for 60V+ Rev.1 output path; lower-clamp TVS only if smart-switch rail returns,SMD/THT,1,Factory,Core,Clamp voltage must match every protected device limit
 Power,Reverse protection,LM74700QDBVRQ1 or LM74700QDRQ1; LM74502-Q1 alternative,SOT-23/SOIC plus external FET,1,Factory,Core,Input reverse polarity

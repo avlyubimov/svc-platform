@@ -18,6 +18,7 @@ It is not a PCB layout package.
 - `docs/production/component-family-shortlist.md`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
+- `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-preliminary-validation.md`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
 
@@ -92,6 +93,8 @@ requires SOA, thermal, clamp-voltage, and assembly-class validation.
 Preliminary validation tables:
 
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
+- `hardware/power-board/PB-100/PB-100-out2-soa.md`
+- `hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-estimates.csv`
 - `hardware/power-board/PB-100/PB-100-protection-validation.csv`
 
@@ -111,7 +114,8 @@ Preliminary validation tables:
 - Validate candidate MPNs in `PB-100-power-path-candidates.csv`.
 - Validate ADR-0011 low-current external-controller implementation.
 - Confirm high-side switch/controller thermal limits.
-- Confirm MOSFET SOA for OUT2 compressor startup/inrush.
+- Confirm detailed MOSFET SOA for OUT2 against
+  `hardware/power-board/PB-100/PB-100-out2-soa.md`.
 - Confirm TVS clamp voltage against high-side controller, MOSFET, and buck
   absolute maximum ratings.
 - Confirm connector current ratings and derating.

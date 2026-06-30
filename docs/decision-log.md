@@ -155,3 +155,13 @@ Reason: A single 2.1 mOhm MOSFET dissipates about 6.72 W at the 40 A board
 budget with the conservative thermal multiplier. The preferred 0.76 mOhm TOLL
 class reduces the estimate to about 2.43 W, with an 80 V LFPAK88 alternate and a
 dual-PowerPAK fallback retained for sourcing and assembly risk.
+
+## 2026-06-30 — OUT2 startup/inrush SOA envelope
+
+Decision: OUT2 schematic planning uses a defined startup/inrush envelope and
+keeps a larger or parallel MOSFET escape path if SIDR626LDP-class SOA is not
+confirmed.
+
+Reason: OUT2 is the highest-risk output because the reference compressor load
+can create startup and fault pulses beyond the 18 A continuous current limit.
+The schematic must bound these pulses before PCB layout.

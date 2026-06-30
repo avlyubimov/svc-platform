@@ -30,7 +30,7 @@ this checklist can close.
 | CAN1 safety policy | Conditional | `docs/adr/ADR-0002-can-read-only-default.md`, `docs/can/can-safety.md`, `hardware/power-board/PB-100/PB-100-can1-tx-disable.md` | Schematic implements DNP/open TX path, default disable state, and LB-100-visible disabled status |
 | Board current budget | Conditional | `docs/adr/ADR-0008-pb-100-current-budget.md` | Input measurement, connector ratings, copper/thermal assumptions, and firmware-visible budget enforcement are all represented in schematic inputs |
 | Board-to-board interface | Conditional | `hardware/power-board/PB-100/PB-100-b2b-pin-budget.csv`, `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv` | Connector MPN and LB-100 MCU resource binding are reviewed against the pin map |
-| High/medium output stage | Conditional | `docs/adr/ADR-0010-pb-100-power-path-candidate-strategy.md`, `hardware/power-board/PB-100/PB-100-power-path-candidates.csv` | Controller, MOSFET, sense path, fuse, and inductive-load protection are validated per output class |
+| High/medium output stage | Conditional | `docs/adr/ADR-0010-pb-100-power-path-candidate-strategy.md`, `hardware/power-board/PB-100/PB-100-power-path-candidates.csv`, `hardware/power-board/PB-100/PB-100-out2-soa.md` | Controller, MOSFET, sense path, fuse, and inductive-load protection are validated per output class |
 | Low-current output stage | Conditional | `docs/adr/ADR-0011-pb-100-low-current-output-stage.md`, `hardware/power-board/PB-100/PB-100-preliminary-validation.md` | OUT5/OUT8/OUT9 external-controller implementation is validated without a direct 40 V smart-switch rail |
 | Input reverse protection | Conditional | `hardware/power-board/PB-100/PB-100-power-path-candidates.csv`, `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`, `hardware/power-board/PB-100/PB-100-thermal-estimates.csv` | Selected input MOSFET package and copper strategy pass 40 A thermal and SOA review |
 | TVS/load-dump protection | Conditional | `hardware/power-board/PB-100/PB-100-protection-validation.csv` | Clamp strategy is compatible with every downstream absolute maximum rating |
@@ -43,15 +43,15 @@ this checklist can close.
 
 ## Active blockers
 
-| ID | Blocker | Required resolution |
-|---|---|---|
-| PB-FRZ-002 | OUT2 compressor startup/inrush SOA is not validated | Add MOSFET SOA evidence for expected inrush pulse and thermal recovery |
+No active planning blockers remain. Conditional gates still require schematic
+evidence before freeze.
 
 ## Resolved blockers
 
 | ID | Resolution | Evidence |
 |---|---|---|
 | PB-FRZ-001 | OUT5/OUT8/OUT9 moved to external controller plus MOSFET Rev.1 baseline | `docs/adr/ADR-0011-pb-100-low-current-output-stage.md` |
+| PB-FRZ-002 | OUT2 startup/inrush SOA envelope and escape strategy defined | `hardware/power-board/PB-100/PB-100-out2-soa.md` |
 | PB-FRZ-003 | Dedicated low-Rds input MOSFET strategy selected for 40 A reverse protection | `hardware/power-board/PB-100/PB-100-input-reverse-protection.md` |
 | PB-FRZ-004 | `JPB1` board-to-board schematic-planning pin map created | `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv` |
 | PB-FRZ-005 | CAN1 TX-disable schematic input created with DNP/open TX default and status readback | `hardware/power-board/PB-100/PB-100-can1-tx-disable.md` |

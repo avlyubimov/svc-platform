@@ -26,6 +26,9 @@ does not approve schematic freeze or PCB layout.
 - SIDR626LDP-class MOSFET conduction losses are acceptable as a starting point,
   but SOA and thermal validation are still required for compressor inrush and
   heated-seat steady state.
+- OUT2 compressor/inrush planning uses the envelope in
+  `hardware/power-board/PB-100/PB-100-out2-soa.md`; SIDR626LDP remains a
+  candidate only if detailed SOA review passes.
 - LM74700QDBVRQ1-class reverse protection is compatible with the 12 V input
   target and cold-crank requirement when paired with a dedicated low-Rds input
   MOSFET strategy.
@@ -39,7 +42,8 @@ does not approve schematic freeze or PCB layout.
 
 - Validate the low-current TPS48110 plus MOSFET implementation for OUT5, OUT8,
   and OUT9.
-- Confirm MOSFET SOA for OUT2 with compressor startup/inrush assumptions.
+- Confirm detailed MOSFET SOA for OUT2 against the defined startup/inrush
+  envelope before PCB layout.
 - Confirm thermal stack-up for all output classes and the input
   reverse-protection MOSFET in the intended enclosure.
 
@@ -47,5 +51,7 @@ does not approve schematic freeze or PCB layout.
 
 - `hardware/power-board/PB-100/PB-100-power-path-candidates.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
+- `hardware/power-board/PB-100/PB-100-out2-soa.md`
+- `hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-estimates.csv`
 - `hardware/power-board/PB-100/PB-100-protection-validation.csv`
