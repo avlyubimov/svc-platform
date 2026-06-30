@@ -43,6 +43,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv`
 - `hardware/power-board/PB-100/PB-100-validation-traceability.csv`
 - `hardware/power-board/PB-100/PB-100-test-point-plan.csv`
+- `hardware/power-board/PB-100/PB-100-fault-response-matrix.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-net-domain-plan.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-capture-plan.md`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
@@ -160,6 +161,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-thermal-estimates.csv`
 - `hardware/power-board/PB-100/PB-100-protection-validation.csv`
 - `hardware/power-board/PB-100/PB-100-test-point-plan.csv`
+- `hardware/power-board/PB-100/PB-100-fault-response-matrix.csv`
 
 ## Net naming rules
 

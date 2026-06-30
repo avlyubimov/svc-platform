@@ -838,3 +838,17 @@ safety, and the no-footprint/no-placement-lock boundary.
 Reason: Bring-up and bench validation need planned measurement points before
 schematic capture. The test-point plan makes validation access explicit without
 starting layout or locking physical pads before schematic freeze.
+
+## 2026-06-30 — PB-100 fault response matrix
+
+Decision: PB-100 now has
+`hardware/power-board/PB-100/PB-100-fault-response-matrix.csv`, covering input,
+logic-power, B2B, output, fuse, thermal, current telemetry, board-budget, CAN1,
+and board-identity faults. `tools/validate_pb100.py` requires every fault ID,
+safe hardware defaults, explicit firmware safe actions, logging, validation
+artifacts, CAN1 DNP/open/future-ADR protection, OUT2 SOA linkage, and
+role-agnostic board identity behavior.
+
+Reason: Safety behavior must be traceable before schematic freeze. The matrix
+keeps fault handling consistent across hardware defaults, firmware policy, test
+planning, and validation artifacts without encoding accessory roles in PB-100.

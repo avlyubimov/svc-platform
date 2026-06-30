@@ -277,6 +277,17 @@ TEST_POINT_PLAN_COLUMNS = (
     "Validation target",
     "Placement status",
 )
+FAULT_RESPONSE_MATRIX_COLUMNS = (
+    "Fault ID",
+    "Area",
+    "Fault condition",
+    "Detection source",
+    "Hardware default",
+    "Firmware response",
+    "User-visible state",
+    "Validation artifact",
+    "Safety constraint",
+)
 REQUIRED_NET_PATTERNS = {
     "VBAT_RAW",
     "VBAT_PROT",
@@ -315,6 +326,7 @@ REQUIRED_READINESS_AREAS = {
     "Logic power design values",
     "Input protection contract",
     "Test point plan",
+    "Fault response matrix",
     "Logic power values",
     "BOM synchronization",
     "Assembly sourcing recheck",
@@ -381,6 +393,22 @@ REQUIRED_CAN1_SAFETY_REQUIREMENTS = {
     "DNP BOM ownership",
     "Firmware safety",
     "Future TX change process",
+}
+REQUIRED_FAULT_IDS = {
+    "PBFLT-INPUT-REV",
+    "PBFLT-LOAD-DUMP",
+    "PBFLT-LOGIC-RAIL",
+    "PBFLT-LB-ABSENT",
+    "PBFLT-OUT-OC",
+    "PBFLT-OUT-SHORT",
+    "PBFLT-OUT2-INRUSH",
+    "PBFLT-FUSE-OPEN",
+    "PBFLT-THERM-HIGH",
+    "PBFLT-THERM-STALE",
+    "PBFLT-CUR-STALE",
+    "PBFLT-BUDGET",
+    "PBFLT-CAN1-TX",
+    "PBFLT-B2B-MISMATCH",
 }
 
 
@@ -2416,6 +2444,67 @@ def validate_test_point_plan() -> None:
         )
 
 
+def validate_fault_response_matrix() -> None:
+    path = PB100_DIR / "PB-100-fault-response-matrix.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty PB-100 fault response matrix: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in FAULT_RESPONSE_MATRIX_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    seen_fault_ids = set()
+    for row_number, row in enumerate(rows, 2):
+        fault_id = row["Fault ID"].strip()
+        if fault_id in seen_fault_ids:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Fault ID {fault_id}")
+        seen_fault_ids.add(fault_id)
+        if fault_id not in REQUIRED_FAULT_IDS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown Fault ID {fault_id}")
+        for column in FAULT_RESPONSE_MATRIX_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if not any(keyword in row_text for keyword in ("disable", "disabled", "off", "derate", "refuse", "block")):
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: fault response must include a safe action")
+        if "log" not in row["Firmware response"].lower() and fault_id not in {"PBFLT-THERM-HIGH"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: firmware response must include logging")
+        if "role" in row_text and "role-agnostic" not in row_text and "role names" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: role references must preserve role-agnostic behavior")
+        if fault_id == "PBFLT-CAN1-TX":
+            if "dnp/open" not in row_text or "future adr" not in row_text:
+                fail("CAN1 TX fault response must keep DNP/open and future ADR explicit")
+        if fault_id == "PBFLT-OUT2-INRUSH" and "soa" not in row_text:
+            fail("OUT2 inrush fault response must reference SOA")
+        if fault_id == "PBFLT-B2B-MISMATCH" and "accessory role assumptions" not in row_text:
+            fail("B2B mismatch fault response must reject accessory role assumptions")
+        validation_artifacts = [artifact.strip() for artifact in row["Validation artifact"].split(";")]
+        for artifact in validation_artifacts:
+            if not (
+                artifact.startswith("PB-100-")
+                or artifact.startswith("docs/")
+                or artifact.startswith("production/")
+            ):
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{row_number}: validation artifact "
+                    f"must be PB-100*, docs/*, or production/*: {artifact}"
+                )
+
+    missing_fault_ids = sorted(REQUIRED_FAULT_IDS - seen_fault_ids)
+    if missing_fault_ids:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing fault IDs: "
+            f"{', '.join(missing_fault_ids)}"
+        )
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -2465,6 +2554,7 @@ def main() -> int:
     validate_assembly_sourcing_recheck()
     validate_validation_traceability()
     validate_test_point_plan()
+    validate_fault_response_matrix()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0

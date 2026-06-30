@@ -51,6 +51,7 @@ manufacturing outputs are also blocked by repository validation.
 - `../PB-100-schematic-freeze-gap-register.csv`
 - `../PB-100-validation-traceability.csv`
 - `../PB-100-test-point-plan.csv`
+- `../PB-100-fault-response-matrix.csv`
 - `../PB-100-can1-safety-verification.csv`
 - `../../../../production/bom/pb100_assembly_sourcing_recheck.csv`
 
