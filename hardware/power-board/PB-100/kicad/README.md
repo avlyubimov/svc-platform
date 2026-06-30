@@ -35,3 +35,11 @@ until schematic freeze.
 4. Replace abstract block symbols with final MPN symbols after package drawings
    and pinouts are checked.
 5. Do not create a PCB layout until the freeze checklist is closed.
+
+## Validation
+
+Run from repository root:
+
+```bash
+python3 tools/validate_pb100.py
+```

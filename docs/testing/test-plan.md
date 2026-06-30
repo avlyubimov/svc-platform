@@ -35,6 +35,19 @@ the motorcycle.
 | PB-BENCH-014 | B2B interface | Check `JPB1` control, fault, telemetry, ID, and reserve pins against the pin map | Pin behavior matches `PB-100-b2b-pin-map.csv` |
 | PB-BENCH-015 | Vibration inspection | Inspect fuses, connectors, and harness strain relief after vibration exposure | No intermittent power, signal, or connector fault is observed |
 
+## Repository validation
+
+Run the PB-100 artifact validator before committing schematic-planning or KiCad
+scaffold changes:
+
+```bash
+python3 tools/validate_pb100.py
+```
+
+The validator checks CSV structure, KiCad scaffold syntax, the no-PCB-layout
+boundary, preliminary symbol-library status, output instance coverage, and PB-100
+net-naming safety rules.
+
 ## PB-100 schematic-review traceability
 
 - OUT2 pulse tests trace to

@@ -256,3 +256,11 @@ CAN1 TX-disable scaffolding.
 Reason: Schematic capture can proceed at block level before final vendor pinouts
 and footprints are locked, while keeping these symbols explicitly non-final and
 excluded from BOM/on-board status.
+
+## 2026-06-30 — PB-100 repository validator
+
+Decision: PB-100 schematic-planning and KiCad scaffold artifacts are validated by
+`tools/validate_pb100.py`.
+
+Reason: The project now has enough generated CSV and KiCad text artifacts that
+basic structural checks must be automated before commits and pushes.
