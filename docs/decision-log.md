@@ -656,3 +656,14 @@ review-defined handling.
 Reason: Schematic capture should place references deliberately by block instead
 of relying on ad hoc sheet edits. This preserves the no-layout boundary while
 making the KiCad capture sequence reviewable.
+
+## 2026-06-30 — PB-100 KiCad sheet manifest
+
+Decision: PB-100 now has
+`hardware/power-board/PB-100/PB-100-kicad-sheet-manifest.csv`, and
+`tools/validate_pb100.py` checks the manifest against the actual top-level and
+child `.kicad_sch` files plus the sheet-reference map.
+
+Reason: Schematic capture needs a stable file-level scaffold. The manifest
+prevents child sheets from being added, removed, or renamed without updating
+the review package and automated checks.

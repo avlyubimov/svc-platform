@@ -25,6 +25,9 @@ KiCad scaffold directory:
 Placeholder child sheets are tracked in
 `hardware/power-board/PB-100/kicad/sheets/`.
 
+KiCad sheet manifest:
+`hardware/power-board/PB-100/PB-100-kicad-sheet-manifest.csv`.
+
 Reference-to-sheet assignment is tracked in
 `hardware/power-board/PB-100/PB-100-schematic-sheet-reference-map.csv`.
 

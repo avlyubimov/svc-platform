@@ -28,6 +28,7 @@ manufacturing outputs are also blocked by repository validation.
 - `../PB-100-schematic-instance-symbol-map.csv`
 - `../PB-100-schematic-sheet-reference-map.csv`
 - `../PB-100-kicad-prep.md`
+- `../PB-100-kicad-sheet-manifest.csv`
 - `../PB-100-kicad-footprint-plan.csv`
 - `../PB-100-symbol-mpn-readiness.csv`
 - `../PB-100-symbol-capture-worklist.csv`

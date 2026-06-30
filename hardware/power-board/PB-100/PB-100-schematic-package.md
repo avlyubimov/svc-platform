@@ -110,6 +110,7 @@ requires SOA, thermal, clamp-voltage, and assembly-class validation.
 Preliminary validation tables:
 
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
+- `hardware/power-board/PB-100/PB-100-kicad-sheet-manifest.csv`
 - `hardware/power-board/PB-100/PB-100-kicad-footprint-plan.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-capture-worklist.csv`

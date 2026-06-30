@@ -36,6 +36,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
+- `hardware/power-board/PB-100/PB-100-kicad-sheet-manifest.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-capture-worklist.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-pin-evidence.csv`

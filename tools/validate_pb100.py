@@ -120,6 +120,14 @@ SHEET_REFERENCE_MAP_COLUMNS = (
     "Capture status",
     "Notes",
 )
+KICAD_SHEET_MANIFEST_COLUMNS = (
+    "Sheet file",
+    "Sheet kind",
+    "Purpose",
+    "Primary artifacts",
+    "Status",
+    "Capture gate",
+)
 
 
 def fail(message: str) -> None:
@@ -758,6 +766,71 @@ def validate_sheet_reference_map() -> None:
         )
 
 
+def validate_kicad_sheet_manifest() -> None:
+    path = PB100_DIR / "PB-100-kicad-sheet-manifest.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty KiCad sheet manifest: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in KICAD_SHEET_MANIFEST_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    expected_sheet_files = {"PB-100.kicad_sch"} | {
+        sheet_path.name for sheet_path in sorted((KICAD_DIR / "sheets").glob("*.kicad_sch"))
+    }
+    manifest_sheet_files = {row["Sheet file"].strip() for row in rows}
+    missing_sheets = sorted(expected_sheet_files - manifest_sheet_files)
+    extra_sheets = sorted(manifest_sheet_files - expected_sheet_files)
+    if missing_sheets:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing KiCad sheets: "
+            f"{', '.join(missing_sheets)}"
+        )
+    if extra_sheets:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} lists unknown KiCad sheets: "
+            f"{', '.join(extra_sheets)}"
+        )
+
+    allowed_kinds = {"top", "child"}
+    allowed_statuses = {"Scaffold", "Template scaffold"}
+    for row_number, row in enumerate(rows, 2):
+        sheet_file = row["Sheet file"].strip()
+        sheet_kind = row["Sheet kind"].strip()
+        if sheet_kind not in allowed_kinds:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid sheet kind {sheet_kind}")
+        if row["Status"].strip() not in allowed_statuses:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid sheet status {row['Status'].strip()}")
+        for column in ("Purpose", "Primary artifacts", "Capture gate"):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if sheet_kind == "top" and sheet_file != "PB-100.kicad_sch":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: only PB-100.kicad_sch may be top")
+        if sheet_kind == "child" and not (KICAD_DIR / "sheets" / sheet_file).exists():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: child sheet file is missing: {sheet_file}")
+
+    sheet_reference_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-schematic-sheet-reference-map.csv").open(newline="", encoding="utf-8"))
+    )
+    referenced_sheets = {
+        row["Sheet file"].strip()
+        for row in sheet_reference_rows
+        if row["Sheet file"].strip() != "cross-sheet-review"
+    }
+    missing_referenced = sorted(referenced_sheets - manifest_sheet_files)
+    if missing_referenced:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing sheets used by sheet-reference map: "
+            f"{', '.join(missing_referenced)}"
+        )
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -789,6 +862,7 @@ def main() -> int:
     validate_jpb1_symbol_from_pin_map()
     validate_instance_symbol_map()
     validate_sheet_reference_map()
+    validate_kicad_sheet_manifest()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0
