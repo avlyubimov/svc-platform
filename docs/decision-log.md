@@ -524,3 +524,12 @@ netlist syntax.
 Reason: ERC proves the schematic has no reported violations, while netlist
 export proves the scaffold can move into downstream schematic-review artifacts
 without committing generated layout or manufacturing files.
+
+## 2026-06-30 — PB-100 KiCad role-token guard
+
+Decision: `tools/validate_pb100.py` now scans PB-100 KiCad schematic and symbol
+files for accessory-role tokens such as `FOG`, `USB`, `SEAT`, `CHIGEE`, `DVR`,
+`BRAKE`, and `CIGARETTE`.
+
+Reason: PB-100 must remain vehicle-agnostic. KiCad artifacts must use generic
+`OUT1`..`OUT10` naming and keep accessory roles in configuration only.

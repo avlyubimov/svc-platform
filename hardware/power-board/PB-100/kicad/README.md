@@ -51,3 +51,7 @@ the PB-100 schematic freeze checklist is closed.
 If `kicad-cli` is installed, the validator also runs schematic ERC, requires
 zero reported violations, and exports a temporary KiCad S-expression netlist. If
 `kicad-cli` is not available, the text-level KiCad scaffold checks still run.
+
+KiCad schematic and symbol files are also checked for accessory-role tokens such
+as `FOG`, `USB`, `SEAT`, `CHIGEE`, `DVR`, and `BRAKE`. PB-100 artifacts must use
+generic `OUT1`..`OUT10` naming only.

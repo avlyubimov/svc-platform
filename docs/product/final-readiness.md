@@ -19,6 +19,7 @@ Current coverage:
 - PB-100 CSV and KiCad scaffold validation.
 - Optional PB-100 KiCad schematic ERC and netlist export when `kicad-cli` is
   installed.
+- PB-100 KiCad role-token guard for generic `OUT1`..`OUT10` naming.
 - PB-100 layout/manufacturing artifact blocker.
 - Firmware config JSON/schema validation.
 - Firmware host-test suite.

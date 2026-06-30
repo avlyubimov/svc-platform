@@ -40,6 +40,15 @@ DISALLOWED_LAYOUT_NAME_FRAGMENTS = (
     "placement",
 )
 MANUFACTURING_HINT_SUFFIXES = {".csv", ".rpt", ".txt", ".xlsx", ".zip"}
+FORBIDDEN_ROLE_TOKENS = (
+    "FOG",
+    "SEAT",
+    "USB",
+    "CHIGEE",
+    "DVR",
+    "BRAKE",
+    "CIGARETTE",
+)
 
 
 def fail(message: str) -> None:
@@ -205,6 +214,18 @@ def validate_symbol_library() -> None:
         fail("preliminary symbols must be excluded from board")
 
 
+def validate_kicad_no_role_tokens() -> None:
+    checked_paths = sorted(KICAD_DIR.rglob("*.kicad_sch")) + sorted((KICAD_DIR / "lib").rglob("*.kicad_sym"))
+    for path in checked_paths:
+        text = read_text(path)
+        for forbidden_token in FORBIDDEN_ROLE_TOKENS:
+            if forbidden_token in text:
+                fail(
+                    f"accessory role token `{forbidden_token}` appears in KiCad artifact: "
+                    f"{path.relative_to(REPO_ROOT)}"
+                )
+
+
 def validate_instance_plan() -> None:
     path = PB100_DIR / "PB-100-schematic-instance-plan.csv"
     validate_csv(path)
@@ -240,6 +261,7 @@ def main() -> int:
     validate_kicad_scaffold()
     validate_kicad_cli_checks()
     validate_symbol_library()
+    validate_kicad_no_role_tokens()
     validate_instance_plan()
     validate_net_naming_contract()
     print("PB-100 validation passed")
