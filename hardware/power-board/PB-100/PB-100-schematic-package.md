@@ -20,12 +20,16 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
+- `hardware/power-board/PB-100/PB-100-input-protection-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
+- `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
+- `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-preliminary-validation.md`
 - `hardware/power-board/PB-100/PB-100-net-naming.md`
+- `hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-net-domain-plan.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-capture-plan.md`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
@@ -121,10 +125,13 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
+- `hardware/power-board/PB-100/PB-100-input-protection-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-budget.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-map.csv`
+- `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
@@ -140,6 +147,8 @@ Preliminary validation tables:
 
 - Track schematic-freeze readiness in
   `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`.
+- Track cross-artifact review status in
+  `hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv`.
 - Validate candidate MPNs in `PB-100-power-path-candidates.csv`.
 - Validate ADR-0011 low-current external-controller implementation.
 - Confirm high-side switch/controller thermal limits.

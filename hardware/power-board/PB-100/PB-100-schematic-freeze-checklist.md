@@ -61,7 +61,11 @@ evidence before freeze.
 Before marking this checklist `Closed`, the review packet must include:
 
 - Updated schematic package.
+- Updated schematic readiness dashboard.
 - Final output channel matrix.
+- Final output-channel pin contract.
+- Final input-protection pin contract.
+- Final logic-power design value table.
 - Final instance-symbol map linking every schematic reference to a symbol key.
 - Final sheet-reference map linking every schematic reference to a capture sheet.
 - Final schematic net-domain plan with safety rules.

@@ -1,0 +1,11 @@
+Output,Controller ref,Switch ref,Fuse ref,Connector ref,Control net,Fault net,Current net,Load net,Fused net,Default state,Safety rule
+OUT1,U101,Q101,F101,J101,OUT1_CTL,OUT1_FLT,OUT1_IMON,OUT1_LOAD,OUT1_FUSED,Off with control pulled low,Role assigned only by configuration and current limit enforced from channel config
+OUT2,U102,Q102,F102,J102,OUT2_CTL,OUT2_FLT,OUT2_IMON,OUT2_LOAD,OUT2_FUSED,Off with control pulled low,Role assigned only by configuration and OUT2 SOA evidence must close before freeze
+OUT3,U103,Q103,F103,J103,OUT3_CTL,OUT3_FLT,OUT3_IMON,OUT3_LOAD,OUT3_FUSED,Off with control pulled low,Role assigned only by configuration and current limit enforced from channel config
+OUT4,U104,Q104,F104,J104,OUT4_CTL,OUT4_FLT,OUT4_IMON,OUT4_LOAD,OUT4_FUSED,Off with control pulled low,Role assigned only by configuration and current limit enforced from channel config
+OUT5,U105,Q105,F105,J105,OUT5_CTL,OUT5_FLT,OUT5_IMON,OUT5_LOAD,OUT5_FUSED,Off with control pulled low,Role assigned only by configuration and low-current external-controller baseline is preserved
+OUT6,U106,Q106,F106,J106,OUT6_CTL,OUT6_FLT,OUT6_IMON,OUT6_LOAD,OUT6_FUSED,Off with control pulled low,Role assigned only by configuration and heater steady-state thermal evidence must close
+OUT7,U107,Q107,F107,J107,OUT7_CTL,OUT7_FLT,OUT7_IMON,OUT7_LOAD,OUT7_FUSED,Off with control pulled low,Role assigned only by configuration and heater steady-state thermal evidence must close
+OUT8,U108,Q108,F108,J108,OUT8_CTL,OUT8_FLT,OUT8_IMON,OUT8_LOAD,OUT8_FUSED,Off with control pulled low,Role assigned only by configuration and low-current external-controller baseline is preserved
+OUT9,U109,Q109,F109,J109,OUT9_CTL,OUT9_FLT,OUT9_IMON,OUT9_LOAD,OUT9_FUSED,Off with control pulled low,Role assigned only by configuration and safety-relevant behavior stays in rules/output manager
+OUT10,U110,Q110,F110,J110,OUT10_CTL,OUT10_FLT,OUT10_IMON,OUT10_LOAD,OUT10_FUSED,Off with control pulled low,Role assigned only by configuration and current limit enforced from channel config

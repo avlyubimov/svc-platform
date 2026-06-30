@@ -1,0 +1,18 @@
+Ref,Symbol key,Concrete symbol name,Interface point,Planned net,Direction,Default state,Freeze dependency
+J1,INPUT_CONNECTOR,PB100_INPUT_CONNECTOR_CLASS_PRELIM,Battery positive,VBAT_RAW,Harness to PB-100,Protected by near-battery main fuse,Garage connector current derating closes
+J1,INPUT_CONNECTOR,PB100_INPUT_CONNECTOR_CLASS_PRELIM,Battery return,GND,Harness to PB-100,Return path present,Ground return and harness gauge review closes
+D1,INPUT_TVS,PB100_INPUT_TVS_PRELIM,Clamp high side,VBAT_RAW,Clamp to ground,Inactive until transient,TVS clamp and overshoot margin close
+D1,INPUT_TVS,PB100_INPUT_TVS_PRELIM,Clamp return,GND,Clamp to ground,Return path present,TVS pulse-current return review closes
+U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Input sense,VBAT_RAW,PB-100 sense,Tracks raw fused battery,Reverse-controller datasheet review closes
+U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Protected sense,VBAT_PROT,PB-100 sense,Valid after reverse path,Reverse-controller threshold and surge review closes
+U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Reverse FET gate drive,INPUT_FET_GATE,Controller to FET,Off when controller unpowered,Gate clamp and turn-off behavior review closes
+Q1,INPUT_REVERSE_FET,PB100_INPUT_NMOS_TOLL_PRELIM,Raw-side power terminal,VBAT_RAW,Power path,Pending symbol and package evidence,TOLL pin evidence and 40 A thermal review close
+Q1,INPUT_REVERSE_FET,PB100_INPUT_NMOS_TOLL_PRELIM,Protected-side power terminal,VBAT_REV_PROT,Power path,Pending symbol and package evidence,TOLL pin evidence and 40 A thermal review close
+Q1,INPUT_REVERSE_FET,PB100_INPUT_NMOS_TOLL_PRELIM,Gate,INPUT_FET_GATE,Controller to FET,Pending off when controller unpowered,TOLL pin evidence gate clamp and 40 A thermal review close
+RSH1,TOTAL_CURRENT_SHUNT,PB100_INPUT_SHUNT_PRELIM,High-side Kelvin,IIN_SHUNT_HI,Measurement,Zero current baseline,Shunt value and power rating close
+RSH1,TOTAL_CURRENT_SHUNT,PB100_INPUT_SHUNT_PRELIM,Low-side Kelvin,IIN_SHUNT_LO,Measurement,Zero current baseline,Shunt value and Kelvin routing review close
+RSH1,TOTAL_CURRENT_SHUNT,PB100_INPUT_SHUNT_PRELIM,Protected output,VBAT_PROT,Power path,Feeds protected board rail,Shunt dissipation and copper review close
+U2,TOTAL_CURRENT_MONITOR,PB100_INA228_Q1_PRELIM,Shunt positive sense,IIN_SHUNT_HI,PB-100 sense,ADC/I2C safe,0-60 A calibration plan closes
+U2,TOTAL_CURRENT_MONITOR,PB100_INA228_Q1_PRELIM,Shunt negative sense,IIN_SHUNT_LO,PB-100 sense,ADC/I2C safe,0-60 A calibration plan closes
+U2,TOTAL_CURRENT_MONITOR,PB100_INA228_Q1_PRELIM,Total current report,IIN_SENSE,PB-100 to LB-100,Zero current baseline,Telemetry scaling and fallback path close
+U2,TOTAL_CURRENT_MONITOR,PB100_INA228_Q1_PRELIM,Battery voltage report,VBAT_SENSE,PB-100 to LB-100,Scaled battery voltage,ADC-safe divider and calibration close

@@ -1,0 +1,11 @@
+Item,Ref or net,Design state,Value status,Freeze dependency,Notes
+Buck regulator,U3,Preferred LM5164-Q1 class,TBD not final,Confirm 1 A budget and 100 V margin,LM5013-Q1 remains higher-current alternate
+Buck input rail,VBAT_PROT,After reverse and TVS protection,TBD not final,Confirm clamp compatibility and input filter values,Must not connect to raw unfused input
+Buck output rail,PB_5V_OUT,Protected 5 V rail,TBD not final,Confirm load budget and output tolerance,Feeds LB-100 and PB-side low-power circuitry only
+Inductor,L1,Automotive shielded inductor,TBD not final,Confirm ripple current saturation current and package,No footprint lock before regulator value review
+Input capacitors,CIN*,Automotive ceramic/electrolytic mix,TBD not final,Confirm cold-crank and load-dump stress,Placement remains schematic-review only
+Output capacitors,COUT*,Automotive ceramic/electrolytic mix,TBD not final,Confirm transient response and stability,No package lock before design equations close
+Feedback divider,RFB*,Sets 5 V output,TBD not final,Confirm tolerance startup and no-load behavior,Board value lock waits for schematic review
+UVLO network,RUVLO*,Defines safe operating threshold,TBD not final,Confirm cold-crank behavior and fail-safe off state,Must keep outputs off when logic rails invalid
+Power-good,PB_PWR_GOOD,PB-100 to LB-100 validity status,TBD not final,Confirm pull-up domain and fault timing,Must not report valid before rail is stable
+EMI input filter,L/C/RC input filter,Motorcycle harness noise filter,TBD not final,Confirm conducted noise strategy and surge survivability,No layout placement until schematic freeze closes

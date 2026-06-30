@@ -23,11 +23,15 @@ manufacturing outputs are also blocked by repository validation.
 ## Source documents
 
 - `../PB-100-schematic-capture-plan.md`
+- `../PB-100-schematic-readiness-dashboard.csv`
 - `../PB-100-net-naming.md`
 - `../PB-100-schematic-instance-plan.csv`
 - `../PB-100-schematic-instance-symbol-map.csv`
 - `../PB-100-schematic-sheet-reference-map.csv`
 - `../PB-100-schematic-net-domain-plan.csv`
+- `../PB-100-output-channel-pin-contract.csv`
+- `../PB-100-input-protection-pin-contract.csv`
+- `../PB-100-logic-power-design-placeholders.csv`
 - `../PB-100-kicad-prep.md`
 - `../PB-100-kicad-sheet-manifest.csv`
 - `../PB-100-kicad-footprint-plan.csv`
@@ -80,3 +84,7 @@ the KiCad symbol library.
 `PB100_JPB1_100PIN_PRELIM` is generated from
 `PB-100-b2b-pin-map.csv`; validation checks all 100 connector pin names and
 numbers directly against that map.
+
+The readiness dashboard and pin/value contract CSVs are checked against the
+instance map, JPB1 pin map, net-domain plan, and freeze policy. They are
+schematic-capture contracts only and do not authorize layout or final values.

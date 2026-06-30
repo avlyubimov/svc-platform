@@ -16,6 +16,15 @@ entering the schematic.
 | `GND` | Power and digital ground |
 | `AGND` | Analog reference ground where separated in schematic |
 
+## Input protection local nets
+
+| Net | Purpose |
+|---|---|
+| `INPUT_FET_GATE` | Local gate drive from ideal-diode/reverse-protection controller to input MOSFET |
+| `VBAT_REV_PROT` | Intermediate node after reverse-protection FET before the final protected rail definition |
+| `IIN_SHUNT_HI` | High-side Kelvin sense for total input current shunt |
+| `IIN_SHUNT_LO` | Low-side Kelvin sense for total input current shunt |
+
 ## Output channel nets
 
 Use `OUTn` where `n` is `1` through `10`.

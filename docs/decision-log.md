@@ -692,3 +692,16 @@ includes battery input connector and per-output fuse holder rows.
 Reason: Schematic symbol planning changes hardware assumptions. BOM drafts must
 stay synchronized with schematic artifacts so sourcing and assembly ownership do
 not drift before schematic freeze.
+
+## 2026-06-30 — PB-100 schematic readiness contracts
+
+Decision: PB-100 now has a machine-checked readiness dashboard plus schematic
+contracts for output-channel pins, input-protection pins, and logic-power design
+placeholders. `tools/validate_pb100.py` checks these files against the instance
+map, `JPB1` pin map, net-domain plan, pending Q1 reverse-FET state, CAN1
+DNP/open policy, and the no-final-values-before-review rule.
+
+Reason: The project is close enough to schematic capture that review status,
+net intent, and unresolved close work must be synchronized automatically. These
+contracts reduce manual drift without starting PCB layout or pretending that
+Q1, logic-power values, SOA, footprints, or assembly sourcing are final.

@@ -146,6 +146,45 @@ BOM_SYMBOL_MAP_COLUMNS = (
     "Status",
     "Notes",
 )
+SCHEMATIC_READINESS_DASHBOARD_COLUMNS = (
+    "Area",
+    "Status",
+    "Evidence",
+    "Machine check",
+    "Remaining close work",
+)
+OUTPUT_CHANNEL_PIN_CONTRACT_COLUMNS = (
+    "Output",
+    "Controller ref",
+    "Switch ref",
+    "Fuse ref",
+    "Connector ref",
+    "Control net",
+    "Fault net",
+    "Current net",
+    "Load net",
+    "Fused net",
+    "Default state",
+    "Safety rule",
+)
+INPUT_PROTECTION_PIN_CONTRACT_COLUMNS = (
+    "Ref",
+    "Symbol key",
+    "Concrete symbol name",
+    "Interface point",
+    "Planned net",
+    "Direction",
+    "Default state",
+    "Freeze dependency",
+)
+LOGIC_POWER_DESIGN_COLUMNS = (
+    "Item",
+    "Ref or net",
+    "Design state",
+    "Value status",
+    "Freeze dependency",
+    "Notes",
+)
 REQUIRED_NET_PATTERNS = {
     "VBAT_RAW",
     "VBAT_PROT",
@@ -162,6 +201,34 @@ REQUIRED_NET_PATTERNS = {
     "CAN1_TX_ROUTE",
 }
 ALLOWED_BOM_FILES = {"factory_bom_draft.csv", "garage_bom_draft.csv"}
+REQUIRED_READINESS_AREAS = {
+    "Architecture baseline",
+    "PB-100 requirements",
+    "Symbol readiness",
+    "KiCad scaffold",
+    "Instance map",
+    "Sheet map",
+    "Net domains",
+    "Output pin contract",
+    "Input protection contract",
+    "Logic power values",
+    "BOM synchronization",
+    "CAN1 safety",
+    "Layout authorization",
+}
+ALLOWED_DASHBOARD_STATUSES = {"Closed", "Conditional", "Open", "Blocked"}
+REQUIRED_LOGIC_POWER_ITEMS = {
+    "Buck regulator",
+    "Buck input rail",
+    "Buck output rail",
+    "Inductor",
+    "Input capacitors",
+    "Output capacitors",
+    "Feedback divider",
+    "UVLO network",
+    "Power-good",
+    "EMI input filter",
+}
 
 
 def fail(message: str) -> None:
@@ -999,6 +1066,314 @@ def validate_bom_symbol_map() -> None:
         fail("CAN1_TX_DISABLE BOM mapping must keep DNP/open explicit")
 
 
+def validate_schematic_readiness_dashboard() -> None:
+    path = PB100_DIR / "PB-100-schematic-readiness-dashboard.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty schematic readiness dashboard: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in SCHEMATIC_READINESS_DASHBOARD_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    seen_areas = set()
+    rows_by_area: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        area = row["Area"].strip()
+        status = row["Status"].strip()
+        if not area:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: missing Area")
+        if area in seen_areas:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Area {area}")
+        seen_areas.add(area)
+        rows_by_area[area] = row
+        if status not in ALLOWED_DASHBOARD_STATUSES:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Status {status}")
+        for column in ("Evidence", "Machine check", "Remaining close work"):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+
+    missing_areas = sorted(REQUIRED_READINESS_AREAS - seen_areas)
+    if missing_areas:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing readiness areas: "
+            f"{', '.join(missing_areas)}"
+        )
+
+    if rows_by_area["Architecture baseline"]["Status"].strip() != "Closed":
+        fail("Architecture baseline must remain Closed in schematic readiness dashboard")
+    if rows_by_area["PB-100 requirements"]["Status"].strip() != "Closed":
+        fail("PB-100 requirements must remain Closed in schematic readiness dashboard")
+    if rows_by_area["Layout authorization"]["Status"].strip() != "Blocked":
+        fail("Layout authorization must remain Blocked before schematic freeze")
+    if "schematic freeze" not in rows_by_area["Layout authorization"]["Remaining close work"].lower():
+        fail("Layout authorization close work must reference schematic freeze")
+
+    symbol_row = rows_by_area["Symbol readiness"]
+    if symbol_row["Status"].strip() != "Conditional":
+        fail("Symbol readiness must remain Conditional while pending symbols exist")
+    if "INPUT_REVERSE_FET" not in symbol_row["Remaining close work"]:
+        fail("Symbol readiness must mention pending INPUT_REVERSE_FET close work")
+
+    can_row = rows_by_area["CAN1 safety"]
+    can_text = " ".join(can_row[column] for column in SCHEMATIC_READINESS_DASHBOARD_COLUMNS).lower()
+    if "dnp/open" not in can_text or "future adr" not in can_text:
+        fail("CAN1 safety dashboard row must keep DNP/open and future ADR explicit")
+
+
+def validate_output_channel_pin_contract() -> None:
+    path = PB100_DIR / "PB-100-output-channel-pin-contract.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty output channel pin contract: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in OUTPUT_CHANNEL_PIN_CONTRACT_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    output_matrix_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-output-channel-matrix.csv").open(newline="", encoding="utf-8"))
+    )
+    expected_outputs = {row["Output"].strip() for row in output_matrix_rows}
+    instance_map_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-schematic-instance-symbol-map.csv").open(newline="", encoding="utf-8"))
+    )
+    symbol_key_by_ref = {row["Ref"].strip(): row["Symbol key"].strip() for row in instance_map_rows}
+    b2b_rows = list(csv.DictReader((PB100_DIR / "PB-100-b2b-pin-map.csv").open(newline="", encoding="utf-8")))
+    b2b_nets = {row["Net"].strip() for row in b2b_rows}
+
+    seen_outputs = set()
+    for row_number, row in enumerate(rows, 2):
+        output = row["Output"].strip()
+        if output in seen_outputs:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate output {output}")
+        seen_outputs.add(output)
+        if output not in expected_outputs:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown output {output}")
+        try:
+            output_number = int(output.removeprefix("OUT"))
+        except ValueError:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid output name {output}")
+
+        expected_refs = {
+            "Controller ref": (f"U{100 + output_number}", "HS_CTRL"),
+            "Switch ref": (f"Q{100 + output_number}", "OUT_FET"),
+            "Fuse ref": (f"F{100 + output_number}", "OUTPUT_FUSE_HOLDER"),
+            "Connector ref": (f"J{100 + output_number}", "OUTPUT_CONNECTOR"),
+        }
+        for column, (expected_ref, expected_key) in expected_refs.items():
+            actual_ref = row[column].strip()
+            if actual_ref != expected_ref:
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{row_number}: {column} must be "
+                    f"{expected_ref}, got {actual_ref}"
+                )
+            actual_key = symbol_key_by_ref.get(actual_ref)
+            if actual_key != expected_key:
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{row_number}: {actual_ref} must map to "
+                    f"{expected_key}, got {actual_key}"
+                )
+
+        expected_nets = {
+            "Control net": f"{output}_CTL",
+            "Fault net": f"{output}_FLT",
+            "Current net": f"{output}_IMON",
+            "Load net": f"{output}_LOAD",
+            "Fused net": f"{output}_FUSED",
+        }
+        for column, expected_net in expected_nets.items():
+            actual_net = row[column].strip()
+            if actual_net != expected_net:
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{row_number}: {column} must be "
+                    f"{expected_net}, got {actual_net}"
+                )
+            for forbidden_token in FORBIDDEN_ROLE_TOKENS:
+                if forbidden_token in actual_net:
+                    fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: role token in net {actual_net}")
+
+        for connector_net in (row["Control net"].strip(), row["Fault net"].strip(), row["Current net"].strip()):
+            if connector_net not in b2b_nets:
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{row_number}: {connector_net} "
+                    "is missing from PB-100-b2b-pin-map.csv"
+                )
+
+        default_state = row["Default state"].strip().lower()
+        safety_rule = row["Safety rule"].strip().lower()
+        if "off" not in default_state:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: default state must be off")
+        if "configuration" not in safety_rule:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: safety rule must preserve configuration mapping")
+        if output == "OUT2" and "soa" not in safety_rule:
+            fail("OUT2 output pin contract must keep SOA close work explicit")
+
+    missing_outputs = sorted(expected_outputs - seen_outputs)
+    extra_outputs = sorted(seen_outputs - expected_outputs)
+    if missing_outputs:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing outputs: "
+            f"{', '.join(missing_outputs)}"
+        )
+    if extra_outputs:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} has outputs not in output matrix: "
+            f"{', '.join(extra_outputs)}"
+        )
+
+
+def validate_input_protection_pin_contract() -> None:
+    path = PB100_DIR / "PB-100-input-protection-pin-contract.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty input protection pin contract: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in INPUT_PROTECTION_PIN_CONTRACT_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    instance_map_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-schematic-instance-symbol-map.csv").open(newline="", encoding="utf-8"))
+    )
+    instance_by_ref = {row["Ref"].strip(): row for row in instance_map_rows}
+    required_refs = {"J1", "D1", "U1", "Q1", "RSH1", "U2"}
+    required_nets = {
+        "VBAT_RAW",
+        "GND",
+        "VBAT_PROT",
+        "INPUT_FET_GATE",
+        "VBAT_REV_PROT",
+        "IIN_SHUNT_HI",
+        "IIN_SHUNT_LO",
+        "IIN_SENSE",
+        "VBAT_SENSE",
+    }
+    seen_refs = set()
+    seen_nets = set()
+    q1_rows = []
+    for row_number, row in enumerate(rows, 2):
+        ref = row["Ref"].strip()
+        symbol_key = row["Symbol key"].strip()
+        concrete_symbol_name = row["Concrete symbol name"].strip()
+        planned_net = row["Planned net"].strip()
+        for column in ("Ref", "Symbol key", "Concrete symbol name", "Interface point", "Planned net", "Direction", "Default state", "Freeze dependency"):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        instance_row = instance_by_ref.get(ref)
+        if instance_row is None:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown instance ref {ref}")
+        if symbol_key != instance_row["Symbol key"].strip():
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: {ref} uses {symbol_key}, "
+                f"but instance-symbol map uses {instance_row['Symbol key'].strip()}"
+            )
+        if concrete_symbol_name != instance_row["Concrete symbol name"].strip():
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: {ref} uses {concrete_symbol_name}, "
+                f"but instance-symbol map uses {instance_row['Concrete symbol name'].strip()}"
+            )
+        for forbidden_token in FORBIDDEN_ROLE_TOKENS:
+            if forbidden_token in planned_net:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: role token in planned net {planned_net}")
+        seen_refs.add(ref)
+        seen_nets.add(planned_net)
+        if ref == "Q1":
+            q1_rows.append(row)
+
+    missing_refs = sorted(required_refs - seen_refs)
+    if missing_refs:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing input refs: "
+            f"{', '.join(missing_refs)}"
+        )
+    missing_nets = sorted(required_nets - seen_nets)
+    if missing_nets:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing input planned nets: "
+            f"{', '.join(missing_nets)}"
+        )
+    if not q1_rows:
+        fail("input protection pin contract must include Q1 pending reverse FET rows")
+    q1_state = instance_by_ref["Q1"]["Symbol state"].strip()
+    if q1_state != "Pending":
+        fail("Q1 must remain Pending until INPUT_REVERSE_FET symbol evidence closes")
+    for row in q1_rows:
+        close_text = " ".join(row[column] for column in ("Default state", "Freeze dependency"))
+        if "Pending" not in close_text or "TOLL" not in close_text or "40 A" not in close_text:
+            fail("Q1 input protection rows must keep pending TOLL and 40 A review explicit")
+
+
+def validate_logic_power_design_placeholders() -> None:
+    path = PB100_DIR / "PB-100-logic-power-design-placeholders.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty logic power design placeholders: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in LOGIC_POWER_DESIGN_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    seen_items = set()
+    refs_or_nets = set()
+    for row_number, row in enumerate(rows, 2):
+        item = row["Item"].strip()
+        if not item:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: missing Item")
+        if item in seen_items:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Item {item}")
+        seen_items.add(item)
+        refs_or_nets.add(row["Ref or net"].strip())
+        for column in ("Ref or net", "Design state", "Value status", "Freeze dependency", "Notes"):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+
+        value_status = row["Value status"].strip().lower()
+        if "final" in value_status and "not final" not in value_status:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: logic power value must not be final before review")
+        for blocked_word in ("locked", "released"):
+            if blocked_word in value_status:
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{row_number}: logic power value "
+                    f"must not be {blocked_word} before review"
+                )
+        if "tbd" not in value_status and "not final" not in value_status:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Value status must remain TBD/not final")
+
+    missing_items = sorted(REQUIRED_LOGIC_POWER_ITEMS - seen_items)
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing logic power items: "
+            f"{', '.join(missing_items)}"
+        )
+    for required_ref_or_net in ("U3", "L1", "VBAT_PROT", "PB_5V_OUT", "PB_PWR_GOOD"):
+        if required_ref_or_net not in refs_or_nets:
+            fail(
+                f"{path.relative_to(REPO_ROOT)} is missing required logic power "
+                f"ref/net {required_ref_or_net}"
+            )
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -1033,6 +1408,10 @@ def main() -> int:
     validate_kicad_sheet_manifest()
     validate_net_domain_plan()
     validate_bom_symbol_map()
+    validate_schematic_readiness_dashboard()
+    validate_output_channel_pin_contract()
+    validate_input_protection_pin_contract()
+    validate_logic_power_design_placeholders()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0
