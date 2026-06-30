@@ -93,6 +93,9 @@ defaults needed for sizing and bench tests.
 Schematic instance plan CSV:
 `hardware/power-board/PB-100/PB-100-schematic-instance-plan.csv`.
 
+Schematic instance-symbol map CSV:
+`hardware/power-board/PB-100/PB-100-schematic-instance-symbol-map.csv`.
+
 ## Power-path candidates
 
 Candidate MPN CSV:
@@ -105,6 +108,10 @@ Preliminary validation tables:
 
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
 - `hardware/power-board/PB-100/PB-100-kicad-footprint-plan.csv`
+- `hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv`
+- `hardware/power-board/PB-100/PB-100-symbol-capture-worklist.csv`
+- `hardware/power-board/PB-100/PB-100-symbol-pin-evidence.csv`
+- `hardware/power-board/PB-100/PB-100-symbol-open-items.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`

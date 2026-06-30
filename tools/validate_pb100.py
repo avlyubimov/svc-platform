@@ -69,9 +69,11 @@ REQUIRED_SYMBOL_KEYS = {
     "OUT_FET",
     "OUT2_ESCAPE_FET",
     "INPUT_IDEAL_DIODE",
+    "INPUT_CONNECTOR",
     "INPUT_REVERSE_FET",
     "INPUT_TVS",
     "LOGIC_BUCK",
+    "LOGIC_BUCK_INDUCTOR",
     "TOTAL_CURRENT_MONITOR",
     "TOTAL_CURRENT_SHUNT",
     "THERMAL_NTC",
@@ -103,6 +105,14 @@ SYMBOL_PIN_EVIDENCE_COLUMNS = (
     "Notes",
 )
 PIN_MAP_EVIDENCE_SYMBOLS = {"PB100_JPB1_100PIN_PRELIM"}
+INSTANCE_SYMBOL_MAP_COLUMNS = (
+    "Ref",
+    "Instance block",
+    "Symbol key",
+    "Concrete symbol name",
+    "Symbol state",
+    "Notes",
+)
 
 
 def fail(message: str) -> None:
@@ -540,10 +550,10 @@ def validate_symbol_pin_evidence() -> None:
         source = row["Source"].strip()
         if not symbol_name or not pin_number or not pin_name:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: missing symbol or pin identity")
-        if not (source.startswith("https://") or source.startswith("hardware/")):
+        if not (source.startswith("https://") or source.startswith("hardware/") or source.startswith("docs/")):
             fail(
                 f"{path.relative_to(REPO_ROOT)}:{row_number}: source must be "
-                "an https URL or an internal hardware/ path"
+                "an https URL or an internal docs/ or hardware/ path"
             )
         for column in ("Source revision", "Package", "Notes"):
             if not row[column].strip():
@@ -608,6 +618,74 @@ def validate_jpb1_symbol_from_pin_map() -> None:
             fail(f"{symbol_name} is missing JPB1 pin {pin_number} {pin_name}")
 
 
+def validate_instance_symbol_map() -> None:
+    path = PB100_DIR / "PB-100-schematic-instance-symbol-map.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty instance-symbol map: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in INSTANCE_SYMBOL_MAP_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    instance_path = PB100_DIR / "PB-100-schematic-instance-plan.csv"
+    instance_rows = list(csv.DictReader(instance_path.open(newline="", encoding="utf-8")))
+    instance_refs = {row["Ref"].strip() for row in instance_rows}
+    map_refs = {row["Ref"].strip() for row in rows}
+    missing_refs = sorted(instance_refs - map_refs)
+    extra_refs = sorted(map_refs - instance_refs)
+    if missing_refs:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing instance refs: "
+            f"{', '.join(missing_refs)}"
+        )
+    if extra_refs:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} has refs not in instance plan: "
+            f"{', '.join(extra_refs)}"
+        )
+
+    readiness_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-symbol-mpn-readiness.csv").open(newline="", encoding="utf-8"))
+    )
+    readiness_keys = {row["Symbol key"].strip() for row in readiness_rows}
+    worklist_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-symbol-capture-worklist.csv").open(newline="", encoding="utf-8"))
+    )
+    worklist_by_key = {row["Symbol key"].strip(): row for row in worklist_rows}
+    symbol_text = read_text(KICAD_DIR / "lib" / "PB100.kicad_sym")
+
+    for row_number, row in enumerate(rows, 2):
+        ref = row["Ref"].strip()
+        symbol_key = row["Symbol key"].strip()
+        symbol_name = row["Concrete symbol name"].strip()
+        symbol_state = row["Symbol state"].strip()
+        if symbol_key not in readiness_keys:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown symbol key {symbol_key}")
+        worklist_row = worklist_by_key.get(symbol_key)
+        if worklist_row is None:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: symbol key {symbol_key} is missing worklist row")
+        if symbol_name != worklist_row["Concrete symbol name"].strip():
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: {ref} maps to {symbol_name}, "
+                f"but worklist uses {worklist_row['Concrete symbol name'].strip()}"
+            )
+        if symbol_state not in {"Created", "Pending"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Symbol state must be Created or Pending")
+        symbol_present = f'(symbol "{symbol_name}"' in symbol_text
+        if symbol_state == "Created" and not symbol_present and symbol_name not in PIN_MAP_EVIDENCE_SYMBOLS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: created symbol is missing: {symbol_name}")
+        if symbol_state == "Pending" and symbol_present:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: pending symbol is already present: {symbol_name}")
+        if ref == "Q102" and "OUT2_ESCAPE_FET" not in row["Notes"]:
+            fail("Q102 instance-symbol map must preserve the OUT2 escape-FET note")
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -637,6 +715,7 @@ def main() -> int:
     validate_symbol_capture_progress()
     validate_symbol_pin_evidence()
     validate_jpb1_symbol_from_pin_map()
+    validate_instance_symbol_map()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0

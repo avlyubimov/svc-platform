@@ -25,6 +25,7 @@ manufacturing outputs are also blocked by repository validation.
 - `../PB-100-schematic-capture-plan.md`
 - `../PB-100-net-naming.md`
 - `../PB-100-schematic-instance-plan.csv`
+- `../PB-100-schematic-instance-symbol-map.csv`
 - `../PB-100-kicad-prep.md`
 - `../PB-100-kicad-footprint-plan.csv`
 - `../PB-100-symbol-mpn-readiness.csv`

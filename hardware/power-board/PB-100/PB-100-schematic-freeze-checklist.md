@@ -62,6 +62,7 @@ Before marking this checklist `Closed`, the review packet must include:
 
 - Updated schematic package.
 - Final output channel matrix.
+- Final instance-symbol map linking every schematic reference to a symbol key.
 - Final power-path candidate table with selected and alternate MPNs.
 - Final symbol/MPN readiness table with concrete symbol and footprint status.
 - Final symbol capture worklist with pin evidence and blocked actions.

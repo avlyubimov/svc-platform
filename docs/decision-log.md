@@ -631,3 +631,15 @@ per-output fuse path used by F101 through F110.
 Reason: Output fuses are part of the schematic instance plan and garage
 installation model. They need a schematic-class symbol without moving fuse
 holders onto the PCB or locking a footprint.
+
+## 2026-06-30 — PB-100 instance-symbol map
+
+Decision: PB-100 now has
+`hardware/power-board/PB-100/PB-100-schematic-instance-symbol-map.csv`, linking
+every row in the schematic instance plan to a symbol key and concrete
+`PB100_*_PRELIM` symbol target. Validation checks one-to-one reference coverage,
+worklist consistency, created/pending state, and the OUT2 escape-FET note.
+
+Reason: Schematic capture needs a controlled path from planned references
+(`U101`, `Q102`, `JPB1`, `TP1..TPn`) to project-local symbols before real
+schematic placement starts.

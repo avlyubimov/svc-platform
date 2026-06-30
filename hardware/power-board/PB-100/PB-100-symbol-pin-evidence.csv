@@ -57,6 +57,14 @@ PB100_OUTPUT_FUSE_CLASS_PRELIM,1,OUTn_SWITCHED,hardware/power-board/PB-100/PB-10
 PB100_OUTPUT_FUSE_CLASS_PRELIM,2,OUTn_FUSED,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage output fuse class,Fused output side toward connector
 PB100_MAIN_FUSE_CLASS_PRELIM,1,VBAT_BATT,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage fuse class,Battery side of near-battery fuse
 PB100_MAIN_FUSE_CLASS_PRELIM,2,VBAT_FUSED,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage fuse class,Protected side after near-battery fuse
+PB100_INPUT_CONNECTOR_CLASS_PRELIM,1,VBAT_RAW,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage input connector class,Battery input positive before reverse protection
+PB100_INPUT_CONNECTOR_CLASS_PRELIM,2,GND_IN,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage input connector class,Battery input ground return
+PB100_BUCK_INDUCTOR_CLASS_PRELIM,1,SW,hardware/power-board/PB-100/PB-100-logic-power-rails.md,Internal Rev.1 schematic class,Buck inductor class,Switching-node side of buck inductor
+PB100_BUCK_INDUCTOR_CLASS_PRELIM,2,PB_5V_OUT,hardware/power-board/PB-100/PB-100-logic-power-rails.md,Internal Rev.1 schematic class,Buck inductor class,Protected 5 V output side
+PB100_BOARD_ID_RESISTOR_CLASS_PRELIM,1,LB_3V3_IO,hardware/power-board/PB-100/PB-100-b2b-pin-map.csv,Internal Rev.1 schematic class,Board identity resistor class,Logic reference side of board ID divider
+PB100_BOARD_ID_RESISTOR_CLASS_PRELIM,2,PB_ID_ADC,hardware/power-board/PB-100/PB-100-b2b-pin-map.csv,Internal Rev.1 schematic class,Board identity resistor class,Board ID ADC node
+PB100_BOARD_ID_RESISTOR_CLASS_PRELIM,3,GND,hardware/power-board/PB-100/PB-100-b2b-pin-map.csv,Internal Rev.1 schematic class,Board identity resistor class,Ground side of board ID divider
+PB100_TEST_POINT_CLASS_PRELIM,1,TP_NET,docs/testing/test-plan.md,Internal Rev.1 schematic class,Test point class,Generic test point node
 PB100_SIDR626LDP_PRELIM,1,S,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B May 2024,PowerPAK SO-8DC,Source lead
 PB100_SIDR626LDP_PRELIM,2,S,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B May 2024,PowerPAK SO-8DC,Source lead
 PB100_SIDR626LDP_PRELIM,3,S,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B May 2024,PowerPAK SO-8DC,Source lead
