@@ -25,6 +25,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
 - `hardware/power-board/PB-100/PB-100-output-channel-matrix.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`
+- `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-instance-plan.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-instance-symbol-map.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-sheet-reference-map.csv`
@@ -59,6 +60,7 @@ The schematic review packet consists of:
 |---|---|
 | High-side output stages | Final controller/FET/sense schematic values and fault timing |
 | Output pin contract | OUT1..OUT10 control, fault, telemetry, load, fuse, and connector nets captured without role-specific names |
+| Output controller template | TPS48110 threshold, timing, bootstrap, gate-drive, and current-sense values reviewed per channel class |
 | OUT2 SOA | Data-sheet SOA extraction against `PB-100-out2-soa-envelope.csv` |
 | Input reverse protection | Final MOSFET package choice, Q1 pin evidence, and 40 A copper/thermal review |
 | TVS/load dump | Clamp and overshoot margin against every selected downstream device |

@@ -1,0 +1,20 @@
+Pin number,Pin name,Signal role,Net pattern,Direction,Default state,Freeze dependency
+1,EN/UVLO,Enable and undervoltage threshold,OUTn_CTL,LB-100 to controller,Pulled low/off until valid logic,UVLO divider and control gating values close during schematic review
+2,OV,Overvoltage threshold,OUTn_OV_SET,Local threshold network,Threshold TBD not final,OV divider value and TVS clamp margin close during schematic review
+3,INP,Gate-driver command input,OUTn_INP,Local control conditioning,Pulled low/off until valid logic,Control conditioning from OUTn_CTL closes during schematic review
+4,FLT_T,Thermal fault output,OUTn_FLT,Controller to LB-100,Fault asserted or pulled to safe state until valid,Open-drain fault aggregation and pull-up domain close during schematic review
+5,FLT_I,Current fault output,OUTn_FLT,Controller to LB-100,Fault asserted or pulled to safe state until valid,Open-drain fault aggregation and pull-up domain close during schematic review
+6,GND,Controller ground,GND,Power reference,Ground reference present,Analog/digital return strategy closes during schematic review
+7,IMON,Current monitor output,OUTn_IMON,Controller to LB-100,Zero volts when off,ADC scaling filtering and calibration close during schematic review
+8,IWRN,Overcurrent warning threshold,OUTn_IWRN_SET,Local threshold network,Threshold TBD not final,Per-class current warning values close during schematic review
+9,TMR,Fault timer,OUTn_TMR,Local timing network,Timing TBD not final,Fault blanking and retry timing close during schematic review
+10,DIODE,Remote temperature diode input,OUTn_DIODE,Local sensor input,Sensor TBD not final,Use of remote diode versus NTC strategy closes during schematic review
+11,N.C.,No connect,NC,None,No connection,Remain no-connect unless schematic review or datasheet review changes package variant
+12,BST,Bootstrap supply,OUTn_BST,Local driver bootstrap,Bootstrap capacitor TBD not final,Bootstrap capacitor value voltage rating and placement close during schematic review
+13,SRC,External FET source sense,OUTn_SRC,Controller to switch node,Tracks switched source node,Source sense and fuse-side naming close during schematic review
+14,PD,Gate pull-down drive,OUTn_PD,Controller to MOSFET gate path,Pull-down keeps gate off by default,Gate resistor and discharge path close during schematic review
+15,PU,Gate pull-up drive,OUTn_PU,Controller to MOSFET gate path,Inactive until controller enabled,Gate resistor and charge path close during schematic review
+17,CS-,Current-sense negative input,OUTn_CS_N,Local current-sense path,Measurement baseline TBD not final,Sense resistor or controller sense topology closes during schematic review
+18,CS+,Current-sense positive input,OUTn_CS_P,Local current-sense path,Measurement baseline TBD not final,Sense resistor or controller sense topology closes during schematic review
+19,ISCP,Short-circuit threshold,OUTn_ISCP_SET,Local threshold network,Threshold TBD not final,Short-circuit threshold values close during schematic review
+20,VS,Controller supply,VBAT_PROT,Protected rail to controller,Absent until protected rail valid,Per-channel decoupling and surge margin close during schematic review

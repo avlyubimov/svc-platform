@@ -167,6 +167,15 @@ OUTPUT_CHANNEL_PIN_CONTRACT_COLUMNS = (
     "Default state",
     "Safety rule",
 )
+OUTPUT_CONTROLLER_PIN_TEMPLATE_COLUMNS = (
+    "Pin number",
+    "Pin name",
+    "Signal role",
+    "Net pattern",
+    "Direction",
+    "Default state",
+    "Freeze dependency",
+)
 INPUT_PROTECTION_PIN_CONTRACT_COLUMNS = (
     "Ref",
     "Symbol key",
@@ -201,6 +210,7 @@ REQUIRED_NET_PATTERNS = {
     "CAN1_TX_ROUTE",
 }
 ALLOWED_BOM_FILES = {"factory_bom_draft.csv", "garage_bom_draft.csv"}
+OUTPUT_CONTROLLER_SYMBOL = "PB100_TPS48110AQDGXRQ1_PRELIM"
 REQUIRED_READINESS_AREAS = {
     "Architecture baseline",
     "PB-100 requirements",
@@ -210,6 +220,7 @@ REQUIRED_READINESS_AREAS = {
     "Sheet map",
     "Net domains",
     "Output pin contract",
+    "Output controller template",
     "Input protection contract",
     "Logic power values",
     "BOM synchronization",
@@ -1233,6 +1244,95 @@ def validate_output_channel_pin_contract() -> None:
         )
 
 
+def validate_output_controller_pin_template() -> None:
+    path = PB100_DIR / "PB-100-output-controller-pin-template.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty output controller pin template: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in OUTPUT_CONTROLLER_PIN_TEMPLATE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    evidence_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-symbol-pin-evidence.csv").open(newline="", encoding="utf-8"))
+    )
+    evidence_pins = {
+        row["Pin number"].strip(): row["Pin name"].strip()
+        for row in evidence_rows
+        if row["Symbol name"].strip() == OUTPUT_CONTROLLER_SYMBOL
+    }
+    if not evidence_pins:
+        fail(f"missing pin evidence for {OUTPUT_CONTROLLER_SYMBOL}")
+
+    seen_pins = set()
+    net_patterns = set()
+    for row_number, row in enumerate(rows, 2):
+        pin_number = row["Pin number"].strip()
+        pin_name = row["Pin name"].strip()
+        net_pattern = row["Net pattern"].strip()
+        for column in OUTPUT_CONTROLLER_PIN_TEMPLATE_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if pin_number in seen_pins:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate pin {pin_number}")
+        seen_pins.add(pin_number)
+        expected_pin_name = evidence_pins.get(pin_number)
+        if expected_pin_name is None:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: pin {pin_number} is not in pin evidence")
+        if pin_name != expected_pin_name:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: pin {pin_number} must be "
+                f"{expected_pin_name}, got {pin_name}"
+            )
+        for forbidden_token in FORBIDDEN_ROLE_TOKENS:
+            if forbidden_token in net_pattern:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: role token in net pattern {net_pattern}")
+        if not (
+            net_pattern.startswith("OUTn_")
+            or net_pattern in {"GND", "NC", "VBAT_PROT"}
+        ):
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: unsupported output-controller "
+                f"net pattern {net_pattern}"
+            )
+        if pin_name == "N.C." and net_pattern != "NC":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: N.C. pin must use NC net pattern")
+        if pin_name == "GND" and net_pattern != "GND":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: GND pin must use GND net pattern")
+        if pin_name == "VS" and net_pattern != "VBAT_PROT":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: VS pin must use VBAT_PROT")
+        if "final" in row["Default state"].lower() and "not final" not in row["Default state"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: default state must not lock final values")
+        if "schematic review" not in row["Freeze dependency"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze dependency must reference schematic review")
+        net_patterns.add(net_pattern)
+
+    missing_pins = sorted(evidence_pins.keys() - seen_pins, key=lambda value: int(value))
+    extra_pins = sorted(seen_pins - evidence_pins.keys(), key=lambda value: int(value))
+    if missing_pins:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing controller pins: "
+            f"{', '.join(missing_pins)}"
+        )
+    if extra_pins:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} has pins not in evidence: "
+            f"{', '.join(extra_pins)}"
+        )
+    for required_pattern in ("OUTn_CTL", "OUTn_FLT", "OUTn_IMON", "OUTn_SRC", "OUTn_PU", "OUTn_PD", "VBAT_PROT"):
+        if required_pattern not in net_patterns:
+            fail(
+                f"{path.relative_to(REPO_ROOT)} is missing required output-controller "
+                f"net pattern {required_pattern}"
+            )
+
+
 def validate_input_protection_pin_contract() -> None:
     path = PB100_DIR / "PB-100-input-protection-pin-contract.csv"
     validate_csv(path)
@@ -1410,6 +1510,7 @@ def main() -> int:
     validate_bom_symbol_map()
     validate_schematic_readiness_dashboard()
     validate_output_channel_pin_contract()
+    validate_output_controller_pin_template()
     validate_input_protection_pin_contract()
     validate_logic_power_design_placeholders()
     validate_net_naming_contract()

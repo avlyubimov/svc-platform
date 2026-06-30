@@ -13,6 +13,18 @@ LB_3V3_IO,Logic reference,b2b-interface.kicad_sch,LB-100 to PB-100,Absent when L
 OUTn_CTL,Output control,outputs-1-10.kicad_sch,LB-100 to PB-100,Pulled low/off,Must remain generic OUTn control and role-mapped by configuration
 OUTn_FLT,Output fault,outputs-1-10.kicad_sch,PB-100 to LB-100,Fault until valid,Must report controller or output fault without role-specific naming
 OUTn_IMON,Output telemetry,outputs-1-10.kicad_sch,PB-100 to LB-100,Zero volts when off,Must be ADC-safe and calibrated per output
+OUTn_OV_SET,Output local threshold,output-channel-template.kicad_sch,Local threshold network,TBD not final,Must close with TVS clamp and controller limit review
+OUTn_INP,Output local control,output-channel-template.kicad_sch,Local control conditioning,Pulled low/off,Must derive from OUTn_CTL without role-specific behavior
+OUTn_IWRN_SET,Output local threshold,output-channel-template.kicad_sch,Local threshold network,TBD not final,Must close with per-class current warning values
+OUTn_TMR,Output local timing,output-channel-template.kicad_sch,Local timing network,TBD not final,Must close with fault blanking and retry policy
+OUTn_DIODE,Output local thermal,output-channel-template.kicad_sch,Local sensor input,TBD not final,Must close with remote diode or no-populate decision
+OUTn_BST,Output local driver,output-channel-template.kicad_sch,Local bootstrap network,TBD not final,Must close with bootstrap capacitor value and voltage rating
+OUTn_SRC,Output local switch,output-channel-template.kicad_sch,Local source sense,Tracks switched source node,Must close with MOSFET source and fuse-side naming review
+OUTn_PD,Output local gate drive,output-channel-template.kicad_sch,Controller to gate path,Pull-down keeps gate off,Must close with gate discharge resistor review
+OUTn_PU,Output local gate drive,output-channel-template.kicad_sch,Controller to gate path,Inactive until enabled,Must close with gate charge resistor review
+OUTn_CS_N,Output local current sense,output-channel-template.kicad_sch,Local current-sense path,TBD not final,Must close with current-sense topology review
+OUTn_CS_P,Output local current sense,output-channel-template.kicad_sch,Local current-sense path,TBD not final,Must close with current-sense topology review
+OUTn_ISCP_SET,Output local threshold,output-channel-template.kicad_sch,Local threshold network,TBD not final,Must close with short-circuit threshold review
 OUTn_LOAD,Output power,outputs-1-10.kicad_sch,PB-100 to harness,Off by default,Must pass fuse current SOA and thermal review
 OUTn_SWITCHED,Output fuse input,outputs-1-10.kicad_sch,PB-100 to fuse,Off by default,Must feed user-serviceable fuse path only
 OUTn_FUSED,Output connector feed,outputs-1-10.kicad_sch,Fuse to harness,Off by default,Must remain generic and fuse-protected

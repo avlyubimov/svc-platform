@@ -34,8 +34,19 @@ Use `OUTn` where `n` is `1` through `10`.
 | `OUTn_CTL` | LB-100 to PB-100 | Enable/PWM command |
 | `OUTn_FLT` | PB-100 to LB-100 | Fault/status output |
 | `OUTn_IMON` | PB-100 to LB-100 | Analog current telemetry |
+| `OUTn_OV_SET` | Local | High-side controller overvoltage threshold network |
+| `OUTn_INP` | Local | Conditioned high-side controller command input |
+| `OUTn_IWRN_SET` | Local | Overcurrent warning threshold network |
+| `OUTn_TMR` | Local | Fault timing network |
+| `OUTn_DIODE` | Local | Remote temperature-sense input or reviewed no-populate path |
+| `OUTn_BST` | Local | Bootstrap supply network |
 | `OUTn_GATE` | Local | External MOSFET gate drive |
 | `OUTn_SRC` | Local | High-side controller source/sense node |
+| `OUTn_PD` | Local | High-side controller gate pull-down drive |
+| `OUTn_PU` | Local | High-side controller gate pull-up drive |
+| `OUTn_CS_N` | Local | Current-sense negative input |
+| `OUTn_CS_P` | Local | Current-sense positive input |
+| `OUTn_ISCP_SET` | Local | Short-circuit threshold network |
 | `OUTn_LOAD` | PB-100 output | Fused output to external load |
 | `OUTn_FUSED` | Local | Node after user-serviceable fuse when needed |
 

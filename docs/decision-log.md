@@ -705,3 +705,18 @@ Reason: The project is close enough to schematic capture that review status,
 net intent, and unresolved close work must be synchronized automatically. These
 contracts reduce manual drift without starting PCB layout or pretending that
 Q1, logic-power values, SOA, footprints, or assembly sourcing are final.
+
+## 2026-06-30 — PB-100 output controller pin template
+
+Decision: PB-100 now has
+`hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`, mapping
+the preliminary TPS48110 controller pins to generic `OUTn_*` schematic patterns.
+Validation checks every template pin number/name against
+`PB-100-symbol-pin-evidence.csv` for `PB100_TPS48110AQDGXRQ1_PRELIM`, keeps
+local threshold/timing/bootstrap/gate-drive values non-final, and requires the
+template to remain role-agnostic.
+
+Reason: The output-channel schematic needs more detail than a controller symbol
+and high-level channel contract. A checked pin template lets OUT1 through OUT10
+share one reviewable pattern while preserving configuration-based role mapping
+and blocking value/footprint lock before schematic review.

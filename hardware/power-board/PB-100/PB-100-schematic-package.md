@@ -27,6 +27,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`
+- `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-preliminary-validation.md`
 - `hardware/power-board/PB-100/PB-100-net-naming.md`
 - `hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv`
@@ -132,6 +133,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-map.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`
+- `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`

@@ -30,6 +30,7 @@ manufacturing outputs are also blocked by repository validation.
 - `../PB-100-schematic-sheet-reference-map.csv`
 - `../PB-100-schematic-net-domain-plan.csv`
 - `../PB-100-output-channel-pin-contract.csv`
+- `../PB-100-output-controller-pin-template.csv`
 - `../PB-100-input-protection-pin-contract.csv`
 - `../PB-100-logic-power-design-placeholders.csv`
 - `../PB-100-kicad-prep.md`
