@@ -21,7 +21,7 @@ state changes.
 ## Initial safety policy
 
 - All outputs default off.
-- Invalid configuration keeps affected outputs off.
+- Invalid device configuration keeps outputs off.
 - Board over-budget state refuses new loads before shedding active loads.
 - Lower-priority loads shed before higher-priority loads.
 - Battery cutoff shutdown is applied through the System Safety Coordinator, not
@@ -34,3 +34,9 @@ Initial host-testable implementation:
 - `firmware/services/output_manager.h`
 - `firmware/services/output_manager.c`
 - `firmware/tests/test_output_manager.c`
+
+Device configuration validation is provided by:
+
+- `firmware/services/config_validator.h`
+- `firmware/services/config_validator.c`
+- `firmware/tests/test_config_validator.c`

@@ -22,5 +22,6 @@ typedef enum {
     OUT_ROLE_HEATED_SEAT_PASSENGER,
     OUT_ROLE_DVR,
     OUT_ROLE_AUX_BRAKE,
-    OUT_ROLE_SPARE
+    OUT_ROLE_SPARE,
+    OUT_ROLE_COUNT
 } output_role_t;

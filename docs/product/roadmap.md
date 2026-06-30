@@ -47,6 +47,7 @@ Status: In progress
 
 Current host-tested services:
 
+- Configuration Validator
 - Event Bus
 - Event Dispatcher
 - Power Budget

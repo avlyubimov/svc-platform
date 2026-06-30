@@ -4,6 +4,7 @@ CFLAGS ?= -std=c11 -Wall -Wextra -Werror
 
 BUILD_DIR := build
 FIRMWARE_HEADERS := $(wildcard core/*.h services/*.h)
+CONFIG_VALIDATOR_TEST := $(BUILD_DIR)/test_config_validator
 POWER_BUDGET_TEST := $(BUILD_DIR)/test_power_budget
 OUTPUT_MANAGER_TEST := $(BUILD_DIR)/test_output_manager
 BATTERY_SERVICE_TEST := $(BUILD_DIR)/test_battery_service
@@ -11,7 +12,56 @@ EVENT_BUS_TEST := $(BUILD_DIR)/test_event_bus
 EVENT_DISPATCHER_TEST := $(BUILD_DIR)/test_event_dispatcher
 CAN_SAFETY_TEST := $(BUILD_DIR)/test_can_safety
 SYSTEM_SAFETY_TEST := $(BUILD_DIR)/test_system_safety
+CONFIG_VALIDATOR_SRCS := \
+	core/svc_config_defaults.c \
+	services/battery_service.c \
+	services/config_validator.c \
+	services/event_bus.c \
+	services/power_budget.c \
+	services/output_manager.c \
+	services/system_safety.c \
+	tests/test_config_validator.c
+POWER_BUDGET_SRCS := \
+	core/svc_config_defaults.c \
+	services/power_budget.c \
+	tests/test_power_budget.c
+OUTPUT_MANAGER_SRCS := \
+	core/svc_config_defaults.c \
+	services/battery_service.c \
+	services/config_validator.c \
+	services/power_budget.c \
+	services/output_manager.c \
+	tests/test_output_manager.c
+BATTERY_SERVICE_SRCS := \
+	core/svc_config_defaults.c \
+	services/battery_service.c \
+	tests/test_battery_service.c
+EVENT_BUS_SRCS := \
+	services/event_bus.c \
+	tests/test_event_bus.c
+EVENT_DISPATCHER_SRCS := \
+	core/svc_config_defaults.c \
+	services/battery_service.c \
+	services/config_validator.c \
+	services/event_bus.c \
+	services/event_dispatcher.c \
+	services/power_budget.c \
+	services/output_manager.c \
+	tests/test_event_dispatcher.c
+CAN_SAFETY_SRCS := \
+	services/can_safety.c \
+	tests/test_can_safety.c
+SYSTEM_SAFETY_SRCS := \
+	core/svc_config_defaults.c \
+	services/battery_service.c \
+	services/config_validator.c \
+	services/event_bus.c \
+	services/power_budget.c \
+	services/output_manager.c \
+	services/system_safety.c \
+	tests/test_system_safety.c
 HOST_TESTS := \
+	$(CONFIG_VALIDATOR_TEST) \
 	$(POWER_BUDGET_TEST) \
 	$(OUTPUT_MANAGER_TEST) \
 	$(BATTERY_SERVICE_TEST) \
@@ -23,6 +73,7 @@ HOST_TESTS := \
 .PHONY: test clean
 
 test: $(HOST_TESTS)
+	$(CONFIG_VALIDATOR_TEST)
 	$(POWER_BUDGET_TEST)
 	$(OUTPUT_MANAGER_TEST)
 	$(BATTERY_SERVICE_TEST)
@@ -34,25 +85,28 @@ test: $(HOST_TESTS)
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-$(POWER_BUDGET_TEST): core/svc_config_defaults.c services/power_budget.c tests/test_power_budget.c $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+$(CONFIG_VALIDATOR_TEST): $(CONFIG_VALIDATOR_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
-$(OUTPUT_MANAGER_TEST): core/svc_config_defaults.c services/power_budget.c services/output_manager.c tests/test_output_manager.c $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+$(POWER_BUDGET_TEST): $(POWER_BUDGET_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
-$(BATTERY_SERVICE_TEST): core/svc_config_defaults.c services/battery_service.c tests/test_battery_service.c $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+$(OUTPUT_MANAGER_TEST): $(OUTPUT_MANAGER_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
-$(EVENT_BUS_TEST): services/event_bus.c tests/test_event_bus.c $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+$(BATTERY_SERVICE_TEST): $(BATTERY_SERVICE_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
-$(EVENT_DISPATCHER_TEST): core/svc_config_defaults.c services/event_bus.c services/event_dispatcher.c services/power_budget.c services/output_manager.c tests/test_event_dispatcher.c $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+$(EVENT_BUS_TEST): $(EVENT_BUS_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
-$(CAN_SAFETY_TEST): services/can_safety.c tests/test_can_safety.c $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+$(EVENT_DISPATCHER_TEST): $(EVENT_DISPATCHER_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
-$(SYSTEM_SAFETY_TEST): core/svc_config_defaults.c services/battery_service.c services/event_bus.c services/power_budget.c services/output_manager.c services/system_safety.c tests/test_system_safety.c $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+$(CAN_SAFETY_TEST): $(CAN_SAFETY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
+
+$(SYSTEM_SAFETY_TEST): $(SYSTEM_SAFETY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 clean:

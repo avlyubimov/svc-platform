@@ -1,5 +1,12 @@
 #include "output_manager.h"
 
+#include "config_validator.h"
+
+static bool config_is_valid(const svc_device_config_t *config)
+{
+    return svc_config_validate_device(config).status == SVC_CONFIG_OK;
+}
+
 static bool output_id_is_valid(svc_output_id_t output_id)
 {
     return output_id >= SVC_OUTPUT_OUT1 && output_id <= SVC_OUTPUT_OUT10;
@@ -34,7 +41,7 @@ bool svc_output_manager_init(
     svc_output_manager_t *manager,
     const svc_device_config_t *config)
 {
-    if (manager == NULL || !svc_power_budget_validate_config(config)) {
+    if (manager == NULL || !config_is_valid(config)) {
         return false;
     }
 
@@ -50,7 +57,7 @@ svc_output_manager_result_t svc_output_manager_request_enable(
     uint32_t measured_total_current_ma,
     bool telemetry_valid)
 {
-    if (manager == NULL || !svc_power_budget_validate_config(manager->config)) {
+    if (manager == NULL || !config_is_valid(manager->config)) {
         return make_result(manager, SVC_OUTPUT_MANAGER_DENY_INVALID_CONFIG, SVC_POWER_BUDGET_DENY_INVALID_CONFIG);
     }
     if (!output_id_is_valid(output_id)) {
@@ -81,7 +88,7 @@ svc_output_manager_result_t svc_output_manager_request_disable(
     svc_output_manager_t *manager,
     svc_output_id_t output_id)
 {
-    if (manager == NULL || !svc_power_budget_validate_config(manager->config)) {
+    if (manager == NULL || !config_is_valid(manager->config)) {
         return make_result(manager, SVC_OUTPUT_MANAGER_DENY_INVALID_CONFIG, SVC_POWER_BUDGET_DENY_INVALID_CONFIG);
     }
     if (!output_id_is_valid(output_id)) {
@@ -96,7 +103,7 @@ svc_output_manager_result_t svc_output_manager_apply_fault(
     svc_output_manager_t *manager,
     svc_output_id_t output_id)
 {
-    if (manager == NULL || !svc_power_budget_validate_config(manager->config)) {
+    if (manager == NULL || !config_is_valid(manager->config)) {
         return make_result(manager, SVC_OUTPUT_MANAGER_DENY_INVALID_CONFIG, SVC_POWER_BUDGET_DENY_INVALID_CONFIG);
     }
     if (!output_id_is_valid(output_id)) {

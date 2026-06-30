@@ -351,3 +351,12 @@ headers and compile only C sources from each target dependency list.
 
 Reason: Interface changes must force host-test binary rebuilds; otherwise local
 checks can pass stale binaries after service header edits.
+
+## 2026-06-30 — Firmware configuration validator
+
+Decision: Firmware now has a host-testable configuration validator for battery
+settings, power budget constraints, output ID continuity, and output role enum
+bounds.
+
+Reason: Accessory roles must remain configuration data. Firmware services should
+reject invalid role values without hard-coding any role-to-output assignment.

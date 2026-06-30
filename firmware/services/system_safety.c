@@ -2,6 +2,8 @@
 
 #include <stddef.h>
 
+#include "config_validator.h"
+
 static uint16_t output_mask_for_id(svc_output_id_t output_id)
 {
     return (uint16_t)(1U << (uint8_t)output_id);
@@ -68,7 +70,7 @@ bool svc_system_safety_init(
     svc_system_safety_t *safety,
     const svc_device_config_t *config)
 {
-    if (safety == NULL || config == NULL || !svc_battery_config_is_valid(&config->battery) || !svc_power_budget_validate_config(config)) {
+    if (safety == NULL || svc_config_validate_device(config).status != SVC_CONFIG_OK) {
         return false;
     }
 
