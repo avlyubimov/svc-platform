@@ -283,3 +283,12 @@ configuration, or projected total-current overrun.
 
 Reason: ADR-0008 makes board-level current-budget enforcement a safety feature,
 so it needs executable tests before hardware is available.
+
+## 2026-06-30 — Firmware output manager core
+
+Decision: Firmware now has a host-testable Output Manager core that keeps all
+outputs off by default, enables outputs only through generic `OUT1`..`OUT10`
+IDs, checks the power budget before enabling, and locks outputs off after faults.
+
+Reason: Output control must be centralized and role-agnostic so CAN/rules cannot
+directly manipulate GPIO/PWM hardware.

@@ -24,3 +24,9 @@ state changes.
 - Invalid configuration keeps affected outputs off.
 - Board over-budget state refuses new loads before shedding active loads.
 - Lower-priority loads shed before higher-priority loads.
+
+Initial host-testable implementation:
+
+- `firmware/services/output_manager.h`
+- `firmware/services/output_manager.c`
+- `firmware/tests/test_output_manager.c`
