@@ -14,7 +14,8 @@ Status: In progress
 
 - Schematic package
 - Schematic freeze checklist
-- Schematic
+- KiCad schematic scaffold
+- Schematic capture
 - PCB
 - Gerber
 - Factory BOM
@@ -36,11 +37,21 @@ Status: In progress
 - service button
 
 ## Phase 4 — Firmware MVP
+Status: In progress
+
 - output control
 - ACC
 - battery protection
 - logging
 - CAN read-only logger
+
+Current host-tested services:
+
+- Event Bus
+- Power Budget
+- Output Manager
+- Battery Protection
+- CAN Safety Guard
 
 ## Phase 5 — BMW K25 integration
 - harness

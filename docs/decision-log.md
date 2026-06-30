@@ -275,6 +275,14 @@ Reason: DT contacts are too close for the 15 A and 20 A fuse output classes,
 while DTP provides the needed high-current connector class. DTM remains a signal
 connector family, not a power-output family.
 
+## 2026-06-30 — Project validation baseline
+
+Decision: Top-level project validation is `python3 tools/validate_pb100.py` plus
+`make -C firmware test`, and GitHub Actions runs both on push and pull request.
+
+Reason: Hardware planning artifacts and firmware safety services now change
+together, so project status must be verified from the repository root.
+
 ## 2026-06-30 — Firmware power budget service
 
 Decision: Firmware now has a host-testable power budget service that denies

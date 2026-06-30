@@ -11,10 +11,20 @@ SVC is an open modular platform for vehicle accessory control. It should allow n
 
 ## Current status
 
-Architecture v1.0 is frozen. PB-100 schematic planning is in progress.
+Architecture v1.0 is frozen. PB-100 schematic planning is ready for schematic
+review, with KiCad schematic scaffold started. Firmware MVP host-testable safety
+services are in progress.
 
-Do not start PCB layout until the PB-100 schematic package, pin budget, and
-component-family selections are reviewed.
+Do not start PCB layout until the PB-100 schematic freeze checklist is closed.
+
+## Validation
+
+```bash
+python3 tools/validate_pb100.py
+make -C firmware test
+```
+
+These checks run in GitHub Actions on push and pull request.
 
 ## Repository structure
 
