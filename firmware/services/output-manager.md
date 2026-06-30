@@ -1,0 +1,26 @@
+# Output Manager
+
+The Output Manager is the only firmware service allowed to apply physical output
+state changes.
+
+## Responsibilities
+
+- Map configured roles to generic outputs.
+- Enforce per-channel current limits.
+- Enforce board-level current budget.
+- Apply priority-based load shedding.
+- Keep outputs off during boot, reset, update, and fault recovery.
+- Convert rule-engine actions into hardware driver commands.
+
+## Prohibited behavior
+
+- CAN Manager must not directly control outputs.
+- Rule Engine must not write GPIO/PWM hardware directly.
+- Accessory roles must not be hard-coded to output numbers in firmware.
+
+## Initial safety policy
+
+- All outputs default off.
+- Invalid configuration keeps affected outputs off.
+- Board over-budget state refuses new loads before shedding active loads.
+- Lower-priority loads shed before higher-priority loads.

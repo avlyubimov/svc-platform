@@ -7,3 +7,6 @@
 - FB-100 Front Panel Board
 
 Do not create KiCad layout until architecture is frozen.
+
+Architecture v1.0 is frozen. PB-100 schematic planning may proceed, but PCB
+layout remains blocked until schematic inputs are reviewed.

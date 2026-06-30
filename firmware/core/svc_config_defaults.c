@@ -1,0 +1,24 @@
+#include "svc_config.h"
+
+const svc_device_config_t svc_default_config = {
+    .power_budget = {
+        .total_current_limit_ma = SVC_DEFAULT_TOTAL_CURRENT_LIMIT_MA,
+        .shed_order = {
+            SVC_PRIORITY_C,
+            SVC_PRIORITY_B,
+            SVC_PRIORITY_A
+        }
+    },
+    .outputs = {
+        {SVC_OUTPUT_OUT1, OUT_ROLE_USB, 15U, 12000U, true, SVC_PRIORITY_B},
+        {SVC_OUTPUT_OUT2, OUT_ROLE_CIGARETTE_SOCKET, 20U, 18000U, false, SVC_PRIORITY_C},
+        {SVC_OUTPUT_OUT3, OUT_ROLE_FOG_LEFT, 10U, 8000U, true, SVC_PRIORITY_C},
+        {SVC_OUTPUT_OUT4, OUT_ROLE_FOG_RIGHT, 10U, 8000U, true, SVC_PRIORITY_C},
+        {SVC_OUTPUT_OUT5, OUT_ROLE_CHIGEE, 5U, 4000U, true, SVC_PRIORITY_B},
+        {SVC_OUTPUT_OUT6, OUT_ROLE_HEATED_SEAT_RIDER, 10U, 8000U, true, SVC_PRIORITY_C},
+        {SVC_OUTPUT_OUT7, OUT_ROLE_HEATED_SEAT_PASSENGER, 10U, 8000U, true, SVC_PRIORITY_C},
+        {SVC_OUTPUT_OUT8, OUT_ROLE_DVR, 5U, 4000U, true, SVC_PRIORITY_B},
+        {SVC_OUTPUT_OUT9, OUT_ROLE_AUX_BRAKE, 5U, 4000U, true, SVC_PRIORITY_A},
+        {SVC_OUTPUT_OUT10, OUT_ROLE_SPARE, 10U, 8000U, true, SVC_PRIORITY_C}
+    }
+};

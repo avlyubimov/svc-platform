@@ -11,7 +11,10 @@ SVC is an open modular platform for vehicle accessory control. It should allow n
 
 ## Current status
 
-Architecture phase. Do not start PCB layout until `docs/architecture/Architecture-Review-v1.0.md` is completed and accepted.
+Architecture v1.0 is frozen. PB-100 schematic planning is in progress.
+
+Do not start PCB layout until the PB-100 schematic package, pin budget, and
+component-family selections are reviewed.
 
 ## Repository structure
 

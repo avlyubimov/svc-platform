@@ -1,10 +1,13 @@
 # SVC Architecture Review v1.0
 
-Status: Freeze candidate
+Status: Frozen
 
-This review defines the v1.0 architecture baseline for SVC. KiCad schematic and
-layout work remains blocked until this document and the referenced ADRs are
-accepted by the project owner.
+This review defines the v1.0 architecture baseline for SVC. PB-100 schematic
+planning may proceed after freeze. KiCad PCB layout remains blocked until
+schematic inputs are reviewed.
+
+Architecture v1.0 was accepted by the project owner on 2026-06-30 and frozen in
+ADR-0009.
 
 ## 1. Architecture goal
 
@@ -81,7 +84,7 @@ They are not hardware roles.
 ## 5. Each output must support
 
 - Fuse
-- MOSFET switching
+- High-side electronic switching
 - PWM where applicable
 - Current measurement
 - Overcurrent protection
@@ -221,9 +224,9 @@ stage design.
 
 ## 13. Freeze checklist
 
-Architecture v1.0 can be considered frozen only when all items are true:
+Architecture v1.0 is frozen because all items are true:
 
-- ADR-0001 through ADR-0008 are accepted.
+- ADR-0001 through ADR-0009 are accepted.
 - PB-100 requirements are reviewed and accepted.
 - CAN1 read-only hardware policy is preserved in schematic requirements.
 - Output role mapping remains configuration-driven.
@@ -235,6 +238,5 @@ Architecture v1.0 can be considered frozen only when all items are true:
 
 ## 14. Review outcome
 
-This review is complete enough to start PB-100 schematic planning after owner
-acceptance. It does not authorize PCB layout or Power Board requirement changes
-without a follow-up ADR.
+This review authorizes PB-100 schematic planning. It does not authorize PCB
+layout or Power Board requirement changes without a follow-up ADR.

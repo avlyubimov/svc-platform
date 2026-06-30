@@ -76,3 +76,12 @@ at 50 A main fuse and 40 A continuous board/configuration budget.
 Reason: The reference channel limits total more than the input fuse, so firmware
 and configuration must enforce total current and load priorities as safety
 features.
+
+## 2026-06-30 — Architecture v1.0 frozen
+
+Decision: Architecture Review v1.0 is frozen by ADR-0009 after owner approval to
+continue implementation.
+
+Reason: The required platform decisions are accepted, PB-100 baseline
+requirements are stable enough for schematic planning, and component families
+have initial alternatives.

@@ -54,6 +54,54 @@
       "current_limit_a": 8,
       "pwm": true,
       "priority": "C"
+    },
+    {
+      "id": "OUT5",
+      "role": "CHIGEE",
+      "fuse_a": 5,
+      "current_limit_a": 4,
+      "pwm": true,
+      "priority": "B"
+    },
+    {
+      "id": "OUT6",
+      "role": "HEATED_SEAT_RIDER",
+      "fuse_a": 10,
+      "current_limit_a": 8,
+      "pwm": true,
+      "priority": "C"
+    },
+    {
+      "id": "OUT7",
+      "role": "HEATED_SEAT_PASSENGER",
+      "fuse_a": 10,
+      "current_limit_a": 8,
+      "pwm": true,
+      "priority": "C"
+    },
+    {
+      "id": "OUT8",
+      "role": "DVR",
+      "fuse_a": 5,
+      "current_limit_a": 4,
+      "pwm": true,
+      "priority": "B"
+    },
+    {
+      "id": "OUT9",
+      "role": "AUX_BRAKE",
+      "fuse_a": 5,
+      "current_limit_a": 4,
+      "pwm": true,
+      "priority": "A"
+    },
+    {
+      "id": "OUT10",
+      "role": "SPARE",
+      "fuse_a": 10,
+      "current_limit_a": 8,
+      "pwm": true,
+      "priority": "C"
     }
   ],
   "fog_logic": {

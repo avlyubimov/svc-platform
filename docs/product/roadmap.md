@@ -1,6 +1,8 @@
 # Roadmap
 
 ## Phase 0 — Architecture
+Status: Complete
+
 - Project constitution
 - Architecture review
 - ADRs
@@ -8,6 +10,9 @@
 - BOM strategy
 
 ## Phase 1 — PB-100 Power Board
+Status: In progress
+
+- Schematic package
 - Schematic
 - PCB
 - Gerber
