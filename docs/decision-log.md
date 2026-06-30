@@ -325,3 +325,12 @@ vehicle transmit attempts in Rev.1 and allows CAN2 expansion transmit.
 
 Reason: Vehicle CAN must remain read-only by default even if higher-level code
 attempts to transmit.
+
+## 2026-06-30 — Firmware system safety coordinator
+
+Decision: Firmware now has a host-testable System Safety Coordinator that
+connects battery protection, Event Bus notification, and Output Manager shutdown
+behavior.
+
+Reason: Low-battery cutoff must disable physical outputs even if event
+publication fails, and recovery must not automatically restore previous loads.

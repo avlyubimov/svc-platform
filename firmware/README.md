@@ -29,3 +29,5 @@ Current host tests cover:
   behavior.
 - Event Bus FIFO order, overflow rejection, and empty-pop behavior.
 - CAN1 listen-only TX denial and CAN2 expansion TX allowance.
+- System Safety Coordinator integration between battery cutoff, Event Bus, and
+  Output Manager output shutdown.

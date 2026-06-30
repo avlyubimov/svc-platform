@@ -24,6 +24,8 @@ state changes.
 - Invalid configuration keeps affected outputs off.
 - Board over-budget state refuses new loads before shedding active loads.
 - Lower-priority loads shed before higher-priority loads.
+- Battery cutoff shutdown is applied through the System Safety Coordinator, not
+  by feature code directly manipulating outputs.
 
 Initial host-testable implementation:
 

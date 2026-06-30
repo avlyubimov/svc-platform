@@ -7,15 +7,17 @@ OUTPUT_MANAGER_TEST := $(BUILD_DIR)/test_output_manager
 BATTERY_SERVICE_TEST := $(BUILD_DIR)/test_battery_service
 EVENT_BUS_TEST := $(BUILD_DIR)/test_event_bus
 CAN_SAFETY_TEST := $(BUILD_DIR)/test_can_safety
+SYSTEM_SAFETY_TEST := $(BUILD_DIR)/test_system_safety
 
 .PHONY: test clean
 
-test: $(POWER_BUDGET_TEST) $(OUTPUT_MANAGER_TEST) $(BATTERY_SERVICE_TEST) $(EVENT_BUS_TEST) $(CAN_SAFETY_TEST)
+test: $(POWER_BUDGET_TEST) $(OUTPUT_MANAGER_TEST) $(BATTERY_SERVICE_TEST) $(EVENT_BUS_TEST) $(CAN_SAFETY_TEST) $(SYSTEM_SAFETY_TEST)
 	$(POWER_BUDGET_TEST)
 	$(OUTPUT_MANAGER_TEST)
 	$(BATTERY_SERVICE_TEST)
 	$(EVENT_BUS_TEST)
 	$(CAN_SAFETY_TEST)
+	$(SYSTEM_SAFETY_TEST)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
@@ -33,6 +35,9 @@ $(EVENT_BUS_TEST): services/event_bus.c tests/test_event_bus.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -Icore -Iservices $^ -o $@
 
 $(CAN_SAFETY_TEST): services/can_safety.c tests/test_can_safety.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -Icore -Iservices $^ -o $@
+
+$(SYSTEM_SAFETY_TEST): core/svc_config_defaults.c services/battery_service.c services/event_bus.c services/power_budget.c services/output_manager.c services/system_safety.c tests/test_system_safety.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -Icore -Iservices $^ -o $@
 
 clean:

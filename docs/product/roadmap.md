@@ -52,6 +52,7 @@ Current host-tested services:
 - Output Manager
 - Battery Protection
 - CAN Safety Guard
+- System Safety Coordinator
 
 ## Phase 5 — BMW K25 integration
 - harness

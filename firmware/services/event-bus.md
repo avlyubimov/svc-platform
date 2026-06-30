@@ -9,12 +9,16 @@ CAN Manager -> Event Bus -> Rule Engine -> Output Manager
 ```
 
 Example events:
-- EVENT_ENGINE_STARTED
-- EVENT_ENGINE_STOPPED
-- EVENT_HIGH_BEAM_ON
-- EVENT_LEFT_INDICATOR_ON
-- EVENT_LOW_BATTERY
-- EVENT_OUTPUT_OVERCURRENT
+- `SVC_EVENT_ENGINE_STARTED`
+- `SVC_EVENT_ENGINE_STOPPED`
+- `SVC_EVENT_HIGH_BEAM_ON`
+- `SVC_EVENT_LEFT_INDICATOR_ON`
+- `SVC_EVENT_LOW_BATTERY_WARN`
+- `SVC_EVENT_LOW_BATTERY_CUTOFF`
+- `SVC_EVENT_OUTPUT_OVERCURRENT`
+
+For non-output events, `output_id` is ignored and `value` carries the event
+payload, such as measured battery millivolts.
 
 Initial host-testable implementation:
 
