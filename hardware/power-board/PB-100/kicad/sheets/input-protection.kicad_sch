@@ -8,6 +8,7 @@
     (date "2026-06-30")
     (rev "sheet-placeholder")
     (company "SVC Platform")
+    (comment 9 "Work queue: CAP-INP. Input protection capture is blocked on Q1 INPUT_REVERSE_FET evidence.")
     (comment 1 "Placeholder sheet. Capture battery input, TVS, reverse protection, input telemetry here.")
     (comment 2 "Source docs: PB-100-input-reverse-protection.md and PB-100-protection-validation.csv.")
   )

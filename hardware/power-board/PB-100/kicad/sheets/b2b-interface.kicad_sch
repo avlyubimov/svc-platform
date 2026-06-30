@@ -8,6 +8,7 @@
     (date "2026-06-30")
     (rev "sheet-placeholder")
     (company "SVC Platform")
+    (comment 9 "Work queue: CAP-B2B. B2B capture follows JPB1 pin map.")
     (comment 1 "Placeholder sheet. Capture JPB1 100-pin interface here.")
     (comment 2 "Source: PB-100-b2b-pin-map.csv.")
   )

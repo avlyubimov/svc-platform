@@ -8,6 +8,7 @@
     (date "2026-06-30")
     (rev "sheet-placeholder")
     (company "SVC Platform")
+    (comment 9 "Work queue: CAP-CAN1. CAN1 capture keeps TX DNP/open and future ADR only.")
     (comment 1 "Placeholder sheet. Capture CAN1 TX disable/DNP-open path here.")
     (comment 2 "Source: PB-100-can1-tx-disable.md.")
   )

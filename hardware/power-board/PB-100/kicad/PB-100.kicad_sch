@@ -8,6 +8,7 @@
     (date "2026-06-30")
     (rev "schematic-scaffold")
     (company "SVC Platform")
+    (comment 9 "Work queue: CAP-TOP. Top-level scaffold follows PB-100-schematic-capture-work-queue.csv.")
     (comment 1 "Schematic scaffold only. PCB layout is blocked until schematic freeze.")
     (comment 2 "Follow ../PB-100-schematic-capture-plan.md and ../PB-100-net-naming.md.")
     (comment 3 "CAN1 TX remains DNP/open and hardware-disabled by default.")

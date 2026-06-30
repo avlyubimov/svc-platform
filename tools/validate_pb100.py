@@ -2638,6 +2638,14 @@ def validate_schematic_capture_work_queue() -> None:
         if sheet_file not in allowed_sheets:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown sheet file {sheet_file}")
         sheets_with_queue_rows.add(sheet_file)
+        if sheet_file in manifest_sheets:
+            sheet_path = KICAD_DIR / sheet_file if sheet_file == "PB-100.kicad_sch" else KICAD_DIR / "sheets" / sheet_file
+            sheet_text = read_text(sheet_path)
+            if f"Work queue: {work_item}" not in sheet_text:
+                fail(
+                    f"{sheet_path.relative_to(REPO_ROOT)} must contain Work queue marker "
+                    f"for {work_item}"
+                )
         if row["Capture status"].strip() not in ALLOWED_CAPTURE_STATUSES:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Capture status {row['Capture status'].strip()}")
         for column in (

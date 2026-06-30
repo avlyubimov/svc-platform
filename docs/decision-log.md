@@ -867,3 +867,14 @@ manifest with validation hooks.
 Reason: The next execution step is schematic capture. The work queue prevents
 ad hoc sheet edits, while the release manifest keeps the freeze packet complete
 and auditable before any layout authorization.
+
+## 2026-06-30 — PB-100 KiCad sheet work-queue markers
+
+Decision: PB-100 KiCad schematic placeholder sheets now include `Work queue:
+CAP-*` title-block markers. `tools/validate_pb100.py` checks each real KiCad
+sheet listed in `PB-100-schematic-capture-work-queue.csv` for the matching
+marker.
+
+Reason: The spreadsheet work queue and the KiCad files must not drift. Embedding
+the work item marker in each placeholder sheet makes the capture sequence
+traceable inside KiCad while still avoiding schematic placement and PCB layout.

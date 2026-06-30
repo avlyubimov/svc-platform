@@ -8,6 +8,7 @@
     (date "2026-06-30")
     (rev "sheet-placeholder")
     (company "SVC Platform")
+    (comment 9 "Work queue: CAP-OUT-INST. Output instances capture follows output net expansion.")
     (comment 1 "Placeholder sheet. Instantiate OUT1 through OUT10 generic channels here.")
     (comment 2 "Source: PB-100-schematic-instance-plan.csv.")
   )
