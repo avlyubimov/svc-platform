@@ -194,3 +194,12 @@ current telemetry and a dedicated input shunt monitor for total board current.
 Reason: Per-output telemetry supports diagnostics and per-channel limits, while
 the board-level 40 A budget must be enforced from an independent total input
 current measurement.
+
+## 2026-06-30 — PB-100 thermal telemetry strategy
+
+Decision: PB-100 Rev.1 schematic planning uses three thermal points:
+`TEMP_PCB`, `TEMP_PWR_A`, and `TEMP_PWR_B`.
+
+Reason: One board reference and two power-zone measurements are needed to derate
+OUT2, the input reverse-protection path, medium-output MOSFET clusters, and the
+logic buck before sustained overheating.

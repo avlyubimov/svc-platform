@@ -1,0 +1,4 @@
+Measurement,Signal,Location target,Primary sensor,Range C,Telemetry path,Requirement,Notes
+PCB temperature,TEMP_PCB,Board reference away from direct MOSFET heat,Automotive NTC or TMP117-class sensor,-40 to 125,LB ADC or PB I2C,Core,Used for board-level derating reference
+Power zone A,TEMP_PWR_A,OUT2 and input reverse-protection hot zone,Automotive NTC,-40 to 150,LB ADC,Core,Highest priority thermal protection point
+Power zone B,TEMP_PWR_B,Medium-output MOSFET cluster or logic buck hot zone,Automotive NTC,-40 to 150,LB ADC,Should,Second power-zone telemetry point

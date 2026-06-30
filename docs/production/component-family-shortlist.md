@@ -28,6 +28,7 @@ order.
 | Smart high-side switch | TI TPS2HB16-Q1 | TI TPS2HB35-Q1; TI TPS1H100-Q1 | HTSSOP class | Deferred low-current alternate after ADR-0011; requires lower-clamp strategy |
 | Output MOSFET | Infineon OptiMOS automotive 40-60 V | Vishay SQJQ automotive; onsemi F085 automotive | TDSON/PowerPAK/TOLL/LFPAK | Must pass SOA and thermal review per channel; OUT2 keeps larger/parallel escape path |
 | Current monitor | TPS48110 IMON for outputs; TI INA228/INA229 or INA226 for input | External analog monitor; firmware-calibrated ADC path | VSSOP/SOIC class | Per-output telemetry uses controller IMON; total input current uses dedicated shunt monitor |
+| Temperature sensor | Automotive NTC thermistor | TI TMP117/TMP112-class digital sensor | 0603/0805 or SOT/DFN class | PB-100 uses PCB reference plus two power-zone thermal points |
 | Logic buck regulator | TI LM5164-Q1 | TI LM5013-Q1; TI TPS54360B-Q1/TPS54360-Q1 | SOIC/HSOIC PowerPAD | LM5164-Q1 for 1 A 100 V rail; LM5013-Q1 preferred over 60 V family if more current is needed |
 | Input reverse protection | TI LM74700-Q1/LM74502-Q1 class | ADI/LTC ideal diode controller families | MSOP/SOIC class | Controller family only; MOSFET is tracked separately |
 | Input reverse MOSFET | Infineon OptiMOS 5 60 V TOLL low-Rds class | Nexperia LFPAK88 80 V; parallel Vishay SIDR626 PowerPAK | TOLL/LFPAK88/PowerPAK | Single 2.1 mOhm MOSFET is rejected for 40 A input thermal |
@@ -71,6 +72,8 @@ The current strategy is:
 - SM8S33A-class TVS reference data was checked for clamp-voltage planning: https://www.mccsemi.com/products/esd-protection-and-power-tvs/tvs/SM8S33A
 - TI TPS2HB16-Q1 datasheet is available through LCSC: https://datasheet.lcsc.com/datasheet/pdf/5e972c8f510fd1d0477aeb85de68fc2f.pdf
 - TI INA226AIDGST was listed at LCSC: https://www.lcsc.com/product-detail/current-sense-amplifiers_texas-instruments-ina226aidgst_C2653870.html
+- TI TMP117 data sheet was checked for optional digital board-temperature sensing: https://www.ti.com/lit/gpn/TMP117
+- TDK automotive NTC thermistor data was checked for PB-100 power-zone sensing: https://www.farnell.com/datasheets/3920346.pdf
 - TI LM5164QDDATQ1 was listed at LCSC: https://www.lcsc.com/product-detail/C1850350.html
 - TI LM5164-Q1 is active as a 6-100 V 1 A automotive buck regulator: https://www.ti.com/product/LM5164-Q1
 - TI LM5013-Q1 is active as a 6-100 V 3.5 A automotive buck regulator: https://www.ti.com/product/LM5013-Q1
