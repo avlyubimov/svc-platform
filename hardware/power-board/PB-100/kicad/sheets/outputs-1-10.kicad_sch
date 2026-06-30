@@ -1,0 +1,20 @@
+(kicad_sch
+  (version 20230121)
+  (generator "codex")
+  (uuid "f1caa49d-cbf2-4f2b-a182-ad530ce9d314")
+  (paper "A2")
+  (title_block
+    (title "PB-100 Outputs 1-10")
+    (date "2026-06-30")
+    (rev "sheet-placeholder")
+    (company "SVC Platform")
+    (comment 1 "Placeholder sheet. Instantiate OUT1 through OUT10 generic channels here.")
+    (comment 2 "Source: PB-100-schematic-instance-plan.csv.")
+  )
+  (lib_symbols)
+  (text "Output capture notes:\n- Instantiate U101..U110 controllers\n- Instantiate Q101..Q110 output MOSFETs\n- Instantiate F101..F110 user-serviceable fuses\n- Instantiate J101..J110 output connectors\n- OUT2 must preserve larger/parallel MOSFET escape path until SOA is proven\n\nNo role-specific net names."
+    (at 25 30 0)
+    (effects (font (size 2.0 2.0)) (justify left top))
+    (uuid "f7894140-3d89-4b61-a336-2976e194d5df")
+  )
+)

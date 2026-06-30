@@ -1,0 +1,20 @@
+(kicad_sch
+  (version 20230121)
+  (generator "codex")
+  (uuid "6f4f6d05-ff46-4e57-b0a7-09fd2042dbe9")
+  (paper "A3")
+  (title_block
+    (title "PB-100 CAN1 Safety")
+    (date "2026-06-30")
+    (rev "sheet-placeholder")
+    (company "SVC Platform")
+    (comment 1 "Placeholder sheet. Capture CAN1 TX disable/DNP-open path here.")
+    (comment 2 "Source: PB-100-can1-tx-disable.md.")
+  )
+  (lib_symbols)
+  (text "CAN1 safety capture notes:\n- CAN1_TX_ROUTE DNP/open by default\n- CAN1_TX_DISABLE_CMD defaults to disable by hardware pull\n- CAN1_TX_DISABLED_STATUS visible to LB-100\n- CAN1_RX_ROUTE may be populated independently if CAN1 crosses PB-100\n- Any CAN1 TX enable path requires a future ADR and hardware action\n\nRev.1 firmware must not transmit on vehicle CAN."
+    (at 25 30 0)
+    (effects (font (size 2.0 2.0)) (justify left top))
+    (uuid "334af018-6f16-4dbd-bfd6-d7e0c3fd87e8")
+  )
+)

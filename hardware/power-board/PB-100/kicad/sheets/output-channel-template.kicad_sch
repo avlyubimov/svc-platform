@@ -1,0 +1,20 @@
+(kicad_sch
+  (version 20230121)
+  (generator "codex")
+  (uuid "69f77ef9-d81a-43a4-9214-f9781c4e0b56")
+  (paper "A3")
+  (title_block
+    (title "PB-100 Generic Output Channel Template")
+    (date "2026-06-30")
+    (rev "sheet-placeholder")
+    (company "SVC Platform")
+    (comment 1 "Placeholder sheet. Capture one generic TPS48110 + MOSFET output stage pattern here.")
+    (comment 2 "Use OUTn nets only. Do not encode accessory roles.")
+  )
+  (lib_symbols)
+  (text "Generic output channel template:\n- U10n TPS48110-class high-side controller\n- Q10n external MOSFET\n- F10n user-serviceable fuse\n- J10n output connector\n- OUTn_CTL, OUTn_FLT, OUTn_IMON\n- OUTn_GATE, OUTn_SRC, OUTn_LOAD\n\nTemplate must remain role-agnostic."
+    (at 25 30 0)
+    (effects (font (size 2.0 2.0)) (justify left top))
+    (uuid "e597ef9f-d7f2-4925-b4a7-e15b11ec070f")
+  )
+)

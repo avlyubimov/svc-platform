@@ -1,0 +1,20 @@
+(kicad_sch
+  (version 20230121)
+  (generator "codex")
+  (uuid "cd18ab13-c6b8-46aa-af8f-e509c7c335d5")
+  (paper "A3")
+  (title_block
+    (title "PB-100 Logic Power")
+    (date "2026-06-30")
+    (rev "sheet-placeholder")
+    (company "SVC Platform")
+    (comment 1 "Placeholder sheet. Capture PB_5V_OUT buck regulator and power-good here.")
+    (comment 2 "Source docs: PB-100-logic-power-rails.md and PB-100-logic-power-budget.csv.")
+  )
+  (lib_symbols)
+  (text "Logic power capture notes:\n- U3 LM5164-Q1-class preferred buck\n- LM5013-Q1-class high-current fallback\n- PB_5V_OUT exported to JPB1\n- PB_PWR_GOOD to LB-100\n- OUT controls default off if PB_5V_OUT or LB_3V3_IO is absent\n\nNo PCB layout from this placeholder."
+    (at 25 30 0)
+    (effects (font (size 2.0 2.0)) (justify left top))
+    (uuid "a5f01f85-b87a-44d1-81b2-1d6d17f69f80")
+  )
+)

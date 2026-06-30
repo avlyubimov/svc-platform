@@ -1,0 +1,20 @@
+(kicad_sch
+  (version 20230121)
+  (generator "codex")
+  (uuid "1e66f891-9f51-4305-a590-3bbf12038367")
+  (paper "A3")
+  (title_block
+    (title "PB-100 Telemetry")
+    (date "2026-06-30")
+    (rev "sheet-placeholder")
+    (company "SVC Platform")
+    (comment 1 "Placeholder sheet. Capture current, voltage, thermal, and board ID telemetry here.")
+    (comment 2 "Sources: PB-100-current-telemetry.md and PB-100-thermal-telemetry.md.")
+  )
+  (lib_symbols)
+  (text "Telemetry capture notes:\n- OUT1_IMON..OUT10_IMON scaled into LB_3V3_IO ADC domain\n- IIN_SENSE total input current path\n- VBAT_SENSE divider\n- TEMP_PCB, TEMP_PWR_A, TEMP_PWR_B\n- PB_ID_ADC board identity fallback\n- PB_I2C reserved for digital monitor options\n\nMissing telemetry is a safe fault."
+    (at 25 30 0)
+    (effects (font (size 2.0 2.0)) (justify left top))
+    (uuid "22f2602f-e9e3-4f6a-a30d-8dafd87577eb")
+  )
+)

@@ -238,3 +238,11 @@ local footprint table, and empty local libraries.
 
 Reason: This creates a concrete schematic workspace while intentionally omitting
 `PB-100.kicad_pcb` so PCB layout remains blocked until schematic freeze.
+
+## 2026-06-30 — PB-100 KiCad child sheet placeholders
+
+Decision: PB-100 KiCad scaffold now includes placeholder child sheets for input
+protection, logic power, outputs, telemetry, B2B interface, and CAN1 safety.
+
+Reason: The schematic workspace now mirrors the capture plan and can be filled
+incrementally without starting PCB layout.

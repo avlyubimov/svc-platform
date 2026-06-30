@@ -22,6 +22,9 @@ KiCad scaffold directory:
 | `b2b-interface.kicad_sch` | `JPB1` PB-100 to LB-100 interface | `PB-100-b2b-pin-map.csv` |
 | `can1-safety.kicad_sch` | CAN1 TX disable/readback and DNP/open TX path | `PB-100-can1-tx-disable.md` |
 
+Placeholder child sheets are tracked in
+`hardware/power-board/PB-100/kicad/sheets/`.
+
 ## Capture order
 
 1. Open `hardware/power-board/PB-100/kicad/PB-100.kicad_pro`.

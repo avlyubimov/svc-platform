@@ -8,6 +8,7 @@ This directory contains the preliminary KiCad project scaffold for PB-100.
 
 - `PB-100.kicad_pro`: project metadata scaffold.
 - `PB-100.kicad_sch`: top-level schematic note sheet.
+- `sheets/*.kicad_sch`: child schematic placeholder sheets for capture.
 - `sym-lib-table`: project-local symbol library table.
 - `fp-lib-table`: project-local footprint library table.
 - `lib/PB100.kicad_sym`: empty preliminary local symbol library.
@@ -29,6 +30,7 @@ until schematic freeze.
 
 1. Open `PB-100.kicad_pro` in KiCad.
 2. Let KiCad normalize project settings if needed.
-3. Create child schematic sheets listed in `PB-100-schematic-capture-plan.md`.
+3. Link or normalize child schematic sheets listed in
+   `PB-100-schematic-capture-plan.md`.
 4. Add preliminary symbols only after package drawings are checked.
 5. Do not create a PCB layout until the freeze checklist is closed.

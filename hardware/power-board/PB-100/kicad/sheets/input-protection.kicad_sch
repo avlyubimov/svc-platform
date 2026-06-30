@@ -1,0 +1,20 @@
+(kicad_sch
+  (version 20230121)
+  (generator "codex")
+  (uuid "1d8ad846-8d50-4ad3-9c1f-3f04446ed9a1")
+  (paper "A3")
+  (title_block
+    (title "PB-100 Input Protection")
+    (date "2026-06-30")
+    (rev "sheet-placeholder")
+    (company "SVC Platform")
+    (comment 1 "Placeholder sheet. Capture battery input, TVS, reverse protection, input telemetry here.")
+    (comment 2 "Source docs: PB-100-input-reverse-protection.md and PB-100-protection-validation.csv.")
+  )
+  (lib_symbols)
+  (text "Input protection capture notes:\n- VBAT_RAW before reverse protection\n- VBAT_PROT after reverse protection\n- D1 input TVS candidate\n- U1 LM74700-class controller\n- Q1 dedicated input MOSFET strategy\n- RSH1/U2 total input current monitor\n\nNo PCB layout from this placeholder."
+    (at 25 30 0)
+    (effects (font (size 2.0 2.0)) (justify left top))
+    (uuid "fcbcb0bb-0992-4217-a8ec-28c9c8df4758")
+  )
+)
