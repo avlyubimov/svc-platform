@@ -53,6 +53,8 @@ PB100_THERMAL_NTC_PRELIM,1,TEMP_NODE,hardware/power-board/PB-100/PB-100-thermal-
 PB100_THERMAL_NTC_PRELIM,2,GND_REF,hardware/power-board/PB-100/PB-100-thermal-telemetry.md,Internal Rev.1 schematic class,NTC class,Ground reference for NTC divider
 PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,1,OUTn_LOAD,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage connector class,Generic output load positive
 PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,2,GND_RETURN,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage connector class,Generic output ground return
+PB100_OUTPUT_FUSE_CLASS_PRELIM,1,OUTn_SWITCHED,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage output fuse class,Switched output side before user-serviceable fuse
+PB100_OUTPUT_FUSE_CLASS_PRELIM,2,OUTn_FUSED,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage output fuse class,Fused output side toward connector
 PB100_MAIN_FUSE_CLASS_PRELIM,1,VBAT_BATT,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage fuse class,Battery side of near-battery fuse
 PB100_MAIN_FUSE_CLASS_PRELIM,2,VBAT_FUSED,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage fuse class,Protected side after near-battery fuse
 PB100_SIDR626LDP_PRELIM,1,S,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B May 2024,PowerPAK SO-8DC,Source lead

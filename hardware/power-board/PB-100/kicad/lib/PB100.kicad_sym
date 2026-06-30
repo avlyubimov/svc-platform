@@ -213,6 +213,18 @@
     (pin passive line (at -15.24 2.54 0) (length 5.08) (name "OUTn_LOAD" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27)))))
     (pin passive line (at -15.24 -2.54 0) (length 5.08) (name "GND_RETURN" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27)))))
   )
+  (symbol "PB100_OUTPUT_FUSE_CLASS_PRELIM"
+    (pin_names (offset 0.8))
+    (in_bom no)
+    (on_board no)
+    (property "Reference" "F" (at 0 10.16 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "OUTPUT_FUSE_CLASS_PRELIM" (at 0 7.62 0) (effects (font (size 1.27 1.27))))
+    (property "Footprint" "" (at 0 -10.16 0) (effects (font (size 1.27 1.27)) hide))
+    (property "Datasheet" "../PB-100-garage-connector-fuse-plan.md" (at 0 -12.7 0) (effects (font (size 1.27 1.27)) hide))
+    (rectangle (start -7.62 5.08) (end 7.62 -5.08) (stroke (width 0.254) (type default)) (fill (type background)))
+    (pin passive line (at -12.7 2.54 0) (length 5.08) (name "OUTn_SWITCHED" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27)))))
+    (pin passive line (at 12.7 2.54 180) (length 5.08) (name "OUTn_FUSED" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27)))))
+  )
   (symbol "PB100_MAIN_FUSE_CLASS_PRELIM"
     (pin_names (offset 0.8))
     (in_bom no)

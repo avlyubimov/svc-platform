@@ -621,3 +621,13 @@ without its worklist status and evidence being updated.
 Reason: The IAUTN06S5N008/TOLL input reverse MOSFET is high-risk for package and
 assembly lock. It must remain explicit pending work until pin evidence, package
 drawing, and factory assembly support are reviewed.
+
+## 2026-06-30 — PB-100 output fuse class symbol
+
+Decision: PB-100 now has `OUTPUT_FUSE_HOLDER` in symbol readiness, a
+`PB100_OUTPUT_FUSE_CLASS_PRELIM` KiCad symbol, and pin evidence for the generic
+per-output fuse path used by F101 through F110.
+
+Reason: Output fuses are part of the schematic instance plan and garage
+installation model. They need a schematic-class symbol without moving fuse
+holders onto the PCB or locking a footprint.

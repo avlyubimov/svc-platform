@@ -77,6 +77,7 @@ REQUIRED_SYMBOL_KEYS = {
     "THERMAL_NTC",
     "B2B_CONNECTOR",
     "OUTPUT_CONNECTOR",
+    "OUTPUT_FUSE_HOLDER",
     "MAIN_FUSE_HOLDER",
     "CAN1_TX_DISABLE",
 }
@@ -323,10 +324,14 @@ def validate_symbol_mpn_readiness() -> None:
         primary_source = row["Primary source"].strip()
         if not primary_source:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: missing primary source")
-        if not (primary_source.startswith("https://") or primary_source.startswith("docs/")):
+        if not (
+            primary_source.startswith("https://")
+            or primary_source.startswith("docs/")
+            or primary_source.startswith("hardware/")
+        ):
             fail(
                 f"{path.relative_to(REPO_ROOT)}:{row_number}: primary source must be "
-                "an https URL or an internal docs/ path"
+                "an https URL or an internal docs/ or hardware/ path"
             )
 
         for column in (
@@ -415,10 +420,14 @@ def validate_symbol_capture_worklist() -> None:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: library must be PB100")
 
         symbol_source = row["Symbol source"].strip()
-        if not (symbol_source.startswith("https://") or symbol_source.startswith("docs/")):
+        if not (
+            symbol_source.startswith("https://")
+            or symbol_source.startswith("docs/")
+            or symbol_source.startswith("hardware/")
+        ):
             fail(
                 f"{path.relative_to(REPO_ROOT)}:{row_number}: symbol source must be "
-                "an https URL or an internal docs/ path"
+                "an https URL or an internal docs/ or hardware/ path"
             )
 
         for column in (
