@@ -16,6 +16,8 @@ Telemetry Snapshot and configuration thresholds.
 - `CUTOFF` at or above cutoff threshold.
 - Cutoff latches per zone until temperature falls to recovery threshold.
 - Missing, invalid, or stale temperature telemetry forces cutoff.
+- System Safety applies thermal cutoff by disabling active outputs through the
+  Output Manager.
 
 ## Configuration
 
@@ -33,3 +35,7 @@ Thresholds are configuration values, not hardware role assumptions.
 - `firmware/services/thermal_service.h`
 - `firmware/services/thermal_service.c`
 - `firmware/tests/test_thermal_service.c`
+
+System-level thermal shutdown tests are in:
+
+- `firmware/tests/test_system_safety.c`

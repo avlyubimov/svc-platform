@@ -16,6 +16,8 @@ Example events:
 - `SVC_EVENT_LEFT_INDICATOR_ON`
 - `SVC_EVENT_LOW_BATTERY_WARN`
 - `SVC_EVENT_LOW_BATTERY_CUTOFF`
+- `SVC_EVENT_THERMAL_DERATE`
+- `SVC_EVENT_THERMAL_CUTOFF`
 - `SVC_EVENT_OUTPUT_OVERCURRENT`
 
 For non-output events, `output_id` is ignored and `value` carries the event

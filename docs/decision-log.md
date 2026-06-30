@@ -494,3 +494,13 @@ cutoff actions plus per-zone cutoff latching.
 Reason: PB-100 requirements treat missing, stale, or implausible thermal
 telemetry as a safe fault. Thermal thresholds must remain configuration values
 and must not encode accessory roles.
+
+## 2026-06-30 — Firmware thermal cutoff safety path
+
+Decision: System Safety now consumes Thermal Protection results from Telemetry
+Snapshot, publishes thermal derate/cutoff events, and disables all active outputs
+through the Output Manager on thermal cutoff or stale thermal telemetry.
+
+Reason: Thermal decisions must be applied through the same centralized output
+safety boundary as battery cutoff and output faults; recovery must not
+automatically restore previous loads.

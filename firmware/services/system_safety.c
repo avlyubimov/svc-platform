@@ -43,6 +43,24 @@ static bool battery_action_event_type(
     return false;
 }
 
+static bool thermal_action_event_type(
+    svc_thermal_action_t action,
+    svc_event_type_t *event_type)
+{
+    if (event_type == NULL) {
+        return false;
+    }
+    if (action == SVC_THERMAL_ACTION_DERATE) {
+        *event_type = SVC_EVENT_THERMAL_DERATE;
+        return true;
+    }
+    if (action == SVC_THERMAL_ACTION_CUTOFF) {
+        *event_type = SVC_EVENT_THERMAL_CUTOFF;
+        return true;
+    }
+    return false;
+}
+
 static uint16_t disable_active_outputs(svc_output_manager_t *output_manager)
 {
     const uint16_t active_mask = svc_output_manager_active_mask(output_manager);
@@ -76,7 +94,9 @@ bool svc_system_safety_init(
 
     safety->config = config;
     svc_battery_monitor_init(&safety->battery_monitor);
+    svc_thermal_monitor_init(&safety->thermal_monitor);
     safety->last_battery_action = SVC_BATTERY_ACTION_ALLOW;
+    safety->last_thermal_action = SVC_THERMAL_ACTION_ALLOW;
     safety->initialized = true;
     return true;
 }
@@ -151,4 +171,64 @@ svc_system_safety_result_t svc_system_safety_update_from_telemetry(
         event_bus,
         input.measured_battery_mv,
         input.telemetry_valid);
+}
+
+svc_system_thermal_safety_result_t svc_system_safety_update_thermal_from_telemetry(
+    svc_system_safety_t *safety,
+    svc_output_manager_t *output_manager,
+    svc_event_bus_t *event_bus,
+    const svc_telemetry_snapshot_t *telemetry,
+    uint32_t now_ms,
+    uint32_t stale_after_ms)
+{
+    svc_system_thermal_safety_result_t result = {
+        .thermal = {
+            .action = SVC_THERMAL_ACTION_CUTOFF,
+            .derate_zone_mask = 0U,
+            .cutoff_zone_mask = 0U,
+            .telemetry_valid = false
+        },
+        .active_output_mask = svc_output_manager_active_mask(output_manager),
+        .disabled_output_mask = 0U,
+        .event_publish_attempted = false,
+        .event_published = false
+    };
+
+    if (safety == NULL || !safety->initialized || safety->config == NULL) {
+        result.disabled_output_mask = disable_active_outputs(output_manager);
+        result.active_output_mask = svc_output_manager_active_mask(output_manager);
+        return result;
+    }
+
+    result.thermal = svc_thermal_update_from_telemetry(
+        &safety->thermal_monitor,
+        safety->config,
+        telemetry,
+        now_ms,
+        stale_after_ms);
+
+    svc_event_type_t event_type = SVC_EVENT_NONE;
+    if (result.thermal.action != safety->last_thermal_action &&
+        thermal_action_event_type(result.thermal.action, &event_type)) {
+        result.event_publish_attempted = true;
+        result.event_published = svc_event_bus_publish(
+            event_bus,
+            (svc_event_t){
+                .type = event_type,
+                .output_id = SVC_OUTPUT_OUT1,
+                .value = ((uint32_t)result.thermal.cutoff_zone_mask << 8U) | result.thermal.derate_zone_mask
+            });
+        if (result.event_published) {
+            safety->last_thermal_action = result.thermal.action;
+        }
+    } else {
+        safety->last_thermal_action = result.thermal.action;
+    }
+
+    if (result.thermal.action == SVC_THERMAL_ACTION_CUTOFF) {
+        result.disabled_output_mask = disable_active_outputs(output_manager);
+    }
+
+    result.active_output_mask = svc_output_manager_active_mask(output_manager);
+    return result;
 }

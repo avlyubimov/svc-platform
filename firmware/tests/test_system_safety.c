@@ -209,6 +209,98 @@ static void test_stale_telemetry_forces_cutoff(void)
     assert(result.active_output_mask == 0U);
 }
 
+static svc_telemetry_snapshot_t thermal_telemetry_all_at(int16_t temperature_c, uint32_t now_ms)
+{
+    svc_telemetry_snapshot_t telemetry = {0};
+    svc_telemetry_snapshot_init(&telemetry);
+    assert(svc_telemetry_update_thermal(&telemetry, SVC_THERMAL_ZONE_PCB, temperature_c, true, now_ms));
+    assert(svc_telemetry_update_thermal(&telemetry, SVC_THERMAL_ZONE_PWR_A, temperature_c, true, now_ms));
+    assert(svc_telemetry_update_thermal(&telemetry, SVC_THERMAL_ZONE_PWR_B, temperature_c, true, now_ms));
+    return telemetry;
+}
+
+static void test_thermal_derate_publishes_event_without_disabling_outputs(void)
+{
+    svc_output_manager_t manager = initialized_output_manager();
+    svc_system_safety_t safety = initialized_safety();
+    svc_event_bus_t bus = {0};
+    svc_event_bus_init(&bus);
+    svc_telemetry_snapshot_t telemetry = thermal_telemetry_all_at(SVC_DEFAULT_THERMAL_WARN_C, 100U);
+
+    assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT9, 1000U, true).status == SVC_OUTPUT_MANAGER_OK);
+
+    const svc_system_thermal_safety_result_t result = svc_system_safety_update_thermal_from_telemetry(
+        &safety,
+        &manager,
+        &bus,
+        &telemetry,
+        100U,
+        SVC_TELEMETRY_DEFAULT_STALE_MS);
+
+    assert(result.thermal.action == SVC_THERMAL_ACTION_DERATE);
+    assert(result.event_publish_attempted);
+    assert(result.event_published);
+    assert(result.disabled_output_mask == 0U);
+    assert((result.active_output_mask & mask_for(SVC_OUTPUT_OUT9)) != 0U);
+
+    svc_event_t event = {0};
+    assert(svc_event_bus_pop(&bus, &event));
+    assert(event.type == SVC_EVENT_THERMAL_DERATE);
+}
+
+static void test_thermal_cutoff_disables_active_outputs(void)
+{
+    svc_output_manager_t manager = initialized_output_manager();
+    svc_system_safety_t safety = initialized_safety();
+    svc_event_bus_t bus = {0};
+    svc_event_bus_init(&bus);
+    svc_telemetry_snapshot_t telemetry = thermal_telemetry_all_at(SVC_DEFAULT_THERMAL_CUTOFF_C, 100U);
+
+    assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT9, 1000U, true).status == SVC_OUTPUT_MANAGER_OK);
+
+    const svc_system_thermal_safety_result_t result = svc_system_safety_update_thermal_from_telemetry(
+        &safety,
+        &manager,
+        &bus,
+        &telemetry,
+        100U,
+        SVC_TELEMETRY_DEFAULT_STALE_MS);
+
+    assert(result.thermal.action == SVC_THERMAL_ACTION_CUTOFF);
+    assert(result.event_publish_attempted);
+    assert(result.event_published);
+    assert(result.disabled_output_mask == mask_for(SVC_OUTPUT_OUT9));
+    assert(result.active_output_mask == 0U);
+
+    svc_event_t event = {0};
+    assert(svc_event_bus_pop(&bus, &event));
+    assert(event.type == SVC_EVENT_THERMAL_CUTOFF);
+}
+
+static void test_stale_thermal_telemetry_disables_active_outputs(void)
+{
+    svc_output_manager_t manager = initialized_output_manager();
+    svc_system_safety_t safety = initialized_safety();
+    svc_event_bus_t bus = {0};
+    svc_event_bus_init(&bus);
+    svc_telemetry_snapshot_t telemetry = thermal_telemetry_all_at(25, 100U);
+
+    assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT9, 1000U, true).status == SVC_OUTPUT_MANAGER_OK);
+
+    const svc_system_thermal_safety_result_t result = svc_system_safety_update_thermal_from_telemetry(
+        &safety,
+        &manager,
+        &bus,
+        &telemetry,
+        1200U,
+        SVC_TELEMETRY_DEFAULT_STALE_MS);
+
+    assert(result.thermal.action == SVC_THERMAL_ACTION_CUTOFF);
+    assert(!result.thermal.telemetry_valid);
+    assert(result.disabled_output_mask == mask_for(SVC_OUTPUT_OUT9));
+    assert(result.active_output_mask == 0U);
+}
+
 int main(void)
 {
     test_warn_publishes_event_without_disabling_outputs();
@@ -218,5 +310,8 @@ int main(void)
     test_recovery_does_not_reenable_outputs();
     test_uninitialized_safety_fails_safe();
     test_stale_telemetry_forces_cutoff();
+    test_thermal_derate_publishes_event_without_disabling_outputs();
+    test_thermal_cutoff_disables_active_outputs();
+    test_stale_thermal_telemetry_disables_active_outputs();
     return 0;
 }

@@ -50,3 +50,5 @@ Current host tests cover:
 - Telemetry-backed System Safety and Rule Engine wrappers for stale-data fail
   safe behavior.
 - Thermal Protection allow/derate/cutoff decisions for PB-100 thermal zones.
+- Thermal System Safety shutdown through Output Manager on cutoff/stale
+  telemetry.

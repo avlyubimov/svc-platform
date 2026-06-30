@@ -68,6 +68,7 @@ Current host-tested services:
 - Telemetry Snapshot
 - Telemetry-backed safety/rule wrappers
 - Thermal Protection service
+- Thermal cutoff output shutdown
 
 ## Phase 5 — BMW K25 integration
 - harness
