@@ -12,6 +12,8 @@ EVENT_BUS_TEST := $(BUILD_DIR)/test_event_bus
 EVENT_DISPATCHER_TEST := $(BUILD_DIR)/test_event_dispatcher
 CAN_SAFETY_TEST := $(BUILD_DIR)/test_can_safety
 SYSTEM_SAFETY_TEST := $(BUILD_DIR)/test_system_safety
+ROLE_RESOLVER_TEST := $(BUILD_DIR)/test_role_resolver
+RULE_ENGINE_TEST := $(BUILD_DIR)/test_rule_engine
 CONFIG_VALIDATOR_SRCS := \
 	core/svc_config_defaults.c \
 	services/battery_service.c \
@@ -60,6 +62,22 @@ SYSTEM_SAFETY_SRCS := \
 	services/output_manager.c \
 	services/system_safety.c \
 	tests/test_system_safety.c
+ROLE_RESOLVER_SRCS := \
+	core/svc_config_defaults.c \
+	services/battery_service.c \
+	services/config_validator.c \
+	services/power_budget.c \
+	services/role_resolver.c \
+	tests/test_role_resolver.c
+RULE_ENGINE_SRCS := \
+	core/svc_config_defaults.c \
+	services/battery_service.c \
+	services/config_validator.c \
+	services/output_manager.c \
+	services/power_budget.c \
+	services/role_resolver.c \
+	services/rule_engine.c \
+	tests/test_rule_engine.c
 HOST_TESTS := \
 	$(CONFIG_VALIDATOR_TEST) \
 	$(POWER_BUDGET_TEST) \
@@ -68,7 +86,9 @@ HOST_TESTS := \
 	$(EVENT_BUS_TEST) \
 	$(EVENT_DISPATCHER_TEST) \
 	$(CAN_SAFETY_TEST) \
-	$(SYSTEM_SAFETY_TEST)
+	$(SYSTEM_SAFETY_TEST) \
+	$(ROLE_RESOLVER_TEST) \
+	$(RULE_ENGINE_TEST)
 
 .PHONY: test clean
 
@@ -81,6 +101,8 @@ test: $(HOST_TESTS)
 	$(EVENT_DISPATCHER_TEST)
 	$(CAN_SAFETY_TEST)
 	$(SYSTEM_SAFETY_TEST)
+	$(ROLE_RESOLVER_TEST)
+	$(RULE_ENGINE_TEST)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
@@ -107,6 +129,12 @@ $(CAN_SAFETY_TEST): $(CAN_SAFETY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(SYSTEM_SAFETY_TEST): $(SYSTEM_SAFETY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
+
+$(ROLE_RESOLVER_TEST): $(ROLE_RESOLVER_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
+
+$(RULE_ENGINE_TEST): $(RULE_ENGINE_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 clean:

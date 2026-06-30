@@ -378,3 +378,12 @@ and rule entries.
 
 Reason: SVC Studio, SVC Mobile, and CI need a shared schema artifact before UI
 configuration editing and import/export flows are implemented.
+
+## 2026-06-30 — Firmware role resolver and rule engine skeleton
+
+Decision: Firmware now has a host-testable Role Resolver and Rule Engine action
+executor that apply enable/disable actions by configured accessory role and then
+call the Output Manager by generic output ID.
+
+Reason: Rule logic must not hard-code physical output numbers. Missing or
+ambiguous role mappings must fail closed instead of guessing a channel.

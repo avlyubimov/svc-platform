@@ -56,6 +56,8 @@ Current host-tested services:
 - Battery Protection
 - CAN Safety Guard
 - System Safety Coordinator
+- Role Resolver
+- Rule Engine skeleton
 
 ## Phase 5 — BMW K25 integration
 - harness

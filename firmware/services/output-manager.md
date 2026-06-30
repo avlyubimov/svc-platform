@@ -28,6 +28,8 @@ state changes.
   by feature code directly manipulating outputs.
 - Output overcurrent and fault events are applied through the Event Dispatcher,
   then the Output Manager fault path.
+- Rule actions resolve roles first and then call the Output Manager by generic
+  output ID.
 
 Initial host-testable implementation:
 
@@ -40,3 +42,8 @@ Device configuration validation is provided by:
 - `firmware/services/config_validator.h`
 - `firmware/services/config_validator.c`
 - `firmware/tests/test_config_validator.c`
+
+Role-based action execution is provided by:
+
+- `firmware/services/role_resolver.h`
+- `firmware/services/rule_engine.h`

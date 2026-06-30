@@ -37,3 +37,5 @@ Current host tests cover:
 - CAN1 listen-only TX denial and CAN2 expansion TX allowance.
 - System Safety Coordinator integration between battery cutoff, Event Bus, and
   Output Manager output shutdown.
+- Role Resolver and Rule Engine skeleton for role-based actions through Output
+  Manager.
