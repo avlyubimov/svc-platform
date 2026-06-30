@@ -1,0 +1,57 @@
+Ref,Block,Generic function,Preferred component or class,Package direction,Qty basis,Status,Notes
+J1,input-protection,Battery input connector,High-current automotive connector,TBD,1,Garage candidate,Final connector family pending current derating
+D1,input-protection,Input load-dump TVS,SM8S33A class,DO-218AB,1,Conditional,Clamp and overshoot margin still require schematic evidence
+U1,input-protection,Ideal-diode reverse controller,LM74700QDBVRQ1,SOT-23-6,1,Candidate,LM74502-Q1 family retained as alternate
+Q1,input-protection,Input reverse MOSFET,IAUTN06S5N008ATMA1,TOLL,1,Preferred candidate,BUK7S1R2-80M or dual SIDR626 fallback
+RSH1,input-protection,Total input current shunt,Low-ohm automotive shunt,TBD,1,Value TBD,Used by total input current monitor
+U2,input-protection,Total input current monitor,INA228/INA229 or INA226 class,VSSOP/SOIC,1,Candidate,Must support 0-60A range target
+U3,logic-power,Protected 5V buck regulator,LM5164QDDATQ1,SO PowerPAD-8,1,Preferred candidate,LM5013-Q1 if 1A budget exceeded
+L1,logic-power,Buck inductor,Automotive shielded inductor,TBD,1,Value TBD,Final value from regulator design
+JPB1,b2b-interface,PB-100 to LB-100 connector,100-pin mezzanine,TBD,1,Vendor TBD,No PCB placement until connector selected
+U101,outputs,OUT1 high-side controller,TPS48110AQDGXRQ1,19-VSSOP,OUT1,Candidate,Generic output controller
+Q101,outputs,OUT1 output MOSFET,SIDR626LDP-T1-RE3,PowerPAK-SO-8DC,OUT1,Candidate,SOA and thermal still require schematic evidence
+F101,outputs,OUT1 user-serviceable fuse,15A fuse holder,TBD,OUT1,Garage candidate,Reference default fuse only
+J101,outputs,OUT1 output connector,Automotive output connector,TBD,OUT1,Garage candidate,Connector derating required
+U102,outputs,OUT2 high-side controller,TPS48110AQDGXRQ1,19-VSSOP,OUT2,Candidate,Highest-risk output
+Q102,outputs,OUT2 output MOSFET,SIDR626LDP-T1-RE3 or larger escape,TBD,OUT2,Conditional,Must pass OUT2 SOA envelope
+F102,outputs,OUT2 user-serviceable fuse,20A fuse holder,TBD,OUT2,Garage candidate,Reference default fuse only
+J102,outputs,OUT2 output connector,Automotive output connector,TBD,OUT2,Garage candidate,Connector derating required
+U103,outputs,OUT3 high-side controller,TPS48110AQDGXRQ1,19-VSSOP,OUT3,Candidate,Generic output controller
+Q103,outputs,OUT3 output MOSFET,SIDR626LDP-T1-RE3,PowerPAK-SO-8DC,OUT3,Candidate,SOA and thermal still require schematic evidence
+F103,outputs,OUT3 user-serviceable fuse,10A fuse holder,TBD,OUT3,Garage candidate,Reference default fuse only
+J103,outputs,OUT3 output connector,Automotive output connector,TBD,OUT3,Garage candidate,Connector derating required
+U104,outputs,OUT4 high-side controller,TPS48110AQDGXRQ1,19-VSSOP,OUT4,Candidate,Generic output controller
+Q104,outputs,OUT4 output MOSFET,SIDR626LDP-T1-RE3,PowerPAK-SO-8DC,OUT4,Candidate,SOA and thermal still require schematic evidence
+F104,outputs,OUT4 user-serviceable fuse,10A fuse holder,TBD,OUT4,Garage candidate,Reference default fuse only
+J104,outputs,OUT4 output connector,Automotive output connector,TBD,OUT4,Garage candidate,Connector derating required
+U105,outputs,OUT5 high-side controller,TPS48110AQDGXRQ1,19-VSSOP,OUT5,Candidate,Low-current external-controller baseline by ADR-0011
+Q105,outputs,OUT5 output MOSFET,SIDR626LDP-T1-RE3,PowerPAK-SO-8DC,OUT5,Candidate,Can be optimized after SOA/thermal review
+F105,outputs,OUT5 user-serviceable fuse,5A fuse holder,TBD,OUT5,Garage candidate,Reference default fuse only
+J105,outputs,OUT5 output connector,Automotive output connector,TBD,OUT5,Garage candidate,Connector derating required
+U106,outputs,OUT6 high-side controller,TPS48110AQDGXRQ1,19-VSSOP,OUT6,Candidate,Generic output controller
+Q106,outputs,OUT6 output MOSFET,SIDR626LDP-T1-RE3,PowerPAK-SO-8DC,OUT6,Candidate,Heater steady-state thermal review required
+F106,outputs,OUT6 user-serviceable fuse,10A fuse holder,TBD,OUT6,Garage candidate,Reference default fuse only
+J106,outputs,OUT6 output connector,Automotive output connector,TBD,OUT6,Garage candidate,Connector derating required
+U107,outputs,OUT7 high-side controller,TPS48110AQDGXRQ1,19-VSSOP,OUT7,Candidate,Generic output controller
+Q107,outputs,OUT7 output MOSFET,SIDR626LDP-T1-RE3,PowerPAK-SO-8DC,OUT7,Candidate,Heater steady-state thermal review required
+F107,outputs,OUT7 user-serviceable fuse,10A fuse holder,TBD,OUT7,Garage candidate,Reference default fuse only
+J107,outputs,OUT7 output connector,Automotive output connector,TBD,OUT7,Garage candidate,Connector derating required
+U108,outputs,OUT8 high-side controller,TPS48110AQDGXRQ1,19-VSSOP,OUT8,Candidate,Low-current external-controller baseline by ADR-0011
+Q108,outputs,OUT8 output MOSFET,SIDR626LDP-T1-RE3,PowerPAK-SO-8DC,OUT8,Candidate,Can be optimized after SOA/thermal review
+F108,outputs,OUT8 user-serviceable fuse,5A fuse holder,TBD,OUT8,Garage candidate,Reference default fuse only
+J108,outputs,OUT8 output connector,Automotive output connector,TBD,OUT8,Garage candidate,Connector derating required
+U109,outputs,OUT9 high-side controller,TPS48110AQDGXRQ1,19-VSSOP,OUT9,Candidate,Safety-relevant reference role remains configuration only
+Q109,outputs,OUT9 output MOSFET,SIDR626LDP-T1-RE3,PowerPAK-SO-8DC,OUT9,Candidate,Can be optimized after SOA/thermal review
+F109,outputs,OUT9 user-serviceable fuse,5A fuse holder,TBD,OUT9,Garage candidate,Reference default fuse only
+J109,outputs,OUT9 output connector,Automotive output connector,TBD,OUT9,Garage candidate,Connector derating required
+U110,outputs,OUT10 high-side controller,TPS48110AQDGXRQ1,19-VSSOP,OUT10,Candidate,Generic spare output
+Q110,outputs,OUT10 output MOSFET,SIDR626LDP-T1-RE3,PowerPAK-SO-8DC,OUT10,Candidate,SOA and thermal still require schematic evidence
+F110,outputs,OUT10 user-serviceable fuse,10A fuse holder,TBD,OUT10,Garage candidate,Reference default fuse only
+J110,outputs,OUT10 output connector,Automotive output connector,TBD,OUT10,Garage candidate,Connector derating required
+RT1,telemetry,PCB reference temperature sensor,Automotive NTC or TMP117 class,0603/0805 or SMD IC,1,Candidate,TEMP_PCB
+RT2,telemetry,Power-zone A temperature sensor,Automotive NTC,0603/0805,1,Candidate,TEMP_PWR_A near OUT2/input path
+RT3,telemetry,Power-zone B temperature sensor,Automotive NTC,0603/0805,1,Candidate,TEMP_PWR_B near medium outputs or buck
+RID1,telemetry,Board identity resistor network,Precision resistor divider,SMD,1,Value TBD,PB_ID_ADC fallback identity
+JP_CAN1,can1-safety,CAN1 TX DNP/open link,Solder jumper or DNP 0R,TBD,1,Default open,No CAN1 TX without future ADR
+U_CAN1,can1-safety,CAN1 TX disable gate,Logic gate or transceiver silent control,TBD,1,Conditional,Only if CAN1 safety gate crosses PB-100
+TP1..TPn,test,Bring-up and telemetry test points,Test point,TBD,TBD,Review item,Exact count from schematic ERC/bench plan

@@ -220,3 +220,12 @@ preparation tracked in `hardware/power-board/PB-100/PB-100-kicad-prep.md`.
 
 Reason: Schematic capture needs package preparation, but PCB layout, placement,
 routing, and Gerber generation remain blocked until schematic freeze.
+
+## 2026-06-30 — PB-100 schematic capture contract
+
+Decision: PB-100 schematic capture now has a sheet plan, net naming contract,
+and component instance plan under `hardware/power-board/PB-100/`.
+
+Reason: The project needs a deterministic bridge from requirements and planning
+tables to schematic capture while preserving generic outputs, CAN1 TX safety, and
+the no-layout boundary.

@@ -23,6 +23,9 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-schematic-package.md`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
 - `hardware/power-board/PB-100/PB-100-output-channel-matrix.csv`
+- `hardware/power-board/PB-100/PB-100-schematic-instance-plan.csv`
+- `hardware/power-board/PB-100/PB-100-net-naming.md`
+- `hardware/power-board/PB-100/PB-100-schematic-capture-plan.md`
 - `hardware/power-board/PB-100/PB-100-power-path-candidates.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`

@@ -23,6 +23,8 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-preliminary-validation.md`
+- `hardware/power-board/PB-100/PB-100-net-naming.md`
+- `hardware/power-board/PB-100/PB-100-schematic-capture-plan.md`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
 - `hardware/power-board/PB-100/PB-100-schematic-readiness-review.md`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
@@ -87,6 +89,9 @@ Output matrix CSV:
 The matrix keeps hardware outputs generic while carrying the BMW K25 reference
 defaults needed for sizing and bench tests.
 
+Schematic instance plan CSV:
+`hardware/power-board/PB-100/PB-100-schematic-instance-plan.csv`.
+
 ## Power-path candidates
 
 Candidate MPN CSV:
@@ -113,12 +118,7 @@ Preliminary validation tables:
 
 ## Net naming rules
 
-- Use neutral output identifiers: `OUT1` through `OUT10`.
-- Do not name nets after accessory roles such as fog, seat, USB, or CHIGEE.
-- Use role names only in configuration and vehicle-profile documents.
-- Mark CAN1 TX-disable hardware clearly in schematic notes.
-- Keep `CAN1_TX_ROUTE` DNP/open by default unless a future ADR explicitly
-  changes the vehicle-CAN policy.
+- Follow `hardware/power-board/PB-100/PB-100-net-naming.md`.
 
 ## Schematic freeze blockers
 
