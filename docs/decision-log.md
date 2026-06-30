@@ -277,8 +277,9 @@ connector family, not a power-output family.
 
 ## 2026-06-30 — Project validation baseline
 
-Decision: Top-level project validation is `python3 tools/validate_pb100.py` plus
-`make -C firmware test`, and GitHub Actions runs both on push and pull request.
+Decision: Top-level project validation is `make check`, which runs
+`python3 tools/validate_pb100.py` plus `make -C firmware test`. GitHub Actions
+runs the same root command on push and pull request.
 
 Reason: Hardware planning artifacts and firmware safety services now change
 together, so project status must be verified from the repository root.

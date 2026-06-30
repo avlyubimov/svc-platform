@@ -9,7 +9,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate PB-100 artifacts
-        run: python3 tools/validate_pb100.py
-      - name: Run firmware host tests
-        run: make -C firmware test
+      - name: Run project checks
+        run: make check

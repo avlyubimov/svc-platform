@@ -20,11 +20,11 @@ Do not start PCB layout until the PB-100 schematic freeze checklist is closed.
 ## Validation
 
 ```bash
-python3 tools/validate_pb100.py
-make -C firmware test
+make check
 ```
 
-These checks run in GitHub Actions on push and pull request.
+This runs PB-100 artifact validation and firmware host tests. The same command
+runs in GitHub Actions on push and pull request.
 
 ## Repository structure
 
