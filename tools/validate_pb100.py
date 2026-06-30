@@ -430,6 +430,36 @@ def validate_symbol_capture_worklist() -> None:
         )
 
 
+def validate_symbol_capture_progress() -> None:
+    path = PB100_DIR / "PB-100-symbol-capture-worklist.csv"
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    symbol_text = read_text(KICAD_DIR / "lib" / "PB100.kicad_sym")
+    for row_number, row in enumerate(rows, 2):
+        pin_status = row["Pin evidence status"].strip().lower()
+        if "preliminary symbol created" not in pin_status:
+            continue
+
+        symbol_name = row["Concrete symbol name"].strip()
+        marker = f'(symbol "{symbol_name}"'
+        start = symbol_text.find(marker)
+        if start < 0:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: worklist marks "
+                f"{symbol_name} created, but symbol is missing from PB100.kicad_sym"
+            )
+
+        next_symbol = symbol_text.find('\n  (symbol "', start + 1)
+        if next_symbol < 0:
+            next_symbol = symbol_text.rfind("\n)")
+        symbol_block = symbol_text[start:next_symbol]
+        if "(in_bom no)" not in symbol_block:
+            fail(f"preliminary symbol {symbol_name} must be excluded from BOM")
+        if "(on_board no)" not in symbol_block:
+            fail(f"preliminary symbol {symbol_name} must be excluded from board")
+        if '(property "Footprint" ""' not in symbol_block:
+            fail(f"preliminary symbol {symbol_name} must not lock a footprint")
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -456,6 +486,7 @@ def main() -> int:
     validate_instance_plan()
     validate_symbol_mpn_readiness()
     validate_symbol_capture_worklist()
+    validate_symbol_capture_progress()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0

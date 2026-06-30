@@ -556,3 +556,14 @@ closure evidence.
 Reason: The local KiCad installation does not provide reusable project-ready
 symbols for the selected PB-100 candidates. A validated worklist lets schematic
 symbol creation proceed in controlled steps while preserving the no-layout gate.
+
+## 2026-06-30 — First PB-100 concrete preliminary symbols
+
+Decision: `hardware/power-board/PB-100/kicad/lib/PB100.kicad_sym` now includes
+preliminary concrete symbols for TPS48110AQDGXRQ1, LM74700QDBVRQ1,
+LM5164QDDATQ1, and INA228-Q1, with pinouts extracted from official TI data
+sheets and kept excluded from BOM/board output.
+
+Reason: These are core schematic-capture dependencies for output control, input
+reverse protection, protected 5 V power, and total input current telemetry. They
+can be reviewed now without locking footprints or authorizing PCB layout.
