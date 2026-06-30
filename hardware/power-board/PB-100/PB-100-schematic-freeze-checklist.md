@@ -67,6 +67,7 @@ Before marking this checklist `Closed`, the review packet must include:
 - Final output channel matrix.
 - Final output-channel pin contract.
 - Final output-controller pin template.
+- Final output-net expansion table.
 - Final output-stage design value table.
 - Final input-protection pin contract.
 - Final input-controller pin template.

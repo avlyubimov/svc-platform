@@ -212,6 +212,15 @@ OUTPUT_STAGE_DESIGN_VALUE_COLUMNS = (
     "Freeze dependency",
     "Notes",
 )
+OUTPUT_NET_EXPANSION_COLUMNS = (
+    "Output",
+    "Net pattern",
+    "Expanded net",
+    "Primary sheet",
+    "Source artifact",
+    "Default state",
+    "Safety rule",
+)
 INPUT_POWER_DESIGN_VALUE_COLUMNS = (
     "Block",
     "Design item",
@@ -286,6 +295,7 @@ REQUIRED_READINESS_AREAS = {
     "Net domains",
     "Output pin contract",
     "Output controller template",
+    "Output net expansion",
     "Output stage design values",
     "Input controller template",
     "Current monitor template",
@@ -1845,6 +1855,79 @@ def output_controller_template_net_patterns() -> set[str]:
     return {row["Net pattern"].strip() for row in rows}
 
 
+def validate_output_net_expansion() -> None:
+    path = PB100_DIR / "PB-100-output-net-expansion.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty output net expansion: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in OUTPUT_NET_EXPANSION_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    output_matrix_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-output-channel-matrix.csv").open(newline="", encoding="utf-8"))
+    )
+    expected_outputs = {row["Output"].strip() for row in output_matrix_rows}
+    expected_patterns = {
+        pattern for pattern in output_controller_template_net_patterns() if pattern.startswith("OUTn_")
+    } | {"OUTn_LOAD", "OUTn_FUSED"}
+    b2b_rows = list(csv.DictReader((PB100_DIR / "PB-100-b2b-pin-map.csv").open(newline="", encoding="utf-8")))
+    b2b_nets = {row["Net"].strip() for row in b2b_rows}
+    manifest_rows = list(csv.DictReader((PB100_DIR / "PB-100-kicad-sheet-manifest.csv").open(newline="", encoding="utf-8")))
+    manifest_sheets = {row["Sheet file"].strip() for row in manifest_rows}
+
+    seen_pairs = set()
+    for row_number, row in enumerate(rows, 2):
+        output = row["Output"].strip()
+        pattern = row["Net pattern"].strip()
+        expanded_net = row["Expanded net"].strip()
+        if output not in expected_outputs:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown output {output}")
+        if pattern not in expected_patterns:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unexpected net pattern {pattern}")
+        expected_net = pattern.replace("OUTn", output)
+        if expanded_net != expected_net:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: expected expanded net "
+                f"{expected_net}, got {expanded_net}"
+            )
+        pair = (output, pattern)
+        if pair in seen_pairs:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate expansion {output}/{pattern}")
+        seen_pairs.add(pair)
+        validate_no_role_tokens_in_row(path, row_number, row)
+        primary_sheet = row["Primary sheet"].strip()
+        if primary_sheet not in manifest_sheets:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown Primary sheet {primary_sheet}")
+        for column in ("Source artifact", "Default state", "Safety rule"):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if pattern in {"OUTn_CTL", "OUTn_FLT", "OUTn_IMON"} and expanded_net not in b2b_nets:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: {expanded_net} is missing from JPB1 pin map")
+        if pattern == "OUTn_CTL" and "configuration" not in row["Safety rule"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: control nets must preserve configuration mapping")
+        if pattern in {"OUTn_LOAD", "OUTn_FUSED"} and "off" not in row["Default state"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: output power nets must default off")
+        if pattern.startswith("OUTn_") and "OUTn" in expanded_net:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: expanded net still contains OUTn")
+
+    expected_pairs = {(output, pattern) for output in expected_outputs for pattern in expected_patterns}
+    missing_pairs = sorted(expected_pairs - seen_pairs)
+    extra_pairs = sorted(seen_pairs - expected_pairs)
+    if missing_pairs:
+        formatted = ", ".join(f"{output}/{pattern}" for output, pattern in missing_pairs)
+        fail(f"{path.relative_to(REPO_ROOT)} is missing expansions: {formatted}")
+    if extra_pairs:
+        formatted = ", ".join(f"{output}/{pattern}" for output, pattern in extra_pairs)
+        fail(f"{path.relative_to(REPO_ROOT)} has extra expansions: {formatted}")
+
+
 def validate_output_stage_design_values() -> None:
     path = PB100_DIR / "PB-100-output-stage-design-values.csv"
     validate_csv(path)
@@ -2266,6 +2349,7 @@ def main() -> int:
     validate_schematic_freeze_gap_register()
     validate_output_channel_pin_contract()
     validate_output_controller_pin_template()
+    validate_output_net_expansion()
     validate_input_and_power_pin_templates()
     validate_input_protection_pin_contract()
     validate_logic_power_design_placeholders()

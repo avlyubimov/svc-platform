@@ -31,6 +31,7 @@ manufacturing outputs are also blocked by repository validation.
 - `../PB-100-schematic-net-domain-plan.csv`
 - `../PB-100-output-channel-pin-contract.csv`
 - `../PB-100-output-controller-pin-template.csv`
+- `../PB-100-output-net-expansion.csv`
 - `../PB-100-output-stage-design-values.csv`
 - `../PB-100-input-controller-pin-template.csv`
 - `../PB-100-input-protection-pin-contract.csv`

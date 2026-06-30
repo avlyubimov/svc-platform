@@ -812,3 +812,16 @@ Q1/40 A, factory sourcing recheck, or garage scope constraints are lost.
 Reason: Freeze gaps are not closed by documentation alone. Each conditional
 gate needs explicit validation evidence before it can move to `Closed`, and the
 coverage must stay synchronized as the checklist changes.
+
+## 2026-06-30 — PB-100 output net expansion
+
+Decision: PB-100 now has
+`hardware/power-board/PB-100/PB-100-output-net-expansion.csv`, expanding every
+generic `OUTn_*` output-controller and output-channel net pattern into concrete
+`OUT1_*` through `OUT10_*` schematic nets. `tools/validate_pb100.py` checks the
+expansion against the output matrix, controller template, sheet manifest, and
+`JPB1` control/fault/current nets.
+
+Reason: Schematic capture should not rely on hand-expanding repeated output
+channel nets. A machine-checked expansion table keeps the ten-channel capture
+role-agnostic, repeatable, and aligned with the board-to-board interface.

@@ -16,8 +16,8 @@ KiCad scaffold directory:
 | `PB-100.kicad_sch` | Top-level sheet, title block, review notes, sheet links | This file plus all child sheets |
 | `input-protection.kicad_sch` | Battery input, reverse protection, TVS, input current/voltage sense | `PB-100-input-reverse-protection.md`, `PB-100-input-protection-pin-contract.csv`, `PB-100-input-controller-pin-template.csv`, `PB-100-current-monitor-pin-template.csv`, `PB-100-input-power-design-values.csv`, `PB-100-protection-validation.csv` |
 | `logic-power.kicad_sch` | Protected `PB_5V_OUT`, power-good, UVLO, local filters | `PB-100-logic-power-rails.md`, `PB-100-logic-power-budget.csv`, `PB-100-logic-power-design-placeholders.csv`, `PB-100-logic-buck-pin-template.csv`, `PB-100-logic-power-design-values.csv` |
-| `output-channel-template.kicad_sch` | Generic high-side output channel pattern | `PB-100-output-channel-matrix.csv`, `PB-100-output-channel-pin-contract.csv`, `PB-100-output-controller-pin-template.csv`, `PB-100-output-stage-design-values.csv`, `PB-100-current-telemetry.md` |
-| `outputs-1-10.kicad_sch` | Ten instantiated generic outputs | `PB-100-schematic-instance-plan.csv` |
+| `output-channel-template.kicad_sch` | Generic high-side output channel pattern | `PB-100-output-channel-matrix.csv`, `PB-100-output-channel-pin-contract.csv`, `PB-100-output-controller-pin-template.csv`, `PB-100-output-net-expansion.csv`, `PB-100-output-stage-design-values.csv`, `PB-100-current-telemetry.md` |
+| `outputs-1-10.kicad_sch` | Ten instantiated generic outputs | `PB-100-schematic-instance-plan.csv`, `PB-100-output-net-expansion.csv` |
 | `telemetry.kicad_sch` | Total input current, voltage, thermal sensors, board ID | `PB-100-current-telemetry-map.csv`, `PB-100-thermal-telemetry-map.csv` |
 | `b2b-interface.kicad_sch` | `JPB1` PB-100 to LB-100 interface | `PB-100-b2b-pin-map.csv` |
 | `can1-safety.kicad_sch` | CAN1 TX disable/readback and DNP/open TX path | `PB-100-can1-tx-disable.md`, `PB-100-can1-safety-verification.csv` |
@@ -45,7 +45,7 @@ Schematic net-domain rules are tracked in
 6. Capture `input-protection.kicad_sch` from the input-protection pin contract.
 7. Capture `logic-power.kicad_sch` from the logic-power value placeholders.
 8. Capture one generic output template from the output-channel pin contract and
-   copy it to OUT1 through OUT10.
+   output net expansion, then copy it to OUT1 through OUT10.
 9. Capture current and thermal telemetry sheets.
 10. Add CAN1 TX-disable hardware with Rev.1 TX route DNP/open.
 11. Run schematic ERC and update the freeze checklist with evidence.
