@@ -348,6 +348,7 @@ REQUIRED_READINESS_AREAS = {
     "Input protection contract",
     "Test point plan",
     "Fault response matrix",
+    "Hardware capability manifest",
     "Logic power values",
     "BOM synchronization",
     "Assembly sourcing recheck",
@@ -462,6 +463,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-can1-safety-verification.csv",
     "hardware/power-board/PB-100/kicad/PB-100.kicad_sch",
     "hardware/power-board/PB-100/kicad/lib/PB100.kicad_sym",
+    "firmware/configs/hardware/pb-100-capabilities.json",
     "production/bom/pb100_symbol_bom_map.csv",
     "production/bom/pb100_assembly_sourcing_recheck.csv",
 }

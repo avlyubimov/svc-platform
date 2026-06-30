@@ -16,6 +16,7 @@ It is not a PCB layout package.
 - `docs/adr/ADR-0011-pb-100-low-current-output-stage.md`
 - `docs/can/can-safety.md`
 - `docs/production/component-family-shortlist.md`
+- `firmware/configs/hardware/pb-100-capabilities.json`
 - `production/bom/pb100_symbol_bom_map.csv`
 - `production/bom/pb100_assembly_sourcing_recheck.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
@@ -166,6 +167,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-test-point-plan.csv`
 - `hardware/power-board/PB-100/PB-100-fault-response-matrix.csv`
 - `hardware/power-board/PB-100/PB-100-review-release-manifest.csv`
+- `firmware/configs/hardware/pb-100-capabilities.json`
 
 ## Net naming rules
 

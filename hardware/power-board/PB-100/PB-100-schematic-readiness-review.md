@@ -29,6 +29,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv`
 - `hardware/power-board/PB-100/PB-100-test-point-plan.csv`
 - `hardware/power-board/PB-100/PB-100-fault-response-matrix.csv`
+- `firmware/configs/hardware/pb-100-capabilities.json`
 - `hardware/power-board/PB-100/PB-100-output-channel-matrix.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`
@@ -88,6 +89,7 @@ The schematic review packet consists of:
 | Thermal telemetry | Final sensor values, placement notes, and derating thresholds |
 | Test points | Bring-up, telemetry, output, fused-output, and CAN1 safety test points are defined without footprint or placement lock |
 | Fault response | Input, logic, B2B, output, thermal, current-budget, CAN1, and identity faults have safe hardware defaults and firmware responses |
+| Hardware capabilities | Role-free PB-100 capabilities align with output matrix, telemetry maps, config defaults, and CAN1 read-only policy |
 | B2B interface | Connector MPN, pin assignment review, and LB-100 MCU resource binding |
 | CAN1 safety | DNP/open TX path, default disable state, status readback, DNP BOM ownership, firmware listen-only behavior, and future ADR hardware-action process |
 | Factory assembly | JLCPCB/PCBWay assembly class, distributor continuity, and alternates for critical MPNs; concrete symbol/footprint status from `PB-100-symbol-mpn-readiness.csv` and `pb100_assembly_sourcing_recheck.csv` |

@@ -33,3 +33,14 @@ The repository validator checks that schema role/output/priority enums stay in
 sync with firmware enums and that `config-example.json` stays aligned with
 `svc_default_config`. It also checks that current JSON rule strings fit the
 limited firmware rule text grammar.
+
+## Hardware capability manifests
+
+Hardware capabilities are separate from vehicle role mapping. PB-100 capabilities
+are tracked in `firmware/configs/hardware/pb-100-capabilities.json`.
+
+The manifest describes generic `OUT1`..`OUT10` electrical capability, telemetry,
+power-budget limits, and CAN1 safety defaults. It must not contain accessory role
+names. `tools/validate_config.py` checks it against the PB-100 output matrix,
+current/thermal telemetry maps, `config-example.json`, and the CAN1 DNP/open
+read-only policy.

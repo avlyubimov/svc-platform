@@ -878,3 +878,18 @@ marker.
 Reason: The spreadsheet work queue and the KiCad files must not drift. Embedding
 the work item marker in each placeholder sheet makes the capture sequence
 traceable inside KiCad while still avoiding schematic placement and PCB layout.
+
+## 2026-06-30 — PB-100 role-free hardware capabilities
+
+Decision: PB-100 now has
+`firmware/configs/hardware/pb-100-capabilities.json`, a role-free hardware
+capability manifest for generic outputs, telemetry, power budget, safe defaults,
+and CAN1 read-only behavior. `tools/validate_config.py` checks it against the
+PB-100 output matrix, current/thermal telemetry maps, firmware config defaults,
+and CAN1 DNP/open future-ADR policy. The PB-100 release manifest includes the
+capability file as a required freeze artifact.
+
+Reason: Firmware and configuration need a machine-readable hardware capability
+contract that does not encode vehicle accessory roles. Role mapping remains in
+configuration and vehicle profiles, while hardware capability discovery uses
+board identity and generic `OUT1`..`OUT10` capabilities.

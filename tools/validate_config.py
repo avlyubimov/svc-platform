@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import csv
 import json
 import re
 import sys
@@ -12,10 +13,23 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = REPO_ROOT / "firmware" / "configs" / "config-example.json"
 CONFIG_SCHEMA_PATH = REPO_ROOT / "firmware" / "configs" / "svc-config.schema.json"
+PB100_CAPABILITIES_PATH = REPO_ROOT / "firmware" / "configs" / "hardware" / "pb-100-capabilities.json"
 SVC_TYPES_PATH = REPO_ROOT / "firmware" / "core" / "svc_types.h"
 SVC_CONFIG_PATH = REPO_ROOT / "firmware" / "core" / "svc_config.h"
 SVC_DEFAULTS_PATH = REPO_ROOT / "firmware" / "core" / "svc_config_defaults.c"
 POWER_BUDGET_PATH = REPO_ROOT / "firmware" / "services" / "power_budget.h"
+PB100_OUTPUT_MATRIX_PATH = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-output-channel-matrix.csv"
+PB100_CURRENT_TELEMETRY_PATH = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-current-telemetry-map.csv"
+PB100_THERMAL_TELEMETRY_PATH = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-thermal-telemetry-map.csv"
+FORBIDDEN_HARDWARE_CAPABILITY_ROLE_TOKENS = (
+    "USB",
+    "FOG",
+    "SEAT",
+    "CHIGEE",
+    "DVR",
+    "BRAKE",
+    "CIGARETTE",
+)
 
 
 def fail(message: str) -> None:
@@ -266,6 +280,119 @@ def validate_outputs(config: dict[str, Any], allowed_roles: set[str]) -> None:
             fail(f"outputs[{index}] does not match C default: {actual_output} != {expected_output}")
 
 
+def load_csv_dicts(path: Path) -> list[dict[str, str]]:
+    try:
+        return list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    except FileNotFoundError:
+        fail(f"missing required CSV: {path.relative_to(REPO_ROOT)}")
+
+
+def validate_no_role_tokens_in_capabilities(capabilities: dict[str, Any]) -> None:
+    text = json.dumps(capabilities, sort_keys=True)
+    for token in FORBIDDEN_HARDWARE_CAPABILITY_ROLE_TOKENS:
+        if token in text:
+            fail(f"hardware capabilities must not contain accessory role token: {token}")
+
+
+def require_capability_dict(parent: dict[str, Any], key: str) -> dict[str, Any]:
+    value = parent.get(key)
+    if not isinstance(value, dict):
+        fail(f"expected object in PB-100 capabilities at `{key}`")
+    return value
+
+
+def validate_pb100_capabilities(config: dict[str, Any]) -> None:
+    capabilities = load_json(PB100_CAPABILITIES_PATH)
+    validate_no_role_tokens_in_capabilities(capabilities)
+
+    device = require_dict(config, "device")
+    hardware = require_dict(device, "hardware")
+    board = require_capability_dict(capabilities, "board")
+    if board.get("id") != "PB-100":
+        fail("PB-100 capabilities board.id must be PB-100")
+    if hardware.get("power_board") != board.get("id"):
+        fail("config device.hardware.power_board must match PB-100 capabilities board.id")
+    if not isinstance(board.get("capability_source"), str) or not board["capability_source"].startswith("hardware/"):
+        fail("PB-100 capabilities board.capability_source must reference hardware source")
+
+    power_budget = require_capability_dict(capabilities, "power_budget")
+    config_power_budget = require_dict(config, "power_budget")
+    if power_budget.get("main_fuse_target_a") != 50:
+        fail("PB-100 capabilities main_fuse_target_a must remain 50")
+    if power_budget.get("board_continuous_target_a") != 40:
+        fail("PB-100 capabilities board_continuous_target_a must remain 40")
+    if power_budget.get("default_total_current_limit_a") != decimal_to_int(
+        config_power_budget.get("total_current_limit_a"),
+        "power_budget.total_current_limit_a",
+    ):
+        fail("PB-100 capabilities total current limit must match config example")
+
+    safety = require_capability_dict(capabilities, "safety")
+    if safety.get("outputs_default_state") != "off":
+        fail("PB-100 capabilities outputs_default_state must be off")
+    if safety.get("configuration_required_for_roles") is not True:
+        fail("PB-100 capabilities must require configuration for roles")
+    can1 = require_capability_dict(safety, "can1")
+    if can1.get("vehicle_can_read_only_default") is not True:
+        fail("PB-100 capabilities CAN1 must be read-only by default")
+    if can1.get("tx_route_population") != "DNP/open":
+        fail("PB-100 capabilities CAN1 TX route must remain DNP/open")
+    if can1.get("tx_requires_future_adr") is not True:
+        fail("PB-100 capabilities CAN1 TX must require future ADR")
+    if can1.get("hardware_action_required_for_tx") is not True:
+        fail("PB-100 capabilities CAN1 TX must require explicit hardware action")
+    if can1.get("disabled_status_signal") != "CAN1_TX_DISABLED_STATUS":
+        fail("PB-100 capabilities CAN1 disabled status signal mismatch")
+
+    matrix_rows = load_csv_dicts(PB100_OUTPUT_MATRIX_PATH)
+    matrix_by_output = {row["Output"].strip(): row for row in matrix_rows}
+    outputs = capabilities.get("outputs")
+    if not isinstance(outputs, list) or len(outputs) != 10:
+        fail("PB-100 capabilities must contain exactly 10 outputs")
+    seen_outputs = set()
+    for index, output in enumerate(outputs):
+        if not isinstance(output, dict):
+            fail(f"PB-100 capabilities outputs[{index}] must be an object")
+        output_id = output.get("id")
+        expected_id = f"OUT{index + 1}"
+        if output_id != expected_id:
+            fail(f"PB-100 capabilities outputs[{index}].id must be {expected_id}")
+        if output_id in seen_outputs:
+            fail(f"duplicate PB-100 capability output {output_id}")
+        seen_outputs.add(output_id)
+        if "role" in output or "reference_default_role" in output:
+            fail("PB-100 hardware capabilities must not contain output roles")
+        matrix_row = matrix_by_output.get(output_id)
+        if matrix_row is None:
+            fail(f"PB-100 capabilities output {output_id} missing from output matrix")
+        expected = {
+            "class": matrix_row["Class"].strip(),
+            "target_fuse_a": int(matrix_row["Target fuse A"]),
+            "target_current_limit_a": int(matrix_row["Target current limit A"]),
+            "pwm_capability": matrix_row["PWM"].strip(),
+            "control_signal": f"{output_id}_CTL",
+            "fault_signal": f"{output_id}_FLT",
+            "current_signal": f"{output_id}_IMON",
+            "load_signal": f"{output_id}_LOAD",
+            "fused_signal": f"{output_id}_FUSED",
+            "safe_default": "off",
+        }
+        actual = {key: output.get(key) for key in expected}
+        if actual != expected:
+            fail(f"PB-100 capabilities output {output_id} mismatch: {actual} != {expected}")
+
+    telemetry = require_capability_dict(capabilities, "telemetry")
+    current_signals = telemetry.get("current_signals")
+    thermal_signals = telemetry.get("thermal_signals")
+    board_signals = telemetry.get("board_signals")
+    if current_signals != [row["Signal"].strip() for row in load_csv_dicts(PB100_CURRENT_TELEMETRY_PATH)]:
+        fail("PB-100 capabilities current_signals must match current telemetry map")
+    if thermal_signals != [row["Signal"].strip() for row in load_csv_dicts(PB100_THERMAL_TELEMETRY_PATH)]:
+        fail("PB-100 capabilities thermal_signals must match thermal telemetry map")
+    if board_signals != ["VBAT_SENSE", "PB_PWR_GOOD", "PB_FAULT", "PB_ID_ADC"]:
+        fail("PB-100 capabilities board_signals mismatch")
+
+
 def validate_rules(config: dict[str, Any], allowed_roles: set[str]) -> None:
     rules = config.get("rules", [])
     if not isinstance(rules, list):
@@ -310,6 +437,7 @@ def main() -> int:
     validate_thermal(config, defines)
     validate_power_budget(config, defines)
     validate_outputs(config, allowed_roles)
+    validate_pb100_capabilities(config)
     validate_rules(config, allowed_roles)
     print("Config validation passed")
     return 0

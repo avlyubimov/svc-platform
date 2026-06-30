@@ -1,0 +1,181 @@
+{
+  "board": {
+    "id": "PB-100",
+    "revision_family": "Rev.1 schematic-planning baseline",
+    "capability_source": "hardware/power-board/PB-100/PB-100-output-channel-matrix.csv"
+  },
+  "power_budget": {
+    "main_fuse_target_a": 50,
+    "board_continuous_target_a": 40,
+    "default_total_current_limit_a": 40
+  },
+  "safety": {
+    "outputs_default_state": "off",
+    "configuration_required_for_roles": true,
+    "can1": {
+      "vehicle_can_read_only_default": true,
+      "tx_route_population": "DNP/open",
+      "tx_requires_future_adr": true,
+      "hardware_action_required_for_tx": true,
+      "disabled_status_signal": "CAN1_TX_DISABLED_STATUS"
+    }
+  },
+  "outputs": [
+    {
+      "id": "OUT1",
+      "class": "Medium current",
+      "target_fuse_a": 15,
+      "target_current_limit_a": 12,
+      "pwm_capability": "yes",
+      "control_signal": "OUT1_CTL",
+      "fault_signal": "OUT1_FLT",
+      "current_signal": "OUT1_IMON",
+      "load_signal": "OUT1_LOAD",
+      "fused_signal": "OUT1_FUSED",
+      "safe_default": "off"
+    },
+    {
+      "id": "OUT2",
+      "class": "High current",
+      "target_fuse_a": 20,
+      "target_current_limit_a": 18,
+      "pwm_capability": "optional",
+      "control_signal": "OUT2_CTL",
+      "fault_signal": "OUT2_FLT",
+      "current_signal": "OUT2_IMON",
+      "load_signal": "OUT2_LOAD",
+      "fused_signal": "OUT2_FUSED",
+      "safe_default": "off"
+    },
+    {
+      "id": "OUT3",
+      "class": "Medium current",
+      "target_fuse_a": 10,
+      "target_current_limit_a": 8,
+      "pwm_capability": "yes",
+      "control_signal": "OUT3_CTL",
+      "fault_signal": "OUT3_FLT",
+      "current_signal": "OUT3_IMON",
+      "load_signal": "OUT3_LOAD",
+      "fused_signal": "OUT3_FUSED",
+      "safe_default": "off"
+    },
+    {
+      "id": "OUT4",
+      "class": "Medium current",
+      "target_fuse_a": 10,
+      "target_current_limit_a": 8,
+      "pwm_capability": "yes",
+      "control_signal": "OUT4_CTL",
+      "fault_signal": "OUT4_FLT",
+      "current_signal": "OUT4_IMON",
+      "load_signal": "OUT4_LOAD",
+      "fused_signal": "OUT4_FUSED",
+      "safe_default": "off"
+    },
+    {
+      "id": "OUT5",
+      "class": "Low current",
+      "target_fuse_a": 5,
+      "target_current_limit_a": 4,
+      "pwm_capability": "yes",
+      "control_signal": "OUT5_CTL",
+      "fault_signal": "OUT5_FLT",
+      "current_signal": "OUT5_IMON",
+      "load_signal": "OUT5_LOAD",
+      "fused_signal": "OUT5_FUSED",
+      "safe_default": "off"
+    },
+    {
+      "id": "OUT6",
+      "class": "Medium current",
+      "target_fuse_a": 10,
+      "target_current_limit_a": 8,
+      "pwm_capability": "yes",
+      "control_signal": "OUT6_CTL",
+      "fault_signal": "OUT6_FLT",
+      "current_signal": "OUT6_IMON",
+      "load_signal": "OUT6_LOAD",
+      "fused_signal": "OUT6_FUSED",
+      "safe_default": "off"
+    },
+    {
+      "id": "OUT7",
+      "class": "Medium current",
+      "target_fuse_a": 10,
+      "target_current_limit_a": 8,
+      "pwm_capability": "yes",
+      "control_signal": "OUT7_CTL",
+      "fault_signal": "OUT7_FLT",
+      "current_signal": "OUT7_IMON",
+      "load_signal": "OUT7_LOAD",
+      "fused_signal": "OUT7_FUSED",
+      "safe_default": "off"
+    },
+    {
+      "id": "OUT8",
+      "class": "Low current",
+      "target_fuse_a": 5,
+      "target_current_limit_a": 4,
+      "pwm_capability": "yes",
+      "control_signal": "OUT8_CTL",
+      "fault_signal": "OUT8_FLT",
+      "current_signal": "OUT8_IMON",
+      "load_signal": "OUT8_LOAD",
+      "fused_signal": "OUT8_FUSED",
+      "safe_default": "off"
+    },
+    {
+      "id": "OUT9",
+      "class": "Low current",
+      "target_fuse_a": 5,
+      "target_current_limit_a": 4,
+      "pwm_capability": "yes",
+      "control_signal": "OUT9_CTL",
+      "fault_signal": "OUT9_FLT",
+      "current_signal": "OUT9_IMON",
+      "load_signal": "OUT9_LOAD",
+      "fused_signal": "OUT9_FUSED",
+      "safe_default": "off"
+    },
+    {
+      "id": "OUT10",
+      "class": "Medium current",
+      "target_fuse_a": 10,
+      "target_current_limit_a": 8,
+      "pwm_capability": "yes",
+      "control_signal": "OUT10_CTL",
+      "fault_signal": "OUT10_FLT",
+      "current_signal": "OUT10_IMON",
+      "load_signal": "OUT10_LOAD",
+      "fused_signal": "OUT10_FUSED",
+      "safe_default": "off"
+    }
+  ],
+  "telemetry": {
+    "current_signals": [
+      "OUT1_IMON",
+      "OUT2_IMON",
+      "OUT3_IMON",
+      "OUT4_IMON",
+      "OUT5_IMON",
+      "OUT6_IMON",
+      "OUT7_IMON",
+      "OUT8_IMON",
+      "OUT9_IMON",
+      "OUT10_IMON",
+      "IIN_SENSE"
+    ],
+    "thermal_signals": [
+      "TEMP_PCB",
+      "TEMP_PWR_A",
+      "TEMP_PWR_B"
+    ],
+    "board_signals": [
+      "VBAT_SENSE",
+      "PB_PWR_GOOD",
+      "PB_FAULT",
+      "PB_ID_ADC"
+    ]
+  }
+}

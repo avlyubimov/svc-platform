@@ -45,6 +45,7 @@ hardware/power-board/PB-100/kicad,KiCad scaffold,Project scaffold directory,Requ
 hardware/power-board/PB-100/kicad/PB-100.kicad_pro,KiCad scaffold,KiCad project,Required,validate_kicad_scaffold,Ready
 hardware/power-board/PB-100/kicad/PB-100.kicad_sch,KiCad scaffold,Top schematic scaffold,Required,validate_kicad_cli_checks,Ready
 hardware/power-board/PB-100/kicad/lib/PB100.kicad_sym,KiCad scaffold,Project symbol library,Required,validate_symbol_library,Conditional
+firmware/configs/hardware/pb-100-capabilities.json,Firmware configuration,PB-100 role-free hardware capabilities,Required,tools/validate_config.py,Conditional
 production/bom/factory_bom_draft.csv,Production,Factory BOM draft,Required,validate_bom_symbol_map,Conditional
 production/bom/garage_bom_draft.csv,Production,Garage BOM draft,Required,validate_bom_symbol_map,Conditional
 production/bom/pb100_symbol_bom_map.csv,Production,Symbol-to-BOM map,Required,validate_bom_symbol_map,Conditional

@@ -80,6 +80,7 @@ Before marking this checklist `Closed`, the review packet must include:
 - Final test-point plan with schematic refs, nets, and no footprint/placement
   lock before layout authorization.
 - Final fault-response matrix covering safe defaults and firmware responses.
+- Final role-free hardware capability manifest aligned with firmware config.
 - Final instance-symbol map linking every schematic reference to a symbol key.
 - Final sheet-reference map linking every schematic reference to a capture sheet.
 - Final schematic net-domain plan with safety rules.
@@ -101,3 +102,5 @@ Before marking this checklist `Closed`, the review packet must include:
 - Fault-response matrix covering safe defaults and firmware actions.
 - Capture work queue covering every KiCad sheet and planned schematic reference.
 - Review release manifest covering every required freeze-packet artifact.
+- Hardware capability manifest checked against PB-100 matrix and firmware
+  configuration defaults.
