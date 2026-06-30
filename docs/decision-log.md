@@ -455,3 +455,13 @@ validity flags and stale-data checks.
 Reason: Safety services need a single telemetry validity boundary before ADC,
 I2C, or CAN drivers exist. Missing, invalid, or stale telemetry must propagate to
 safe denial/cutoff behavior.
+
+## 2026-06-30 — Firmware telemetry-backed safety wrappers
+
+Decision: System Safety and Rule Engine now have wrapper APIs that consume
+Telemetry Snapshot inputs directly. Stale battery telemetry forces cutoff, and
+stale total-current telemetry denies matching rule actions through the Output
+Manager budget path.
+
+Reason: Callers should not duplicate telemetry freshness logic or pass raw
+validity flags around once a central snapshot service exists.

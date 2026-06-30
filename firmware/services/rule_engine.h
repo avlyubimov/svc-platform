@@ -8,6 +8,7 @@
 #include "rule_condition.h"
 #include "role_resolver.h"
 #include "svc_config.h"
+#include "telemetry.h"
 
 typedef enum {
     SVC_RULE_ACTION_ENABLE_ROLE = 0,
@@ -56,3 +57,12 @@ svc_rule_engine_result_t svc_rule_engine_evaluate_rule(
     const svc_rule_t *rule,
     uint32_t measured_total_current_ma,
     bool telemetry_valid);
+
+svc_rule_engine_result_t svc_rule_engine_evaluate_rule_with_telemetry(
+    const svc_device_config_t *config,
+    svc_output_manager_t *output_manager,
+    const svc_rule_state_t *state,
+    const svc_rule_t *rule,
+    const svc_telemetry_snapshot_t *telemetry,
+    uint32_t now_ms,
+    uint32_t stale_after_ms);

@@ -28,3 +28,6 @@ Battery telemetry validity/staleness is provided by:
 - `firmware/services/telemetry.h`
 - `firmware/services/telemetry.c`
 - `firmware/tests/test_telemetry.c`
+
+`svc_system_safety_update_from_telemetry()` converts stale or invalid battery
+telemetry into the same cutoff path as invalid raw telemetry.

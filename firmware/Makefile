@@ -25,6 +25,7 @@ CONFIG_VALIDATOR_SRCS := \
 	services/power_budget.c \
 	services/output_manager.c \
 	services/system_safety.c \
+	services/telemetry.c \
 	tests/test_config_validator.c
 POWER_BUDGET_SRCS := \
 	core/svc_config_defaults.c \
@@ -64,6 +65,7 @@ SYSTEM_SAFETY_SRCS := \
 	services/power_budget.c \
 	services/output_manager.c \
 	services/system_safety.c \
+	services/telemetry.c \
 	tests/test_system_safety.c
 ROLE_RESOLVER_SRCS := \
 	core/svc_config_defaults.c \
@@ -84,6 +86,7 @@ RULE_ENGINE_SRCS := \
 	services/rule_condition.c \
 	services/role_resolver.c \
 	services/rule_engine.c \
+	services/telemetry.c \
 	tests/test_rule_engine.c
 RULE_TEXT_SRCS := \
 	core/svc_config_defaults.c \
@@ -95,6 +98,7 @@ RULE_TEXT_SRCS := \
 	services/role_resolver.c \
 	services/rule_engine.c \
 	services/rule_text.c \
+	services/telemetry.c \
 	tests/test_rule_text.c
 TELEMETRY_SRCS := \
 	services/telemetry.c \

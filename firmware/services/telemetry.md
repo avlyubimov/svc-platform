@@ -10,6 +10,8 @@ and safety services.
 - Track update timestamps for stale-data checks.
 - Provide power-budget and battery-service input structs.
 - Reject invalid output IDs for per-output current updates.
+- Feed System Safety and Rule Engine wrapper APIs so callers do not pass raw
+  validity flags manually.
 
 ## Safety contract
 

@@ -108,3 +108,25 @@ svc_rule_engine_result_t svc_rule_engine_evaluate_rule(
         measured_total_current_ma,
         telemetry_valid);
 }
+
+svc_rule_engine_result_t svc_rule_engine_evaluate_rule_with_telemetry(
+    const svc_device_config_t *config,
+    svc_output_manager_t *output_manager,
+    const svc_rule_state_t *state,
+    const svc_rule_t *rule,
+    const svc_telemetry_snapshot_t *telemetry,
+    uint32_t now_ms,
+    uint32_t stale_after_ms)
+{
+    const svc_telemetry_power_budget_input_t input = svc_telemetry_power_budget_input(
+        telemetry,
+        now_ms,
+        stale_after_ms);
+    return svc_rule_engine_evaluate_rule(
+        config,
+        output_manager,
+        state,
+        rule,
+        input.measured_total_current_ma,
+        input.telemetry_valid);
+}

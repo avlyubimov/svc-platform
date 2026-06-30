@@ -56,3 +56,7 @@ Rule text parsing is implemented in:
 The parser can also compile condition/action strings into an in-memory
 `svc_rule_t` using caller-provided condition storage, so embedded code can avoid
 dynamic allocation.
+
+`svc_rule_engine_evaluate_rule_with_telemetry()` reads total-current validity
+from Telemetry Snapshot before applying a matching rule, so stale current data
+denies new output starts through the Output Manager budget path.

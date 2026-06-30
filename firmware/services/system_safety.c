@@ -132,3 +132,23 @@ svc_system_safety_result_t svc_system_safety_update_battery(
     result.active_output_mask = svc_output_manager_active_mask(output_manager);
     return result;
 }
+
+svc_system_safety_result_t svc_system_safety_update_from_telemetry(
+    svc_system_safety_t *safety,
+    svc_output_manager_t *output_manager,
+    svc_event_bus_t *event_bus,
+    const svc_telemetry_snapshot_t *telemetry,
+    uint32_t now_ms,
+    uint32_t stale_after_ms)
+{
+    const svc_telemetry_battery_input_t input = svc_telemetry_battery_input(
+        telemetry,
+        now_ms,
+        stale_after_ms);
+    return svc_system_safety_update_battery(
+        safety,
+        output_manager,
+        event_bus,
+        input.measured_battery_mv,
+        input.telemetry_valid);
+}

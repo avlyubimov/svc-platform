@@ -65,6 +65,7 @@ Current host-tested services:
 - Rule text-to-runner compile helper
 - Output Manager PWM duty-cycle state
 - Telemetry Snapshot
+- Telemetry-backed safety/rule wrappers
 
 ## Phase 5 — BMW K25 integration
 - harness

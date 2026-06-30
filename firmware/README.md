@@ -46,3 +46,5 @@ Current host tests cover:
 - Rule text compile helper from condition/action strings to in-memory `svc_rule_t`.
 - Telemetry Snapshot validity/staleness for battery, total current, and
   per-output current samples.
+- Telemetry-backed System Safety and Rule Engine wrappers for stale-data fail
+  safe behavior.

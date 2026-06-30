@@ -5,6 +5,7 @@
 #include "output_manager.h"
 #include "rule_engine.h"
 #include "svc_config.h"
+#include "telemetry.h"
 
 static uint16_t mask_for(svc_output_id_t output_id)
 {
@@ -212,6 +213,41 @@ static void test_null_rule_is_denied(void)
     assert(result.status == SVC_RULE_ENGINE_DENY_INVALID_ARGUMENT);
 }
 
+static void test_stale_power_telemetry_denies_matching_rule(void)
+{
+    svc_output_manager_t manager = initialized_output_manager(&svc_default_config);
+    svc_rule_state_t state = {0};
+    svc_rule_state_init(&state);
+    svc_rule_state_apply_event(&state, (svc_event_t){SVC_EVENT_ENGINE_STARTED, SVC_OUTPUT_OUT1, 1U});
+
+    const svc_rule_condition_t conditions[] = {
+        {SVC_RULE_CONDITION_ENGINE_RUNNING, true}
+    };
+    const svc_rule_t rule = {
+        .conditions = conditions,
+        .condition_count = sizeof(conditions) / sizeof(conditions[0]),
+        .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 40U}
+    };
+
+    svc_telemetry_snapshot_t telemetry = {0};
+    svc_telemetry_snapshot_init(&telemetry);
+    svc_telemetry_update_total_current(&telemetry, 1000U, true, 100U);
+
+    const svc_rule_engine_result_t result = svc_rule_engine_evaluate_rule_with_telemetry(
+        &svc_default_config,
+        &manager,
+        &state,
+        &rule,
+        &telemetry,
+        1200U,
+        SVC_TELEMETRY_DEFAULT_STALE_MS);
+
+    assert(result.status == SVC_RULE_ENGINE_DENY_OUTPUT_MANAGER);
+    assert(result.output_result.status == SVC_OUTPUT_MANAGER_DENY_BUDGET);
+    assert(result.output_result.budget_decision == SVC_POWER_BUDGET_DENY_TELEMETRY_INVALID);
+    assert(svc_output_manager_active_mask(&manager) == 0U);
+}
+
 int main(void)
 {
     test_enable_role_uses_config_mapping();
@@ -224,5 +260,6 @@ int main(void)
     test_matching_rule_applies_role_action();
     test_unmatched_rule_is_skipped_without_output_change();
     test_null_rule_is_denied();
+    test_stale_power_telemetry_denies_matching_rule();
     return 0;
 }
