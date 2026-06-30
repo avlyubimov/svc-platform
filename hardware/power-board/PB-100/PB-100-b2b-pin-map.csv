@@ -1,0 +1,101 @@
+Connector,Pin,Net,Signal group,Direction,Requirement,Voltage domain,Default state,LB-100 resource,Notes
+JPB1,1,GND,Power,PB-100/LB-100,Core,GND,N/A,None,Ground return
+JPB1,2,GND,Power,PB-100/LB-100,Core,GND,N/A,None,Ground return
+JPB1,3,GND,Power,PB-100/LB-100,Core,GND,N/A,None,Ground return
+JPB1,4,GND,Power,PB-100/LB-100,Core,GND,N/A,None,Ground return
+JPB1,5,GND,Power,PB-100/LB-100,Core,GND,N/A,None,Ground return
+JPB1,6,GND,Power,PB-100/LB-100,Core,GND,N/A,None,Ground return
+JPB1,7,GND,Power,PB-100/LB-100,Core,GND,N/A,None,Ground return
+JPB1,8,GND,Power,PB-100/LB-100,Core,GND,N/A,None,Ground return
+JPB1,9,GND,Power,PB-100/LB-100,Core,GND,N/A,None,Ground return
+JPB1,10,GND,Power,PB-100/LB-100,Core,GND,N/A,None,Ground return
+JPB1,11,AGND,Power,PB-100/LB-100,Core,AGND,N/A,None,Analog ground reference
+JPB1,12,AGND,Power,PB-100/LB-100,Core,AGND,N/A,None,Analog ground reference
+JPB1,13,PB_5V_OUT,Power,PB-100 to LB-100,Core,PB_5V,Protected 5V,Power input,Protected logic supply
+JPB1,14,PB_5V_OUT,Power,PB-100 to LB-100,Core,PB_5V,Protected 5V,Power input,Protected logic supply
+JPB1,15,PB_5V_OUT,Power,PB-100 to LB-100,Core,PB_5V,Protected 5V,Power input,Protected logic supply
+JPB1,16,PB_5V_OUT,Power,PB-100 to LB-100,Core,PB_5V,Protected 5V,Power input,Protected logic supply
+JPB1,17,LB_3V3_IO,Power,LB-100 to PB-100,Core,LB_3V3,LB supplied,Power output,PB-side logic reference
+JPB1,18,LB_3V3_IO,Power,LB-100 to PB-100,Core,LB_3V3,LB supplied,Power output,PB-side logic reference
+JPB1,19,PB_PWR_GOOD,Status,PB-100 to LB-100,Core,LB_3V3,Inactive until valid,GPIO input,Logic power-good status
+JPB1,20,PB_WAKE_REQ,Status,PB-100 to LB-100,Should,LB_3V3,Inactive,GPIO interrupt,Wake or fault wake request
+JPB1,21,OUT1_CTL,Output control,LB-100 to PB-100,Core,LB_3V3,Pulled low off,GPIO PWM,Enable or PWM command
+JPB1,22,OUT2_CTL,Output control,LB-100 to PB-100,Core,LB_3V3,Pulled low off,GPIO PWM,Enable or PWM command
+JPB1,23,OUT3_CTL,Output control,LB-100 to PB-100,Core,LB_3V3,Pulled low off,GPIO PWM,Enable or PWM command
+JPB1,24,OUT4_CTL,Output control,LB-100 to PB-100,Core,LB_3V3,Pulled low off,GPIO PWM,Enable or PWM command
+JPB1,25,OUT5_CTL,Output control,LB-100 to PB-100,Core,LB_3V3,Pulled low off,GPIO PWM,Enable or PWM command
+JPB1,26,OUT6_CTL,Output control,LB-100 to PB-100,Core,LB_3V3,Pulled low off,GPIO PWM,Enable or PWM command
+JPB1,27,OUT7_CTL,Output control,LB-100 to PB-100,Core,LB_3V3,Pulled low off,GPIO PWM,Enable or PWM command
+JPB1,28,OUT8_CTL,Output control,LB-100 to PB-100,Core,LB_3V3,Pulled low off,GPIO PWM,Enable or PWM command
+JPB1,29,OUT9_CTL,Output control,LB-100 to PB-100,Core,LB_3V3,Pulled low off,GPIO PWM,Enable or PWM command
+JPB1,30,OUT10_CTL,Output control,LB-100 to PB-100,Core,LB_3V3,Pulled low off,GPIO PWM,Enable or PWM command
+JPB1,31,OUT1_FLT,Output fault,PB-100 to LB-100,Core,LB_3V3,Fault until valid,GPIO input,Fault or diagnostic status
+JPB1,32,OUT2_FLT,Output fault,PB-100 to LB-100,Core,LB_3V3,Fault until valid,GPIO input,Fault or diagnostic status
+JPB1,33,OUT3_FLT,Output fault,PB-100 to LB-100,Core,LB_3V3,Fault until valid,GPIO input,Fault or diagnostic status
+JPB1,34,OUT4_FLT,Output fault,PB-100 to LB-100,Core,LB_3V3,Fault until valid,GPIO input,Fault or diagnostic status
+JPB1,35,OUT5_FLT,Output fault,PB-100 to LB-100,Core,LB_3V3,Fault until valid,GPIO input,Fault or diagnostic status
+JPB1,36,OUT6_FLT,Output fault,PB-100 to LB-100,Core,LB_3V3,Fault until valid,GPIO input,Fault or diagnostic status
+JPB1,37,OUT7_FLT,Output fault,PB-100 to LB-100,Core,LB_3V3,Fault until valid,GPIO input,Fault or diagnostic status
+JPB1,38,OUT8_FLT,Output fault,PB-100 to LB-100,Core,LB_3V3,Fault until valid,GPIO input,Fault or diagnostic status
+JPB1,39,OUT9_FLT,Output fault,PB-100 to LB-100,Core,LB_3V3,Fault until valid,GPIO input,Fault or diagnostic status
+JPB1,40,OUT10_FLT,Output fault,PB-100 to LB-100,Core,LB_3V3,Fault until valid,GPIO input,Fault or diagnostic status
+JPB1,41,OUT1_IMON,Output telemetry,PB-100 to LB-100,Core,Analog,0V when off,ADC,Analog current monitor
+JPB1,42,OUT2_IMON,Output telemetry,PB-100 to LB-100,Core,Analog,0V when off,ADC,Analog current monitor
+JPB1,43,OUT3_IMON,Output telemetry,PB-100 to LB-100,Core,Analog,0V when off,ADC,Analog current monitor
+JPB1,44,OUT4_IMON,Output telemetry,PB-100 to LB-100,Core,Analog,0V when off,ADC,Analog current monitor
+JPB1,45,OUT5_IMON,Output telemetry,PB-100 to LB-100,Core,Analog,0V when off,ADC,Analog current monitor
+JPB1,46,OUT6_IMON,Output telemetry,PB-100 to LB-100,Core,Analog,0V when off,ADC,Analog current monitor
+JPB1,47,OUT7_IMON,Output telemetry,PB-100 to LB-100,Core,Analog,0V when off,ADC,Analog current monitor
+JPB1,48,OUT8_IMON,Output telemetry,PB-100 to LB-100,Core,Analog,0V when off,ADC,Analog current monitor
+JPB1,49,OUT9_IMON,Output telemetry,PB-100 to LB-100,Core,Analog,0V when off,ADC,Analog current monitor
+JPB1,50,OUT10_IMON,Output telemetry,PB-100 to LB-100,Core,Analog,0V when off,ADC,Analog current monitor
+JPB1,51,VBAT_SENSE,Board telemetry,PB-100 to LB-100,Core,Analog,Scaled battery voltage,ADC,Battery input voltage telemetry
+JPB1,52,IIN_SENSE,Board telemetry,PB-100 to LB-100,Core,Analog,0V at zero current,ADC,Total input current telemetry
+JPB1,53,TEMP_PCB,Board telemetry,PB-100 to LB-100,Core,Analog,Sensor default,ADC,PCB temperature telemetry
+JPB1,54,TEMP_PWR_A,Board telemetry,PB-100 to LB-100,Core,Analog,Sensor default,ADC,Power-zone temperature telemetry
+JPB1,55,TEMP_PWR_B,Board telemetry,PB-100 to LB-100,Should,Analog,Sensor default,ADC,Second power-zone temperature telemetry
+JPB1,56,PB_FAULT,Board telemetry,PB-100 to LB-100,Core,LB_3V3,Fault until valid,GPIO input,Board-level fault summary
+JPB1,57,PB_I2C_SCL,Digital bus,LB-100 to PB-100,Should,LB_3V3,Pull-up required,I2C SCL,PB-side monitor or identity bus
+JPB1,58,PB_I2C_SDA,Digital bus,LB-100/PB-100,Should,LB_3V3,Pull-up required,I2C SDA,PB-side monitor or identity bus
+JPB1,59,PB_I2C_INT,Digital bus,PB-100 to LB-100,Should,LB_3V3,Inactive,GPIO interrupt,Monitor interrupt
+JPB1,60,PB_ID_ADC,Board identity,PB-100 to LB-100,Should,Analog,Revision divider,ADC,Resistor-coded board revision fallback
+JPB1,61,PB_SPI_SCK,Digital bus,LB-100 to PB-100,Future,LB_3V3,Idle low,SPI SCK,Reserved for SPI monitors
+JPB1,62,PB_SPI_MISO,Digital bus,PB-100 to LB-100,Future,LB_3V3,High impedance,SPI MISO,Reserved for SPI monitors
+JPB1,63,PB_SPI_MOSI,Digital bus,LB-100 to PB-100,Future,LB_3V3,Idle low,SPI MOSI,Reserved for SPI monitors
+JPB1,64,PB_SPI_CS0,Digital bus,LB-100 to PB-100,Future,LB_3V3,Inactive high,SPI CS,Reserved for SPI monitors
+JPB1,65,PB_SPI_CS1,Digital bus,LB-100 to PB-100,Future,LB_3V3,Inactive high,SPI CS,Reserved for SPI monitors
+JPB1,66,ADC_REF,Analog,LB-100 to PB-100,Should,Analog,Reference disabled,ADC reference,Analog reference if external ADC strategy is used
+JPB1,67,CAN1_TX_DISABLE_CMD,CAN safety,LB-100 to PB-100,Core if CAN1 crosses PB,LB_3V3,Disable asserted by hardware pull,GPIO output,CAN1 TX hardware disable command
+JPB1,68,CAN1_TX_DISABLED_STATUS,CAN safety,PB-100 to LB-100,Core if CAN1 crosses PB,LB_3V3,Asserted when disabled,GPIO input,CAN1 TX hardware disable status
+JPB1,69,CAN1_RX_ROUTE,CAN safety,PB-100 to LB-100,Future,CAN,DNP by default,FDCAN RX,DNP unless vehicle CAN routes through PB-100
+JPB1,70,CAN1_TX_ROUTE,CAN safety,LB-100 to PB-100,Future,CAN,DNP gated by default,FDCAN TX,DNP and hardware-gated unless future ADR allows
+JPB1,71,CAN2_RX_ROUTE,Expansion,PB-100 to LB-100,Future,CAN,DNP by default,FDCAN RX,Expansion connector route if needed
+JPB1,72,CAN2_TX_ROUTE,Expansion,LB-100 to PB-100,Future,CAN,DNP by default,FDCAN TX,Expansion connector route if needed
+JPB1,73,LIN_TX,Expansion,LB-100 to PB-100,Future,LB_3V3,DNP by default,UART TX,LIN footprint route
+JPB1,74,LIN_RX,Expansion,PB-100 to LB-100,Future,LB_3V3,DNP by default,UART RX,LIN footprint route
+JPB1,75,RS485_DE,Expansion,LB-100 to PB-100,Future,LB_3V3,DNP by default,GPIO output,RS485 direction enable
+JPB1,76,RS485_RX,Expansion,PB-100 to LB-100,Future,LB_3V3,DNP by default,UART RX,RS485 receive route
+JPB1,77,RS485_TX,Expansion,LB-100 to PB-100,Future,LB_3V3,DNP by default,UART TX,RS485 transmit route
+JPB1,78,UART_TX,Expansion,LB-100 to PB-100,Future,LB_3V3,DNP by default,UART TX,Accessory UART route
+JPB1,79,UART_RX,Expansion,PB-100 to LB-100,Future,LB_3V3,DNP by default,UART RX,Accessory UART route
+JPB1,80,EXT_ADC1,Expansion,PB-100 to LB-100,Future,Analog,DNP by default,ADC,External analog input route
+JPB1,81,EXT_ADC2,Expansion,PB-100 to LB-100,Future,Analog,DNP by default,ADC,External analog input route
+JPB1,82,EXT_DIG1,Expansion,PB-100 to LB-100,Future,LB_3V3,DNP by default,GPIO input,External digital input route
+JPB1,83,EXT_DIG2,Expansion,PB-100 to LB-100,Future,LB_3V3,DNP by default,GPIO input,External digital input route
+JPB1,84,EXT_5V_EN,Expansion,LB-100 to PB-100,Future,LB_3V3,DNP by default,GPIO output,External sensor supply enable
+JPB1,85,SPARE_01,Reserve,Mixed,Future,TBD,NC,TBD,Reserved
+JPB1,86,SPARE_02,Reserve,Mixed,Future,TBD,NC,TBD,Reserved
+JPB1,87,SPARE_03,Reserve,Mixed,Future,TBD,NC,TBD,Reserved
+JPB1,88,SPARE_04,Reserve,Mixed,Future,TBD,NC,TBD,Reserved
+JPB1,89,SPARE_05,Reserve,Mixed,Future,TBD,NC,TBD,Reserved
+JPB1,90,SPARE_06,Reserve,Mixed,Future,TBD,NC,TBD,Reserved
+JPB1,91,SPARE_07,Reserve,Mixed,Future,TBD,NC,TBD,Reserved
+JPB1,92,SPARE_08,Reserve,Mixed,Future,TBD,NC,TBD,Reserved
+JPB1,93,SPARE_09,Reserve,Mixed,Future,TBD,NC,TBD,Reserved
+JPB1,94,SPARE_10,Reserve,Mixed,Future,TBD,NC,TBD,Reserved
+JPB1,95,SPARE_11,Reserve,Mixed,Future,TBD,NC,TBD,Reserved
+JPB1,96,SPARE_12,Reserve,Mixed,Future,TBD,NC,TBD,Reserved
+JPB1,97,SPARE_13,Reserve,Mixed,Future,TBD,NC,TBD,Reserved
+JPB1,98,SPARE_14,Reserve,Mixed,Future,TBD,NC,TBD,Reserved
+JPB1,99,SPARE_15,Reserve,Mixed,Future,TBD,NC,TBD,Reserved
+JPB1,100,SPARE_16,Reserve,Mixed,Future,TBD,NC,TBD,Reserved

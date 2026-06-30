@@ -125,3 +125,12 @@ OUT5, OUT8, and OUT9 instead of direct 40 V integrated smart switches.
 Reason: This removes the SM8S33A-class TVS clamp conflict with 40 V smart
 switches while keeping low-current channel fuse and current-limit requirements
 unchanged.
+
+## 2026-06-30 — PB-100 board-to-board pin map
+
+Decision: PB-100 to LB-100 schematic planning uses `JPB1` with the logical
+100-pin map captured in `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`.
+
+Reason: Schematic freeze needs a concrete interface contract for power, grounds,
+output control, telemetry, faults, board identity, expansion, and CAN1 TX-disable
+signals before KiCad layout can be considered.

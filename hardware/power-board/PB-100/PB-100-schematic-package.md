@@ -53,6 +53,9 @@ It is not a PCB layout package.
 Logical pin-budget CSV:
 `hardware/power-board/PB-100/PB-100-b2b-pin-budget.csv`.
 
+Schematic-planning pin map CSV:
+`hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`.
+
 | Signal group | Count target | Direction | Notes |
 |---|---:|---|---|
 | Power and grounds | 20-30 pins | PB-100/LB-100 | Multiple grounds and supply pins for current return and signal integrity |
@@ -63,9 +66,9 @@ Logical pin-budget CSV:
 | Configuration/ID | 2-4 signals | PB-100 to LB-100 | Revision ID, EEPROM, or resistor-coded identity |
 | Expansion reserve | 10-20 pins | Mixed | Spare GPIO/ADC/I2C/SPI/UART capacity |
 
-The initial 100-pin mezzanine target remains plausible, but final pin assignment
-requires schematic-level tradeoff between direct signals, multiplexed telemetry,
-and digital monitor buses.
+The initial 100-pin mezzanine target remains plausible. `JPB1` pin assignment is
+now captured as a schematic-planning input, but final connector MPN and LB-100
+MCU pin binding remain schematic-review items.
 
 ## Output channel matrix
 
