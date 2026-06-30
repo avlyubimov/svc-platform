@@ -229,6 +229,14 @@ LOGIC_POWER_DESIGN_VALUE_COLUMNS = (
     "Freeze dependency",
     "Notes",
 )
+CAN1_SAFETY_VERIFICATION_COLUMNS = (
+    "Requirement",
+    "Signal or artifact",
+    "Rev.1 default",
+    "Verification method",
+    "Pass condition",
+    "Blocked change",
+)
 REQUIRED_NET_PATTERNS = {
     "VBAT_RAW",
     "VBAT_PROT",
@@ -267,6 +275,7 @@ REQUIRED_READINESS_AREAS = {
     "Logic power values",
     "BOM synchronization",
     "CAN1 safety",
+    "CAN1 safety verification",
     "Layout authorization",
 }
 ALLOWED_DASHBOARD_STATUSES = {"Closed", "Conditional", "Open", "Blocked"}
@@ -318,6 +327,16 @@ REQUIRED_LOGIC_POWER_VALUE_ITEMS = {
     "Output capacitors",
     "Power-good pull-up",
     "Higher-current fallback",
+}
+REQUIRED_CAN1_SAFETY_REQUIREMENTS = {
+    "Vehicle CAN read-only default",
+    "TX physical path",
+    "Disable command",
+    "Disabled status",
+    "RX independence",
+    "DNP BOM ownership",
+    "Firmware safety",
+    "Future TX change process",
 }
 
 
@@ -1985,6 +2004,62 @@ def validate_logic_power_design_values() -> None:
         )
 
 
+def validate_can1_safety_verification() -> None:
+    path = PB100_DIR / "PB-100-can1-safety-verification.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty CAN1 safety verification matrix: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in CAN1_SAFETY_VERIFICATION_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_requirement: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        requirement = row["Requirement"].strip()
+        if requirement not in REQUIRED_CAN1_SAFETY_REQUIREMENTS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown CAN1 requirement {requirement}")
+        if requirement in rows_by_requirement:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate CAN1 requirement {requirement}")
+        rows_by_requirement[requirement] = row
+        for column in CAN1_SAFETY_VERIFICATION_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        row_text = " ".join(row.values()).lower()
+        if "enabled by default" in row_text or "default-populated tx" in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1 TX must not be enabled/populated by default")
+        if requirement != "Future TX change process" and "configuration only" in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1 TX cannot be changed by configuration only")
+
+    missing_requirements = sorted(REQUIRED_CAN1_SAFETY_REQUIREMENTS - rows_by_requirement.keys())
+    if missing_requirements:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing CAN1 requirements: "
+            f"{', '.join(missing_requirements)}"
+        )
+
+    tx_row_text = " ".join(rows_by_requirement["TX physical path"].values()).lower()
+    if "can1_tx_route" not in tx_row_text or "dnp/open" not in tx_row_text or "future-adr" not in tx_row_text:
+        fail("CAN1 TX physical path verification must keep CAN1_TX_ROUTE DNP/open and future-ADR explicit")
+    disable_row_text = " ".join(rows_by_requirement["Disable command"].values()).lower()
+    if "disable asserted" not in disable_row_text or "reset" not in disable_row_text or "unpowered" not in disable_row_text:
+        fail("CAN1 disable command verification must keep reset/unpowered disable explicit")
+    status_row_text = " ".join(rows_by_requirement["Disabled status"].values()).lower()
+    if "disabled state" not in status_row_text:
+        fail("CAN1 disabled-status verification must require physical disabled-state readback")
+    bom_row_text = " ".join(rows_by_requirement["DNP BOM ownership"].values()).lower()
+    if "dnp/open" not in bom_row_text or "default" not in bom_row_text:
+        fail("CAN1 DNP BOM verification must keep default DNP/open explicit")
+    future_row_text = " ".join(rows_by_requirement["Future TX change process"].values()).lower()
+    if "future adr" not in future_row_text or "hardware action" not in future_row_text:
+        fail("CAN1 future TX process must require future ADR and hardware action")
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -2029,6 +2104,7 @@ def main() -> int:
     validate_output_stage_design_values()
     validate_input_power_design_values()
     validate_logic_power_design_values()
+    validate_can1_safety_verification()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0

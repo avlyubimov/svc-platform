@@ -38,6 +38,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-power-path-candidates.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
+- `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
@@ -76,7 +77,7 @@ The schematic review packet consists of:
 | Current telemetry | INA228 pin template, ADC scaling, filtering, calibration plan, and total-current monitor choice |
 | Thermal telemetry | Final sensor values, placement notes, and derating thresholds |
 | B2B interface | Connector MPN, pin assignment review, and LB-100 MCU resource binding |
-| CAN1 safety | DNP/open TX path, default disable state, and status readback in schematic |
+| CAN1 safety | DNP/open TX path, default disable state, status readback, DNP BOM ownership, firmware listen-only behavior, and future ADR hardware-action process |
 | Factory assembly | JLCPCB/PCBWay assembly class and alternates for critical MPNs; concrete symbol/footprint status from `PB-100-symbol-mpn-readiness.csv` |
 | Garage assembly | Connector, fuse, enclosure, and harness items remain user-installable |
 

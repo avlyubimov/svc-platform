@@ -27,7 +27,7 @@ this checklist can close.
 | Architecture baseline | Closed | `docs/architecture/Architecture-Review-v1.0.md`, `docs/adr/ADR-0009-architecture-v1-freeze.md` | Architecture remains frozen and no PB-100 requirement change is pending |
 | PB-100 requirements | Closed | `docs/requirements/pb-100-requirements.md`, `docs/adr/ADR-0006-pb-100-baseline-requirements.md` | Requirements changes are handled only through ADR |
 | Generic output model | Closed | `docs/adr/ADR-0004-generic-outputs-role-mapping.md`, `hardware/power-board/PB-100/PB-100-output-channel-matrix.csv` | Schematic nets and silkscreen use only neutral `OUT1` through `OUT10` identifiers |
-| CAN1 safety policy | Conditional | `docs/adr/ADR-0002-can-read-only-default.md`, `docs/can/can-safety.md`, `hardware/power-board/PB-100/PB-100-can1-tx-disable.md` | Schematic implements DNP/open TX path, default disable state, and LB-100-visible disabled status |
+| CAN1 safety policy | Conditional | `docs/adr/ADR-0002-can-read-only-default.md`, `docs/can/can-safety.md`, `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`, `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv` | Schematic implements DNP/open TX path, default disable state, and LB-100-visible disabled status |
 | Board current budget | Conditional | `docs/adr/ADR-0008-pb-100-current-budget.md` | Input measurement, connector ratings, copper/thermal assumptions, and firmware-visible budget enforcement are all represented in schematic inputs |
 | Board-to-board interface | Conditional | `hardware/power-board/PB-100/PB-100-b2b-pin-budget.csv`, `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv` | Connector MPN and LB-100 MCU resource binding are reviewed against the pin map |
 | High/medium output stage | Conditional | `docs/adr/ADR-0010-pb-100-power-path-candidate-strategy.md`, `hardware/power-board/PB-100/PB-100-power-path-candidates.csv`, `hardware/power-board/PB-100/PB-100-out2-soa.md` | Controller, MOSFET, sense path, fuse, and inductive-load protection are validated per output class |
@@ -84,6 +84,7 @@ Before marking this checklist `Closed`, the review packet must include:
 - Thermal and protection validation tables.
 - Final PB-100 to LB-100 pin map.
 - CAN1 TX-disable schematic input and verification notes.
+- CAN1 safety verification matrix.
 - Factory and garage BOM drafts synchronized with selected MPNs.
 - Bench validation plan for protection, telemetry, current budget, and CAN1
   listen-only behavior.

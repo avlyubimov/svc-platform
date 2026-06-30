@@ -18,6 +18,7 @@ It is not a PCB layout package.
 - `docs/production/component-family-shortlist.md`
 - `production/bom/pb100_symbol_bom_map.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
+- `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`
 - `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`

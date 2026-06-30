@@ -20,7 +20,7 @@ KiCad scaffold directory:
 | `outputs-1-10.kicad_sch` | Ten instantiated generic outputs | `PB-100-schematic-instance-plan.csv` |
 | `telemetry.kicad_sch` | Total input current, voltage, thermal sensors, board ID | `PB-100-current-telemetry-map.csv`, `PB-100-thermal-telemetry-map.csv` |
 | `b2b-interface.kicad_sch` | `JPB1` PB-100 to LB-100 interface | `PB-100-b2b-pin-map.csv` |
-| `can1-safety.kicad_sch` | CAN1 TX disable/readback and DNP/open TX path | `PB-100-can1-tx-disable.md` |
+| `can1-safety.kicad_sch` | CAN1 TX disable/readback and DNP/open TX path | `PB-100-can1-tx-disable.md`, `PB-100-can1-safety-verification.csv` |
 
 Placeholder child sheets are tracked in
 `hardware/power-board/PB-100/kicad/sheets/`.

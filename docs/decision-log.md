@@ -768,3 +768,18 @@ gate drive, bootstrap, shunt, UVLO, feedback, EMI, and power-good networks, but
 the actual values are not safe to lock before SOA, thermal, clamp, sourcing, and
 assembly review. These tables make the remaining value work reviewable without
 starting PCB layout.
+
+## 2026-06-30 — PB-100 CAN1 safety verification matrix
+
+Decision: PB-100 now has
+`hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`, a dedicated
+matrix for vehicle-CAN read-only behavior, DNP/open `CAN1_TX_ROUTE`, reset and
+unpowered disable behavior, disabled-state readback, RX independence, DNP BOM
+ownership, firmware listen-only policy, and the future-ADR plus hardware-action
+process. `tools/validate_pb100.py` fails if the matrix omits any required CAN1
+safety requirement or allows default-populated/default-enabled TX.
+
+Reason: CAN1 safety is a constitutional rule, not a normal design preference.
+A separate checked matrix keeps the physical TX-disable policy visible across
+schematic, BOM, firmware safety, and future-change review before schematic
+freeze.
