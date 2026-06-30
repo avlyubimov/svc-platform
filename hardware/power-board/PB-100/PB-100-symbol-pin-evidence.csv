@@ -43,3 +43,15 @@ PB100_INA228_Q1_PRELIM,7,GND,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLY
 PB100_INA228_Q1_PRELIM,8,VBUS,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,Bus voltage input
 PB100_INA228_Q1_PRELIM,9,IN-,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,Current sense negative input
 PB100_INA228_Q1_PRELIM,10,IN+,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,Current sense positive input
+PB100_INPUT_TVS_PRELIM,1,VBAT_PROT,hardware/power-board/PB-100/PB-100-protection-validation.csv,Internal Rev.1 schematic class,TVS class,Protected rail side of input TVS
+PB100_INPUT_TVS_PRELIM,2,GND,hardware/power-board/PB-100/PB-100-protection-validation.csv,Internal Rev.1 schematic class,TVS class,Ground side of input TVS
+PB100_INPUT_SHUNT_PRELIM,1,PWR_IN,hardware/power-board/PB-100/PB-100-current-telemetry.md,Internal Rev.1 schematic class,Four-terminal shunt class,High-current input side
+PB100_INPUT_SHUNT_PRELIM,2,PWR_OUT,hardware/power-board/PB-100/PB-100-current-telemetry.md,Internal Rev.1 schematic class,Four-terminal shunt class,High-current protected rail side
+PB100_INPUT_SHUNT_PRELIM,3,SNS_IN,hardware/power-board/PB-100/PB-100-current-telemetry.md,Internal Rev.1 schematic class,Four-terminal shunt class,Kelvin sense input side
+PB100_INPUT_SHUNT_PRELIM,4,SNS_OUT,hardware/power-board/PB-100/PB-100-current-telemetry.md,Internal Rev.1 schematic class,Four-terminal shunt class,Kelvin sense output side
+PB100_THERMAL_NTC_PRELIM,1,TEMP_NODE,hardware/power-board/PB-100/PB-100-thermal-telemetry.md,Internal Rev.1 schematic class,NTC class,ADC divider temperature node
+PB100_THERMAL_NTC_PRELIM,2,GND_REF,hardware/power-board/PB-100/PB-100-thermal-telemetry.md,Internal Rev.1 schematic class,NTC class,Ground reference for NTC divider
+PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,1,OUTn_LOAD,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage connector class,Generic output load positive
+PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,2,GND_RETURN,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage connector class,Generic output ground return
+PB100_MAIN_FUSE_CLASS_PRELIM,1,VBAT_BATT,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage fuse class,Battery side of near-battery fuse
+PB100_MAIN_FUSE_CLASS_PRELIM,2,VBAT_FUSED,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage fuse class,Protected side after near-battery fuse

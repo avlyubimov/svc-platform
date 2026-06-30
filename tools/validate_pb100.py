@@ -512,8 +512,11 @@ def validate_symbol_pin_evidence() -> None:
         source = row["Source"].strip()
         if not symbol_name or not pin_number or not pin_name:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: missing symbol or pin identity")
-        if not source.startswith("https://"):
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: source must be an https URL")
+        if not (source.startswith("https://") or source.startswith("hardware/")):
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: source must be "
+                "an https URL or an internal hardware/ path"
+            )
         for column in ("Source revision", "Package", "Notes"):
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")

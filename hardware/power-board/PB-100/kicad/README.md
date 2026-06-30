@@ -11,8 +11,9 @@ This directory contains the preliminary KiCad project scaffold for PB-100.
 - `sheets/*.kicad_sch`: child schematic placeholder sheets for capture.
 - `sym-lib-table`: project-local symbol library table.
 - `fp-lib-table`: project-local footprint library table.
-- `lib/PB100.kicad_sym`: preliminary abstract block symbols plus first
-  project-local concrete MPN symbols.
+- `lib/PB100.kicad_sym`: preliminary abstract block symbols, first
+  project-local concrete MPN symbols, and non-final class symbols for passive
+  or garage-installed schematic elements.
 - `lib/PB100.pretty/`: empty preliminary local footprint library.
 
 There is intentionally no `PB-100.kicad_pcb` file. PCB layout remains blocked
@@ -67,5 +68,6 @@ created` are checked against `lib/PB100.kicad_sym`; those symbols must stay
 excluded from BOM and board output until schematic freeze.
 
 `PB-100-symbol-pin-evidence.csv` records the official data-sheet pin tables used
-for those preliminary symbols. Validation checks each recorded pin number/name
-against the KiCad symbol library.
+for concrete MPN symbols and the internal schematic-class pin contracts used for
+non-final class symbols. Validation checks each recorded pin number/name against
+the KiCad symbol library.

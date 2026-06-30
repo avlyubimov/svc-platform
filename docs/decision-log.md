@@ -578,3 +578,14 @@ Decision: Created PB-100 preliminary symbols now have
 Reason: Schematic capture needs traceable pinout provenance. A machine check
 prevents the worklist from claiming a symbol is created while the KiCad library
 misses or renames pins.
+
+## 2026-06-30 — PB-100 passive class symbols
+
+Decision: PB-100 now has preliminary class symbols for input TVS, four-terminal
+input shunt, thermal NTC, output connector class, and main fuse class. These
+symbols remain excluded from BOM/board output and use internal schematic-class
+pin evidence until final MPN/package selection.
+
+Reason: Schematic capture can represent protection, telemetry, and
+garage-installed interfaces without pretending that package drawings, PCB
+footprints, or final sourcing are locked.
