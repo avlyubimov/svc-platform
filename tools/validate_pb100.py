@@ -202,6 +202,33 @@ LOGIC_POWER_DESIGN_COLUMNS = (
     "Freeze dependency",
     "Notes",
 )
+OUTPUT_STAGE_DESIGN_VALUE_COLUMNS = (
+    "Output class",
+    "Applies to",
+    "Design item",
+    "Related net pattern",
+    "Value status",
+    "Candidate direction",
+    "Freeze dependency",
+    "Notes",
+)
+INPUT_POWER_DESIGN_VALUE_COLUMNS = (
+    "Block",
+    "Design item",
+    "Related net",
+    "Value status",
+    "Candidate direction",
+    "Freeze dependency",
+    "Notes",
+)
+LOGIC_POWER_DESIGN_VALUE_COLUMNS = (
+    "Design item",
+    "Related net",
+    "Value status",
+    "Candidate direction",
+    "Freeze dependency",
+    "Notes",
+)
 REQUIRED_NET_PATTERNS = {
     "VBAT_RAW",
     "VBAT_PROT",
@@ -230,9 +257,12 @@ REQUIRED_READINESS_AREAS = {
     "Net domains",
     "Output pin contract",
     "Output controller template",
+    "Output stage design values",
     "Input controller template",
     "Current monitor template",
     "Logic buck template",
+    "Input power design values",
+    "Logic power design values",
     "Input protection contract",
     "Logic power values",
     "BOM synchronization",
@@ -251,6 +281,43 @@ REQUIRED_LOGIC_POWER_ITEMS = {
     "UVLO network",
     "Power-good",
     "EMI input filter",
+}
+REQUIRED_OUTPUT_STAGE_CLASSES = {"High current", "Medium current", "Low current"}
+REQUIRED_OUTPUT_STAGE_ITEMS = {
+    "OV threshold divider",
+    "Current warning threshold",
+    "Short-circuit threshold",
+    "Fault timer",
+    "Bootstrap capacitor",
+    "Gate drive resistors",
+    "Current sense topology",
+    "Inductive clamp strategy",
+}
+REQUIRED_INPUT_POWER_ITEMS = {
+    "Battery positive derating",
+    "TVS clamp selection",
+    "Charge-pump capacitor",
+    "Enable network",
+    "Gate clamp and discharge",
+    "Q1 package and copper path",
+    "Shunt value and power rating",
+    "I2C address straps",
+    "I2C pull-up domain",
+    "Alert mapping",
+    "Bus voltage sense",
+    "Protected battery distribution",
+}
+REQUIRED_LOGIC_POWER_VALUE_ITEMS = {
+    "Input filter",
+    "UVLO divider",
+    "RON programming",
+    "Feedback divider",
+    "Bootstrap capacitor",
+    "Switch node damping",
+    "Inductor",
+    "Output capacitors",
+    "Power-good pull-up",
+    "Higher-current fallback",
 }
 
 
@@ -1710,6 +1777,214 @@ def validate_logic_power_design_placeholders() -> None:
             )
 
 
+def validate_not_final_value_status(path: Path, row_number: int, value_status: str) -> None:
+    normalized = value_status.strip().lower()
+    if "tbd" not in normalized and "not final" not in normalized:
+        fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Value status must remain TBD/not final")
+    if "final" in normalized and "not final" not in normalized:
+        fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: value must not be final before schematic review")
+    for blocked_word in ("locked", "released", "approved"):
+        if blocked_word in normalized:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: value must not be "
+                f"{blocked_word} before schematic review"
+            )
+
+
+def validate_no_role_tokens_in_row(path: Path, row_number: int, row: dict[str, str]) -> None:
+    row_text = " ".join(row.values())
+    for forbidden_token in FORBIDDEN_ROLE_TOKENS:
+        if forbidden_token in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: role token {forbidden_token} is not allowed")
+
+
+def output_controller_template_net_patterns() -> set[str]:
+    path = PB100_DIR / "PB-100-output-controller-pin-template.csv"
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    return {row["Net pattern"].strip() for row in rows}
+
+
+def validate_output_stage_design_values() -> None:
+    path = PB100_DIR / "PB-100-output-stage-design-values.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty output-stage design values: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in OUTPUT_STAGE_DESIGN_VALUE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    allowed_patterns = output_controller_template_net_patterns() | {"OUTn_LOAD"}
+    seen_items: dict[str, set[str]] = {output_class: set() for output_class in REQUIRED_OUTPUT_STAGE_CLASSES}
+    class_text: dict[str, list[str]] = {output_class: [] for output_class in REQUIRED_OUTPUT_STAGE_CLASSES}
+    for row_number, row in enumerate(rows, 2):
+        output_class = row["Output class"].strip()
+        design_item = row["Design item"].strip()
+        if output_class not in REQUIRED_OUTPUT_STAGE_CLASSES:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid output class {output_class}")
+        if design_item not in REQUIRED_OUTPUT_STAGE_ITEMS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid design item {design_item}")
+        if design_item in seen_items[output_class]:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate {output_class}/{design_item}")
+        seen_items[output_class].add(design_item)
+        class_text[output_class].append(" ".join(row.values()))
+        validate_no_role_tokens_in_row(path, row_number, row)
+        for column in ("Applies to", "Related net pattern", "Candidate direction", "Freeze dependency", "Notes"):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_not_final_value_status(path, row_number, row["Value status"])
+        if "schematic freeze" not in row["Freeze dependency"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze dependency must reference schematic freeze")
+        related_patterns = [part.strip() for part in row["Related net pattern"].split(";")]
+        if not related_patterns:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: missing related net pattern")
+        for pattern in related_patterns:
+            if pattern not in allowed_patterns:
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown output "
+                    f"net pattern {pattern}"
+                )
+        if output_class == "High current" and "OUT2" not in row["Applies to"]:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: high-current rows must apply to OUT2")
+
+    for output_class, items in seen_items.items():
+        missing_items = sorted(REQUIRED_OUTPUT_STAGE_ITEMS - items)
+        if missing_items:
+            fail(
+                f"{path.relative_to(REPO_ROOT)} is missing {output_class} design items: "
+                f"{', '.join(missing_items)}"
+            )
+    if "SOA" not in " ".join(class_text["High current"]):
+        fail("high-current output-stage design values must keep OUT2 SOA explicit")
+    if "external controller" not in " ".join(class_text["Low current"]).lower():
+        fail("low-current output-stage design values must preserve external-controller baseline")
+
+
+def validate_input_power_design_values() -> None:
+    path = PB100_DIR / "PB-100-input-power-design-values.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty input-power design values: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in INPUT_POWER_DESIGN_VALUE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    allowed_nets = {
+        "VBAT_RAW",
+        "VBAT_REV_PROT",
+        "VBAT_PROT",
+        "LM74700_VCAP",
+        "INPUT_PROT_EN",
+        "INPUT_FET_GATE",
+        "IIN_SHUNT_HI",
+        "IIN_SHUNT_LO",
+        "IIN_MON_A0",
+        "IIN_MON_A1",
+        "PB_I2C_SCL",
+        "PB_I2C_SDA",
+        "PB_I2C_INT",
+    }
+    seen_items = set()
+    for row_number, row in enumerate(rows, 2):
+        design_item = row["Design item"].strip()
+        if design_item not in REQUIRED_INPUT_POWER_ITEMS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid design item {design_item}")
+        if design_item in seen_items:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate design item {design_item}")
+        seen_items.add(design_item)
+        validate_no_role_tokens_in_row(path, row_number, row)
+        for column in ("Block", "Related net", "Candidate direction", "Freeze dependency", "Notes"):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_not_final_value_status(path, row_number, row["Value status"])
+        if "schematic freeze" not in row["Freeze dependency"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze dependency must reference schematic freeze")
+        for net_name in [part.strip() for part in row["Related net"].split(";")]:
+            if net_name not in allowed_nets:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown input-power net {net_name}")
+        if design_item == "Q1 package and copper path":
+            row_text = " ".join(row.values())
+            if "TOLL" not in row_text or "40 A" not in row_text:
+                fail("Q1 package and copper path must keep TOLL and 40 A review explicit")
+        if design_item == "Shunt value and power rating" and "four-terminal" not in " ".join(row.values()).lower():
+            fail("input shunt design row must preserve four-terminal requirement")
+
+    missing_items = sorted(REQUIRED_INPUT_POWER_ITEMS - seen_items)
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing input-power design items: "
+            f"{', '.join(missing_items)}"
+        )
+
+
+def validate_logic_power_design_values() -> None:
+    path = PB100_DIR / "PB-100-logic-power-design-values.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty logic-power design values: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in LOGIC_POWER_DESIGN_VALUE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    allowed_nets = {
+        "VBAT_PROT",
+        "BUCK_EN_UVLO",
+        "BUCK_RON_SET",
+        "BUCK_FB",
+        "BUCK_BST",
+        "BUCK_SW",
+        "L1",
+        "PB_5V_OUT",
+        "PB_PWR_GOOD",
+    }
+    seen_items = set()
+    for row_number, row in enumerate(rows, 2):
+        design_item = row["Design item"].strip()
+        if design_item not in REQUIRED_LOGIC_POWER_VALUE_ITEMS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid design item {design_item}")
+        if design_item in seen_items:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate design item {design_item}")
+        seen_items.add(design_item)
+        validate_no_role_tokens_in_row(path, row_number, row)
+        for column in ("Related net", "Candidate direction", "Freeze dependency", "Notes"):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_not_final_value_status(path, row_number, row["Value status"])
+        if "schematic freeze" not in row["Freeze dependency"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze dependency must reference schematic freeze")
+        related_net = row["Related net"].strip()
+        if related_net not in allowed_nets:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown logic-power net/ref {related_net}")
+        if design_item == "Higher-current fallback" and "LM5013-Q1" not in " ".join(row.values()):
+            fail("logic-power higher-current fallback must preserve LM5013-Q1-class option")
+        if related_net == "PB_5V_OUT" and "accessory" in " ".join(row.values()).lower() and "must not" not in " ".join(row.values()).lower():
+            fail("PB_5V_OUT rows must not allow accessory loads")
+
+    missing_items = sorted(REQUIRED_LOGIC_POWER_VALUE_ITEMS - seen_items)
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing logic-power design items: "
+            f"{', '.join(missing_items)}"
+        )
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -1751,6 +2026,9 @@ def main() -> int:
     validate_input_and_power_pin_templates()
     validate_input_protection_pin_contract()
     validate_logic_power_design_placeholders()
+    validate_output_stage_design_values()
+    validate_input_power_design_values()
+    validate_logic_power_design_values()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0

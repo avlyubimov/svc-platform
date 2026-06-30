@@ -31,11 +31,14 @@ manufacturing outputs are also blocked by repository validation.
 - `../PB-100-schematic-net-domain-plan.csv`
 - `../PB-100-output-channel-pin-contract.csv`
 - `../PB-100-output-controller-pin-template.csv`
+- `../PB-100-output-stage-design-values.csv`
 - `../PB-100-input-controller-pin-template.csv`
 - `../PB-100-input-protection-pin-contract.csv`
+- `../PB-100-input-power-design-values.csv`
 - `../PB-100-current-monitor-pin-template.csv`
 - `../PB-100-logic-buck-pin-template.csv`
 - `../PB-100-logic-power-design-placeholders.csv`
+- `../PB-100-logic-power-design-values.csv`
 - `../PB-100-kicad-prep.md`
 - `../PB-100-kicad-sheet-manifest.csv`
 - `../PB-100-kicad-footprint-plan.csv`

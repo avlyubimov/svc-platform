@@ -750,3 +750,21 @@ Reason: The freeze checklist defines the gate, but the remaining work needs an
 operational register that can be assigned, reviewed, and closed without losing
 synchronization. Machine-checking the register prevents conditional gates from
 being silently omitted before schematic freeze.
+
+## 2026-06-30 — PB-100 design-value placeholders
+
+Decision: PB-100 now has machine-checked design-value placeholder tables for
+output stages, input power, and logic power:
+`PB-100-output-stage-design-values.csv`,
+`PB-100-input-power-design-values.csv`, and
+`PB-100-logic-power-design-values.csv`. Validation requires complete class or
+block coverage, rejects final/locked values, checks referenced nets against the
+pin templates, preserves OUT2 SOA and low-current external-controller notes,
+and keeps Q1/TOLL/40 A, four-terminal shunt, LM5013-Q1 fallback, and
+configuration-based role mapping explicit.
+
+Reason: Schematic capture needs concrete value positions for thresholds, timing,
+gate drive, bootstrap, shunt, UVLO, feedback, EMI, and power-good networks, but
+the actual values are not safe to lock before SOA, thermal, clamp, sourcing, and
+assembly review. These tables make the remaining value work reviewable without
+starting PCB layout.

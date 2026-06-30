@@ -27,6 +27,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-output-channel-matrix.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`
+- `hardware/power-board/PB-100/PB-100-output-stage-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-instance-plan.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-instance-symbol-map.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-sheet-reference-map.csv`
@@ -42,6 +43,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
 - `hardware/power-board/PB-100/PB-100-kicad-sheet-manifest.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv`
@@ -49,6 +51,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-symbol-pin-evidence.csv`
 - `hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-input-protection-pin-contract.csv`
+- `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
@@ -65,10 +68,11 @@ The schematic review packet consists of:
 | High-side output stages | Final controller/FET/sense schematic values and fault timing |
 | Output pin contract | OUT1..OUT10 control, fault, telemetry, load, fuse, and connector nets captured without role-specific names |
 | Output controller template | TPS48110 threshold, timing, bootstrap, gate-drive, and current-sense values reviewed per channel class |
+| Output stage design values | High, medium, and low class threshold, timing, gate-drive, sense, and clamp values selected without role-specific names |
 | OUT2 SOA | Data-sheet SOA extraction against `PB-100-out2-soa-envelope.csv` |
-| Input reverse protection | Final MOSFET package choice, Q1 pin evidence, and 40 A copper/thermal review |
+| Input reverse protection | Input power values, final MOSFET package choice, Q1 pin evidence, and 40 A copper/thermal review |
 | TVS/load dump | Clamp and overshoot margin against every selected downstream device |
-| Logic power | LM5164 pin template, final buck current budget, external values, EMI parts, UVLO, feedback, and power-good implementation |
+| Logic power | LM5164 pin template, logic power design values, final buck current budget, EMI parts, UVLO, feedback, and power-good implementation |
 | Current telemetry | INA228 pin template, ADC scaling, filtering, calibration plan, and total-current monitor choice |
 | Thermal telemetry | Final sensor values, placement notes, and derating thresholds |
 | B2B interface | Connector MPN, pin assignment review, and LB-100 MCU resource binding |

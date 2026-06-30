@@ -1,0 +1,11 @@
+Design item,Related net,Value status,Candidate direction,Freeze dependency,Notes
+Input filter,VBAT_PROT,TBD not final,Select damping EMI and surge-tolerant input capacitance,Close conducted-noise and load-dump stress review before schematic freeze,Must remain after reverse protection
+UVLO divider,BUCK_EN_UVLO,TBD not final,Set cold-crank threshold from LM5164 datasheet and safe-off policy,Close cold-crank behavior before schematic freeze,Outputs default off if rail invalid
+RON programming,BUCK_RON_SET,TBD not final,Set switching frequency from LM5164 equations and EMI constraints,Close frequency efficiency and load budget before schematic freeze,Do not lock resistor value before review
+Feedback divider,BUCK_FB,TBD not final,Set 5 V rail tolerance from regulator feedback requirements,Close tolerance and no-load review before schematic freeze,PB_5V_OUT must not power accessory loads
+Bootstrap capacitor,BUCK_BST,TBD not final,Size from LM5164 datasheet and voltage stress,Close bootstrap capacitor value and rating before schematic freeze,No footprint lock before review
+Switch node damping,BUCK_SW,TBD not final,Review snubber or damping need after schematic simulation or bench plan,Close EMI and ringing review before schematic freeze,No layout geometry before freeze
+Inductor,L1,TBD not final,Select shielded automotive inductor from ripple and saturation margin,Close ripple current saturation and thermal review before schematic freeze,Must sync with BOM buck inductor row
+Output capacitors,PB_5V_OUT,TBD not final,Select stability and transient response network,Close load-step and stability review before schematic freeze,Feeds LB-100 and PB-side low-power circuitry only
+Power-good pull-up,PB_PWR_GOOD,TBD not final,Select pull-up domain and filtering to report valid rail only,Close power-good timing before schematic freeze,Must not assert before PB_5V_OUT is stable
+Higher-current fallback,PB_5V_OUT,TBD not final,Switch to LM5013-Q1-class if 1 A budget is exceeded,Close load budget before schematic freeze,Do not choose lower voltage margin without protection review

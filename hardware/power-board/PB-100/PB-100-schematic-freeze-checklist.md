@@ -66,9 +66,11 @@ Before marking this checklist `Closed`, the review packet must include:
 - Final output channel matrix.
 - Final output-channel pin contract.
 - Final output-controller pin template.
+- Final output-stage design value table.
 - Final input-protection pin contract.
 - Final input-controller pin template.
 - Final total-current monitor pin template.
+- Final input-power design value table.
 - Final logic-buck pin template.
 - Final logic-power design value table.
 - Final instance-symbol map linking every schematic reference to a symbol key.
