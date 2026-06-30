@@ -212,3 +212,11 @@ schematic freeze and PCB layout remain blocked until all conditional gates in
 
 Reason: The package now has no active planning blockers and includes output,
 power, telemetry, thermal, CAN safety, B2B, BOM, and bench-validation inputs.
+
+## 2026-06-30 — PB-100 KiCad preparation boundary
+
+Decision: PB-100 KiCad work may proceed only as preliminary symbol and footprint
+preparation tracked in `hardware/power-board/PB-100/PB-100-kicad-prep.md`.
+
+Reason: Schematic capture needs package preparation, but PCB layout, placement,
+routing, and Gerber generation remain blocked until schematic freeze.

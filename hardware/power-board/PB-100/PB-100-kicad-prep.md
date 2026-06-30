@@ -1,0 +1,41 @@
+# PB-100 KiCad Preparation Plan
+
+Status: Preliminary symbol/footprint planning; no PCB layout
+
+This plan identifies schematic-symbol and footprint preparation work that can
+start before PCB layout. It does not authorize placement, routing, board outline,
+Gerber generation, or footprint use without package drawing verification.
+
+## Rules
+
+- Do not start PCB layout from this file.
+- Use KiCad stock footprints only when package dimensions match the vendor data
+  sheet.
+- Create custom footprints for power packages, exposed pads, or non-standard pin
+  counts.
+- Keep DNP/default-open CAN1 TX hardware visible in the schematic.
+- Keep output names generic: `OUT1` through `OUT10`.
+- Recheck JLCPCB/PCBWay assembly class before locking final footprints.
+
+## Footprint inventory
+
+Detailed inventory CSV:
+`hardware/power-board/PB-100/PB-100-kicad-footprint-plan.csv`.
+
+The inventory is package-focused, not a final MPN lock.
+
+## Allowed prep work
+
+- Create schematic symbols for selected candidate families.
+- Collect package drawings and courtyard requirements.
+- Create draft footprints in a separate library branch or clearly marked
+  preliminary library.
+- Add 3D model placeholders only after footprint dimensions are verified.
+
+## Blocked work
+
+- PCB layout.
+- Copper pours and current-carrying trace geometry.
+- Connector placement.
+- Board outline.
+- Gerber, Pick&Place, or assembly output generation.

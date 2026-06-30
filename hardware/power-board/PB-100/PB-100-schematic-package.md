@@ -19,6 +19,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
+- `hardware/power-board/PB-100/PB-100-kicad-prep.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-preliminary-validation.md`
@@ -96,6 +97,8 @@ requires SOA, thermal, clamp-voltage, and assembly-class validation.
 
 Preliminary validation tables:
 
+- `hardware/power-board/PB-100/PB-100-kicad-prep.md`
+- `hardware/power-board/PB-100/PB-100-kicad-footprint-plan.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-budget.csv`
