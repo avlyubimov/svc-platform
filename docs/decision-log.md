@@ -27,3 +27,19 @@ Reason: Avoid any risk to ZFE/ABS/DME/KOMBI operation.
 Decision: All fine-pitch and small SMD parts must be assembled by the PCB manufacturer.
 
 Reason: User has only a soldering iron, no working hot-air/rework station.
+
+## 2026-06-30 — Architecture Review v1.0 freeze candidate
+
+Decision: Architecture Review v1.0 is promoted from draft to freeze candidate.
+
+Reason: Core platform boundaries are defined: PB-100 remains stable, outputs are
+generic and configuration-mapped, CAN1 is read-only by default, and factory/garage
+assembly responsibilities are separated.
+
+## 2026-06-30 — PB-100 baseline requirements
+
+Decision: PB-100 baseline requirements are captured in ADR-0006 and
+`docs/requirements/pb-100-requirements.md`.
+
+Reason: Power Board requirements must be explicit before schematic planning and
+must not change later without ADR review.

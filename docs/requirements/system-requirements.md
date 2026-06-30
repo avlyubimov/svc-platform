@@ -16,6 +16,7 @@
 - Watchdog
 - Recovery mode
 - CAN read-only default
+- Safe default-off output state during boot/reset/update/fault
 
 ## Manufacturing
 - SMD factory assembly
@@ -32,3 +33,7 @@
 - USB-C service mode
 - BLE configuration
 - microSD logging
+
+## Power Board
+- PB-100 requirements are tracked in `docs/requirements/pb-100-requirements.md`
+- PB-100 requirement changes require ADR approval
