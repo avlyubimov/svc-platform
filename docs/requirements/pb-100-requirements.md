@@ -42,6 +42,10 @@ PB-100 must provide at least 10 generic protected outputs.
 Reference default roles are initial configuration defaults for BMW K25 Vehicle
 Profile #001. Physical outputs remain generic.
 
+The reference fuse ratings total 100 A and the reference current limits total
+82 A. This is intentionally higher than the board-level continuous-current
+budget. See ADR-0008.
+
 ## 4. Per-output requirements
 
 Each output must support:
@@ -57,7 +61,17 @@ Each output must support:
 - Configuration-based current limit and priority.
 - Safe default-off state during boot, reset, update, and fault recovery.
 
-## 5. Thermal and diagnostics
+## 5. Board-level current budget
+
+- Main harness fuse target: 50 A.
+- Board continuous-current design target: at least 40 A after thermal validation.
+- Default firmware/configuration total-current limit: 40 A.
+- Outputs are allowed to be over-subscribed relative to the board budget.
+- Firmware must refuse startup or shed lower-priority loads when the configured
+  board-level budget would be exceeded.
+- Total input current measurement is required for budget enforcement.
+
+## 6. Thermal and diagnostics
 
 - Requires PCB temperature measurement.
 - Requires power-zone temperature measurement.
@@ -65,14 +79,14 @@ Each output must support:
 - Must support firmware-visible diagnostic state for overcurrent, thermal
   derating, fuse/open-load suspicion where practical, and lockout.
 
-## 6. Vehicle network safety
+## 7. Vehicle network safety
 
 - PB-100 must not require vehicle CAN TX for any core function.
 - If CAN1 routing or transceiver support crosses PB-100, CAN1 TX disable must be
   physically enforced by default.
 - Any CAN1 TX enable path requires a new ADR and an explicit hardware action.
 
-## 7. Board interface
+## 8. Board interface
 
 PB-100 must expose a stable board-to-board interface to LB-100 for:
 
@@ -85,7 +99,7 @@ PB-100 must expose a stable board-to-board interface to LB-100 for:
 
 The exact pin map is deferred to schematic freeze.
 
-## 8. Manufacturing
+## 9. Manufacturing
 
 - Fine-pitch and small SMD parts are factory assembled.
 - User-installed parts are limited to connectors, fuses, enclosure hardware, and
@@ -96,12 +110,15 @@ The exact pin map is deferred to schematic freeze.
 - Initial component-family shortlist is tracked in
   `docs/production/component-family-shortlist.md`.
 
-## 9. Acceptance criteria
+## 10. Acceptance criteria
 
 PB-100 requirements are ready for schematic planning when:
 
 - ADR-0006 is accepted.
+- ADR-0007 is accepted.
+- ADR-0008 is accepted.
 - Output count and protection model are stable.
 - CAN read-only policy is preserved.
+- Board-level current budget is documented.
 - Factory/garage BOM split is still valid.
 - Component-family shortlist exists with alternatives for critical parts.

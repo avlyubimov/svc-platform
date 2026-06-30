@@ -17,6 +17,8 @@
 - Recovery mode
 - CAN read-only default
 - Safe default-off output state during boot/reset/update/fault
+- Board-level current budget enforcement
+- Priority-based load shedding
 
 ## Manufacturing
 - SMD factory assembly

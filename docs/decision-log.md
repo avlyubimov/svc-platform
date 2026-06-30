@@ -66,3 +66,13 @@ Decision: Initial factory-assembly component families are documented in
 
 Reason: Architecture freeze needs at least two viable alternatives for critical
 components before schematic planning starts.
+
+## 2026-06-30 — PB-100 board-level current budget
+
+Decision: PB-100 outputs are intentionally over-subscribed relative to the main
+fuse and board continuous-current budget. ADR-0008 sets the initial Rev.1 target
+at 50 A main fuse and 40 A continuous board/configuration budget.
+
+Reason: The reference channel limits total more than the input fuse, so firmware
+and configuration must enforce total current and load priorities as safety
+features.

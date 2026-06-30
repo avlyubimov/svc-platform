@@ -160,6 +160,7 @@ Required software boundaries:
 Configuration is separate from firmware and contains:
 - channel role mapping
 - current limits
+- board-level total current budget
 - PWM limits
 - profiles
 - IF/THEN rules
@@ -222,10 +223,11 @@ stage design.
 
 Architecture v1.0 can be considered frozen only when all items are true:
 
-- ADR-0001 through ADR-0007 are accepted.
+- ADR-0001 through ADR-0008 are accepted.
 - PB-100 requirements are reviewed and accepted.
 - CAN1 read-only hardware policy is preserved in schematic requirements.
 - Output role mapping remains configuration-driven.
+- Board-level current budget and priority shedding are defined.
 - Critical component families have at least two viable alternatives.
 - Initial component-family shortlist is complete.
 - Factory and garage BOM split remains valid.
