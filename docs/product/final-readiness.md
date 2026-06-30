@@ -17,7 +17,8 @@ make check
 Current coverage:
 
 - PB-100 CSV and KiCad scaffold validation.
-- Optional PB-100 KiCad schematic ERC when `kicad-cli` is installed.
+- Optional PB-100 KiCad schematic ERC and netlist export when `kicad-cli` is
+  installed.
 - PB-100 layout/manufacturing artifact blocker.
 - Firmware config JSON/schema validation.
 - Firmware host-test suite.
@@ -28,7 +29,7 @@ Current coverage:
 |---|---|---|
 | Architecture v1.0 | Ready | Frozen by ADR; PB-100 requirement changes still need ADR |
 | PB-100 requirements | Ready for schematic planning | Baseline is frozen; schematic freeze remains open |
-| PB-100 KiCad scaffold | Review-ready scaffold | Schematic ERC passes locally with KiCad 10.0.4 |
+| PB-100 KiCad scaffold | Review-ready scaffold | Schematic ERC and netlist export pass locally with KiCad 10.0.4 |
 | PB-100 PCB/layout | Blocked | Layout, Gerber, drill, placement, and manufacturing zips are blocked |
 | Firmware safety core | Host-test ready | Output, battery, thermal, CAN, telemetry, events, logging, config, and rule paths covered |
 | Configuration format | Host-test ready | JSON schema and example are validated against firmware defaults |
@@ -44,7 +45,8 @@ Current coverage:
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.
 - Synchronize factory and garage BOM drafts with final selections.
-- Run `make check` with local `kicad-cli` available and zero ERC violations.
+- Run `make check` with local `kicad-cli` available, zero ERC violations, and a
+  successful KiCad S-expression netlist export.
 
 ## Required before PCB layout
 

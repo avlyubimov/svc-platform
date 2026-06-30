@@ -48,6 +48,6 @@ python3 tools/validate_pb100.py
 The validator intentionally fails if layout/manufacturing artifacts appear before
 the PB-100 schematic freeze checklist is closed.
 
-If `kicad-cli` is installed, the validator also runs schematic ERC and requires
-zero reported violations. If `kicad-cli` is not available, the text-level KiCad
-scaffold checks still run.
+If `kicad-cli` is installed, the validator also runs schematic ERC, requires
+zero reported violations, and exports a temporary KiCad S-expression netlist. If
+`kicad-cli` is not available, the text-level KiCad scaffold checks still run.

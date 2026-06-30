@@ -108,13 +108,13 @@ def validate_kicad_scaffold() -> None:
     validate_no_layout_artifacts()
 
 
-def validate_kicad_cli_erc() -> None:
+def validate_kicad_cli_checks() -> None:
     kicad_cli = shutil.which("kicad-cli")
     if kicad_cli is None:
-        print("PB-100 KiCad ERC skipped: kicad-cli not found")
+        print("PB-100 KiCad CLI checks skipped: kicad-cli not found")
         return
 
-    with tempfile.TemporaryDirectory(prefix="svc-pb100-erc-") as temp_dir:
+    with tempfile.TemporaryDirectory(prefix="svc-pb100-kicad-") as temp_dir:
         report_path = Path(temp_dir) / "PB-100-erc.json"
         command = [
             kicad_cli,
@@ -145,6 +145,32 @@ def validate_kicad_cli_erc() -> None:
 
         version = report.get("kicad_version", "unknown")
         print(f"PB-100 KiCad ERC passed with kicad-cli {version}")
+        validate_kicad_cli_netlist_export(kicad_cli, Path(temp_dir))
+
+
+def validate_kicad_cli_netlist_export(kicad_cli: str, temp_dir: Path) -> None:
+    netlist_path = temp_dir / "PB-100.net"
+    command = [
+        kicad_cli,
+        "sch",
+        "export",
+        "netlist",
+        "--format",
+        "kicadsexpr",
+        "--output",
+        str(netlist_path),
+        str(KICAD_DIR / "PB-100.kicad_sch"),
+    ]
+    result = subprocess.run(command, check=False, text=True, capture_output=True)
+    if result.returncode != 0:
+        details = "\n".join(part for part in (result.stdout.strip(), result.stderr.strip()) if part)
+        fail(f"KiCad netlist export failed for PB-100 schematic: {details}")
+
+    netlist_text = read_text(netlist_path)
+    if "(export" not in netlist_text or "(design" not in netlist_text:
+        fail("KiCad netlist export did not produce a valid PB-100 netlist")
+    validate_s_expression_balance(netlist_path)
+    print("PB-100 KiCad netlist export passed")
 
 
 def validate_no_layout_artifacts() -> None:
@@ -212,7 +238,7 @@ def main() -> int:
     for csv_path in csv_paths:
         validate_csv(csv_path)
     validate_kicad_scaffold()
-    validate_kicad_cli_erc()
+    validate_kicad_cli_checks()
     validate_symbol_library()
     validate_instance_plan()
     validate_net_naming_contract()

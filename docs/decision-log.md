@@ -514,3 +514,13 @@ prototype bring-up prerequisites.
 Reason: The project now has enough hardware planning, KiCad scaffold, firmware
 safety code, and validation tooling that “ready” must be explicit and separated
 from PB-100 PCB layout authorization.
+
+## 2026-06-30 — Optional PB-100 KiCad netlist export validation
+
+Decision: `tools/validate_pb100.py` now exports a temporary PB-100 KiCad
+S-expression netlist when `kicad-cli` is available and validates the exported
+netlist syntax.
+
+Reason: ERC proves the schematic has no reported violations, while netlist
+export proves the scaffold can move into downstream schematic-review artifacts
+without committing generated layout or manufacturing files.
