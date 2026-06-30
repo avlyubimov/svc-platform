@@ -48,6 +48,7 @@ Status: In progress
 Current host-tested services:
 
 - Event Bus
+- Event Dispatcher
 - Power Budget
 - Output Manager
 - Battery Protection

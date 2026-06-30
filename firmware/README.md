@@ -28,6 +28,7 @@ Current host tests cover:
 - Battery protection warning, cutoff latch, recovery, and invalid telemetry
   behavior.
 - Event Bus FIFO order, overflow rejection, and empty-pop behavior.
+- Event Dispatcher output overcurrent/fault handling through Output Manager.
 - CAN1 listen-only TX denial and CAN2 expansion TX allowance.
 - System Safety Coordinator integration between battery cutoff, Event Bus, and
   Output Manager output shutdown.

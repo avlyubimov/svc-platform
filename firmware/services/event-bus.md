@@ -6,6 +6,7 @@ Correct flow:
 
 ```text
 CAN Manager -> Event Bus -> Rule Engine -> Output Manager
+Fault Monitor -> Event Bus -> Event Dispatcher -> Output Manager
 ```
 
 Example events:
@@ -25,3 +26,9 @@ Initial host-testable implementation:
 - `firmware/services/event_bus.h`
 - `firmware/services/event_bus.c`
 - `firmware/tests/test_event_bus.c`
+
+Fault event dispatch is implemented separately:
+
+- `firmware/services/event_dispatcher.h`
+- `firmware/services/event_dispatcher.c`
+- `firmware/tests/test_event_dispatcher.c`

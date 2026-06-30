@@ -334,3 +334,12 @@ behavior.
 
 Reason: Low-battery cutoff must disable physical outputs even if event
 publication fails, and recovery must not automatically restore previous loads.
+
+## 2026-06-30 — Firmware event dispatcher
+
+Decision: Firmware now has a host-testable Event Dispatcher that drains fault
+events from the Event Bus and applies output overcurrent/fault events through the
+Output Manager fault path.
+
+Reason: Safety events need an executable Event Bus to Output Manager path, while
+preserving the rule that no feature code directly controls physical outputs.

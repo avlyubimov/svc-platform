@@ -26,6 +26,8 @@ state changes.
 - Lower-priority loads shed before higher-priority loads.
 - Battery cutoff shutdown is applied through the System Safety Coordinator, not
   by feature code directly manipulating outputs.
+- Output overcurrent and fault events are applied through the Event Dispatcher,
+  then the Output Manager fault path.
 
 Initial host-testable implementation:
 
