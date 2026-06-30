@@ -1,0 +1,19 @@
+Subsystem,Item,Suggested part/class,Package/assembly,Qty,Assembly,Priority,Notes
+Logic,MCU,STM32H563/H573 class,LQFP/BGA depending final choice,1,Factory,Core,Product target; verify availability
+Logic,CAN1 transceiver,TJA1051/TJA1057 automotive,SOIC/VSON,1,Factory,Core,BMW CAN read-only
+Logic,CAN2 transceiver,TJA1051/TJA1057 automotive,SOIC/VSON,1,Factory,Should,Expansion CAN
+Logic,BLE module,nRF52/ESP32-C3 module or BLE UART module,Module,1,Factory,Should,Final choice pending
+Logic,microSD socket,Push-push/push-pull,SMD,1,Factory,Core,Logs/config
+Logic,RTC,DS3231/MCP7940 class,SMD,1,Factory,Should,Log timestamps
+Logic,FRAM,MB85RC256/MB85RS class,SMD,1,Factory,Core,Black box/settings
+Logic,IMU,BMI270/ICM42688 class,LGA,1,Factory,Should,Shock/tilt/vibration
+Logic,Lux sensor,VEML7700/OPT3001,SMD,1,Factory,Core,Fog logic
+Logic,Temp sensor,TMP117/NTC,SMD,2,Factory,Core,PCB + power zone temp
+Power,Current sensor,INA226/INA228 or high-side monitor,SMD,10,Factory,Core,Per output
+Power,MOSFET,Automotive low Rds(on) >=40V,Power SO8/DPAK,10,Factory,Core,PWM capable
+Power,Gate driver,Automotive MOSFET driver,SMD,5,Factory,Should,2-channel drivers
+Power,TVS protection,Automotive TVS 12V load dump rated,SMD/THT,1,Factory,Core,Input protection
+Power,Reverse protection,Ideal diode MOSFET circuit,>=60V >=80A,1,Factory,Core,Input reverse polarity
+Power,DC/DC,Automotive buck 12V->5V,SMD module/IC,1,Factory,Core,Logic power
+Comms,LIN transceiver,Automotive LIN,SMD,1,Factory,Future,Footprint can be DNP
+Comms,RS485 transceiver,Automotive/industrial RS485,SMD,1,Factory,Future,Footprint can be DNP

@@ -1,0 +1,82 @@
+{
+  "device": {
+    "name": "SVC-1",
+    "vehicle_profile": "BMW_K25",
+    "hardware": {
+      "power_board": "PB-100",
+      "logic_board": "LB-100",
+      "front_board": "FB-100"
+    }
+  },
+  "battery": {
+    "warn_v": 12.0,
+    "cutoff_v": 11.8,
+    "recovery_v": 12.4,
+    "shutdown_delay_s": 30
+  },
+  "outputs": [
+    {
+      "id": "OUT1",
+      "role": "USB",
+      "fuse_a": 15,
+      "current_limit_a": 12,
+      "pwm": true,
+      "priority": "B"
+    },
+    {
+      "id": "OUT2",
+      "role": "CIGARETTE_SOCKET",
+      "fuse_a": 20,
+      "current_limit_a": 18,
+      "pwm": false,
+      "priority": "C"
+    },
+    {
+      "id": "OUT3",
+      "role": "FOG_LEFT",
+      "fuse_a": 10,
+      "current_limit_a": 8,
+      "pwm": true,
+      "priority": "C"
+    },
+    {
+      "id": "OUT4",
+      "role": "FOG_RIGHT",
+      "fuse_a": 10,
+      "current_limit_a": 8,
+      "pwm": true,
+      "priority": "C"
+    }
+  ],
+  "fog_logic": {
+    "day_lux": 10000,
+    "dusk_lux": 3000,
+    "night_lux": 1000,
+    "day_pwm": 0,
+    "dusk_pwm": 40,
+    "night_pwm": 70,
+    "high_beam_pwm": 100
+  },
+  "rules": [
+    {
+      "name": "Fog high beam",
+      "if": [
+        "engine_running == true",
+        "high_beam == true"
+      ],
+      "then": [
+        "FOG_LEFT.pwm = 100",
+        "FOG_RIGHT.pwm = 100"
+      ]
+    },
+    {
+      "name": "Left indicator fog cut",
+      "if": [
+        "left_indicator == true"
+      ],
+      "then": [
+        "FOG_LEFT.pwm = 0"
+      ]
+    }
+  ]
+}
