@@ -1,6 +1,12 @@
 #include "svc_config.h"
 
 const svc_device_config_t svc_default_config = {
+    .battery = {
+        .warn_mv = SVC_DEFAULT_BATTERY_WARN_MV,
+        .cutoff_mv = SVC_DEFAULT_BATTERY_CUTOFF_MV,
+        .recovery_mv = SVC_DEFAULT_BATTERY_RECOVERY_MV,
+        .shutdown_delay_s = SVC_DEFAULT_BATTERY_SHUTDOWN_DELAY_S
+    },
     .power_budget = {
         .total_current_limit_ma = SVC_DEFAULT_TOTAL_CURRENT_LIMIT_MA,
         .shed_order = {

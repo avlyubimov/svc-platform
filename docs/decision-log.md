@@ -292,3 +292,11 @@ IDs, checks the power budget before enabling, and locks outputs off after faults
 
 Reason: Output control must be centralized and role-agnostic so CAN/rules cannot
 directly manipulate GPIO/PWM hardware.
+
+## 2026-06-30 — Firmware battery protection service
+
+Decision: Firmware now has a host-testable battery protection service with warn,
+cutoff latch, recovery threshold, and invalid-telemetry cutoff behavior.
+
+Reason: Low-voltage shutdown is a safety requirement and must fail safe before
+vehicle integration.

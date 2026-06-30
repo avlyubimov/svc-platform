@@ -25,3 +25,5 @@ Current host tests cover:
 - PB-100 board-level power budget service.
 - Output Manager safe default-off, enable/disable, budget denial, telemetry
   denial, and fault lockout behavior.
+- Battery protection warning, cutoff latch, recovery, and invalid telemetry
+  behavior.

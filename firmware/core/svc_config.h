@@ -7,6 +7,10 @@
 
 #define SVC_OUTPUT_COUNT 10U
 #define SVC_DEFAULT_TOTAL_CURRENT_LIMIT_MA 40000U
+#define SVC_DEFAULT_BATTERY_WARN_MV 12000U
+#define SVC_DEFAULT_BATTERY_CUTOFF_MV 11800U
+#define SVC_DEFAULT_BATTERY_RECOVERY_MV 12400U
+#define SVC_DEFAULT_BATTERY_SHUTDOWN_DELAY_S 30U
 
 typedef enum {
     SVC_OUTPUT_OUT1 = 0,
@@ -42,6 +46,14 @@ typedef struct {
 } svc_power_budget_config_t;
 
 typedef struct {
+    uint16_t warn_mv;
+    uint16_t cutoff_mv;
+    uint16_t recovery_mv;
+    uint16_t shutdown_delay_s;
+} svc_battery_config_t;
+
+typedef struct {
+    svc_battery_config_t battery;
     svc_power_budget_config_t power_budget;
     svc_output_config_t outputs[SVC_OUTPUT_COUNT];
 } svc_device_config_t;
