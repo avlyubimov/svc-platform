@@ -1,0 +1,11 @@
+Pin number,Pin name,Signal role,Net pattern,Direction,Default state,Freeze dependency
+1,A1,I2C address strap,IIN_MON_A1,Local address strap,Address TBD not final,I2C address plan closes during schematic review
+2,A0,I2C address strap,IIN_MON_A0,Local address strap,Address TBD not final,I2C address plan closes during schematic review
+3,ALERT,Monitor alert output,PB_I2C_INT,PB-100 to LB-100,Inactive until valid,Alert pull-up domain and fault mapping close during schematic review
+4,SDA,I2C data,PB_I2C_SDA,LB-100/PB-100,Pull-up required,I2C pull-up domain and bus ownership close during schematic review
+5,SCL,I2C clock,PB_I2C_SCL,LB-100 to PB-100,Pull-up required,I2C pull-up domain and bus ownership close during schematic review
+6,VS,Monitor supply,LB_3V3_IO,LB-100 to PB-100,Absent when LB-100 unpowered,Monitor supply and level compatibility close during schematic review
+7,GND,Monitor ground,GND,Power reference,Ground reference present,Analog return and Kelvin sense reference close during schematic review
+8,VBUS,Bus-voltage sense,VBAT_PROT,PB-100 sense,Scaled/protected battery rail,Voltage range and surge divider strategy close during schematic review
+9,IN-,Shunt negative input,IIN_SHUNT_LO,PB-100 sense,Zero-current baseline,0-60 A shunt range and calibration close during schematic review
+10,IN+,Shunt positive input,IIN_SHUNT_HI,PB-100 sense,Zero-current baseline,0-60 A shunt range and calibration close during schematic review

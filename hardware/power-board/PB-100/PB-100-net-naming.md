@@ -21,9 +21,23 @@ entering the schematic.
 | Net | Purpose |
 |---|---|
 | `INPUT_FET_GATE` | Local gate drive from ideal-diode/reverse-protection controller to input MOSFET |
+| `INPUT_PROT_EN` | Local enable network for the input reverse-protection controller |
+| `LM74700_VCAP` | Local charge-pump capacitor node for the input ideal-diode controller |
 | `VBAT_REV_PROT` | Intermediate node after reverse-protection FET before the final protected rail definition |
 | `IIN_SHUNT_HI` | High-side Kelvin sense for total input current shunt |
 | `IIN_SHUNT_LO` | Low-side Kelvin sense for total input current shunt |
+| `IIN_MON_A0` | Local total-current monitor address strap |
+| `IIN_MON_A1` | Local total-current monitor address strap |
+
+## Logic power local nets
+
+| Net | Purpose |
+|---|---|
+| `BUCK_EN_UVLO` | Local buck enable and undervoltage threshold network |
+| `BUCK_RON_SET` | Local buck on-time or frequency programming network |
+| `BUCK_FB` | Local buck feedback divider node |
+| `BUCK_BST` | Local buck bootstrap supply node |
+| `BUCK_SW` | Local buck switching node |
 
 ## Output channel nets
 

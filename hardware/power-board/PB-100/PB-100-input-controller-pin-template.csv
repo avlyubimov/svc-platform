@@ -1,0 +1,7 @@
+Pin number,Pin name,Signal role,Net pattern,Direction,Default state,Freeze dependency
+1,VCAP,Charge-pump capacitor node,LM74700_VCAP,Local charge-pump network,Capacitor TBD not final,Charge-pump capacitor value and voltage rating close during schematic review
+2,GND,Controller ground,GND,Power reference,Ground reference present,Return strategy closes during schematic review
+3,EN,Controller enable,INPUT_PROT_EN,Local enable network,Enable behavior TBD not final,Default enable policy and service-disable option close during schematic review
+4,CATHODE,Protected-side sense,VBAT_REV_PROT,Controller sense,Valid after reverse FET,Protected-side sense node closes during schematic review
+5,GATE,External MOSFET gate drive,INPUT_FET_GATE,Controller to input MOSFET,Off when controller unpowered,Gate clamp turn-off and Q1 package evidence close during schematic review
+6,ANODE,Raw-side input sense,VBAT_RAW,Controller sense,Tracks fused battery input,Raw-side surge and reverse-polarity stress review closes during schematic review

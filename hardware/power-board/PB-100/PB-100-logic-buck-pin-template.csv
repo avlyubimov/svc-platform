@@ -1,0 +1,10 @@
+Pin number,Pin name,Signal role,Net pattern,Direction,Default state,Freeze dependency
+1,GND,Buck ground,GND,Power reference,Ground reference present,Power and signal return strategy closes during schematic review
+2,VIN,Buck input supply,VBAT_PROT,Protected rail to buck,Absent until protected rail valid,Input filter clamp and surge margin close during schematic review
+3,EN/UVLO,Enable and UVLO threshold,BUCK_EN_UVLO,Local threshold network,Threshold TBD not final,Cold-crank UVLO values close during schematic review
+4,RON,On-time programming input,BUCK_RON_SET,Local programming network,Value TBD not final,Switching frequency and load budget close during schematic review
+5,FB,Feedback input,BUCK_FB,Local feedback network,Divider TBD not final,5 V tolerance and feedback divider values close during schematic review
+6,PGOOD,Power-good output,PB_PWR_GOOD,PB-100 to LB-100,Fault or inactive until rail valid,Pull-up domain and power-good timing close during schematic review
+7,BST,Bootstrap supply,BUCK_BST,Local bootstrap network,Capacitor TBD not final,Bootstrap capacitor value and voltage rating close during schematic review
+8,SW,Switch node,BUCK_SW,Local switching node,Inactive when buck disabled,Inductor diode/synchronous path and EMI review close during schematic review
+EP,EP,Exposed pad,GND,Power reference,Ground copper TBD not final,Thermal pad grounding and copper strategy close during schematic review

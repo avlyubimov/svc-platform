@@ -221,6 +221,9 @@ REQUIRED_READINESS_AREAS = {
     "Net domains",
     "Output pin contract",
     "Output controller template",
+    "Input controller template",
+    "Current monitor template",
+    "Logic buck template",
     "Input protection contract",
     "Logic power values",
     "BOM synchronization",
@@ -1333,6 +1336,144 @@ def validate_output_controller_pin_template() -> None:
             )
 
 
+def sort_pin_number(pin_number: str) -> tuple[int, str]:
+    return (0, f"{int(pin_number):04d}") if pin_number.isdigit() else (1, pin_number)
+
+
+def validate_component_pin_template(
+    file_name: str,
+    symbol_name: str,
+    allowed_net_patterns: set[str],
+    required_net_patterns: set[str],
+) -> None:
+    path = PB100_DIR / file_name
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty component pin template: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in OUTPUT_CONTROLLER_PIN_TEMPLATE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    evidence_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-symbol-pin-evidence.csv").open(newline="", encoding="utf-8"))
+    )
+    evidence_pins = {
+        row["Pin number"].strip(): row["Pin name"].strip()
+        for row in evidence_rows
+        if row["Symbol name"].strip() == symbol_name
+    }
+    if not evidence_pins:
+        fail(f"missing pin evidence for {symbol_name}")
+
+    seen_pins = set()
+    net_patterns = set()
+    for row_number, row in enumerate(rows, 2):
+        pin_number = row["Pin number"].strip()
+        pin_name = row["Pin name"].strip()
+        net_pattern = row["Net pattern"].strip()
+        for column in OUTPUT_CONTROLLER_PIN_TEMPLATE_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if pin_number in seen_pins:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate pin {pin_number}")
+        seen_pins.add(pin_number)
+        expected_pin_name = evidence_pins.get(pin_number)
+        if expected_pin_name is None:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: pin {pin_number} is not in pin evidence")
+        if pin_name != expected_pin_name:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: pin {pin_number} must be "
+                f"{expected_pin_name}, got {pin_name}"
+            )
+        if net_pattern not in allowed_net_patterns:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: unsupported net pattern "
+                f"{net_pattern}"
+            )
+        for forbidden_token in FORBIDDEN_ROLE_TOKENS:
+            if forbidden_token in net_pattern:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: role token in net pattern {net_pattern}")
+        if "final" in row["Default state"].lower() and "not final" not in row["Default state"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: default state must not lock final values")
+        if "schematic review" not in row["Freeze dependency"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze dependency must reference schematic review")
+        net_patterns.add(net_pattern)
+
+    missing_pins = sorted(evidence_pins.keys() - seen_pins, key=sort_pin_number)
+    extra_pins = sorted(seen_pins - evidence_pins.keys(), key=sort_pin_number)
+    if missing_pins:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing pins for {symbol_name}: "
+            f"{', '.join(missing_pins)}"
+        )
+    if extra_pins:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} has pins not in evidence for {symbol_name}: "
+            f"{', '.join(extra_pins)}"
+        )
+
+    missing_patterns = sorted(required_net_patterns - net_patterns)
+    if missing_patterns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required net patterns: "
+            f"{', '.join(missing_patterns)}"
+        )
+
+
+def validate_input_and_power_pin_templates() -> None:
+    validate_component_pin_template(
+        "PB-100-input-controller-pin-template.csv",
+        "PB100_LM74700QDBVRQ1_PRELIM",
+        {
+            "LM74700_VCAP",
+            "GND",
+            "INPUT_PROT_EN",
+            "VBAT_REV_PROT",
+            "INPUT_FET_GATE",
+            "VBAT_RAW",
+        },
+        {"VBAT_RAW", "VBAT_REV_PROT", "INPUT_FET_GATE", "INPUT_PROT_EN"},
+    )
+    validate_component_pin_template(
+        "PB-100-current-monitor-pin-template.csv",
+        "PB100_INA228_Q1_PRELIM",
+        {
+            "IIN_MON_A1",
+            "IIN_MON_A0",
+            "PB_I2C_INT",
+            "PB_I2C_SDA",
+            "PB_I2C_SCL",
+            "LB_3V3_IO",
+            "GND",
+            "VBAT_PROT",
+            "IIN_SHUNT_LO",
+            "IIN_SHUNT_HI",
+        },
+        {"IIN_SHUNT_HI", "IIN_SHUNT_LO", "PB_I2C_SDA", "PB_I2C_SCL", "VBAT_PROT"},
+    )
+    validate_component_pin_template(
+        "PB-100-logic-buck-pin-template.csv",
+        "PB100_LM5164QDDATQ1_PRELIM",
+        {
+            "GND",
+            "VBAT_PROT",
+            "BUCK_EN_UVLO",
+            "BUCK_RON_SET",
+            "BUCK_FB",
+            "PB_PWR_GOOD",
+            "BUCK_BST",
+            "BUCK_SW",
+        },
+        {"VBAT_PROT", "BUCK_EN_UVLO", "BUCK_FB", "PB_PWR_GOOD", "BUCK_SW"},
+    )
+
+
 def validate_input_protection_pin_contract() -> None:
     path = PB100_DIR / "PB-100-input-protection-pin-contract.csv"
     validate_csv(path)
@@ -1511,6 +1652,7 @@ def main() -> int:
     validate_schematic_readiness_dashboard()
     validate_output_channel_pin_contract()
     validate_output_controller_pin_template()
+    validate_input_and_power_pin_templates()
     validate_input_protection_pin_contract()
     validate_logic_power_design_placeholders()
     validate_net_naming_contract()

@@ -14,8 +14,8 @@ KiCad scaffold directory:
 | Sheet | Purpose | Primary artifacts |
 |---|---|---|
 | `PB-100.kicad_sch` | Top-level sheet, title block, review notes, sheet links | This file plus all child sheets |
-| `input-protection.kicad_sch` | Battery input, reverse protection, TVS, input current/voltage sense | `PB-100-input-reverse-protection.md`, `PB-100-input-protection-pin-contract.csv`, `PB-100-protection-validation.csv` |
-| `logic-power.kicad_sch` | Protected `PB_5V_OUT`, power-good, UVLO, local filters | `PB-100-logic-power-rails.md`, `PB-100-logic-power-budget.csv`, `PB-100-logic-power-design-placeholders.csv` |
+| `input-protection.kicad_sch` | Battery input, reverse protection, TVS, input current/voltage sense | `PB-100-input-reverse-protection.md`, `PB-100-input-protection-pin-contract.csv`, `PB-100-input-controller-pin-template.csv`, `PB-100-current-monitor-pin-template.csv`, `PB-100-protection-validation.csv` |
+| `logic-power.kicad_sch` | Protected `PB_5V_OUT`, power-good, UVLO, local filters | `PB-100-logic-power-rails.md`, `PB-100-logic-power-budget.csv`, `PB-100-logic-power-design-placeholders.csv`, `PB-100-logic-buck-pin-template.csv` |
 | `output-channel-template.kicad_sch` | Generic high-side output channel pattern | `PB-100-output-channel-matrix.csv`, `PB-100-output-channel-pin-contract.csv`, `PB-100-output-controller-pin-template.csv`, `PB-100-current-telemetry.md` |
 | `outputs-1-10.kicad_sch` | Ten instantiated generic outputs | `PB-100-schematic-instance-plan.csv` |
 | `telemetry.kicad_sch` | Total input current, voltage, thermal sensors, board ID | `PB-100-current-telemetry-map.csv`, `PB-100-thermal-telemetry-map.csv` |

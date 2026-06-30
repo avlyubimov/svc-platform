@@ -720,3 +720,19 @@ Reason: The output-channel schematic needs more detail than a controller symbol
 and high-level channel contract. A checked pin template lets OUT1 through OUT10
 share one reviewable pattern while preserving configuration-based role mapping
 and blocking value/footprint lock before schematic review.
+
+## 2026-06-30 — PB-100 input and power pin templates
+
+Decision: PB-100 now has checked pin templates for the LM74700 input
+ideal-diode controller, INA228 total-current monitor, and LM5164 logic buck:
+`PB-100-input-controller-pin-template.csv`,
+`PB-100-current-monitor-pin-template.csv`, and
+`PB-100-logic-buck-pin-template.csv`. Validation compares each template against
+`PB-100-symbol-pin-evidence.csv`, keeps all values and local networks
+non-final, and verifies the templates remain tied to schematic-review close
+work.
+
+Reason: Input protection, total-current measurement, and the protected logic
+rail are freeze-critical blocks. Capturing their pin-level intent now reduces
+schematic-review ambiguity while keeping Q1 package evidence, shunt calibration,
+UVLO, feedback, EMI, and sourcing decisions open until reviewed.

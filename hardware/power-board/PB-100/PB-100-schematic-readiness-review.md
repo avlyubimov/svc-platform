@@ -37,13 +37,16 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
+- `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
+- `hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
 - `hardware/power-board/PB-100/PB-100-kicad-sheet-manifest.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-capture-worklist.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-pin-evidence.csv`
+- `hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-input-protection-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
@@ -64,8 +67,8 @@ The schematic review packet consists of:
 | OUT2 SOA | Data-sheet SOA extraction against `PB-100-out2-soa-envelope.csv` |
 | Input reverse protection | Final MOSFET package choice, Q1 pin evidence, and 40 A copper/thermal review |
 | TVS/load dump | Clamp and overshoot margin against every selected downstream device |
-| Logic power | Final buck current budget, external values, EMI parts, UVLO, feedback, and power-good implementation |
-| Current telemetry | ADC scaling, filtering, calibration plan, and total-current monitor choice |
+| Logic power | LM5164 pin template, final buck current budget, external values, EMI parts, UVLO, feedback, and power-good implementation |
+| Current telemetry | INA228 pin template, ADC scaling, filtering, calibration plan, and total-current monitor choice |
 | Thermal telemetry | Final sensor values, placement notes, and derating thresholds |
 | B2B interface | Connector MPN, pin assignment review, and LB-100 MCU resource binding |
 | CAN1 safety | DNP/open TX path, default disable state, and status readback in schematic |

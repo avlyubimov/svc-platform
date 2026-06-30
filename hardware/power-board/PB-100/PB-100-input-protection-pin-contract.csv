@@ -4,7 +4,7 @@ J1,INPUT_CONNECTOR,PB100_INPUT_CONNECTOR_CLASS_PRELIM,Battery return,GND,Harness
 D1,INPUT_TVS,PB100_INPUT_TVS_PRELIM,Clamp high side,VBAT_RAW,Clamp to ground,Inactive until transient,TVS clamp and overshoot margin close
 D1,INPUT_TVS,PB100_INPUT_TVS_PRELIM,Clamp return,GND,Clamp to ground,Return path present,TVS pulse-current return review closes
 U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Input sense,VBAT_RAW,PB-100 sense,Tracks raw fused battery,Reverse-controller datasheet review closes
-U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Protected sense,VBAT_PROT,PB-100 sense,Valid after reverse path,Reverse-controller threshold and surge review closes
+U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Protected sense,VBAT_REV_PROT,PB-100 sense,Valid after reverse path,Reverse-controller threshold and surge review closes
 U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Reverse FET gate drive,INPUT_FET_GATE,Controller to FET,Off when controller unpowered,Gate clamp and turn-off behavior review closes
 Q1,INPUT_REVERSE_FET,PB100_INPUT_NMOS_TOLL_PRELIM,Raw-side power terminal,VBAT_RAW,Power path,Pending symbol and package evidence,TOLL pin evidence and 40 A thermal review close
 Q1,INPUT_REVERSE_FET,PB100_INPUT_NMOS_TOLL_PRELIM,Protected-side power terminal,VBAT_REV_PROT,Power path,Pending symbol and package evidence,TOLL pin evidence and 40 A thermal review close

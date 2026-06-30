@@ -1,13 +1,22 @@
 Net pattern,Domain,Primary sheet,Direction,Default state,Safety rule
 VBAT_RAW,High-current input,input-protection.kicad_sch,Input from harness,Fused by near-battery garage fuse,No PCB layout current geometry before schematic freeze
 INPUT_FET_GATE,Input reverse control,input-protection.kicad_sch,Controller to input MOSFET,Off when controller unpowered,Must remain local until Q1 TOLL pin evidence closes
+INPUT_PROT_EN,Input reverse control,input-protection.kicad_sch,Local enable network,TBD not final,Must close with default enable and service-disable review
+LM74700_VCAP,Input reverse local supply,input-protection.kicad_sch,Local charge-pump network,Capacitor TBD not final,Must close with capacitor value and voltage rating review
 VBAT_REV_PROT,High-current reverse-protected,input-protection.kicad_sch,Internal protected rail,Present after reverse FET,Must feed shunt and protected rail only after 40 A thermal review
 IIN_SHUNT_HI,Analog current sense,input-protection.kicad_sch,PB-100 sense,Zero-current baseline,Must use Kelvin sense and stay separate from load current path
 IIN_SHUNT_LO,Analog current sense,input-protection.kicad_sch,PB-100 sense,Zero-current baseline,Must use Kelvin sense and stay separate from load current path
+IIN_MON_A0,Monitor local strap,input-protection.kicad_sch,Local address strap,TBD not final,Must close with I2C address plan
+IIN_MON_A1,Monitor local strap,input-protection.kicad_sch,Local address strap,TBD not final,Must close with I2C address plan
 VBAT_PROT,High-current protected,input-protection.kicad_sch,Internal protected rail,Present after reverse protection,Must remain protected by reverse MOSFET and input TVS strategy
 VBAT_SENSE,Analog telemetry,input-protection.kicad_sch,PB-100 to LB-100,Scaled battery voltage,Must stay in ADC-safe voltage range
 IIN_SENSE,Analog telemetry,input-protection.kicad_sch,PB-100 to LB-100,Zero-current baseline,Must be derived from total input current path
 PB_5V_OUT,Protected logic power,logic-power.kicad_sch,PB-100 to LB-100,Off until buck valid,Must not be confused with accessory power output
+BUCK_EN_UVLO,Logic power local threshold,logic-power.kicad_sch,Local threshold network,TBD not final,Must close with cold-crank UVLO review
+BUCK_RON_SET,Logic power local programming,logic-power.kicad_sch,Local programming network,TBD not final,Must close with switching-frequency and load-budget review
+BUCK_FB,Logic power local feedback,logic-power.kicad_sch,Local feedback network,TBD not final,Must close with 5 V tolerance review
+BUCK_BST,Logic power local bootstrap,logic-power.kicad_sch,Local bootstrap network,Capacitor TBD not final,Must close with bootstrap value and voltage-rating review
+BUCK_SW,Logic power switching node,logic-power.kicad_sch,Local switching node,Inactive when buck disabled,Must close with inductor EMI and snubber review
 PB_PWR_GOOD,Logic status,logic-power.kicad_sch,PB-100 to LB-100,Fault/inactive until valid,Must reflect protected logic rail validity
 LB_3V3_IO,Logic reference,b2b-interface.kicad_sch,LB-100 to PB-100,Absent when LB-100 unpowered,PB-100 outputs must default off without valid logic reference
 OUTn_CTL,Output control,outputs-1-10.kicad_sch,LB-100 to PB-100,Pulled low/off,Must remain generic OUTn control and role-mapped by configuration
