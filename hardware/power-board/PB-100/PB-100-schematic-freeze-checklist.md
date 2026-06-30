@@ -62,6 +62,7 @@ Before marking this checklist `Closed`, the review packet must include:
 
 - Updated schematic package.
 - Updated schematic readiness dashboard.
+- Updated schematic freeze gap register with one row per conditional gate.
 - Final output channel matrix.
 - Final output-channel pin contract.
 - Final output-controller pin template.

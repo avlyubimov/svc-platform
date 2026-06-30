@@ -736,3 +736,17 @@ Reason: Input protection, total-current measurement, and the protected logic
 rail are freeze-critical blocks. Capturing their pin-level intent now reduces
 schematic-review ambiguity while keeping Q1 package evidence, shunt calibration,
 UVLO, feedback, EMI, and sourcing decisions open until reviewed.
+
+## 2026-06-30 — PB-100 schematic freeze gap register
+
+Decision: PB-100 now has
+`hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv` with one
+row for every `Conditional` gate in the schematic freeze checklist.
+`tools/validate_pb100.py` parses the checklist table, verifies exact register
+coverage, and keeps CAN1 DNP/open, Q1/TOLL/40 A, factory assembly alternatives,
+and garage user-scope close work explicit.
+
+Reason: The freeze checklist defines the gate, but the remaining work needs an
+operational register that can be assigned, reviewed, and closed without losing
+synchronization. Machine-checking the register prevents conditional gates from
+being silently omitted before schematic freeze.

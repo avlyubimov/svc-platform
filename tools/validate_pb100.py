@@ -153,6 +153,14 @@ SCHEMATIC_READINESS_DASHBOARD_COLUMNS = (
     "Machine check",
     "Remaining close work",
 )
+SCHEMATIC_FREEZE_GAP_REGISTER_COLUMNS = (
+    "Gate",
+    "Status",
+    "Close evidence required",
+    "Primary gap artifact",
+    "Validator coverage",
+    "Next close action",
+)
 OUTPUT_CHANNEL_PIN_CONTRACT_COLUMNS = (
     "Output",
     "Controller ref",
@@ -216,6 +224,7 @@ REQUIRED_READINESS_AREAS = {
     "PB-100 requirements",
     "Symbol readiness",
     "KiCad scaffold",
+    "Freeze gap register",
     "Instance map",
     "Sheet map",
     "Net domains",
@@ -1140,6 +1149,92 @@ def validate_schematic_readiness_dashboard() -> None:
         fail("CAN1 safety dashboard row must keep DNP/open and future ADR explicit")
 
 
+def freeze_checklist_gates_by_status() -> dict[str, str]:
+    text = read_text(PB100_DIR / "PB-100-schematic-freeze-checklist.md")
+    gates_by_status: dict[str, str] = {}
+    for line in text.splitlines():
+        if not line.startswith("| "):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if len(cells) < 4 or cells[0] in {"Gate", "---"}:
+            continue
+        gate, status = cells[0], cells[1]
+        if status in {"Closed", "Conditional", "Open", "Blocked"}:
+            gates_by_status[gate] = status
+    return gates_by_status
+
+
+def validate_schematic_freeze_gap_register() -> None:
+    path = PB100_DIR / "PB-100-schematic-freeze-gap-register.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty schematic freeze gap register: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in SCHEMATIC_FREEZE_GAP_REGISTER_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    gates_by_status = freeze_checklist_gates_by_status()
+    conditional_gates = {gate for gate, status in gates_by_status.items() if status == "Conditional"}
+    seen_gates = set()
+    rows_by_gate: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        gate = row["Gate"].strip()
+        status = row["Status"].strip()
+        if gate in seen_gates:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Gate {gate}")
+        seen_gates.add(gate)
+        rows_by_gate[gate] = row
+        if gate not in gates_by_status:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown freeze checklist gate {gate}")
+        if status != "Conditional":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: gap register rows must remain Conditional")
+        if gates_by_status[gate] != "Conditional":
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: gate {gate} is "
+                f"{gates_by_status[gate]} in freeze checklist but present in gap register"
+            )
+        for column in (
+            "Close evidence required",
+            "Primary gap artifact",
+            "Validator coverage",
+            "Next close action",
+        ):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+
+    missing_gates = sorted(conditional_gates - seen_gates)
+    extra_gates = sorted(seen_gates - conditional_gates)
+    if missing_gates:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing conditional gates: "
+            f"{', '.join(missing_gates)}"
+        )
+    if extra_gates:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} has non-conditional gates: "
+            f"{', '.join(extra_gates)}"
+        )
+
+    can_text = " ".join(rows_by_gate["CAN1 safety policy"].values()).lower()
+    if "dnp/open" not in can_text or "default" not in can_text:
+        fail("CAN1 safety policy gap must keep DNP/open default explicit")
+    input_text = " ".join(rows_by_gate["Input reverse protection"].values())
+    if "Q1" not in input_text or "40 A" not in input_text or "TOLL" not in input_text:
+        fail("Input reverse protection gap must keep Q1 TOLL and 40 A review explicit")
+    factory_text = " ".join(rows_by_gate["Factory assembly readiness"].values()).lower()
+    if "assembly" not in factory_text or "alternat" not in factory_text:
+        fail("Factory assembly readiness gap must keep assembly and alternatives explicit")
+    garage_text = " ".join(rows_by_gate["Garage assembly readiness"].values()).lower()
+    if "garage" not in garage_text or "user" not in garage_text:
+        fail("Garage assembly readiness gap must keep garage/user scope explicit")
+
+
 def validate_output_channel_pin_contract() -> None:
     path = PB100_DIR / "PB-100-output-channel-pin-contract.csv"
     validate_csv(path)
@@ -1650,6 +1745,7 @@ def main() -> int:
     validate_net_domain_plan()
     validate_bom_symbol_map()
     validate_schematic_readiness_dashboard()
+    validate_schematic_freeze_gap_register()
     validate_output_channel_pin_contract()
     validate_output_controller_pin_template()
     validate_input_and_power_pin_templates()

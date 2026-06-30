@@ -23,6 +23,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-schematic-package.md`
 - `hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
+- `hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-matrix.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`

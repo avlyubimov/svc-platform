@@ -44,6 +44,7 @@ manufacturing outputs are also blocked by repository validation.
 - `../PB-100-symbol-pin-evidence.csv`
 - `../PB-100-symbol-open-items.md`
 - `../PB-100-schematic-freeze-checklist.md`
+- `../PB-100-schematic-freeze-gap-register.csv`
 
 ## Next KiCad work
 
