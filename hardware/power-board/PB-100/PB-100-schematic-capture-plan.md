@@ -25,6 +25,9 @@ KiCad scaffold directory:
 Placeholder child sheets are tracked in
 `hardware/power-board/PB-100/kicad/sheets/`.
 
+Reference-to-sheet assignment is tracked in
+`hardware/power-board/PB-100/PB-100-schematic-sheet-reference-map.csv`.
+
 ## Capture order
 
 1. Open `hardware/power-board/PB-100/kicad/PB-100.kicad_pro`.
@@ -53,6 +56,7 @@ Placeholder child sheets are tracked in
 - ERC report.
 - Updated instance table with final references.
 - Updated instance-symbol map linking every reference to a symbol key.
+- Updated sheet-reference map linking every reference to a capture sheet.
 - Updated symbol/MPN readiness table with concrete symbol and footprint status.
 - Updated symbol capture worklist with pin evidence and blocked actions.
 - Updated symbol pin evidence table for created preliminary symbols.

@@ -113,6 +113,13 @@ INSTANCE_SYMBOL_MAP_COLUMNS = (
     "Symbol state",
     "Notes",
 )
+SHEET_REFERENCE_MAP_COLUMNS = (
+    "Sheet file",
+    "Ref",
+    "Symbol key",
+    "Capture status",
+    "Notes",
+)
 
 
 def fail(message: str) -> None:
@@ -686,6 +693,71 @@ def validate_instance_symbol_map() -> None:
             fail("Q102 instance-symbol map must preserve the OUT2 escape-FET note")
 
 
+def validate_sheet_reference_map() -> None:
+    path = PB100_DIR / "PB-100-schematic-sheet-reference-map.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty sheet-reference map: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in SHEET_REFERENCE_MAP_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    instance_map_path = PB100_DIR / "PB-100-schematic-instance-symbol-map.csv"
+    instance_rows = list(csv.DictReader(instance_map_path.open(newline="", encoding="utf-8")))
+    symbol_by_ref = {row["Ref"].strip(): row["Symbol key"].strip() for row in instance_rows}
+    expected_refs = set(symbol_by_ref)
+    seen_refs = set()
+    allowed_virtual_sheets = {"cross-sheet-review"}
+    allowed_statuses = {"Planned", "Pending symbol", "Review-defined"}
+
+    for row_number, row in enumerate(rows, 2):
+        sheet_file = row["Sheet file"].strip()
+        ref = row["Ref"].strip()
+        symbol_key = row["Symbol key"].strip()
+        capture_status = row["Capture status"].strip()
+        if ref in seen_refs:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate ref {ref}")
+        seen_refs.add(ref)
+        if ref not in symbol_by_ref:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown instance ref {ref}")
+        if symbol_key != symbol_by_ref[ref]:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: {ref} uses {symbol_key}, "
+                f"but instance-symbol map uses {symbol_by_ref[ref]}"
+            )
+        if capture_status not in allowed_statuses:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid capture status {capture_status}")
+        if not row["Notes"].strip():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty Notes")
+        if sheet_file not in allowed_virtual_sheets:
+            sheet_path = KICAD_DIR / "sheets" / sheet_file
+            if not sheet_path.exists():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: missing sheet file {sheet_file}")
+        if ref == "Q1" and capture_status != "Pending symbol":
+            fail("Q1 must remain marked Pending symbol while INPUT_REVERSE_FET is open")
+        if ref == "TP1..TPn" and sheet_file != "cross-sheet-review":
+            fail("TP1..TPn must remain cross-sheet-review until exact test point locations close")
+
+    missing_refs = sorted(expected_refs - seen_refs)
+    extra_refs = sorted(seen_refs - expected_refs)
+    if missing_refs:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing refs from instance-symbol map: "
+            f"{', '.join(missing_refs)}"
+        )
+    if extra_refs:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} has refs not in instance-symbol map: "
+            f"{', '.join(extra_refs)}"
+        )
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -716,6 +788,7 @@ def main() -> int:
     validate_symbol_pin_evidence()
     validate_jpb1_symbol_from_pin_map()
     validate_instance_symbol_map()
+    validate_sheet_reference_map()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0

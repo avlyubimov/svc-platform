@@ -1,0 +1,57 @@
+Sheet file,Ref,Symbol key,Capture status,Notes
+input-protection.kicad_sch,J1,INPUT_CONNECTOR,Planned,Battery input connector class
+input-protection.kicad_sch,D1,INPUT_TVS,Planned,Input TVS
+input-protection.kicad_sch,U1,INPUT_IDEAL_DIODE,Planned,Reverse-protection controller
+input-protection.kicad_sch,Q1,INPUT_REVERSE_FET,Pending symbol,Input reverse MOSFET TOLL symbol still open
+input-protection.kicad_sch,RSH1,TOTAL_CURRENT_SHUNT,Planned,Total input current shunt
+input-protection.kicad_sch,U2,TOTAL_CURRENT_MONITOR,Planned,Total input current monitor
+logic-power.kicad_sch,U3,LOGIC_BUCK,Planned,Protected 5 V buck regulator
+logic-power.kicad_sch,L1,LOGIC_BUCK_INDUCTOR,Planned,Protected 5 V buck inductor
+b2b-interface.kicad_sch,JPB1,B2B_CONNECTOR,Planned,PB-100 to LB-100 interface
+outputs-1-10.kicad_sch,U101,HS_CTRL,Planned,OUT1 controller
+outputs-1-10.kicad_sch,Q101,OUT_FET,Planned,OUT1 MOSFET
+outputs-1-10.kicad_sch,F101,OUTPUT_FUSE_HOLDER,Planned,OUT1 fuse
+outputs-1-10.kicad_sch,J101,OUTPUT_CONNECTOR,Planned,OUT1 connector
+outputs-1-10.kicad_sch,U102,HS_CTRL,Planned,OUT2 controller
+outputs-1-10.kicad_sch,Q102,OUT_FET,Planned,OUT2 MOSFET with conditional OUT2_ESCAPE_FET note
+outputs-1-10.kicad_sch,F102,OUTPUT_FUSE_HOLDER,Planned,OUT2 fuse
+outputs-1-10.kicad_sch,J102,OUTPUT_CONNECTOR,Planned,OUT2 connector
+outputs-1-10.kicad_sch,U103,HS_CTRL,Planned,OUT3 controller
+outputs-1-10.kicad_sch,Q103,OUT_FET,Planned,OUT3 MOSFET
+outputs-1-10.kicad_sch,F103,OUTPUT_FUSE_HOLDER,Planned,OUT3 fuse
+outputs-1-10.kicad_sch,J103,OUTPUT_CONNECTOR,Planned,OUT3 connector
+outputs-1-10.kicad_sch,U104,HS_CTRL,Planned,OUT4 controller
+outputs-1-10.kicad_sch,Q104,OUT_FET,Planned,OUT4 MOSFET
+outputs-1-10.kicad_sch,F104,OUTPUT_FUSE_HOLDER,Planned,OUT4 fuse
+outputs-1-10.kicad_sch,J104,OUTPUT_CONNECTOR,Planned,OUT4 connector
+outputs-1-10.kicad_sch,U105,HS_CTRL,Planned,OUT5 controller
+outputs-1-10.kicad_sch,Q105,OUT_FET,Planned,OUT5 MOSFET
+outputs-1-10.kicad_sch,F105,OUTPUT_FUSE_HOLDER,Planned,OUT5 fuse
+outputs-1-10.kicad_sch,J105,OUTPUT_CONNECTOR,Planned,OUT5 connector
+outputs-1-10.kicad_sch,U106,HS_CTRL,Planned,OUT6 controller
+outputs-1-10.kicad_sch,Q106,OUT_FET,Planned,OUT6 MOSFET
+outputs-1-10.kicad_sch,F106,OUTPUT_FUSE_HOLDER,Planned,OUT6 fuse
+outputs-1-10.kicad_sch,J106,OUTPUT_CONNECTOR,Planned,OUT6 connector
+outputs-1-10.kicad_sch,U107,HS_CTRL,Planned,OUT7 controller
+outputs-1-10.kicad_sch,Q107,OUT_FET,Planned,OUT7 MOSFET
+outputs-1-10.kicad_sch,F107,OUTPUT_FUSE_HOLDER,Planned,OUT7 fuse
+outputs-1-10.kicad_sch,J107,OUTPUT_CONNECTOR,Planned,OUT7 connector
+outputs-1-10.kicad_sch,U108,HS_CTRL,Planned,OUT8 controller
+outputs-1-10.kicad_sch,Q108,OUT_FET,Planned,OUT8 MOSFET
+outputs-1-10.kicad_sch,F108,OUTPUT_FUSE_HOLDER,Planned,OUT8 fuse
+outputs-1-10.kicad_sch,J108,OUTPUT_CONNECTOR,Planned,OUT8 connector
+outputs-1-10.kicad_sch,U109,HS_CTRL,Planned,OUT9 controller
+outputs-1-10.kicad_sch,Q109,OUT_FET,Planned,OUT9 MOSFET
+outputs-1-10.kicad_sch,F109,OUTPUT_FUSE_HOLDER,Planned,OUT9 fuse
+outputs-1-10.kicad_sch,J109,OUTPUT_CONNECTOR,Planned,OUT9 connector
+outputs-1-10.kicad_sch,U110,HS_CTRL,Planned,OUT10 controller
+outputs-1-10.kicad_sch,Q110,OUT_FET,Planned,OUT10 MOSFET
+outputs-1-10.kicad_sch,F110,OUTPUT_FUSE_HOLDER,Planned,OUT10 fuse
+outputs-1-10.kicad_sch,J110,OUTPUT_CONNECTOR,Planned,OUT10 connector
+telemetry.kicad_sch,RT1,THERMAL_NTC,Planned,TEMP_PCB sensor
+telemetry.kicad_sch,RT2,THERMAL_NTC,Planned,TEMP_PWR_A sensor
+telemetry.kicad_sch,RT3,THERMAL_NTC,Planned,TEMP_PWR_B sensor
+telemetry.kicad_sch,RID1,BOARD_ID_RESISTOR,Planned,Board identity resistor network
+can1-safety.kicad_sch,JP_CAN1,CAN1_TX_DISABLE,Planned,DNP/open CAN1 TX link
+can1-safety.kicad_sch,U_CAN1,CAN1_TX_DISABLE,Planned,Conditional CAN1 TX disable gate
+cross-sheet-review,TP1..TPn,TEST_POINT,Review-defined,Exact test point locations are defined during schematic review

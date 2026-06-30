@@ -96,6 +96,9 @@ Schematic instance plan CSV:
 Schematic instance-symbol map CSV:
 `hardware/power-board/PB-100/PB-100-schematic-instance-symbol-map.csv`.
 
+Schematic sheet-reference map CSV:
+`hardware/power-board/PB-100/PB-100-schematic-sheet-reference-map.csv`.
+
 ## Power-path candidates
 
 Candidate MPN CSV:

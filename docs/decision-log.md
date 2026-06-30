@@ -643,3 +643,16 @@ worklist consistency, created/pending state, and the OUT2 escape-FET note.
 Reason: Schematic capture needs a controlled path from planned references
 (`U101`, `Q102`, `JPB1`, `TP1..TPn`) to project-local symbols before real
 schematic placement starts.
+
+## 2026-06-30 — PB-100 sheet-reference map
+
+Decision: PB-100 now has
+`hardware/power-board/PB-100/PB-100-schematic-sheet-reference-map.csv`, assigning
+every planned schematic reference to a KiCad child sheet or an explicit
+cross-sheet review bucket. Validation checks reference coverage, sheet file
+existence, symbol-key consistency, Q1 pending-symbol status, and `TP1..TPn`
+review-defined handling.
+
+Reason: Schematic capture should place references deliberately by block instead
+of relying on ad hoc sheet edits. This preserves the no-layout boundary while
+making the KiCad capture sequence reviewable.
