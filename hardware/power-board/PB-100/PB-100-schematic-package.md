@@ -15,6 +15,7 @@ It is not a PCB layout package.
 - `docs/adr/ADR-0010-pb-100-power-path-candidate-strategy.md`
 - `docs/production/component-family-shortlist.md`
 - `hardware/power-board/PB-100/PB-100-preliminary-validation.md`
+- `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
 
 ## Electrical baseline
 
@@ -95,6 +96,8 @@ Preliminary validation tables:
 
 ## Schematic freeze blockers
 
+- Track schematic-freeze readiness in
+  `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`.
 - Validate candidate MPNs in `PB-100-power-path-candidates.csv`.
 - Resolve SM8S33A-class TVS clamp compatibility with 40 V smart switches.
 - Confirm high-side switch/controller thermal limits.

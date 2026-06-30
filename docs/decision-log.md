@@ -105,3 +105,13 @@ power-path devices, but it is not accepted for any direct 40 V smart-switch rail
 Reason: Its clamp voltage class can exceed 40 V device limits. Low-current
 smart-switch channels need a lower-clamp protection strategy or must move to the
 external-controller architecture.
+
+## 2026-06-30 — PB-100 schematic freeze gate
+
+Decision: PB-100 schematic freeze is gated by
+`hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md` before any
+PCB layout work.
+
+Reason: Architecture v1.0 authorizes schematic planning, but PCB layout must
+remain blocked until unresolved protection, thermal, pin-map, BOM, and CAN1
+listen-only implementation evidence is closed.

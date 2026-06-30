@@ -13,6 +13,7 @@ Status: Complete
 Status: In progress
 
 - Schematic package
+- Schematic freeze checklist
 - Schematic
 - PCB
 - Gerber
