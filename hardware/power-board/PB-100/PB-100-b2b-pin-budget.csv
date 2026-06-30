@@ -1,0 +1,101 @@
+Pin,Signal,Group,Direction,Requirement,Notes
+1,GND,Power,PB-100/LB-100,Core,Ground return
+2,GND,Power,PB-100/LB-100,Core,Ground return
+3,GND,Power,PB-100/LB-100,Core,Ground return
+4,GND,Power,PB-100/LB-100,Core,Ground return
+5,GND,Power,PB-100/LB-100,Core,Ground return
+6,GND,Power,PB-100/LB-100,Core,Ground return
+7,GND,Power,PB-100/LB-100,Core,Ground return
+8,GND,Power,PB-100/LB-100,Core,Ground return
+9,GND,Power,PB-100/LB-100,Core,Ground return
+10,GND,Power,PB-100/LB-100,Core,Ground return
+11,AGND,Power,PB-100/LB-100,Core,Analog ground reference
+12,AGND,Power,PB-100/LB-100,Core,Analog ground reference
+13,PB_5V_OUT,Power,PB-100 to LB-100,Core,Protected logic supply
+14,PB_5V_OUT,Power,PB-100 to LB-100,Core,Protected logic supply
+15,PB_5V_OUT,Power,PB-100 to LB-100,Core,Protected logic supply
+16,PB_5V_OUT,Power,PB-100 to LB-100,Core,Protected logic supply
+17,LB_3V3_IO,Power,LB-100 to PB-100,Core,Logic-level reference for PB-side interfaces
+18,LB_3V3_IO,Power,LB-100 to PB-100,Core,Logic-level reference for PB-side interfaces
+19,PB_PWR_GOOD,Status,PB-100 to LB-100,Core,Logic power-good status
+20,PB_WAKE_REQ,Status,PB-100 to LB-100,Should,Wake or fault wake request
+21,OUT1_CTL,Output control,LB-100 to PB-100,Core,Enable or PWM command
+22,OUT2_CTL,Output control,LB-100 to PB-100,Core,Enable or PWM command
+23,OUT3_CTL,Output control,LB-100 to PB-100,Core,Enable or PWM command
+24,OUT4_CTL,Output control,LB-100 to PB-100,Core,Enable or PWM command
+25,OUT5_CTL,Output control,LB-100 to PB-100,Core,Enable or PWM command
+26,OUT6_CTL,Output control,LB-100 to PB-100,Core,Enable or PWM command
+27,OUT7_CTL,Output control,LB-100 to PB-100,Core,Enable or PWM command
+28,OUT8_CTL,Output control,LB-100 to PB-100,Core,Enable or PWM command
+29,OUT9_CTL,Output control,LB-100 to PB-100,Core,Enable or PWM command
+30,OUT10_CTL,Output control,LB-100 to PB-100,Core,Enable or PWM command
+31,OUT1_FLT,Output fault,PB-100 to LB-100,Core,Fault or diagnostic status
+32,OUT2_FLT,Output fault,PB-100 to LB-100,Core,Fault or diagnostic status
+33,OUT3_FLT,Output fault,PB-100 to LB-100,Core,Fault or diagnostic status
+34,OUT4_FLT,Output fault,PB-100 to LB-100,Core,Fault or diagnostic status
+35,OUT5_FLT,Output fault,PB-100 to LB-100,Core,Fault or diagnostic status
+36,OUT6_FLT,Output fault,PB-100 to LB-100,Core,Fault or diagnostic status
+37,OUT7_FLT,Output fault,PB-100 to LB-100,Core,Fault or diagnostic status
+38,OUT8_FLT,Output fault,PB-100 to LB-100,Core,Fault or diagnostic status
+39,OUT9_FLT,Output fault,PB-100 to LB-100,Core,Fault or diagnostic status
+40,OUT10_FLT,Output fault,PB-100 to LB-100,Core,Fault or diagnostic status
+41,OUT1_IMON,Output telemetry,PB-100 to LB-100,Core,Analog current monitor or mux input
+42,OUT2_IMON,Output telemetry,PB-100 to LB-100,Core,Analog current monitor or mux input
+43,OUT3_IMON,Output telemetry,PB-100 to LB-100,Core,Analog current monitor or mux input
+44,OUT4_IMON,Output telemetry,PB-100 to LB-100,Core,Analog current monitor or mux input
+45,OUT5_IMON,Output telemetry,PB-100 to LB-100,Core,Analog current monitor or mux input
+46,OUT6_IMON,Output telemetry,PB-100 to LB-100,Core,Analog current monitor or mux input
+47,OUT7_IMON,Output telemetry,PB-100 to LB-100,Core,Analog current monitor or mux input
+48,OUT8_IMON,Output telemetry,PB-100 to LB-100,Core,Analog current monitor or mux input
+49,OUT9_IMON,Output telemetry,PB-100 to LB-100,Core,Analog current monitor or mux input
+50,OUT10_IMON,Output telemetry,PB-100 to LB-100,Core,Analog current monitor or mux input
+51,VBAT_SENSE,Board telemetry,PB-100 to LB-100,Core,Battery input voltage telemetry
+52,IIN_SENSE,Board telemetry,PB-100 to LB-100,Core,Total input current telemetry
+53,TEMP_PCB,Board telemetry,PB-100 to LB-100,Core,PCB temperature telemetry
+54,TEMP_PWR_A,Board telemetry,PB-100 to LB-100,Core,Power-zone temperature telemetry
+55,TEMP_PWR_B,Board telemetry,PB-100 to LB-100,Should,Second power-zone temperature telemetry
+56,PB_FAULT,Board telemetry,PB-100 to LB-100,Core,Board-level fault summary
+57,PB_I2C_SCL,Digital bus,LB-100 to PB-100,Should,PB-side monitor or identity bus
+58,PB_I2C_SDA,Digital bus,LB-100/PB-100,Should,PB-side monitor or identity bus
+59,PB_I2C_INT,Digital bus,PB-100 to LB-100,Should,Monitor interrupt
+60,PB_ID_ADC,Board identity,PB-100 to LB-100,Should,Resistor-coded board revision fallback
+61,PB_SPI_SCK,Digital bus,LB-100 to PB-100,Future,Reserved for SPI monitors
+62,PB_SPI_MISO,Digital bus,PB-100 to LB-100,Future,Reserved for SPI monitors
+63,PB_SPI_MOSI,Digital bus,LB-100 to PB-100,Future,Reserved for SPI monitors
+64,PB_SPI_CS0,Digital bus,LB-100 to PB-100,Future,Reserved for SPI monitors
+65,PB_SPI_CS1,Digital bus,LB-100 to PB-100,Future,Reserved for SPI monitors
+66,ADC_REF,Analog,LB-100 to PB-100,Should,Analog reference if external ADC strategy is used
+67,CAN1_TX_DISABLE_CMD,CAN safety,LB-100 to PB-100,Core if CAN1 crosses PB,CAN1 TX hardware disable command
+68,CAN1_TX_DISABLED_STATUS,CAN safety,PB-100 to LB-100,Core if CAN1 crosses PB,CAN1 TX hardware disable status
+69,CAN1_RX_ROUTE,CAN safety,PB-100 to LB-100,Future,DNP unless vehicle CAN physically routes through PB-100
+70,CAN1_TX_ROUTE,CAN safety,LB-100 to PB-100,Future,DNP and hardware-gated unless future ADR allows
+71,CAN2_RX_ROUTE,Expansion,PB-100 to LB-100,Future,Expansion connector route if needed
+72,CAN2_TX_ROUTE,Expansion,LB-100 to PB-100,Future,Expansion connector route if needed
+73,LIN_TX,Expansion,LB-100 to PB-100,Future,LIN footprint route
+74,LIN_RX,Expansion,PB-100 to LB-100,Future,LIN footprint route
+75,RS485_DE,Expansion,LB-100 to PB-100,Future,RS485 direction enable
+76,RS485_RX,Expansion,PB-100 to LB-100,Future,RS485 receive route
+77,RS485_TX,Expansion,LB-100 to PB-100,Future,RS485 transmit route
+78,UART_TX,Expansion,LB-100 to PB-100,Future,Accessory UART route
+79,UART_RX,Expansion,PB-100 to LB-100,Future,Accessory UART route
+80,EXT_ADC1,Expansion,PB-100 to LB-100,Future,External analog input route
+81,EXT_ADC2,Expansion,PB-100 to LB-100,Future,External analog input route
+82,EXT_DIG1,Expansion,PB-100 to LB-100,Future,External digital input route
+83,EXT_DIG2,Expansion,PB-100 to LB-100,Future,External digital input route
+84,EXT_5V_EN,Expansion,LB-100 to PB-100,Future,External sensor supply enable
+85,SPARE_01,Reserve,Mixed,Future,Reserved
+86,SPARE_02,Reserve,Mixed,Future,Reserved
+87,SPARE_03,Reserve,Mixed,Future,Reserved
+88,SPARE_04,Reserve,Mixed,Future,Reserved
+89,SPARE_05,Reserve,Mixed,Future,Reserved
+90,SPARE_06,Reserve,Mixed,Future,Reserved
+91,SPARE_07,Reserve,Mixed,Future,Reserved
+92,SPARE_08,Reserve,Mixed,Future,Reserved
+93,SPARE_09,Reserve,Mixed,Future,Reserved
+94,SPARE_10,Reserve,Mixed,Future,Reserved
+95,SPARE_11,Reserve,Mixed,Future,Reserved
+96,SPARE_12,Reserve,Mixed,Future,Reserved
+97,SPARE_13,Reserve,Mixed,Future,Reserved
+98,SPARE_14,Reserve,Mixed,Future,Reserved
+99,SPARE_15,Reserve,Mixed,Future,Reserved
+100,SPARE_16,Reserve,Mixed,Future,Reserved

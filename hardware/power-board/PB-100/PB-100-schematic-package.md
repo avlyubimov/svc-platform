@@ -46,6 +46,9 @@ It is not a PCB layout package.
 
 ## Board-to-board signal budget
 
+Logical pin-budget CSV:
+`hardware/power-board/PB-100/PB-100-b2b-pin-budget.csv`.
+
 | Signal group | Count target | Direction | Notes |
 |---|---:|---|---|
 | Power and grounds | 20-30 pins | PB-100/LB-100 | Multiple grounds and supply pins for current return and signal integrity |
@@ -59,6 +62,14 @@ It is not a PCB layout package.
 The initial 100-pin mezzanine target remains plausible, but final pin assignment
 requires schematic-level tradeoff between direct signals, multiplexed telemetry,
 and digital monitor buses.
+
+## Output channel matrix
+
+Output matrix CSV:
+`hardware/power-board/PB-100/PB-100-output-channel-matrix.csv`.
+
+The matrix keeps hardware outputs generic while carrying the BMW K25 reference
+defaults needed for sizing and bench tests.
 
 ## Net naming rules
 

@@ -34,3 +34,5 @@ This board is intended to remain compatible across future Logic Board revisions.
 ## Implementation package
 
 Schematic planning starts in `hardware/power-board/PB-100/PB-100-schematic-package.md`.
+The initial logical board-to-board pin budget is
+`hardware/power-board/PB-100/PB-100-b2b-pin-budget.csv`.
