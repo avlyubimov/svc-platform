@@ -38,7 +38,7 @@ this checklist can close.
 | Current telemetry | Conditional | `docs/requirements/pb-100-requirements.md`, `hardware/power-board/PB-100/PB-100-current-telemetry.md`, `hardware/power-board/PB-100/PB-100-current-telemetry-map.csv` | Per-output current and total input current measurement ranges are selected and mapped to LB-100 |
 | Thermal telemetry | Conditional | `docs/requirements/pb-100-requirements.md`, `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-map.csv` | PCB and power-zone temperature sensing strategy is selected and mapped to LB-100 |
 | Factory assembly readiness | Conditional | `docs/production/component-family-shortlist.md`, `production/bom/factory_bom_draft.csv` | Critical components have at least two alternatives and assembly-source status is checked |
-| Garage assembly readiness | Conditional | `production/bom/garage_bom_draft.csv` | User-installed items are limited to connectors, fuses, enclosure hardware, and wiring |
+| Garage assembly readiness | Conditional | `production/bom/garage_bom_draft.csv`, `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md` | User-installed items are limited to connectors, fuses, enclosure hardware, and wiring |
 | Bench validation plan | Closed | `docs/testing/test-plan.md` | PB-100 bring-up, protection, thermal, current-budget, and CAN1 listen-only tests are explicitly listed |
 
 ## Active blockers

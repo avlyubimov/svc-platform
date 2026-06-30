@@ -18,6 +18,7 @@ It is not a PCB layout package.
 - `docs/production/component-family-shortlist.md`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
+- `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
@@ -104,6 +105,8 @@ Preliminary validation tables:
 
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
 - `hardware/power-board/PB-100/PB-100-kicad-footprint-plan.csv`
+- `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
+- `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-budget.csv`

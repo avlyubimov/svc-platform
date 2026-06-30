@@ -31,3 +31,6 @@ Everything installed manually:
 ## Rule
 
 If a part is QFN, LQFP, 0402, 0603, or otherwise annoying to solder manually, it belongs in Factory BOM.
+
+PB-100 garage connector and fuse planning is tracked in
+`hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`.

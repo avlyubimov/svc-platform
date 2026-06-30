@@ -1,12 +1,13 @@
 Category,Item,Suggested spec,Qty,Buy/Install,Priority,Notes
-Protection,MAXI fuse holder,Waterproof inline 50A,1,Garage,Core,Install near battery per ADR-0008
+Protection,Littelfuse MAXI fuse holder,MAXI 152 or MAH sealed inline 50A class,1,Garage,Core,Install near battery per ADR-0008
 Protection,MAXI fuses,50A,2,Garage,Core,One spare
-Connectors,Deutsch DT 2-pin sets,For outputs,10,Garage,Core,Power outputs
+Connectors,Deutsch DTP 2-pin sets,OUT1/OUT2 high-current outputs,2,Garage,Core,DTP class for 15A/20A fuse outputs
+Connectors,Deutsch DT 2-pin sets,OUT3-OUT10 outputs,8,Garage,Core,DT class for 5A/10A fuse outputs
 Connectors,Deutsch DTM 4-pin sets,CAN/service,2,Garage,Core,CAN/inputs
 Connectors,Deutsch DTM 8-pin set,External inputs,1,Garage,Should,Buttons/ADC/pulse
 Fuses,Mini/ATO blade fuses,5/10/15/20A kit,1,Garage,Core,Per channel
-Wire,Automotive wire red/black,4 mm²,2,Garage,Core,Battery input
-Wire,Automotive wire,2.5 mm²,5,Garage,Core,High-load outputs
+Wire,Automotive wire red/black,4 mm² or larger after derating,2,Garage,Core,Battery input
+Wire,Automotive wire,2.5 mm² or larger after derating,5,Garage,Core,High-load outputs
 Wire,Automotive wire,0.5–1.0 mm²,5,Garage,Core,Signals/CAN
 Harness,Tesa cloth tape,Automotive harness tape,1,Garage,Core,User already has analog
 Harness,Adhesive heat shrink,Assorted,1,Garage,Core,Harness sealing

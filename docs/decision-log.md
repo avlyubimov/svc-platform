@@ -264,3 +264,13 @@ Decision: PB-100 schematic-planning and KiCad scaffold artifacts are validated b
 
 Reason: The project now has enough generated CSV and KiCad text artifacts that
 basic structural checks must be automated before commits and pushes.
+
+## 2026-06-30 — PB-100 garage connector and fuse families
+
+Decision: PB-100 garage planning uses DEUTSCH DTP class for OUT1/OUT2,
+DEUTSCH DT class for OUT3-OUT10, DEUTSCH DTM class for signal/CAN connectors,
+and Littelfuse MAXI-class sealed inline holder for the main battery fuse.
+
+Reason: DT contacts are too close for the 15 A and 20 A fuse output classes,
+while DTP provides the needed high-current connector class. DTM remains a signal
+connector family, not a power-output family.

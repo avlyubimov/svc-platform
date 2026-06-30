@@ -1,0 +1,16 @@
+Interface,Target current or fuse,Connector or fuse family,Status,Notes
+Battery input,50A main fuse / 40A board budget,High-current sealed connector or ring-lug harness entry TBD,Conditional,Must be derated before schematic freeze
+Main harness fuse,50A,Littelfuse MAXI 152 or MAH sealed inline holder,Candidate,Install near battery
+OUT1,15A fuse / 12A limit,DEUTSCH DTP 2-pin class,Candidate,DT 13A class is too close for 15A fuse class
+OUT2,20A fuse / 18A limit,DEUTSCH DTP 2-pin class,Candidate,Compressor reference load requires DTP class
+OUT3,10A fuse / 8A limit,DEUTSCH DT 2-pin class,Candidate,DT size 16 contact class has margin
+OUT4,10A fuse / 8A limit,DEUTSCH DT 2-pin class,Candidate,DT size 16 contact class has margin
+OUT5,5A fuse / 4A limit,DEUTSCH DT 2-pin class,Candidate,DT chosen for output connector commonality
+OUT6,10A fuse / 8A limit,DEUTSCH DT 2-pin class,Candidate,DT size 16 contact class has margin
+OUT7,10A fuse / 8A limit,DEUTSCH DT 2-pin class,Candidate,DT size 16 contact class has margin
+OUT8,5A fuse / 4A limit,DEUTSCH DT 2-pin class,Candidate,DT chosen for output connector commonality
+OUT9,5A fuse / 4A limit,DEUTSCH DT 2-pin class,Candidate,DT chosen for output connector commonality
+OUT10,10A fuse / 8A limit,DEUTSCH DT 2-pin class,Candidate,DT size 16 contact class has margin
+CAN/service,Signal current,DEUTSCH DTM 4-pin class,Candidate,DTM is signal/CAN class
+External inputs,Signal current,DEUTSCH DTM 8-pin class,Candidate,Buttons ADC pulse and low-current signals
+Per-channel fuses,5A 10A 15A 20A,MINI/ATO blade fuse family,Candidate,Final holder style depends on enclosure
