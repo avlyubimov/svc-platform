@@ -52,6 +52,7 @@ Current host-tested services:
 - Configuration Validator
 - Event Bus
 - Event Dispatcher
+- Event Log
 - Power Budget
 - Output Manager
 - Battery Protection

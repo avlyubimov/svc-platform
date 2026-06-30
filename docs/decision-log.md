@@ -465,3 +465,13 @@ Manager budget path.
 
 Reason: Callers should not duplicate telemetry freshness logic or pass raw
 validity flags around once a central snapshot service exists.
+
+## 2026-06-30 — Firmware event log ring buffer
+
+Decision: Firmware now has a host-testable fixed-size Event Log ring buffer that
+stores timestamped events, preserves the latest entries on overflow, and counts
+dropped entries.
+
+Reason: Diagnostics and future service APIs need deterministic logging without
+dynamic allocation before persistent storage or transport-specific logging is
+added.

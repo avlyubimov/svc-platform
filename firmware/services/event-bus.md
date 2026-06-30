@@ -41,3 +41,9 @@ Rule condition state consumes selected events:
 - `SVC_EVENT_HIGH_BEAM_OFF`
 - `SVC_EVENT_LEFT_INDICATOR_ON`
 - `SVC_EVENT_LEFT_INDICATOR_OFF`
+
+Diagnostic logging is implemented separately:
+
+- `firmware/services/event_log.h`
+- `firmware/services/event_log.c`
+- `firmware/tests/test_event_log.c`

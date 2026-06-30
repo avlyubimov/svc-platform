@@ -34,6 +34,7 @@ Current host tests cover:
   behavior.
 - Event Bus FIFO order, overflow rejection, and empty-pop behavior.
 - Event Dispatcher output overcurrent/fault handling through Output Manager.
+- Event Log fixed-size diagnostic ring buffer with overwrite/drop accounting.
 - CAN1 listen-only TX denial and CAN2 expansion TX allowance.
 - System Safety Coordinator integration between battery cutoff, Event Bus, and
   Output Manager output shutdown.

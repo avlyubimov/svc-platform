@@ -10,6 +10,7 @@ OUTPUT_MANAGER_TEST := $(BUILD_DIR)/test_output_manager
 BATTERY_SERVICE_TEST := $(BUILD_DIR)/test_battery_service
 EVENT_BUS_TEST := $(BUILD_DIR)/test_event_bus
 EVENT_DISPATCHER_TEST := $(BUILD_DIR)/test_event_dispatcher
+EVENT_LOG_TEST := $(BUILD_DIR)/test_event_log
 CAN_SAFETY_TEST := $(BUILD_DIR)/test_can_safety
 SYSTEM_SAFETY_TEST := $(BUILD_DIR)/test_system_safety
 ROLE_RESOLVER_TEST := $(BUILD_DIR)/test_role_resolver
@@ -54,6 +55,9 @@ EVENT_DISPATCHER_SRCS := \
 	services/power_budget.c \
 	services/output_manager.c \
 	tests/test_event_dispatcher.c
+EVENT_LOG_SRCS := \
+	services/event_log.c \
+	tests/test_event_log.c
 CAN_SAFETY_SRCS := \
 	services/can_safety.c \
 	tests/test_can_safety.c
@@ -110,6 +114,7 @@ HOST_TESTS := \
 	$(BATTERY_SERVICE_TEST) \
 	$(EVENT_BUS_TEST) \
 	$(EVENT_DISPATCHER_TEST) \
+	$(EVENT_LOG_TEST) \
 	$(CAN_SAFETY_TEST) \
 	$(SYSTEM_SAFETY_TEST) \
 	$(ROLE_RESOLVER_TEST) \
@@ -127,6 +132,7 @@ test: $(HOST_TESTS)
 	$(BATTERY_SERVICE_TEST)
 	$(EVENT_BUS_TEST)
 	$(EVENT_DISPATCHER_TEST)
+	$(EVENT_LOG_TEST)
 	$(CAN_SAFETY_TEST)
 	$(SYSTEM_SAFETY_TEST)
 	$(ROLE_RESOLVER_TEST)
@@ -154,6 +160,9 @@ $(EVENT_BUS_TEST): $(EVENT_BUS_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(EVENT_DISPATCHER_TEST): $(EVENT_DISPATCHER_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
+
+$(EVENT_LOG_TEST): $(EVENT_LOG_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(CAN_SAFETY_TEST): $(CAN_SAFETY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
