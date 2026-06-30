@@ -343,3 +343,11 @@ Output Manager fault path.
 
 Reason: Safety events need an executable Event Bus to Output Manager path, while
 preserving the rule that no feature code directly controls physical outputs.
+
+## 2026-06-30 — Firmware host-test header dependencies
+
+Decision: Firmware host-test targets now depend on `core/*.h` and `services/*.h`
+headers and compile only C sources from each target dependency list.
+
+Reason: Interface changes must force host-test binary rebuilds; otherwise local
+checks can pass stale binaries after service header edits.

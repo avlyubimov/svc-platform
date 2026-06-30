@@ -20,6 +20,9 @@ Run from `firmware/`:
 make test
 ```
 
+The firmware Makefile treats `core/*.h` and `services/*.h` as host-test
+prerequisites, so interface changes force test binary rebuilds.
+
 Current host tests cover:
 
 - PB-100 board-level power budget service.
