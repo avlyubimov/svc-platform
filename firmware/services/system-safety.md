@@ -22,3 +22,9 @@ available, the coordinator still disables active outputs.
 - `firmware/services/system_safety.h`
 - `firmware/services/system_safety.c`
 - `firmware/tests/test_system_safety.c`
+
+Battery telemetry validity/staleness is provided by:
+
+- `firmware/services/telemetry.h`
+- `firmware/services/telemetry.c`
+- `firmware/tests/test_telemetry.c`

@@ -445,3 +445,13 @@ zipped manufacturing outputs, before schematic freeze.
 Reason: Architecture and project rules prohibit PCB layout before the PB-100
 schematic freeze checklist is closed, so the repository validator must enforce
 that boundary automatically.
+
+## 2026-06-30 — Firmware telemetry snapshot service
+
+Decision: Firmware now has a host-testable Telemetry Snapshot service for
+battery voltage, total input current, and per-output current samples with
+validity flags and stale-data checks.
+
+Reason: Safety services need a single telemetry validity boundary before ADC,
+I2C, or CAN drivers exist. Missing, invalid, or stale telemetry must propagate to
+safe denial/cutoff behavior.

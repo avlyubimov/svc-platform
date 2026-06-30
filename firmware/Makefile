@@ -16,6 +16,7 @@ ROLE_RESOLVER_TEST := $(BUILD_DIR)/test_role_resolver
 RULE_CONDITION_TEST := $(BUILD_DIR)/test_rule_condition
 RULE_ENGINE_TEST := $(BUILD_DIR)/test_rule_engine
 RULE_TEXT_TEST := $(BUILD_DIR)/test_rule_text
+TELEMETRY_TEST := $(BUILD_DIR)/test_telemetry
 CONFIG_VALIDATOR_SRCS := \
 	core/svc_config_defaults.c \
 	services/battery_service.c \
@@ -95,6 +96,9 @@ RULE_TEXT_SRCS := \
 	services/rule_engine.c \
 	services/rule_text.c \
 	tests/test_rule_text.c
+TELEMETRY_SRCS := \
+	services/telemetry.c \
+	tests/test_telemetry.c
 HOST_TESTS := \
 	$(CONFIG_VALIDATOR_TEST) \
 	$(POWER_BUDGET_TEST) \
@@ -107,7 +111,8 @@ HOST_TESTS := \
 	$(ROLE_RESOLVER_TEST) \
 	$(RULE_CONDITION_TEST) \
 	$(RULE_ENGINE_TEST) \
-	$(RULE_TEXT_TEST)
+	$(RULE_TEXT_TEST) \
+	$(TELEMETRY_TEST)
 
 .PHONY: test clean
 
@@ -124,6 +129,7 @@ test: $(HOST_TESTS)
 	$(RULE_CONDITION_TEST)
 	$(RULE_ENGINE_TEST)
 	$(RULE_TEXT_TEST)
+	$(TELEMETRY_TEST)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
@@ -162,6 +168,9 @@ $(RULE_ENGINE_TEST): $(RULE_ENGINE_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(RULE_TEXT_TEST): $(RULE_TEXT_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
+
+$(TELEMETRY_TEST): $(TELEMETRY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 clean:

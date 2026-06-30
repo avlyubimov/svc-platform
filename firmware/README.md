@@ -44,3 +44,5 @@ Current host tests cover:
 - Rule text parser for the initial supported JSON rule condition/action grammar.
 - Output Manager PWM duty-cycle ownership and `pwm_allowed` enforcement.
 - Rule text compile helper from condition/action strings to in-memory `svc_rule_t`.
+- Telemetry Snapshot validity/staleness for battery, total current, and
+  per-output current samples.

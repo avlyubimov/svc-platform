@@ -33,3 +33,9 @@ Initial host-testable implementation:
 If telemetry is missing or invalid, the service must choose the safer state:
 deny new high-current loads and keep affected outputs off until diagnostics are
 valid again.
+
+Telemetry validity/staleness is provided by:
+
+- `firmware/services/telemetry.h`
+- `firmware/services/telemetry.c`
+- `firmware/tests/test_telemetry.c`
