@@ -14,7 +14,9 @@ It is not a PCB layout package.
 - `docs/adr/ADR-0008-pb-100-current-budget.md`
 - `docs/adr/ADR-0010-pb-100-power-path-candidate-strategy.md`
 - `docs/adr/ADR-0011-pb-100-low-current-output-stage.md`
+- `docs/can/can-safety.md`
 - `docs/production/component-family-shortlist.md`
+- `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-preliminary-validation.md`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
 
@@ -97,6 +99,8 @@ Preliminary validation tables:
 - Do not name nets after accessory roles such as fog, seat, USB, or CHIGEE.
 - Use role names only in configuration and vehicle-profile documents.
 - Mark CAN1 TX-disable hardware clearly in schematic notes.
+- Keep `CAN1_TX_ROUTE` DNP/open by default unless a future ADR explicitly
+  changes the vehicle-CAN policy.
 
 ## Schematic freeze blockers
 

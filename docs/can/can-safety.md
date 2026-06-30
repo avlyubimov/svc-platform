@@ -11,6 +11,9 @@ CAN TX to vehicle bus must be physically disabled by default:
 - or TX gate disabled;
 - or transceiver silent mode.
 
+PB-100 schematic input for CAN1 TX disable is tracked in
+`hardware/power-board/PB-100/PB-100-can1-tx-disable.md`.
+
 ## Firmware policy
 
 Rev.1 firmware must not transmit frames to vehicle CAN.

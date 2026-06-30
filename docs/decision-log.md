@@ -134,3 +134,13 @@ Decision: PB-100 to LB-100 schematic planning uses `JPB1` with the logical
 Reason: Schematic freeze needs a concrete interface contract for power, grounds,
 output control, telemetry, faults, board identity, expansion, and CAN1 TX-disable
 signals before KiCad layout can be considered.
+
+## 2026-06-30 — CAN1 TX-disable schematic input
+
+Decision: PB-100 Rev.1 schematic planning requires CAN1 TX to be DNP/open and
+hardware-disabled by default, with `CAN1_TX_DISABLED_STATUS` visible to LB-100
+when the safety gate crosses PB-100.
+
+Reason: This preserves the ADR-0002 vehicle-CAN read-only policy even if
+firmware is faulty, LB-100 is reset, or a future board revision routes CAN1
+through PB-100.

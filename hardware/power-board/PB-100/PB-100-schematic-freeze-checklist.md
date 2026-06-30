@@ -27,7 +27,7 @@ this checklist can close.
 | Architecture baseline | Closed | `docs/architecture/Architecture-Review-v1.0.md`, `docs/adr/ADR-0009-architecture-v1-freeze.md` | Architecture remains frozen and no PB-100 requirement change is pending |
 | PB-100 requirements | Closed | `docs/requirements/pb-100-requirements.md`, `docs/adr/ADR-0006-pb-100-baseline-requirements.md` | Requirements changes are handled only through ADR |
 | Generic output model | Closed | `docs/adr/ADR-0004-generic-outputs-role-mapping.md`, `hardware/power-board/PB-100/PB-100-output-channel-matrix.csv` | Schematic nets and silkscreen use only neutral `OUT1` through `OUT10` identifiers |
-| CAN1 safety policy | Open | `docs/adr/ADR-0002-can-read-only-default.md`, `docs/can/can-safety.md` | CAN1 TX is physically disabled by default and the disable mechanism is visible to LB-100 |
+| CAN1 safety policy | Conditional | `docs/adr/ADR-0002-can-read-only-default.md`, `docs/can/can-safety.md`, `hardware/power-board/PB-100/PB-100-can1-tx-disable.md` | Schematic implements DNP/open TX path, default disable state, and LB-100-visible disabled status |
 | Board current budget | Conditional | `docs/adr/ADR-0008-pb-100-current-budget.md` | Input measurement, connector ratings, copper/thermal assumptions, and firmware-visible budget enforcement are all represented in schematic inputs |
 | Board-to-board interface | Conditional | `hardware/power-board/PB-100/PB-100-b2b-pin-budget.csv`, `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv` | Connector MPN and LB-100 MCU resource binding are reviewed against the pin map |
 | High/medium output stage | Conditional | `docs/adr/ADR-0010-pb-100-power-path-candidate-strategy.md`, `hardware/power-board/PB-100/PB-100-power-path-candidates.csv` | Controller, MOSFET, sense path, fuse, and inductive-load protection are validated per output class |
@@ -47,7 +47,6 @@ this checklist can close.
 |---|---|---|
 | PB-FRZ-002 | OUT2 compressor startup/inrush SOA is not validated | Add MOSFET SOA evidence for expected inrush pulse and thermal recovery |
 | PB-FRZ-003 | 40 A input reverse-protection dissipation is not validated | Select final MOSFET strategy or parallel device strategy with thermal estimate |
-| PB-FRZ-005 | CAN1 TX disable implementation is not captured in schematic inputs | Define the physical disable mechanism and LB-100-visible status path |
 
 ## Resolved blockers
 
@@ -55,6 +54,7 @@ this checklist can close.
 |---|---|---|
 | PB-FRZ-001 | OUT5/OUT8/OUT9 moved to external controller plus MOSFET Rev.1 baseline | `docs/adr/ADR-0011-pb-100-low-current-output-stage.md` |
 | PB-FRZ-004 | `JPB1` board-to-board schematic-planning pin map created | `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv` |
+| PB-FRZ-005 | CAN1 TX-disable schematic input created with DNP/open TX default and status readback | `hardware/power-board/PB-100/PB-100-can1-tx-disable.md` |
 
 ## Review packet for freeze
 
@@ -65,6 +65,7 @@ Before marking this checklist `Closed`, the review packet must include:
 - Final power-path candidate table with selected and alternate MPNs.
 - Thermal and protection validation tables.
 - Final PB-100 to LB-100 pin map.
+- CAN1 TX-disable schematic input and verification notes.
 - Factory and garage BOM drafts synchronized with selected MPNs.
 - Bench validation plan for protection, telemetry, current budget, and CAN1
   listen-only behavior.
