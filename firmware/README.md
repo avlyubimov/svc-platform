@@ -27,3 +27,4 @@ Current host tests cover:
   denial, and fault lockout behavior.
 - Battery protection warning, cutoff latch, recovery, and invalid telemetry
   behavior.
+- Event Bus FIFO order, overflow rejection, and empty-pop behavior.

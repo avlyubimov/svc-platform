@@ -300,3 +300,11 @@ cutoff latch, recovery threshold, and invalid-telemetry cutoff behavior.
 
 Reason: Low-voltage shutdown is a safety requirement and must fail safe before
 vehicle integration.
+
+## 2026-06-30 — Firmware event bus core
+
+Decision: Firmware now has a host-testable fixed-size Event Bus with FIFO order,
+overflow rejection, and empty-pop protection.
+
+Reason: The architecture requires CAN, sensors, rules, logging, and output
+control to communicate through events instead of direct feature-to-feature calls.

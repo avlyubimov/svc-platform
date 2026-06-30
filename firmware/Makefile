@@ -5,13 +5,15 @@ BUILD_DIR := build
 POWER_BUDGET_TEST := $(BUILD_DIR)/test_power_budget
 OUTPUT_MANAGER_TEST := $(BUILD_DIR)/test_output_manager
 BATTERY_SERVICE_TEST := $(BUILD_DIR)/test_battery_service
+EVENT_BUS_TEST := $(BUILD_DIR)/test_event_bus
 
 .PHONY: test clean
 
-test: $(POWER_BUDGET_TEST) $(OUTPUT_MANAGER_TEST) $(BATTERY_SERVICE_TEST)
+test: $(POWER_BUDGET_TEST) $(OUTPUT_MANAGER_TEST) $(BATTERY_SERVICE_TEST) $(EVENT_BUS_TEST)
 	$(POWER_BUDGET_TEST)
 	$(OUTPUT_MANAGER_TEST)
 	$(BATTERY_SERVICE_TEST)
+	$(EVENT_BUS_TEST)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
@@ -23,6 +25,9 @@ $(OUTPUT_MANAGER_TEST): core/svc_config_defaults.c services/power_budget.c servi
 	$(CC) $(CFLAGS) -Icore -Iservices $^ -o $@
 
 $(BATTERY_SERVICE_TEST): core/svc_config_defaults.c services/battery_service.c tests/test_battery_service.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -Icore -Iservices $^ -o $@
+
+$(EVENT_BUS_TEST): services/event_bus.c tests/test_event_bus.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -Icore -Iservices $^ -o $@
 
 clean:
