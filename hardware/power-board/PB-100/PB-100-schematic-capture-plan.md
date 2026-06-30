@@ -34,6 +34,9 @@ Reference-to-sheet assignment is tracked in
 Schematic net-domain rules are tracked in
 `hardware/power-board/PB-100/PB-100-schematic-net-domain-plan.csv`.
 
+Sheet-level capture execution is tracked in
+`hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv`.
+
 Schematic-level test point candidates are tracked in
 `hardware/power-board/PB-100/PB-100-test-point-plan.csv`; these rows do not
 lock footprints or placement.
@@ -45,16 +48,17 @@ lock footprints or placement.
 3. Create local symbols and footprint aliases for candidate packages.
 4. Check every critical row in `PB-100-symbol-mpn-readiness.csv` has a matching
    work item in `PB-100-symbol-capture-worklist.csv`.
-5. Capture `b2b-interface.kicad_sch` from the `JPB1` pin map.
-6. Capture `input-protection.kicad_sch` from the input-protection pin contract.
-7. Capture `logic-power.kicad_sch` from the logic-power value placeholders.
-8. Capture one generic output template from the output-channel pin contract and
+5. Use `PB-100-schematic-capture-work-queue.csv` to execute sheet capture.
+6. Capture `b2b-interface.kicad_sch` from the `JPB1` pin map.
+7. Capture `input-protection.kicad_sch` from the input-protection pin contract.
+8. Capture `logic-power.kicad_sch` from the logic-power value placeholders.
+9. Capture one generic output template from the output-channel pin contract and
    output net expansion, then copy it to OUT1 through OUT10.
-9. Capture current and thermal telemetry sheets.
-10. Add CAN1 TX-disable hardware with Rev.1 TX route DNP/open.
-11. Add schematic test-point candidates from `PB-100-test-point-plan.csv`
+10. Capture current and thermal telemetry sheets.
+11. Add CAN1 TX-disable hardware with Rev.1 TX route DNP/open.
+12. Add schematic test-point candidates from `PB-100-test-point-plan.csv`
     without locking footprints or placement.
-12. Run schematic ERC and update the freeze checklist with evidence.
+13. Run schematic ERC and update the freeze checklist with evidence.
 
 ## Schematic rules
 
@@ -77,6 +81,7 @@ lock footprints or placement.
 - Updated PB-100 symbol-to-BOM map.
 - Updated BOM draft synchronized with chosen schematic symbols.
 - Updated readiness dashboard showing closed, conditional, and blocked gates.
+- Updated capture work queue showing sheet-level capture status and blockers.
 - Updated test-point plan for bring-up, telemetry, output, and CAN1 safety
   validation points.
 - Updated freeze checklist evidence for all conditional gates.

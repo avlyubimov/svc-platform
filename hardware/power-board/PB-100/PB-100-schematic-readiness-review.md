@@ -21,10 +21,12 @@ all active planning blockers. It does not authorize PCB layout.
 The schematic review packet consists of:
 
 - `hardware/power-board/PB-100/PB-100-schematic-package.md`
+- `hardware/power-board/PB-100/PB-100-review-release-manifest.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv`
 - `hardware/power-board/PB-100/PB-100-validation-traceability.csv`
+- `hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv`
 - `hardware/power-board/PB-100/PB-100-test-point-plan.csv`
 - `hardware/power-board/PB-100/PB-100-fault-response-matrix.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-matrix.csv`
@@ -76,6 +78,8 @@ The schematic review packet consists of:
 | Output controller template | TPS48110 threshold, timing, bootstrap, gate-drive, and current-sense values reviewed per channel class |
 | Output net expansion | Every `OUTn_*` template net expanded to `OUT1_*` through `OUT10_*`, with JPB1-facing control/fault/current nets checked |
 | Output stage design values | High, medium, and low class threshold, timing, gate-drive, sense, and clamp values selected without role-specific names |
+| Capture work queue | Every KiCad sheet has source artifacts, refs, blockers, freeze evidence, and explicit no-layout boundary |
+| Review release manifest | Every required freeze-packet artifact exists and remains synchronized with validation hooks |
 | OUT2 SOA | Data-sheet SOA extraction against `PB-100-out2-soa-envelope.csv` |
 | Input reverse protection | Input power values, final MOSFET package choice, Q1 pin evidence, and 40 A copper/thermal review |
 | TVS/load dump | Clamp and overshoot margin against every selected downstream device |

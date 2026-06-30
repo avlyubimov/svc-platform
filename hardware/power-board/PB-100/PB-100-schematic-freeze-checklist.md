@@ -61,7 +61,9 @@ evidence before freeze.
 Before marking this checklist `Closed`, the review packet must include:
 
 - Updated schematic package.
+- Updated review release manifest.
 - Updated schematic readiness dashboard.
+- Updated schematic capture work queue.
 - Updated schematic freeze gap register with one row per conditional gate.
 - Updated validation traceability register with one row per conditional gate.
 - Final output channel matrix.
@@ -97,3 +99,5 @@ Before marking this checklist `Closed`, the review packet must include:
 - Validation traceability register covering every conditional freeze gate.
 - Test-point plan covering rails, telemetry, outputs, and CAN1 safety.
 - Fault-response matrix covering safe defaults and firmware actions.
+- Capture work queue covering every KiCad sheet and planned schematic reference.
+- Review release manifest covering every required freeze-packet artifact.

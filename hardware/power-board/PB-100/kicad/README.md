@@ -23,6 +23,8 @@ manufacturing outputs are also blocked by repository validation.
 ## Source documents
 
 - `../PB-100-schematic-capture-plan.md`
+- `../PB-100-schematic-capture-work-queue.csv`
+- `../PB-100-review-release-manifest.csv`
 - `../PB-100-schematic-readiness-dashboard.csv`
 - `../PB-100-net-naming.md`
 - `../PB-100-schematic-instance-plan.csv`

@@ -852,3 +852,18 @@ role-agnostic board identity behavior.
 Reason: Safety behavior must be traceable before schematic freeze. The matrix
 keeps fault handling consistent across hardware defaults, firmware policy, test
 planning, and validation artifacts without encoding accessory roles in PB-100.
+
+## 2026-06-30 — PB-100 capture queue and release manifest
+
+Decision: PB-100 now has
+`hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv` and
+`hardware/power-board/PB-100/PB-100-review-release-manifest.csv`.
+`tools/validate_pb100.py` checks sheet-level capture work against the KiCad
+sheet manifest, sheet-reference map, source artifacts, Q1/TOLL blocker, CAN1
+DNP/open future-ADR policy, and explicit no-layout boundaries. It also checks
+that required freeze-packet artifacts exist and are listed in the release
+manifest with validation hooks.
+
+Reason: The next execution step is schematic capture. The work queue prevents
+ad hoc sheet edits, while the release manifest keeps the freeze packet complete
+and auditable before any layout authorization.

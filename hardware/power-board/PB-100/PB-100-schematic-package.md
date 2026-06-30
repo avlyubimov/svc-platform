@@ -46,8 +46,10 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-fault-response-matrix.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-net-domain-plan.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-capture-plan.md`
+- `hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
 - `hardware/power-board/PB-100/PB-100-schematic-readiness-review.md`
+- `hardware/power-board/PB-100/PB-100-review-release-manifest.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
 
 ## Electrical baseline
@@ -132,6 +134,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
 - `hardware/power-board/PB-100/PB-100-kicad-sheet-manifest.csv`
 - `hardware/power-board/PB-100/PB-100-kicad-footprint-plan.csv`
+- `hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-capture-worklist.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-pin-evidence.csv`
@@ -162,6 +165,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-protection-validation.csv`
 - `hardware/power-board/PB-100/PB-100-test-point-plan.csv`
 - `hardware/power-board/PB-100/PB-100-fault-response-matrix.csv`
+- `hardware/power-board/PB-100/PB-100-review-release-manifest.csv`
 
 ## Net naming rules
 
@@ -177,6 +181,10 @@ Preliminary validation tables:
   `hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv`.
 - Track validation coverage for every conditional gate in
   `hardware/power-board/PB-100/PB-100-validation-traceability.csv`.
+- Track sheet-level capture execution in
+  `hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv`.
+- Track freeze packet contents in
+  `hardware/power-board/PB-100/PB-100-review-release-manifest.csv`.
 - Validate candidate MPNs in `PB-100-power-path-candidates.csv`.
 - Validate ADR-0011 low-current external-controller implementation.
 - Confirm high-side switch/controller thermal limits.

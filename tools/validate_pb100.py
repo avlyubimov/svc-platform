@@ -288,6 +288,25 @@ FAULT_RESPONSE_MATRIX_COLUMNS = (
     "Validation artifact",
     "Safety constraint",
 )
+SCHEMATIC_CAPTURE_WORK_QUEUE_COLUMNS = (
+    "Work item",
+    "Sheet file",
+    "Capture scope",
+    "Required refs",
+    "Primary source artifacts",
+    "Capture status",
+    "Blocker",
+    "Freeze close evidence",
+    "Layout boundary",
+)
+REVIEW_RELEASE_MANIFEST_COLUMNS = (
+    "Artifact",
+    "Category",
+    "Freeze role",
+    "Required for freeze",
+    "Validation hook",
+    "Status",
+)
 REQUIRED_NET_PATTERNS = {
     "VBAT_RAW",
     "VBAT_PROT",
@@ -310,6 +329,8 @@ REQUIRED_READINESS_AREAS = {
     "PB-100 requirements",
     "Symbol readiness",
     "KiCad scaffold",
+    "Capture work queue",
+    "Review release manifest",
     "Freeze gap register",
     "Validation traceability",
     "Instance map",
@@ -409,6 +430,40 @@ REQUIRED_FAULT_IDS = {
     "PBFLT-BUDGET",
     "PBFLT-CAN1-TX",
     "PBFLT-B2B-MISMATCH",
+}
+REQUIRED_CAPTURE_WORK_ITEMS = {
+    "CAP-TOP",
+    "CAP-INP",
+    "CAP-LOGIC",
+    "CAP-OUT-TEMPLATE",
+    "CAP-OUT-INST",
+    "CAP-TEL",
+    "CAP-B2B",
+    "CAP-CAN1",
+    "CAP-TP",
+}
+ALLOWED_CAPTURE_STATUSES = {
+    "Scaffold ready",
+    "Planned capture",
+    "Blocked pending symbol",
+    "Review-defined",
+}
+REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
+    "hardware/power-board/PB-100/PB-100-schematic-package.md",
+    "hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv",
+    "hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md",
+    "hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv",
+    "hardware/power-board/PB-100/PB-100-validation-traceability.csv",
+    "hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv",
+    "hardware/power-board/PB-100/PB-100-review-release-manifest.csv",
+    "hardware/power-board/PB-100/PB-100-output-net-expansion.csv",
+    "hardware/power-board/PB-100/PB-100-test-point-plan.csv",
+    "hardware/power-board/PB-100/PB-100-fault-response-matrix.csv",
+    "hardware/power-board/PB-100/PB-100-can1-safety-verification.csv",
+    "hardware/power-board/PB-100/kicad/PB-100.kicad_sch",
+    "hardware/power-board/PB-100/kicad/lib/PB100.kicad_sym",
+    "production/bom/pb100_symbol_bom_map.csv",
+    "production/bom/pb100_assembly_sourcing_recheck.csv",
 }
 
 
@@ -2505,6 +2560,194 @@ def validate_fault_response_matrix() -> None:
         )
 
 
+def resolve_review_artifact(path_text: str) -> Path:
+    if path_text.startswith("docs/") or path_text.startswith("production/") or path_text.startswith("hardware/"):
+        return REPO_ROOT / path_text
+    return PB100_DIR / path_text
+
+
+def expand_reference_token(token: str) -> set[str]:
+    token = token.strip()
+    if not token:
+        return set()
+    if ".." not in token:
+        return {token}
+    start, end = [part.strip() for part in token.split("..", 1)]
+    start_prefix = "".join(character for character in start if not character.isdigit())
+    end_prefix = "".join(character for character in end if not character.isdigit())
+    if start_prefix != end_prefix:
+        return {token}
+    start_digits = "".join(character for character in start if character.isdigit())
+    end_digits = "".join(character for character in end if character.isdigit())
+    if not start_digits or not end_digits:
+        return {token}
+    width = max(len(start_digits), len(end_digits))
+    return {
+        f"{start_prefix}{number:0{width}d}"
+        for number in range(int(start_digits), int(end_digits) + 1)
+    }
+
+
+def refs_from_cell(cell: str) -> set[str]:
+    references = set()
+    for token in cell.split(";"):
+        references.update(expand_reference_token(token))
+    return references
+
+
+def validate_schematic_capture_work_queue() -> None:
+    path = PB100_DIR / "PB-100-schematic-capture-work-queue.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty schematic capture work queue: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in SCHEMATIC_CAPTURE_WORK_QUEUE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    manifest_rows = list(csv.DictReader((PB100_DIR / "PB-100-kicad-sheet-manifest.csv").open(newline="", encoding="utf-8")))
+    manifest_sheets = {row["Sheet file"].strip() for row in manifest_rows}
+    allowed_sheets = manifest_sheets | {"cross-sheet-review"}
+    sheet_reference_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-schematic-sheet-reference-map.csv").open(newline="", encoding="utf-8"))
+    )
+    refs_by_sheet: dict[str, set[str]] = {}
+    for sheet_row in sheet_reference_rows:
+        sheet_file = sheet_row["Sheet file"].strip()
+        ref = sheet_row["Ref"].strip()
+        if ref == "TP1..TPn":
+            continue
+        refs_by_sheet.setdefault(sheet_file, set()).add(ref)
+
+    seen_work_items = set()
+    sheets_with_queue_rows = set()
+    refs_covered_by_sheet: dict[str, set[str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        work_item = row["Work item"].strip()
+        sheet_file = row["Sheet file"].strip()
+        if work_item in seen_work_items:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Work item {work_item}")
+        seen_work_items.add(work_item)
+        if work_item not in REQUIRED_CAPTURE_WORK_ITEMS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown Work item {work_item}")
+        if sheet_file not in allowed_sheets:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown sheet file {sheet_file}")
+        sheets_with_queue_rows.add(sheet_file)
+        if row["Capture status"].strip() not in ALLOWED_CAPTURE_STATUSES:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Capture status {row['Capture status'].strip()}")
+        for column in (
+            "Capture scope",
+            "Required refs",
+            "Primary source artifacts",
+            "Blocker",
+            "Freeze close evidence",
+            "Layout boundary",
+        ):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        layout_boundary = row["Layout boundary"].lower()
+        if "no " not in layout_boundary or "layout" not in layout_boundary:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: layout boundary must explicitly block layout")
+        if "manufacturing output" in layout_boundary and "no " not in layout_boundary:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: manufacturing output must be blocked")
+        for artifact in [part.strip() for part in row["Primary source artifacts"].split(";")]:
+            artifact_path = resolve_review_artifact(artifact)
+            if not artifact_path.exists():
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{row_number}: missing source artifact "
+                    f"{artifact}"
+                )
+        row_refs = refs_from_cell(row["Required refs"])
+        refs_covered_by_sheet.setdefault(sheet_file, set()).update(row_refs)
+        if "Q1" in row_refs:
+            row_text = " ".join(row.values())
+            if row["Capture status"].strip() != "Blocked pending symbol":
+                fail("Q1 capture work must remain Blocked pending symbol")
+            if "INPUT_REVERSE_FET" not in row_text or "TOLL" not in row_text:
+                fail("Q1 capture work must keep INPUT_REVERSE_FET and TOLL evidence blocker explicit")
+        if work_item == "CAP-CAN1":
+            row_text = " ".join(row.values()).lower()
+            if "dnp/open" not in row_text or "future adr" not in row_text:
+                fail("CAN1 capture work must keep DNP/open and future ADR explicit")
+        if work_item == "CAP-TP" and "footprint" not in row["Blocker"].lower():
+            fail("test point capture work must keep footprint/placement blocker explicit")
+
+    missing_work_items = sorted(REQUIRED_CAPTURE_WORK_ITEMS - seen_work_items)
+    if missing_work_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing capture work items: "
+            f"{', '.join(missing_work_items)}"
+        )
+    missing_sheets = sorted(manifest_sheets - sheets_with_queue_rows)
+    if missing_sheets:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing KiCad sheet work rows: "
+            f"{', '.join(missing_sheets)}"
+        )
+    for sheet_file, expected_refs in refs_by_sheet.items():
+        missing_refs = sorted(expected_refs - refs_covered_by_sheet.get(sheet_file, set()))
+        if missing_refs:
+            fail(
+                f"{path.relative_to(REPO_ROOT)} does not cover refs on {sheet_file}: "
+                f"{', '.join(missing_refs)}"
+            )
+
+
+def validate_review_release_manifest() -> None:
+    path = PB100_DIR / "PB-100-review-release-manifest.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty PB-100 review release manifest: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in REVIEW_RELEASE_MANIFEST_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    allowed_statuses = {"Frozen", "Ready", "Conditional", "Open"}
+    seen_artifacts = set()
+    for row_number, row in enumerate(rows, 2):
+        artifact = row["Artifact"].strip()
+        if artifact in seen_artifacts:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate artifact {artifact}")
+        seen_artifacts.add(artifact)
+        for column in REVIEW_RELEASE_MANIFEST_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if row["Required for freeze"].strip() != "Required":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: release manifest artifacts must be Required")
+        if row["Status"].strip() not in allowed_statuses:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Status {row['Status'].strip()}")
+        artifact_path = REPO_ROOT / artifact
+        if not artifact_path.exists():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: missing release artifact {artifact}")
+        if artifact_path.is_file():
+            name = artifact_path.name.lower()
+            suffix = artifact_path.suffix.lower()
+            if name.endswith(".kicad_pcb-bak") or suffix in DISALLOWED_LAYOUT_SUFFIXES:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: release manifest must not include layout artifact {artifact}")
+        hook = row["Validation hook"].strip()
+        if hook.startswith("validate_") and hook not in globals():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown validation hook {hook}")
+
+    missing_artifacts = sorted(REQUIRED_RELEASE_MANIFEST_ARTIFACTS - seen_artifacts)
+    if missing_artifacts:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing release artifacts: "
+            f"{', '.join(missing_artifacts)}"
+        )
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -2541,6 +2784,8 @@ def main() -> int:
     validate_bom_symbol_map()
     validate_schematic_readiness_dashboard()
     validate_schematic_freeze_gap_register()
+    validate_schematic_capture_work_queue()
+    validate_review_release_manifest()
     validate_output_channel_pin_contract()
     validate_output_controller_pin_template()
     validate_output_net_expansion()
