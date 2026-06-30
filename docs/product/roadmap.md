@@ -58,6 +58,7 @@ Current host-tested services:
 - System Safety Coordinator
 - Role Resolver
 - Rule Engine skeleton
+- Rule condition evaluator
 
 ## Phase 5 — BMW K25 integration
 - harness

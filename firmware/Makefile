@@ -13,6 +13,7 @@ EVENT_DISPATCHER_TEST := $(BUILD_DIR)/test_event_dispatcher
 CAN_SAFETY_TEST := $(BUILD_DIR)/test_can_safety
 SYSTEM_SAFETY_TEST := $(BUILD_DIR)/test_system_safety
 ROLE_RESOLVER_TEST := $(BUILD_DIR)/test_role_resolver
+RULE_CONDITION_TEST := $(BUILD_DIR)/test_rule_condition
 RULE_ENGINE_TEST := $(BUILD_DIR)/test_rule_engine
 CONFIG_VALIDATOR_SRCS := \
 	core/svc_config_defaults.c \
@@ -69,6 +70,9 @@ ROLE_RESOLVER_SRCS := \
 	services/power_budget.c \
 	services/role_resolver.c \
 	tests/test_role_resolver.c
+RULE_CONDITION_SRCS := \
+	services/rule_condition.c \
+	tests/test_rule_condition.c
 RULE_ENGINE_SRCS := \
 	core/svc_config_defaults.c \
 	services/battery_service.c \
@@ -88,6 +92,7 @@ HOST_TESTS := \
 	$(CAN_SAFETY_TEST) \
 	$(SYSTEM_SAFETY_TEST) \
 	$(ROLE_RESOLVER_TEST) \
+	$(RULE_CONDITION_TEST) \
 	$(RULE_ENGINE_TEST)
 
 .PHONY: test clean
@@ -102,6 +107,7 @@ test: $(HOST_TESTS)
 	$(CAN_SAFETY_TEST)
 	$(SYSTEM_SAFETY_TEST)
 	$(ROLE_RESOLVER_TEST)
+	$(RULE_CONDITION_TEST)
 	$(RULE_ENGINE_TEST)
 
 $(BUILD_DIR):
@@ -132,6 +138,9 @@ $(SYSTEM_SAFETY_TEST): $(SYSTEM_SAFETY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(ROLE_RESOLVER_TEST): $(ROLE_RESOLVER_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
+
+$(RULE_CONDITION_TEST): $(RULE_CONDITION_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(RULE_ENGINE_TEST): $(RULE_ENGINE_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)

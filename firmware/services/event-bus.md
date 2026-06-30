@@ -32,3 +32,12 @@ Fault event dispatch is implemented separately:
 - `firmware/services/event_dispatcher.h`
 - `firmware/services/event_dispatcher.c`
 - `firmware/tests/test_event_dispatcher.c`
+
+Rule condition state consumes selected events:
+
+- `SVC_EVENT_ENGINE_STARTED`
+- `SVC_EVENT_ENGINE_STOPPED`
+- `SVC_EVENT_HIGH_BEAM_ON`
+- `SVC_EVENT_HIGH_BEAM_OFF`
+- `SVC_EVENT_LEFT_INDICATOR_ON`
+- `SVC_EVENT_LEFT_INDICATOR_OFF`

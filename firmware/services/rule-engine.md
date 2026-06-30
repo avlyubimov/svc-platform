@@ -6,6 +6,9 @@ numbers.
 
 ## Initial skeleton
 
+- Track event-derived condition state for engine running, high beam, and left
+  indicator.
+- Evaluate condition lists with all-conditions-must-match semantics.
 - Enable a configured role through role resolution.
 - Disable a configured role through role resolution.
 - Deny missing or ambiguous role mappings.
@@ -20,3 +23,9 @@ event-condition evaluation will be added after the core safety path is stable.
 - `firmware/services/rule_engine.h`
 - `firmware/services/rule_engine.c`
 - `firmware/tests/test_rule_engine.c`
+
+Rule condition state is implemented in:
+
+- `firmware/services/rule_condition.h`
+- `firmware/services/rule_condition.c`
+- `firmware/tests/test_rule_condition.c`

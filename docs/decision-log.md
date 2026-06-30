@@ -387,3 +387,12 @@ call the Output Manager by generic output ID.
 
 Reason: Rule logic must not hard-code physical output numbers. Missing or
 ambiguous role mappings must fail closed instead of guessing a channel.
+
+## 2026-06-30 — Firmware rule condition state
+
+Decision: Firmware now has host-testable rule condition state tracking for
+engine running, high beam, and left indicator events, plus all-conditions-match
+evaluation.
+
+Reason: Rule execution needs an event-derived state layer before JSON rule
+parsing and vehicle-specific logic are added.

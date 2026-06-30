@@ -39,3 +39,4 @@ Current host tests cover:
   Output Manager output shutdown.
 - Role Resolver and Rule Engine skeleton for role-based actions through Output
   Manager.
+- Rule condition state tracking for engine, high-beam, and left-indicator events.
