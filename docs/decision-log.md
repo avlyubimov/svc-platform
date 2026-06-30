@@ -203,3 +203,12 @@ Decision: PB-100 Rev.1 schematic planning uses three thermal points:
 Reason: One board reference and two power-zone measurements are needed to derate
 OUT2, the input reverse-protection path, medium-output MOSFET clusters, and the
 logic buck before sustained overheating.
+
+## 2026-06-30 — PB-100 schematic planning ready for review
+
+Decision: PB-100 schematic planning inputs are ready for schematic review, but
+schematic freeze and PCB layout remain blocked until all conditional gates in
+`hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md` are closed.
+
+Reason: The package now has no active planning blockers and includes output,
+power, telemetry, thermal, CAN safety, B2B, BOM, and bench-validation inputs.

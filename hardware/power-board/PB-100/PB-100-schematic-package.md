@@ -1,6 +1,6 @@
 # PB-100 Schematic Package
 
-Status: Started after Architecture v1.0 freeze
+Status: Schematic planning package ready for review; not frozen
 
 This package converts frozen PB-100 requirements into schematic-planning inputs.
 It is not a PCB layout package.
@@ -23,6 +23,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-preliminary-validation.md`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
+- `hardware/power-board/PB-100/PB-100-schematic-readiness-review.md`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
 
 ## Electrical baseline
