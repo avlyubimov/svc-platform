@@ -274,3 +274,12 @@ and Littelfuse MAXI-class sealed inline holder for the main battery fuse.
 Reason: DT contacts are too close for the 15 A and 20 A fuse output classes,
 while DTP provides the needed high-current connector class. DTM remains a signal
 connector family, not a power-output family.
+
+## 2026-06-30 — Firmware power budget service
+
+Decision: Firmware now has a host-testable power budget service that denies
+output startup on invalid telemetry, already-active outputs, invalid
+configuration, or projected total-current overrun.
+
+Reason: ADR-0008 makes board-level current-budget enforcement a safety feature,
+so it needs executable tests before hardware is available.
