@@ -248,6 +248,15 @@ ASSEMBLY_SOURCING_RECHECK_COLUMNS = (
     "Garage action",
     "Freeze dependency",
 )
+VALIDATION_TRACEABILITY_COLUMNS = (
+    "Test ID",
+    "Freeze gate",
+    "Validation phase",
+    "Primary artifact",
+    "Method",
+    "Pass condition",
+    "Safety constraint",
+)
 REQUIRED_NET_PATTERNS = {
     "VBAT_RAW",
     "VBAT_PROT",
@@ -271,6 +280,7 @@ REQUIRED_READINESS_AREAS = {
     "Symbol readiness",
     "KiCad scaffold",
     "Freeze gap register",
+    "Validation traceability",
     "Instance map",
     "Sheet map",
     "Net domains",
@@ -2158,6 +2168,66 @@ def validate_assembly_sourcing_recheck() -> None:
         )
 
 
+def validate_validation_traceability() -> None:
+    path = PB100_DIR / "PB-100-validation-traceability.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty PB-100 validation traceability register: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in VALIDATION_TRACEABILITY_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    conditional_gates = {
+        gate for gate, status in freeze_checklist_gates_by_status().items() if status == "Conditional"
+    }
+    seen_test_ids = set()
+    gates_with_tests: dict[str, list[dict[str, str]]] = {gate: [] for gate in conditional_gates}
+    allowed_phases = {"Schematic review", "Schematic plus bench", "Production review"}
+    for row_number, row in enumerate(rows, 2):
+        test_id = row["Test ID"].strip()
+        freeze_gate = row["Freeze gate"].strip()
+        if test_id in seen_test_ids:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Test ID {test_id}")
+        seen_test_ids.add(test_id)
+        if not test_id.startswith("PBVAL-"):
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Test ID must start with PBVAL-")
+        if freeze_gate not in conditional_gates:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown or non-conditional freeze gate {freeze_gate}")
+        if row["Validation phase"].strip() not in allowed_phases:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Validation phase {row['Validation phase'].strip()}")
+        for column in VALIDATION_TRACEABILITY_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if "before layout" in row_text and "schematic freeze" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: layout boundary must reference schematic freeze")
+        if freeze_gate == "CAN1 safety policy":
+            if "dnp/open" not in row_text or "read-only" not in row_text or "future adr" not in row_text:
+                fail("CAN1 validation trace must keep DNP/open read-only and future ADR explicit")
+        if freeze_gate == "Input reverse protection":
+            if "q1" not in row_text or "40 a" not in row_text:
+                fail("Input reverse validation trace must keep Q1 and 40 A explicit")
+        if freeze_gate == "Factory assembly readiness" and "sourcing recheck" not in row_text:
+            fail("Factory assembly validation trace must require sourcing recheck")
+        if freeze_gate == "Garage assembly readiness" and "garage" not in row_text:
+            fail("Garage assembly validation trace must keep garage scope explicit")
+        gates_with_tests[freeze_gate].append(row)
+
+    missing_gates = sorted(gate for gate, gate_rows in gates_with_tests.items() if not gate_rows)
+    if missing_gates:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing validation rows for gates: "
+            f"{', '.join(missing_gates)}"
+        )
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -2204,6 +2274,7 @@ def main() -> int:
     validate_logic_power_design_values()
     validate_can1_safety_verification()
     validate_assembly_sourcing_recheck()
+    validate_validation_traceability()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0

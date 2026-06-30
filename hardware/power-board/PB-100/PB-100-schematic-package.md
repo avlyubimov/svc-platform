@@ -40,6 +40,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-net-naming.md`
 - `hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv`
+- `hardware/power-board/PB-100/PB-100-validation-traceability.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-net-domain-plan.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-capture-plan.md`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
@@ -168,6 +169,8 @@ Preliminary validation tables:
   `hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv`.
 - Track every conditional freeze gap in
   `hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv`.
+- Track validation coverage for every conditional gate in
+  `hardware/power-board/PB-100/PB-100-validation-traceability.csv`.
 - Validate candidate MPNs in `PB-100-power-path-candidates.csv`.
 - Validate ADR-0011 low-current external-controller implementation.
 - Confirm high-side switch/controller thermal limits.

@@ -24,6 +24,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv`
+- `hardware/power-board/PB-100/PB-100-validation-traceability.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-matrix.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`
@@ -81,6 +82,10 @@ The schematic review packet consists of:
 | CAN1 safety | DNP/open TX path, default disable state, status readback, DNP BOM ownership, firmware listen-only behavior, and future ADR hardware-action process |
 | Factory assembly | JLCPCB/PCBWay assembly class, distributor continuity, and alternates for critical MPNs; concrete symbol/footprint status from `PB-100-symbol-mpn-readiness.csv` and `pb100_assembly_sourcing_recheck.csv` |
 | Garage assembly | Connector, fuse, enclosure, harness items, current derating, wire gauge, crimp tooling, and service access remain user-installable |
+
+Each conditional area must also have a matching row in
+`hardware/power-board/PB-100/PB-100-validation-traceability.csv` before the
+freeze checklist can close.
 
 ## Allowed next work
 

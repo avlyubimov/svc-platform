@@ -799,3 +799,16 @@ Reason: Component availability and assembly support can change. The design
 should not treat candidate MPNs as locked until JLCPCB/PCBWay, distributor,
 connector, fuse-holder, wire-gauge, and serviceability checks are repeated near
 schematic freeze.
+
+## 2026-06-30 — PB-100 validation traceability register
+
+Decision: PB-100 now has
+`hardware/power-board/PB-100/PB-100-validation-traceability.csv`, mapping every
+conditional schematic-freeze gate to a schematic, bench, or production review
+validation row. `tools/validate_pb100.py` parses the freeze checklist and fails
+if any conditional gate lacks validation coverage or if CAN1 DNP/open/read-only,
+Q1/40 A, factory sourcing recheck, or garage scope constraints are lost.
+
+Reason: Freeze gaps are not closed by documentation alone. Each conditional
+gate needs explicit validation evidence before it can move to `Closed`, and the
+coverage must stay synchronized as the checklist changes.

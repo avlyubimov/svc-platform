@@ -63,6 +63,7 @@ Before marking this checklist `Closed`, the review packet must include:
 - Updated schematic package.
 - Updated schematic readiness dashboard.
 - Updated schematic freeze gap register with one row per conditional gate.
+- Updated validation traceability register with one row per conditional gate.
 - Final output channel matrix.
 - Final output-channel pin contract.
 - Final output-controller pin template.
@@ -89,3 +90,4 @@ Before marking this checklist `Closed`, the review packet must include:
 - Assembly sourcing recheck register synchronized with critical symbol keys.
 - Bench validation plan for protection, telemetry, current budget, and CAN1
   listen-only behavior.
+- Validation traceability register covering every conditional freeze gate.
