@@ -12,10 +12,13 @@ SVC is an open modular platform for vehicle accessory control. It should allow n
 ## Current status
 
 Architecture v1.0 is frozen. PB-100 schematic planning is ready for schematic
-review, with KiCad schematic scaffold started. Firmware MVP host-testable safety
-services are in progress.
+review, with KiCad schematic scaffold started. Firmware MVP has host-tested
+safety, configuration, role-mapping, rule-runner, CAN safety, and PWM ownership
+services in progress.
 
 Do not start PCB layout until the PB-100 schematic freeze checklist is closed.
+Repository validation blocks PB-100 layout/manufacturing artifacts before that
+freeze.
 
 ## Validation
 
@@ -26,6 +29,10 @@ make check
 This runs PB-100 artifact validation, firmware config JSON validation, and
 firmware host tests. The same command runs in GitHub Actions on push and pull
 request.
+
+Current host checks cover PB-100 schematic-planning artifacts, config/schema
+consistency, output safety, battery cutoff, CAN1 TX denial, event dispatch,
+role-based rules, and PWM duty-cycle ownership.
 
 ## Repository structure
 

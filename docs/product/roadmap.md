@@ -15,6 +15,7 @@ Status: In progress
 - Schematic package
 - Schematic freeze checklist
 - KiCad schematic scaffold
+- Layout/manufacturing artifact blocker
 - Schematic capture
 - PCB
 - Gerber
@@ -40,9 +41,9 @@ Status: In progress
 Status: In progress
 
 - output control
-- ACC
+- event-derived rule conditions
 - battery protection
-- logging
+- role-mapped rule actions
 - CAN read-only logger
 - config JSON schema
 
