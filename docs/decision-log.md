@@ -175,3 +175,13 @@ listen-only tests.
 Reason: Schematic freeze requires a testable design, not only a component list.
 The test matrix ties the schematic inputs to bench evidence before any motorcycle
 installation.
+
+## 2026-06-30 — PB-100 logic power rail strategy
+
+Decision: PB-100 Rev.1 schematic planning uses a protected `PB_5V_OUT` rail
+based on an LM5164-Q1-class 100 V 1 A buck, with LM5013-Q1-class 100 V higher
+current fallback before considering 60 V buck families.
+
+Reason: The logic rail must tolerate the same transient strategy as the power
+path and must not be confused with accessory USB power. The 1 A budget is enough
+for initial planning but keeps a 100 V higher-current escape path.

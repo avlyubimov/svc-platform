@@ -15,6 +15,6 @@ Power,MOSFET,SIDR626LDP-T1-RE3 or JMSL0606AGQ-13; OUT2 may require TOLL/LFPAK or
 Power,Input reverse MOSFET,IAUTN06S5N008ATMA1 preferred; BUK7S1R2-80M or dual SIDR626LDP alternatives,TOLL/LFPAK88/PowerPAK,1-2,Factory,Core,Single 2.1mOhm MOSFET rejected for 40A thermal
 Power,TVS protection,SM8S33A class for 60V+ Rev.1 output path; lower-clamp TVS only if smart-switch rail returns,SMD/THT,1,Factory,Core,Clamp voltage must match every protected device limit
 Power,Reverse protection,LM74700QDBVRQ1 or LM74700QDRQ1; LM74502-Q1 alternative,SOT-23/SOIC plus external FET,1,Factory,Core,Input reverse polarity
-Power,DC/DC,LM5164QDDATQ1 default; TPS54360B-Q1/TPS54360-Q1 alternatives,SOIC/HSOIC PowerPAD,1,Factory,Core,Logic power current decides final family
+Power,DC/DC,LM5164QDDATQ1 default; LM5013-Q1 high-current 100V alternate; TPS54360B-Q1 conditional 60V alternate,SOIC/HSOIC PowerPAD,1,Factory,Core,Logic power current and TVS margin decide final family
 Comms,LIN transceiver,Automotive LIN,SMD,1,Factory,Future,Footprint can be DNP
 Comms,RS485 transceiver,Automotive/industrial RS485,SMD,1,Factory,Future,Footprint can be DNP

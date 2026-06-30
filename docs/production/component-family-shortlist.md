@@ -28,7 +28,7 @@ order.
 | Smart high-side switch | TI TPS2HB16-Q1 | TI TPS2HB35-Q1; TI TPS1H100-Q1 | HTSSOP class | Deferred low-current alternate after ADR-0011; requires lower-clamp strategy |
 | Output MOSFET | Infineon OptiMOS automotive 40-60 V | Vishay SQJQ automotive; onsemi F085 automotive | TDSON/PowerPAK/TOLL/LFPAK | Must pass SOA and thermal review per channel; OUT2 keeps larger/parallel escape path |
 | Current monitor | TI INA226 | TI INA228/INA229; integrated IMON from high-side controller | VSSOP/SOIC class | External monitor may be unnecessary on channels with accurate IMON |
-| Logic buck regulator | TI LM5164-Q1 | TI TPS54360B-Q1/TPS54360-Q1 | SOIC/HSOIC PowerPAD | LM5164-Q1 for low-IQ 1 A rail; TPS54360 family for higher 5 V current |
+| Logic buck regulator | TI LM5164-Q1 | TI LM5013-Q1; TI TPS54360B-Q1/TPS54360-Q1 | SOIC/HSOIC PowerPAD | LM5164-Q1 for 1 A 100 V rail; LM5013-Q1 preferred over 60 V family if more current is needed |
 | Input reverse protection | TI LM74700-Q1/LM74502-Q1 class | ADI/LTC ideal diode controller families | MSOP/SOIC class | Controller family only; MOSFET is tracked separately |
 | Input reverse MOSFET | Infineon OptiMOS 5 60 V TOLL low-Rds class | Nexperia LFPAK88 80 V; parallel Vishay SIDR626 PowerPAK | TOLL/LFPAK88/PowerPAK | Single 2.1 mOhm MOSFET is rejected for 40 A input thermal |
 | Input TVS/load dump | SM8S automotive TVS class | SMBJ/SMCJ automotive TVS class | DO-218/SMC/SMA as needed | Final clamp voltage depends on MOSFET and buck ratings |
@@ -72,6 +72,8 @@ The current strategy is:
 - TI TPS2HB16-Q1 datasheet is available through LCSC: https://datasheet.lcsc.com/datasheet/pdf/5e972c8f510fd1d0477aeb85de68fc2f.pdf
 - TI INA226AIDGST was listed at LCSC: https://www.lcsc.com/product-detail/current-sense-amplifiers_texas-instruments-ina226aidgst_C2653870.html
 - TI LM5164QDDATQ1 was listed at LCSC: https://www.lcsc.com/product-detail/C1850350.html
+- TI LM5164-Q1 is active as a 6-100 V 1 A automotive buck regulator: https://www.ti.com/product/LM5164-Q1
+- TI LM5013-Q1 is active as a 6-100 V 3.5 A automotive buck regulator: https://www.ti.com/product/LM5013-Q1
 - TI TPS54360B-Q1 is active as an automotive 60 V 3.5 A buck regulator: https://www.ti.com/product/TPS54360B-Q1
 
 ## Open checks before schematic freeze

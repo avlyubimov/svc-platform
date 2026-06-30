@@ -1,0 +1,8 @@
+Rail,Load,Current mA,Source,Requirement,Notes
+PB_5V_OUT,LB-100 logic allocation,500,PB-100 buck,Core,Initial planning budget only
+PB_5V_OUT,PB-100 controllers and sensors,150,PB-100 buck,Core,High-side controllers telemetry and sensors
+PB_5V_OUT,Telemetry pullups and status circuits,50,PB-100 buck,Core,I2C status and fault support
+PB_5V_OUT,Expansion reserve,200,PB-100 buck,Should,Reserved for future PB-side monitors
+PB_5V_OUT,Design margin,100,PB-100 buck,Should,Margin inside 1A LM5164-Q1-class limit
+PB_5V_OUT,Initial total,1000,PB-100 buck,Core,Move to LM5013-Q1-class if exceeded
+LB_3V3_IO,PB-side logic-level reference,TBD,LB-100 regulator,Core,Not a PB-100 power source for loads
