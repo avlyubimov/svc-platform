@@ -96,3 +96,12 @@ TVS sizing.
 Reason: This keeps thermal and SOA margin for compressor, heated-seat, and
 lighting loads while retaining simpler integrated switches for low-current
 channels.
+
+## 2026-06-30 — PB-100 TVS clamp compatibility risk
+
+Decision: SM8S33A-class input TVS remains a candidate for 60 V or higher
+power-path devices, but it is not accepted for any direct 40 V smart-switch rail.
+
+Reason: Its clamp voltage class can exceed 40 V device limits. Low-current
+smart-switch channels need a lower-clamp protection strategy or must move to the
+external-controller architecture.

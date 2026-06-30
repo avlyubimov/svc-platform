@@ -1,0 +1,7 @@
+Path,Output class,Current A,Rds or Ron ohm,Temperature multiplier,Estimated dissipation W,Status,Notes
+SIDR626LDP external MOSFET,High current OUT2,18,0.0021,2.0,1.36,Needs thermal validation,Conservative conduction estimate only; excludes switching and inrush
+SIDR626LDP external MOSFET,Medium current 12A channel,12,0.0021,2.0,0.60,Needs thermal validation,Applies to OUT1 class
+SIDR626LDP external MOSFET,Medium current 8A channel,8,0.0021,2.0,0.27,Needs thermal validation,Applies to OUT3 OUT4 OUT6 OUT7 OUT10 class
+TPS2HB35 integrated switch,Low current 4A channel,4,0.035,2.0,1.12,Conditional,Per-channel estimate; two active channels in one package may double package heat
+TPS2HB16 integrated switch,Low current 4A channel,4,0.016,2.0,0.51,Alternative,Lower Ron alternative if availability and current-limit variant fit
+LM74700 external MOSFET,Board input 40A budget,40,0.0021,2.0,6.72,Needs different MOSFET or paralleling,Input reverse MOSFET must be selected separately for board-level current

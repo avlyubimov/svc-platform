@@ -14,6 +14,7 @@ It is not a PCB layout package.
 - `docs/adr/ADR-0008-pb-100-current-budget.md`
 - `docs/adr/ADR-0010-pb-100-power-path-candidate-strategy.md`
 - `docs/production/component-family-shortlist.md`
+- `hardware/power-board/PB-100/PB-100-preliminary-validation.md`
 
 ## Electrical baseline
 
@@ -80,6 +81,11 @@ Candidate MPN CSV:
 These candidates are allowed for schematic planning only. Final MPN lock still
 requires SOA, thermal, clamp-voltage, and assembly-class validation.
 
+Preliminary validation tables:
+
+- `hardware/power-board/PB-100/PB-100-thermal-estimates.csv`
+- `hardware/power-board/PB-100/PB-100-protection-validation.csv`
+
 ## Net naming rules
 
 - Use neutral output identifiers: `OUT1` through `OUT10`.
@@ -90,6 +96,7 @@ requires SOA, thermal, clamp-voltage, and assembly-class validation.
 ## Schematic freeze blockers
 
 - Validate candidate MPNs in `PB-100-power-path-candidates.csv`.
+- Resolve SM8S33A-class TVS clamp compatibility with 40 V smart switches.
 - Confirm high-side switch/controller thermal limits.
 - Confirm MOSFET SOA for OUT2 compressor startup/inrush.
 - Confirm TVS clamp voltage against high-side controller, MOSFET, and buck

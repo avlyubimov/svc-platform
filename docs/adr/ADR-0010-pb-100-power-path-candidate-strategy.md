@@ -18,7 +18,8 @@ Use this schematic-planning strategy:
 - High-current and medium-current channels use an external smart high-side
   controller with an external 60 V or higher N-channel MOSFET.
 - Low-current channels may use integrated automotive smart high-side switches
-  when thermal review confirms margin.
+  when thermal review confirms margin and the protected battery rail is clamped
+  within their voltage limits.
 - Input reverse-polarity protection uses an automotive ideal-diode controller
   with an external N-channel MOSFET.
 - Input transient protection starts from SM8S33A-class load-dump TVS sizing.
@@ -29,6 +30,10 @@ Candidate MPNs are tracked in
 This is not a final MPN lock. Final schematic selections still require
 JLCPCB/PCBWay assembly-class confirmation, MOSFET SOA review, thermal review,
 and TVS clamp-voltage validation.
+
+If the input transient clamp cannot be kept within the voltage rating of
+integrated smart switches, low-current outputs must fall back to the external
+high-side controller plus MOSFET architecture.
 
 ## Consequences
 The design keeps thermal and SOA margin for compressor, heated-seat, and lighting

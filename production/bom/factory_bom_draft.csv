@@ -10,9 +10,9 @@ Logic,IMU,BMI270/ICM42688 class,LGA,1,Factory,Should,Shock/tilt/vibration
 Logic,Lux sensor,VEML7700/OPT3001,SMD,1,Factory,Core,Fog logic
 Logic,Temp sensor,TMP117/NTC,SMD,2,Factory,Core,PCB + power zone temp
 Power,Current sensor,TPS48110/TPS2HB IMON or TI INA226/INA228/INA229,VSSOP/SOIC class,10,Factory,Core,Prefer integrated IMON where accuracy is sufficient
-Power,High-side switch/controller,TPS48110AQDGXRQ1 for high/medium; TPS2HB35BQPWPRQ1 for low-current,VSSOP/HTSSOP,10,Factory,Core,Power-path candidates in ADR-0010
+Power,High-side switch/controller,TPS48110AQDGXRQ1 for high/medium; TPS2HB35BQPWPRQ1 conditional for low-current,VSSOP/HTSSOP,10,Factory,Core,TPS2HB path requires rail clamp below device limit
 Power,MOSFET,SIDR626LDP-T1-RE3 or JMSL0606AGQ-13,PowerPAK-SO-8DC/PDFN5x6,10,Factory,Core,External FET channels require SOA and thermal validation
-Power,TVS protection,SM8S33A class with SMCJ33A/SMBJ33A alternatives,SMD/THT,1,Factory,Core,Clamp voltage must match controller/MOSFET/buck limits
+Power,TVS protection,SM8S33A class for 60V+ path; lower-clamp alternative for 40V smart switch rail,SMD/THT,1,Factory,Core,Clamp voltage must match every protected device limit
 Power,Reverse protection,LM74700QDBVRQ1 or LM74700QDRQ1; LM74502-Q1 alternative,SOT-23/SOIC plus external FET,1,Factory,Core,Input reverse polarity
 Power,DC/DC,LM5164QDDATQ1 default; TPS54360B-Q1/TPS54360-Q1 alternatives,SOIC/HSOIC PowerPAD,1,Factory,Core,Logic power current decides final family
 Comms,LIN transceiver,Automotive LIN,SMD,1,Factory,Future,Footprint can be DNP
