@@ -60,6 +60,7 @@ Current host-tested services:
 - Rule Engine skeleton
 - Rule condition evaluator
 - In-memory rule runner
+- Rule text parser
 
 ## Phase 5 — BMW K25 integration
 - harness

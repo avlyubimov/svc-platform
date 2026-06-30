@@ -19,6 +19,21 @@ numbers.
 The current implementation is an in-memory rule runner. Full JSON rule parsing
 will be added after the core safety path is stable.
 
+## Initial text grammar
+
+Supported condition strings:
+
+- `engine_running == true|false`
+- `high_beam == true|false`
+- `left_indicator == true|false`
+
+Supported action strings:
+
+- `ROLE.pwm = 0..100`
+
+`0` maps to a disable-role action. Any positive PWM value currently maps to an
+enable-role action; duty-cycle control will be added separately.
+
 ## Host-testable implementation
 
 - `firmware/services/rule_engine.h`
@@ -30,3 +45,9 @@ Rule condition state is implemented in:
 - `firmware/services/rule_condition.h`
 - `firmware/services/rule_condition.c`
 - `firmware/tests/test_rule_condition.c`
+
+Rule text parsing is implemented in:
+
+- `firmware/services/rule_text.h`
+- `firmware/services/rule_text.c`
+- `firmware/tests/test_rule_text.c`

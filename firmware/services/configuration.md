@@ -30,4 +30,5 @@ Repository-level JSON validation:
 
 The repository validator checks that schema role/output/priority enums stay in
 sync with firmware enums and that `config-example.json` stays aligned with
-`svc_default_config`.
+`svc_default_config`. It also checks that current JSON rule strings fit the
+limited firmware rule text grammar.

@@ -405,3 +405,14 @@ conditions first and applying role-based actions only when all conditions match.
 Reason: The firmware now has an executable path from event-derived state to
 configured role action to Output Manager, without adding JSON parsing or direct
 channel assumptions prematurely.
+
+## 2026-06-30 — Firmware initial rule text grammar
+
+Decision: Firmware now has a host-testable rule text parser for
+`engine_running`, `high_beam`, and `left_indicator` boolean conditions plus
+`ROLE.pwm = 0..100` actions. Repository config validation checks JSON rules
+against the same limited grammar.
+
+Reason: Configuration examples must not accept rule strings that firmware cannot
+understand. PWM values are currently translated to enable/disable role actions
+until duty-cycle output control is implemented.

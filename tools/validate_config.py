@@ -245,6 +245,39 @@ def validate_outputs(config: dict[str, Any], allowed_roles: set[str]) -> None:
             fail(f"outputs[{index}] does not match C default: {actual_output} != {expected_output}")
 
 
+def validate_rules(config: dict[str, Any], allowed_roles: set[str]) -> None:
+    rules = config.get("rules", [])
+    if not isinstance(rules, list):
+        fail("rules must be an array")
+
+    condition_pattern = re.compile(r"^(engine_running|high_beam|left_indicator) == (true|false)$")
+    action_pattern = re.compile(r"^([A-Z0-9_]+)\.pwm = ([0-9]+)$")
+    for rule_index, rule in enumerate(rules):
+        if not isinstance(rule, dict):
+            fail(f"rules[{rule_index}] must be an object")
+        conditions = rule.get("if", [])
+        actions = rule.get("then", [])
+        if not isinstance(conditions, list) or not all(isinstance(condition, str) for condition in conditions):
+            fail(f"rules[{rule_index}].if must be an array of strings")
+        if not isinstance(actions, list) or not all(isinstance(action, str) for action in actions):
+            fail(f"rules[{rule_index}].then must be an array of strings")
+
+        for condition_index, condition in enumerate(conditions):
+            if condition_pattern.match(condition) is None:
+                fail(f"rules[{rule_index}].if[{condition_index}] is not supported by firmware rule parser")
+
+        for action_index, action in enumerate(actions):
+            match = action_pattern.match(action)
+            if match is None:
+                fail(f"rules[{rule_index}].then[{action_index}] is not supported by firmware rule parser")
+            role, pwm_value_text = match.groups()
+            if role not in allowed_roles or role == "NONE":
+                fail(f"rules[{rule_index}].then[{action_index}] uses unknown or non-actionable role: {role}")
+            pwm_value = int(pwm_value_text)
+            if pwm_value > 100:
+                fail(f"rules[{rule_index}].then[{action_index}] PWM value must be 0..100")
+
+
 def main() -> int:
     config = load_json(CONFIG_PATH)
     schema = load_json(CONFIG_SCHEMA_PATH)
@@ -255,6 +288,7 @@ def main() -> int:
     validate_battery(config, defines)
     validate_power_budget(config, defines)
     validate_outputs(config, allowed_roles)
+    validate_rules(config, allowed_roles)
     print("Config validation passed")
     return 0
 

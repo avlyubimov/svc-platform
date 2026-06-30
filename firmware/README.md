@@ -41,3 +41,4 @@ Current host tests cover:
   Manager.
 - Rule condition state tracking for engine, high-beam, and left-indicator events.
 - Rule runner evaluation for matched/unmatched conditions before role actions.
+- Rule text parser for the initial supported JSON rule condition/action grammar.
