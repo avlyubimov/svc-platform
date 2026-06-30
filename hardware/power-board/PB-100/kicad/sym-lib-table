@@ -1,0 +1,10 @@
+(sym_lib_table
+  (version 7)
+  (lib
+    (name "PB100")
+    (type "KiCad")
+    (uri "${KIPRJMOD}/lib/PB100.kicad_sym")
+    (options "")
+    (descr "PB-100 preliminary project-local symbols")
+  )
+)

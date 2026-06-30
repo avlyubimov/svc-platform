@@ -229,3 +229,12 @@ and component instance plan under `hardware/power-board/PB-100/`.
 Reason: The project needs a deterministic bridge from requirements and planning
 tables to schematic capture while preserving generic outputs, CAN1 TX safety, and
 the no-layout boundary.
+
+## 2026-06-30 — PB-100 KiCad schematic scaffold
+
+Decision: PB-100 now has a project-local KiCad scaffold under
+`hardware/power-board/PB-100/kicad/` with a top schematic, local symbol table,
+local footprint table, and empty local libraries.
+
+Reason: This creates a concrete schematic workspace while intentionally omitting
+`PB-100.kicad_pcb` so PCB layout remains blocked until schematic freeze.

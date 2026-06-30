@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "filename": "PB-100.kicad_pro",
+    "version": 1
+  },
+  "project": {
+    "name": "PB-100",
+    "description": "SVC PB-100 Power Board schematic scaffold; PCB layout intentionally blocked"
+  },
+  "schematic": {
+    "drawing": {
+      "default_line_thickness": 6,
+      "default_text_size": 50
+    },
+    "legacy_lib_dir": "",
+    "legacy_lib_list": [],
+    "net_format_name": "Pcbnew",
+    "page_layout_descr_file": "",
+    "plot_directory": "exports/schematic/"
+  },
+  "sheets": [
+    [
+      "00000000-0000-0000-0000-000000000000",
+      ""
+    ]
+  ],
+  "text_variables": {
+    "BOARD": "PB-100",
+    "PROJECT": "SVC"
+  }
+}

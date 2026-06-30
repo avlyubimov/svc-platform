@@ -1,0 +1,37 @@
+(kicad_sch
+  (version 20230121)
+  (generator "codex")
+  (uuid "25fbc165-c84b-4bbd-b746-47e2c3a22938")
+  (paper "A3")
+  (title_block
+    (title "PB-100 Power Board")
+    (date "2026-06-30")
+    (rev "schematic-scaffold")
+    (company "SVC Platform")
+    (comment 1 "Schematic scaffold only. PCB layout is blocked until schematic freeze.")
+    (comment 2 "Follow ../PB-100-schematic-capture-plan.md and ../PB-100-net-naming.md.")
+    (comment 3 "CAN1 TX remains DNP/open and hardware-disabled by default.")
+    (comment 4 "Outputs are generic OUT1..OUT10; roles are configuration-only.")
+  )
+  (lib_symbols)
+  (text "PB-100 schematic scaffold only.\n\nDo not create PCB layout from this project until PB-100 schematic freeze is closed.\n\nPrimary inputs:\n- ../PB-100-schematic-capture-plan.md\n- ../PB-100-schematic-instance-plan.csv\n- ../PB-100-net-naming.md\n- ../PB-100-schematic-freeze-checklist.md"
+    (at 30 35 0)
+    (effects
+      (font
+        (size 2.54 2.54)
+      )
+      (justify left top)
+    )
+    (uuid "2ad5c5cd-c3fc-4f7f-a924-8602c73b75bb")
+  )
+  (text "Blocked in this scaffold:\n- PCB layout\n- Gerber generation\n- CAN1 TX enable path\n- Accessory role names in hardware nets"
+    (at 30 95 0)
+    (effects
+      (font
+        (size 2.0 2.0)
+      )
+      (justify left top)
+    )
+    (uuid "b6ec4a8a-8991-44dc-bc7f-db7929292c48")
+  )
+)

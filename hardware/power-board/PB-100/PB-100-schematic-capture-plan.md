@@ -8,6 +8,9 @@ layout.
 
 ## Capture structure
 
+KiCad scaffold directory:
+`hardware/power-board/PB-100/kicad/`.
+
 | Sheet | Purpose | Primary artifacts |
 |---|---|---|
 | `PB-100.kicad_sch` | Top-level sheet, title block, review notes, sheet links | This file plus all child sheets |
@@ -21,13 +24,15 @@ layout.
 
 ## Capture order
 
-1. Create local symbols and footprint aliases for candidate packages.
-2. Capture `b2b-interface.kicad_sch` from the `JPB1` pin map.
-3. Capture `input-protection.kicad_sch` and `logic-power.kicad_sch`.
-4. Capture one generic output template and copy it to OUT1 through OUT10.
-5. Capture current and thermal telemetry sheets.
-6. Add CAN1 TX-disable hardware with Rev.1 TX route DNP/open.
-7. Run schematic ERC and update the freeze checklist with evidence.
+1. Open `hardware/power-board/PB-100/kicad/PB-100.kicad_pro`.
+2. Let KiCad normalize project metadata if needed.
+3. Create local symbols and footprint aliases for candidate packages.
+4. Capture `b2b-interface.kicad_sch` from the `JPB1` pin map.
+5. Capture `input-protection.kicad_sch` and `logic-power.kicad_sch`.
+6. Capture one generic output template and copy it to OUT1 through OUT10.
+7. Capture current and thermal telemetry sheets.
+8. Add CAN1 TX-disable hardware with Rev.1 TX route DNP/open.
+9. Run schematic ERC and update the freeze checklist with evidence.
 
 ## Schematic rules
 

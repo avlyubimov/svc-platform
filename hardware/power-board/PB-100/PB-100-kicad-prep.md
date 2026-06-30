@@ -24,6 +24,9 @@ Detailed inventory CSV:
 
 The inventory is package-focused, not a final MPN lock.
 
+KiCad scaffold directory:
+`hardware/power-board/PB-100/kicad/`.
+
 ## Allowed prep work
 
 - Create schematic symbols for selected candidate families.
