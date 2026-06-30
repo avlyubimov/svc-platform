@@ -34,6 +34,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
+- `hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
@@ -54,7 +55,7 @@ The schematic review packet consists of:
 | Thermal telemetry | Final sensor values, placement notes, and derating thresholds |
 | B2B interface | Connector MPN, pin assignment review, and LB-100 MCU resource binding |
 | CAN1 safety | DNP/open TX path, default disable state, and status readback in schematic |
-| Factory assembly | JLCPCB/PCBWay assembly class and alternates for critical MPNs |
+| Factory assembly | JLCPCB/PCBWay assembly class and alternates for critical MPNs; concrete symbol/footprint status from `PB-100-symbol-mpn-readiness.csv` |
 | Garage assembly | Connector, fuse, enclosure, and harness items remain user-installable |
 
 ## Allowed next work

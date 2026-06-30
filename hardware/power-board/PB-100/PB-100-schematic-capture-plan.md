@@ -30,12 +30,14 @@ Placeholder child sheets are tracked in
 1. Open `hardware/power-board/PB-100/kicad/PB-100.kicad_pro`.
 2. Let KiCad normalize project metadata if needed.
 3. Create local symbols and footprint aliases for candidate packages.
-4. Capture `b2b-interface.kicad_sch` from the `JPB1` pin map.
-5. Capture `input-protection.kicad_sch` and `logic-power.kicad_sch`.
-6. Capture one generic output template and copy it to OUT1 through OUT10.
-7. Capture current and thermal telemetry sheets.
-8. Add CAN1 TX-disable hardware with Rev.1 TX route DNP/open.
-9. Run schematic ERC and update the freeze checklist with evidence.
+4. Check every critical row in `PB-100-symbol-mpn-readiness.csv` has a
+   concrete symbol, package drawing, and sourcing alternative.
+5. Capture `b2b-interface.kicad_sch` from the `JPB1` pin map.
+6. Capture `input-protection.kicad_sch` and `logic-power.kicad_sch`.
+7. Capture one generic output template and copy it to OUT1 through OUT10.
+8. Capture current and thermal telemetry sheets.
+9. Add CAN1 TX-disable hardware with Rev.1 TX route DNP/open.
+10. Run schematic ERC and update the freeze checklist with evidence.
 
 ## Schematic rules
 
@@ -50,5 +52,6 @@ Placeholder child sheets are tracked in
 
 - ERC report.
 - Updated instance table with final references.
+- Updated symbol/MPN readiness table with concrete symbol and footprint status.
 - Updated BOM draft synchronized with chosen schematic symbols.
 - Updated freeze checklist evidence for all conditional gates.

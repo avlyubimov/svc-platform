@@ -22,7 +22,11 @@ Gerber generation, or footprint use without package drawing verification.
 Detailed inventory CSV:
 `hardware/power-board/PB-100/PB-100-kicad-footprint-plan.csv`.
 
-The inventory is package-focused, not a final MPN lock.
+Symbol/MPN readiness CSV:
+`hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv`.
+
+The inventories are package-focused and source-aware, but they are not final MPN
+locks.
 
 KiCad scaffold directory:
 `hardware/power-board/PB-100/kicad/`.
@@ -30,6 +34,9 @@ KiCad scaffold directory:
 ## Allowed prep work
 
 - Create schematic symbols for selected candidate families.
+- Convert each `PB-100-symbol-mpn-readiness.csv` row marked `Critical=yes` into
+  a concrete schematic symbol or documented class symbol before schematic
+  freeze.
 - Collect package drawings and courtyard requirements.
 - Create draft footprints in a separate library branch or clearly marked
   preliminary library.

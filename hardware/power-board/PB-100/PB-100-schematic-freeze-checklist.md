@@ -37,7 +37,7 @@ this checklist can close.
 | Logic power rails | Conditional | `hardware/power-board/PB-100/PB-100-power-path-candidates.csv`, `hardware/power-board/PB-100/PB-100-logic-power-rails.md`, `hardware/power-board/PB-100/PB-100-logic-power-budget.csv` | Buck and post-regulator strategy covers cold crank, load dump, telemetry, and LB-100 supply requirements |
 | Current telemetry | Conditional | `docs/requirements/pb-100-requirements.md`, `hardware/power-board/PB-100/PB-100-current-telemetry.md`, `hardware/power-board/PB-100/PB-100-current-telemetry-map.csv` | Per-output current and total input current measurement ranges are selected and mapped to LB-100 |
 | Thermal telemetry | Conditional | `docs/requirements/pb-100-requirements.md`, `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-map.csv` | PCB and power-zone temperature sensing strategy is selected and mapped to LB-100 |
-| Factory assembly readiness | Conditional | `docs/production/component-family-shortlist.md`, `production/bom/factory_bom_draft.csv` | Critical components have at least two alternatives and assembly-source status is checked |
+| Factory assembly readiness | Conditional | `docs/production/component-family-shortlist.md`, `hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv`, `production/bom/factory_bom_draft.csv` | Critical components have at least two alternatives and assembly-source status is checked |
 | Garage assembly readiness | Conditional | `production/bom/garage_bom_draft.csv`, `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md` | User-installed items are limited to connectors, fuses, enclosure hardware, and wiring |
 | Bench validation plan | Closed | `docs/testing/test-plan.md` | PB-100 bring-up, protection, thermal, current-budget, and CAN1 listen-only tests are explicitly listed |
 
@@ -63,6 +63,7 @@ Before marking this checklist `Closed`, the review packet must include:
 - Updated schematic package.
 - Final output channel matrix.
 - Final power-path candidate table with selected and alternate MPNs.
+- Final symbol/MPN readiness table with concrete symbol and footprint status.
 - Thermal and protection validation tables.
 - Final PB-100 to LB-100 pin map.
 - CAN1 TX-disable schematic input and verification notes.

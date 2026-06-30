@@ -533,3 +533,14 @@ files for accessory-role tokens such as `FOG`, `USB`, `SEAT`, `CHIGEE`, `DVR`,
 
 Reason: PB-100 must remain vehicle-agnostic. KiCad artifacts must use generic
 `OUT1`..`OUT10` naming and keep accessory roles in configuration only.
+
+## 2026-06-30 — PB-100 symbol/MPN readiness gate
+
+Decision: PB-100 schematic freeze now requires
+`hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv`, with critical
+symbol keys, preferred candidate MPNs/classes, at least two alternatives, source
+links, footprint status, and explicit assembly/sourcing recheck notes.
+
+Reason: Preliminary KiCad symbol work can proceed safely only if every critical
+component remains source-aware, non-final, and traceable to schematic-freeze
+evidence without starting PCB layout.

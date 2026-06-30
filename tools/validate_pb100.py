@@ -49,6 +49,37 @@ FORBIDDEN_ROLE_TOKENS = (
     "BRAKE",
     "CIGARETTE",
 )
+SYMBOL_MPN_COLUMNS = (
+    "Symbol key",
+    "Schematic block",
+    "Function",
+    "Critical",
+    "Preferred MPN or class",
+    "Preferred package",
+    "Alternate 1",
+    "Alternate 2",
+    "KiCad symbol status",
+    "Footprint status",
+    "Assembly/sourcing status",
+    "Freeze condition",
+    "Primary source",
+)
+REQUIRED_SYMBOL_KEYS = {
+    "HS_CTRL",
+    "OUT_FET",
+    "OUT2_ESCAPE_FET",
+    "INPUT_IDEAL_DIODE",
+    "INPUT_REVERSE_FET",
+    "INPUT_TVS",
+    "LOGIC_BUCK",
+    "TOTAL_CURRENT_MONITOR",
+    "TOTAL_CURRENT_SHUNT",
+    "THERMAL_NTC",
+    "B2B_CONNECTOR",
+    "OUTPUT_CONNECTOR",
+    "MAIN_FUSE_HOLDER",
+    "CAN1_TX_DISABLE",
+}
 
 
 def fail(message: str) -> None:
@@ -239,6 +270,81 @@ def validate_instance_plan() -> None:
                 fail(f"missing output instance reference: {expected_ref}")
 
 
+def validate_symbol_mpn_readiness() -> None:
+    path = PB100_DIR / "PB-100-symbol-mpn-readiness.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty symbol/MPN readiness table: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in SYMBOL_MPN_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    seen_keys = set()
+    for row_number, row in enumerate(rows, 2):
+        symbol_key = row["Symbol key"].strip()
+        if not symbol_key:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: missing symbol key")
+        if symbol_key in seen_keys:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate symbol key {symbol_key}")
+        seen_keys.add(symbol_key)
+
+        critical = row["Critical"].strip().lower()
+        if critical not in {"yes", "no"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Critical must be yes or no")
+
+        primary_source = row["Primary source"].strip()
+        if not primary_source:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: missing primary source")
+        if not (primary_source.startswith("https://") or primary_source.startswith("docs/")):
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: primary source must be "
+                "an https URL or an internal docs/ path"
+            )
+
+        for column in (
+            "Schematic block",
+            "Function",
+            "Preferred MPN or class",
+            "Preferred package",
+            "KiCad symbol status",
+            "Footprint status",
+            "Assembly/sourcing status",
+            "Freeze condition",
+        ):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+
+        if critical == "yes":
+            for column in ("Alternate 1", "Alternate 2"):
+                if not row[column].strip():
+                    fail(
+                        f"{path.relative_to(REPO_ROOT)}:{row_number}: "
+                        f"critical symbol {symbol_key} is missing {column}"
+                    )
+            assembly_status = row["Assembly/sourcing status"].lower()
+            if "recheck" not in assembly_status and "garage-installed" not in assembly_status:
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{row_number}: critical symbol "
+                    f"{symbol_key} must keep assembly/sourcing recheck explicit"
+                )
+
+        if row["KiCad symbol status"].strip().lower() in {"final", "locked"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: symbol status must not be final/locked")
+
+    missing_keys = sorted(REQUIRED_SYMBOL_KEYS - seen_keys)
+    if missing_keys:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required symbol keys: "
+            f"{', '.join(missing_keys)}"
+        )
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -263,6 +369,7 @@ def main() -> int:
     validate_symbol_library()
     validate_kicad_no_role_tokens()
     validate_instance_plan()
+    validate_symbol_mpn_readiness()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0
