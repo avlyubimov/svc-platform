@@ -132,3 +132,42 @@ svc_rule_text_status_t svc_rule_text_parse_action(
     action->type = pwm_value == 0UL ? SVC_RULE_ACTION_DISABLE_ROLE : SVC_RULE_ACTION_ENABLE_ROLE;
     return SVC_RULE_TEXT_OK;
 }
+
+svc_rule_text_status_t svc_rule_text_compile_rule(
+    const char *const *condition_texts,
+    size_t condition_count,
+    const char *action_text,
+    svc_rule_condition_t *condition_buffer,
+    size_t condition_capacity,
+    svc_rule_t *rule)
+{
+    if (rule == NULL || action_text == NULL) {
+        return SVC_RULE_TEXT_INVALID_ARGUMENT;
+    }
+    if (condition_count > condition_capacity) {
+        return SVC_RULE_TEXT_TOO_MANY_CONDITIONS;
+    }
+    if (condition_count > 0U && (condition_texts == NULL || condition_buffer == NULL)) {
+        return SVC_RULE_TEXT_INVALID_ARGUMENT;
+    }
+
+    for (size_t condition_index = 0U; condition_index < condition_count; ++condition_index) {
+        const svc_rule_text_status_t status = svc_rule_text_parse_condition(
+            condition_texts[condition_index],
+            &condition_buffer[condition_index]);
+        if (status != SVC_RULE_TEXT_OK) {
+            return status;
+        }
+    }
+
+    svc_rule_action_t action = {0};
+    const svc_rule_text_status_t action_status = svc_rule_text_parse_action(action_text, &action);
+    if (action_status != SVC_RULE_TEXT_OK) {
+        return action_status;
+    }
+
+    rule->conditions = condition_buffer;
+    rule->condition_count = condition_count;
+    rule->action = action;
+    return SVC_RULE_TEXT_OK;
+}

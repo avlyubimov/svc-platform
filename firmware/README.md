@@ -43,3 +43,4 @@ Current host tests cover:
 - Rule runner evaluation for matched/unmatched conditions before role actions.
 - Rule text parser for the initial supported JSON rule condition/action grammar.
 - Output Manager PWM duty-cycle ownership and `pwm_allowed` enforcement.
+- Rule text compile helper from condition/action strings to in-memory `svc_rule_t`.

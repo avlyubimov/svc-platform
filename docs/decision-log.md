@@ -425,3 +425,13 @@ the output, and partial duty is denied when `pwm_allowed` is false.
 
 Reason: PWM requests must remain behind the same safety boundary as on/off
 output state, budget checks, lockout, and role mapping.
+
+## 2026-06-30 — Firmware rule text compile helper
+
+Decision: Rule text parsing can now compile condition/action strings into an
+in-memory `svc_rule_t` using caller-provided condition storage, and tests execute
+that compiled rule through the Rule Engine and Output Manager.
+
+Reason: The firmware needs a deterministic bridge from configuration rule text
+to executable in-memory rules without adding dynamic allocation or a full JSON
+parser to the embedded layer yet.

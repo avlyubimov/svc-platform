@@ -85,7 +85,14 @@ RULE_ENGINE_SRCS := \
 	services/rule_engine.c \
 	tests/test_rule_engine.c
 RULE_TEXT_SRCS := \
+	core/svc_config_defaults.c \
+	services/battery_service.c \
+	services/config_validator.c \
+	services/output_manager.c \
+	services/power_budget.c \
 	services/rule_condition.c \
+	services/role_resolver.c \
+	services/rule_engine.c \
 	services/rule_text.c \
 	tests/test_rule_text.c
 HOST_TESTS := \

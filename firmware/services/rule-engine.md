@@ -52,3 +52,7 @@ Rule text parsing is implemented in:
 - `firmware/services/rule_text.h`
 - `firmware/services/rule_text.c`
 - `firmware/tests/test_rule_text.c`
+
+The parser can also compile condition/action strings into an in-memory
+`svc_rule_t` using caller-provided condition storage, so embedded code can avoid
+dynamic allocation.
