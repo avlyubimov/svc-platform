@@ -504,3 +504,13 @@ through the Output Manager on thermal cutoff or stale thermal telemetry.
 Reason: Thermal decisions must be applied through the same centralized output
 safety boundary as battery cutoff and output faults; recovery must not
 automatically restore previous loads.
+
+## 2026-06-30 — Project final readiness gates
+
+Decision: `docs/product/final-readiness.md` now defines repository readiness
+levels, automated gates, schematic-freeze requirements, PCB-layout blockers, and
+prototype bring-up prerequisites.
+
+Reason: The project now has enough hardware planning, KiCad scaffold, firmware
+safety code, and validation tooling that “ready” must be explicit and separated
+from PB-100 PCB layout authorization.

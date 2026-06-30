@@ -8,6 +8,7 @@ Status: Complete
 - ADRs
 - Requirements
 - BOM strategy
+- Final readiness gates
 
 ## Phase 1 — PB-100 Power Board
 Status: In progress

@@ -20,6 +20,8 @@ Do not start PCB layout until the PB-100 schematic freeze checklist is closed.
 Repository validation blocks PB-100 layout/manufacturing artifacts before that
 freeze.
 
+Final readiness gates are tracked in `docs/product/final-readiness.md`.
+
 ## Validation
 
 ```bash
