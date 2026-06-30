@@ -18,6 +18,12 @@ PB-100 schematic input for CAN1 TX disable is tracked in
 
 Rev.1 firmware must not transmit frames to vehicle CAN.
 
+Firmware guard implementation:
+
+- `firmware/services/can_safety.h`
+- `firmware/services/can_safety.c`
+- `firmware/tests/test_can_safety.c`
+
 ## Allowed actions
 
 - listen

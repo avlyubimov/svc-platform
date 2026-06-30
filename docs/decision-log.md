@@ -308,3 +308,11 @@ overflow rejection, and empty-pop protection.
 
 Reason: The architecture requires CAN, sensors, rules, logging, and output
 control to communicate through events instead of direct feature-to-feature calls.
+
+## 2026-06-30 — Firmware CAN safety guard
+
+Decision: Firmware now has a host-testable CAN safety guard that denies CAN1
+vehicle transmit attempts in Rev.1 and allows CAN2 expansion transmit.
+
+Reason: Vehicle CAN must remain read-only by default even if higher-level code
+attempts to transmit.

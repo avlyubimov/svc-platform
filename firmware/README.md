@@ -28,3 +28,4 @@ Current host tests cover:
 - Battery protection warning, cutoff latch, recovery, and invalid telemetry
   behavior.
 - Event Bus FIFO order, overflow rejection, and empty-pop behavior.
+- CAN1 listen-only TX denial and CAN2 expansion TX allowance.
