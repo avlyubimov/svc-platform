@@ -391,6 +391,8 @@ def validate_symbol_capture_worklist() -> None:
         if row["Critical"].strip().lower() == "yes"
     }
 
+    symbol_text = read_text(KICAD_DIR / "lib" / "PB100.kicad_sym")
+    open_items_text = read_text(PB100_DIR / "PB-100-symbol-open-items.md")
     worklist_keys = set()
     for row_number, row in enumerate(rows, 2):
         symbol_key = row["Symbol key"].strip()
@@ -431,6 +433,22 @@ def validate_symbol_capture_worklist() -> None:
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
         if "do not" not in row["Blocked action"].lower():
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+
+        created = "preliminary symbol created" in row["Pin evidence status"].strip().lower()
+        symbol_present = f'(symbol "{concrete_symbol_name}"' in symbol_text
+        if not created:
+            if not row["Pin evidence status"].strip().lower().startswith("pending"):
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: pending symbol status must be explicit")
+            if symbol_present:
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{row_number}: pending symbol "
+                    f"{concrete_symbol_name} is already present in PB100.kicad_sym"
+                )
+            if symbol_key not in open_items_text or concrete_symbol_name not in open_items_text:
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{row_number}: pending symbol "
+                    f"{symbol_key}/{concrete_symbol_name} must be tracked in PB-100-symbol-open-items.md"
+                )
 
     missing_worklist_keys = sorted(critical_keys - worklist_keys)
     if missing_worklist_keys:

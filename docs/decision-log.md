@@ -610,3 +610,14 @@ generated from `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`, and
 Reason: The PB-100/LB-100 interface can be captured schematically without
 choosing or placing a final mezzanine connector footprint. The pin contract
 remains source-controlled and machine-checked before connector MPN lock.
+
+## 2026-06-30 — PB-100 pending symbol gate
+
+Decision: PB-100 now tracks intentionally uncreated schematic symbols in
+`hardware/power-board/PB-100/PB-100-symbol-open-items.md`, and
+`tools/validate_pb100.py` fails if a pending symbol appears in `PB100.kicad_sym`
+without its worklist status and evidence being updated.
+
+Reason: The IAUTN06S5N008/TOLL input reverse MOSFET is high-risk for package and
+assembly lock. It must remain explicit pending work until pin evidence, package
+drawing, and factory assembly support are reviewed.
