@@ -246,3 +246,13 @@ protection, logic power, outputs, telemetry, B2B interface, and CAN1 safety.
 
 Reason: The schematic workspace now mirrors the capture plan and can be filled
 incrementally without starting PCB layout.
+
+## 2026-06-30 — PB-100 preliminary abstract symbols
+
+Decision: PB-100 local KiCad symbol library now includes abstract preliminary
+symbols for input protection, logic power, generic output channels, JPB1, and
+CAN1 TX-disable scaffolding.
+
+Reason: Schematic capture can proceed at block level before final vendor pinouts
+and footprints are locked, while keeping these symbols explicitly non-final and
+excluded from BOM/on-board status.

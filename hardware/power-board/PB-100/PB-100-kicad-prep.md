@@ -34,6 +34,8 @@ KiCad scaffold directory:
 - Create draft footprints in a separate library branch or clearly marked
   preliminary library.
 - Add 3D model placeholders only after footprint dimensions are verified.
+- Use `PB100_*_PRELIM` symbols only as abstract schematic-capture scaffolding;
+  replace them before schematic freeze.
 
 ## Blocked work
 
