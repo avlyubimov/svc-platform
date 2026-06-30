@@ -10,6 +10,33 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PB100_DIR = REPO_ROOT / "hardware" / "power-board" / "PB-100"
 KICAD_DIR = PB100_DIR / "kicad"
+PRODUCTION_DIR = REPO_ROOT / "production"
+DISALLOWED_LAYOUT_SUFFIXES = {
+    ".kicad_pcb",
+    ".drl",
+    ".gbr",
+    ".gbl",
+    ".gbo",
+    ".gbs",
+    ".gko",
+    ".gm1",
+    ".gtl",
+    ".gto",
+    ".gts",
+    ".kicad_pos",
+    ".pos",
+    ".xln",
+    ".zip",
+}
+DISALLOWED_LAYOUT_NAME_FRAGMENTS = (
+    "gerber",
+    "drill",
+    "pick-place",
+    "pick_and_place",
+    "pickplace",
+    "placement",
+)
+MANUFACTURING_HINT_SUFFIXES = {".csv", ".rpt", ".txt", ".xlsx", ".zip"}
 
 
 def fail(message: str) -> None:
@@ -75,8 +102,21 @@ def validate_kicad_scaffold() -> None:
     for table_name in ("sym-lib-table", "fp-lib-table"):
         validate_s_expression_balance(KICAD_DIR / table_name)
     validate_s_expression_balance(KICAD_DIR / "lib" / "PB100.kicad_sym")
-    if list(KICAD_DIR.rglob("*.kicad_pcb")):
-        fail("PB-100 KiCad scaffold must not contain .kicad_pcb before schematic freeze")
+    validate_no_layout_artifacts()
+
+
+def validate_no_layout_artifacts() -> None:
+    search_roots = (PB100_DIR, PRODUCTION_DIR)
+    for search_root in search_roots:
+        for path in search_root.rglob("*"):
+            if not path.is_file():
+                continue
+            name = path.name.lower()
+            suffix = path.suffix.lower()
+            if name.endswith(".kicad_pcb-bak") or suffix in DISALLOWED_LAYOUT_SUFFIXES:
+                fail(f"layout/manufacturing artifact is blocked before schematic freeze: {path.relative_to(REPO_ROOT)}")
+            if suffix in MANUFACTURING_HINT_SUFFIXES and any(fragment in name for fragment in DISALLOWED_LAYOUT_NAME_FRAGMENTS):
+                fail(f"layout/manufacturing artifact name is blocked before schematic freeze: {path.relative_to(REPO_ROOT)}")
 
 
 def validate_symbol_library() -> None:

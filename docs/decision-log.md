@@ -435,3 +435,13 @@ that compiled rule through the Rule Engine and Output Manager.
 Reason: The firmware needs a deterministic bridge from configuration rule text
 to executable in-memory rules without adding dynamic allocation or a full JSON
 parser to the embedded layer yet.
+
+## 2026-06-30 — PB-100 layout artifact blocker
+
+Decision: `tools/validate_pb100.py` now blocks PB-100 PCB layout and
+manufacturing artifacts, including `.kicad_pcb`, Gerber, drill, placement, and
+zipped manufacturing outputs, before schematic freeze.
+
+Reason: Architecture and project rules prohibit PCB layout before the PB-100
+schematic freeze checklist is closed, so the repository validator must enforce
+that boundary automatically.

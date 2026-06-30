@@ -15,7 +15,8 @@ This directory contains the preliminary KiCad project scaffold for PB-100.
 - `lib/PB100.pretty/`: empty preliminary local footprint library.
 
 There is intentionally no `PB-100.kicad_pcb` file. PCB layout remains blocked
-until schematic freeze.
+until schematic freeze. Gerber, drill, pick-and-place, placement, and zipped
+manufacturing outputs are also blocked by repository validation.
 
 ## Source documents
 
@@ -43,3 +44,6 @@ Run from repository root:
 ```bash
 python3 tools/validate_pb100.py
 ```
+
+The validator intentionally fails if layout/manufacturing artifacts appear before
+the PB-100 schematic freeze checklist is closed.
