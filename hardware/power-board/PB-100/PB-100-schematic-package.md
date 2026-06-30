@@ -12,6 +12,7 @@ It is not a PCB layout package.
 - `docs/adr/ADR-0006-pb-100-baseline-requirements.md`
 - `docs/adr/ADR-0007-pb-100-high-side-output-switching.md`
 - `docs/adr/ADR-0008-pb-100-current-budget.md`
+- `docs/adr/ADR-0010-pb-100-power-path-candidate-strategy.md`
 - `docs/production/component-family-shortlist.md`
 
 ## Electrical baseline
@@ -27,9 +28,9 @@ It is not a PCB layout package.
 
 | Class | Outputs | Target fuse | Target current limit | Initial implementation direction |
 |---|---|---:|---:|---|
-| High current | OUT2 | 20 A | 18 A | External N-MOSFET high-side controller |
-| Medium current | OUT1, OUT3, OUT4, OUT6, OUT7, OUT10 | 10-15 A | 8-12 A | Smart high-side switch or external controller after thermal review |
-| Low current | OUT5, OUT8, OUT9 | 5 A | 4 A | Smart high-side switch preferred |
+| High current | OUT2 | 20 A | 18 A | TPS48110AQDGXRQ1-class controller plus external 60 V N-MOSFET |
+| Medium current | OUT1, OUT3, OUT4, OUT6, OUT7, OUT10 | 10-15 A | 8-12 A | TPS48110AQDGXRQ1-class controller plus external 60 V N-MOSFET |
+| Low current | OUT5, OUT8, OUT9 | 5 A | 4 A | TPS2HB35BQPWPRQ1-class smart high-side switch |
 
 ## Required schematic blocks
 
@@ -71,6 +72,14 @@ Output matrix CSV:
 The matrix keeps hardware outputs generic while carrying the BMW K25 reference
 defaults needed for sizing and bench tests.
 
+## Power-path candidates
+
+Candidate MPN CSV:
+`hardware/power-board/PB-100/PB-100-power-path-candidates.csv`.
+
+These candidates are allowed for schematic planning only. Final MPN lock still
+requires SOA, thermal, clamp-voltage, and assembly-class validation.
+
 ## Net naming rules
 
 - Use neutral output identifiers: `OUT1` through `OUT10`.
@@ -80,7 +89,7 @@ defaults needed for sizing and bench tests.
 
 ## Schematic freeze blockers
 
-- Pick one implementation path per output class.
+- Validate candidate MPNs in `PB-100-power-path-candidates.csv`.
 - Confirm high-side switch/controller thermal limits.
 - Confirm MOSFET SOA for OUT2 compressor startup/inrush.
 - Confirm TVS clamp voltage against high-side controller, MOSFET, and buck

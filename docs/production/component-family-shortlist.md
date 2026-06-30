@@ -36,6 +36,19 @@ order.
 | IMU | Bosch BMI270/BMI323 | TDK ICM-42688 class | LGA | Optional for Rev.1 if layout risk is high |
 | Ambient light | Vishay VEML7700 | TI OPT3001 | SMD optical | Placement and window design required |
 
+## PB-100 power-path candidates
+
+Detailed candidate MPNs for PB-100 schematic planning are tracked in
+`hardware/power-board/PB-100/PB-100-power-path-candidates.csv`.
+
+The current strategy is:
+
+- High and medium outputs: TPS48110AQDGXRQ1-class high-side controller plus
+  external 60 V N-MOSFET.
+- Low-current outputs: TPS2HB35BQPWPRQ1-class integrated smart high-side switch.
+- Input reverse protection: LM74700QDBVRQ1-class ideal-diode controller.
+- Input transient clamp: SM8S33A-class load-dump TVS.
+
 ## Evidence links
 
 - STM32H563VI is active and in volume production at ST: https://www.st.com/en/microcontrollers-microprocessors/stm32h563vi.html
@@ -45,6 +58,11 @@ order.
 - NXP TJA1051T/3 variants were listed at LCSC: https://www.lcsc.com/product-detail/C58988.html
 - TI TCAN1042-Q1 was listed at LCSC: https://www.lcsc.com/product-detail/can-transceivers_texas-instruments-tcan1042hgvdrbrq1_C2671243.html
 - TI TPS4811-Q1 is active as an automotive high-side driver with protection and diagnostics: https://www.ti.com/product/TPS4811-Q1
+- TI TPS48110AQDGXRQ1 was listed at LCSC on the snapshot date: https://www.lcsc.com/product-image/C17556513.html
+- TI TPS2HB35BQPWPRQ1 was listed at LCSC on the snapshot date: https://www.lcsc.com/product-detail/power-distribution-switches_texas-instruments-tps2hb35bqpwprq1_C3230080.html
+- Vishay SIDR626LDP-T1-RE3 was listed at LCSC on the snapshot date: https://www.lcsc.com/product-detail/C3279576.html
+- TI LM74700QDBVRQ1 was listed at LCSC on the snapshot date: https://www.lcsc.com/product-detail/C2941042.html
+- SM8S33A-class TVS reference data was checked for clamp-voltage planning: https://www.mccsemi.com/products/esd-protection-and-power-tvs/tvs/SM8S33A
 - TI TPS2HB16-Q1 datasheet is available through LCSC: https://datasheet.lcsc.com/datasheet/pdf/5e972c8f510fd1d0477aeb85de68fc2f.pdf
 - TI INA226AIDGST was listed at LCSC: https://www.lcsc.com/product-detail/current-sense-amplifiers_texas-instruments-ina226aidgst_C2653870.html
 - TI LM5164QDDATQ1 was listed at LCSC: https://www.lcsc.com/product-detail/C1850350.html

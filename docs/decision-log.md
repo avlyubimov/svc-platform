@@ -85,3 +85,14 @@ continue implementation.
 Reason: The required platform decisions are accepted, PB-100 baseline
 requirements are stable enough for schematic planning, and component families
 have initial alternatives.
+
+## 2026-06-30 — PB-100 power-path candidate strategy
+
+Decision: ADR-0010 selects external smart high-side controller plus external
+60 V N-MOSFET for high/medium outputs, integrated smart high-side switches for
+low-current outputs, LM74700-class reverse protection, and SM8S33A-class input
+TVS sizing.
+
+Reason: This keeps thermal and SOA margin for compressor, heated-seat, and
+lighting loads while retaining simpler integrated switches for low-current
+channels.
