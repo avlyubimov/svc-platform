@@ -589,3 +589,14 @@ pin evidence until final MPN/package selection.
 Reason: Schematic capture can represent protection, telemetry, and
 garage-installed interfaces without pretending that package drawings, PCB
 footprints, or final sourcing are locked.
+
+## 2026-06-30 — PB-100 MOSFET and CAN safety preliminary symbols
+
+Decision: PB-100 now has preliminary symbols and pin evidence for
+SIDR626LDP-class output MOSFETs, a Nexperia LFPAK88 escape MOSFET class, and
+the CAN1 TX-disable schematic gate. Infineon TOLL input-reverse MOSFET symbol
+work remains pending until package pin evidence is reviewed separately.
+
+Reason: Output-channel schematic capture needs MOSFET symbols now, but the
+input reverse-protection TOLL package and OUT2 escape decision must not be
+locked before SOA, thermal, and assembly evidence closes.

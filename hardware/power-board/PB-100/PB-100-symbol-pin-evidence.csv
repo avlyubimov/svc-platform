@@ -55,3 +55,21 @@ PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,1,OUTn_LOAD,hardware/power-board/PB-100/PB-1
 PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,2,GND_RETURN,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage connector class,Generic output ground return
 PB100_MAIN_FUSE_CLASS_PRELIM,1,VBAT_BATT,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage fuse class,Battery side of near-battery fuse
 PB100_MAIN_FUSE_CLASS_PRELIM,2,VBAT_FUSED,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage fuse class,Protected side after near-battery fuse
+PB100_SIDR626LDP_PRELIM,1,S,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B May 2024,PowerPAK SO-8DC,Source lead
+PB100_SIDR626LDP_PRELIM,2,S,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B May 2024,PowerPAK SO-8DC,Source lead
+PB100_SIDR626LDP_PRELIM,3,S,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B May 2024,PowerPAK SO-8DC,Source lead
+PB100_SIDR626LDP_PRELIM,4,G,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B May 2024,PowerPAK SO-8DC,Gate lead
+PB100_SIDR626LDP_PRELIM,5,D,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B May 2024,PowerPAK SO-8DC,Drain lead
+PB100_SIDR626LDP_PRELIM,6,D,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B May 2024,PowerPAK SO-8DC,Drain lead
+PB100_SIDR626LDP_PRELIM,7,D,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B May 2024,PowerPAK SO-8DC,Drain lead
+PB100_SIDR626LDP_PRELIM,8,D,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B May 2024,PowerPAK SO-8DC,Drain lead
+PB100_POWER_NMOS_ESCAPE_PRELIM,1,G,https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf,Preliminary data sheet February 2024,LFPAK88 SOT1235,Gate
+PB100_POWER_NMOS_ESCAPE_PRELIM,2,S,https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf,Preliminary data sheet February 2024,LFPAK88 SOT1235,Source
+PB100_POWER_NMOS_ESCAPE_PRELIM,3,S,https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf,Preliminary data sheet February 2024,LFPAK88 SOT1235,Source
+PB100_POWER_NMOS_ESCAPE_PRELIM,4,S,https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf,Preliminary data sheet February 2024,LFPAK88 SOT1235,Source
+PB100_POWER_NMOS_ESCAPE_PRELIM,mb,D,https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf,Preliminary data sheet February 2024,LFPAK88 SOT1235,Mounting base connected to drain
+PB100_CAN1_TX_DISABLE_PRELIM,1,CAN1_TX_DISABLE_CMD,hardware/power-board/PB-100/PB-100-can1-tx-disable.md,Internal Rev.1 schematic class,DNP/default-disabled CAN1 safety gate,Disable command input
+PB100_CAN1_TX_DISABLE_PRELIM,2,CAN1_TX_DISABLED_STATUS,hardware/power-board/PB-100/PB-100-can1-tx-disable.md,Internal Rev.1 schematic class,DNP/default-disabled CAN1 safety gate,Disable status output
+PB100_CAN1_TX_DISABLE_PRELIM,3,CAN1_TX_ROUTE,hardware/power-board/PB-100/PB-100-can1-tx-disable.md,Internal Rev.1 schematic class,DNP/default-disabled CAN1 safety gate,DNP/open TX route
+PB100_CAN1_TX_DISABLE_PRELIM,4,CAN1_RX_ROUTE,hardware/power-board/PB-100/PB-100-can1-tx-disable.md,Internal Rev.1 schematic class,DNP/default-disabled CAN1 safety gate,RX route independent of TX
+PB100_CAN1_TX_DISABLE_PRELIM,5,GND,hardware/power-board/PB-100/PB-100-can1-tx-disable.md,Internal Rev.1 schematic class,DNP/default-disabled CAN1 safety gate,Ground reference
