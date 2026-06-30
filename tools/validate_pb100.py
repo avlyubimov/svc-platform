@@ -92,6 +92,15 @@ SYMBOL_WORKLIST_COLUMNS = (
     "Blocked action",
     "Freeze close evidence",
 )
+SYMBOL_PIN_EVIDENCE_COLUMNS = (
+    "Symbol name",
+    "Pin number",
+    "Pin name",
+    "Source",
+    "Source revision",
+    "Package",
+    "Notes",
+)
 
 
 def fail(message: str) -> None:
@@ -460,6 +469,82 @@ def validate_symbol_capture_progress() -> None:
             fail(f"preliminary symbol {symbol_name} must not lock a footprint")
 
 
+def symbol_block(symbol_text: str, symbol_name: str) -> str:
+    marker = f'(symbol "{symbol_name}"'
+    start = symbol_text.find(marker)
+    if start < 0:
+        return ""
+    next_symbol = symbol_text.find('\n  (symbol "', start + 1)
+    if next_symbol < 0:
+        next_symbol = symbol_text.rfind("\n)")
+    return symbol_text[start:next_symbol]
+
+
+def validate_symbol_pin_evidence() -> None:
+    path = PB100_DIR / "PB-100-symbol-pin-evidence.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty symbol pin evidence table: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in SYMBOL_PIN_EVIDENCE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    worklist_path = PB100_DIR / "PB-100-symbol-capture-worklist.csv"
+    worklist_rows = list(csv.DictReader(worklist_path.open(newline="", encoding="utf-8")))
+    created_symbols = {
+        row["Concrete symbol name"].strip()
+        for row in worklist_rows
+        if "preliminary symbol created" in row["Pin evidence status"].strip().lower()
+    }
+
+    symbol_text = read_text(KICAD_DIR / "lib" / "PB100.kicad_sym")
+    evidence_by_symbol: dict[str, set[tuple[str, str]]] = {}
+    for row_number, row in enumerate(rows, 2):
+        symbol_name = row["Symbol name"].strip()
+        pin_number = row["Pin number"].strip()
+        pin_name = row["Pin name"].strip()
+        source = row["Source"].strip()
+        if not symbol_name or not pin_number or not pin_name:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: missing symbol or pin identity")
+        if not source.startswith("https://"):
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: source must be an https URL")
+        for column in ("Source revision", "Package", "Notes"):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+
+        block = symbol_block(symbol_text, symbol_name)
+        if not block:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: symbol {symbol_name} is missing")
+
+        expected_name = f'(name "{pin_name}"'
+        expected_number = f'(number "{pin_number}"'
+        pin_matches = [
+            line
+            for line in block.splitlines()
+            if expected_name in line and expected_number in line
+        ]
+        if not pin_matches:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: pin {pin_number} "
+                f"{pin_name} is not present in {symbol_name}"
+            )
+
+        evidence_by_symbol.setdefault(symbol_name, set()).add((pin_number, pin_name))
+
+    missing_evidence = sorted(created_symbols - evidence_by_symbol.keys())
+    if missing_evidence:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing pin evidence for created symbols: "
+            f"{', '.join(missing_evidence)}"
+        )
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -487,6 +572,7 @@ def main() -> int:
     validate_symbol_mpn_readiness()
     validate_symbol_capture_worklist()
     validate_symbol_capture_progress()
+    validate_symbol_pin_evidence()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0

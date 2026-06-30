@@ -1,0 +1,45 @@
+Symbol name,Pin number,Pin name,Source,Source revision,Package,Notes
+PB100_TPS48110AQDGXRQ1_PRELIM,1,EN/UVLO,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Enable and UVLO input
+PB100_TPS48110AQDGXRQ1_PRELIM,2,OV,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Overvoltage threshold input
+PB100_TPS48110AQDGXRQ1_PRELIM,3,INP,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Input signal for PD and PU state
+PB100_TPS48110AQDGXRQ1_PRELIM,4,FLT_T,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Open-drain overtemperature fault output
+PB100_TPS48110AQDGXRQ1_PRELIM,5,FLT_I,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Open-drain overcurrent fault output
+PB100_TPS48110AQDGXRQ1_PRELIM,6,GND,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Ground
+PB100_TPS48110AQDGXRQ1_PRELIM,7,IMON,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Analog current monitor output
+PB100_TPS48110AQDGXRQ1_PRELIM,8,IWRN,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Overcurrent threshold setting
+PB100_TPS48110AQDGXRQ1_PRELIM,9,TMR,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Fault timer input
+PB100_TPS48110AQDGXRQ1_PRELIM,10,DIODE,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Remote temperature-sense diode input
+PB100_TPS48110AQDGXRQ1_PRELIM,11,N.C.,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,No connect on TPS48110-Q1
+PB100_TPS48110AQDGXRQ1_PRELIM,12,BST,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Bootstrapped high-side supply
+PB100_TPS48110AQDGXRQ1_PRELIM,13,SRC,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,External FET source connection
+PB100_TPS48110AQDGXRQ1_PRELIM,14,PD,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Gate driver pull-down
+PB100_TPS48110AQDGXRQ1_PRELIM,15,PU,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Gate driver pull-up
+PB100_TPS48110AQDGXRQ1_PRELIM,17,CS-,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Current sense negative input
+PB100_TPS48110AQDGXRQ1_PRELIM,18,CS+,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Current sense positive input
+PB100_TPS48110AQDGXRQ1_PRELIM,19,ISCP,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Short-circuit threshold setting
+PB100_TPS48110AQDGXRQ1_PRELIM,20,VS,https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,SLUSEE5E April 2026,DGX-19 VSSOP,Controller supply pin
+PB100_LM74700QDBVRQ1_PRELIM,1,VCAP,https://www.ti.com/lit/ds/symlink/lm74700-q1.pdf,SNOSD17G December 2020,DBV SOT-23-6,Charge pump output
+PB100_LM74700QDBVRQ1_PRELIM,2,GND,https://www.ti.com/lit/ds/symlink/lm74700-q1.pdf,SNOSD17G December 2020,DBV SOT-23-6,Ground
+PB100_LM74700QDBVRQ1_PRELIM,3,EN,https://www.ti.com/lit/ds/symlink/lm74700-q1.pdf,SNOSD17G December 2020,DBV SOT-23-6,Enable input
+PB100_LM74700QDBVRQ1_PRELIM,4,CATHODE,https://www.ti.com/lit/ds/symlink/lm74700-q1.pdf,SNOSD17G December 2020,DBV SOT-23-6,Ideal-diode cathode
+PB100_LM74700QDBVRQ1_PRELIM,5,GATE,https://www.ti.com/lit/ds/symlink/lm74700-q1.pdf,SNOSD17G December 2020,DBV SOT-23-6,External N-MOSFET gate drive
+PB100_LM74700QDBVRQ1_PRELIM,6,ANODE,https://www.ti.com/lit/ds/symlink/lm74700-q1.pdf,SNOSD17G December 2020,DBV SOT-23-6,Ideal-diode anode and input power
+PB100_LM5164QDDATQ1_PRELIM,1,GND,https://www.ti.com/lit/ds/symlink/lm5164-q1.pdf,SNVSB51C December 2025,DDA SO PowerPAD-8,Ground
+PB100_LM5164QDDATQ1_PRELIM,2,VIN,https://www.ti.com/lit/ds/symlink/lm5164-q1.pdf,SNVSB51C December 2025,DDA SO PowerPAD-8,Regulator input supply
+PB100_LM5164QDDATQ1_PRELIM,3,EN/UVLO,https://www.ti.com/lit/ds/symlink/lm5164-q1.pdf,SNVSB51C December 2025,DDA SO PowerPAD-8,Enable and UVLO programming input
+PB100_LM5164QDDATQ1_PRELIM,4,RON,https://www.ti.com/lit/ds/symlink/lm5164-q1.pdf,SNVSB51C December 2025,DDA SO PowerPAD-8,On-time programming input
+PB100_LM5164QDDATQ1_PRELIM,5,FB,https://www.ti.com/lit/ds/symlink/lm5164-q1.pdf,SNVSB51C December 2025,DDA SO PowerPAD-8,Feedback input
+PB100_LM5164QDDATQ1_PRELIM,6,PGOOD,https://www.ti.com/lit/ds/symlink/lm5164-q1.pdf,SNVSB51C December 2025,DDA SO PowerPAD-8,Open-drain power-good output
+PB100_LM5164QDDATQ1_PRELIM,7,BST,https://www.ti.com/lit/ds/symlink/lm5164-q1.pdf,SNVSB51C December 2025,DDA SO PowerPAD-8,Bootstrap gate-drive supply
+PB100_LM5164QDDATQ1_PRELIM,8,SW,https://www.ti.com/lit/ds/symlink/lm5164-q1.pdf,SNVSB51C December 2025,DDA SO PowerPAD-8,Switching node
+PB100_LM5164QDDATQ1_PRELIM,EP,EP,https://www.ti.com/lit/ds/symlink/lm5164-q1.pdf,SNVSB51C December 2025,DDA SO PowerPAD-8,Exposed pad connected to ground copper
+PB100_INA228_Q1_PRELIM,1,A1,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,I2C address pin
+PB100_INA228_Q1_PRELIM,2,A0,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,I2C address pin
+PB100_INA228_Q1_PRELIM,3,ALERT,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,Open-drain alert output
+PB100_INA228_Q1_PRELIM,4,SDA,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,I2C data
+PB100_INA228_Q1_PRELIM,5,SCL,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,I2C clock
+PB100_INA228_Q1_PRELIM,6,VS,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,Power supply
+PB100_INA228_Q1_PRELIM,7,GND,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,Ground
+PB100_INA228_Q1_PRELIM,8,VBUS,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,Bus voltage input
+PB100_INA228_Q1_PRELIM,9,IN-,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,Current sense negative input
+PB100_INA228_Q1_PRELIM,10,IN+,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,Current sense positive input

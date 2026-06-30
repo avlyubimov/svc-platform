@@ -36,6 +36,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
 - `hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-capture-worklist.csv`
+- `hardware/power-board/PB-100/PB-100-symbol-pin-evidence.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`

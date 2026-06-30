@@ -28,6 +28,7 @@ manufacturing outputs are also blocked by repository validation.
 - `../PB-100-kicad-footprint-plan.csv`
 - `../PB-100-symbol-mpn-readiness.csv`
 - `../PB-100-symbol-capture-worklist.csv`
+- `../PB-100-symbol-pin-evidence.csv`
 - `../PB-100-schematic-freeze-checklist.md`
 
 ## Next KiCad work
@@ -64,3 +65,7 @@ generic `OUT1`..`OUT10` naming only.
 Rows in `PB-100-symbol-capture-worklist.csv` that say `preliminary symbol
 created` are checked against `lib/PB100.kicad_sym`; those symbols must stay
 excluded from BOM and board output until schematic freeze.
+
+`PB-100-symbol-pin-evidence.csv` records the official data-sheet pin tables used
+for those preliminary symbols. Validation checks each recorded pin number/name
+against the KiCad symbol library.

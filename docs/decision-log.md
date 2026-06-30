@@ -567,3 +567,14 @@ sheets and kept excluded from BOM/board output.
 Reason: These are core schematic-capture dependencies for output control, input
 reverse protection, protected 5 V power, and total input current telemetry. They
 can be reviewed now without locking footprints or authorizing PCB layout.
+
+## 2026-06-30 — PB-100 symbol pin evidence validation
+
+Decision: Created PB-100 preliminary symbols now have
+`hardware/power-board/PB-100/PB-100-symbol-pin-evidence.csv`, and
+`tools/validate_pb100.py` checks every recorded pin number/name against
+`PB100.kicad_sym`.
+
+Reason: Schematic capture needs traceable pinout provenance. A machine check
+prevents the worklist from claiming a symbol is created while the KiCad library
+misses or renames pins.

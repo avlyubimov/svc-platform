@@ -65,6 +65,7 @@ Before marking this checklist `Closed`, the review packet must include:
 - Final power-path candidate table with selected and alternate MPNs.
 - Final symbol/MPN readiness table with concrete symbol and footprint status.
 - Final symbol capture worklist with pin evidence and blocked actions.
+- Final symbol pin evidence table for created preliminary symbols.
 - Thermal and protection validation tables.
 - Final PB-100 to LB-100 pin map.
 - CAN1 TX-disable schematic input and verification notes.
