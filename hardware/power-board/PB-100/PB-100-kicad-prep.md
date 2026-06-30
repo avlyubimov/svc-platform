@@ -25,6 +25,9 @@ Detailed inventory CSV:
 Symbol/MPN readiness CSV:
 `hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv`.
 
+Concrete symbol capture worklist:
+`hardware/power-board/PB-100/PB-100-symbol-capture-worklist.csv`.
+
 The inventories are package-focused and source-aware, but they are not final MPN
 locks.
 

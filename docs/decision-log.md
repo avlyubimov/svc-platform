@@ -544,3 +544,15 @@ links, footprint status, and explicit assembly/sourcing recheck notes.
 Reason: Preliminary KiCad symbol work can proceed safely only if every critical
 component remains source-aware, non-final, and traceable to schematic-freeze
 evidence without starting PCB layout.
+
+## 2026-06-30 — PB-100 symbol capture worklist
+
+Decision: PB-100 now has
+`hardware/power-board/PB-100/PB-100-symbol-capture-worklist.csv`, mapping every
+critical symbol key to a project-local `PB100_*_PRELIM` symbol target, source,
+pin-evidence status, instance refs, allowed action, blocked action, and freeze
+closure evidence.
+
+Reason: The local KiCad installation does not provide reusable project-ready
+symbols for the selected PB-100 candidates. A validated worklist lets schematic
+symbol creation proceed in controlled steps while preserving the no-layout gate.

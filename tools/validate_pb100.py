@@ -80,6 +80,18 @@ REQUIRED_SYMBOL_KEYS = {
     "MAIN_FUSE_HOLDER",
     "CAN1_TX_DISABLE",
 }
+SYMBOL_WORKLIST_COLUMNS = (
+    "Symbol key",
+    "Concrete symbol name",
+    "Library",
+    "Symbol source",
+    "Pin evidence status",
+    "Footprint dependency",
+    "Instance refs",
+    "Allowed action",
+    "Blocked action",
+    "Freeze close evidence",
+)
 
 
 def fail(message: str) -> None:
@@ -345,6 +357,79 @@ def validate_symbol_mpn_readiness() -> None:
         )
 
 
+def validate_symbol_capture_worklist() -> None:
+    path = PB100_DIR / "PB-100-symbol-capture-worklist.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty symbol capture worklist: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in SYMBOL_WORKLIST_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    readiness_path = PB100_DIR / "PB-100-symbol-mpn-readiness.csv"
+    readiness_rows = list(csv.DictReader(readiness_path.open(newline="", encoding="utf-8")))
+    readiness_keys = {row["Symbol key"].strip() for row in readiness_rows}
+    critical_keys = {
+        row["Symbol key"].strip()
+        for row in readiness_rows
+        if row["Critical"].strip().lower() == "yes"
+    }
+
+    worklist_keys = set()
+    for row_number, row in enumerate(rows, 2):
+        symbol_key = row["Symbol key"].strip()
+        if symbol_key not in readiness_keys:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: "
+                f"unknown readiness symbol key {symbol_key}"
+            )
+        if symbol_key in worklist_keys:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate symbol key {symbol_key}")
+        worklist_keys.add(symbol_key)
+
+        concrete_symbol_name = row["Concrete symbol name"].strip()
+        if not concrete_symbol_name.startswith("PB100_") or not concrete_symbol_name.endswith("_PRELIM"):
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: concrete symbol name "
+                "must use PB100_*_PRELIM"
+            )
+        if row["Library"].strip() != "PB100":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: library must be PB100")
+
+        symbol_source = row["Symbol source"].strip()
+        if not (symbol_source.startswith("https://") or symbol_source.startswith("docs/")):
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: symbol source must be "
+                "an https URL or an internal docs/ path"
+            )
+
+        for column in (
+            "Pin evidence status",
+            "Footprint dependency",
+            "Instance refs",
+            "Allowed action",
+            "Blocked action",
+            "Freeze close evidence",
+        ):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+
+    missing_worklist_keys = sorted(critical_keys - worklist_keys)
+    if missing_worklist_keys:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing critical symbol worklist keys: "
+            f"{', '.join(missing_worklist_keys)}"
+        )
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -370,6 +455,7 @@ def main() -> int:
     validate_kicad_no_role_tokens()
     validate_instance_plan()
     validate_symbol_mpn_readiness()
+    validate_symbol_capture_worklist()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0
