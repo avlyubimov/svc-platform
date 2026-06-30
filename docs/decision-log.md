@@ -680,3 +680,15 @@ changes policy.
 Reason: Net naming alone is not enough for schematic capture. The design needs
 machine-checkable intent for power, logic, analog telemetry, generic outputs,
 and vehicle-CAN safety before any schematic freeze review.
+
+## 2026-06-30 — PB-100 symbol-to-BOM synchronization
+
+Decision: PB-100 now has `production/bom/pb100_symbol_bom_map.csv`, linking
+every symbol readiness key to either the factory or garage BOM draft. The factory
+BOM now includes input shunt, buck inductor, B2B connector, board ID resistor
+network, test points, and CAN1 TX-disable DNP link rows. The garage BOM now
+includes battery input connector and per-output fuse holder rows.
+
+Reason: Schematic symbol planning changes hardware assumptions. BOM drafts must
+stay synchronized with schematic artifacts so sourcing and assembly ownership do
+not drift before schematic freeze.

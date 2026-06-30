@@ -66,5 +66,6 @@ Schematic net-domain rules are tracked in
 - Updated symbol/MPN readiness table with concrete symbol and footprint status.
 - Updated symbol capture worklist with pin evidence and blocked actions.
 - Updated symbol pin evidence table for created preliminary symbols.
+- Updated PB-100 symbol-to-BOM map.
 - Updated BOM draft synchronized with chosen schematic symbols.
 - Updated freeze checklist evidence for all conditional gates.

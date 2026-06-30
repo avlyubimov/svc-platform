@@ -136,6 +136,16 @@ NET_DOMAIN_PLAN_COLUMNS = (
     "Default state",
     "Safety rule",
 )
+BOM_SYMBOL_MAP_COLUMNS = (
+    "Symbol key",
+    "BOM file",
+    "BOM item",
+    "Qty basis",
+    "Population",
+    "Assembly owner",
+    "Status",
+    "Notes",
+)
 REQUIRED_NET_PATTERNS = {
     "VBAT_RAW",
     "VBAT_PROT",
@@ -151,6 +161,7 @@ REQUIRED_NET_PATTERNS = {
     "CAN1_RX_ROUTE",
     "CAN1_TX_ROUTE",
 }
+ALLOWED_BOM_FILES = {"factory_bom_draft.csv", "garage_bom_draft.csv"}
 
 
 def fail(message: str) -> None:
@@ -909,6 +920,85 @@ def validate_net_domain_plan() -> None:
         fail("CAN1_TX_ROUTE safety rule must require a future ADR")
 
 
+def validate_bom_symbol_map() -> None:
+    path = REPO_ROOT / "production" / "bom" / "pb100_symbol_bom_map.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty PB-100 symbol BOM map: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in BOM_SYMBOL_MAP_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    readiness_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-symbol-mpn-readiness.csv").open(newline="", encoding="utf-8"))
+    )
+    readiness_keys = {row["Symbol key"].strip() for row in readiness_rows}
+    critical_keys = {
+        row["Symbol key"].strip()
+        for row in readiness_rows
+        if row["Critical"].strip().lower() == "yes"
+    }
+
+    bom_items_by_file: dict[str, set[str]] = {}
+    for bom_file in ALLOWED_BOM_FILES:
+        bom_path = REPO_ROOT / "production" / "bom" / bom_file
+        validate_csv(bom_path)
+        bom_rows = list(csv.DictReader(bom_path.open(newline="", encoding="utf-8")))
+        bom_items_by_file[bom_file] = {row["Item"].strip() for row in bom_rows}
+
+    seen_keys = set()
+    for row_number, row in enumerate(rows, 2):
+        symbol_key = row["Symbol key"].strip()
+        bom_file = row["BOM file"].strip()
+        bom_item = row["BOM item"].strip()
+        if symbol_key not in readiness_keys:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown symbol key {symbol_key}")
+        if symbol_key in seen_keys:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate symbol key {symbol_key}")
+        seen_keys.add(symbol_key)
+        if bom_file not in ALLOWED_BOM_FILES:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unsupported BOM file {bom_file}")
+        if bom_item not in bom_items_by_file[bom_file]:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: BOM item {bom_item} "
+                f"is missing from production/bom/{bom_file}"
+            )
+        for column in ("Qty basis", "Population", "Assembly owner", "Status", "Notes"):
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if bom_file == "factory_bom_draft.csv" and row["Assembly owner"].strip() != "Factory":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: factory BOM row must use Factory owner")
+        if bom_file == "garage_bom_draft.csv" and row["Assembly owner"].strip() != "Garage":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: garage BOM row must use Garage owner")
+
+    missing_keys = sorted(readiness_keys - seen_keys)
+    if missing_keys:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing symbol keys: "
+            f"{', '.join(missing_keys)}"
+        )
+
+    missing_critical = sorted(critical_keys - seen_keys)
+    if missing_critical:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing critical symbol keys: "
+            f"{', '.join(missing_critical)}"
+        )
+
+    can1_rows = [row for row in rows if row["Symbol key"].strip() == "CAN1_TX_DISABLE"]
+    if len(can1_rows) != 1:
+        fail("CAN1_TX_DISABLE must appear exactly once in PB-100 symbol BOM map")
+    can1_row = can1_rows[0]
+    if "dnp/open" not in can1_row["Population"].lower() and "dnp/open" not in can1_row["Notes"].lower():
+        fail("CAN1_TX_DISABLE BOM mapping must keep DNP/open explicit")
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -942,6 +1032,7 @@ def main() -> int:
     validate_sheet_reference_map()
     validate_kicad_sheet_manifest()
     validate_net_domain_plan()
+    validate_bom_symbol_map()
     validate_net_naming_contract()
     print("PB-100 validation passed")
     return 0

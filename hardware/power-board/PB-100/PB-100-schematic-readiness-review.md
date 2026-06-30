@@ -47,6 +47,7 @@ The schematic review packet consists of:
 - `docs/testing/test-plan.md`
 - `production/bom/factory_bom_draft.csv`
 - `production/bom/garage_bom_draft.csv`
+- `production/bom/pb100_symbol_bom_map.csv`
 
 ## Conditional work before schematic freeze
 

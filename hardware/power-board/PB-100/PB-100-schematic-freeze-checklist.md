@@ -38,7 +38,7 @@ this checklist can close.
 | Current telemetry | Conditional | `docs/requirements/pb-100-requirements.md`, `hardware/power-board/PB-100/PB-100-current-telemetry.md`, `hardware/power-board/PB-100/PB-100-current-telemetry-map.csv` | Per-output current and total input current measurement ranges are selected and mapped to LB-100 |
 | Thermal telemetry | Conditional | `docs/requirements/pb-100-requirements.md`, `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-map.csv` | PCB and power-zone temperature sensing strategy is selected and mapped to LB-100 |
 | Factory assembly readiness | Conditional | `docs/production/component-family-shortlist.md`, `hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv`, `production/bom/factory_bom_draft.csv` | Critical components have at least two alternatives and assembly-source status is checked |
-| Garage assembly readiness | Conditional | `production/bom/garage_bom_draft.csv`, `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md` | User-installed items are limited to connectors, fuses, enclosure hardware, and wiring |
+| Garage assembly readiness | Conditional | `production/bom/garage_bom_draft.csv`, `production/bom/pb100_symbol_bom_map.csv`, `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md` | User-installed items are limited to connectors, fuses, enclosure hardware, and wiring |
 | Bench validation plan | Closed | `docs/testing/test-plan.md` | PB-100 bring-up, protection, thermal, current-budget, and CAN1 listen-only tests are explicitly listed |
 
 ## Active blockers
@@ -69,6 +69,7 @@ Before marking this checklist `Closed`, the review packet must include:
 - Final symbol/MPN readiness table with concrete symbol and footprint status.
 - Final symbol capture worklist with pin evidence and blocked actions.
 - Final symbol pin evidence table for created preliminary symbols.
+- Final PB-100 symbol-to-BOM map synchronized with factory and garage drafts.
 - Thermal and protection validation tables.
 - Final PB-100 to LB-100 pin map.
 - CAN1 TX-disable schematic input and verification notes.

@@ -16,6 +16,7 @@ It is not a PCB layout package.
 - `docs/adr/ADR-0011-pb-100-low-current-output-stage.md`
 - `docs/can/can-safety.md`
 - `docs/production/component-family-shortlist.md`
+- `production/bom/pb100_symbol_bom_map.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
