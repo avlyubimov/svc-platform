@@ -369,3 +369,12 @@ limits, shed priority order, and C default configuration values.
 
 Reason: The JSON vehicle/profile example and C default config must not drift
 apart while configuration remains separate from firmware logic.
+
+## 2026-06-30 — Firmware config JSON schema
+
+Decision: Firmware now has `firmware/configs/svc-config.schema.json` for the
+device configuration shape, output IDs, output roles, load priorities, fog logic,
+and rule entries.
+
+Reason: SVC Studio, SVC Mobile, and CI need a shared schema artifact before UI
+configuration editing and import/export flows are implemented.

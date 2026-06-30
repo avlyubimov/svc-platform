@@ -25,4 +25,9 @@ valid.
 
 Repository-level JSON validation:
 
+- `firmware/configs/svc-config.schema.json`
 - `tools/validate_config.py`
+
+The repository validator checks that schema role/output/priority enums stay in
+sync with firmware enums and that `config-example.json` stays aligned with
+`svc_default_config`.

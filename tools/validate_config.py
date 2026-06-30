@@ -11,6 +11,7 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = REPO_ROOT / "firmware" / "configs" / "config-example.json"
+CONFIG_SCHEMA_PATH = REPO_ROOT / "firmware" / "configs" / "svc-config.schema.json"
 SVC_TYPES_PATH = REPO_ROOT / "firmware" / "core" / "svc_types.h"
 SVC_CONFIG_PATH = REPO_ROOT / "firmware" / "core" / "svc_config.h"
 SVC_DEFAULTS_PATH = REPO_ROOT / "firmware" / "core" / "svc_config_defaults.c"
@@ -125,6 +126,34 @@ def parse_c_shed_order() -> list[str]:
     return priorities
 
 
+def require_schema_enum(schema: dict[str, Any], definition_name: str) -> list[str]:
+    try:
+        values = schema["$defs"][definition_name]["enum"]
+    except KeyError:
+        fail(f"missing schema enum $defs.{definition_name}.enum")
+    if not isinstance(values, list) or not all(isinstance(value, str) for value in values):
+        fail(f"schema enum $defs.{definition_name}.enum must be a string array")
+    return values
+
+
+def validate_schema(schema: dict[str, Any], allowed_roles: set[str]) -> None:
+    schema_roles = require_schema_enum(schema, "outputRole")
+    if set(schema_roles) != allowed_roles:
+        fail("schema outputRole enum does not match firmware output_role_t")
+
+    schema_outputs = require_schema_enum(schema, "outputId")
+    if schema_outputs != [f"OUT{output_number}" for output_number in range(1, 11)]:
+        fail("schema outputId enum must be OUT1..OUT10")
+
+    schema_priorities = require_schema_enum(schema, "loadPriority")
+    if schema_priorities != ["A", "B", "C"]:
+        fail("schema loadPriority enum must be A, B, C")
+
+    outputs_schema = schema.get("properties", {}).get("outputs", {})
+    if outputs_schema.get("minItems") != 10 or outputs_schema.get("maxItems") != 10:
+        fail("schema outputs array must require exactly 10 items")
+
+
 def validate_battery(config: dict[str, Any], defines: dict[str, int]) -> None:
     battery = require_dict(config, "battery")
     warn_mv = decimal_amps_to_ma(battery.get("warn_v"), "battery.warn_v")
@@ -218,8 +247,10 @@ def validate_outputs(config: dict[str, Any], allowed_roles: set[str]) -> None:
 
 def main() -> int:
     config = load_json(CONFIG_PATH)
+    schema = load_json(CONFIG_SCHEMA_PATH)
     defines = parse_defines()
     allowed_roles = parse_allowed_roles()
+    validate_schema(schema, allowed_roles)
     require_dict(config, "device")
     validate_battery(config, defines)
     validate_power_budget(config, defines)

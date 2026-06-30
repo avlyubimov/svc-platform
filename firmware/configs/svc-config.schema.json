@@ -1,0 +1,261 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://svc-platform.local/schemas/svc-config.schema.json",
+  "title": "SVC Device Configuration",
+  "type": "object",
+  "required": [
+    "device",
+    "battery",
+    "power_budget",
+    "outputs"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "device": {
+      "type": "object",
+      "required": [
+        "name",
+        "vehicle_profile",
+        "hardware"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "vehicle_profile": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hardware": {
+          "type": "object",
+          "required": [
+            "power_board",
+            "logic_board",
+            "front_board"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "power_board": {
+              "type": "string",
+              "minLength": 1
+            },
+            "logic_board": {
+              "type": "string",
+              "minLength": 1
+            },
+            "front_board": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "battery": {
+      "type": "object",
+      "required": [
+        "warn_v",
+        "cutoff_v",
+        "recovery_v",
+        "shutdown_delay_s"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "warn_v": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "cutoff_v": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "recovery_v": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "shutdown_delay_s": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "power_budget": {
+      "type": "object",
+      "required": [
+        "total_current_limit_a",
+        "shed_priority_order"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "total_current_limit_a": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "shed_priority_order": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/loadPriority"
+          }
+        }
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {
+        "$ref": "#/$defs/output"
+      }
+    },
+    "fog_logic": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "day_lux": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "dusk_lux": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "night_lux": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "day_pwm": {
+          "$ref": "#/$defs/pwmPercent"
+        },
+        "dusk_pwm": {
+          "$ref": "#/$defs/pwmPercent"
+        },
+        "night_pwm": {
+          "$ref": "#/$defs/pwmPercent"
+        },
+        "high_beam_pwm": {
+          "$ref": "#/$defs/pwmPercent"
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/rule"
+      }
+    }
+  },
+  "$defs": {
+    "loadPriority": {
+      "type": "string",
+      "enum": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    "outputId": {
+      "type": "string",
+      "enum": [
+        "OUT1",
+        "OUT2",
+        "OUT3",
+        "OUT4",
+        "OUT5",
+        "OUT6",
+        "OUT7",
+        "OUT8",
+        "OUT9",
+        "OUT10"
+      ]
+    },
+    "outputRole": {
+      "type": "string",
+      "enum": [
+        "NONE",
+        "USB",
+        "CIGARETTE_SOCKET",
+        "FOG_LEFT",
+        "FOG_RIGHT",
+        "CHIGEE",
+        "HEATED_SEAT_RIDER",
+        "HEATED_SEAT_PASSENGER",
+        "DVR",
+        "AUX_BRAKE",
+        "SPARE"
+      ]
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "id",
+        "role",
+        "fuse_a",
+        "current_limit_a",
+        "pwm",
+        "priority"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/outputId"
+        },
+        "role": {
+          "$ref": "#/$defs/outputRole"
+        },
+        "fuse_a": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "current_limit_a": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "pwm": {
+          "type": "boolean"
+        },
+        "priority": {
+          "$ref": "#/$defs/loadPriority"
+        }
+      }
+    },
+    "pwmPercent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "rule": {
+      "type": "object",
+      "required": [
+        "name",
+        "if",
+        "then"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "if": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "then": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

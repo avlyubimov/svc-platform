@@ -44,6 +44,7 @@ Status: In progress
 - battery protection
 - logging
 - CAN read-only logger
+- config JSON schema
 
 Current host-tested services:
 
