@@ -32,7 +32,7 @@ this checklist can close.
 | Board-to-board interface | Conditional | `hardware/power-board/PB-100/PB-100-b2b-pin-budget.csv`, `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv` | Connector MPN and LB-100 MCU resource binding are reviewed against the pin map |
 | High/medium output stage | Conditional | `docs/adr/ADR-0010-pb-100-power-path-candidate-strategy.md`, `hardware/power-board/PB-100/PB-100-power-path-candidates.csv` | Controller, MOSFET, sense path, fuse, and inductive-load protection are validated per output class |
 | Low-current output stage | Conditional | `docs/adr/ADR-0011-pb-100-low-current-output-stage.md`, `hardware/power-board/PB-100/PB-100-preliminary-validation.md` | OUT5/OUT8/OUT9 external-controller implementation is validated without a direct 40 V smart-switch rail |
-| Input reverse protection | Conditional | `hardware/power-board/PB-100/PB-100-power-path-candidates.csv`, `hardware/power-board/PB-100/PB-100-thermal-estimates.csv` | Ideal-diode controller and MOSFET choice passes 40 A thermal and SOA review |
+| Input reverse protection | Conditional | `hardware/power-board/PB-100/PB-100-power-path-candidates.csv`, `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`, `hardware/power-board/PB-100/PB-100-thermal-estimates.csv` | Selected input MOSFET package and copper strategy pass 40 A thermal and SOA review |
 | TVS/load-dump protection | Conditional | `hardware/power-board/PB-100/PB-100-protection-validation.csv` | Clamp strategy is compatible with every downstream absolute maximum rating |
 | Logic power rails | Open | `hardware/power-board/PB-100/PB-100-power-path-candidates.csv` | Buck and post-regulator strategy covers cold crank, load dump, telemetry, and LB-100 supply requirements |
 | Current telemetry | Open | `docs/requirements/pb-100-requirements.md` | Per-output current and total input current measurement ranges are selected and mapped to LB-100 |
@@ -46,13 +46,13 @@ this checklist can close.
 | ID | Blocker | Required resolution |
 |---|---|---|
 | PB-FRZ-002 | OUT2 compressor startup/inrush SOA is not validated | Add MOSFET SOA evidence for expected inrush pulse and thermal recovery |
-| PB-FRZ-003 | 40 A input reverse-protection dissipation is not validated | Select final MOSFET strategy or parallel device strategy with thermal estimate |
 
 ## Resolved blockers
 
 | ID | Resolution | Evidence |
 |---|---|---|
 | PB-FRZ-001 | OUT5/OUT8/OUT9 moved to external controller plus MOSFET Rev.1 baseline | `docs/adr/ADR-0011-pb-100-low-current-output-stage.md` |
+| PB-FRZ-003 | Dedicated low-Rds input MOSFET strategy selected for 40 A reverse protection | `hardware/power-board/PB-100/PB-100-input-reverse-protection.md` |
 | PB-FRZ-004 | `JPB1` board-to-board schematic-planning pin map created | `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv` |
 | PB-FRZ-005 | CAN1 TX-disable schematic input created with DNP/open TX default and status readback | `hardware/power-board/PB-100/PB-100-can1-tx-disable.md` |
 

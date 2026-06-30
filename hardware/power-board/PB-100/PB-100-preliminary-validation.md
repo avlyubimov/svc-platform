@@ -15,6 +15,8 @@ does not approve schematic freeze or PCB layout.
   N-MOSFET.
 - SIDR626LDP-T1-RE3: 60 V N-MOSFET, 2.1 mOhm max at VGS = 4.5 V, PowerPAK
   SO-8DC.
+- IAUTN06S5N008: 60 V automotive N-MOSFET, 0.76 mOhm max at VGS = 10 V, TOLL.
+- BUK7S1R2-80M: 80 V automotive N-MOSFET, 1.2 mOhm class, LFPAK88.
 - SM8S33A-class TVS: 33 V standoff, 53.3 V clamp at rated pulse current.
 
 ## Preliminary findings
@@ -25,7 +27,8 @@ does not approve schematic freeze or PCB layout.
   but SOA and thermal validation are still required for compressor inrush and
   heated-seat steady state.
 - LM74700QDBVRQ1-class reverse protection is compatible with the 12 V input
-  target and cold-crank requirement.
+  target and cold-crank requirement when paired with a dedicated low-Rds input
+  MOSFET strategy.
 - SM8S33A-class input TVS is compatible with 60 V MOSFET planning but leaves
   limited voltage margin against 60 V absolute maximum ratings.
 - SM8S33A-class input TVS is not automatically compatible with 40 V integrated
@@ -37,10 +40,12 @@ does not approve schematic freeze or PCB layout.
 - Validate the low-current TPS48110 plus MOSFET implementation for OUT5, OUT8,
   and OUT9.
 - Confirm MOSFET SOA for OUT2 with compressor startup/inrush assumptions.
-- Confirm thermal stack-up for all output classes in the intended enclosure.
+- Confirm thermal stack-up for all output classes and the input
+  reverse-protection MOSFET in the intended enclosure.
 
 ## Related tables
 
 - `hardware/power-board/PB-100/PB-100-power-path-candidates.csv`
+- `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-thermal-estimates.csv`
 - `hardware/power-board/PB-100/PB-100-protection-validation.csv`

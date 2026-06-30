@@ -144,3 +144,14 @@ when the safety gate crosses PB-100.
 Reason: This preserves the ADR-0002 vehicle-CAN read-only policy even if
 firmware is faulty, LB-100 is reset, or a future board revision routes CAN1
 through PB-100.
+
+## 2026-06-30 — PB-100 input reverse MOSFET strategy
+
+Decision: PB-100 Rev.1 schematic planning uses a dedicated low-Rds input MOSFET
+strategy for LM74700-class reverse protection instead of a single 2.1 mOhm
+PowerPAK output MOSFET.
+
+Reason: A single 2.1 mOhm MOSFET dissipates about 6.72 W at the 40 A board
+budget with the conservative thermal multiplier. The preferred 0.76 mOhm TOLL
+class reduces the estimate to about 2.43 W, with an 80 V LFPAK88 alternate and a
+dual-PowerPAK fallback retained for sourcing and assembly risk.

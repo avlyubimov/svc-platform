@@ -29,7 +29,8 @@ order.
 | Output MOSFET | Infineon OptiMOS automotive 40-60 V | Vishay SQJQ automotive; onsemi F085 automotive | TDSON/PowerPAK/DPAK | Must pass SOA and thermal review per channel |
 | Current monitor | TI INA226 | TI INA228/INA229; integrated IMON from high-side controller | VSSOP/SOIC class | External monitor may be unnecessary on channels with accurate IMON |
 | Logic buck regulator | TI LM5164-Q1 | TI TPS54360B-Q1/TPS54360-Q1 | SOIC/HSOIC PowerPAD | LM5164-Q1 for low-IQ 1 A rail; TPS54360 family for higher 5 V current |
-| Input reverse protection | TI LM74700-Q1/LM74502-Q1 class | ADI/LTC ideal diode controller families | MSOP/SOIC class | External MOSFET sizing remains open |
+| Input reverse protection | TI LM74700-Q1/LM74502-Q1 class | ADI/LTC ideal diode controller families | MSOP/SOIC class | Controller family only; MOSFET is tracked separately |
+| Input reverse MOSFET | Infineon OptiMOS 5 60 V TOLL low-Rds class | Nexperia LFPAK88 80 V; parallel Vishay SIDR626 PowerPAK | TOLL/LFPAK88/PowerPAK | Single 2.1 mOhm MOSFET is rejected for 40 A input thermal |
 | Input TVS/load dump | SM8S automotive TVS class | SMBJ/SMCJ automotive TVS class | DO-218/SMC/SMA as needed | Final clamp voltage depends on MOSFET and buck ratings |
 | FRAM | Fujitsu/Infineon MB85 I2C/SPI FRAM | Cypress/Infineon Excelon FRAM | SOIC/TSSOP/DFN | Configuration and black-box storage |
 | RTC | Microchip MCP7940 class | NXP PCF8523/PCF8563; DS3231 class | SOIC/TSSOP/DFN/module | Prefer low-IQ SMD IC over hobby module |
@@ -47,6 +48,8 @@ The current strategy is:
   external 60 V N-MOSFET.
 - Low-current integrated smart switches: deferred alternatives only.
 - Input reverse protection: LM74700QDBVRQ1-class ideal-diode controller.
+- Input reverse MOSFET: IAUTN06S5N008ATMA1-class low-Rds TOLL device, with
+  BUK7S1R2-80M-class LFPAK88 and dual SIDR626LDP fallback alternatives.
 - Input transient clamp: SM8S33A-class load-dump TVS.
 
 ## Evidence links
@@ -62,6 +65,8 @@ The current strategy is:
 - TI TPS2HB35BQPWPRQ1 was listed at LCSC on the snapshot date: https://www.lcsc.com/product-detail/power-distribution-switches_texas-instruments-tps2hb35bqpwprq1_C3230080.html
 - Vishay SIDR626LDP-T1-RE3 was listed at LCSC on the snapshot date: https://www.lcsc.com/product-detail/C3279576.html
 - TI LM74700QDBVRQ1 was listed at LCSC on the snapshot date: https://www.lcsc.com/product-detail/C2941042.html
+- Infineon IAUTN06S5N008 is active/preferred as a 60 V 0.76 mOhm automotive TOLL MOSFET: https://www.infineon.com/part/IAUTN06S5N008
+- Nexperia BUK7S1R2-80M data sheet lists an 80 V 1.2 mOhm automotive LFPAK88 MOSFET: https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf
 - SM8S33A-class TVS reference data was checked for clamp-voltage planning: https://www.mccsemi.com/products/esd-protection-and-power-tvs/tvs/SM8S33A
 - TI TPS2HB16-Q1 datasheet is available through LCSC: https://datasheet.lcsc.com/datasheet/pdf/5e972c8f510fd1d0477aeb85de68fc2f.pdf
 - TI INA226AIDGST was listed at LCSC: https://www.lcsc.com/product-detail/current-sense-amplifiers_texas-instruments-ina226aidgst_C2653870.html
@@ -75,3 +80,5 @@ The current strategy is:
 - Confirm MOSFET SOA for compressor and heated-seat inrush cases.
 - Confirm TVS clamp voltage against buck, MOSFET, and high-side controller limits.
 - Confirm high-side controller availability through at least two suppliers.
+- Confirm TOLL/LFPAK88 assembly support at JLCPCB/PCBWay or use the documented
+  parallel PowerPAK fallback for input reverse protection.
