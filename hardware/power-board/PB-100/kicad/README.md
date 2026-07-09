@@ -56,6 +56,7 @@ manufacturing outputs are also blocked by repository validation.
 - `../PB-100-fault-response-matrix.csv`
 - `../PB-100-can1-safety-verification.csv`
 - `../../../../production/bom/pb100_assembly_sourcing_recheck.csv`
+- `../../../../production/bom/pb100_sourcing_evidence_snapshot.csv`
 - `../../../../firmware/configs/hardware/pb-100-capabilities.json`
 
 ## Next KiCad work

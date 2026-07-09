@@ -1094,3 +1094,15 @@ the schematic MPN.
 Reason: Current sourcing review found the MCC `SM8S33A` source obsolete with a
 2025 last-time-ship notice. Keeping it as the preferred candidate would make the
 factory assembly plan fragile before schematic freeze.
+
+## 2026-07-09 — PB-100 TVS artifact synchronization
+
+Decision: PB-100 schematic-package, protection-validation, footprint-plan,
+symbol-capture, and production README artifacts now use the active
+`SM8S33AHE3`-class TVS wording. `tools/validate_pb100.py` rejects the old MCC
+`SM8S33A` URL as an active TVS source and rejects stale `SM8S33A-class` wording
+in active schematic-planning artifacts.
+
+Reason: The TVS source correction must be enforceable across the schematic
+freeze packet, not only in the sourcing snapshot. This prevents the obsolete
+source from drifting back into active symbol, footprint, or protection inputs.

@@ -1,6 +1,6 @@
 Ref,Block,Generic function,Preferred component or class,Package direction,Qty basis,Status,Notes
 J1,input-protection,Battery input connector,High-current automotive connector,TBD,1,Garage candidate,Final connector family pending current derating
-D1,input-protection,Input load-dump TVS,SM8S33A class,DO-218AB,1,Conditional,Clamp and overshoot margin still require schematic evidence
+D1,input-protection,Input load-dump TVS,Active AEC-Q101 SM8S33AHE3_A/I-class,DO-218AB,1,Conditional,Clamp and overshoot margin still require schematic evidence
 U1,input-protection,Ideal-diode reverse controller,LM74700QDBVRQ1,SOT-23-6,1,Candidate,LM74502-Q1 family retained as alternate
 Q1,input-protection,Input reverse MOSFET,IAUTN06S5N008ATMA1,TOLL,1,Preferred candidate,BUK7S1R2-80M or dual SIDR626 fallback
 RSH1,input-protection,Total input current shunt,Low-ohm automotive shunt,TBD,1,Value TBD,Used by total input current monitor

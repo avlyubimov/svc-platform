@@ -2435,6 +2435,29 @@ def validate_sourcing_evidence_snapshot() -> None:
         )
 
 
+def validate_tvs_candidate_consistency() -> None:
+    stale_tvs_source = "https://www.mccsemi.com/products/esd-protection-and-power-tvs/tvs/SM8S33A"
+    for relative_path in (
+        "hardware/power-board/PB-100/PB-100-symbol-capture-worklist.csv",
+        "hardware/power-board/PB-100/PB-100-power-path-candidates.csv",
+        "hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv",
+    ):
+        text = read_text(REPO_ROOT / relative_path)
+        if stale_tvs_source in text:
+            fail(f"{relative_path} must not use MCC SM8S33A as active TVS source")
+
+    for relative_path in (
+        "hardware/power-board/PB-100/PB-100-schematic-instance-plan.csv",
+        "hardware/power-board/PB-100/PB-100-preliminary-validation.md",
+        "hardware/power-board/PB-100/PB-100-kicad-footprint-plan.csv",
+        "hardware/power-board/PB-100/PB-100-protection-validation.csv",
+        "hardware/power-board/PB-100/PB-100-logic-power-rails.md",
+    ):
+        text = read_text(REPO_ROOT / relative_path)
+        if "SM8S33A-class" in text:
+            fail(f"{relative_path} must use active SM8S33AHE3-class TVS wording")
+
+
 def validate_validation_traceability() -> None:
     path = PB100_DIR / "PB-100-validation-traceability.csv"
     validate_csv(path)
@@ -2895,6 +2918,7 @@ def main() -> int:
     validate_can1_safety_verification()
     validate_assembly_sourcing_recheck()
     validate_sourcing_evidence_snapshot()
+    validate_tvs_candidate_consistency()
     validate_validation_traceability()
     validate_test_point_plan()
     validate_fault_response_matrix()
