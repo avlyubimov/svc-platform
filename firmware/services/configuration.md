@@ -24,8 +24,11 @@ valid.
 - `firmware/services/config_validator.c`
 - `firmware/services/config_store.h`
 - `firmware/services/config_store.c`
+- `firmware/services/config_update.h`
+- `firmware/services/config_update.c`
 - `firmware/tests/test_config_validator.c`
 - `firmware/tests/test_config_store.c`
+- `firmware/tests/test_config_update.c`
 
 Repository-level JSON validation:
 
@@ -41,6 +44,9 @@ Configuration persistence is defined by `firmware/services/config-store.md`.
 Persisted records are versioned, checksummed, and selected from two slots before
 falling back to compiled defaults. Firmware updates must not erase or silently
 prefer new defaults over a valid persisted user configuration.
+New persisted records must be prepared through `svc_config_update_prepare_record()`
+so the configuration is accepted against the target hardware capability before a
+record can be written by a storage backend.
 
 ## Hardware capability manifests
 

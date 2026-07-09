@@ -9,6 +9,8 @@ selects the active configuration.
 
 - Build versioned configuration records with sequence numbers.
 - Validate magic, format version, checksum, and configuration contents.
+- Prepare update records only after configuration acceptance against hardware
+  capability succeeds.
 - Select the newest valid record from two slots.
 - Fall back to compiled defaults only when no valid persisted record exists.
 - Keep persisted user configuration preferred across firmware default changes.
@@ -22,4 +24,7 @@ configuration are invalid, no configuration is loaded.
 
 - `firmware/services/config_store.h`
 - `firmware/services/config_store.c`
+- `firmware/services/config_update.h`
+- `firmware/services/config_update.c`
 - `firmware/tests/test_config_store.c`
+- `firmware/tests/test_config_update.c`

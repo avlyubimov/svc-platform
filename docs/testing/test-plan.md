@@ -67,6 +67,8 @@ services uninitialized. Store-backed runtime boot tests verify persisted records
 are loaded before hardware capability acceptance.
 Configuration store tests verify persisted user configuration is selected ahead
 of firmware defaults after an update.
+Configuration update tests verify unsafe or hardware-incompatible configurations
+are not prepared for persistence.
 
 ## PB-100 schematic-review traceability
 

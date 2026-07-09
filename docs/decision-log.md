@@ -969,3 +969,14 @@ for the runtime lifetime.
 Reason: Persistence and startup safety need to be connected. Firmware must boot
 from valid persisted user configuration after updates, but still reject the boot
 if the loaded configuration exceeds the connected hardware capability.
+
+## 2026-07-09 — Configuration update persistence gate
+
+Decision: Firmware now has `svc_config_update_prepare_record()` in
+`firmware/services/config_update.c`. New persisted configuration records are
+created only after the candidate configuration is accepted against the target
+hardware capability. Rejected configurations leave the output record empty.
+
+Reason: Boot-time rejection is necessary but not sufficient. The service-tool or
+future API path that writes configuration must also prevent unsafe or
+hardware-incompatible configuration from becoming the persisted user record.

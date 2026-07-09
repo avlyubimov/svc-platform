@@ -7,6 +7,7 @@ FIRMWARE_HEADERS := $(wildcard core/*.h services/*.h)
 CONFIG_VALIDATOR_TEST := $(BUILD_DIR)/test_config_validator
 CONFIG_ACCEPTANCE_TEST := $(BUILD_DIR)/test_config_acceptance
 CONFIG_STORE_TEST := $(BUILD_DIR)/test_config_store
+CONFIG_UPDATE_TEST := $(BUILD_DIR)/test_config_update
 HARDWARE_CAPABILITY_TEST := $(BUILD_DIR)/test_hardware_capability
 POWER_BUDGET_TEST := $(BUILD_DIR)/test_power_budget
 OUTPUT_MANAGER_TEST := $(BUILD_DIR)/test_output_manager
@@ -54,6 +55,19 @@ CONFIG_STORE_SRCS := \
 	services/telemetry.c \
 	services/thermal_service.c \
 	tests/test_config_store.c
+CONFIG_UPDATE_SRCS := \
+	core/svc_config_defaults.c \
+	services/battery_service.c \
+	services/config_acceptance.c \
+	services/config_store.c \
+	services/config_update.c \
+	services/config_validator.c \
+	services/hardware_capability.c \
+	services/pb100_capability.c \
+	services/power_budget.c \
+	services/telemetry.c \
+	services/thermal_service.c \
+	tests/test_config_update.c
 HARDWARE_CAPABILITY_SRCS := \
 	core/svc_config_defaults.c \
 	services/hardware_capability.c \
@@ -172,6 +186,7 @@ HOST_TESTS := \
 	$(CONFIG_VALIDATOR_TEST) \
 	$(CONFIG_ACCEPTANCE_TEST) \
 	$(CONFIG_STORE_TEST) \
+	$(CONFIG_UPDATE_TEST) \
 	$(HARDWARE_CAPABILITY_TEST) \
 	$(POWER_BUDGET_TEST) \
 	$(OUTPUT_MANAGER_TEST) \
@@ -195,6 +210,7 @@ test: $(HOST_TESTS)
 	$(CONFIG_VALIDATOR_TEST)
 	$(CONFIG_ACCEPTANCE_TEST)
 	$(CONFIG_STORE_TEST)
+	$(CONFIG_UPDATE_TEST)
 	$(HARDWARE_CAPABILITY_TEST)
 	$(POWER_BUDGET_TEST)
 	$(OUTPUT_MANAGER_TEST)
@@ -222,6 +238,9 @@ $(CONFIG_ACCEPTANCE_TEST): $(CONFIG_ACCEPTANCE_SRCS) $(FIRMWARE_HEADERS) | $(BUI
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(CONFIG_STORE_TEST): $(CONFIG_STORE_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
+
+$(CONFIG_UPDATE_TEST): $(CONFIG_UPDATE_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(HARDWARE_CAPABILITY_TEST): $(HARDWARE_CAPABILITY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
