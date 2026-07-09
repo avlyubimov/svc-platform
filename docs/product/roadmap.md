@@ -71,6 +71,7 @@ Current host-tested services:
 - Role Resolver
 - Rule Engine skeleton
 - Rule condition evaluator
+- Ambient day/dusk/night rule conditions
 - In-memory rule runner
 - Ordered rule set runner
 - Rule text parser

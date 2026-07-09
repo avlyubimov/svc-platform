@@ -132,6 +132,42 @@
   },
   "rules": [
     {
+      "name": "Fog day off",
+      "if": [
+        "engine_running == true",
+        "ambient_day == true",
+        "high_beam == false"
+      ],
+      "then": [
+        "FOG_LEFT.pwm = 0",
+        "FOG_RIGHT.pwm = 0"
+      ]
+    },
+    {
+      "name": "Fog dusk running",
+      "if": [
+        "engine_running == true",
+        "ambient_dusk == true",
+        "high_beam == false"
+      ],
+      "then": [
+        "FOG_LEFT.pwm = 40",
+        "FOG_RIGHT.pwm = 40"
+      ]
+    },
+    {
+      "name": "Fog night running",
+      "if": [
+        "engine_running == true",
+        "ambient_night == true",
+        "high_beam == false"
+      ],
+      "then": [
+        "FOG_LEFT.pwm = 70",
+        "FOG_RIGHT.pwm = 70"
+      ]
+    },
+    {
       "name": "Fog high beam",
       "if": [
         "engine_running == true",

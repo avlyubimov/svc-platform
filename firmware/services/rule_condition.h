@@ -8,13 +8,19 @@
 typedef enum {
     SVC_RULE_CONDITION_ENGINE_RUNNING = 0,
     SVC_RULE_CONDITION_HIGH_BEAM,
-    SVC_RULE_CONDITION_LEFT_INDICATOR
+    SVC_RULE_CONDITION_LEFT_INDICATOR,
+    SVC_RULE_CONDITION_AMBIENT_DAY,
+    SVC_RULE_CONDITION_AMBIENT_DUSK,
+    SVC_RULE_CONDITION_AMBIENT_NIGHT
 } svc_rule_condition_type_t;
 
 typedef struct {
     bool engine_running;
     bool high_beam;
     bool left_indicator;
+    bool ambient_day;
+    bool ambient_dusk;
+    bool ambient_night;
 } svc_rule_state_t;
 
 typedef struct {

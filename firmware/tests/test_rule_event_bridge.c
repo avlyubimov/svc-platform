@@ -172,6 +172,27 @@ static void test_ordered_condition_events_update_final_state(void)
     assert(svc_event_bus_is_empty(&bus));
 }
 
+static void test_ambient_condition_events_are_consumed(void)
+{
+    svc_event_bus_t bus = {0};
+    svc_event_bus_init(&bus);
+    svc_rule_state_t state = {0};
+    svc_rule_state_init(&state);
+
+    assert(svc_event_bus_publish(&bus, (svc_event_t){SVC_EVENT_AMBIENT_LIGHT_DAY, SVC_OUTPUT_OUT1, 10000U}));
+    assert(svc_event_bus_publish(&bus, (svc_event_t){SVC_EVENT_AMBIENT_LIGHT_NIGHT, SVC_OUTPUT_OUT1, 1000U}));
+
+    const svc_rule_event_bridge_result_t result = svc_rule_event_bridge_drain(&bus, &state);
+
+    assert(result.processed_events == 2U);
+    assert(result.condition_events == 2U);
+    assert(result.retained_events == 0U);
+    assert(!state.ambient_day);
+    assert(!state.ambient_dusk);
+    assert(state.ambient_night);
+    assert(svc_event_bus_is_empty(&bus));
+}
+
 static void test_null_arguments_do_not_consume_events(void)
 {
     svc_event_bus_t bus = {0};
@@ -191,6 +212,7 @@ int main(void)
     test_non_rule_events_are_retained_in_fifo_order();
     test_bridge_then_fault_dispatcher_preserves_lockout_path();
     test_ordered_condition_events_update_final_state();
+    test_ambient_condition_events_are_consumed();
     test_null_arguments_do_not_consume_events();
     return 0;
 }

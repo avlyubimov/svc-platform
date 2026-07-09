@@ -1106,3 +1106,15 @@ in active schematic-planning artifacts.
 Reason: The TVS source correction must be enforceable across the schematic
 freeze packet, not only in the sourcing snapshot. This prevents the obsolete
 source from drifting back into active symbol, footprint, or protection inputs.
+
+## 2026-07-09 — Ambient light rule conditions
+
+Decision: Firmware rule condition state and rule text parsing now support
+`ambient_day`, `ambient_dusk`, and `ambient_night` boolean conditions driven by
+Event Bus ambient-light events. The example configuration expresses day, dusk,
+night, and high-beam fog-light PWM behavior as role-based rules.
+
+Reason: The reference vehicle requires fog light behavior to respond to ambient
+light and CAN-derived state without hard-coding physical output channels.
+Adding ambient-light conditions keeps the behavior in configuration and the Rule
+Engine path, with Output Manager still owning physical output changes.

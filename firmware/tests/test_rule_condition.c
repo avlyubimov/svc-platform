@@ -9,7 +9,10 @@ static void test_init_clears_state(void)
     svc_rule_state_t state = {
         .engine_running = true,
         .high_beam = true,
-        .left_indicator = true
+        .left_indicator = true,
+        .ambient_day = true,
+        .ambient_dusk = true,
+        .ambient_night = true
     };
 
     svc_rule_state_init(&state);
@@ -17,6 +20,9 @@ static void test_init_clears_state(void)
     assert(!state.engine_running);
     assert(!state.high_beam);
     assert(!state.left_indicator);
+    assert(!state.ambient_day);
+    assert(!state.ambient_dusk);
+    assert(!state.ambient_night);
 }
 
 static void test_events_update_rule_state(void)
@@ -41,6 +47,30 @@ static void test_events_update_rule_state(void)
     assert(!state.left_indicator);
 }
 
+static void test_ambient_events_update_exclusive_rule_state(void)
+{
+    svc_rule_state_t state = {0};
+    svc_rule_state_init(&state);
+
+    svc_rule_state_apply_event(&state, (svc_event_t){SVC_EVENT_AMBIENT_LIGHT_DAY, SVC_OUTPUT_OUT1, 10000U});
+
+    assert(state.ambient_day);
+    assert(!state.ambient_dusk);
+    assert(!state.ambient_night);
+
+    svc_rule_state_apply_event(&state, (svc_event_t){SVC_EVENT_AMBIENT_LIGHT_DUSK, SVC_OUTPUT_OUT1, 3000U});
+
+    assert(!state.ambient_day);
+    assert(state.ambient_dusk);
+    assert(!state.ambient_night);
+
+    svc_rule_state_apply_event(&state, (svc_event_t){SVC_EVENT_AMBIENT_LIGHT_NIGHT, SVC_OUTPUT_OUT1, 1000U});
+
+    assert(!state.ambient_day);
+    assert(!state.ambient_dusk);
+    assert(state.ambient_night);
+}
+
 static void test_non_rule_events_are_ignored(void)
 {
     svc_rule_state_t state = {0};
@@ -51,6 +81,9 @@ static void test_non_rule_events_are_ignored(void)
     assert(!state.engine_running);
     assert(!state.high_beam);
     assert(!state.left_indicator);
+    assert(!state.ambient_day);
+    assert(!state.ambient_dusk);
+    assert(!state.ambient_night);
 }
 
 static void test_single_condition_matches_expected_state(void)
@@ -65,6 +98,23 @@ static void test_single_condition_matches_expected_state(void)
     assert(!svc_rule_condition_matches(
         &state,
         (svc_rule_condition_t){SVC_RULE_CONDITION_HIGH_BEAM, false}));
+}
+
+static void test_ambient_condition_matches_expected_state(void)
+{
+    svc_rule_state_t state = {0};
+    svc_rule_state_init(&state);
+    svc_rule_state_apply_event(&state, (svc_event_t){SVC_EVENT_AMBIENT_LIGHT_DUSK, SVC_OUTPUT_OUT1, 3000U});
+
+    assert(svc_rule_condition_matches(
+        &state,
+        (svc_rule_condition_t){SVC_RULE_CONDITION_AMBIENT_DUSK, true}));
+    assert(svc_rule_condition_matches(
+        &state,
+        (svc_rule_condition_t){SVC_RULE_CONDITION_AMBIENT_DAY, false}));
+    assert(!svc_rule_condition_matches(
+        &state,
+        (svc_rule_condition_t){SVC_RULE_CONDITION_AMBIENT_NIGHT, true}));
 }
 
 static void test_all_conditions_must_match(void)
@@ -98,8 +148,10 @@ int main(void)
 {
     test_init_clears_state();
     test_events_update_rule_state();
+    test_ambient_events_update_exclusive_rule_state();
     test_non_rule_events_are_ignored();
     test_single_condition_matches_expected_state();
+    test_ambient_condition_matches_expected_state();
     test_all_conditions_must_match();
     return 0;
 }

@@ -41,6 +41,8 @@ sync with firmware enums and that `config-example.json` stays aligned with
 limited firmware rule text grammar, that every `then[]` has at least one action,
 that rule actions resolve to one configured role mapping, and that partial PWM
 actions target PWM-capable outputs.
+The example fog-light rules use the ambient day/dusk/night conditions supported
+by firmware rather than hard-coding physical output channels.
 
 Configuration persistence is defined by `firmware/services/config-store.md`.
 Persisted records are versioned, checksummed, and selected from two slots before

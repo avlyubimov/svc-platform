@@ -19,7 +19,10 @@ typedef struct {
 static const condition_name_t CONDITION_NAMES[] = {
     {"engine_running", SVC_RULE_CONDITION_ENGINE_RUNNING},
     {"high_beam", SVC_RULE_CONDITION_HIGH_BEAM},
-    {"left_indicator", SVC_RULE_CONDITION_LEFT_INDICATOR}
+    {"left_indicator", SVC_RULE_CONDITION_LEFT_INDICATOR},
+    {"ambient_day", SVC_RULE_CONDITION_AMBIENT_DAY},
+    {"ambient_dusk", SVC_RULE_CONDITION_AMBIENT_DUSK},
+    {"ambient_night", SVC_RULE_CONDITION_AMBIENT_NIGHT}
 };
 
 static const role_name_t ROLE_NAMES[] = {

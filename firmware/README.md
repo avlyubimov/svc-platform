@@ -57,7 +57,8 @@ Current host tests cover:
   Output Manager output shutdown.
 - Role Resolver and Rule Engine skeleton for role-based actions through Output
   Manager.
-- Rule condition state tracking for engine, high-beam, and left-indicator events.
+- Rule condition state tracking for engine, high-beam, left-indicator, and
+  ambient-light day/dusk/night events.
 - Rule runner evaluation for matched/unmatched conditions before role actions.
 - Rule set runner for ordered multi-rule evaluation, skipped-rule accounting,
   and stop-on-first-failure behavior.

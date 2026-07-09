@@ -10,7 +10,10 @@ static bool event_updates_rule_state(svc_event_type_t event_type)
            event_type == SVC_EVENT_HIGH_BEAM_ON ||
            event_type == SVC_EVENT_HIGH_BEAM_OFF ||
            event_type == SVC_EVENT_LEFT_INDICATOR_ON ||
-           event_type == SVC_EVENT_LEFT_INDICATOR_OFF;
+           event_type == SVC_EVENT_LEFT_INDICATOR_OFF ||
+           event_type == SVC_EVENT_AMBIENT_LIGHT_DAY ||
+           event_type == SVC_EVENT_AMBIENT_LIGHT_DUSK ||
+           event_type == SVC_EVENT_AMBIENT_LIGHT_NIGHT;
 }
 
 svc_rule_event_bridge_result_t svc_rule_event_bridge_drain(

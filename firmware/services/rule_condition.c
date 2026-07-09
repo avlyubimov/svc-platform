@@ -11,6 +11,16 @@ void svc_rule_state_init(svc_rule_state_t *state)
     state->engine_running = false;
     state->high_beam = false;
     state->left_indicator = false;
+    state->ambient_day = false;
+    state->ambient_dusk = false;
+    state->ambient_night = false;
+}
+
+static void set_ambient_light_state(svc_rule_state_t *state, bool day, bool dusk, bool night)
+{
+    state->ambient_day = day;
+    state->ambient_dusk = dusk;
+    state->ambient_night = night;
 }
 
 void svc_rule_state_apply_event(svc_rule_state_t *state, svc_event_t event)
@@ -38,6 +48,15 @@ void svc_rule_state_apply_event(svc_rule_state_t *state, svc_event_t event)
     case SVC_EVENT_LEFT_INDICATOR_OFF:
         state->left_indicator = false;
         break;
+    case SVC_EVENT_AMBIENT_LIGHT_DAY:
+        set_ambient_light_state(state, true, false, false);
+        break;
+    case SVC_EVENT_AMBIENT_LIGHT_DUSK:
+        set_ambient_light_state(state, false, true, false);
+        break;
+    case SVC_EVENT_AMBIENT_LIGHT_NIGHT:
+        set_ambient_light_state(state, false, false, true);
+        break;
     default:
         break;
     }
@@ -61,6 +80,15 @@ bool svc_rule_condition_matches(
         break;
     case SVC_RULE_CONDITION_LEFT_INDICATOR:
         actual = state->left_indicator;
+        break;
+    case SVC_RULE_CONDITION_AMBIENT_DAY:
+        actual = state->ambient_day;
+        break;
+    case SVC_RULE_CONDITION_AMBIENT_DUSK:
+        actual = state->ambient_dusk;
+        break;
+    case SVC_RULE_CONDITION_AMBIENT_NIGHT:
+        actual = state->ambient_night;
         break;
     default:
         return false;

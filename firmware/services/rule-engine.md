@@ -8,6 +8,8 @@ numbers.
 
 - Track event-derived condition state for engine running, high beam, and left
   indicator.
+- Track event-derived ambient light state for day, dusk, and night fog-light
+  rules.
 - Accept condition state updates from the Rule Event Bridge, which drains
   matching Event Bus events without controlling outputs.
 - Evaluate condition lists with all-conditions-must-match semantics.
@@ -32,6 +34,9 @@ Supported condition strings:
 - `engine_running == true|false`
 - `high_beam == true|false`
 - `left_indicator == true|false`
+- `ambient_day == true|false`
+- `ambient_dusk == true|false`
+- `ambient_night == true|false`
 
 Supported action strings:
 

@@ -644,7 +644,9 @@ def validate_rules(config: dict[str, Any], allowed_roles: set[str]) -> None:
             continue
         role_outputs.setdefault(role, []).append(output)
 
-    condition_pattern = re.compile(r"^(engine_running|high_beam|left_indicator) == (true|false)$")
+    condition_pattern = re.compile(
+        r"^(engine_running|high_beam|left_indicator|ambient_day|ambient_dusk|ambient_night) == (true|false)$"
+    )
     action_pattern = re.compile(r"^([A-Z0-9_]+)\.pwm = ([0-9]+)$")
     for rule_index, rule in enumerate(rules):
         if not isinstance(rule, dict):

@@ -30,6 +30,19 @@ static void test_parse_false_condition(void)
     assert(!condition.expected);
 }
 
+static void test_parse_ambient_condition(void)
+{
+    svc_rule_condition_t condition = {0};
+
+    const svc_rule_text_status_t status = svc_rule_text_parse_condition(
+        "ambient_night == true",
+        &condition);
+
+    assert(status == SVC_RULE_TEXT_OK);
+    assert(condition.type == SVC_RULE_CONDITION_AMBIENT_NIGHT);
+    assert(condition.expected);
+}
+
 static void test_reject_unknown_condition(void)
 {
     svc_rule_condition_t condition = {0};
@@ -270,6 +283,7 @@ int main(void)
 {
     test_parse_true_condition();
     test_parse_false_condition();
+    test_parse_ambient_condition();
     test_reject_unknown_condition();
     test_parse_positive_pwm_as_enable_action();
     test_parse_zero_pwm_as_disable_action();
