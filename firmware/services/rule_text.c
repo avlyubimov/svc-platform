@@ -171,3 +171,59 @@ svc_rule_text_status_t svc_rule_text_compile_rule(
     rule->action = action;
     return SVC_RULE_TEXT_OK;
 }
+
+svc_rule_text_status_t svc_rule_text_compile_rule_set(
+    const char *const *condition_texts,
+    size_t condition_count,
+    const char *const *action_texts,
+    size_t action_count,
+    svc_rule_condition_t *condition_buffer,
+    size_t condition_capacity,
+    svc_rule_t *rule_buffer,
+    size_t rule_capacity,
+    size_t *compiled_rule_count)
+{
+    if (compiled_rule_count != NULL) {
+        *compiled_rule_count = 0U;
+    }
+    if (action_count == 0U || action_texts == NULL || rule_buffer == NULL) {
+        return SVC_RULE_TEXT_INVALID_ARGUMENT;
+    }
+    if (condition_count > condition_capacity) {
+        return SVC_RULE_TEXT_TOO_MANY_CONDITIONS;
+    }
+    if (action_count > rule_capacity) {
+        return SVC_RULE_TEXT_TOO_MANY_ACTIONS;
+    }
+    if (condition_count > 0U && (condition_texts == NULL || condition_buffer == NULL)) {
+        return SVC_RULE_TEXT_INVALID_ARGUMENT;
+    }
+
+    for (size_t condition_index = 0U; condition_index < condition_count; ++condition_index) {
+        const svc_rule_text_status_t status = svc_rule_text_parse_condition(
+            condition_texts[condition_index],
+            &condition_buffer[condition_index]);
+        if (status != SVC_RULE_TEXT_OK) {
+            return status;
+        }
+    }
+
+    for (size_t action_index = 0U; action_index < action_count; ++action_index) {
+        svc_rule_action_t action = {0};
+        const svc_rule_text_status_t status = svc_rule_text_parse_action(
+            action_texts[action_index],
+            &action);
+        if (status != SVC_RULE_TEXT_OK) {
+            return status;
+        }
+
+        rule_buffer[action_index].conditions = condition_count == 0U ? NULL : condition_buffer;
+        rule_buffer[action_index].condition_count = condition_count;
+        rule_buffer[action_index].action = action;
+    }
+
+    if (compiled_rule_count != NULL) {
+        *compiled_rule_count = action_count;
+    }
+    return SVC_RULE_TEXT_OK;
+}

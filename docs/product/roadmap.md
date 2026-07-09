@@ -75,6 +75,7 @@ Current host-tested services:
 - Ordered rule set runner
 - Rule text parser
 - Rule text-to-runner compile helper
+- Multi-action rule text compiler
 - Output Manager PWM duty-cycle state
 - Runtime Boot
 - Telemetry Snapshot

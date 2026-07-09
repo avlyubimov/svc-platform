@@ -61,7 +61,8 @@ Current host tests cover:
   and stop-on-first-failure behavior.
 - Rule text parser for the initial supported JSON rule condition/action grammar.
 - Output Manager PWM duty-cycle ownership and `pwm_allowed` enforcement.
-- Rule text compile helper from condition/action strings to in-memory `svc_rule_t`.
+- Rule text compile helpers from condition/action strings to in-memory
+  `svc_rule_t` and ordered `svc_rule_t` arrays for multi-action rules.
 - Runtime Boot path from direct configuration or persistent store that keeps
   outputs off unless configuration and hardware capability checks pass.
 - Telemetry Snapshot validity/staleness for battery, total current, and

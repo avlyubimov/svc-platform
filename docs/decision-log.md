@@ -1037,3 +1037,14 @@ Reason: The configuration model already allows multiple `then` actions per
 logical rule. Representing those actions as ordered `svc_rule_t` entries with
 shared conditions gives firmware a deterministic multi-action execution path
 without hard-coding channel roles or bypassing Output Manager safety checks.
+
+## 2026-07-09 — Multi-action Rule Text Compiler
+
+Decision: Firmware rule text compilation now supports one condition list plus
+multiple action strings, producing an ordered `svc_rule_t` array in caller-owned
+storage.
+
+Reason: The example configuration uses `then[]` arrays. Compiling those actions
+into ordered in-memory rules closes the next gap between configuration grammar
+and the rule-set runner while keeping configuration separate from firmware and
+avoiding dynamic allocation in the firmware core.

@@ -79,6 +79,8 @@ dispatch.
 Rule Engine rule-set tests verify ordered multi-rule execution, skipped-rule
 accounting, stop-on-first-failure behavior, and stale-telemetry denial through
 the Output Manager budget path.
+Rule Text tests verify multi-action `then[]` compilation into ordered
+`svc_rule_t` arrays using caller-owned storage.
 
 ## PB-100 schematic-review traceability
 
