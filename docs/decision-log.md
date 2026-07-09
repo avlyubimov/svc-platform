@@ -1048,3 +1048,14 @@ Reason: The example configuration uses `then[]` arrays. Compiling those actions
 into ordered in-memory rules closes the next gap between configuration grammar
 and the rule-set runner while keeping configuration separate from firmware and
 avoiding dynamic allocation in the firmware core.
+
+## 2026-07-09 — Rule Configuration Validation Tightening
+
+Decision: Repository config validation now requires non-empty `then[]` arrays,
+checks that each rule action resolves to exactly one configured role mapping,
+and rejects partial PWM requests when the mapped output is not PWM-capable.
+
+Reason: The JSON schema and repository validator must match the firmware rule
+compiler and Output Manager boundary. Catching unmapped, ambiguous, or
+electrically impossible rule actions at validation time reduces runtime
+surprises without hard-coding physical channel roles.

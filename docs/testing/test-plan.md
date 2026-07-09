@@ -81,6 +81,8 @@ accounting, stop-on-first-failure behavior, and stale-telemetry denial through
 the Output Manager budget path.
 Rule Text tests verify multi-action `then[]` compilation into ordered
 `svc_rule_t` arrays using caller-owned storage.
+Repository config validation checks rule grammar, non-empty `then[]`, mapped
+rule-action roles, and partial-PWM compatibility against the configured outputs.
 
 ## PB-100 schematic-review traceability
 

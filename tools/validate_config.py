@@ -212,6 +212,11 @@ def validate_schema(schema: dict[str, Any], allowed_roles: set[str]) -> None:
     if outputs_schema.get("minItems") != 10 or outputs_schema.get("maxItems") != 10:
         fail("schema outputs array must require exactly 10 items")
 
+    rule_schema = schema.get("$defs", {}).get("rule", {})
+    then_schema = rule_schema.get("properties", {}).get("then", {})
+    if then_schema.get("minItems") != 1:
+        fail("schema rule.then must require at least one action")
+
 
 def validate_battery(config: dict[str, Any], defines: dict[str, int]) -> None:
     battery = require_dict(config, "battery")
@@ -630,6 +635,15 @@ def validate_rules(config: dict[str, Any], allowed_roles: set[str]) -> None:
     if not isinstance(rules, list):
         fail("rules must be an array")
 
+    role_outputs: dict[str, list[dict[str, Any]]] = {}
+    for output_index, output in enumerate(require_list(config, "outputs")):
+        if not isinstance(output, dict):
+            fail(f"outputs[{output_index}] must be an object")
+        role = output.get("role")
+        if not isinstance(role, str) or role == "NONE":
+            continue
+        role_outputs.setdefault(role, []).append(output)
+
     condition_pattern = re.compile(r"^(engine_running|high_beam|left_indicator) == (true|false)$")
     action_pattern = re.compile(r"^([A-Z0-9_]+)\.pwm = ([0-9]+)$")
     for rule_index, rule in enumerate(rules):
@@ -641,6 +655,8 @@ def validate_rules(config: dict[str, Any], allowed_roles: set[str]) -> None:
             fail(f"rules[{rule_index}].if must be an array of strings")
         if not isinstance(actions, list) or not all(isinstance(action, str) for action in actions):
             fail(f"rules[{rule_index}].then must be an array of strings")
+        if len(actions) == 0:
+            fail(f"rules[{rule_index}].then must contain at least one action")
 
         for condition_index, condition in enumerate(conditions):
             if condition_pattern.match(condition) is None:
@@ -653,9 +669,20 @@ def validate_rules(config: dict[str, Any], allowed_roles: set[str]) -> None:
             role, pwm_value_text = match.groups()
             if role not in allowed_roles or role == "NONE":
                 fail(f"rules[{rule_index}].then[{action_index}] uses unknown or non-actionable role: {role}")
+            mapped_outputs = role_outputs.get(role, [])
+            if len(mapped_outputs) == 0:
+                fail(f"rules[{rule_index}].then[{action_index}] uses unmapped role: {role}")
+            if len(mapped_outputs) > 1:
+                fail(f"rules[{rule_index}].then[{action_index}] uses ambiguous role mapping: {role}")
             pwm_value = int(pwm_value_text)
             if pwm_value > 100:
                 fail(f"rules[{rule_index}].then[{action_index}] PWM value must be 0..100")
+            if 0 < pwm_value < 100 and mapped_outputs[0].get("pwm") is not True:
+                output_id = mapped_outputs[0].get("id", "<unknown>")
+                fail(
+                    f"rules[{rule_index}].then[{action_index}] requests partial PWM "
+                    f"for non-PWM output {output_id}"
+                )
 
 
 def main() -> int:
