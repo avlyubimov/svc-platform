@@ -12,6 +12,8 @@ numbers.
   matching Event Bus events without controlling outputs.
 - Evaluate condition lists with all-conditions-must-match semantics.
 - Evaluate an in-memory rule and skip it when conditions do not match.
+- Evaluate ordered rule sets so multiple configured actions can be represented
+  as multiple `svc_rule_t` entries with shared conditions.
 - Enable a configured role through role resolution.
 - Disable a configured role through role resolution.
 - Deny missing or ambiguous role mappings.
@@ -19,7 +21,9 @@ numbers.
   denials.
 
 The current implementation is an in-memory rule runner. Full JSON rule parsing
-will be added after the core safety path is stable.
+will be added after the core safety path is stable. Configuration entries with
+multiple `then` actions can be represented by multiple `svc_rule_t` entries that
+share the same condition array and execute in order.
 
 ## Initial text grammar
 
@@ -62,3 +66,8 @@ dynamic allocation.
 `svc_rule_engine_evaluate_rule_with_telemetry()` reads total-current validity
 from Telemetry Snapshot before applying a matching rule, so stale current data
 denies new output starts through the Output Manager budget path.
+
+`svc_rule_engine_evaluate_rules()` and
+`svc_rule_engine_evaluate_rules_with_telemetry()` evaluate ordered rule arrays,
+continue past skipped conditions, and stop on the first denied action while
+reporting the failed rule index.

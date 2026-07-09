@@ -57,6 +57,8 @@ Current host tests cover:
   Manager.
 - Rule condition state tracking for engine, high-beam, and left-indicator events.
 - Rule runner evaluation for matched/unmatched conditions before role actions.
+- Rule set runner for ordered multi-rule evaluation, skipped-rule accounting,
+  and stop-on-first-failure behavior.
 - Rule text parser for the initial supported JSON rule condition/action grammar.
 - Output Manager PWM duty-cycle ownership and `pwm_allowed` enforcement.
 - Rule text compile helper from condition/action strings to in-memory `svc_rule_t`.

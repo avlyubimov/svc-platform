@@ -72,6 +72,7 @@ Current host-tested services:
 - Rule Engine skeleton
 - Rule condition evaluator
 - In-memory rule runner
+- Ordered rule set runner
 - Rule text parser
 - Rule text-to-runner compile helper
 - Output Manager PWM duty-cycle state

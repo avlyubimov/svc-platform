@@ -76,6 +76,9 @@ through the Event Bus without repeating unchanged states.
 Rule Event Bridge tests verify condition events drain into rule state, CAN-derived
 events can reach rule evaluation, and non-rule events remain available for safety
 dispatch.
+Rule Engine rule-set tests verify ordered multi-rule execution, skipped-rule
+accounting, stop-on-first-failure behavior, and stale-telemetry denial through
+the Output Manager budget path.
 
 ## PB-100 schematic-review traceability
 

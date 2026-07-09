@@ -14,6 +14,22 @@ static svc_rule_engine_result_t make_result(
     };
 }
 
+static svc_rule_engine_run_result_t make_run_result(svc_rule_engine_status_t status)
+{
+    return (svc_rule_engine_run_result_t){
+        .status = status,
+        .evaluated_rules = 0U,
+        .matched_rules = 0U,
+        .skipped_rules = 0U,
+        .applied_actions = 0U,
+        .failed_rule_index = SVC_RULE_ENGINE_RULE_INDEX_NONE,
+        .last_result = make_result(
+            status,
+            (svc_role_resolver_result_t){0},
+            (svc_output_manager_result_t){0})
+    };
+}
+
 static svc_rule_engine_status_t status_for_role_result(svc_role_resolver_status_t status)
 {
     if (status == SVC_ROLE_RESOLVER_INVALID_CONFIG) {
@@ -127,6 +143,72 @@ svc_rule_engine_result_t svc_rule_engine_evaluate_rule_with_telemetry(
         output_manager,
         state,
         rule,
+        input.measured_total_current_ma,
+        input.telemetry_valid);
+}
+
+svc_rule_engine_run_result_t svc_rule_engine_evaluate_rules(
+    const svc_device_config_t *config,
+    svc_output_manager_t *output_manager,
+    const svc_rule_state_t *state,
+    const svc_rule_t *rules,
+    size_t rule_count,
+    uint32_t measured_total_current_ma,
+    bool telemetry_valid)
+{
+    if (state == NULL || (rule_count > 0U && rules == NULL)) {
+        return make_run_result(SVC_RULE_ENGINE_DENY_INVALID_ARGUMENT);
+    }
+
+    svc_rule_engine_run_result_t run_result = make_run_result(SVC_RULE_ENGINE_OK);
+    for (size_t rule_index = 0U; rule_index < rule_count; ++rule_index) {
+        const svc_rule_engine_result_t result = svc_rule_engine_evaluate_rule(
+            config,
+            output_manager,
+            state,
+            &rules[rule_index],
+            measured_total_current_ma,
+            telemetry_valid);
+
+        ++run_result.evaluated_rules;
+        run_result.last_result = result;
+        if (result.status == SVC_RULE_ENGINE_SKIPPED_CONDITIONS) {
+            ++run_result.skipped_rules;
+            continue;
+        }
+        if (result.status != SVC_RULE_ENGINE_OK) {
+            run_result.status = result.status;
+            run_result.failed_rule_index = rule_index;
+            return run_result;
+        }
+
+        ++run_result.matched_rules;
+        ++run_result.applied_actions;
+    }
+
+    return run_result;
+}
+
+svc_rule_engine_run_result_t svc_rule_engine_evaluate_rules_with_telemetry(
+    const svc_device_config_t *config,
+    svc_output_manager_t *output_manager,
+    const svc_rule_state_t *state,
+    const svc_rule_t *rules,
+    size_t rule_count,
+    const svc_telemetry_snapshot_t *telemetry,
+    uint32_t now_ms,
+    uint32_t stale_after_ms)
+{
+    const svc_telemetry_power_budget_input_t input = svc_telemetry_power_budget_input(
+        telemetry,
+        now_ms,
+        stale_after_ms);
+    return svc_rule_engine_evaluate_rules(
+        config,
+        output_manager,
+        state,
+        rules,
+        rule_count,
         input.measured_total_current_ma,
         input.telemetry_valid);
 }

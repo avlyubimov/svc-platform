@@ -10,6 +10,8 @@
 #include "svc_config.h"
 #include "telemetry.h"
 
+#define SVC_RULE_ENGINE_RULE_INDEX_NONE ((size_t)-1)
+
 typedef enum {
     SVC_RULE_ACTION_ENABLE_ROLE = 0,
     SVC_RULE_ACTION_DISABLE_ROLE
@@ -43,6 +45,16 @@ typedef struct {
     svc_output_manager_result_t output_result;
 } svc_rule_engine_result_t;
 
+typedef struct {
+    svc_rule_engine_status_t status;
+    size_t evaluated_rules;
+    size_t matched_rules;
+    size_t skipped_rules;
+    size_t applied_actions;
+    size_t failed_rule_index;
+    svc_rule_engine_result_t last_result;
+} svc_rule_engine_run_result_t;
+
 svc_rule_engine_result_t svc_rule_engine_apply_action(
     const svc_device_config_t *config,
     svc_output_manager_t *output_manager,
@@ -63,6 +75,25 @@ svc_rule_engine_result_t svc_rule_engine_evaluate_rule_with_telemetry(
     svc_output_manager_t *output_manager,
     const svc_rule_state_t *state,
     const svc_rule_t *rule,
+    const svc_telemetry_snapshot_t *telemetry,
+    uint32_t now_ms,
+    uint32_t stale_after_ms);
+
+svc_rule_engine_run_result_t svc_rule_engine_evaluate_rules(
+    const svc_device_config_t *config,
+    svc_output_manager_t *output_manager,
+    const svc_rule_state_t *state,
+    const svc_rule_t *rules,
+    size_t rule_count,
+    uint32_t measured_total_current_ma,
+    bool telemetry_valid);
+
+svc_rule_engine_run_result_t svc_rule_engine_evaluate_rules_with_telemetry(
+    const svc_device_config_t *config,
+    svc_output_manager_t *output_manager,
+    const svc_rule_state_t *state,
+    const svc_rule_t *rules,
+    size_t rule_count,
     const svc_telemetry_snapshot_t *telemetry,
     uint32_t now_ms,
     uint32_t stale_after_ms);

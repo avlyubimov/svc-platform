@@ -1025,3 +1025,15 @@ non-rule events for safety and diagnostic dispatchers.
 Reason: CAN-derived state changes must reach the Rule Engine through the
 documented Event Bus boundary without bypassing Output Manager, hard-coding
 physical output roles, or dropping fault events.
+
+## 2026-07-09 — Ordered Rule Set Runner
+
+Decision: Firmware now has a host-tested ordered rule set runner that evaluates
+arrays of `svc_rule_t`, continues past unmatched conditions, applies matching
+role-based actions in order, and stops on the first denied action while
+reporting the failed rule index.
+
+Reason: The configuration model already allows multiple `then` actions per
+logical rule. Representing those actions as ordered `svc_rule_t` entries with
+shared conditions gives firmware a deterministic multi-action execution path
+without hard-coding channel roles or bypassing Output Manager safety checks.

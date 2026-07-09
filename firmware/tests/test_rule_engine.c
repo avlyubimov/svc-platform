@@ -248,6 +248,202 @@ static void test_stale_power_telemetry_denies_matching_rule(void)
     assert(svc_output_manager_active_mask(&manager) == 0U);
 }
 
+static void test_rule_set_applies_multiple_matching_rules(void)
+{
+    svc_output_manager_t manager = initialized_output_manager(&svc_default_config);
+    svc_rule_state_t state = {0};
+    svc_rule_state_init(&state);
+    svc_rule_state_apply_event(&state, (svc_event_t){SVC_EVENT_ENGINE_STARTED, SVC_OUTPUT_OUT1, 1U});
+    svc_rule_state_apply_event(&state, (svc_event_t){SVC_EVENT_HIGH_BEAM_ON, SVC_OUTPUT_OUT1, 1U});
+
+    const svc_rule_condition_t conditions[] = {
+        {SVC_RULE_CONDITION_ENGINE_RUNNING, true},
+        {SVC_RULE_CONDITION_HIGH_BEAM, true}
+    };
+    const svc_rule_t rules[] = {
+        {
+            .conditions = conditions,
+            .condition_count = sizeof(conditions) / sizeof(conditions[0]),
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U}
+        },
+        {
+            .conditions = conditions,
+            .condition_count = sizeof(conditions) / sizeof(conditions[0]),
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_RIGHT, 100U}
+        }
+    };
+
+    const svc_rule_engine_run_result_t result = svc_rule_engine_evaluate_rules(
+        &svc_default_config,
+        &manager,
+        &state,
+        rules,
+        sizeof(rules) / sizeof(rules[0]),
+        1000U,
+        true);
+
+    assert(result.status == SVC_RULE_ENGINE_OK);
+    assert(result.evaluated_rules == 2U);
+    assert(result.matched_rules == 2U);
+    assert(result.skipped_rules == 0U);
+    assert(result.applied_actions == 2U);
+    assert(result.failed_rule_index == SVC_RULE_ENGINE_RULE_INDEX_NONE);
+    assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT3)) != 0U);
+    assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT4)) != 0U);
+}
+
+static void test_rule_set_skips_unmatched_rules_and_continues(void)
+{
+    svc_output_manager_t manager = initialized_output_manager(&svc_default_config);
+    svc_rule_state_t state = {0};
+    svc_rule_state_init(&state);
+    svc_rule_state_apply_event(&state, (svc_event_t){SVC_EVENT_ENGINE_STARTED, SVC_OUTPUT_OUT1, 1U});
+
+    const svc_rule_condition_t high_beam_conditions[] = {
+        {SVC_RULE_CONDITION_HIGH_BEAM, true}
+    };
+    const svc_rule_condition_t engine_conditions[] = {
+        {SVC_RULE_CONDITION_ENGINE_RUNNING, true}
+    };
+    const svc_rule_t rules[] = {
+        {
+            .conditions = high_beam_conditions,
+            .condition_count = sizeof(high_beam_conditions) / sizeof(high_beam_conditions[0]),
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U}
+        },
+        {
+            .conditions = engine_conditions,
+            .condition_count = sizeof(engine_conditions) / sizeof(engine_conditions[0]),
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_CHIGEE, 100U}
+        }
+    };
+
+    const svc_rule_engine_run_result_t result = svc_rule_engine_evaluate_rules(
+        &svc_default_config,
+        &manager,
+        &state,
+        rules,
+        sizeof(rules) / sizeof(rules[0]),
+        1000U,
+        true);
+
+    assert(result.status == SVC_RULE_ENGINE_OK);
+    assert(result.evaluated_rules == 2U);
+    assert(result.matched_rules == 1U);
+    assert(result.skipped_rules == 1U);
+    assert(result.applied_actions == 1U);
+    assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT3)) == 0U);
+    assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT5)) != 0U);
+}
+
+static void test_rule_set_stops_on_first_failed_action(void)
+{
+    svc_output_manager_t manager = initialized_output_manager(&svc_default_config);
+    svc_rule_state_t state = {0};
+    svc_rule_state_init(&state);
+    svc_rule_state_apply_event(&state, (svc_event_t){SVC_EVENT_ENGINE_STARTED, SVC_OUTPUT_OUT1, 1U});
+
+    const svc_rule_condition_t conditions[] = {
+        {SVC_RULE_CONDITION_ENGINE_RUNNING, true}
+    };
+    const svc_rule_t rules[] = {
+        {
+            .conditions = conditions,
+            .condition_count = sizeof(conditions) / sizeof(conditions[0]),
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U}
+        },
+        {
+            .conditions = conditions,
+            .condition_count = sizeof(conditions) / sizeof(conditions[0]),
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_CIGARETTE_SOCKET, 40U}
+        },
+        {
+            .conditions = conditions,
+            .condition_count = sizeof(conditions) / sizeof(conditions[0]),
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_CHIGEE, 100U}
+        }
+    };
+
+    const svc_rule_engine_run_result_t result = svc_rule_engine_evaluate_rules(
+        &svc_default_config,
+        &manager,
+        &state,
+        rules,
+        sizeof(rules) / sizeof(rules[0]),
+        1000U,
+        true);
+
+    assert(result.status == SVC_RULE_ENGINE_DENY_OUTPUT_MANAGER);
+    assert(result.evaluated_rules == 2U);
+    assert(result.matched_rules == 1U);
+    assert(result.skipped_rules == 0U);
+    assert(result.applied_actions == 1U);
+    assert(result.failed_rule_index == 1U);
+    assert(result.last_result.output_result.status == SVC_OUTPUT_MANAGER_DENY_PWM_NOT_ALLOWED);
+    assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT3)) != 0U);
+    assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT5)) == 0U);
+}
+
+static void test_rule_set_invalid_arguments_do_not_apply_rules(void)
+{
+    svc_output_manager_t manager = initialized_output_manager(&svc_default_config);
+    svc_rule_state_t state = {0};
+    svc_rule_state_init(&state);
+
+    const svc_rule_engine_run_result_t result = svc_rule_engine_evaluate_rules(
+        &svc_default_config,
+        &manager,
+        &state,
+        NULL,
+        1U,
+        1000U,
+        true);
+
+    assert(result.status == SVC_RULE_ENGINE_DENY_INVALID_ARGUMENT);
+    assert(result.evaluated_rules == 0U);
+    assert(result.failed_rule_index == SVC_RULE_ENGINE_RULE_INDEX_NONE);
+    assert(svc_output_manager_active_mask(&manager) == 0U);
+}
+
+static void test_rule_set_telemetry_wrapper_denies_stale_matching_rule(void)
+{
+    svc_output_manager_t manager = initialized_output_manager(&svc_default_config);
+    svc_rule_state_t state = {0};
+    svc_rule_state_init(&state);
+    svc_rule_state_apply_event(&state, (svc_event_t){SVC_EVENT_ENGINE_STARTED, SVC_OUTPUT_OUT1, 1U});
+
+    const svc_rule_condition_t conditions[] = {
+        {SVC_RULE_CONDITION_ENGINE_RUNNING, true}
+    };
+    const svc_rule_t rules[] = {
+        {
+            .conditions = conditions,
+            .condition_count = sizeof(conditions) / sizeof(conditions[0]),
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 40U}
+        }
+    };
+
+    svc_telemetry_snapshot_t telemetry = {0};
+    svc_telemetry_snapshot_init(&telemetry);
+    svc_telemetry_update_total_current(&telemetry, 1000U, true, 100U);
+
+    const svc_rule_engine_run_result_t result = svc_rule_engine_evaluate_rules_with_telemetry(
+        &svc_default_config,
+        &manager,
+        &state,
+        rules,
+        sizeof(rules) / sizeof(rules[0]),
+        &telemetry,
+        1200U,
+        SVC_TELEMETRY_DEFAULT_STALE_MS);
+
+    assert(result.status == SVC_RULE_ENGINE_DENY_OUTPUT_MANAGER);
+    assert(result.evaluated_rules == 1U);
+    assert(result.failed_rule_index == 0U);
+    assert(result.last_result.output_result.budget_decision == SVC_POWER_BUDGET_DENY_TELEMETRY_INVALID);
+    assert(svc_output_manager_active_mask(&manager) == 0U);
+}
+
 int main(void)
 {
     test_enable_role_uses_config_mapping();
@@ -261,5 +457,10 @@ int main(void)
     test_unmatched_rule_is_skipped_without_output_change();
     test_null_rule_is_denied();
     test_stale_power_telemetry_denies_matching_rule();
+    test_rule_set_applies_multiple_matching_rules();
+    test_rule_set_skips_unmatched_rules_and_continues();
+    test_rule_set_stops_on_first_failed_action();
+    test_rule_set_invalid_arguments_do_not_apply_rules();
+    test_rule_set_telemetry_wrapper_denies_stale_matching_rule();
     return 0;
 }
