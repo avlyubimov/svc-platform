@@ -957,3 +957,15 @@ valid persisted record exists.
 
 Reason: Configuration is separate from firmware. Firmware updates must not erase
 or silently override valid user configuration with new compiled defaults.
+
+## 2026-07-09 — Store-backed runtime boot
+
+Decision: `svc_runtime_boot_from_store()` now loads the newest valid
+configuration record from the two-slot Configuration Store, falls back to
+compiled defaults only when no valid persisted record exists, and then runs the
+runtime boot acceptance path. The caller owns the loaded configuration storage
+for the runtime lifetime.
+
+Reason: Persistence and startup safety need to be connected. Firmware must boot
+from valid persisted user configuration after updates, but still reject the boot
+if the loaded configuration exceeds the connected hardware capability.

@@ -63,3 +63,67 @@ svc_runtime_boot_result_t svc_runtime_boot(
     runtime->initialized = true;
     return make_result(SVC_RUNTIME_BOOT_OK, acceptance, runtime);
 }
+
+static svc_runtime_store_boot_result_t make_store_boot_result(
+    svc_runtime_store_boot_status_t status,
+    svc_config_store_load_result_t store,
+    svc_runtime_boot_result_t boot)
+{
+    return (svc_runtime_store_boot_result_t){
+        .status = status,
+        .store = store,
+        .boot = boot
+    };
+}
+
+svc_runtime_store_boot_result_t svc_runtime_boot_from_store(
+    svc_runtime_t *runtime,
+    const svc_config_record_t *slot_a,
+    const svc_config_record_t *slot_b,
+    const svc_device_config_t *fallback_config,
+    const svc_hardware_capability_t *capability,
+    svc_device_config_t *loaded_config)
+{
+    const svc_config_store_load_result_t empty_store = {
+        .status = SVC_CONFIG_STORE_LOAD_INVALID_ARGUMENT,
+        .source = SVC_CONFIG_STORE_SOURCE_NONE,
+        .slot_a_status = SVC_CONFIG_STORE_INVALID_NULL,
+        .slot_b_status = SVC_CONFIG_STORE_INVALID_NULL,
+        .sequence = 0U
+    };
+
+    if (runtime == NULL || loaded_config == NULL) {
+        const svc_runtime_boot_result_t boot = svc_runtime_boot(runtime, NULL, capability);
+        return make_store_boot_result(
+            SVC_RUNTIME_STORE_BOOT_INVALID_ARGUMENT,
+            empty_store,
+            boot);
+    }
+
+    const svc_config_store_load_result_t store = svc_config_store_load_latest(
+        slot_a,
+        slot_b,
+        fallback_config,
+        loaded_config);
+    if (store.status != SVC_CONFIG_STORE_LOAD_OK &&
+        store.status != SVC_CONFIG_STORE_LOAD_FALLBACK_DEFAULT) {
+        *runtime = (svc_runtime_t){0};
+        svc_event_bus_init(&runtime->event_bus);
+        const svc_runtime_boot_result_t boot = svc_runtime_boot(runtime, NULL, capability);
+        return make_store_boot_result(
+            SVC_RUNTIME_STORE_BOOT_LOAD_FAILED,
+            store,
+            boot);
+    }
+
+    const svc_runtime_boot_result_t boot = svc_runtime_boot(
+        runtime,
+        loaded_config,
+        capability);
+    return make_store_boot_result(
+        boot.status == SVC_RUNTIME_BOOT_OK
+            ? SVC_RUNTIME_STORE_BOOT_OK
+            : SVC_RUNTIME_STORE_BOOT_BOOT_FAILED,
+        store,
+        boot);
+}

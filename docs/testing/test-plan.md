@@ -63,7 +63,8 @@ the JSON hardware capability manifest.
 Configuration acceptance tests verify startup rejects invalid configuration,
 invalid hardware capability data, and configurations exceeding PB-100 limits.
 Runtime boot tests verify rejected configuration leaves outputs off and runtime
-services uninitialized.
+services uninitialized. Store-backed runtime boot tests verify persisted records
+are loaded before hardware capability acceptance.
 Configuration store tests verify persisted user configuration is selected ahead
 of firmware defaults after an update.
 

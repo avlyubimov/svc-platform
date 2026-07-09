@@ -53,8 +53,8 @@ Current host tests cover:
 - Rule text parser for the initial supported JSON rule condition/action grammar.
 - Output Manager PWM duty-cycle ownership and `pwm_allowed` enforcement.
 - Rule text compile helper from condition/action strings to in-memory `svc_rule_t`.
-- Runtime Boot acceptance path that keeps outputs off unless configuration and
-  hardware capability checks pass.
+- Runtime Boot path from direct configuration or persistent store that keeps
+  outputs off unless configuration and hardware capability checks pass.
 - Telemetry Snapshot validity/staleness for battery, total current, and
   per-output current samples.
 - Telemetry-backed System Safety and Rule Engine wrappers for stale-data fail

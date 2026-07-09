@@ -148,6 +148,7 @@ RUNTIME_BOOT_SRCS := \
 	core/svc_config_defaults.c \
 	services/battery_service.c \
 	services/config_acceptance.c \
+	services/config_store.c \
 	services/config_validator.c \
 	services/event_bus.c \
 	services/hardware_capability.c \
