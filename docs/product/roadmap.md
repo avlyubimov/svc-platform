@@ -47,10 +47,16 @@ Status: In progress
 - role-mapped rule actions
 - CAN read-only logger
 - config JSON schema
+- config persistence and startup acceptance
 
 Current host-tested services:
 
 - Configuration Validator
+- Configuration Store
+- Configuration Update
+- Configuration Acceptance
+- Hardware Capability Guard
+- PB-100 Capability Baseline
 - Event Bus
 - Event Dispatcher
 - Event Log
@@ -66,6 +72,7 @@ Current host-tested services:
 - Rule text parser
 - Rule text-to-runner compile helper
 - Output Manager PWM duty-cycle state
+- Runtime Boot
 - Telemetry Snapshot
 - Telemetry-backed safety/rule wrappers
 - Thermal Protection service

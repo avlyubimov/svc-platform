@@ -980,3 +980,14 @@ hardware capability. Rejected configurations leave the output record empty.
 Reason: Boot-time rejection is necessary but not sufficient. The service-tool or
 future API path that writes configuration must also prevent unsafe or
 hardware-incompatible configuration from becoming the persisted user record.
+
+## 2026-07-09 — Product readiness status refresh
+
+Decision: `docs/product/final-readiness.md` and `docs/product/roadmap.md` now
+reflect the firmware configuration persistence, hardware capability, config
+update, config acceptance, and runtime boot host-test coverage added on
+2026-07-09.
+
+Reason: Readiness documents should track the repository state used for planning
+the next work. The update is status-only and does not change PB-100 requirements
+or authorize PCB layout.

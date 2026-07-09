@@ -1,7 +1,7 @@
 # Final Readiness
 
 Status: In progress  
-Last updated: 2026-06-30
+Last updated: 2026-07-09
 
 This document defines what “ready” means for the current repository state. It
 does not authorize PB-100 PCB layout.
@@ -23,6 +23,8 @@ Current coverage:
 - PB-100 layout/manufacturing artifact blocker.
 - Firmware config JSON/schema validation.
 - Firmware host-test suite.
+- Firmware hardware-capability, config-store, config-update, and runtime-boot
+  startup safety validation.
 
 ## Current readiness
 
@@ -32,8 +34,8 @@ Current coverage:
 | PB-100 requirements | Ready for schematic planning | Baseline is frozen; schematic freeze remains open |
 | PB-100 KiCad scaffold | Review-ready scaffold | Schematic ERC and netlist export pass locally with KiCad 10.0.4 |
 | PB-100 PCB/layout | Blocked | Layout, Gerber, drill, placement, and manufacturing zips are blocked |
-| Firmware safety core | Host-test ready | Output, battery, thermal, CAN, telemetry, events, logging, config, and rule paths covered |
-| Configuration format | Host-test ready | JSON schema and example are validated against firmware defaults |
+| Firmware safety core | Host-test ready | Output, battery, thermal, CAN, telemetry, events, logging, config, runtime boot, and rule paths covered |
+| Configuration format | Host-test ready | JSON schema, PB-100 capability manifest, compiled capability baseline, config store, config update, and examples are validated |
 | Production package | Draft | BOMs and component families need final sourcing and schematic evidence |
 
 ## Required before schematic freeze
