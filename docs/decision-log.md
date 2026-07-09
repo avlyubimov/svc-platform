@@ -933,3 +933,16 @@ Reason: A configuration that is internally valid can still be unsafe for a
 specific board capability set. Startup must reject that case before Output
 Manager, System Safety, Rule Engine, or other services act on configuration
 data.
+
+## 2026-07-09 — Runtime boot safety boundary
+
+Decision: Firmware now has `svc_runtime_boot()` in
+`firmware/services/runtime_boot.c`. Runtime boot initializes the Event Bus,
+accepts configuration against discovered hardware capability, and initializes
+Output Manager plus System Safety only after acceptance succeeds. Rejected
+configuration or invalid capability leaves the runtime uninitialized with zero
+active outputs.
+
+Reason: Safe default-off behavior must hold at startup, not only inside
+individual services. A single boot boundary prevents services from being
+initialized around an unsafe configuration/capability pairing.

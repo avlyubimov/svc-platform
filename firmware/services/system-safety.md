@@ -25,6 +25,12 @@ available, the coordinator still disables active outputs.
 - `firmware/services/system_safety.c`
 - `firmware/tests/test_system_safety.c`
 
+Startup sequencing is handled by:
+
+- `firmware/services/runtime_boot.h`
+- `firmware/services/runtime_boot.c`
+- `firmware/tests/test_runtime_boot.c`
+
 Battery telemetry validity/staleness is provided by:
 
 - `firmware/services/telemetry.h`

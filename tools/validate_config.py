@@ -22,7 +22,12 @@ PB100_CAPABILITY_HEADER_PATH = REPO_ROOT / "firmware" / "services" / "pb100_capa
 PB100_CAPABILITY_IMPL_PATH = REPO_ROOT / "firmware" / "services" / "pb100_capability.c"
 CONFIG_ACCEPTANCE_TEST_PATH = REPO_ROOT / "firmware" / "tests" / "test_config_acceptance.c"
 HARDWARE_CAPABILITY_TEST_PATH = REPO_ROOT / "firmware" / "tests" / "test_hardware_capability.c"
+RUNTIME_BOOT_HEADER_PATH = REPO_ROOT / "firmware" / "services" / "runtime_boot.h"
+RUNTIME_BOOT_IMPL_PATH = REPO_ROOT / "firmware" / "services" / "runtime_boot.c"
+RUNTIME_BOOT_TEST_PATH = REPO_ROOT / "firmware" / "tests" / "test_runtime_boot.c"
 CONFIGURATION_DOC_PATH = REPO_ROOT / "firmware" / "services" / "configuration.md"
+RUNTIME_BOOT_DOC_PATH = REPO_ROOT / "firmware" / "services" / "runtime-boot.md"
+SYSTEM_SAFETY_DOC_PATH = REPO_ROOT / "firmware" / "services" / "system-safety.md"
 SVC_TYPES_PATH = REPO_ROOT / "firmware" / "core" / "svc_types.h"
 SVC_CONFIG_PATH = REPO_ROOT / "firmware" / "core" / "svc_config.h"
 SVC_DEFAULTS_PATH = REPO_ROOT / "firmware" / "core" / "svc_config_defaults.c"
@@ -43,6 +48,9 @@ REQUIRED_HARDWARE_CAPABILITY_TOKENS = (
     "svc_config_accept_for_hardware",
     "SVC_CONFIG_ACCEPTANCE_CONFIG_EXCEEDS_HARDWARE",
     "SVC_CONFIG_ACCEPTANCE_INVALID_HARDWARE_CAPABILITY",
+    "svc_runtime_boot",
+    "SVC_RUNTIME_BOOT_REJECTED_CONFIG",
+    "SVC_RUNTIME_BOOT_INVALID_ARGUMENT",
     "svc_hardware_capability_validate_config",
     "svc_pb100_hardware_capability",
     "SVC_HARDWARE_CAPABILITY_CONFIG_EXCEEDS_OUTPUT_CAPABILITY",
@@ -415,21 +423,29 @@ def validate_pb100_c_capability(capabilities: dict[str, Any], pb100_implementati
 def validate_hardware_capability_service(capabilities: dict[str, Any]) -> None:
     config_acceptance_header_text = read_text(CONFIG_ACCEPTANCE_HEADER_PATH)
     config_acceptance_implementation_text = read_text(CONFIG_ACCEPTANCE_IMPL_PATH)
+    runtime_boot_header_text = read_text(RUNTIME_BOOT_HEADER_PATH)
+    runtime_boot_implementation_text = read_text(RUNTIME_BOOT_IMPL_PATH)
     header_text = read_text(HARDWARE_CAPABILITY_HEADER_PATH)
     implementation_text = read_text(HARDWARE_CAPABILITY_IMPL_PATH)
     pb100_header_text = read_text(PB100_CAPABILITY_HEADER_PATH)
     pb100_implementation_text = read_text(PB100_CAPABILITY_IMPL_PATH)
     config_acceptance_test_text = read_text(CONFIG_ACCEPTANCE_TEST_PATH)
+    runtime_boot_test_text = read_text(RUNTIME_BOOT_TEST_PATH)
     test_text = read_text(HARDWARE_CAPABILITY_TEST_PATH)
     configuration_doc_text = read_text(CONFIGURATION_DOC_PATH)
+    runtime_boot_doc_text = read_text(RUNTIME_BOOT_DOC_PATH)
+    system_safety_doc_text = read_text(SYSTEM_SAFETY_DOC_PATH)
     service_text = "\n".join((
         config_acceptance_header_text,
         config_acceptance_implementation_text,
+        runtime_boot_header_text,
+        runtime_boot_implementation_text,
         header_text,
         implementation_text,
         pb100_header_text,
         pb100_implementation_text,
         config_acceptance_test_text,
+        runtime_boot_test_text,
         test_text,
     ))
 
@@ -440,6 +456,8 @@ def validate_hardware_capability_service(capabilities: dict[str, Any]) -> None:
     role_free_source_text = "\n".join((
         config_acceptance_header_text,
         config_acceptance_implementation_text,
+        runtime_boot_header_text,
+        runtime_boot_implementation_text,
         header_text,
         implementation_text,
         pb100_header_text,
@@ -449,6 +467,7 @@ def validate_hardware_capability_service(capabilities: dict[str, Any]) -> None:
         if token in role_free_source_text:
             fail(f"hardware capability service must not contain accessory role token: {token}")
 
+    docs_text = "\n".join((configuration_doc_text, runtime_boot_doc_text, system_safety_doc_text))
     for path in (
         "firmware/services/config_acceptance.h",
         "firmware/services/config_acceptance.c",
@@ -456,11 +475,14 @@ def validate_hardware_capability_service(capabilities: dict[str, Any]) -> None:
         "firmware/services/hardware_capability.c",
         "firmware/services/pb100_capability.h",
         "firmware/services/pb100_capability.c",
+        "firmware/services/runtime_boot.h",
+        "firmware/services/runtime_boot.c",
         "firmware/tests/test_config_acceptance.c",
         "firmware/tests/test_hardware_capability.c",
+        "firmware/tests/test_runtime_boot.c",
     ):
-        if path not in configuration_doc_text:
-            fail(f"configuration docs must reference {path}")
+        if path not in docs_text:
+            fail(f"configuration/runtime docs must reference {path}")
 
     validate_pb100_c_capability(capabilities, pb100_implementation_text)
 

@@ -19,6 +19,7 @@ ROLE_RESOLVER_TEST := $(BUILD_DIR)/test_role_resolver
 RULE_CONDITION_TEST := $(BUILD_DIR)/test_rule_condition
 RULE_ENGINE_TEST := $(BUILD_DIR)/test_rule_engine
 RULE_TEXT_TEST := $(BUILD_DIR)/test_rule_text
+RUNTIME_BOOT_TEST := $(BUILD_DIR)/test_runtime_boot
 TELEMETRY_TEST := $(BUILD_DIR)/test_telemetry
 THERMAL_SERVICE_TEST := $(BUILD_DIR)/test_thermal_service
 CONFIG_VALIDATOR_SRCS := \
@@ -133,6 +134,21 @@ RULE_TEXT_SRCS := \
 	services/telemetry.c \
 	services/thermal_service.c \
 	tests/test_rule_text.c
+RUNTIME_BOOT_SRCS := \
+	core/svc_config_defaults.c \
+	services/battery_service.c \
+	services/config_acceptance.c \
+	services/config_validator.c \
+	services/event_bus.c \
+	services/hardware_capability.c \
+	services/output_manager.c \
+	services/pb100_capability.c \
+	services/power_budget.c \
+	services/runtime_boot.c \
+	services/system_safety.c \
+	services/telemetry.c \
+	services/thermal_service.c \
+	tests/test_runtime_boot.c
 TELEMETRY_SRCS := \
 	services/telemetry.c \
 	tests/test_telemetry.c
@@ -157,6 +173,7 @@ HOST_TESTS := \
 	$(RULE_CONDITION_TEST) \
 	$(RULE_ENGINE_TEST) \
 	$(RULE_TEXT_TEST) \
+	$(RUNTIME_BOOT_TEST) \
 	$(TELEMETRY_TEST) \
 	$(THERMAL_SERVICE_TEST)
 
@@ -178,6 +195,7 @@ test: $(HOST_TESTS)
 	$(RULE_CONDITION_TEST)
 	$(RULE_ENGINE_TEST)
 	$(RULE_TEXT_TEST)
+	$(RUNTIME_BOOT_TEST)
 	$(TELEMETRY_TEST)
 	$(THERMAL_SERVICE_TEST)
 
@@ -227,6 +245,9 @@ $(RULE_ENGINE_TEST): $(RULE_ENGINE_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(RULE_TEXT_TEST): $(RULE_TEXT_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
+
+$(RUNTIME_BOOT_TEST): $(RUNTIME_BOOT_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(TELEMETRY_TEST): $(TELEMETRY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)

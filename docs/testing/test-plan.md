@@ -62,6 +62,8 @@ Repository validation also compares the compiled PB-100 capability constant with
 the JSON hardware capability manifest.
 Configuration acceptance tests verify startup rejects invalid configuration,
 invalid hardware capability data, and configurations exceeding PB-100 limits.
+Runtime boot tests verify rejected configuration leaves outputs off and runtime
+services uninitialized.
 
 ## PB-100 schematic-review traceability
 
