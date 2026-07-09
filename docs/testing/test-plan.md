@@ -69,6 +69,8 @@ Configuration store tests verify persisted user configuration is selected ahead
 of firmware defaults after an update.
 Configuration update tests verify unsafe or hardware-incompatible configurations
 are not prepared for persistence.
+CAN RX log tests verify CAN1/CAN2 receive-only frame capture, invalid-frame
+rejection, and ring-buffer overwrite accounting.
 
 ## PB-100 schematic-review traceability
 

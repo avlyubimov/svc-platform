@@ -981,6 +981,17 @@ Reason: Boot-time rejection is necessary but not sufficient. The service-tool or
 future API path that writes configuration must also prevent unsafe or
 hardware-incompatible configuration from becoming the persisted user record.
 
+## 2026-07-09 — CAN receive-only log
+
+Decision: Firmware now has a receive-only CAN frame log in
+`firmware/services/can_log.c`. It stores CAN1/CAN2 received frames in a fixed
+ring buffer, tracks dropped frames and per-port receive counts, and rejects
+invalid ports or DLC values. It exposes no transmit API.
+
+Reason: The firmware MVP needs CAN read-only logging while preserving the
+vehicle-CAN safety policy. A receive-only logging boundary moves the CAN logger
+forward without adding any path that can transmit on CAN1.
+
 ## 2026-07-09 — Product readiness status refresh
 
 Decision: `docs/product/final-readiness.md` and `docs/product/roadmap.md` now

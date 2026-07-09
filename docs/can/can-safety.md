@@ -24,6 +24,14 @@ Firmware guard implementation:
 - `firmware/services/can_safety.c`
 - `firmware/tests/test_can_safety.c`
 
+Receive-only logging implementation:
+
+- `firmware/services/can_log.h`
+- `firmware/services/can_log.c`
+- `firmware/tests/test_can_log.c`
+
+The CAN RX log stores received frames only. It does not expose any transmit API.
+
 ## Allowed actions
 
 - listen

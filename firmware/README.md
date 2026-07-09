@@ -46,6 +46,7 @@ Current host tests cover:
 - Event Dispatcher output overcurrent/fault handling through Output Manager.
 - Event Log fixed-size diagnostic ring buffer with overwrite/drop accounting.
 - CAN1 listen-only TX denial and CAN2 expansion TX allowance.
+- CAN RX Log fixed-size receive-only frame capture for CAN1/CAN2.
 - System Safety Coordinator integration between battery cutoff, Event Bus, and
   Output Manager output shutdown.
 - Role Resolver and Rule Engine skeleton for role-based actions through Output
