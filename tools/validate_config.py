@@ -14,10 +14,13 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = REPO_ROOT / "firmware" / "configs" / "config-example.json"
 CONFIG_SCHEMA_PATH = REPO_ROOT / "firmware" / "configs" / "svc-config.schema.json"
 PB100_CAPABILITIES_PATH = REPO_ROOT / "firmware" / "configs" / "hardware" / "pb-100-capabilities.json"
+CONFIG_ACCEPTANCE_HEADER_PATH = REPO_ROOT / "firmware" / "services" / "config_acceptance.h"
+CONFIG_ACCEPTANCE_IMPL_PATH = REPO_ROOT / "firmware" / "services" / "config_acceptance.c"
 HARDWARE_CAPABILITY_HEADER_PATH = REPO_ROOT / "firmware" / "services" / "hardware_capability.h"
 HARDWARE_CAPABILITY_IMPL_PATH = REPO_ROOT / "firmware" / "services" / "hardware_capability.c"
 PB100_CAPABILITY_HEADER_PATH = REPO_ROOT / "firmware" / "services" / "pb100_capability.h"
 PB100_CAPABILITY_IMPL_PATH = REPO_ROOT / "firmware" / "services" / "pb100_capability.c"
+CONFIG_ACCEPTANCE_TEST_PATH = REPO_ROOT / "firmware" / "tests" / "test_config_acceptance.c"
 HARDWARE_CAPABILITY_TEST_PATH = REPO_ROOT / "firmware" / "tests" / "test_hardware_capability.c"
 CONFIGURATION_DOC_PATH = REPO_ROOT / "firmware" / "services" / "configuration.md"
 SVC_TYPES_PATH = REPO_ROOT / "firmware" / "core" / "svc_types.h"
@@ -37,6 +40,9 @@ FORBIDDEN_HARDWARE_CAPABILITY_ROLE_TOKENS = (
     "CIGARETTE",
 )
 REQUIRED_HARDWARE_CAPABILITY_TOKENS = (
+    "svc_config_accept_for_hardware",
+    "SVC_CONFIG_ACCEPTANCE_CONFIG_EXCEEDS_HARDWARE",
+    "SVC_CONFIG_ACCEPTANCE_INVALID_HARDWARE_CAPABILITY",
     "svc_hardware_capability_validate_config",
     "svc_pb100_hardware_capability",
     "SVC_HARDWARE_CAPABILITY_CONFIG_EXCEEDS_OUTPUT_CAPABILITY",
@@ -407,28 +413,50 @@ def validate_pb100_c_capability(capabilities: dict[str, Any], pb100_implementati
 
 
 def validate_hardware_capability_service(capabilities: dict[str, Any]) -> None:
+    config_acceptance_header_text = read_text(CONFIG_ACCEPTANCE_HEADER_PATH)
+    config_acceptance_implementation_text = read_text(CONFIG_ACCEPTANCE_IMPL_PATH)
     header_text = read_text(HARDWARE_CAPABILITY_HEADER_PATH)
     implementation_text = read_text(HARDWARE_CAPABILITY_IMPL_PATH)
     pb100_header_text = read_text(PB100_CAPABILITY_HEADER_PATH)
     pb100_implementation_text = read_text(PB100_CAPABILITY_IMPL_PATH)
+    config_acceptance_test_text = read_text(CONFIG_ACCEPTANCE_TEST_PATH)
     test_text = read_text(HARDWARE_CAPABILITY_TEST_PATH)
     configuration_doc_text = read_text(CONFIGURATION_DOC_PATH)
-    service_text = "\n".join((header_text, implementation_text, pb100_header_text, pb100_implementation_text, test_text))
+    service_text = "\n".join((
+        config_acceptance_header_text,
+        config_acceptance_implementation_text,
+        header_text,
+        implementation_text,
+        pb100_header_text,
+        pb100_implementation_text,
+        config_acceptance_test_text,
+        test_text,
+    ))
 
     for token in REQUIRED_HARDWARE_CAPABILITY_TOKENS:
         if token not in service_text:
             fail(f"hardware capability service is missing required token: {token}")
 
-    role_free_source_text = "\n".join((header_text, implementation_text, pb100_header_text, pb100_implementation_text))
+    role_free_source_text = "\n".join((
+        config_acceptance_header_text,
+        config_acceptance_implementation_text,
+        header_text,
+        implementation_text,
+        pb100_header_text,
+        pb100_implementation_text,
+    ))
     for token in FORBIDDEN_HARDWARE_CAPABILITY_ROLE_TOKENS:
         if token in role_free_source_text:
             fail(f"hardware capability service must not contain accessory role token: {token}")
 
     for path in (
+        "firmware/services/config_acceptance.h",
+        "firmware/services/config_acceptance.c",
         "firmware/services/hardware_capability.h",
         "firmware/services/hardware_capability.c",
         "firmware/services/pb100_capability.h",
         "firmware/services/pb100_capability.c",
+        "firmware/tests/test_config_acceptance.c",
         "firmware/tests/test_hardware_capability.c",
     ):
         if path not in configuration_doc_text:

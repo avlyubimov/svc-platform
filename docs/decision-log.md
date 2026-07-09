@@ -920,3 +920,16 @@ Reason: The JSON capability manifest and the firmware capability contract must
 stay synchronized. A checked compiled constant gives firmware a concrete
 role-free board capability source while keeping accessory roles in configuration
 and preserving CAN1 read-only defaults.
+
+## 2026-07-09 — Configuration acceptance boundary
+
+Decision: Firmware now has `svc_config_accept_for_hardware()` in
+`firmware/services/config_acceptance.c`. The boundary composes generic
+configuration validation with the discovered hardware capability contract and
+classifies startup failures as invalid configuration, invalid hardware
+capability data, or a valid configuration exceeding the connected board limits.
+
+Reason: A configuration that is internally valid can still be unsafe for a
+specific board capability set. Startup must reject that case before Output
+Manager, System Safety, Rule Engine, or other services act on configuration
+data.

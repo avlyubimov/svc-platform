@@ -47,10 +47,13 @@ read-only policy.
 
 Firmware consumes capabilities through a role-free service boundary:
 
+- `firmware/services/config_acceptance.h`
+- `firmware/services/config_acceptance.c`
 - `firmware/services/hardware_capability.h`
 - `firmware/services/hardware_capability.c`
 - `firmware/services/pb100_capability.h`
 - `firmware/services/pb100_capability.c`
+- `firmware/tests/test_config_acceptance.c`
 - `firmware/tests/test_hardware_capability.c`
 
 The service validates generic output count, per-output electrical limits, PWM
@@ -62,3 +65,9 @@ configuration and vehicle-profile data.
 host tests. `tools/validate_config.py` checks it against
 `firmware/configs/hardware/pb-100-capabilities.json` so firmware and JSON
 capability contracts do not drift.
+
+Startup acceptance must call `svc_config_accept_for_hardware()` before a loaded
+configuration is used by safety services. This composes general configuration
+validation with the discovered board capability contract and reports whether a
+failure is invalid configuration, invalid hardware capability data, or a valid
+configuration exceeding the connected board limits.

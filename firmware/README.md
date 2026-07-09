@@ -27,6 +27,8 @@ Current host tests cover:
 
 - Configuration validation for battery settings, power budget, and output role
   enum bounds without role-to-output assumptions.
+- Configuration acceptance for a discovered hardware capability contract before
+  startup uses a configuration.
 - Hardware capability validation that checks generic board limits, safe defaults,
   CAN1 read-only policy, and config electrical limits without role assumptions.
   PB-100's compiled capability constant is checked against the JSON hardware
