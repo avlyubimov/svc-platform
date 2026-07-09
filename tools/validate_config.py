@@ -16,6 +16,8 @@ CONFIG_SCHEMA_PATH = REPO_ROOT / "firmware" / "configs" / "svc-config.schema.jso
 PB100_CAPABILITIES_PATH = REPO_ROOT / "firmware" / "configs" / "hardware" / "pb-100-capabilities.json"
 HARDWARE_CAPABILITY_HEADER_PATH = REPO_ROOT / "firmware" / "services" / "hardware_capability.h"
 HARDWARE_CAPABILITY_IMPL_PATH = REPO_ROOT / "firmware" / "services" / "hardware_capability.c"
+PB100_CAPABILITY_HEADER_PATH = REPO_ROOT / "firmware" / "services" / "pb100_capability.h"
+PB100_CAPABILITY_IMPL_PATH = REPO_ROOT / "firmware" / "services" / "pb100_capability.c"
 HARDWARE_CAPABILITY_TEST_PATH = REPO_ROOT / "firmware" / "tests" / "test_hardware_capability.c"
 CONFIGURATION_DOC_PATH = REPO_ROOT / "firmware" / "services" / "configuration.md"
 SVC_TYPES_PATH = REPO_ROOT / "firmware" / "core" / "svc_types.h"
@@ -36,6 +38,7 @@ FORBIDDEN_HARDWARE_CAPABILITY_ROLE_TOKENS = (
 )
 REQUIRED_HARDWARE_CAPABILITY_TOKENS = (
     "svc_hardware_capability_validate_config",
+    "svc_pb100_hardware_capability",
     "SVC_HARDWARE_CAPABILITY_CONFIG_EXCEEDS_OUTPUT_CAPABILITY",
     "SVC_HARDWARE_CAPABILITY_CONFIG_REQUIRES_PWM",
     "SVC_HARDWARE_CAPABILITY_CONFIG_EXCEEDS_POWER_BUDGET",
@@ -307,18 +310,116 @@ def validate_no_role_tokens_in_capabilities(capabilities: dict[str, Any]) -> Non
             fail(f"hardware capabilities must not contain accessory role token: {token}")
 
 
-def validate_hardware_capability_service() -> None:
+def parse_c_bool(value: str) -> bool:
+    if value == "true":
+        return True
+    if value == "false":
+        return False
+    fail(f"invalid C boolean literal: {value}")
+
+
+def parse_c_uint_field(text: str, field_name: str) -> int:
+    match = re.search(rf"\.{field_name}\s*=\s*(\d+)U", text)
+    if match is None:
+        fail(f"PB-100 C capability missing integer field: {field_name}")
+    return int(match.group(1))
+
+
+def parse_c_bool_field(text: str, field_name: str) -> bool:
+    match = re.search(rf"\.{field_name}\s*=\s*(true|false)", text)
+    if match is None:
+        fail(f"PB-100 C capability missing boolean field: {field_name}")
+    return parse_c_bool(match.group(1))
+
+
+def parse_pb100_c_capability(text: str) -> dict[str, Any]:
+    if ".output_count = SVC_OUTPUT_COUNT" not in text:
+        fail("PB-100 C capability output_count must use SVC_OUTPUT_COUNT")
+
+    output_pattern = re.compile(
+        r"\{SVC_OUTPUT_OUT(\d+),\s*(\d+)U,\s*(\d+)U,\s*"
+        r"(true|false),\s*(true|false)\}"
+    )
+    outputs = []
+    for output_number, fuse_a, current_ma, pwm_supported, safe_default_off in output_pattern.findall(text):
+        outputs.append(
+            {
+                "id": f"OUT{output_number}",
+                "max_fuse_a": int(fuse_a),
+                "max_current_ma": int(current_ma),
+                "pwm_supported": parse_c_bool(pwm_supported),
+                "safe_default_off": parse_c_bool(safe_default_off),
+            }
+        )
+    if len(outputs) != 10:
+        fail(f"expected 10 PB-100 C capability outputs, found {len(outputs)}")
+
+    return {
+        "main_fuse_limit_ma": parse_c_uint_field(text, "main_fuse_limit_ma"),
+        "board_continuous_limit_ma": parse_c_uint_field(text, "board_continuous_limit_ma"),
+        "default_total_current_limit_ma": parse_c_uint_field(text, "default_total_current_limit_ma"),
+        "outputs_default_off": parse_c_bool_field(text, "outputs_default_off"),
+        "configuration_required_for_roles": parse_c_bool_field(text, "configuration_required_for_roles"),
+        "can1_read_only_default": parse_c_bool_field(text, "can1_read_only_default"),
+        "can1_tx_route_dnp_open": parse_c_bool_field(text, "can1_tx_route_dnp_open"),
+        "can1_tx_requires_future_adr": parse_c_bool_field(text, "can1_tx_requires_future_adr"),
+        "can1_hardware_action_required_for_tx": parse_c_bool_field(
+            text,
+            "can1_hardware_action_required_for_tx",
+        ),
+        "outputs": outputs,
+    }
+
+
+def expected_pb100_c_capability(capabilities: dict[str, Any]) -> dict[str, Any]:
+    power_budget = require_capability_dict(capabilities, "power_budget")
+    safety = require_capability_dict(capabilities, "safety")
+    can1 = require_capability_dict(safety, "can1")
+    outputs = require_list(capabilities, "outputs")
+    return {
+        "main_fuse_limit_ma": int(power_budget["main_fuse_target_a"]) * 1000,
+        "board_continuous_limit_ma": int(power_budget["board_continuous_target_a"]) * 1000,
+        "default_total_current_limit_ma": int(power_budget["default_total_current_limit_a"]) * 1000,
+        "outputs_default_off": safety.get("outputs_default_state") == "off",
+        "configuration_required_for_roles": safety.get("configuration_required_for_roles") is True,
+        "can1_read_only_default": can1.get("vehicle_can_read_only_default") is True,
+        "can1_tx_route_dnp_open": can1.get("tx_route_population") == "DNP/open",
+        "can1_tx_requires_future_adr": can1.get("tx_requires_future_adr") is True,
+        "can1_hardware_action_required_for_tx": can1.get("hardware_action_required_for_tx") is True,
+        "outputs": [
+            {
+                "id": output["id"],
+                "max_fuse_a": int(output["target_fuse_a"]),
+                "max_current_ma": int(output["target_current_limit_a"]) * 1000,
+                "pwm_supported": output["pwm_capability"] == "yes",
+                "safe_default_off": output["safe_default"] == "off",
+            }
+            for output in outputs
+        ],
+    }
+
+
+def validate_pb100_c_capability(capabilities: dict[str, Any], pb100_implementation_text: str) -> None:
+    actual = parse_pb100_c_capability(pb100_implementation_text)
+    expected = expected_pb100_c_capability(capabilities)
+    if actual != expected:
+        fail(f"PB-100 C hardware capability does not match JSON manifest: {actual} != {expected}")
+
+
+def validate_hardware_capability_service(capabilities: dict[str, Any]) -> None:
     header_text = read_text(HARDWARE_CAPABILITY_HEADER_PATH)
     implementation_text = read_text(HARDWARE_CAPABILITY_IMPL_PATH)
+    pb100_header_text = read_text(PB100_CAPABILITY_HEADER_PATH)
+    pb100_implementation_text = read_text(PB100_CAPABILITY_IMPL_PATH)
     test_text = read_text(HARDWARE_CAPABILITY_TEST_PATH)
     configuration_doc_text = read_text(CONFIGURATION_DOC_PATH)
-    service_text = "\n".join((header_text, implementation_text, test_text))
+    service_text = "\n".join((header_text, implementation_text, pb100_header_text, pb100_implementation_text, test_text))
 
     for token in REQUIRED_HARDWARE_CAPABILITY_TOKENS:
         if token not in service_text:
             fail(f"hardware capability service is missing required token: {token}")
 
-    role_free_source_text = "\n".join((header_text, implementation_text))
+    role_free_source_text = "\n".join((header_text, implementation_text, pb100_header_text, pb100_implementation_text))
     for token in FORBIDDEN_HARDWARE_CAPABILITY_ROLE_TOKENS:
         if token in role_free_source_text:
             fail(f"hardware capability service must not contain accessory role token: {token}")
@@ -326,10 +427,14 @@ def validate_hardware_capability_service() -> None:
     for path in (
         "firmware/services/hardware_capability.h",
         "firmware/services/hardware_capability.c",
+        "firmware/services/pb100_capability.h",
+        "firmware/services/pb100_capability.c",
         "firmware/tests/test_hardware_capability.c",
     ):
         if path not in configuration_doc_text:
             fail(f"configuration docs must reference {path}")
+
+    validate_pb100_c_capability(capabilities, pb100_implementation_text)
 
 
 def require_capability_dict(parent: dict[str, Any], key: str) -> dict[str, Any]:
@@ -339,7 +444,7 @@ def require_capability_dict(parent: dict[str, Any], key: str) -> dict[str, Any]:
     return value
 
 
-def validate_pb100_capabilities(config: dict[str, Any]) -> None:
+def validate_pb100_capabilities(config: dict[str, Any]) -> dict[str, Any]:
     capabilities = load_json(PB100_CAPABILITIES_PATH)
     validate_no_role_tokens_in_capabilities(capabilities)
 
@@ -429,6 +534,7 @@ def validate_pb100_capabilities(config: dict[str, Any]) -> None:
         fail("PB-100 capabilities thermal_signals must match thermal telemetry map")
     if board_signals != ["VBAT_SENSE", "PB_PWR_GOOD", "PB_FAULT", "PB_ID_ADC"]:
         fail("PB-100 capabilities board_signals mismatch")
+    return capabilities
 
 
 def validate_rules(config: dict[str, Any], allowed_roles: set[str]) -> None:
@@ -475,8 +581,8 @@ def main() -> int:
     validate_thermal(config, defines)
     validate_power_budget(config, defines)
     validate_outputs(config, allowed_roles)
-    validate_pb100_capabilities(config)
-    validate_hardware_capability_service()
+    capabilities = validate_pb100_capabilities(config)
+    validate_hardware_capability_service(capabilities)
     validate_rules(config, allowed_roles)
     print("Config validation passed")
     return 0

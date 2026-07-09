@@ -907,3 +907,16 @@ Reason: The PB-100 capability manifest must become an executable firmware
 boundary, not only a JSON artifact. The guard keeps hardware capability
 discovery separate from vehicle role mapping and fails safe if a configuration
 exceeds PB-100 electrical limits or weakens CAN1 read-only behavior.
+
+## 2026-07-09 — PB-100 compiled capability baseline
+
+Decision: Firmware now exposes `svc_pb100_hardware_capability` in
+`firmware/services/pb100_capability.c` as the compiled PB-100 Rev.1 capability
+baseline. `firmware/tests/test_hardware_capability.c` uses that constant instead
+of a private fixture, and `tools/validate_config.py` compares the C constant
+against `firmware/configs/hardware/pb-100-capabilities.json`.
+
+Reason: The JSON capability manifest and the firmware capability contract must
+stay synchronized. A checked compiled constant gives firmware a concrete
+role-free board capability source while keeping accessory roles in configuration
+and preserving CAN1 read-only defaults.

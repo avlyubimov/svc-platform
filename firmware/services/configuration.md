@@ -49,9 +49,16 @@ Firmware consumes capabilities through a role-free service boundary:
 
 - `firmware/services/hardware_capability.h`
 - `firmware/services/hardware_capability.c`
+- `firmware/services/pb100_capability.h`
+- `firmware/services/pb100_capability.c`
 - `firmware/tests/test_hardware_capability.c`
 
 The service validates generic output count, per-output electrical limits, PWM
 capability, safe default-off state, total-current budget, and CAN1 read-only
 policy. It intentionally does not inspect accessory roles; role mapping remains
 configuration and vehicle-profile data.
+
+`svc_pb100_hardware_capability` is the compiled PB-100 Rev.1 baseline used by
+host tests. `tools/validate_config.py` checks it against
+`firmware/configs/hardware/pb-100-capabilities.json` so firmware and JSON
+capability contracts do not drift.

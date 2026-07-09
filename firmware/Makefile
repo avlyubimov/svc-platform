@@ -34,6 +34,7 @@ CONFIG_VALIDATOR_SRCS := \
 HARDWARE_CAPABILITY_SRCS := \
 	core/svc_config_defaults.c \
 	services/hardware_capability.c \
+	services/pb100_capability.c \
 	tests/test_hardware_capability.c
 POWER_BUDGET_SRCS := \
 	core/svc_config_defaults.c \

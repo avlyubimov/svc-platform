@@ -58,6 +58,8 @@ make -C firmware test
 The hardware-capability tests verify that PB-100 generic output limits,
 safe-default behavior, board current budget, and CAN1 read-only defaults are
 accepted without binding accessory roles to physical outputs.
+Repository validation also compares the compiled PB-100 capability constant with
+the JSON hardware capability manifest.
 
 ## PB-100 schematic-review traceability
 
