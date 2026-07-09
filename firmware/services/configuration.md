@@ -22,7 +22,10 @@ valid.
 
 - `firmware/services/config_validator.h`
 - `firmware/services/config_validator.c`
+- `firmware/services/config_store.h`
+- `firmware/services/config_store.c`
 - `firmware/tests/test_config_validator.c`
+- `firmware/tests/test_config_store.c`
 
 Repository-level JSON validation:
 
@@ -33,6 +36,11 @@ The repository validator checks that schema role/output/priority enums stay in
 sync with firmware enums and that `config-example.json` stays aligned with
 `svc_default_config`. It also checks that current JSON rule strings fit the
 limited firmware rule text grammar.
+
+Configuration persistence is defined by `firmware/services/config-store.md`.
+Persisted records are versioned, checksummed, and selected from two slots before
+falling back to compiled defaults. Firmware updates must not erase or silently
+prefer new defaults over a valid persisted user configuration.
 
 ## Hardware capability manifests
 

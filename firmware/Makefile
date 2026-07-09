@@ -6,6 +6,7 @@ BUILD_DIR := build
 FIRMWARE_HEADERS := $(wildcard core/*.h services/*.h)
 CONFIG_VALIDATOR_TEST := $(BUILD_DIR)/test_config_validator
 CONFIG_ACCEPTANCE_TEST := $(BUILD_DIR)/test_config_acceptance
+CONFIG_STORE_TEST := $(BUILD_DIR)/test_config_store
 HARDWARE_CAPABILITY_TEST := $(BUILD_DIR)/test_hardware_capability
 POWER_BUDGET_TEST := $(BUILD_DIR)/test_power_budget
 OUTPUT_MANAGER_TEST := $(BUILD_DIR)/test_output_manager
@@ -44,6 +45,15 @@ CONFIG_ACCEPTANCE_SRCS := \
 	services/telemetry.c \
 	services/thermal_service.c \
 	tests/test_config_acceptance.c
+CONFIG_STORE_SRCS := \
+	core/svc_config_defaults.c \
+	services/battery_service.c \
+	services/config_store.c \
+	services/config_validator.c \
+	services/power_budget.c \
+	services/telemetry.c \
+	services/thermal_service.c \
+	tests/test_config_store.c
 HARDWARE_CAPABILITY_SRCS := \
 	core/svc_config_defaults.c \
 	services/hardware_capability.c \
@@ -160,6 +170,7 @@ THERMAL_SERVICE_SRCS := \
 HOST_TESTS := \
 	$(CONFIG_VALIDATOR_TEST) \
 	$(CONFIG_ACCEPTANCE_TEST) \
+	$(CONFIG_STORE_TEST) \
 	$(HARDWARE_CAPABILITY_TEST) \
 	$(POWER_BUDGET_TEST) \
 	$(OUTPUT_MANAGER_TEST) \
@@ -182,6 +193,7 @@ HOST_TESTS := \
 test: $(HOST_TESTS)
 	$(CONFIG_VALIDATOR_TEST)
 	$(CONFIG_ACCEPTANCE_TEST)
+	$(CONFIG_STORE_TEST)
 	$(HARDWARE_CAPABILITY_TEST)
 	$(POWER_BUDGET_TEST)
 	$(OUTPUT_MANAGER_TEST)
@@ -206,6 +218,9 @@ $(CONFIG_VALIDATOR_TEST): $(CONFIG_VALIDATOR_SRCS) $(FIRMWARE_HEADERS) | $(BUILD
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(CONFIG_ACCEPTANCE_TEST): $(CONFIG_ACCEPTANCE_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
+
+$(CONFIG_STORE_TEST): $(CONFIG_STORE_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(HARDWARE_CAPABILITY_TEST): $(HARDWARE_CAPABILITY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)

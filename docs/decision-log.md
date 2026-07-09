@@ -946,3 +946,14 @@ active outputs.
 Reason: Safe default-off behavior must hold at startup, not only inside
 individual services. A single boot boundary prevents services from being
 initialized around an unsafe configuration/capability pairing.
+
+## 2026-07-09 — Configuration store persistence contract
+
+Decision: Firmware now has a storage-backend-neutral Configuration Store in
+`firmware/services/config_store.c`. It builds versioned records with sequence
+numbers and explicit checksums, validates records before use, selects the newest
+valid record from two slots, and falls back to compiled defaults only when no
+valid persisted record exists.
+
+Reason: Configuration is separate from firmware. Firmware updates must not erase
+or silently override valid user configuration with new compiled defaults.

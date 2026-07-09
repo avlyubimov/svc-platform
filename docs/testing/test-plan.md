@@ -64,6 +64,8 @@ Configuration acceptance tests verify startup rejects invalid configuration,
 invalid hardware capability data, and configurations exceeding PB-100 limits.
 Runtime boot tests verify rejected configuration leaves outputs off and runtime
 services uninitialized.
+Configuration store tests verify persisted user configuration is selected ahead
+of firmware defaults after an update.
 
 ## PB-100 schematic-review traceability
 

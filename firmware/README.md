@@ -27,6 +27,8 @@ Current host tests cover:
 
 - Configuration validation for battery settings, power budget, and output role
   enum bounds without role-to-output assumptions.
+- Configuration Store record validation and two-slot selection so firmware
+  defaults do not overwrite valid persisted user configuration.
 - Configuration acceptance for a discovered hardware capability contract before
   startup uses a configuration.
 - Hardware capability validation that checks generic board limits, safe defaults,
