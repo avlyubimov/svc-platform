@@ -257,6 +257,15 @@ ASSEMBLY_SOURCING_RECHECK_COLUMNS = (
     "Garage action",
     "Freeze dependency",
 )
+SOURCING_EVIDENCE_COLUMNS = (
+    "Symbol key",
+    "Evidence date",
+    "Evidence source type",
+    "Primary evidence URL",
+    "Secondary evidence URL",
+    "Evidence result",
+    "Open sourcing blocker",
+)
 VALIDATION_TRACEABILITY_COLUMNS = (
     "Test ID",
     "Freeze gate",
@@ -2348,6 +2357,84 @@ def validate_assembly_sourcing_recheck() -> None:
         )
 
 
+def evidence_link_is_valid(value: str) -> bool:
+    return value.startswith(("https://", "http://", "docs/", "hardware/", "production/"))
+
+
+def validate_sourcing_evidence_date(path: Path, row_number: int, value: str) -> None:
+    parts = value.split("-")
+    if len(parts) != 3 or any(not part.isdigit() for part in parts):
+        fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid evidence date {value}")
+    year, month, day = (int(part) for part in parts)
+    if year < 2026 or not (1 <= month <= 12) or not (1 <= day <= 31):
+        fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: evidence date must be a current snapshot date")
+
+
+def validate_sourcing_evidence_snapshot() -> None:
+    path = REPO_ROOT / "production" / "bom" / "pb100_sourcing_evidence_snapshot.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty sourcing evidence snapshot: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in SOURCING_EVIDENCE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    readiness_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-symbol-mpn-readiness.csv").open(newline="", encoding="utf-8"))
+    )
+    critical_keys = {
+        row["Symbol key"].strip()
+        for row in readiness_rows
+        if row["Critical"].strip().lower() == "yes"
+    }
+
+    seen_keys = set()
+    for row_number, row in enumerate(rows, 2):
+        symbol_key = row["Symbol key"].strip()
+        if symbol_key in seen_keys:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate symbol key {symbol_key}")
+        seen_keys.add(symbol_key)
+        if symbol_key not in critical_keys:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: symbol key {symbol_key} is not critical")
+        for column in SOURCING_EVIDENCE_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_sourcing_evidence_date(path, row_number, row["Evidence date"].strip())
+        for column in ("Primary evidence URL", "Secondary evidence URL"):
+            if not evidence_link_is_valid(row[column].strip()):
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid {column}")
+        row_text = " ".join(row.values()).lower()
+        if "open:" not in row["Open sourcing blocker"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocker must remain explicit")
+        if symbol_key == "INPUT_TVS":
+            for token in ("obsolete", "eol", "do not lock", "active"):
+                if token not in row_text:
+                    fail(f"INPUT_TVS sourcing evidence must explicitly track {token}")
+        if symbol_key == "CAN1_TX_DISABLE":
+            for token in ("dnp/open", "no default-populated tx", "future adr"):
+                if token not in row_text:
+                    fail(f"CAN1_TX_DISABLE evidence must preserve {token}")
+
+    missing_keys = sorted(critical_keys - seen_keys)
+    extra_keys = sorted(seen_keys - critical_keys)
+    if missing_keys:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing critical sourcing evidence keys: "
+            f"{', '.join(missing_keys)}"
+        )
+    if extra_keys:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} has non-critical sourcing evidence keys: "
+            f"{', '.join(extra_keys)}"
+        )
+
+
 def validate_validation_traceability() -> None:
     path = PB100_DIR / "PB-100-validation-traceability.csv"
     validate_csv(path)
@@ -2807,6 +2894,7 @@ def main() -> int:
     validate_logic_power_design_values()
     validate_can1_safety_verification()
     validate_assembly_sourcing_recheck()
+    validate_sourcing_evidence_snapshot()
     validate_validation_traceability()
     validate_test_point_plan()
     validate_fault_response_matrix()

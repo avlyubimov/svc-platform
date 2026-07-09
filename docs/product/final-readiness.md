@@ -44,6 +44,9 @@ Current coverage:
 - Select final critical MPNs and at least two alternatives for each critical
   component family.
 - Recheck JLCPCB/PCBWay assembly availability and package suitability.
+- Resolve the TVS active-MPN blocker: MCC `SM8S33A` is EOL evidence only, so
+  schematic freeze must select an active AEC-Q101 SM8S33AHE3-class or equivalent
+  load-dump TVS and validate clamp margin.
 - Close PB-100 CAN1 TX-disable schematic evidence.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.

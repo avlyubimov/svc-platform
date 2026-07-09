@@ -1071,3 +1071,26 @@ Reason: The firmware MVP needs a deterministic event-to-action loop, not just
 separate services. Keeping the composition explicit preserves CAN receive-only
 behavior, role-based output mapping, telemetry fail-safe denial, and the single
 Output Manager boundary for physical outputs.
+
+## 2026-07-09 — PB-100 sourcing evidence snapshot
+
+Decision: PB-100 production planning now has
+`production/bom/pb100_sourcing_evidence_snapshot.csv`, and
+`tools/validate_pb100.py` requires it to cover every critical symbol key. The
+snapshot captures current sourcing evidence and keeps open blockers explicit.
+
+Reason: Factory assembly readiness must be evidence-driven before schematic
+freeze. A separate sourcing snapshot makes external evidence auditable without
+pretending that package assembly, reel availability, or distributor continuity
+are already closed.
+
+## 2026-07-09 — PB-100 TVS candidate source correction
+
+Decision: The input TVS candidate direction is updated from MCC `SM8S33A` to an
+active AEC-Q101 `SM8S33AHE3_A/I`-class DO-218AB TVS or reviewed equivalent.
+The MCC page is retained only as EOL/obsolete evidence and must not be locked as
+the schematic MPN.
+
+Reason: Current sourcing review found the MCC `SM8S33A` source obsolete with a
+2025 last-time-ship notice. Keeping it as the preferred candidate would make the
+factory assembly plan fragile before schematic freeze.

@@ -14,7 +14,7 @@ Power,Input current shunt,Low-ohm four-terminal automotive shunt,Power shunt pac
 Power,High-side switch/controller,TPS48110AQDGXRQ1-class for all Rev.1 outputs,VSSOP/HTSSOP,10,Factory,Core,Integrated smart switches deferred by ADR-0011
 Power,MOSFET,SIDR626LDP-T1-RE3 or JMSL0606AGQ-13; OUT2 may require TOLL/LFPAK or parallel FET escape path,PowerPAK-SO-8DC/PDFN5x6/TOLL/LFPAK,10,Factory,Core,External FET channels require SOA and thermal validation
 Power,Input reverse MOSFET,IAUTN06S5N008ATMA1 preferred; BUK7S1R2-80M or dual SIDR626LDP alternatives,TOLL/LFPAK88/PowerPAK,1-2,Factory,Core,Single 2.1mOhm MOSFET rejected for 40A thermal
-Power,TVS protection,SM8S33A class for 60V+ Rev.1 output path; lower-clamp TVS only if smart-switch rail returns,SMD/THT,1,Factory,Core,Clamp voltage must match every protected device limit
+Power,TVS protection,Active AEC-Q101 SM8S33AHE3_A/I-class for 60V+ Rev.1 output path; lower-clamp TVS only if smart-switch rail returns,DO-218AB or reviewed SMD package,1,Factory,Core,Do not lock MCC SM8S33A EOL source; clamp voltage must match every protected device limit
 Power,Reverse protection,LM74700QDBVRQ1 or LM74700QDRQ1; LM74502-Q1 alternative,SOT-23/SOIC plus external FET,1,Factory,Core,Input reverse polarity
 Power,DC/DC,LM5164QDDATQ1 default; LM5013-Q1 high-current 100V alternate; TPS54360B-Q1 conditional 60V alternate,SOIC/HSOIC PowerPAD,1,Factory,Core,Logic power current and TVS margin decide final family
 Power,Buck inductor,Automotive shielded power inductor class,TBD after regulator design,1,Factory,Core,Value saturation current and heating close with LM5164-Q1 design
