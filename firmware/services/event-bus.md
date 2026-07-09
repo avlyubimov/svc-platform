@@ -44,6 +44,13 @@ Rule condition state consumes selected events:
 - `SVC_EVENT_LEFT_INDICATOR_ON`
 - `SVC_EVENT_LEFT_INDICATOR_OFF`
 
+The Rule Event Bridge owns draining those events into `svc_rule_state_t` while
+retaining unrelated events on the Event Bus:
+
+- `firmware/services/rule_event_bridge.h`
+- `firmware/services/rule_event_bridge.c`
+- `firmware/tests/test_rule_event_bridge.c`
+
 Diagnostic logging is implemented separately:
 
 - `firmware/services/event_log.h`

@@ -49,6 +49,8 @@ Current host tests cover:
 - CAN RX Log fixed-size receive-only frame capture for CAN1/CAN2.
 - CAN Event Decode from received frames to internal Event Bus state-change
   events without output control.
+- Rule Event Bridge that drains CAN-derived and other condition events into rule
+  condition state while retaining non-rule events for safety dispatch.
 - System Safety Coordinator integration between battery cutoff, Event Bus, and
   Output Manager output shutdown.
 - Role Resolver and Rule Engine skeleton for role-based actions through Output

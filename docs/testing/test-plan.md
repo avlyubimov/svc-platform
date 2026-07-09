@@ -73,6 +73,9 @@ CAN RX log tests verify CAN1/CAN2 receive-only frame capture, invalid-frame
 rejection, and ring-buffer overwrite accounting.
 CAN decode tests verify received frames publish internal state-change events
 through the Event Bus without repeating unchanged states.
+Rule Event Bridge tests verify condition events drain into rule state, CAN-derived
+events can reach rule evaluation, and non-rule events remain available for safety
+dispatch.
 
 ## PB-100 schematic-review traceability
 

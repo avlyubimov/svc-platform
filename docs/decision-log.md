@@ -1015,3 +1015,13 @@ update, config acceptance, and runtime boot host-test coverage added on
 Reason: Readiness documents should track the repository state used for planning
 the next work. The update is status-only and does not change PB-100 requirements
 or authorize PCB layout.
+
+## 2026-07-09 — Rule Event Bridge
+
+Decision: Firmware now has a host-tested Rule Event Bridge that drains
+rule-condition events from the Event Bus into `svc_rule_state_t` while retaining
+non-rule events for safety and diagnostic dispatchers.
+
+Reason: CAN-derived state changes must reach the Rule Engine through the
+documented Event Bus boundary without bypassing Output Manager, hard-coding
+physical output roles, or dropping fault events.

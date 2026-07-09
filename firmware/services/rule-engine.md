@@ -8,6 +8,8 @@ numbers.
 
 - Track event-derived condition state for engine running, high beam, and left
   indicator.
+- Accept condition state updates from the Rule Event Bridge, which drains
+  matching Event Bus events without controlling outputs.
 - Evaluate condition lists with all-conditions-must-match semantics.
 - Evaluate an in-memory rule and skip it when conditions do not match.
 - Enable a configured role through role resolution.

@@ -8,7 +8,8 @@ through existing services.
 - Consume events in FIFO order.
 - Apply `SVC_EVENT_OUTPUT_OVERCURRENT` through the Output Manager fault path.
 - Apply `SVC_EVENT_OUTPUT_FAULT` through the Output Manager fault path.
-- Ignore non-fault events until the Rule Engine owns them.
+- Ignore non-fault events that remain after the Rule Event Bridge has retained
+  safety/diagnostic events and consumed rule-condition events.
 - Preserve queued events if required dependencies are missing.
 
 ## Safety contract
