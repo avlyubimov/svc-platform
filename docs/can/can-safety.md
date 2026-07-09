@@ -32,6 +32,15 @@ Receive-only logging implementation:
 
 The CAN RX log stores received frames only. It does not expose any transmit API.
 
+Receive-only event decode implementation:
+
+- `firmware/services/can_decode.h`
+- `firmware/services/can_decode.c`
+- `firmware/tests/test_can_decode.c`
+
+The decoder maps received frames to internal Event Bus events through
+caller-provided rules. It does not transmit frames or control outputs directly.
+
 ## Allowed actions
 
 - listen

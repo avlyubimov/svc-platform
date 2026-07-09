@@ -17,6 +17,7 @@ EVENT_DISPATCHER_TEST := $(BUILD_DIR)/test_event_dispatcher
 EVENT_LOG_TEST := $(BUILD_DIR)/test_event_log
 CAN_SAFETY_TEST := $(BUILD_DIR)/test_can_safety
 CAN_LOG_TEST := $(BUILD_DIR)/test_can_log
+CAN_DECODE_TEST := $(BUILD_DIR)/test_can_decode
 SYSTEM_SAFETY_TEST := $(BUILD_DIR)/test_system_safety
 ROLE_RESOLVER_TEST := $(BUILD_DIR)/test_role_resolver
 RULE_CONDITION_TEST := $(BUILD_DIR)/test_rule_condition
@@ -114,6 +115,10 @@ CAN_SAFETY_SRCS := \
 CAN_LOG_SRCS := \
 	services/can_log.c \
 	tests/test_can_log.c
+CAN_DECODE_SRCS := \
+	services/can_decode.c \
+	services/event_bus.c \
+	tests/test_can_decode.c
 SYSTEM_SAFETY_SRCS := \
 	core/svc_config_defaults.c \
 	services/battery_service.c \
@@ -200,6 +205,7 @@ HOST_TESTS := \
 	$(EVENT_LOG_TEST) \
 	$(CAN_SAFETY_TEST) \
 	$(CAN_LOG_TEST) \
+	$(CAN_DECODE_TEST) \
 	$(SYSTEM_SAFETY_TEST) \
 	$(ROLE_RESOLVER_TEST) \
 	$(RULE_CONDITION_TEST) \
@@ -225,6 +231,7 @@ test: $(HOST_TESTS)
 	$(EVENT_LOG_TEST)
 	$(CAN_SAFETY_TEST)
 	$(CAN_LOG_TEST)
+	$(CAN_DECODE_TEST)
 	$(SYSTEM_SAFETY_TEST)
 	$(ROLE_RESOLVER_TEST)
 	$(RULE_CONDITION_TEST)
@@ -274,6 +281,9 @@ $(CAN_SAFETY_TEST): $(CAN_SAFETY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(CAN_LOG_TEST): $(CAN_LOG_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
+
+$(CAN_DECODE_TEST): $(CAN_DECODE_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(SYSTEM_SAFETY_TEST): $(SYSTEM_SAFETY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)

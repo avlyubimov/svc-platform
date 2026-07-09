@@ -992,6 +992,19 @@ Reason: The firmware MVP needs CAN read-only logging while preserving the
 vehicle-CAN safety policy. A receive-only logging boundary moves the CAN logger
 forward without adding any path that can transmit on CAN1.
 
+## 2026-07-09 — CAN receive-only event decode
+
+Decision: Firmware now has `firmware/services/can_decode.c`, which maps
+received CAN frames to internal Event Bus events using caller-provided rules. It
+matches by port and CAN identifier mask, evaluates configured byte/bit
+conditions, suppresses unchanged repeated states, and reports dropped events
+when the Event Bus is full.
+
+Reason: CAN-derived behavior must flow through the Event Bus and Rule Engine,
+not directly to outputs. A receive-only decoder advances CAN-aware automation
+without adding a vehicle-CAN transmit path or hard-coding BMW message IDs in the
+service.
+
 ## 2026-07-09 — Product readiness status refresh
 
 Decision: `docs/product/final-readiness.md` and `docs/product/roadmap.md` now

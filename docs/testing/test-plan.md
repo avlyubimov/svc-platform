@@ -71,6 +71,8 @@ Configuration update tests verify unsafe or hardware-incompatible configurations
 are not prepared for persistence.
 CAN RX log tests verify CAN1/CAN2 receive-only frame capture, invalid-frame
 rejection, and ring-buffer overwrite accounting.
+CAN decode tests verify received frames publish internal state-change events
+through the Event Bus without repeating unchanged states.
 
 ## PB-100 schematic-review traceability
 

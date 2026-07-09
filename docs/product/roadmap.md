@@ -65,6 +65,7 @@ Current host-tested services:
 - Battery Protection
 - CAN Safety Guard
 - CAN RX Log
+- CAN Event Decode
 - System Safety Coordinator
 - Role Resolver
 - Rule Engine skeleton
