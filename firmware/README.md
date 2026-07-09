@@ -27,6 +27,8 @@ Current host tests cover:
 
 - Configuration validation for battery settings, power budget, and output role
   enum bounds without role-to-output assumptions.
+- Hardware capability validation that checks generic board limits, safe defaults,
+  CAN1 read-only policy, and config electrical limits without role assumptions.
 - PB-100 board-level power budget service.
 - Output Manager safe default-off, enable/disable, budget denial, telemetry
   denial, and fault lockout behavior.

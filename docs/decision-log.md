@@ -893,3 +893,17 @@ Reason: Firmware and configuration need a machine-readable hardware capability
 contract that does not encode vehicle accessory roles. Role mapping remains in
 configuration and vehicle profiles, while hardware capability discovery uses
 board identity and generic `OUT1`..`OUT10` capabilities.
+
+## 2026-07-09 — Firmware hardware capability guard
+
+Decision: Firmware now has a role-free hardware capability validation service in
+`firmware/services/hardware_capability.c` with host tests in
+`firmware/tests/test_hardware_capability.c`. The service validates generic board
+output count, safe default-off behavior, per-output electrical limits, PWM
+support, board current budget, and CAN1 read-only default policy before a device
+configuration is accepted against a board capability contract.
+
+Reason: The PB-100 capability manifest must become an executable firmware
+boundary, not only a JSON artifact. The guard keeps hardware capability
+discovery separate from vehicle role mapping and fails safe if a configuration
+exceeds PB-100 electrical limits or weakens CAN1 read-only behavior.

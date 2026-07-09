@@ -44,3 +44,14 @@ power-budget limits, and CAN1 safety defaults. It must not contain accessory rol
 names. `tools/validate_config.py` checks it against the PB-100 output matrix,
 current/thermal telemetry maps, `config-example.json`, and the CAN1 DNP/open
 read-only policy.
+
+Firmware consumes capabilities through a role-free service boundary:
+
+- `firmware/services/hardware_capability.h`
+- `firmware/services/hardware_capability.c`
+- `firmware/tests/test_hardware_capability.c`
+
+The service validates generic output count, per-output electrical limits, PWM
+capability, safe default-off state, total-current budget, and CAN1 read-only
+policy. It intentionally does not inspect accessory roles; role mapping remains
+configuration and vehicle-profile data.

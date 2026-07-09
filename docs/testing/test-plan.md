@@ -48,6 +48,17 @@ The validator checks CSV structure, KiCad scaffold syntax, the no-PCB-layout
 boundary, preliminary symbol-library status, output instance coverage, and PB-100
 net-naming safety rules.
 
+Run firmware host tests after changing configuration, hardware-capability, or
+safety-service contracts:
+
+```bash
+make -C firmware test
+```
+
+The hardware-capability tests verify that PB-100 generic output limits,
+safe-default behavior, board current budget, and CAN1 read-only defaults are
+accepted without binding accessory roles to physical outputs.
+
 ## PB-100 schematic-review traceability
 
 - OUT2 pulse tests trace to

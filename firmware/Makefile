@@ -5,6 +5,7 @@ CFLAGS ?= -std=c11 -Wall -Wextra -Werror
 BUILD_DIR := build
 FIRMWARE_HEADERS := $(wildcard core/*.h services/*.h)
 CONFIG_VALIDATOR_TEST := $(BUILD_DIR)/test_config_validator
+HARDWARE_CAPABILITY_TEST := $(BUILD_DIR)/test_hardware_capability
 POWER_BUDGET_TEST := $(BUILD_DIR)/test_power_budget
 OUTPUT_MANAGER_TEST := $(BUILD_DIR)/test_output_manager
 BATTERY_SERVICE_TEST := $(BUILD_DIR)/test_battery_service
@@ -30,6 +31,10 @@ CONFIG_VALIDATOR_SRCS := \
 	services/telemetry.c \
 	services/thermal_service.c \
 	tests/test_config_validator.c
+HARDWARE_CAPABILITY_SRCS := \
+	core/svc_config_defaults.c \
+	services/hardware_capability.c \
+	tests/test_hardware_capability.c
 POWER_BUDGET_SRCS := \
 	core/svc_config_defaults.c \
 	services/power_budget.c \
@@ -125,6 +130,7 @@ THERMAL_SERVICE_SRCS := \
 	tests/test_thermal_service.c
 HOST_TESTS := \
 	$(CONFIG_VALIDATOR_TEST) \
+	$(HARDWARE_CAPABILITY_TEST) \
 	$(POWER_BUDGET_TEST) \
 	$(OUTPUT_MANAGER_TEST) \
 	$(BATTERY_SERVICE_TEST) \
@@ -144,6 +150,7 @@ HOST_TESTS := \
 
 test: $(HOST_TESTS)
 	$(CONFIG_VALIDATOR_TEST)
+	$(HARDWARE_CAPABILITY_TEST)
 	$(POWER_BUDGET_TEST)
 	$(OUTPUT_MANAGER_TEST)
 	$(BATTERY_SERVICE_TEST)
@@ -163,6 +170,9 @@ $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
 $(CONFIG_VALIDATOR_TEST): $(CONFIG_VALIDATOR_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
+
+$(HARDWARE_CAPABILITY_TEST): $(HARDWARE_CAPABILITY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(POWER_BUDGET_TEST): $(POWER_BUDGET_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
