@@ -83,6 +83,8 @@ Rule Text tests verify multi-action `then[]` compilation into ordered
 `svc_rule_t` arrays using caller-owned storage.
 Repository config validation checks rule grammar, non-empty `then[]`, mapped
 rule-action roles, and partial-PWM compatibility against the configured outputs.
+Rule Runtime tests verify CAN-derived condition events, retained fault dispatch,
+ordered rule execution, and stale-telemetry denial in one processing step.
 
 ## PB-100 schematic-review traceability
 

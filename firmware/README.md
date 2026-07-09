@@ -51,6 +51,8 @@ Current host tests cover:
   events without output control.
 - Rule Event Bridge that drains CAN-derived and other condition events into rule
   condition state while retaining non-rule events for safety dispatch.
+- Rule Runtime step that runs bridge, fault dispatch, and ordered rule
+  evaluation in a safety-preserving order.
 - System Safety Coordinator integration between battery cutoff, Event Bus, and
   Output Manager output shutdown.
 - Role Resolver and Rule Engine skeleton for role-based actions through Output

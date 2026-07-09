@@ -23,6 +23,7 @@ ROLE_RESOLVER_TEST := $(BUILD_DIR)/test_role_resolver
 RULE_CONDITION_TEST := $(BUILD_DIR)/test_rule_condition
 RULE_EVENT_BRIDGE_TEST := $(BUILD_DIR)/test_rule_event_bridge
 RULE_ENGINE_TEST := $(BUILD_DIR)/test_rule_engine
+RULE_RUNTIME_TEST := $(BUILD_DIR)/test_rule_runtime
 RULE_TEXT_TEST := $(BUILD_DIR)/test_rule_text
 RUNTIME_BOOT_TEST := $(BUILD_DIR)/test_runtime_boot
 TELEMETRY_TEST := $(BUILD_DIR)/test_telemetry
@@ -171,6 +172,23 @@ RULE_ENGINE_SRCS := \
 	services/telemetry.c \
 	services/thermal_service.c \
 	tests/test_rule_engine.c
+RULE_RUNTIME_SRCS := \
+	core/svc_config_defaults.c \
+	services/battery_service.c \
+	services/can_decode.c \
+	services/config_validator.c \
+	services/event_bus.c \
+	services/event_dispatcher.c \
+	services/output_manager.c \
+	services/power_budget.c \
+	services/role_resolver.c \
+	services/rule_condition.c \
+	services/rule_engine.c \
+	services/rule_event_bridge.c \
+	services/rule_runtime.c \
+	services/telemetry.c \
+	services/thermal_service.c \
+	tests/test_rule_runtime.c
 RULE_TEXT_SRCS := \
 	core/svc_config_defaults.c \
 	services/battery_service.c \
@@ -228,6 +246,7 @@ HOST_TESTS := \
 	$(RULE_CONDITION_TEST) \
 	$(RULE_EVENT_BRIDGE_TEST) \
 	$(RULE_ENGINE_TEST) \
+	$(RULE_RUNTIME_TEST) \
 	$(RULE_TEXT_TEST) \
 	$(RUNTIME_BOOT_TEST) \
 	$(TELEMETRY_TEST) \
@@ -255,6 +274,7 @@ test: $(HOST_TESTS)
 	$(RULE_CONDITION_TEST)
 	$(RULE_EVENT_BRIDGE_TEST)
 	$(RULE_ENGINE_TEST)
+	$(RULE_RUNTIME_TEST)
 	$(RULE_TEXT_TEST)
 	$(RUNTIME_BOOT_TEST)
 	$(TELEMETRY_TEST)
@@ -318,6 +338,9 @@ $(RULE_EVENT_BRIDGE_TEST): $(RULE_EVENT_BRIDGE_SRCS) $(FIRMWARE_HEADERS) | $(BUI
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(RULE_ENGINE_TEST): $(RULE_ENGINE_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
+
+$(RULE_RUNTIME_TEST): $(RULE_RUNTIME_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(RULE_TEXT_TEST): $(RULE_TEXT_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)

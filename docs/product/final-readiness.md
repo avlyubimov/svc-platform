@@ -34,7 +34,7 @@ Current coverage:
 | PB-100 requirements | Ready for schematic planning | Baseline is frozen; schematic freeze remains open |
 | PB-100 KiCad scaffold | Review-ready scaffold | Schematic ERC and netlist export pass locally with KiCad 10.0.4 |
 | PB-100 PCB/layout | Blocked | Layout, Gerber, drill, placement, and manufacturing zips are blocked |
-| Firmware safety core | Host-test ready | Output, battery, thermal, CAN, telemetry, events, logging, config, runtime boot, CAN-to-rule bridge, ordered rule sets, multi-action rule compilation, and rule paths covered |
+| Firmware safety core | Host-test ready | Output, battery, thermal, CAN, telemetry, events, logging, config, runtime boot, CAN-to-rule bridge, ordered rule sets, multi-action rule compilation, rule runtime, and rule paths covered |
 | Configuration format | Host-test ready | JSON schema, rule grammar, rule-action mapping, PB-100 capability manifest, compiled capability baseline, config store, config update, and examples are validated |
 | Production package | Draft | BOMs and component families need final sourcing and schematic evidence |
 

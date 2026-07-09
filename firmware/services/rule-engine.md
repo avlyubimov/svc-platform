@@ -76,3 +76,10 @@ denies new output starts through the Output Manager budget path.
 `svc_rule_engine_evaluate_rules_with_telemetry()` evaluate ordered rule arrays,
 continue past skipped conditions, and stop on the first denied action while
 reporting the failed rule index.
+
+Rule Runtime composes the event bridge, fault dispatcher, and ordered rule
+runner into the intended firmware step:
+
+- `firmware/services/rule_runtime.h`
+- `firmware/services/rule_runtime.c`
+- `firmware/tests/test_rule_runtime.c`

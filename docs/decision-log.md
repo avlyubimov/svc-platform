@@ -1059,3 +1059,15 @@ Reason: The JSON schema and repository validator must match the firmware rule
 compiler and Output Manager boundary. Catching unmapped, ambiguous, or
 electrically impossible rule actions at validation time reduces runtime
 surprises without hard-coding physical channel roles.
+
+## 2026-07-09 — Rule Runtime Processing Step
+
+Decision: Firmware now has a host-tested Rule Runtime step that runs Rule Event
+Bridge, Event Dispatcher, and ordered Rule Engine evaluation in a fixed order.
+Fault events are dispatched through Output Manager before matching rule actions
+can request output state.
+
+Reason: The firmware MVP needs a deterministic event-to-action loop, not just
+separate services. Keeping the composition explicit preserves CAN receive-only
+behavior, role-based output mapping, telemetry fail-safe denial, and the single
+Output Manager boundary for physical outputs.

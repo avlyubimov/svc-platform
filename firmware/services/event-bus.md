@@ -51,6 +51,13 @@ retaining unrelated events on the Event Bus:
 - `firmware/services/rule_event_bridge.c`
 - `firmware/tests/test_rule_event_bridge.c`
 
+The firmware runtime step combines rule-event bridging, output-fault dispatch,
+and ordered rule evaluation:
+
+- `firmware/services/rule_runtime.h`
+- `firmware/services/rule_runtime.c`
+- `firmware/tests/test_rule_runtime.c`
+
 Diagnostic logging is implemented separately:
 
 - `firmware/services/event_log.h`
