@@ -286,7 +286,8 @@
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "pattern": "^(engine_running|high_beam|left_indicator|ambient_day|ambient_dusk|ambient_night) == (true|false)$"
           }
         },
         "then": {
@@ -294,7 +295,8 @@
           "minItems": 1,
           "items": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "pattern": "^([A-Z0-9_]+)\\.pwm = ([0-9]+)$"
           }
         }
       }

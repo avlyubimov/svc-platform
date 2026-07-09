@@ -1118,3 +1118,14 @@ Reason: The reference vehicle requires fog light behavior to respond to ambient
 light and CAN-derived state without hard-coding physical output channels.
 Adding ambient-light conditions keeps the behavior in configuration and the Rule
 Engine path, with Output Manager still owning physical output changes.
+
+## 2026-07-09 — Rule Schema Pattern Enforcement
+
+Decision: `firmware/configs/svc-config.schema.json` now constrains rule
+condition and action strings with the same supported patterns checked by
+`tools/validate_config.py`.
+
+Reason: The schema is part of the configuration contract and should reject
+unsupported rule-string shapes before firmware-specific validation runs. Keeping
+the schema patterns machine-checked against the repository validator prevents
+ambient-light rule support and future grammar changes from drifting.

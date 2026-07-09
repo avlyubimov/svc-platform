@@ -35,12 +35,12 @@ Repository-level JSON validation:
 - `firmware/configs/svc-config.schema.json`
 - `tools/validate_config.py`
 
-The repository validator checks that schema role/output/priority enums stay in
-sync with firmware enums and that `config-example.json` stays aligned with
-`svc_default_config`. It also checks that current JSON rule strings fit the
-limited firmware rule text grammar, that every `then[]` has at least one action,
-that rule actions resolve to one configured role mapping, and that partial PWM
-actions target PWM-capable outputs.
+The repository validator checks that schema role/output/priority enums and rule
+string patterns stay in sync with firmware enums and the supported rule grammar.
+It also checks that `config-example.json` stays aligned with `svc_default_config`,
+that current JSON rule strings fit the limited firmware rule text grammar, that
+every `then[]` has at least one action, that rule actions resolve to one
+configured role mapping, and that partial PWM actions target PWM-capable outputs.
 The example fog-light rules use the ambient day/dusk/night conditions supported
 by firmware rather than hard-coding physical output channels.
 

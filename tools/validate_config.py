@@ -75,6 +75,8 @@ REQUIRED_HARDWARE_CAPABILITY_TOKENS = (
     "can1_tx_route_dnp_open",
     "configuration_required_for_roles",
 )
+RULE_CONDITION_PATTERN = r"^(engine_running|high_beam|left_indicator|ambient_day|ambient_dusk|ambient_night) == (true|false)$"
+RULE_ACTION_PATTERN = r"^([A-Z0-9_]+)\.pwm = ([0-9]+)$"
 
 
 def fail(message: str) -> None:
@@ -213,9 +215,15 @@ def validate_schema(schema: dict[str, Any], allowed_roles: set[str]) -> None:
         fail("schema outputs array must require exactly 10 items")
 
     rule_schema = schema.get("$defs", {}).get("rule", {})
+    if_schema = rule_schema.get("properties", {}).get("if", {})
+    if if_schema.get("items", {}).get("pattern") != RULE_CONDITION_PATTERN:
+        fail("schema rule.if item pattern must match supported firmware rule conditions")
+
     then_schema = rule_schema.get("properties", {}).get("then", {})
     if then_schema.get("minItems") != 1:
         fail("schema rule.then must require at least one action")
+    if then_schema.get("items", {}).get("pattern") != RULE_ACTION_PATTERN:
+        fail("schema rule.then item pattern must match supported firmware rule actions")
 
 
 def validate_battery(config: dict[str, Any], defines: dict[str, int]) -> None:
@@ -644,10 +652,8 @@ def validate_rules(config: dict[str, Any], allowed_roles: set[str]) -> None:
             continue
         role_outputs.setdefault(role, []).append(output)
 
-    condition_pattern = re.compile(
-        r"^(engine_running|high_beam|left_indicator|ambient_day|ambient_dusk|ambient_night) == (true|false)$"
-    )
-    action_pattern = re.compile(r"^([A-Z0-9_]+)\.pwm = ([0-9]+)$")
+    condition_pattern = re.compile(RULE_CONDITION_PATTERN)
+    action_pattern = re.compile(RULE_ACTION_PATTERN)
     for rule_index, rule in enumerate(rules):
         if not isinstance(rule, dict):
             fail(f"rules[{rule_index}] must be an object")
