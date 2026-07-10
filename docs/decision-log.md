@@ -1311,6 +1311,19 @@ Reason: Logic power is a safety dependency for output default-off behavior and
 LB-100 startup. A dedicated trace makes the protected input rail, 5 V budget,
 power-good timing, rail-invalid output behavior, and lower-voltage fallback
 risk machine-checkable before schematic freeze.
+## 2026-07-10 — PB-100 Q1 input reverse package trace
+
+Decision: PB-100 schematic planning now includes
+`PB-100-input-reverse-package-trace.csv` for the Q1 input reverse-protection
+MOSFET package path. The trace keeps `IAUTN06S5N008ATMA1` as the preferred
+TOLL path, `BUK7S1R2-80M` as the 80 V LFPAK88 alternate, and dual
+`SIDR626LDP` PowerPAK devices as the factory-assembly fallback.
+
+Reason: The input reverse MOSFET is part of the 40 A board-current safety path.
+Tracing package, copper, TVS overshoot, shunt measurement, and factory assembly
+blockers together prevents a footprint or MPN from being locked before
+schematic freeze and thermal review.
+
 ## 2026-07-10 — PB-100 JPB1 B2B interface trace
 
 Decision: PB-100 schematic planning now includes

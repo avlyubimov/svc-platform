@@ -249,6 +249,14 @@ INPUT_POWER_DESIGN_VALUE_COLUMNS = (
     "Freeze dependency",
     "Notes",
 )
+INPUT_REVERSE_PACKAGE_TRACE_COLUMNS = (
+    "Trace item",
+    "Primary evidence",
+    "Preferred path",
+    "Alternate path",
+    "Safety boundary",
+    "Freeze dependency",
+)
 BOARD_CURRENT_BUDGET_TRACE_COLUMNS = (
     "Check",
     "Target",
@@ -547,6 +555,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv",
+    "hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv",
     "hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv",
     "hardware/power-board/PB-100/PB-100-output-net-expansion.csv",
     "hardware/power-board/PB-100/PB-100-test-point-plan.csv",
@@ -1569,8 +1578,16 @@ def validate_schematic_freeze_gap_register() -> None:
     if "dnp/open" not in can_text or "default" not in can_text:
         fail("CAN1 safety policy gap must keep DNP/open default explicit")
     input_text = " ".join(rows_by_gate["Input reverse protection"].values())
-    if "Q1" not in input_text or "40 A" not in input_text or "TOLL" not in input_text:
-        fail("Input reverse protection gap must keep Q1 TOLL and 40 A review explicit")
+    for token in (
+        "PB-100-input-reverse-package-trace.csv",
+        "Q1",
+        "40 A",
+        "IAUTN06S5N008",
+        "BUK7S1R2-80M",
+        "dual SIDR626LDP",
+    ):
+        if token not in input_text:
+            fail(f"Input reverse protection gap must keep {token} explicit")
     high_medium_text = " ".join(rows_by_gate["High/medium output stage"].values())
     for token in ("PB-100-high-medium-output-baseline-trace.csv", "OUT2", "SOA", "gate drive", "sense"):
         if token not in high_medium_text:
@@ -2545,6 +2562,153 @@ def validate_input_power_design_values() -> None:
             f"{path.relative_to(REPO_ROOT)} is missing input-power design items: "
             f"{', '.join(missing_items)}"
         )
+
+
+def validate_input_reverse_package_trace() -> None:
+    path = PB100_DIR / "PB-100-input-reverse-package-trace.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty input reverse package trace: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in INPUT_REVERSE_PACKAGE_TRACE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    required_items = {
+        "Controller gate path",
+        "Preferred TOLL path",
+        "80 V LFPAK88 alternate",
+        "Dual PowerPAK fallback",
+        "Current measurement boundary",
+        "Assembly sourcing gate",
+    }
+    rows_by_item: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        item = row["Trace item"].strip()
+        if item in rows_by_item:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate trace item {item}")
+        if item not in required_items:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown trace item {item}")
+        rows_by_item[item] = row
+        for column in INPUT_REVERSE_PACKAGE_TRACE_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        if "schematic freeze" not in " ".join(row.values()).lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze dependency must reference schematic freeze")
+
+    missing_items = sorted(required_items - rows_by_item.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing input reverse trace items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    trace_text = read_text(path)
+    for token in (
+        "IAUTN06S5N008ATMA1",
+        "60 V",
+        "TOLL",
+        "0.76 mOhm",
+        "2.43 W",
+        "40 A",
+        "BUK7S1R2-80M",
+        "80 V",
+        "LFPAK88",
+        "1.2 mOhm",
+        "3.84 W",
+        "Dual SIDR626LDP",
+        "1.68 W per FET",
+        "Single 2.1 mOhm PowerPAK device is rejected",
+        "0.5mΩ",
+        "VBAT_REV_PROT",
+        "IIN_SHUNT_HI/IIN_SHUNT_LO",
+        "JLCPCB PCBWay",
+    ):
+        if token not in trace_text:
+            fail(f"input reverse package trace must include {token}")
+
+    controller_text = " ".join(rows_by_item["Controller gate path"].values())
+    for token in ("LM74700QDBVRQ1", "INPUT_FET_GATE", "controller-unpowered off"):
+        if token not in controller_text:
+            fail(f"input reverse controller trace must include {token}")
+
+    preferred_text = " ".join(rows_by_item["Preferred TOLL path"].values())
+    for token in ("HM3 TVS overshoot", "Do not lock TOLL footprint", "40 A copper"):
+        if token not in preferred_text:
+            fail(f"preferred TOLL trace must include {token}")
+
+    fallback_text = " ".join(rows_by_item["Dual PowerPAK fallback"].values())
+    for token in ("20 A per FET", "current sharing", "Single 2.1 mOhm"):
+        if token not in fallback_text:
+            fail(f"dual PowerPAK fallback trace must include {token}")
+
+    input_doc = read_text(PB100_DIR / "PB-100-input-reverse-protection.md")
+    for token in (
+        "IAUTN06S5N008ATMA1-class 60 V TOLL MOSFET",
+        "BUK7S1R2-80M-class 80 V LFPAK88 MOSFET",
+        "Dual SIDR626LDP-class PowerPAK MOSFETs",
+        "single 2.1 mOhm PowerPAK-class MOSFET",
+    ):
+        if token not in input_doc:
+            fail(f"input reverse strategy document must include {token}")
+
+    thermal_rows = list(csv.DictReader((PB100_DIR / "PB-100-thermal-estimates.csv").open(newline="", encoding="utf-8")))
+    thermal_by_path = {row["Path"].strip(): row for row in thermal_rows}
+    expected_thermal = {
+        "IAUTN06S5N008 input reverse MOSFET": ("40", "0.00076", "2.43"),
+        "BUK7S1R2-80M input reverse MOSFET": ("40", "0.0012", "3.84"),
+        "Dual SIDR626LDP input reverse MOSFETs": ("20 per FET", "0.0021", "1.68 per FET"),
+    }
+    for thermal_path, (current, rds, dissipation) in expected_thermal.items():
+        row = thermal_by_path.get(thermal_path)
+        if row is None:
+            fail(f"thermal estimates must include {thermal_path}")
+        if row["Current A"].strip() != current:
+            fail(f"{thermal_path} current must remain {current}")
+        if row["Rds or Ron ohm"].strip() != rds:
+            fail(f"{thermal_path} Rds must remain {rds}")
+        if row["Estimated dissipation W"].strip() != dissipation:
+            fail(f"{thermal_path} dissipation must remain {dissipation}")
+
+    pin_contract_rows = list(csv.DictReader((PB100_DIR / "PB-100-input-protection-pin-contract.csv").open(newline="", encoding="utf-8")))
+    q1_nets = {row["Planned net"].strip() for row in pin_contract_rows if row["Ref"].strip() == "Q1"}
+    if q1_nets != {"VBAT_RAW", "VBAT_REV_PROT", "INPUT_FET_GATE"}:
+        fail("Q1 input pin contract must map VBAT_RAW VBAT_REV_PROT and INPUT_FET_GATE")
+
+    input_power_text = read_text(PB100_DIR / "PB-100-input-power-design-values.csv")
+    for token in ("Review TOLL candidate against LFPAK88 or dual fallback", "40 A thermal review", "0.5mΩ"):
+        if token not in input_power_text:
+            fail(f"input power values must preserve input reverse token {token}")
+
+    protection_text = read_text(PB100_DIR / "PB-100-protection-validation.csv")
+    for token in (
+        "IAUTN06S5N008 input reverse MOSFET,60V VDS",
+        "Conditional limited margin",
+        "BUK7S1R2-80M input reverse MOSFET,80V VDS",
+        "Pass with margin",
+    ):
+        if token not in protection_text:
+            fail(f"protection validation must preserve input reverse token {token}")
+
+    checked_paths = (
+        PB100_DIR / "PB-100-symbol-mpn-readiness.csv",
+        PB100_DIR / "PB-100-kicad-footprint-plan.csv",
+        REPO_ROOT / "production" / "bom" / "factory_bom_draft.csv",
+        REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv",
+        REPO_ROOT / "production" / "bom" / "pb100_sourcing_evidence_snapshot.csv",
+        REPO_ROOT / "docs" / "production" / "component-family-shortlist.md",
+    )
+    for checked_path in checked_paths:
+        checked_text = read_text(checked_path)
+        for token in ("IAUTN06S5N008", "BUK7S1R2-80M", "SIDR626LDP"):
+            if token not in checked_text:
+                fail(f"{checked_path.relative_to(REPO_ROOT)} must retain input reverse alternate {token}")
 
 
 def validate_logic_power_design_values() -> None:
@@ -4089,6 +4253,7 @@ def main() -> int:
     validate_logic_power_design_placeholders()
     validate_output_stage_design_values()
     validate_input_power_design_values()
+    validate_input_reverse_package_trace()
     validate_board_current_budget_trace()
     validate_current_telemetry_trace()
     validate_thermal_telemetry_trace()

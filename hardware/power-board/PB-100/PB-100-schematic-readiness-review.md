@@ -86,7 +86,7 @@ The schematic review packet consists of:
 | Capture work queue | Every KiCad sheet has source artifacts, refs, blockers, freeze evidence, and explicit no-layout boundary |
 | Review release manifest | Every required freeze-packet artifact exists and remains synchronized with validation hooks |
 | OUT2 SOA | Data-sheet SOA extraction against `PB-100-out2-soa-envelope.csv` |
-| Input reverse protection | Input power values, final MOSFET package choice, Q1 pin evidence, and 40 A copper/thermal review |
+| Input reverse protection | Input reverse package trace, input power values, Q1 pin evidence, and 40 A copper/thermal review |
 | TVS/load dump | Clamp and overshoot margin trace against every selected downstream voltage class |
 | Logic power | Logic power rail trace, LM5164 pin template, logic power design values, final buck current budget, EMI parts, UVLO, feedback, and power-good implementation |
 | Current telemetry | Current telemetry trace, INA228 pin template, board-current budget trace, ADC scaling, filtering, calibration plan, and total-current monitor choice |
