@@ -469,6 +469,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-board-current-budget-trace.csv",
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-tvs-load-dump-margin-trace.csv",
+        "PB-100-tvs-load-dump-freeze-review.csv",
     ),
     "CAP-LOGIC": ("PB-100-logic-power-rail-trace.csv",),
     "CAP-OUT-TEMPLATE": (
@@ -620,6 +621,17 @@ REQUIRED_INPUT_REVERSE_FREEZE_REVIEW_ITEMS = {
     "Assembly and sourcing gate",
     "Layout authorization boundary",
 }
+REQUIRED_TVS_LOAD_DUMP_FREEZE_REVIEW_ITEMS = {
+    "Active HM3 branch",
+    "100V device margin",
+    "60V MOSFET conditional margin",
+    "80V input alternate",
+    "60V buck alternate boundary",
+    "40V smart-switch ADR boundary",
+    "OV and input-filter dependencies",
+    "Assembly and sourcing gate",
+    "Layout authorization boundary",
+}
 REQUIRED_LOGIC_POWER_VALUE_ITEMS = {
     "Input filter",
     "UVLO divider",
@@ -745,6 +757,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-can1-safety-verification.csv",
     "hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv",
+    "hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv",
     "hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md",
     "hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv",
@@ -1767,6 +1780,7 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-board-current-budget-freeze-review.csv",
             "PB-100-input-reverse-package-trace.csv",
             "PB-100-tvs-load-dump-margin-trace.csv",
+            "PB-100-tvs-load-dump-freeze-review.csv",
         ),
         "Logic power design values": ("PB-100-logic-power-rail-trace.csv",),
         "Input protection contract": ("PB-100-input-reverse-package-trace.csv",),
@@ -1902,7 +1916,11 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-input-reverse-freeze-review.csv",
             "PB-100-input-reverse-protection.md",
         ),
-        "TVS/load-dump protection": ("PB-100-tvs-load-dump-margin-trace.csv", "PB-100-protection-validation.csv"),
+        "TVS/load-dump protection": (
+            "PB-100-tvs-load-dump-margin-trace.csv",
+            "PB-100-tvs-load-dump-freeze-review.csv",
+            "PB-100-protection-validation.csv",
+        ),
         "Logic power rails": ("PB-100-logic-power-rail-trace.csv", "PB-100-logic-power-budget.csv"),
         "Current telemetry": (
             "PB-100-current-telemetry-trace.csv",
@@ -1982,7 +2000,13 @@ def validate_schematic_freeze_gap_register() -> None:
         if token not in current_budget_text:
             fail(f"Board current budget gap must keep {token} explicit")
     tvs_text = " ".join(rows_by_gate["TVS/load-dump protection"].values())
-    for token in ("PB-100-tvs-load-dump-margin-trace.csv", "60 V", "DO-218AC", "overshoot"):
+    for token in (
+        "PB-100-tvs-load-dump-margin-trace.csv",
+        "PB-100-tvs-load-dump-freeze-review.csv",
+        "60 V",
+        "DO-218AC",
+        "overshoot",
+    ):
         if token not in tvs_text:
             fail(f"TVS/load-dump gap must keep {token} explicit")
     current_telemetry_text = " ".join(rows_by_gate["Current telemetry"].values())
@@ -4745,6 +4769,7 @@ def validate_tvs_candidate_consistency() -> None:
         "hardware/power-board/PB-100/PB-100-logic-power-rails.md",
         "hardware/power-board/PB-100/PB-100-input-power-design-values.csv",
         "hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv",
+        "hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv",
     )
     for relative_path in active_tvs_paths:
         text = read_text(REPO_ROOT / relative_path)
@@ -4827,6 +4852,118 @@ def validate_tvs_load_dump_margin_trace() -> None:
     for token in ("Active SM8S33AHM3-class TVS", "53.3V clamp", "Conditional limited margin"):
         if token not in protection_text:
             fail(f"protection validation must preserve {token}")
+
+
+def validate_tvs_load_dump_freeze_review() -> None:
+    path = PB100_DIR / "PB-100-tvs-load-dump-freeze-review.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty TVS/load-dump freeze review: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in OUTPUT_FREEZE_REVIEW_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_item: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        review_item = row["Review item"].strip()
+        if review_item not in REQUIRED_TVS_LOAD_DUMP_FREEZE_REVIEW_ITEMS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown TVS/load-dump review item {review_item}")
+        if review_item in rows_by_item:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate TVS/load-dump review item {review_item}")
+        rows_by_item[review_item] = row
+        for column in OUTPUT_FREEZE_REVIEW_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+
+    missing_items = sorted(REQUIRED_TVS_LOAD_DUMP_FREEZE_REVIEW_ITEMS - rows_by_item.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing TVS/load-dump review items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    review_text = read_text(path)
+    for token in (
+        "SM8S33AHM3/I",
+        "HM3 DO-218AC",
+        "53.3 V clamp at 124 A",
+        "MCC SM8S33A EOL",
+        "Vishay HE3 NFD",
+        "TPS48110",
+        "LM5164QDDATQ1",
+        "LM5013-Q1",
+        "100 V",
+        "SIDR626LDP",
+        "IAUTN06S5N008",
+        "60 V",
+        "Conditional limited margin",
+        "overshoot",
+        "BUK7S1R2-80M",
+        "80 V",
+        "TPS54360B-Q1",
+        "TPS2HB35",
+        "ADR-0011",
+        "lower-clamp",
+        "OV divider",
+        "buck input network",
+        "JLCPCB PCBWay",
+        "critical alternatives",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+    ):
+        if token not in review_text:
+            fail(f"TVS/load-dump freeze review must include {token}")
+
+    margin_text = read_text(PB100_DIR / "PB-100-tvs-load-dump-margin-trace.csv")
+    for token in (
+        "SM8S33AHM3/I",
+        "HM3 DO-218AC",
+        "53.3 V clamp at 124 A",
+        "Conditional limited margin",
+        "BUK7S1R2-80M",
+        "TPS54360B-Q1",
+        "TPS2HB35",
+        "Deferred by ADR-0011",
+    ):
+        if token not in margin_text:
+            fail(f"TVS margin trace must support freeze review token {token}")
+
+    protection_text = read_text(PB100_DIR / "PB-100-protection-validation.csv")
+    for token in (
+        "Active SM8S33AHM3-class TVS",
+        "53.3V clamp",
+        "Conditional limited margin",
+        "Optional future alternate",
+        "TPS54360B-Q1",
+    ):
+        if token not in protection_text:
+            fail(f"protection validation must support TVS freeze review token {token}")
+
+    input_values_text = read_text(PB100_DIR / "PB-100-input-power-design-values.csv")
+    for token in ("SM8S33AHM3/I", "MCC SM8S33A EOL", "Vishay HE3 NFD", "downstream absolute maximum margin"):
+        if token not in input_values_text:
+            fail(f"input power values must support TVS freeze review token {token}")
+
+    output_values_text = read_text(PB100_DIR / "PB-100-output-stage-design-values.csv")
+    if "OV threshold divider" not in output_values_text or "TVS/load-dump margin" not in output_values_text:
+        fail("output stage design values must preserve TVS OV dependency")
+
+    logic_values_text = read_text(PB100_DIR / "PB-100-logic-power-design-values.csv")
+    for token in ("Input filter", "surge-tolerant input capacitance", "load-dump stress"):
+        if token not in logic_values_text:
+            fail(f"logic power design values must support TVS freeze review token {token}")
+
+    sourcing_text = read_text(REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv")
+    for token in ("INPUT_TVS", "SM8S33AHM3/I", "SLD8S33A", "DM8W33AQ-13", "SM8S33A-Q"):
+        if token not in sourcing_text:
+            fail(f"assembly sourcing recheck must support TVS freeze review token {token}")
 
 
 def validate_thermal_telemetry_baseline() -> None:
@@ -5253,6 +5390,11 @@ def validate_validation_traceability() -> None:
         if freeze_gate == "Input reverse protection":
             if "q1" not in row_text or "40 a" not in row_text:
                 fail("Input reverse validation trace must keep Q1 and 40 A explicit")
+        if freeze_gate == "TVS/load-dump protection":
+            if "pb-100-tvs-load-dump-freeze-review.csv" not in row_text:
+                fail("TVS/load-dump validation trace must include freeze review")
+            if "60 v" not in row_text or "overshoot" not in row_text:
+                fail("TVS/load-dump validation trace must keep 60 V overshoot explicit")
         if freeze_gate == "Factory assembly readiness" and "sourcing recheck" not in row_text:
             fail("Factory assembly validation trace must require sourcing recheck")
         if freeze_gate == "Garage assembly readiness" and "garage" not in row_text:
@@ -5727,6 +5869,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-input-reverse-package-trace.csv",
         "PB-100-input-reverse-freeze-review.csv",
         "PB-100-tvs-load-dump-margin-trace.csv",
+        "PB-100-tvs-load-dump-freeze-review.csv",
         "PB-100-current-telemetry-trace.csv",
         "PB-100-current-telemetry-freeze-review.csv",
         "PB-100-board-current-budget-trace.csv",
@@ -5826,6 +5969,7 @@ def main() -> int:
     validate_sourcing_evidence_snapshot()
     validate_tvs_candidate_consistency()
     validate_tvs_load_dump_margin_trace()
+    validate_tvs_load_dump_freeze_review()
     validate_thermal_telemetry_baseline()
     validate_b2b_interface_trace()
     validate_b2b_connector_candidate()

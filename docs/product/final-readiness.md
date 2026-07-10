@@ -52,6 +52,10 @@ Current coverage:
   `SM8S33AHM3/I` branch and its 53.3 V clamp point; schematic freeze must still
   close 60 V overshoot margin, DO-218AC assembly handling, and any lower-clamp
   future path through a review or ADR.
+- TVS/load-dump freeze review now ties the active SM8S33AHM3/I branch,
+  100 V pass-with-margin paths, 60 V overshoot dependencies, 40 V smart-switch
+  ADR boundary, sourcing gate, and no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`.
 - OUT5, OUT8, and OUT9 now have a low-current baseline trace enforcing the
   ADR-0011 external-controller plus external 60 V MOSFET architecture and
   blocking any direct 40 V smart-switch rail without a future ADR.

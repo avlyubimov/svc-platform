@@ -14,7 +14,7 @@ KiCad scaffold directory:
 | Sheet | Purpose | Primary artifacts |
 |---|---|---|
 | `PB-100.kicad_sch` | Top-level sheet, title block, review notes, sheet links | This file plus all child sheets |
-| `input-protection.kicad_sch` | Battery input, reverse protection, TVS, input current/voltage sense | `PB-100-input-reverse-package-trace.csv`, `PB-100-input-reverse-freeze-review.csv`, `PB-100-board-current-budget-trace.csv`, `PB-100-board-current-budget-freeze-review.csv`, `PB-100-tvs-load-dump-margin-trace.csv`, `PB-100-input-protection-pin-contract.csv`, `PB-100-input-controller-pin-template.csv`, `PB-100-current-monitor-pin-template.csv`, `PB-100-input-power-design-values.csv`, `PB-100-protection-validation.csv` |
+| `input-protection.kicad_sch` | Battery input, reverse protection, TVS, input current/voltage sense | `PB-100-input-reverse-package-trace.csv`, `PB-100-input-reverse-freeze-review.csv`, `PB-100-board-current-budget-trace.csv`, `PB-100-board-current-budget-freeze-review.csv`, `PB-100-tvs-load-dump-margin-trace.csv`, `PB-100-tvs-load-dump-freeze-review.csv`, `PB-100-input-protection-pin-contract.csv`, `PB-100-input-controller-pin-template.csv`, `PB-100-current-monitor-pin-template.csv`, `PB-100-input-power-design-values.csv`, `PB-100-protection-validation.csv` |
 | `logic-power.kicad_sch` | Protected `PB_5V_OUT`, power-good, UVLO, local filters | `PB-100-logic-power-rail-trace.csv`, `PB-100-logic-buck-pin-template.csv`, `PB-100-logic-power-design-values.csv`, `PB-100-logic-power-design-placeholders.csv`, `PB-100-logic-power-budget.csv` |
 | `output-channel-template.kicad_sch` | Generic high-side output channel pattern | `PB-100-high-medium-output-baseline-trace.csv`, `PB-100-high-medium-output-freeze-review.csv`, `PB-100-low-current-output-baseline-trace.csv`, `PB-100-low-current-output-freeze-review.csv`, `PB-100-output-controller-pin-template.csv`, `PB-100-output-channel-pin-contract.csv`, `PB-100-output-stage-design-values.csv` |
 | `outputs-1-10.kicad_sch` | Ten instantiated generic outputs | `PB-100-high-medium-output-baseline-trace.csv`, `PB-100-high-medium-output-freeze-review.csv`, `PB-100-low-current-output-baseline-trace.csv`, `PB-100-low-current-output-freeze-review.csv`, `PB-100-schematic-instance-symbol-map.csv`, `PB-100-output-net-expansion.csv`, `PB-100-output-channel-pin-contract.csv` |
@@ -53,7 +53,7 @@ lock footprints or placement.
    resource-class binding, and `JPB1` pin map.
 7. Capture `input-protection.kicad_sch` from the input reverse package trace,
    input reverse freeze review, board-current 40 A freeze review, TVS margin
-   traces, and input-protection pin contract.
+   trace, TVS freeze review, and input-protection pin contract.
 8. Capture `logic-power.kicad_sch` from the logic-power value placeholders.
 9. Capture one generic output template from the output-channel pin contract and
    output net expansion, then copy it to OUT1 through OUT10.

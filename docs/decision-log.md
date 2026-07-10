@@ -1634,3 +1634,22 @@ Reason: The Q1 reverse-protection path is part of the 40 A board-current safety
 path. Schematic freeze needs explicit controller, MOSFET package, voltage
 margin, telemetry ordering, and sourcing evidence before any TOLL/LFPAK/PowerPAK
 footprint, copper, placement, or manufacturing output is authorized.
+
+## 2026-07-10 — PB-100 TVS/load-dump freeze review
+
+Decision: PB-100 schematic planning now includes
+`PB-100-tvs-load-dump-freeze-review.csv`, tying the active Vishay
+SM8S33AHM3/I HM3 DO-218AC branch, 53.3 V clamp at 124 A, 100 V controller and
+buck pass-with-margin paths, 60 V MOSFET overshoot dependencies, BUK7S1R2-80M
+80 V input alternate, TPS54360B-Q1 60 V buck alternate boundary, TPS2HB35
+ADR-0011 40 V smart-switch boundary, OV/input-filter dependencies, sourcing
+gate, and no-layout boundary into one review artifact. The PB-100 validator now
+checks this artifact against TVS margin trace, protection validation, input
+power values, output-stage values, logic-power values, sourcing recheck,
+freeze checklist, validation traceability, KiCad sheet notes, and release
+manifest.
+
+Reason: The selected load-dump clamp determines whether 60 V MOSFET and buck
+alternates are acceptable. Schematic freeze must preserve voltage-class
+boundaries and obsolete/NFD source exclusions without authorizing D1 footprint,
+pulse-current return copper, placement, or manufacturing output.

@@ -29,6 +29,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv`
 - `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
+- `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
@@ -93,6 +94,10 @@ It is not a PCB layout package.
   and PowerPAK alternates, protected measurement sequence, HM3 TVS dependency,
   sourcing gate, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`.
+- TVS/load-dump freeze review: active SM8S33AHM3/I HM3 branch, 100 V device
+  margin, 60 V MOSFET overshoot dependency, 80 V Q1 alternate, 40 V
+  smart-switch ADR boundary, sourcing gate, and no-layout boundary are tracked
+  in `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`.
 - Thermal telemetry freeze review: NTC sensor class, divider/ADC scaling,
   placement zones, 85/105/75 °C thresholds, firmware fail-safe behavior,
   calibration, assembly alternates, and bench validation are tracked in
@@ -222,6 +227,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-output-net-expansion.csv`
 - `hardware/power-board/PB-100/PB-100-output-stage-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
+- `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
