@@ -4401,6 +4401,32 @@ def validate_schematic_capture_work_queue() -> None:
         if work_item == "CAP-TP" and "footprint" not in row["Blocker"].lower():
             fail("test point capture work must keep footprint/placement blocker explicit")
 
+    required_source_artifacts = {
+        "CAP-INP": (
+            "PB-100-input-reverse-package-trace.csv",
+            "PB-100-board-current-budget-trace.csv",
+            "PB-100-tvs-load-dump-margin-trace.csv",
+        ),
+        "CAP-LOGIC": ("PB-100-logic-power-rail-trace.csv",),
+        "CAP-OUT-TEMPLATE": (
+            "PB-100-high-medium-output-baseline-trace.csv",
+            "PB-100-low-current-output-baseline-trace.csv",
+        ),
+        "CAP-OUT-INST": (
+            "PB-100-high-medium-output-baseline-trace.csv",
+            "PB-100-low-current-output-baseline-trace.csv",
+        ),
+        "CAP-TEL": ("PB-100-current-telemetry-trace.csv", "PB-100-thermal-telemetry-trace.csv"),
+        "CAP-B2B": ("PB-100-b2b-interface-trace.csv",),
+        "CAP-CAN1": ("PB-100-can1-tx-disable-trace.csv",),
+    }
+    rows_by_work_item = {row["Work item"].strip(): row for row in rows}
+    for work_item, tokens in required_source_artifacts.items():
+        source_artifacts = rows_by_work_item[work_item]["Primary source artifacts"]
+        for token in tokens:
+            if token not in source_artifacts:
+                fail(f"capture work queue {work_item} must include source artifact {token}")
+
     missing_work_items = sorted(REQUIRED_CAPTURE_WORK_ITEMS - seen_work_items)
     if missing_work_items:
         fail(

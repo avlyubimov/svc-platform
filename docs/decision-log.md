@@ -1312,6 +1312,17 @@ LB-100 startup. A dedicated trace makes the protected input rail, 5 V budget,
 power-good timing, rail-invalid output behavior, and lower-voltage fallback
 risk machine-checkable before schematic freeze.
 
+## 2026-07-10 — PB-100 capture work queue trace evidence synchronization
+
+Decision: PB-100 schematic capture work queue now lists the dedicated trace
+artifacts as primary source inputs for input protection, logic power, output
+template/instances, telemetry, B2B, and CAN1 sheets. Validation fails if those
+sheet work items lose their trace source artifacts.
+
+Reason: Schematic capture should consume the same trace evidence that gates
+freeze review. This reduces the risk of capturing a sheet from stale source
+documents while the machine-checked traces have moved ahead.
+
 ## 2026-07-10 — PB-100 symbol readiness created-status synchronization
 
 Decision: PB-100 symbol readiness now marks preliminary symbols as created when
