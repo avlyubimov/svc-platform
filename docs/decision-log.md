@@ -1247,3 +1247,16 @@ Reason: ADR-0011 rejected direct 40 V smart-switch rails behind the active
 SM8S33AHM3-class TVS for Rev.1. A dedicated trace makes that decision
 machine-checkable across output matrix, output contracts, hardware capability
 manifest, and config defaults without finalizing resistor values or PCB layout.
+
+## 2026-07-10 — PB-100 assembly ownership trace
+
+Decision: PB-100 schematic planning now includes
+`PB-100-assembly-readiness-trace.csv` as the factory-vs-garage ownership trace
+for critical symbol keys. Factory rows remain tied to JLCPCB/PCBWay assembly
+class recheck, while garage rows remain limited to connectors, fuse holders,
+main fuse, wiring, enclosure, and service-access items.
+
+Reason: Assembly readiness spans symbol readiness, BOM ownership, sourcing
+evidence, and garage-install boundaries. A single trace makes owner drift
+machine-checkable without locking MPNs, footprints, pick-place data, or PCB
+layout.

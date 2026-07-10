@@ -282,6 +282,14 @@ ASSEMBLY_SOURCING_RECHECK_COLUMNS = (
     "Garage action",
     "Freeze dependency",
 )
+ASSEMBLY_READINESS_TRACE_COLUMNS = (
+    "Assembly owner",
+    "Scope",
+    "Required symbol keys",
+    "Current state",
+    "Freeze action",
+    "Blocked action",
+)
 SOURCING_EVIDENCE_COLUMNS = (
     "Symbol key",
     "Evidence date",
@@ -498,6 +506,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-fault-response-matrix.csv",
     "hardware/power-board/PB-100/PB-100-can1-safety-verification.csv",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv",
+    "hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv",
     "hardware/power-board/PB-100/kicad/PB-100.kicad_sch",
     "hardware/power-board/PB-100/kicad/lib/PB100.kicad_sym",
     "firmware/configs/hardware/pb-100-capabilities.json",
@@ -1528,10 +1537,10 @@ def validate_schematic_freeze_gap_register() -> None:
         if token not in tvs_text:
             fail(f"TVS/load-dump gap must keep {token} explicit")
     factory_text = " ".join(rows_by_gate["Factory assembly readiness"].values()).lower()
-    if "assembly" not in factory_text or "alternat" not in factory_text:
+    if "pb-100-assembly-readiness-trace.csv" not in factory_text or "assembly" not in factory_text or "alternat" not in factory_text:
         fail("Factory assembly readiness gap must keep assembly and alternatives explicit")
     garage_text = " ".join(rows_by_gate["Garage assembly readiness"].values()).lower()
-    if "garage" not in garage_text or "user" not in garage_text:
+    if "pb-100-assembly-readiness-trace.csv" not in garage_text or "garage" not in garage_text or "user" not in garage_text:
         fail("Garage assembly readiness gap must keep garage/user scope explicit")
 
 
@@ -2645,6 +2654,89 @@ def validate_assembly_sourcing_recheck() -> None:
         )
 
 
+def trace_symbol_keys(value: str) -> set[str]:
+    return {part.strip() for part in value.split(";") if part.strip()}
+
+
+def validate_assembly_readiness_trace() -> None:
+    path = PB100_DIR / "PB-100-assembly-readiness-trace.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty assembly readiness trace: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in ASSEMBLY_READINESS_TRACE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_owner: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        owner = row["Assembly owner"].strip()
+        if owner in rows_by_owner:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate assembly owner row {owner}")
+        if owner not in {"Factory", "Garage", "Safety DNP"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown assembly owner row {owner}")
+        rows_by_owner[owner] = row
+        for column in ASSEMBLY_READINESS_TRACE_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        row_text = " ".join(row.values()).lower()
+        if "schematic freeze" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze action must reference schematic freeze")
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+
+    for owner in ("Factory", "Garage", "Safety DNP"):
+        if owner not in rows_by_owner:
+            fail(f"{path.relative_to(REPO_ROOT)} must include {owner} assembly trace row")
+
+    sourcing_rows = list(
+        csv.DictReader((REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv").open(newline="", encoding="utf-8"))
+    )
+    expected_keys_by_owner = {
+        "Factory": {
+            row["Symbol key"].strip()
+            for row in sourcing_rows
+            if row["Assembly owner"].strip() == "Factory"
+        },
+        "Garage": {
+            row["Symbol key"].strip()
+            for row in sourcing_rows
+            if row["Assembly owner"].strip() == "Garage"
+        },
+    }
+
+    for owner in ("Factory", "Garage"):
+        trace_keys = trace_symbol_keys(rows_by_owner[owner]["Required symbol keys"])
+        expected_keys = expected_keys_by_owner[owner]
+        if trace_keys != expected_keys:
+            missing = sorted(expected_keys - trace_keys)
+            extra = sorted(trace_keys - expected_keys)
+            fail(
+                f"{path.relative_to(REPO_ROOT)} {owner} keys mismatch; "
+                f"missing={','.join(missing)} extra={','.join(extra)}"
+            )
+
+    factory_text = " ".join(rows_by_owner["Factory"].values()).lower()
+    for token in ("jlcpcb", "pcbway", "alternates", "assembly class", "do not lock"):
+        if token not in factory_text:
+            fail(f"factory assembly trace must preserve {token}")
+
+    garage_text = " ".join(rows_by_owner["Garage"].values()).lower()
+    for token in ("user-installed", "connector", "fuse", "wire gauge", "crimp", "do not move"):
+        if token not in garage_text:
+            fail(f"garage assembly trace must preserve {token}")
+
+    safety_text = " ".join(rows_by_owner["Safety DNP"].values()).lower()
+    for token in ("can1_tx_disable", "dnp/open", "no default-populated", "future adr"):
+        if token not in safety_text:
+            fail(f"safety DNP assembly trace must preserve {token}")
+
+
 def evidence_link_is_valid(value: str) -> bool:
     return value.startswith(("https://", "http://", "docs/", "hardware/", "production/"))
 
@@ -3386,6 +3478,7 @@ def main() -> int:
     validate_can1_safety_verification()
     validate_can1_capture_contract()
     validate_assembly_sourcing_recheck()
+    validate_assembly_readiness_trace()
     validate_sourcing_evidence_snapshot()
     validate_tvs_candidate_consistency()
     validate_tvs_load_dump_margin_trace()

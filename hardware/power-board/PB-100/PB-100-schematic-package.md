@@ -18,6 +18,7 @@ It is not a PCB layout package.
 - `docs/production/component-family-shortlist.md`
 - `firmware/configs/hardware/pb-100-capabilities.json`
 - `production/bom/pb100_symbol_bom_map.csv`
+- `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`
 - `production/bom/pb100_assembly_sourcing_recheck.csv`
 - `production/bom/pb100_sourcing_evidence_snapshot.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
@@ -208,3 +209,5 @@ Preliminary validation tables:
 - Close `production/bom/pb100_assembly_sourcing_recheck.csv` and
   `production/bom/pb100_sourcing_evidence_snapshot.csv` rows before schematic
   freeze.
+- Keep `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`
+  synchronized with factory and garage ownership before schematic freeze.

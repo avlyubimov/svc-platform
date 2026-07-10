@@ -95,8 +95,8 @@ The schematic review packet consists of:
 | Hardware capabilities | Role-free PB-100 capabilities align with output matrix, telemetry maps, config defaults, and CAN1 read-only policy |
 | B2B interface | Connector MPN, pin assignment review, and LB-100 MCU resource binding |
 | CAN1 safety | DNP/open TX path, default disable state, status readback, DNP BOM ownership, firmware listen-only behavior, and future ADR hardware-action process |
-| Factory assembly | JLCPCB/PCBWay assembly class, distributor continuity, and alternates for critical MPNs; concrete symbol/footprint status from `PB-100-symbol-mpn-readiness.csv`, `pb100_assembly_sourcing_recheck.csv`, and `pb100_sourcing_evidence_snapshot.csv` |
-| Garage assembly | Connector, fuse, enclosure, harness items, current derating, wire gauge, crimp tooling, and service access remain user-installable |
+| Factory assembly | JLCPCB/PCBWay assembly class, distributor continuity, and alternates for critical MPNs; ownership is traced in `PB-100-assembly-readiness-trace.csv`, `PB-100-symbol-mpn-readiness.csv`, `pb100_assembly_sourcing_recheck.csv`, and `pb100_sourcing_evidence_snapshot.csv` |
+| Garage assembly | Connector, fuse, enclosure, harness items, current derating, wire gauge, crimp tooling, and service access remain user-installable per `PB-100-assembly-readiness-trace.csv` |
 
 Each conditional area must also have a matching row in
 `hardware/power-board/PB-100/PB-100-validation-traceability.csv` before the

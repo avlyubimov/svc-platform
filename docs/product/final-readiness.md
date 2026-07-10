@@ -55,6 +55,10 @@ Current coverage:
 - OUT5, OUT8, and OUT9 now have a low-current baseline trace enforcing the
   ADR-0011 external-controller plus external 60 V MOSFET architecture and
   blocking any direct 40 V smart-switch rail without a future ADR.
+- Factory-vs-garage assembly ownership now has a dedicated trace for critical
+  PB-100 symbol keys; schematic freeze must still recheck JLCPCB/PCBWay
+  assembly class, distributor continuity, garage connector derating, crimp
+  tooling, and service access.
 - Thermal telemetry now has a TDK `NTCGS103JF103FT8`-class 10 kΩ 150 °C
   AEC-Q200 NTC candidate for all three thermal points; schematic freeze must
   still close divider values, ADC scaling, placement, assembly class, and

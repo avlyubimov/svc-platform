@@ -52,5 +52,6 @@ firmware/configs/hardware/pb-100-capabilities.json,Firmware configuration,PB-100
 production/bom/factory_bom_draft.csv,Production,Factory BOM draft,Required,validate_bom_symbol_map,Conditional
 production/bom/garage_bom_draft.csv,Production,Garage BOM draft,Required,validate_bom_symbol_map,Conditional
 production/bom/pb100_symbol_bom_map.csv,Production,Symbol-to-BOM map,Required,validate_bom_symbol_map,Conditional
+hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv,Production,Factory and garage assembly ownership trace,Required,validate_assembly_readiness_trace,Conditional
 production/bom/pb100_assembly_sourcing_recheck.csv,Production,Assembly sourcing recheck,Required,validate_assembly_sourcing_recheck,Conditional
 production/bom/pb100_sourcing_evidence_snapshot.csv,Production,Sourcing evidence snapshot,Required,validate_sourcing_evidence_snapshot,Conditional
