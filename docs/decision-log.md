@@ -1454,3 +1454,14 @@ drops a release-manifest artifact or required capture trace.
 Reason: The readiness review is the top-level human handoff for schematic
 freeze work. It must match the machine-checked release manifest so reviewers do
 not miss trace evidence while approving schematic capture inputs.
+
+## 2026-07-10 — PB-100 schematic package release-packet synchronization
+
+Decision: PB-100 schematic package now lists the concrete KiCad top schematic
+and local PB100 symbol library from the release manifest. The PB-100 validator
+now fails if the schematic package drops any release-manifest artifact except
+the package document itself.
+
+Reason: The schematic package is the governing input bundle for capture work.
+It must point reviewers to the actual KiCad source files, not only the planning
+documents, while still explicitly excluding PCB layout scope.

@@ -4562,6 +4562,19 @@ def validate_schematic_readiness_review() -> None:
                 fail(f"{path.relative_to(REPO_ROOT)} review packet must include trace artifact {token}")
 
 
+def validate_schematic_package() -> None:
+    path = PB100_DIR / "PB-100-schematic-package.md"
+    text = read_text(path)
+    lower_text = text.lower()
+    if "not a pcb layout package" not in lower_text:
+        fail(f"{path.relative_to(REPO_ROOT)} must explicitly avoid PCB layout scope")
+    for artifact in sorted(REQUIRED_RELEASE_MANIFEST_ARTIFACTS):
+        if artifact == "hardware/power-board/PB-100/PB-100-schematic-package.md":
+            continue
+        if artifact not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} must include release artifact {artifact}")
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -4603,6 +4616,7 @@ def main() -> int:
     validate_schematic_capture_plan()
     validate_review_release_manifest()
     validate_schematic_readiness_review()
+    validate_schematic_package()
     validate_output_channel_pin_contract()
     validate_output_controller_pin_template()
     validate_output_net_expansion()
