@@ -1298,3 +1298,16 @@ Reason: Thermal telemetry is a safety input that must remain separate from
 accessory role mapping and firmware constants. A dedicated trace makes divider
 values, ADC scaling, placement, self-heating, calibration, and stale/cutoff
 firmware behavior machine-checkable before schematic freeze.
+
+## 2026-07-10 — PB-100 logic power rail trace
+
+Decision: PB-100 schematic planning now includes
+`PB-100-logic-power-rail-trace.csv` for the protected 5 V logic rail. The trace
+keeps LM5164-Q1-class 100 V 1 A as the preferred baseline, LM5013-Q1-class
+100 V as the higher-current fallback, and `PB_PWR_GOOD` as the LB-100-visible
+validity signal.
+
+Reason: Logic power is a safety dependency for output default-off behavior and
+LB-100 startup. A dedicated trace makes the protected input rail, 5 V budget,
+power-good timing, rail-invalid output behavior, and lower-voltage fallback
+risk machine-checkable before schematic freeze.

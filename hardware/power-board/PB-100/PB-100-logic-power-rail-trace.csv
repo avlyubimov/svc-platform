@@ -1,0 +1,7 @@
+Trace item,Net or ref,Planning baseline,Safety boundary,Freeze dependency
+Buck regulator,U3,LM5164-Q1-class 100 V 1 A preferred regulator,Use LM5013-Q1-class 100 V fallback if PB_5V_OUT budget exceeds 1 A,Close regulator equations package sourcing input filter and load budget before schematic freeze
+Buck input rail,VBAT_PROT,Feed from protected rail after reverse protection TVS and shunt sequencing,Do not connect logic buck to raw unfused input,Close load-dump input filter capacitor voltage EMI and surge margin before schematic freeze
+Buck output rail,PB_5V_OUT,Protected 5 V rail for LB-100 and PB-side low-power circuits only,PB_5V_OUT must not power accessory loads,Close stability output capacitance tolerance and load-step review before schematic freeze
+Power good,PB_PWR_GOOD,PB-100 to LB-100 validity status,Must not assert before PB_5V_OUT is stable,Close pull-up domain timing filtering and LB-100 interpretation before schematic freeze
+Safe default off,OUT1..OUT10 control,Outputs remain default off when PB_5V_OUT or LB_3V3_IO is absent,Output Manager remains the only path to enable physical outputs,Close reset brownout and rail-invalid behavior before schematic freeze
+Higher-current fallback,PB_5V_OUT,LM5013-Q1-class 100 V fallback retained,TPS54360B-Q1-class 60 V path remains conditional on TVS margin,Switch to LM5013-Q1-class before schematic freeze if 1 A budget is exceeded

@@ -274,6 +274,13 @@ THERMAL_TELEMETRY_TRACE_COLUMNS = (
     "Configuration boundary",
     "Freeze dependency",
 )
+LOGIC_POWER_RAIL_TRACE_COLUMNS = (
+    "Trace item",
+    "Net or ref",
+    "Planning baseline",
+    "Safety boundary",
+    "Freeze dependency",
+)
 TVS_LOAD_DUMP_MARGIN_TRACE_COLUMNS = (
     "Protected item",
     "Voltage class",
@@ -531,6 +538,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv",
+    "hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv",
     "hardware/power-board/PB-100/PB-100-output-net-expansion.csv",
     "hardware/power-board/PB-100/PB-100-test-point-plan.csv",
     "hardware/power-board/PB-100/PB-100-fault-response-matrix.csv",
@@ -1578,6 +1586,10 @@ def validate_schematic_freeze_gap_register() -> None:
     for token in ("PB-100-thermal-telemetry-trace.csv", "NTCGS103JF103FT8", "self-heating", "firmware thresholds"):
         if token not in thermal_telemetry_text:
             fail(f"Thermal telemetry gap must keep {token} explicit")
+    logic_power_text = " ".join(rows_by_gate["Logic power rails"].values())
+    for token in ("PB-100-logic-power-rail-trace.csv", "1 A", "power-good", "UVLO"):
+        if token not in logic_power_text:
+            fail(f"Logic power rails gap must keep {token} explicit")
     factory_text = " ".join(rows_by_gate["Factory assembly readiness"].values()).lower()
     if "pb-100-assembly-readiness-trace.csv" not in factory_text or "assembly" not in factory_text or "alternat" not in factory_text:
         fail("Factory assembly readiness gap must keep assembly and alternatives explicit")
@@ -2883,6 +2895,90 @@ def validate_thermal_telemetry_trace() -> None:
             fail(f"firmware README must keep thermal safety coverage token: {token}")
 
 
+def validate_logic_power_rail_trace() -> None:
+    path = PB100_DIR / "PB-100-logic-power-rail-trace.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty logic power rail trace: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in LOGIC_POWER_RAIL_TRACE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    required_items = {
+        "Buck regulator",
+        "Buck input rail",
+        "Buck output rail",
+        "Power good",
+        "Safe default off",
+        "Higher-current fallback",
+    }
+    rows_by_item: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        item = row["Trace item"].strip()
+        if item in rows_by_item:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate trace item {item}")
+        if item not in required_items:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown trace item {item}")
+        rows_by_item[item] = row
+        for column in LOGIC_POWER_RAIL_TRACE_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if "schematic freeze" not in " ".join(row.values()).lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze dependency must reference schematic freeze")
+
+    missing_items = sorted(required_items - rows_by_item.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing logic power trace items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    trace_text = read_text(path)
+    for token in (
+        "LM5164-Q1-class 100 V 1 A",
+        "LM5013-Q1-class 100 V fallback",
+        "PB_5V_OUT must not power accessory loads",
+        "PB_PWR_GOOD",
+        "default off",
+        "TPS54360B-Q1-class 60 V path remains conditional",
+    ):
+        if token not in trace_text:
+            fail(f"logic power rail trace must include {token}")
+
+    budget_rows = list(csv.DictReader((PB100_DIR / "PB-100-logic-power-budget.csv").open(newline="", encoding="utf-8")))
+    initial_total = next((row for row in budget_rows if row["Load"].strip() == "Initial total"), None)
+    if initial_total is None or initial_total["Current mA"].strip() != "1000":
+        fail("logic power budget must keep 1000 mA initial total")
+    if "LM5013-Q1" not in initial_total["Notes"]:
+        fail("logic power budget must keep LM5013-Q1 fallback note")
+
+    placeholder_text = read_text(PB100_DIR / "PB-100-logic-power-design-placeholders.csv")
+    for token in ("Preferred LM5164-Q1 class", "LM5013-Q1 remains higher-current alternate", "Must not connect to raw unfused input"):
+        if token not in placeholder_text:
+            fail(f"logic power placeholders must include {token}")
+
+    design_values_text = read_text(PB100_DIR / "PB-100-logic-power-design-values.csv")
+    for token in ("PB_5V_OUT must not power accessory loads", "LM5013-Q1-class", "Outputs default off"):
+        if token not in design_values_text:
+            fail(f"logic power design values must include {token}")
+
+    capabilities = json.loads(read_text(REPO_ROOT / "firmware" / "configs" / "hardware" / "pb-100-capabilities.json"))
+    board_signals = set(capabilities["telemetry"]["board_signals"])
+    if "PB_PWR_GOOD" not in board_signals:
+        fail("PB-100 capability manifest must expose PB_PWR_GOOD board signal")
+
+    firmware_readme = read_text(REPO_ROOT / "firmware" / "README.md").lower()
+    for token in ("runtime boot", "outputs off", "hardware capability"):
+        if token not in firmware_readme:
+            fail(f"firmware README must keep runtime boot safety token: {token}")
+
+
 def validate_can1_capture_contract() -> None:
     can1_doc = read_text(PB100_DIR / "PB-100-can1-tx-disable.md").lower()
     for token in (
@@ -3818,6 +3914,7 @@ def main() -> int:
     validate_board_current_budget_trace()
     validate_current_telemetry_trace()
     validate_thermal_telemetry_trace()
+    validate_logic_power_rail_trace()
     validate_logic_power_design_values()
     validate_can1_safety_verification()
     validate_can1_capture_contract()

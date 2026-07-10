@@ -36,6 +36,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
 - `hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
@@ -158,6 +159,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
+- `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-budget.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`
