@@ -90,7 +90,7 @@ The schematic review packet consists of:
 | TVS/load dump | Clamp and overshoot margin trace against every selected downstream voltage class |
 | Logic power | LM5164 pin template, logic power design values, final buck current budget, EMI parts, UVLO, feedback, and power-good implementation |
 | Current telemetry | Current telemetry trace, INA228 pin template, board-current budget trace, ADC scaling, filtering, calibration plan, and total-current monitor choice |
-| Thermal telemetry | Final sensor values, placement notes, and derating thresholds |
+| Thermal telemetry | Thermal telemetry trace, final sensor values, divider values, placement notes, calibration, and derating thresholds |
 | Test points | Bring-up, telemetry, output, fused-output, and CAN1 safety test points are defined without footprint or placement lock |
 | Fault response | Input, logic, B2B, output, thermal, current-budget, CAN1, and identity faults have safe hardware defaults and firmware responses |
 | Hardware capabilities | Role-free PB-100 capabilities align with output matrix, telemetry maps, config defaults, and CAN1 read-only policy |

@@ -59,6 +59,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-schematic-readiness-review.md`
 - `hardware/power-board/PB-100/PB-100-review-release-manifest.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`
 
 ## Electrical baseline
 
@@ -175,6 +176,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-map.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-estimates.csv`
 - `hardware/power-board/PB-100/PB-100-protection-validation.csv`

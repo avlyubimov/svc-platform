@@ -265,6 +265,15 @@ CURRENT_TELEMETRY_TRACE_COLUMNS = (
     "Firmware safety use",
     "Freeze dependency",
 )
+THERMAL_TELEMETRY_TRACE_COLUMNS = (
+    "Thermal zone",
+    "Signal",
+    "Sensor candidate",
+    "Telemetry path",
+    "Default thresholds",
+    "Configuration boundary",
+    "Freeze dependency",
+)
 TVS_LOAD_DUMP_MARGIN_TRACE_COLUMNS = (
     "Protected item",
     "Voltage class",
@@ -521,6 +530,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv",
+    "hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-output-net-expansion.csv",
     "hardware/power-board/PB-100/PB-100-test-point-plan.csv",
     "hardware/power-board/PB-100/PB-100-fault-response-matrix.csv",
@@ -1564,6 +1574,10 @@ def validate_schematic_freeze_gap_register() -> None:
     for token in ("PB-100-current-telemetry-trace.csv", "0.5mΩ", "ADC or I2C", "firmware safety"):
         if token not in current_telemetry_text:
             fail(f"Current telemetry gap must keep {token} explicit")
+    thermal_telemetry_text = " ".join(rows_by_gate["Thermal telemetry"].values())
+    for token in ("PB-100-thermal-telemetry-trace.csv", "NTCGS103JF103FT8", "self-heating", "firmware thresholds"):
+        if token not in thermal_telemetry_text:
+            fail(f"Thermal telemetry gap must keep {token} explicit")
     factory_text = " ".join(rows_by_gate["Factory assembly readiness"].values()).lower()
     if "pb-100-assembly-readiness-trace.csv" not in factory_text or "assembly" not in factory_text or "alternat" not in factory_text:
         fail("Factory assembly readiness gap must keep assembly and alternatives explicit")
@@ -2783,6 +2797,92 @@ def validate_current_telemetry_trace() -> None:
             fail(f"firmware README must keep telemetry safety coverage token: {token}")
 
 
+def validate_thermal_telemetry_trace() -> None:
+    path = PB100_DIR / "PB-100-thermal-telemetry-trace.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty thermal telemetry trace: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in THERMAL_TELEMETRY_TRACE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    expected_signals_by_zone = {
+        "PCB reference": "TEMP_PCB",
+        "Power zone A": "TEMP_PWR_A",
+        "Power zone B": "TEMP_PWR_B",
+    }
+    rows_by_zone: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        zone = row["Thermal zone"].strip()
+        if zone in rows_by_zone:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate thermal zone {zone}")
+        if zone not in expected_signals_by_zone:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown thermal zone {zone}")
+        rows_by_zone[zone] = row
+        for column in THERMAL_TELEMETRY_TRACE_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if row["Signal"].strip() != expected_signals_by_zone[zone]:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: {zone} signal mismatch")
+        row_text = " ".join(row.values())
+        for token in (
+            "NTCGS103JF103FT8",
+            "10k",
+            "150C",
+            "AEC-Q200",
+            "LB ADC",
+            "85C warn 105C cutoff 75C recovery",
+            "configuration",
+            "schematic freeze",
+        ):
+            if token not in row_text:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: thermal trace row must include {token}")
+
+    missing_zones = sorted(set(expected_signals_by_zone) - set(rows_by_zone))
+    if missing_zones:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing thermal zones: "
+            f"{', '.join(missing_zones)}"
+        )
+
+    thermal_map_rows = list(csv.DictReader((PB100_DIR / "PB-100-thermal-telemetry-map.csv").open(newline="", encoding="utf-8")))
+    map_by_signal = {row["Signal"].strip(): row for row in thermal_map_rows}
+    capabilities = json.loads(read_text(REPO_ROOT / "firmware" / "configs" / "hardware" / "pb-100-capabilities.json"))
+    capability_signals = set(capabilities["telemetry"]["thermal_signals"])
+    for signal in expected_signals_by_zone.values():
+        if signal not in capability_signals:
+            fail(f"{signal} must be exposed in PB-100 capability manifest")
+        map_row = map_by_signal.get(signal)
+        if map_row is None:
+            fail(f"thermal telemetry map must include {signal}")
+        map_text = " ".join(map_row.values())
+        for token in ("NTCGS103JF103FT8", "-40 to 150", "LB ADC", "85C warn 105C cutoff 75C recovery"):
+            if token not in map_text:
+                fail(f"thermal telemetry map row {signal} must include {token}")
+
+    config_example = json.loads(read_text(REPO_ROOT / "firmware" / "configs" / "config-example.json"))
+    for zone_key in ("pcb", "power_zone_a", "power_zone_b"):
+        zone_config = config_example["thermal"][zone_key]
+        if zone_config != {"warn_c": 85, "cutoff_c": 105, "recovery_c": 75}:
+            fail(f"config thermal thresholds for {zone_key} must remain 85/105/75")
+
+    thermal_doc = read_text(PB100_DIR / "PB-100-thermal-telemetry.md")
+    for token in ("configuration/calibration values", "Missing, saturated, or implausible", "Output Manager", "85 °C warn"):
+        if token not in thermal_doc:
+            fail(f"thermal telemetry strategy must preserve {token}")
+
+    firmware_readme = read_text(REPO_ROOT / "firmware" / "README.md").lower()
+    for token in ("thermal protection", "thermal system safety", "cutoff/stale", "telemetry"):
+        if token not in firmware_readme:
+            fail(f"firmware README must keep thermal safety coverage token: {token}")
+
+
 def validate_can1_capture_contract() -> None:
     can1_doc = read_text(PB100_DIR / "PB-100-can1-tx-disable.md").lower()
     for token in (
@@ -3717,6 +3817,7 @@ def main() -> int:
     validate_input_power_design_values()
     validate_board_current_budget_trace()
     validate_current_telemetry_trace()
+    validate_thermal_telemetry_trace()
     validate_logic_power_design_values()
     validate_can1_safety_verification()
     validate_can1_capture_contract()

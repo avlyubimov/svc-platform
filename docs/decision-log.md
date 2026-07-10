@@ -1285,3 +1285,16 @@ Reason: Current telemetry is a firmware safety input, not only a measurement
 feature. The trace makes range targets, ADC/I2C ownership, calibration, RC
 filtering, stale-telemetry safe-off behavior, and shunt Kelvin review
 machine-checkable before schematic freeze.
+
+## 2026-07-10 — PB-100 thermal telemetry trace
+
+Decision: PB-100 schematic planning now includes
+`PB-100-thermal-telemetry-trace.csv` for `TEMP_PCB`, `TEMP_PWR_A`, and
+`TEMP_PWR_B`. The trace keeps the TDK `NTCGS103JF103FT8`-class NTC candidate,
+LB ADC path, 85 °C warn, 105 °C cutoff, and 75 °C recovery defaults tied to
+configuration-owned calibration.
+
+Reason: Thermal telemetry is a safety input that must remain separate from
+accessory role mapping and firmware constants. A dedicated trace makes divider
+values, ADC scaling, placement, self-heating, calibration, and stale/cutoff
+firmware behavior machine-checkable before schematic freeze.
