@@ -23,6 +23,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`
 - `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
+- `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
@@ -155,6 +156,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
+- `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-map.csv`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`

@@ -1208,3 +1208,16 @@ Reason: Q1 was the remaining pending schematic-symbol gate in the PB-100 input
 reverse-protection path. Capturing the pin evidence removes the symbol blocker
 without freezing the TOLL footprint, PCB copper strategy, package assembly
 handling, gate clamp, or 40 A thermal path.
+
+## 2026-07-10 — PB-100 board-current budget trace
+
+Decision: PB-100 schematic planning now includes
+`PB-100-board-current-budget-trace.csv` as the cross-artifact current-budget
+review anchor. It ties ADR-0008, the 50 A main fuse target, 40 A board and
+configuration limit, 0-60 A total-current telemetry range, 0.5 mΩ shunt
+operating point, and output-limit oversubscription together.
+
+Reason: The 40 A budget is a safety boundary spanning hardware, configuration,
+telemetry, firmware, and garage-installed fuse/connectors. A dedicated trace
+file makes drift machine-checkable without changing the accepted PB-100 current
+budget or starting PCB copper/layout work.

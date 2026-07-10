@@ -230,6 +230,14 @@ INPUT_POWER_DESIGN_VALUE_COLUMNS = (
     "Freeze dependency",
     "Notes",
 )
+BOARD_CURRENT_BUDGET_TRACE_COLUMNS = (
+    "Check",
+    "Target",
+    "Repository evidence",
+    "Measured or enforced by",
+    "Freeze state",
+    "Remaining work",
+)
 LOGIC_POWER_DESIGN_VALUE_COLUMNS = (
     "Design item",
     "Related net",
@@ -466,6 +474,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-validation-traceability.csv",
     "hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv",
     "hardware/power-board/PB-100/PB-100-review-release-manifest.csv",
+    "hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv",
     "hardware/power-board/PB-100/PB-100-output-net-expansion.csv",
     "hardware/power-board/PB-100/PB-100-test-point-plan.csv",
     "hardware/power-board/PB-100/PB-100-fault-response-matrix.csv",
@@ -1487,6 +1496,10 @@ def validate_schematic_freeze_gap_register() -> None:
     input_text = " ".join(rows_by_gate["Input reverse protection"].values())
     if "Q1" not in input_text or "40 A" not in input_text or "TOLL" not in input_text:
         fail("Input reverse protection gap must keep Q1 TOLL and 40 A review explicit")
+    current_budget_text = " ".join(rows_by_gate["Board current budget"].values())
+    for token in ("PB-100-board-current-budget-trace.csv", "40 A", "firmware config", "shunt"):
+        if token not in current_budget_text:
+            fail(f"Board current budget gap must keep {token} explicit")
     factory_text = " ".join(rows_by_gate["Factory assembly readiness"].values()).lower()
     if "assembly" not in factory_text or "alternat" not in factory_text:
         fail("Factory assembly readiness gap must keep assembly and alternatives explicit")
@@ -2312,6 +2325,89 @@ def validate_can1_safety_verification() -> None:
         fail("CAN1 future TX process must require future ADR and hardware action")
 
 
+def validate_board_current_budget_trace() -> None:
+    path = PB100_DIR / "PB-100-board-current-budget-trace.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty board-current budget trace: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in BOARD_CURRENT_BUDGET_TRACE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    required_checks = {
+        "Main fuse target",
+        "Board continuous target",
+        "Default configuration limit",
+        "Total input telemetry range",
+        "Shunt operating point",
+        "Output limit oversubscription",
+    }
+    rows_by_check: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        check = row["Check"].strip()
+        if check in rows_by_check:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Check {check}")
+        if check not in required_checks:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown current-budget check {check}")
+        rows_by_check[check] = row
+        for column in BOARD_CURRENT_BUDGET_TRACE_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        row_text = " ".join(row.values()).lower()
+        if "schematic freeze" not in row_text and check != "Default configuration limit":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: remaining work must reference schematic freeze")
+
+    missing_checks = sorted(required_checks - rows_by_check.keys())
+    if missing_checks:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing current-budget checks: "
+            f"{', '.join(missing_checks)}"
+        )
+
+    capabilities = json.loads(read_text(REPO_ROOT / "firmware" / "configs" / "hardware" / "pb-100-capabilities.json"))
+    config_example = json.loads(read_text(REPO_ROOT / "firmware" / "configs" / "config-example.json"))
+    power_budget = capabilities["power_budget"]
+    if power_budget["main_fuse_target_a"] != 50:
+        fail("PB-100 capability manifest must keep 50 A main fuse target")
+    if power_budget["board_continuous_target_a"] != 40:
+        fail("PB-100 capability manifest must keep 40 A board continuous target")
+    if power_budget["default_total_current_limit_a"] != 40:
+        fail("PB-100 capability manifest must keep 40 A default total-current limit")
+    if config_example["power_budget"]["total_current_limit_a"] != 40:
+        fail("config example must keep 40 A total_current_limit_a")
+
+    output_limit_sum = sum(output["target_current_limit_a"] for output in capabilities["outputs"])
+    if output_limit_sum != 82:
+        fail(f"PB-100 output current-limit sum must remain 82 A, got {output_limit_sum} A")
+    if "IIN_SENSE" not in capabilities["telemetry"]["current_signals"]:
+        fail("PB-100 capability manifest must expose IIN_SENSE total-current telemetry")
+
+    current_rows = list(csv.DictReader((PB100_DIR / "PB-100-current-telemetry-map.csv").open(newline="", encoding="utf-8")))
+    total_current_row = next((row for row in current_rows if row["Signal"].strip() == "IIN_SENSE"), None)
+    if total_current_row is None:
+        fail("current telemetry map must include IIN_SENSE")
+    total_current_text = " ".join(total_current_row.values())
+    for token in ("0-60", "0.5mΩ", "40A"):
+        if token not in total_current_text:
+            fail(f"IIN_SENSE telemetry map row must include {token}")
+
+    input_power_text = read_text(PB100_DIR / "PB-100-input-power-design-values.csv")
+    for token in ("0.5mΩ", "20mV at 40A", "0.8W board-budget"):
+        if token not in input_power_text:
+            fail(f"input power design values must include {token}")
+
+    trace_text = read_text(path)
+    for token in ("50 A", "40 A", "0-60 A", "0.5 mOhm", "82 A", "configuration separate from firmware"):
+        if token not in trace_text:
+            fail(f"board-current budget trace must include {token}")
+
+
 def validate_can1_capture_contract() -> None:
     can1_doc = read_text(PB100_DIR / "PB-100-can1-tx-disable.md").lower()
     for token in (
@@ -3085,6 +3181,7 @@ def main() -> int:
     validate_logic_power_design_placeholders()
     validate_output_stage_design_values()
     validate_input_power_design_values()
+    validate_board_current_budget_trace()
     validate_logic_power_design_values()
     validate_can1_safety_verification()
     validate_can1_capture_contract()

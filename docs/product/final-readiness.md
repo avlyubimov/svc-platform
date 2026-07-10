@@ -59,6 +59,11 @@ Current coverage:
 - Q1 input reverse MOSFET pin evidence is captured from the Infineon
   `IAUTN06S5N008` data sheet; schematic freeze must still close TOLL footprint,
   40 A copper/thermal review, assembly handling, and gate clamp behavior.
+- The PB-100 board-current budget now has a cross-artifact trace tying the
+  50 A main fuse target, 40 A board/configuration limit, 0-60 A total-current
+  telemetry range, and 0.5 mΩ shunt operating point together; schematic freeze
+  must still close connector derating, shunt copper, calibration, and thermal
+  evidence.
 - Close PB-100 CAN1 TX-disable schematic evidence using the `JP_CAN1`
   DNP/open link plus `U_CAN1` default-disabled/readback contract.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.

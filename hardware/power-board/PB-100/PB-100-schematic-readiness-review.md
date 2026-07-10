@@ -47,6 +47,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
+- `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
@@ -86,7 +87,7 @@ The schematic review packet consists of:
 | Input reverse protection | Input power values, final MOSFET package choice, Q1 pin evidence, and 40 A copper/thermal review |
 | TVS/load dump | Clamp and overshoot margin against every selected downstream device |
 | Logic power | LM5164 pin template, logic power design values, final buck current budget, EMI parts, UVLO, feedback, and power-good implementation |
-| Current telemetry | INA228 pin template, ADC scaling, filtering, calibration plan, and total-current monitor choice |
+| Current telemetry | INA228 pin template, board-current budget trace, ADC scaling, filtering, calibration plan, and total-current monitor choice |
 | Thermal telemetry | Final sensor values, placement notes, and derating thresholds |
 | Test points | Bring-up, telemetry, output, fused-output, and CAN1 safety test points are defined without footprint or placement lock |
 | Fault response | Input, logic, B2B, output, thermal, current-budget, CAN1, and identity faults have safe hardware defaults and firmware responses |
