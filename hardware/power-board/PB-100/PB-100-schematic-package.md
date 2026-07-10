@@ -39,6 +39,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-input-protection-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv`
+- `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
 - `hardware/power-board/PB-100/kicad/PB-100.kicad_sch`
@@ -88,6 +89,10 @@ It is not a PCB layout package.
   headroom, Kelvin sense, ADC/I2C ownership, per-output IMON scaling,
   calibration configuration, and stale-telemetry safe faults are tracked in
   `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`.
+- Input reverse freeze review: LM74700 gate/default-off behavior, TOLL/LFPAK88
+  and PowerPAK alternates, protected measurement sequence, HM3 TVS dependency,
+  sourcing gate, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`.
 - Thermal telemetry freeze review: NTC sensor class, divider/ADC scaling,
   placement zones, 85/105/75 °C thresholds, firmware fail-safe behavior,
   calibration, assembly alternates, and bench validation are tracked in
@@ -194,6 +199,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-symbol-open-items.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv`
+- `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-input-protection-pin-contract.csv`

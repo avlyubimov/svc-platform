@@ -1617,3 +1617,20 @@ Reason: Output stages are the remaining high-risk path between schematic
 planning and board layout. The reviews preserve electrical and firmware safety
 constraints without hard-coding roles, locking values prematurely, or
 authorizing MOSFET/fuse/connector placement.
+
+## 2026-07-10 — PB-100 input reverse freeze review
+
+Decision: PB-100 schematic planning now includes
+`PB-100-input-reverse-freeze-review.csv`, tying LM74700 gate/default-off
+behavior, IAUTN06S5N008 TOLL, BUK7S1R2 LFPAK88, dual SIDR626LDP fallback,
+protected input-current measurement sequence, HM3 TVS overshoot dependency,
+factory sourcing gate, critical alternates, and no-layout boundary into one
+review artifact. The PB-100 validator now checks this artifact against the
+input reverse package trace, pin contract, TVS/load-dump margin trace, sourcing
+recheck, freeze checklist, validation traceability, KiCad sheet notes, and
+release manifest.
+
+Reason: The Q1 reverse-protection path is part of the 40 A board-current safety
+path. Schematic freeze needs explicit controller, MOSFET package, voltage
+margin, telemetry ordering, and sourcing evidence before any TOLL/LFPAK/PowerPAK
+footprint, copper, placement, or manufacturing output is authorized.

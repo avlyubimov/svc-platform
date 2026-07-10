@@ -10,10 +10,10 @@
     (company "SVC Platform")
     (comment 9 "Work queue: CAP-INP. Input protection capture is blocked on Q1 INPUT_REVERSE_FET evidence.")
     (comment 1 "Placeholder sheet. Capture battery input, TVS, reverse protection, input telemetry here.")
-    (comment 2 "Sources: PB-100-input-reverse-package-trace.csv, PB-100-board-current-budget-trace.csv, PB-100-board-current-budget-freeze-review.csv, PB-100-tvs-load-dump-margin-trace.csv.")
+    (comment 2 "Sources: PB-100-input-reverse-package-trace.csv, PB-100-input-reverse-freeze-review.csv, PB-100-board-current-budget-trace.csv, PB-100-board-current-budget-freeze-review.csv, PB-100-tvs-load-dump-margin-trace.csv.")
   )
   (lib_symbols)
-  (text "Input protection capture notes:\n- Source traces: PB-100-input-reverse-package-trace.csv, PB-100-board-current-budget-trace.csv, PB-100-board-current-budget-freeze-review.csv, PB-100-tvs-load-dump-margin-trace.csv\n- VBAT_RAW before reverse protection\n- VBAT_PROT after reverse protection\n- D1 input TVS candidate\n- U1 LM74700-class controller\n- Q1 dedicated input MOSFET strategy\n- RSH1/U2 total input current monitor\n- 40 A review covers connector derating, shunt Kelvin path, Q1 thermal path, firmware config, and no-layout boundary\n\nNo PCB layout from this placeholder."
+  (text "Input protection capture notes:\n- Source traces: PB-100-input-reverse-package-trace.csv, PB-100-input-reverse-freeze-review.csv, PB-100-board-current-budget-trace.csv, PB-100-board-current-budget-freeze-review.csv, PB-100-tvs-load-dump-margin-trace.csv\n- VBAT_RAW before reverse protection\n- VBAT_PROT after reverse protection\n- D1 input TVS candidate\n- U1 LM74700-class controller\n- Q1 dedicated input MOSFET strategy\n- RSH1/U2 total input current monitor\n- 40 A review covers connector derating, shunt Kelvin path, Q1 thermal path, firmware config, and no-layout boundary\n\nNo PCB layout from this placeholder."
     (at 25 30 0)
     (effects (font (size 2.0 2.0)) (justify left top))
     (uuid "fcbcb0bb-0992-4217-a8ec-28c9c8df4758")

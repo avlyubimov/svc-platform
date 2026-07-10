@@ -465,6 +465,7 @@ SCHEMATIC_CAPTURE_WORK_QUEUE_COLUMNS = (
 CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
     "CAP-INP": (
         "PB-100-input-reverse-package-trace.csv",
+        "PB-100-input-reverse-freeze-review.csv",
         "PB-100-board-current-budget-trace.csv",
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-tvs-load-dump-margin-trace.csv",
@@ -609,6 +610,16 @@ REQUIRED_INPUT_POWER_ITEMS = {
     "Bus voltage sense",
     "Protected battery distribution",
 }
+REQUIRED_INPUT_REVERSE_FREEZE_REVIEW_ITEMS = {
+    "Controller gate default",
+    "Preferred TOLL path",
+    "80V LFPAK88 alternate",
+    "Dual PowerPAK fallback",
+    "Protected measurement sequence",
+    "TVS overshoot dependency",
+    "Assembly and sourcing gate",
+    "Layout authorization boundary",
+}
 REQUIRED_LOGIC_POWER_VALUE_ITEMS = {
     "Input filter",
     "UVLO divider",
@@ -724,6 +735,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv",
+    "hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv",
     "hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv",
     "hardware/power-board/PB-100/PB-100-output-net-expansion.csv",
@@ -1885,7 +1897,11 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-low-current-output-freeze-review.csv",
             "ADR-0011",
         ),
-        "Input reverse protection": ("PB-100-input-reverse-package-trace.csv", "PB-100-input-reverse-protection.md"),
+        "Input reverse protection": (
+            "PB-100-input-reverse-package-trace.csv",
+            "PB-100-input-reverse-freeze-review.csv",
+            "PB-100-input-reverse-protection.md",
+        ),
         "TVS/load-dump protection": ("PB-100-tvs-load-dump-margin-trace.csv", "PB-100-protection-validation.csv"),
         "Logic power rails": ("PB-100-logic-power-rail-trace.csv", "PB-100-logic-power-budget.csv"),
         "Current telemetry": (
@@ -1924,6 +1940,7 @@ def validate_schematic_freeze_gap_register() -> None:
     input_text = " ".join(rows_by_gate["Input reverse protection"].values())
     for token in (
         "PB-100-input-reverse-package-trace.csv",
+        "PB-100-input-reverse-freeze-review.csv",
         "Q1",
         "40 A",
         "IAUTN06S5N008",
@@ -3257,6 +3274,91 @@ def validate_input_reverse_package_trace() -> None:
         for token in ("IAUTN06S5N008", "BUK7S1R2-80M", "SIDR626LDP"):
             if token not in checked_text:
                 fail(f"{checked_path.relative_to(REPO_ROOT)} must retain input reverse alternate {token}")
+
+
+def validate_input_reverse_freeze_review() -> None:
+    path = PB100_DIR / "PB-100-input-reverse-freeze-review.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty input reverse freeze review: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in OUTPUT_FREEZE_REVIEW_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_item: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        review_item = row["Review item"].strip()
+        if review_item not in REQUIRED_INPUT_REVERSE_FREEZE_REVIEW_ITEMS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown input reverse review item {review_item}")
+        if review_item in rows_by_item:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate input reverse review item {review_item}")
+        rows_by_item[review_item] = row
+        for column in OUTPUT_FREEZE_REVIEW_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+
+    missing_items = sorted(REQUIRED_INPUT_REVERSE_FREEZE_REVIEW_ITEMS - rows_by_item.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing input reverse review items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    review_text = read_text(path)
+    for token in (
+        "LM74700-Q1",
+        "INPUT_FET_GATE",
+        "controller-unpowered off state",
+        "LM74502-Q1",
+        "IAUTN06S5N008ATMA1",
+        "60V TOLL",
+        "0.76mΩ",
+        "2.43W at 40A",
+        "BUK7S1R2-80M",
+        "80V LFPAK88",
+        "3.84W at 40A",
+        "Dual SIDR626LDP",
+        "20A per FET",
+        "single 2.1mΩ PowerPAK",
+        "VBAT_REV_PROT",
+        "VBAT_PROT",
+        "IIN_SHUNT_HI",
+        "IIN_SHUNT_LO",
+        "HM3 TVS",
+        "JLCPCB PCBWay",
+        "critical alternatives",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+    ):
+        if token not in review_text:
+            fail(f"input reverse freeze review must include {token}")
+
+    trace_text = read_text(PB100_DIR / "PB-100-input-reverse-package-trace.csv")
+    for token in ("IAUTN06S5N008ATMA1", "BUK7S1R2-80M", "Dual SIDR626LDP", "40 A", "JLCPCB PCBWay"):
+        if token not in trace_text:
+            fail(f"input reverse package trace must support freeze review token {token}")
+
+    pin_contract_text = read_text(PB100_DIR / "PB-100-input-protection-pin-contract.csv")
+    for token in ("Q1", "VBAT_RAW", "VBAT_REV_PROT", "INPUT_FET_GATE", "IIN_SHUNT_HI", "IIN_SHUNT_LO"):
+        if token not in pin_contract_text:
+            fail(f"input protection pin contract must support freeze review token {token}")
+
+    tvs_margin_text = read_text(PB100_DIR / "PB-100-tvs-load-dump-margin-trace.csv")
+    for token in ("IAUTN06S5N008", "60 V", "BUK7S1R2-80M", "80 V", "SM8S33AHM3/I"):
+        if token not in tvs_margin_text:
+            fail(f"TVS margin trace must support input reverse freeze review token {token}")
+
+    sourcing_text = read_text(REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv")
+    for token in ("INPUT_REVERSE_FET", "TOLL", "BUK7S1R2-80M", "SIDR626LDP"):
+        if token not in sourcing_text:
+            fail(f"assembly sourcing recheck must support input reverse freeze review token {token}")
 
 
 def validate_logic_power_design_values() -> None:
@@ -5146,6 +5248,9 @@ def validate_validation_traceability() -> None:
             if "pb-100-low-current-output-freeze-review.csv" not in row_text:
                 fail("Low-current output validation trace must include freeze review")
         if freeze_gate == "Input reverse protection":
+            if "pb-100-input-reverse-freeze-review.csv" not in row_text:
+                fail("Input reverse validation trace must include freeze review")
+        if freeze_gate == "Input reverse protection":
             if "q1" not in row_text or "40 a" not in row_text:
                 fail("Input reverse validation trace must keep Q1 and 40 A explicit")
         if freeze_gate == "Factory assembly readiness" and "sourcing recheck" not in row_text:
@@ -5620,6 +5725,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-can1-tx-disable-trace.csv",
         "PB-100-can1-production-dnp-review.csv",
         "PB-100-input-reverse-package-trace.csv",
+        "PB-100-input-reverse-freeze-review.csv",
         "PB-100-tvs-load-dump-margin-trace.csv",
         "PB-100-current-telemetry-trace.csv",
         "PB-100-current-telemetry-freeze-review.csv",
@@ -5701,6 +5807,7 @@ def main() -> int:
     validate_output_stage_design_values()
     validate_input_power_design_values()
     validate_input_reverse_package_trace()
+    validate_input_reverse_freeze_review()
     validate_board_current_budget_trace()
     validate_board_current_budget_freeze_review()
     validate_current_telemetry_trace()

@@ -106,6 +106,10 @@ Current coverage:
 - Q1 input reverse planning now has a package/thermal trace tying
   `IAUTN06S5N008ATMA1`, `BUK7S1R2-80M`, dual `SIDR626LDP`, the 40 A board
   budget, shunt measurement boundary, and assembly-source blockers together.
+- Q1 input reverse freeze review now ties LM74700 default-off behavior,
+  TOLL/LFPAK/PowerPAK alternates, protected measurement sequence, HM3 TVS
+  dependency, sourcing gate, and no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`.
 - The PB-100 board-current budget now has a cross-artifact trace tying the
   50 A main fuse target, 40 A board/configuration limit, 0-60 A total-current
   telemetry range, and 0.5 mΩ shunt operating point together; schematic freeze
