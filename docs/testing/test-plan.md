@@ -103,7 +103,8 @@ ordered rule execution, and stale-telemetry denial in one processing step.
 - CAN1 listen-only tests trace to
   `hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv`,
   `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`, and
-  `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`.
+  `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`, plus
+  `hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv`.
 - Input reverse-protection tests trace to
   `hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv` and
   `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`.

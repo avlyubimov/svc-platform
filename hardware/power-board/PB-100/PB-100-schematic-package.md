@@ -26,6 +26,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv`
 - `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`
+- `hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv`
 - `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
@@ -97,6 +98,9 @@ It is not a PCB layout package.
 - Board-to-board interface: stable PB-100 to LB-100 connector.
 - Safety interlocks: CAN1 TX disable status/control if CAN1 routing crosses
   PB-100.
+- CAN1 production DNP review: `JP_CAN1` remains DNP/open, `U_CAN1` defaults
+  disabled, `CAN1_TX_DISABLED_STATUS` reports physical disabled state, and
+  future CAN1 TX requires ADR plus hardware action.
 
 ## Board-to-board signal budget
 

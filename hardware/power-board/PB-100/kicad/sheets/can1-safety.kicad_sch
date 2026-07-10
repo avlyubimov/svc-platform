@@ -10,10 +10,10 @@
     (company "SVC Platform")
     (comment 9 "Work queue: CAP-CAN1. CAN1 capture keeps TX DNP/open and future ADR only.")
     (comment 1 "Capture contract: JP_CAN1 DNP/open TX link and U_CAN1 default-disabled gate.")
-    (comment 2 "Sources: PB-100-can1-tx-disable-trace.csv and PB-100-can1-tx-disable.md.")
+    (comment 2 "Sources: PB-100-can1-tx-disable-trace.csv, PB-100-can1-production-dnp-review.csv, and PB-100-can1-tx-disable.md.")
   )
   (lib_symbols)
-  (text "CAN1 safety capture notes:\n- Source trace: PB-100-can1-tx-disable-trace.csv\n- JP_CAN1 is the DNP/open physical missing-link in CAN1_TX_ROUTE\n- U_CAN1 is the optional default-disabled gate or silent-control element\n- CAN1_TX_ROUTE has no default-populated TX item\n- CAN1_TX_DISABLE_CMD defaults to disable by hardware pull\n- CAN1_TX_DISABLED_STATUS reflects physical disabled state and is visible to LB-100\n- CAN1_RX_ROUTE may be populated independently if CAN1 crosses PB-100\n- Any CAN1 TX enable path requires a future ADR and hardware action\n\nRev.1 firmware must not transmit on vehicle CAN."
+  (text "CAN1 safety capture notes:\n- Source trace: PB-100-can1-tx-disable-trace.csv\n- Production DNP review: PB-100-can1-production-dnp-review.csv\n- JP_CAN1 is the DNP/open physical missing-link in CAN1_TX_ROUTE\n- U_CAN1 is the optional default-disabled gate or silent-control element\n- CAN1_TX_ROUTE has no default-populated TX item\n- CAN1_TX_DISABLE_CMD defaults to disable by hardware pull\n- CAN1_TX_DISABLED_STATUS reflects physical disabled state and is visible to LB-100\n- CAN1_RX_ROUTE may be populated independently if CAN1 crosses PB-100\n- Any CAN1 TX enable path requires a future ADR and hardware action\n\nRev.1 firmware must not transmit on vehicle CAN."
     (at 25 30 0)
     (effects (font (size 2.0 2.0)) (justify left top))
     (uuid "334af018-6f16-4dbd-bfd6-d7e0c3fd87e8")

@@ -344,6 +344,15 @@ CAN1_TX_DISABLE_TRACE_COLUMNS = (
     "Blocked change",
     "Freeze dependency",
 )
+CAN1_PRODUCTION_DNP_REVIEW_COLUMNS = (
+    "Review item",
+    "Signal or artifact",
+    "Required default",
+    "Primary evidence",
+    "Verification method",
+    "Pass condition",
+    "Blocked action",
+)
 GARAGE_CONNECTOR_FUSE_PLAN_COLUMNS = (
     "Interface",
     "Target current or fuse",
@@ -441,7 +450,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-b2b-interface-trace.csv",
         "PB-100-b2b-lb100-resource-binding.csv",
     ),
-    "CAP-CAN1": ("PB-100-can1-tx-disable-trace.csv",),
+    "CAP-CAN1": ("PB-100-can1-tx-disable-trace.csv", "PB-100-can1-production-dnp-review.csv"),
 }
 REVIEW_RELEASE_MANIFEST_COLUMNS = (
     "Artifact",
@@ -560,6 +569,15 @@ REQUIRED_CAN1_SAFETY_REQUIREMENTS = {
     "Firmware safety",
     "Future TX change process",
 }
+REQUIRED_CAN1_PRODUCTION_DNP_REVIEW_ITEMS = {
+    "Physical missing link",
+    "Default disabled gate",
+    "Physical status readback",
+    "RX independence",
+    "Firmware listen-only",
+    "Future change process",
+    "Factory DNP ownership",
+}
 REQUIRED_FAULT_IDS = {
     "PBFLT-INPUT-REV",
     "PBFLT-LOAD-DUMP",
@@ -616,6 +634,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-fault-response-matrix.csv",
     "hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv",
     "hardware/power-board/PB-100/PB-100-can1-safety-verification.csv",
+    "hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv",
     "hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv",
     "hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md",
@@ -1649,7 +1668,7 @@ def validate_schematic_readiness_dashboard() -> None:
         "Logic power values": ("PB-100-logic-power-rail-trace.csv",),
         "BOM synchronization": ("PB-100-assembly-readiness-trace.csv",),
         "Assembly sourcing recheck": ("PB-100-assembly-readiness-trace.csv",),
-        "CAN1 safety": ("PB-100-can1-tx-disable-trace.csv",),
+        "CAN1 safety": ("PB-100-can1-tx-disable-trace.csv", "PB-100-can1-production-dnp-review.csv"),
         "CAN1 safety verification": ("PB-100-can1-tx-disable-trace.csv",),
     }
     for area, tokens in required_dashboard_evidence.items():
@@ -1743,7 +1762,11 @@ def validate_schematic_freeze_gap_register() -> None:
         )
 
     required_checklist_evidence = {
-        "CAN1 safety policy": ("PB-100-can1-tx-disable-trace.csv", "PB-100-can1-safety-verification.csv"),
+        "CAN1 safety policy": (
+            "PB-100-can1-tx-disable-trace.csv",
+            "PB-100-can1-safety-verification.csv",
+            "PB-100-can1-production-dnp-review.csv",
+        ),
         "Board current budget": ("PB-100-board-current-budget-trace.csv", "PB-100-input-power-design-values.csv"),
         "Board-to-board interface": (
             "PB-100-b2b-interface-trace.csv",
@@ -1772,6 +1795,7 @@ def validate_schematic_freeze_gap_register() -> None:
         fail("CAN1 safety policy gap must keep DNP/open default explicit")
     for token in (
         "PB-100-can1-tx-disable-trace.csv",
+        "PB-100-can1-production-dnp-review.csv",
         "JP_CAN1",
         "U_CAN1",
         "future ADR",
@@ -3188,6 +3212,103 @@ def validate_can1_safety_verification() -> None:
         fail("CAN1 future TX process must require future ADR and hardware action")
 
 
+def validate_can1_production_dnp_review() -> None:
+    path = PB100_DIR / "PB-100-can1-production-dnp-review.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty CAN1 production DNP review: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in CAN1_PRODUCTION_DNP_REVIEW_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_item: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        review_item = row["Review item"].strip()
+        if review_item not in REQUIRED_CAN1_PRODUCTION_DNP_REVIEW_ITEMS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown CAN1 review item {review_item}")
+        if review_item in rows_by_item:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate CAN1 review item {review_item}")
+        rows_by_item[review_item] = row
+        for column in CAN1_PRODUCTION_DNP_REVIEW_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if review_item in {"Physical missing link", "Factory DNP ownership"}:
+            if "dnp/open" not in row_text or "no default-populated" not in row_text:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1 DNP rows must keep no-default-populated TX explicit")
+        if review_item == "Future change process":
+            if "future adr" not in row_text or "hardware action" not in row_text or "configuration" not in row_text:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1 future process must block configuration-only TX enable")
+
+    missing_items = sorted(REQUIRED_CAN1_PRODUCTION_DNP_REVIEW_ITEMS - rows_by_item.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing CAN1 production DNP review items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    review_text = read_text(path)
+    for token in (
+        "JP_CAN1",
+        "U_CAN1",
+        "DNP/open",
+        "no default-populated",
+        "future ADR",
+        "explicit hardware action",
+        "physical disabled state",
+        "not firmware-only",
+        "CAN2 expansion TX remains separate",
+        "Configuration alone cannot enable vehicle-CAN TX",
+        "Do not enable vehicle-CAN TX through configuration only",
+    ):
+        if token not in review_text:
+            fail(f"CAN1 production DNP review must include {token}")
+
+    tx_row_text = " ".join(rows_by_item["Physical missing link"].values()).lower()
+    if "can1_tx_route" not in tx_row_text or "jp_can1" not in tx_row_text:
+        fail("CAN1 production DNP review must bind JP_CAN1 to CAN1_TX_ROUTE")
+    gate_row_text = " ".join(rows_by_item["Default disabled gate"].values()).lower()
+    if "can1_tx_disable_cmd" not in gate_row_text or "u_can1" not in gate_row_text or "reset" not in gate_row_text:
+        fail("CAN1 production DNP review must bind U_CAN1 disable default to reset/unpowered state")
+    status_row_text = " ".join(rows_by_item["Physical status readback"].values()).lower()
+    if "can1_tx_disabled_status" not in status_row_text or "physical disabled state" not in status_row_text:
+        fail("CAN1 production DNP review must bind disabled-status readback to physical state")
+    rx_row_text = " ".join(rows_by_item["RX independence"].values()).lower()
+    if "can1_rx_route" not in rx_row_text or "listen-only rx" not in rx_row_text:
+        fail("CAN1 production DNP review must keep RX independent for listen-only RX")
+
+    production_texts = {
+        "Factory BOM": read_text(REPO_ROOT / "production" / "bom" / "factory_bom_draft.csv"),
+        "Symbol BOM map": read_text(REPO_ROOT / "production" / "bom" / "pb100_symbol_bom_map.csv"),
+        "Assembly recheck": read_text(REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv"),
+        "Assembly readiness": read_text(PB100_DIR / "PB-100-assembly-readiness-trace.csv"),
+    }
+    for label, text in production_texts.items():
+        lower_text = text.lower()
+        for token in ("can1_tx_disable", "dnp/open", "no default-populated"):
+            if token not in lower_text:
+                fail(f"{label} must retain CAN1 production DNP token {token}")
+
+    firmware_readme = read_text(REPO_ROOT / "firmware" / "README.md").lower()
+    if "can1" not in firmware_readme or "listen-only" not in firmware_readme or "can2" not in firmware_readme:
+        fail("firmware README must keep CAN1 listen-only and CAN2 expansion boundary")
+    firmware_tests = read_text(REPO_ROOT / "firmware" / "tests" / "test_can_safety.c")
+    for token in (
+        "test_can1_tx_is_denied_when_disabled_status_true",
+        "test_can1_tx_is_denied_when_disabled_status_false",
+        "test_can2_tx_is_allowed_for_expansion",
+    ):
+        if token not in firmware_tests:
+            fail(f"CAN1 production DNP review requires firmware test {token}")
+
+
 def validate_board_current_budget_trace() -> None:
     path = PB100_DIR / "PB-100-board-current-budget-trace.csv"
     validate_csv(path)
@@ -3538,8 +3659,20 @@ def validate_can1_capture_contract() -> None:
         if token not in can1_doc:
             fail(f"PB-100 CAN1 TX-disable document must include {token}")
 
+    production_review = read_text(PB100_DIR / "PB-100-can1-production-dnp-review.csv").lower()
+    for token in ("jp_can1", "u_can1", "dnp/open", "no default-populated", "firmware-only"):
+        if token not in production_review:
+            fail(f"CAN1 production DNP review must include {token}")
+
     can1_sheet = read_text(KICAD_DIR / "sheets" / "can1-safety.kicad_sch").lower()
-    for token in ("jp_can1", "u_can1", "dnp/open", "no default-populated tx", "physical disabled state"):
+    for token in (
+        "jp_can1",
+        "u_can1",
+        "dnp/open",
+        "no default-populated tx",
+        "physical disabled state",
+        "pb-100-can1-production-dnp-review.csv",
+    ):
         if token not in can1_sheet:
             fail(f"CAN1 safety KiCad sheet capture notes must include {token}")
 
@@ -4379,6 +4512,8 @@ def validate_validation_traceability() -> None:
         if freeze_gate == "CAN1 safety policy":
             if "dnp/open" not in row_text or "read-only" not in row_text or "future adr" not in row_text:
                 fail("CAN1 validation trace must keep DNP/open read-only and future ADR explicit")
+            if "pb-100-can1-production-dnp-review.csv" not in row_text:
+                fail("CAN1 validation trace must include production DNP review")
         if freeze_gate == "Input reverse protection":
             if "q1" not in row_text or "40 a" not in row_text:
                 fail("Input reverse validation trace must keep Q1 and 40 A explicit")
@@ -4850,6 +4985,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-high-medium-output-baseline-trace.csv",
         "PB-100-low-current-output-baseline-trace.csv",
         "PB-100-can1-tx-disable-trace.csv",
+        "PB-100-can1-production-dnp-review.csv",
         "PB-100-input-reverse-package-trace.csv",
         "PB-100-tvs-load-dump-margin-trace.csv",
         "PB-100-current-telemetry-trace.csv",
@@ -4934,6 +5070,7 @@ def main() -> int:
     validate_logic_power_design_values()
     validate_can1_tx_disable_trace()
     validate_can1_safety_verification()
+    validate_can1_production_dnp_review()
     validate_can1_capture_contract()
     validate_assembly_sourcing_recheck()
     validate_assembly_readiness_trace()

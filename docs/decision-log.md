@@ -1529,3 +1529,19 @@ Reason: Garage-installed items must stay limited to user-serviceable
 connectors, fuses, enclosure, wiring, and harness hardware. Machine-checking
 the existing plan prevents factory/garage ownership drift without changing
 component requirements or starting PCB layout.
+
+## 2026-07-10 — PB-100 CAN1 production DNP review
+
+Decision: PB-100 schematic planning now includes
+`PB-100-can1-production-dnp-review.csv`, tying `JP_CAN1` DNP/open production
+state, `U_CAN1` default-disabled behavior, physical disabled-status readback,
+listen-only RX independence, firmware CAN1 deny/CAN2 expansion separation, and
+the future-ADR plus hardware-action boundary into one review artifact. The
+PB-100 validator now fails if the release packet, freeze checklist, capture
+queue, test plan, KiCad CAN1 sheet note, or BOM-facing CAN1 evidence drops this
+production-DNP boundary.
+
+Reason: CAN1 read-only behavior is a constitutional hardware safety rule. The
+schematic freeze gate needs explicit production ownership of the DNP/open TX
+path so configuration or firmware cannot silently create a vehicle-CAN TX path
+without a future ADR and deliberate hardware action.
