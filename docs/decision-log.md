@@ -1579,3 +1579,20 @@ Reason: Current telemetry is both measurement hardware and firmware safety
 input. Schematic freeze must preserve range, calibration, interface ownership,
 and stale-data behavior without authorizing high-current copper layout or
 hard-coded firmware calibration constants.
+
+## 2026-07-10 — PB-100 thermal telemetry freeze review
+
+Decision: PB-100 schematic planning now includes
+`PB-100-thermal-telemetry-freeze-review.csv`, tying the three required thermal
+zones, TDK NTCGS103JF103FT8-class 10 kΩ 150 °C AEC-Q200 NTC direction,
+Vishay/Murata alternates, divider/ADC scaling, placement intent, 85/105/75 °C
+configuration thresholds, stale-thermal-telemetry cutoff behavior, calibration
+boundary, assembly recheck, and bench validation into one review artifact. The
+PB-100 validator now checks this artifact against the thermal strategy, map,
+configuration defaults, firmware thermal tests, freeze checklist, validation
+traceability, and schematic review packet.
+
+Reason: Thermal telemetry is a layout-sensitive safety input. Schematic freeze
+must keep sensor count, threshold ownership, fail-safe behavior, and calibration
+evidence explicit without allowing premature sensor placement or thermal-copper
+layout.

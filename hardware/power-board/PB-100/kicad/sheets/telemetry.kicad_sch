@@ -10,10 +10,10 @@
     (company "SVC Platform")
     (comment 9 "Work queue: CAP-TEL. Telemetry capture follows current and thermal maps.")
     (comment 1 "Placeholder sheet. Capture current, voltage, thermal, and board ID telemetry here.")
-    (comment 2 "Sources: PB-100-current-telemetry-trace.csv, PB-100-current-telemetry-freeze-review.csv, PB-100-thermal-telemetry-trace.csv, telemetry maps.")
+    (comment 2 "Sources: PB-100-current-telemetry-trace.csv, PB-100-current-telemetry-freeze-review.csv, PB-100-thermal-telemetry-trace.csv, PB-100-thermal-telemetry-freeze-review.csv, telemetry maps.")
   )
   (lib_symbols)
-  (text "Telemetry capture notes:\n- Source traces: PB-100-current-telemetry-trace.csv, PB-100-current-telemetry-freeze-review.csv, PB-100-thermal-telemetry-trace.csv\n- OUT1_IMON..OUT10_IMON scaled into LB_3V3_IO ADC domain\n- IIN_SENSE total input current path\n- 0.5 mOhm shunt review covers INA228 range, Kelvin sense, ADC/I2C ownership, and calibration config\n- VBAT_SENSE divider\n- TEMP_PCB, TEMP_PWR_A, TEMP_PWR_B\n- PB_ID_ADC board identity fallback\n- PB_I2C reserved for digital monitor options\n\nMissing telemetry is a safe fault."
+  (text "Telemetry capture notes:\n- Source traces: PB-100-current-telemetry-trace.csv, PB-100-current-telemetry-freeze-review.csv, PB-100-thermal-telemetry-trace.csv, PB-100-thermal-telemetry-freeze-review.csv\n- OUT1_IMON..OUT10_IMON scaled into LB_3V3_IO ADC domain\n- IIN_SENSE total input current path\n- 0.5 mOhm shunt review covers INA228 range, Kelvin sense, ADC/I2C ownership, and calibration config\n- VBAT_SENSE divider\n- TEMP_PCB, TEMP_PWR_A, TEMP_PWR_B use NTC divider/ADC scaling and placement review\n- PB_ID_ADC board identity fallback\n- PB_I2C reserved for digital monitor options\n\nMissing telemetry is a safe fault."
     (at 25 30 0)
     (effects (font (size 2.0 2.0)) (justify left top))
     (uuid "22f2602f-e9e3-4f6a-a30d-8dafd87577eb")

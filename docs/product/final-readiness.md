@@ -68,6 +68,10 @@ Current coverage:
 - Thermal telemetry now has a trace tying `TEMP_PCB`, `TEMP_PWR_A`, and
   `TEMP_PWR_B` to the TDK NTC candidate, default 85/105/75 °C thresholds,
   configuration-owned calibration, and firmware thermal fail-safe behavior.
+- Thermal telemetry freeze review now ties NTC sensor class, divider/ADC
+  scaling, placement zones, threshold ownership, stale-telemetry cutoff,
+  assembly alternates, and bench validation into
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`.
 - Logic power now has a trace tying the LM5164-Q1-class 100 V 1 A default,
   LM5013-Q1-class 100 V fallback, protected `PB_5V_OUT`, `PB_PWR_GOOD`, and
   rail-invalid default-off behavior together.

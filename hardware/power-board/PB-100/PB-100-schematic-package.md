@@ -70,6 +70,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-review-release-manifest.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`
 
 ## Electrical baseline
 
@@ -85,6 +86,10 @@ It is not a PCB layout package.
   headroom, Kelvin sense, ADC/I2C ownership, per-output IMON scaling,
   calibration configuration, and stale-telemetry safe faults are tracked in
   `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`.
+- Thermal telemetry freeze review: NTC sensor class, divider/ADC scaling,
+  placement zones, 85/105/75 °C thresholds, firmware fail-safe behavior,
+  calibration, assembly alternates, and bench validation are tracked in
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`.
 - Outputs: 10 generic high-side protected channels.
 - CAN1: read-only by default; TX physically disabled.
 

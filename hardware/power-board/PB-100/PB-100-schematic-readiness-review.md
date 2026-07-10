@@ -62,6 +62,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`
 - `hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv`
@@ -107,7 +108,7 @@ The schematic review packet consists of:
 | TVS/load dump | Clamp and overshoot margin trace against every selected downstream voltage class |
 | Logic power | Logic power rail trace, LM5164 pin template, logic power design values, final buck current budget, EMI parts, UVLO, feedback, and power-good implementation |
 | Current telemetry | Current telemetry trace, current telemetry freeze review, INA228 pin template, board-current budget trace, 40 A freeze review, ADC scaling, filtering, calibration plan, and total-current monitor choice |
-| Thermal telemetry | Thermal telemetry trace, final sensor values, divider values, placement notes, calibration, and derating thresholds |
+| Thermal telemetry | Thermal telemetry trace, thermal telemetry freeze review, final sensor values, divider values, placement notes, calibration, and derating thresholds |
 | Test points | Bring-up, telemetry, output, fused-output, and CAN1 safety test points are defined without footprint or placement lock |
 | Fault response | Input, logic, B2B, output, thermal, current-budget, CAN1, and identity faults have safe hardware defaults and firmware responses |
 | Hardware capabilities | Role-free PB-100 capabilities align with output matrix, telemetry maps, config defaults, and CAN1 read-only policy |

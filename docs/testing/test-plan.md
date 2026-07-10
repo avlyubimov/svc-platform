@@ -118,7 +118,8 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   and
   `docs/adr/ADR-0008-pb-100-current-budget.md`.
 - Thermal derating tests trace to
-  `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`.
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv` and
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`.
 - B2B interface tests trace to
   `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`,
   `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`, and

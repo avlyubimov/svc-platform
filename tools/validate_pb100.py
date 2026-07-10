@@ -303,6 +303,14 @@ THERMAL_TELEMETRY_TRACE_COLUMNS = (
     "Configuration boundary",
     "Freeze dependency",
 )
+THERMAL_TELEMETRY_FREEZE_REVIEW_COLUMNS = (
+    "Review item",
+    "Required boundary",
+    "Primary evidence",
+    "Schematic freeze check",
+    "Pass condition",
+    "Blocked action",
+)
 LOGIC_POWER_RAIL_TRACE_COLUMNS = (
     "Trace item",
     "Net or ref",
@@ -466,6 +474,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-current-telemetry-trace.csv",
         "PB-100-current-telemetry-freeze-review.csv",
         "PB-100-thermal-telemetry-trace.csv",
+        "PB-100-thermal-telemetry-freeze-review.csv",
     ),
     "CAP-B2B": (
         "PB-100-b2b-interface-trace.csv",
@@ -619,6 +628,16 @@ REQUIRED_CURRENT_TELEMETRY_FREEZE_REVIEW_ITEMS = {
     "Stale telemetry safe fault",
     "Bench validation path",
 }
+REQUIRED_THERMAL_TELEMETRY_FREEZE_REVIEW_ITEMS = {
+    "Sensor class",
+    "Divider and ADC scaling",
+    "Placement zones",
+    "Configuration thresholds",
+    "Firmware fail-safe",
+    "Calibration boundary",
+    "Assembly and alternates",
+    "Bench validation path",
+}
 REQUIRED_FAULT_IDS = {
     "PBFLT-INPUT-REV",
     "PBFLT-LOAD-DUMP",
@@ -668,6 +687,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv",
+    "hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv",
     "hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv",
@@ -1831,7 +1851,11 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-current-telemetry-freeze-review.csv",
             "PB-100-current-telemetry-map.csv",
         ),
-        "Thermal telemetry": ("PB-100-thermal-telemetry-trace.csv", "PB-100-thermal-telemetry-map.csv"),
+        "Thermal telemetry": (
+            "PB-100-thermal-telemetry-trace.csv",
+            "PB-100-thermal-telemetry-freeze-review.csv",
+            "PB-100-thermal-telemetry-map.csv",
+        ),
         "Factory assembly readiness": ("PB-100-assembly-readiness-trace.csv", "pb100_sourcing_evidence_snapshot.csv"),
         "Garage assembly readiness": ("PB-100-assembly-readiness-trace.csv", "PB-100-garage-connector-fuse-plan.md"),
     }
@@ -1899,7 +1923,13 @@ def validate_schematic_freeze_gap_register() -> None:
         if token not in current_telemetry_text:
             fail(f"Current telemetry gap must keep {token} explicit")
     thermal_telemetry_text = " ".join(rows_by_gate["Thermal telemetry"].values())
-    for token in ("PB-100-thermal-telemetry-trace.csv", "NTCGS103JF103FT8", "self-heating", "firmware thresholds"):
+    for token in (
+        "PB-100-thermal-telemetry-trace.csv",
+        "PB-100-thermal-telemetry-freeze-review.csv",
+        "NTCGS103JF103FT8",
+        "self-heating",
+        "firmware thresholds",
+    ):
         if token not in thermal_telemetry_text:
             fail(f"Thermal telemetry gap must keep {token} explicit")
     logic_power_text = " ".join(rows_by_gate["Logic power rails"].values())
@@ -3821,6 +3851,104 @@ def validate_thermal_telemetry_trace() -> None:
             fail(f"firmware README must keep thermal safety coverage token: {token}")
 
 
+def validate_thermal_telemetry_freeze_review() -> None:
+    path = PB100_DIR / "PB-100-thermal-telemetry-freeze-review.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty thermal telemetry freeze review: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in THERMAL_TELEMETRY_FREEZE_REVIEW_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_item: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        review_item = row["Review item"].strip()
+        if review_item not in REQUIRED_THERMAL_TELEMETRY_FREEZE_REVIEW_ITEMS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown thermal telemetry review item {review_item}")
+        if review_item in rows_by_item:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate thermal telemetry review item {review_item}")
+        rows_by_item[review_item] = row
+        for column in THERMAL_TELEMETRY_FREEZE_REVIEW_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if review_item == "Configuration thresholds" and "configuration" not in row_text:
+            fail("thermal telemetry freeze review must keep thresholds in configuration")
+        if review_item == "Firmware fail-safe" and "stale" not in row_text:
+            fail("thermal telemetry freeze review must keep stale telemetry fail-safe behavior")
+
+    missing_items = sorted(REQUIRED_THERMAL_TELEMETRY_FREEZE_REVIEW_ITEMS - rows_by_item.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing thermal telemetry review items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    review_text = read_text(path)
+    for token in (
+        "NTCGS103JF103FT8",
+        "10k",
+        "150C",
+        "AEC-Q200",
+        "TEMP_PCB",
+        "TEMP_PWR_A",
+        "TEMP_PWR_B",
+        "Vishay NTCS0402E3",
+        "Murata NCU18",
+        "85C warn 105C cutoff",
+        "75C recovery",
+        "LB_3V3_IO ADC",
+        "self-heating",
+        "configuration and calibration data not firmware constants",
+        "Stale thermal telemetry",
+        "test_stale_thermal_telemetry_forces_cutoff",
+        "PB-BENCH-009",
+        "Do not place sensors or thermal copper before schematic freeze",
+    ):
+        if token not in review_text:
+            fail(f"thermal telemetry freeze review must include {token}")
+
+    thermal_doc = read_text(PB100_DIR / "PB-100-thermal-telemetry.md")
+    for token in ("NTCGS103JF103FT8", "10 kΩ", "3435 K", "150 °C", "self-heating", "configuration/calibration"):
+        if token not in thermal_doc:
+            fail(f"thermal telemetry strategy must support freeze review token {token}")
+
+    thermal_map_text = read_text(PB100_DIR / "PB-100-thermal-telemetry-map.csv")
+    for token in ("TEMP_PCB", "TEMP_PWR_A", "TEMP_PWR_B", "-40 to 150", "85C warn 105C cutoff 75C recovery"):
+        if token not in thermal_map_text:
+            fail(f"thermal telemetry map must support freeze review token {token}")
+
+    config_text = read_text(REPO_ROOT / "firmware" / "configs" / "config-example.json")
+    for token in ("\"warn_c\": 85", "\"cutoff_c\": 105", "\"recovery_c\": 75"):
+        if token not in config_text:
+            fail(f"thermal config example must support freeze review token {token}")
+
+    firmware_joined = "\n".join(
+        (
+            read_text(REPO_ROOT / "firmware" / "tests" / "test_thermal_service.c"),
+            read_text(REPO_ROOT / "firmware" / "tests" / "test_system_safety.c"),
+            read_text(REPO_ROOT / "firmware" / "tests" / "test_config_validator.c"),
+        )
+    )
+    for token in (
+        "test_default_thermal_config_is_valid",
+        "test_invalid_thermal_config_is_rejected",
+        "test_thermal_derate_publishes_event_without_disabling_outputs",
+        "test_thermal_cutoff_disables_active_outputs",
+        "test_stale_thermal_telemetry_disables_active_outputs",
+        "test_stale_thermal_telemetry_forces_cutoff",
+    ):
+        if token not in firmware_joined:
+            fail(f"firmware tests must retain thermal freeze review token {token}")
+
+
 def validate_logic_power_rail_trace() -> None:
     path = PB100_DIR / "PB-100-logic-power-rail-trace.csv"
     validate_csv(path)
@@ -4781,6 +4909,9 @@ def validate_validation_traceability() -> None:
         if freeze_gate == "Current telemetry":
             if "pb-100-current-telemetry-freeze-review.csv" not in row_text:
                 fail("Current telemetry validation trace must include freeze review")
+        if freeze_gate == "Thermal telemetry":
+            if "pb-100-thermal-telemetry-freeze-review.csv" not in row_text:
+                fail("Thermal telemetry validation trace must include freeze review")
         if freeze_gate == "Input reverse protection":
             if "q1" not in row_text or "40 a" not in row_text:
                 fail("Input reverse validation trace must keep Q1 and 40 A explicit")
@@ -5260,6 +5391,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-board-current-budget-trace.csv",
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-thermal-telemetry-trace.csv",
+        "PB-100-thermal-telemetry-freeze-review.csv",
         "PB-100-b2b-interface-trace.csv",
         "PB-100-b2b-lb100-resource-binding.csv",
         "PB-100-assembly-readiness-trace.csv",
@@ -5337,6 +5469,7 @@ def main() -> int:
     validate_current_telemetry_trace()
     validate_current_telemetry_freeze_review()
     validate_thermal_telemetry_trace()
+    validate_thermal_telemetry_freeze_review()
     validate_logic_power_rail_trace()
     validate_logic_power_design_values()
     validate_can1_tx_disable_trace()

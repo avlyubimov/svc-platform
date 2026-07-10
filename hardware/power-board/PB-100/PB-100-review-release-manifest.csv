@@ -46,6 +46,7 @@ hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv,Telemetry,Current
 hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv,Telemetry,Current telemetry freeze review,Required,validate_current_telemetry_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-current-telemetry-map.csv,Telemetry,Current telemetry map,Required,CSV width validation,Ready
 hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv,Telemetry,Thermal telemetry and firmware safety trace,Required,validate_thermal_telemetry_trace,Conditional
+hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv,Telemetry,Thermal telemetry freeze review,Required,validate_thermal_telemetry_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-thermal-telemetry-map.csv,Telemetry,Thermal telemetry map,Required,CSV width validation,Ready
 hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv,Protection,TVS/load-dump downstream margin trace,Required,validate_tvs_load_dump_margin_trace,Conditional
 hardware/power-board/PB-100/PB-100-protection-validation.csv,Protection,TVS/load-dump protection review,Required,CSV width validation,Conditional
