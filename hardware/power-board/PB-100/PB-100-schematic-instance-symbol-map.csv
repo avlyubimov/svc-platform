@@ -2,7 +2,7 @@ Ref,Instance block,Symbol key,Concrete symbol name,Symbol state,Notes
 J1,input-protection,INPUT_CONNECTOR,PB100_INPUT_CONNECTOR_CLASS_PRELIM,Created,Garage battery input connector class
 D1,input-protection,INPUT_TVS,PB100_INPUT_TVS_PRELIM,Created,Input load-dump TVS class
 U1,input-protection,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Created,LM74700-Q1 preliminary symbol
-Q1,input-protection,INPUT_REVERSE_FET,PB100_INPUT_NMOS_TOLL_PRELIM,Pending,IAUTN06S5N008/TOLL pin evidence remains open
+Q1,input-protection,INPUT_REVERSE_FET,PB100_INPUT_NMOS_TOLL_PRELIM,Created,IAUTN06S5N008/TOLL pin evidence captured; footprint and 40 A thermal review remain open
 RSH1,input-protection,TOTAL_CURRENT_SHUNT,PB100_INPUT_SHUNT_PRELIM,Created,Four-terminal total input current shunt class
 U2,input-protection,TOTAL_CURRENT_MONITOR,PB100_INA228_Q1_PRELIM,Created,INA228-Q1 preliminary symbol
 U3,logic-power,LOGIC_BUCK,PB100_LM5164QDDATQ1_PRELIM,Created,LM5164-Q1 preliminary symbol

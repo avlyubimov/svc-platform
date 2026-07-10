@@ -1196,3 +1196,15 @@ direction and gives a concrete pair for sourcing and footprint review. The
 candidate still needs stack-height confirmation, vendor drawing review,
 vibration retention assessment, PCBA assembly handling review, and LB-100 MCU
 resource binding before the board-to-board freeze gate can close.
+
+## 2026-07-10 — PB-100 Q1 input reverse MOSFET pin evidence
+
+Decision: `PB100_INPUT_NMOS_TOLL_PRELIM` is now captured as a project-local
+preliminary KiCad symbol for the Infineon `IAUTN06S5N008` TOLL input reverse
+MOSFET. The symbol uses gate pin 1, source pins 2-8, and drain tab evidence
+from the official Infineon data sheet.
+
+Reason: Q1 was the remaining pending schematic-symbol gate in the PB-100 input
+reverse-protection path. Capturing the pin evidence removes the symbol blocker
+without freezing the TOLL footprint, PCB copper strategy, package assembly
+handling, gate clamp, or 40 A thermal path.

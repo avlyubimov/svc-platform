@@ -6,9 +6,9 @@ D1,INPUT_TVS,PB100_INPUT_TVS_PRELIM,Clamp return,GND,Clamp to ground,Return path
 U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Input sense,VBAT_RAW,PB-100 sense,Tracks raw fused battery,Reverse-controller datasheet review closes
 U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Protected sense,VBAT_REV_PROT,PB-100 sense,Valid after reverse path,Reverse-controller threshold and surge review closes
 U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Reverse FET gate drive,INPUT_FET_GATE,Controller to FET,Off when controller unpowered,Gate clamp and turn-off behavior review closes
-Q1,INPUT_REVERSE_FET,PB100_INPUT_NMOS_TOLL_PRELIM,Raw-side power terminal,VBAT_RAW,Power path,Pending symbol and package evidence,TOLL pin evidence and 40 A thermal review close
-Q1,INPUT_REVERSE_FET,PB100_INPUT_NMOS_TOLL_PRELIM,Protected-side power terminal,VBAT_REV_PROT,Power path,Pending symbol and package evidence,TOLL pin evidence and 40 A thermal review close
-Q1,INPUT_REVERSE_FET,PB100_INPUT_NMOS_TOLL_PRELIM,Gate,INPUT_FET_GATE,Controller to FET,Pending off when controller unpowered,TOLL pin evidence gate clamp and 40 A thermal review close
+Q1,INPUT_REVERSE_FET,PB100_INPUT_NMOS_TOLL_PRELIM,Raw-side power terminal,VBAT_RAW,Power path,TOLL symbol evidence captured orientation reviewed in schematic,TOLL package footprint and 40 A thermal review close
+Q1,INPUT_REVERSE_FET,PB100_INPUT_NMOS_TOLL_PRELIM,Protected-side power terminal,VBAT_REV_PROT,Power path,TOLL symbol evidence captured orientation reviewed in schematic,TOLL package footprint and 40 A thermal review close
+Q1,INPUT_REVERSE_FET,PB100_INPUT_NMOS_TOLL_PRELIM,Gate,INPUT_FET_GATE,Controller to FET,Gate pin 1 off when controller unpowered,TOLL gate clamp and 40 A thermal review close
 RSH1,TOTAL_CURRENT_SHUNT,PB100_INPUT_SHUNT_PRELIM,High-side Kelvin,IIN_SHUNT_HI,Measurement,Zero current baseline,0.5mΩ shunt value and power rating close
 RSH1,TOTAL_CURRENT_SHUNT,PB100_INPUT_SHUNT_PRELIM,Low-side Kelvin,IIN_SHUNT_LO,Measurement,Zero current baseline,0.5mΩ Kelvin routing review close
 RSH1,TOTAL_CURRENT_SHUNT,PB100_INPUT_SHUNT_PRELIM,Protected output,VBAT_PROT,Power path,Feeds protected board rail,0.5mΩ shunt dissipation and copper review close

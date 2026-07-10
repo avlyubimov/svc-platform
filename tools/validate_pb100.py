@@ -949,6 +949,43 @@ def validate_symbol_pin_evidence() -> None:
         )
 
 
+def validate_input_reverse_fet_symbol_evidence() -> None:
+    symbol_name = "PB100_INPUT_NMOS_TOLL_PRELIM"
+    symbol_text = read_text(KICAD_DIR / "lib" / "PB100.kicad_sym")
+    block = symbol_block(symbol_text, symbol_name)
+    if not block:
+        fail(f"{symbol_name} must exist after Q1 pin evidence is captured")
+
+    for pin_number, pin_name in (
+        ("1", "G"),
+        ("2", "S"),
+        ("3", "S"),
+        ("4", "S"),
+        ("5", "S"),
+        ("6", "S"),
+        ("7", "S"),
+        ("8", "S"),
+        ("Tab", "D"),
+    ):
+        expected_name = f'(name "{pin_name}"'
+        expected_number = f'(number "{pin_number}"'
+        if not any(expected_name in line and expected_number in line for line in block.splitlines()):
+            fail(f"{symbol_name} is missing Q1 pin {pin_number} {pin_name}")
+
+    if "(in_bom no)" not in block:
+        fail(f"{symbol_name} must remain excluded from BOM")
+    if "(on_board no)" not in block:
+        fail(f"{symbol_name} must remain excluded from board")
+    if '(property "Footprint" ""' not in block:
+        fail(f"{symbol_name} must not lock a TOLL footprint")
+
+    open_items_text = read_text(PB100_DIR / "PB-100-symbol-open-items.md")
+    if "Evidence captured" not in open_items_text:
+        fail("Q1 symbol-open-items row must mark evidence captured")
+    if "40 A copper/thermal review remain open" not in open_items_text:
+        fail("Q1 symbol-open-items row must keep 40 A copper/thermal review open")
+
+
 def validate_jpb1_symbol_from_pin_map() -> None:
     worklist_path = PB100_DIR / "PB-100-symbol-capture-worklist.csv"
     worklist_rows = list(csv.DictReader(worklist_path.open(newline="", encoding="utf-8")))
@@ -1095,8 +1132,6 @@ def validate_sheet_reference_map() -> None:
             sheet_path = KICAD_DIR / "sheets" / sheet_file
             if not sheet_path.exists():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: missing sheet file {sheet_file}")
-        if ref == "Q1" and capture_status != "Pending symbol":
-            fail("Q1 must remain marked Pending symbol while INPUT_REVERSE_FET is open")
         if ref == "TP1..TPn" and sheet_file != "cross-sheet-review":
             fail("TP1..TPn must remain cross-sheet-review until exact test point locations close")
 
@@ -1363,9 +1398,10 @@ def validate_schematic_readiness_dashboard() -> None:
 
     symbol_row = rows_by_area["Symbol readiness"]
     if symbol_row["Status"].strip() != "Conditional":
-        fail("Symbol readiness must remain Conditional while pending symbols exist")
-    if "INPUT_REVERSE_FET" not in symbol_row["Remaining close work"]:
-        fail("Symbol readiness must mention pending INPUT_REVERSE_FET close work")
+        fail("Symbol readiness must remain Conditional while Q1 package and assembly review remain open")
+    symbol_close_work = symbol_row["Remaining close work"].lower()
+    if "q1" not in symbol_close_work or "40 a" not in symbol_close_work:
+        fail("Symbol readiness must mention Q1 and 40 A close work")
 
     can_row = rows_by_area["CAN1 safety"]
     can_text = " ".join(can_row[column] for column in SCHEMATIC_READINESS_DASHBOARD_COLUMNS).lower()
@@ -1869,14 +1905,14 @@ def validate_input_protection_pin_contract() -> None:
             f"{', '.join(missing_nets)}"
         )
     if not q1_rows:
-        fail("input protection pin contract must include Q1 pending reverse FET rows")
+        fail("input protection pin contract must include Q1 reverse FET rows")
     q1_state = instance_by_ref["Q1"]["Symbol state"].strip()
-    if q1_state != "Pending":
-        fail("Q1 must remain Pending until INPUT_REVERSE_FET symbol evidence closes")
+    if q1_state != "Created":
+        fail("Q1 must be Created after INPUT_REVERSE_FET symbol evidence closes")
     for row in q1_rows:
         close_text = " ".join(row[column] for column in ("Default state", "Freeze dependency"))
-        if "Pending" not in close_text or "TOLL" not in close_text or "40 A" not in close_text:
-            fail("Q1 input protection rows must keep pending TOLL and 40 A review explicit")
+        if "TOLL" not in close_text or "40 A" not in close_text:
+            fail("Q1 input protection rows must keep TOLL and 40 A review explicit")
 
 
 def validate_logic_power_design_placeholders() -> None:
@@ -2923,10 +2959,8 @@ def validate_schematic_capture_work_queue() -> None:
         refs_covered_by_sheet.setdefault(sheet_file, set()).update(row_refs)
         if "Q1" in row_refs:
             row_text = " ".join(row.values())
-            if row["Capture status"].strip() != "Blocked pending symbol":
-                fail("Q1 capture work must remain Blocked pending symbol")
-            if "INPUT_REVERSE_FET" not in row_text or "TOLL" not in row_text:
-                fail("Q1 capture work must keep INPUT_REVERSE_FET and TOLL evidence blocker explicit")
+            if "INPUT_REVERSE_FET" not in row_text or "TOLL" not in row_text or "40 A" not in row_text:
+                fail("Q1 capture work must keep INPUT_REVERSE_FET, TOLL, and 40 A review explicit")
         if work_item == "CAP-CAN1":
             row_text = " ".join(row.values()).lower()
             if "dnp/open" not in row_text or "future adr" not in row_text:
@@ -3032,6 +3066,7 @@ def main() -> int:
     validate_symbol_capture_worklist()
     validate_symbol_capture_progress()
     validate_symbol_pin_evidence()
+    validate_input_reverse_fet_symbol_evidence()
     validate_jpb1_symbol_from_pin_map()
     validate_instance_symbol_map()
     validate_sheet_reference_map()

@@ -56,6 +56,9 @@ Current coverage:
   `FX18-100S-0.8SV20` candidate pair; schematic freeze must still close stack
   height, footprint drawing, vibration retention, assembly handling, and LB-100
   MCU resource binding.
+- Q1 input reverse MOSFET pin evidence is captured from the Infineon
+  `IAUTN06S5N008` data sheet; schematic freeze must still close TOLL footprint,
+  40 A copper/thermal review, assembly handling, and gate clamp behavior.
 - Close PB-100 CAN1 TX-disable schematic evidence using the `JP_CAN1`
   DNP/open link plus `U_CAN1` default-disabled/readback contract.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.

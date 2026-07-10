@@ -59,6 +59,15 @@ PB100_MAIN_FUSE_CLASS_PRELIM,1,VBAT_BATT,hardware/power-board/PB-100/PB-100-gara
 PB100_MAIN_FUSE_CLASS_PRELIM,2,VBAT_FUSED,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage fuse class,Protected side after near-battery fuse
 PB100_INPUT_CONNECTOR_CLASS_PRELIM,1,VBAT_RAW,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage input connector class,Battery input positive before reverse protection
 PB100_INPUT_CONNECTOR_CLASS_PRELIM,2,GND_IN,hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Internal Rev.1 schematic class,Garage input connector class,Battery input ground return
+PB100_INPUT_NMOS_TOLL_PRELIM,1,G,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn06s5n008-datasheet-en.pdf,Data Sheet Rev. 1.01 2023-09-01,PG-HSOF-8-1 TOLL,Gate pin
+PB100_INPUT_NMOS_TOLL_PRELIM,2,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn06s5n008-datasheet-en.pdf,Data Sheet Rev. 1.01 2023-09-01,PG-HSOF-8-1 TOLL,Source pin
+PB100_INPUT_NMOS_TOLL_PRELIM,3,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn06s5n008-datasheet-en.pdf,Data Sheet Rev. 1.01 2023-09-01,PG-HSOF-8-1 TOLL,Source pin
+PB100_INPUT_NMOS_TOLL_PRELIM,4,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn06s5n008-datasheet-en.pdf,Data Sheet Rev. 1.01 2023-09-01,PG-HSOF-8-1 TOLL,Source pin
+PB100_INPUT_NMOS_TOLL_PRELIM,5,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn06s5n008-datasheet-en.pdf,Data Sheet Rev. 1.01 2023-09-01,PG-HSOF-8-1 TOLL,Source pin
+PB100_INPUT_NMOS_TOLL_PRELIM,6,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn06s5n008-datasheet-en.pdf,Data Sheet Rev. 1.01 2023-09-01,PG-HSOF-8-1 TOLL,Source pin
+PB100_INPUT_NMOS_TOLL_PRELIM,7,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn06s5n008-datasheet-en.pdf,Data Sheet Rev. 1.01 2023-09-01,PG-HSOF-8-1 TOLL,Source pin
+PB100_INPUT_NMOS_TOLL_PRELIM,8,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn06s5n008-datasheet-en.pdf,Data Sheet Rev. 1.01 2023-09-01,PG-HSOF-8-1 TOLL,Source pin
+PB100_INPUT_NMOS_TOLL_PRELIM,Tab,D,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn06s5n008-datasheet-en.pdf,Data Sheet Rev. 1.01 2023-09-01,PG-HSOF-8-1 TOLL,Drain tab
 PB100_BUCK_INDUCTOR_CLASS_PRELIM,1,SW,hardware/power-board/PB-100/PB-100-logic-power-rails.md,Internal Rev.1 schematic class,Buck inductor class,Switching-node side of buck inductor
 PB100_BUCK_INDUCTOR_CLASS_PRELIM,2,PB_5V_OUT,hardware/power-board/PB-100/PB-100-logic-power-rails.md,Internal Rev.1 schematic class,Buck inductor class,Protected 5 V output side
 PB100_BOARD_ID_RESISTOR_CLASS_PRELIM,1,LB_3V3_IO,hardware/power-board/PB-100/PB-100-b2b-pin-map.csv,Internal Rev.1 schematic class,Board identity resistor class,Logic reference side of board ID divider
