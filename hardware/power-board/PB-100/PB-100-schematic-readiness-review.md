@@ -35,6 +35,8 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-output-net-expansion.csv`
 - `hardware/power-board/PB-100/PB-100-output-stage-design-values.csv`
+- `hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv`
+- `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-instance-plan.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-instance-symbol-map.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-sheet-reference-map.csv`
@@ -42,15 +44,22 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-schematic-net-domain-plan.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-capture-plan.md`
 - `hardware/power-board/PB-100/kicad/`
+- `hardware/power-board/PB-100/kicad/PB-100.kicad_sch`
+- `hardware/power-board/PB-100/kicad/lib/PB100.kicad_sym`
 - `hardware/power-board/PB-100/PB-100-power-path-candidates.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`
+- `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
+- `hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv`
 - `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
+- `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
+- `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`
 - `hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
@@ -61,7 +70,9 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-input-protection-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
+- `hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
+- `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
@@ -71,6 +82,7 @@ The schematic review packet consists of:
 - `production/bom/pb100_symbol_bom_map.csv`
 - `production/bom/pb100_assembly_sourcing_recheck.csv`
 - `production/bom/pb100_sourcing_evidence_snapshot.csv`
+- `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`
 
 ## Conditional work before schematic freeze
 

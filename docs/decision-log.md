@@ -1443,3 +1443,14 @@ sheet.
 Reason: The manifest is the KiCad-facing source index. If it lags the
 trace-driven capture plan, schematic work can start from obsolete planning
 inputs even while the release packet appears complete.
+
+## 2026-07-10 — PB-100 readiness review release-packet synchronization
+
+Decision: PB-100 schematic readiness review now lists every required release
+manifest artifact, including the dedicated trace files and KiCad schematic
+source files. The PB-100 validator now fails if the readiness review packet
+drops a release-manifest artifact or required capture trace.
+
+Reason: The readiness review is the top-level human handoff for schematic
+freeze work. It must match the machine-checked release manifest so reviewers do
+not miss trace evidence while approving schematic capture inputs.

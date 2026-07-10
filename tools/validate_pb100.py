@@ -4547,6 +4547,21 @@ def validate_review_release_manifest() -> None:
         )
 
 
+def validate_schematic_readiness_review() -> None:
+    path = PB100_DIR / "PB-100-schematic-readiness-review.md"
+    text = read_text(path)
+    lower_text = text.lower()
+    if "does not authorize pcb layout" not in lower_text:
+        fail(f"{path.relative_to(REPO_ROOT)} must explicitly avoid PCB layout authorization")
+    for artifact in sorted(REQUIRED_RELEASE_MANIFEST_ARTIFACTS):
+        if artifact not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} review packet must include {artifact}")
+    for tokens in CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM.values():
+        for token in tokens:
+            if token not in text:
+                fail(f"{path.relative_to(REPO_ROOT)} review packet must include trace artifact {token}")
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -4587,6 +4602,7 @@ def main() -> int:
     validate_schematic_capture_work_queue()
     validate_schematic_capture_plan()
     validate_review_release_manifest()
+    validate_schematic_readiness_review()
     validate_output_channel_pin_contract()
     validate_output_controller_pin_template()
     validate_output_net_expansion()
