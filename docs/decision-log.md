@@ -1170,3 +1170,16 @@ AEC-Q200 automotive grade while keeping all three thermal points on one common
 or calibration constants. Schematic freeze still requires ADC scaling,
 placement, self-heating review, JLCPCB/PCBWay assembly handling, and bench
 calibration.
+
+## 2026-07-10 — PB-100 CAN1 TX-disable capture contract
+
+Decision: PB-100 CAN1 safety capture now explicitly treats `JP_CAN1` as the
+DNP/open physical missing-link in `CAN1_TX_ROUTE` and `U_CAN1` as the optional
+default-disabled gate or silent-control element with physical disabled-status
+readback to LB-100.
+
+Reason: The project rule is that BMW/vehicle CAN is read-only by default.
+Documenting the capture contract and BOM ownership before final schematic
+wiring keeps the default state auditable: no default-populated TX item,
+configuration cannot enable TX, and any future transmit support still requires
+a future ADR plus explicit hardware action.

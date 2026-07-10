@@ -52,7 +52,8 @@ Current coverage:
   AEC-Q200 NTC candidate for all three thermal points; schematic freeze must
   still close divider values, ADC scaling, placement, assembly class, and
   calibration.
-- Close PB-100 CAN1 TX-disable schematic evidence.
+- Close PB-100 CAN1 TX-disable schematic evidence using the `JP_CAN1`
+  DNP/open link plus `U_CAN1` default-disabled/readback contract.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.
 - Synchronize factory and garage BOM drafts with final selections.

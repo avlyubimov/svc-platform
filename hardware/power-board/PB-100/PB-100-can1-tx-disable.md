@@ -47,6 +47,24 @@ The preferred Rev.1 schematic input is both a DNP/open TX route and a default
 asserted disable gate. This gives a physical missing-link barrier plus an
 electrical disable state.
 
+## Rev.1 capture contract
+
+The schematic capture packet must show these two refs if CAN1 safety crosses
+PB-100:
+
+| Ref | Required default | Capture intent |
+|---|---|---|
+| `JP_CAN1` | DNP/open | Physical missing-link barrier in `CAN1_TX_ROUTE`; no default-populated TX item |
+| `U_CAN1` | Disabled | Optional gate or transceiver silent-control element with hardware default that asserts `CAN1_TX_DISABLE_CMD` while LB-100 is reset, unpowered, or absent |
+
+`CAN1_TX_DISABLED_STATUS` must be sourced from the physical disabled state where
+the gate exists. A firmware variable, configuration flag, or MCU output alone is
+not acceptable as disabled-status evidence.
+
+Configuration cannot enable vehicle-CAN TX in Rev.1. Any CAN1 TX support needs
+a future ADR plus an explicit hardware action that changes the DNP/open
+production state.
+
 ## `JPB1` signal contract
 
 | Signal | Direction | Rev.1 default |
@@ -67,3 +85,5 @@ electrical disable state.
 - Schematic notes state that Rev.1 firmware must not transmit on vehicle CAN.
 - Any future CAN1 TX enable path is marked as requiring a new ADR and explicit
   hardware action.
+- Factory BOM output marks `JP_CAN1` or equivalent TX link DNP/open and not a
+  default-populated TX item.

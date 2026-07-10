@@ -2245,8 +2245,10 @@ def validate_can1_safety_verification() -> None:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
         row_text = " ".join(row.values()).lower()
-        if "enabled by default" in row_text or "default-populated tx" in row_text:
+        if "enabled by default" in row_text:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1 TX must not be enabled/populated by default")
+        if "default-populated tx" in row_text and "no default-populated tx" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1 TX must not be default-populated")
         if requirement != "Future TX change process" and "configuration only" in row_text:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1 TX cannot be changed by configuration only")
 
@@ -2272,6 +2274,32 @@ def validate_can1_safety_verification() -> None:
     future_row_text = " ".join(rows_by_requirement["Future TX change process"].values()).lower()
     if "future adr" not in future_row_text or "hardware action" not in future_row_text:
         fail("CAN1 future TX process must require future ADR and hardware action")
+
+
+def validate_can1_capture_contract() -> None:
+    can1_doc = read_text(PB100_DIR / "PB-100-can1-tx-disable.md").lower()
+    for token in (
+        "jp_can1",
+        "u_can1",
+        "dnp/open",
+        "no default-populated tx",
+        "physical disabled state",
+        "configuration cannot enable",
+        "future adr",
+        "explicit hardware action",
+    ):
+        if token not in can1_doc:
+            fail(f"PB-100 CAN1 TX-disable document must include {token}")
+
+    can1_sheet = read_text(KICAD_DIR / "sheets" / "can1-safety.kicad_sch").lower()
+    for token in ("jp_can1", "u_can1", "dnp/open", "no default-populated tx", "physical disabled state"):
+        if token not in can1_sheet:
+            fail(f"CAN1 safety KiCad sheet capture notes must include {token}")
+
+    bom_map = read_text(REPO_ROOT / "production" / "bom" / "pb100_symbol_bom_map.csv").lower()
+    for token in ("can1_tx_disable", "default dnp/open", "no default-populated"):
+        if token not in bom_map:
+            fail(f"CAN1 symbol BOM map must include {token}")
 
 
 def validate_assembly_sourcing_recheck() -> None:
@@ -2985,6 +3013,7 @@ def main() -> int:
     validate_input_power_design_values()
     validate_logic_power_design_values()
     validate_can1_safety_verification()
+    validate_can1_capture_contract()
     validate_assembly_sourcing_recheck()
     validate_sourcing_evidence_snapshot()
     validate_tvs_candidate_consistency()
