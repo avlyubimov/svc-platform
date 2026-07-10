@@ -1511,18 +1511,28 @@ def validate_schematic_readiness_dashboard() -> None:
         fail("CAN1 safety dashboard row must keep DNP/open and future ADR explicit")
 
 
-def freeze_checklist_gates_by_status() -> dict[str, str]:
+def freeze_checklist_rows_by_gate() -> dict[str, dict[str, str]]:
     text = read_text(PB100_DIR / "PB-100-schematic-freeze-checklist.md")
-    gates_by_status: dict[str, str] = {}
+    rows_by_gate: dict[str, dict[str, str]] = {}
     for line in text.splitlines():
         if not line.startswith("| "):
             continue
         cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
         if len(cells) < 4 or cells[0] in {"Gate", "---"}:
             continue
-        gate, status = cells[0], cells[1]
+        gate, status, evidence, close_condition = cells[0], cells[1], cells[2], cells[3]
         if status in {"Closed", "Conditional", "Open", "Blocked"}:
-            gates_by_status[gate] = status
+            rows_by_gate[gate] = {
+                "Status": status,
+                "Evidence": evidence,
+                "Close condition": close_condition,
+            }
+    return rows_by_gate
+
+
+def freeze_checklist_gates_by_status() -> dict[str, str]:
+    rows_by_gate = freeze_checklist_rows_by_gate()
+    gates_by_status = {gate: row["Status"] for gate, row in rows_by_gate.items()}
     return gates_by_status
 
 
@@ -1541,7 +1551,8 @@ def validate_schematic_freeze_gap_register() -> None:
             f"{', '.join(missing_columns)}"
         )
 
-    gates_by_status = freeze_checklist_gates_by_status()
+    checklist_rows_by_gate = freeze_checklist_rows_by_gate()
+    gates_by_status = {gate: row["Status"] for gate, row in checklist_rows_by_gate.items()}
     conditional_gates = {gate for gate, status in gates_by_status.items() if status == "Conditional"}
     seen_gates = set()
     rows_by_gate: dict[str, dict[str, str]] = {}
@@ -1582,6 +1593,26 @@ def validate_schematic_freeze_gap_register() -> None:
             f"{path.relative_to(REPO_ROOT)} has non-conditional gates: "
             f"{', '.join(extra_gates)}"
         )
+
+    required_checklist_evidence = {
+        "CAN1 safety policy": ("PB-100-can1-tx-disable-trace.csv", "PB-100-can1-safety-verification.csv"),
+        "Board current budget": ("PB-100-board-current-budget-trace.csv", "PB-100-input-power-design-values.csv"),
+        "Board-to-board interface": ("PB-100-b2b-interface-trace.csv", "PB-100-b2b-pin-map.csv"),
+        "High/medium output stage": ("PB-100-high-medium-output-baseline-trace.csv", "PB-100-out2-soa.md"),
+        "Low-current output stage": ("PB-100-low-current-output-baseline-trace.csv", "ADR-0011"),
+        "Input reverse protection": ("PB-100-input-reverse-package-trace.csv", "PB-100-input-reverse-protection.md"),
+        "TVS/load-dump protection": ("PB-100-tvs-load-dump-margin-trace.csv", "PB-100-protection-validation.csv"),
+        "Logic power rails": ("PB-100-logic-power-rail-trace.csv", "PB-100-logic-power-budget.csv"),
+        "Current telemetry": ("PB-100-current-telemetry-trace.csv", "PB-100-current-telemetry-map.csv"),
+        "Thermal telemetry": ("PB-100-thermal-telemetry-trace.csv", "PB-100-thermal-telemetry-map.csv"),
+        "Factory assembly readiness": ("PB-100-assembly-readiness-trace.csv", "pb100_sourcing_evidence_snapshot.csv"),
+        "Garage assembly readiness": ("PB-100-assembly-readiness-trace.csv", "PB-100-garage-connector-fuse-plan.md"),
+    }
+    for gate, tokens in required_checklist_evidence.items():
+        evidence = checklist_rows_by_gate[gate]["Evidence"]
+        for token in tokens:
+            if token not in evidence:
+                fail(f"freeze checklist evidence for {gate} must include {token}")
 
     can_gap_text = " ".join(rows_by_gate["CAN1 safety policy"].values())
     can_text = can_gap_text.lower()

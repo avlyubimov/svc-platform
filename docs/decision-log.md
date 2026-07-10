@@ -1311,6 +1311,19 @@ Reason: Logic power is a safety dependency for output default-off behavior and
 LB-100 startup. A dedicated trace makes the protected input rail, 5 V budget,
 power-good timing, rail-invalid output behavior, and lower-voltage fallback
 risk machine-checkable before schematic freeze.
+
+## 2026-07-10 — PB-100 freeze checklist trace evidence synchronization
+
+Decision: PB-100 schematic-freeze checklist evidence now includes the dedicated
+trace artifacts for every remaining conditional freeze gate. Validation fails if
+the checklist omits the trace files that back CAN1 safety, current budget, B2B,
+outputs, input reverse protection, TVS/load-dump, logic power, telemetry, or
+assembly readiness.
+
+Reason: The checklist is the human freeze gate while the trace files are the
+machine-checked evidence. Keeping both synchronized prevents review drift before
+schematic freeze.
+
 ## 2026-07-10 — PB-100 CAN1 TX-disable trace
 
 Decision: PB-100 schematic planning now includes
