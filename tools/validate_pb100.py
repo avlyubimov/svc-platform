@@ -2147,8 +2147,11 @@ def validate_input_power_design_values() -> None:
             row_text = " ".join(row.values())
             if "TOLL" not in row_text or "40 A" not in row_text:
                 fail("Q1 package and copper path must keep TOLL and 40 A review explicit")
-        if design_item == "Shunt value and power rating" and "four-terminal" not in " ".join(row.values()).lower():
-            fail("input shunt design row must preserve four-terminal requirement")
+        if design_item == "Shunt value and power rating":
+            row_text = " ".join(row.values()).lower()
+            for token in ("four-terminal", "0.5m", "60a", "30mv", "1.8w", "40a", "0.8w"):
+                if token not in row_text:
+                    fail(f"input shunt design row must preserve {token} assumption")
 
     missing_items = sorted(REQUIRED_INPUT_POWER_ITEMS - seen_items)
     if missing_items:

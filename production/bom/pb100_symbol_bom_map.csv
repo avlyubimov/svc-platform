@@ -9,7 +9,7 @@ INPUT_TVS,factory_bom_draft.csv,TVS protection,1,Populated,Factory,Conditional,C
 LOGIC_BUCK,factory_bom_draft.csv,DC/DC,1,Populated,Factory,Candidate,Protected PB_5V_OUT logic rail regulator
 LOGIC_BUCK_INDUCTOR,factory_bom_draft.csv,Buck inductor,1,Populated,Factory,Value TBD,Value and saturation current close with buck design
 TOTAL_CURRENT_MONITOR,factory_bom_draft.csv,Current sensor,1,Populated,Factory,Candidate,Total input current monitor plus controller IMON paths
-TOTAL_CURRENT_SHUNT,factory_bom_draft.csv,Input current shunt,1,Populated,Factory,Value TBD,Four-terminal shunt for independent board current budget
+TOTAL_CURRENT_SHUNT,factory_bom_draft.csv,Input current shunt,1,Populated,Factory,Candidate value,0.5mΩ four-terminal shunt for independent board current budget
 THERMAL_NTC,factory_bom_draft.csv,Temp sensor,3,Populated,Factory,Candidate,TEMP_PCB TEMP_PWR_A TEMP_PWR_B
 BOARD_ID_RESISTOR,factory_bom_draft.csv,Board identity resistor network,1,Populated,Factory,Value TBD,PB_ID_ADC fallback identity
 TEST_POINT,factory_bom_draft.csv,Test points,TBD,PCB feature,Factory,Review,No placement before schematic freeze

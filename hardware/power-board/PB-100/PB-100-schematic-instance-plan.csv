@@ -3,7 +3,7 @@ J1,input-protection,Battery input connector,High-current automotive connector,TB
 D1,input-protection,Input load-dump TVS,Vishay SM8S33AHM3/I,DO-218AC,1,Conditional,Clamp and overshoot margin still require schematic evidence
 U1,input-protection,Ideal-diode reverse controller,LM74700QDBVRQ1,SOT-23-6,1,Candidate,LM74502-Q1 family retained as alternate
 Q1,input-protection,Input reverse MOSFET,IAUTN06S5N008ATMA1,TOLL,1,Preferred candidate,BUK7S1R2-80M or dual SIDR626 fallback
-RSH1,input-protection,Total input current shunt,Low-ohm automotive shunt,TBD,1,Value TBD,Used by total input current monitor
+RSH1,input-protection,Total input current shunt,Bourns CSS4J-4026R-L500F-class 0.5mΩ four-terminal shunt,CSS4J-4026,1,Candidate value,Used by total input current monitor; 30mV at 60A target
 U2,input-protection,Total input current monitor,INA228/INA229 or INA226 class,VSSOP/SOIC,1,Candidate,Must support 0-60A range target
 U3,logic-power,Protected 5V buck regulator,LM5164QDDATQ1,SO PowerPAD-8,1,Preferred candidate,LM5013-Q1 if 1A budget exceeded
 L1,logic-power,Buck inductor,Automotive shielded inductor,TBD,1,Value TBD,Final value from regulator design

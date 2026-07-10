@@ -9,4 +9,4 @@ OUT7 current,OUT7_IMON,0-15,LB ADC,TPS48110 IMON,External current monitor,Config
 OUT8 current,OUT8_IMON,0-8,LB ADC,TPS48110 IMON,External current monitor,Configured limit 4A
 OUT9 current,OUT9_IMON,0-8,LB ADC,TPS48110 IMON,External current monitor,Configured limit 4A
 OUT10 current,OUT10_IMON,0-15,LB ADC,TPS48110 IMON,External current monitor,Configured limit 8A
-Total input current,IIN_SENSE,0-60,LB ADC or PB I2C,Dedicated input shunt monitor,Sum of output IMON only for diagnostics,Required for 40A board budget enforcement
+Total input current,IIN_SENSE,0-60,LB ADC or PB I2C,Dedicated input shunt monitor,Sum of output IMON only for diagnostics,0.5mΩ four-terminal candidate gives 30mV at 60A and 20mV at 40A board budget

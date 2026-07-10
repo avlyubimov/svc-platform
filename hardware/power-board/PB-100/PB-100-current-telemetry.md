@@ -16,6 +16,17 @@ family remains INA228/INA229 or INA226-class digital current monitors, with an
 analog `IIN_SENSE` path retained for fast firmware budget checks if the final
 monitor topology requires it.
 
+Initial total-current shunt direction:
+
+- Use a 0.5 mΩ four-terminal AEC-Q200 shunt such as the Bourns
+  CSS4J-4026R-L500F class.
+- At the 40 A board budget this produces 20 mV and about 0.8 W.
+- At the 60 A telemetry range target this produces 30 mV and about 1.8 W.
+- Configure an INA228-Q1-class monitor for the ±40.96 mV shunt range
+  candidate when the final monitor remains INA228/INA229-class.
+
+This is a schematic-planning value, not a footprint or sourcing lock.
+
 ## Measurement map
 
 Detailed map CSV:
@@ -54,4 +65,7 @@ total input current measurement, not the sum of output estimates alone.
 
 - TI TPS4811-Q1 product page: https://www.ti.com/product/TPS4811-Q1
 - TI TPS4811-Q1 data sheet: https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf
+- TI INA228-Q1 data sheet: https://www.ti.com/lit/ds/symlink/ina228-q1.pdf
+- Bourns CSS4J-4026 shunt data sheet:
+  https://www.bourns.com/docs/product-datasheets/css4j-4026.pdf
 - INA226 LCSC candidate: https://www.lcsc.com/product-detail/current-sense-amplifiers_texas-instruments-ina226aidgst_C2653870.html

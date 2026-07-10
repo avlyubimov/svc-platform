@@ -7,5 +7,5 @@ Pin number,Pin name,Signal role,Net pattern,Direction,Default state,Freeze depen
 6,VS,Monitor supply,LB_3V3_IO,LB-100 to PB-100,Absent when LB-100 unpowered,Monitor supply and level compatibility close during schematic review
 7,GND,Monitor ground,GND,Power reference,Ground reference present,Analog return and Kelvin sense reference close during schematic review
 8,VBUS,Bus-voltage sense,VBAT_PROT,PB-100 sense,Scaled/protected battery rail,Voltage range and surge divider strategy close during schematic review
-9,IN-,Shunt negative input,IIN_SHUNT_LO,PB-100 sense,Zero-current baseline,0-60 A shunt range and calibration close during schematic review
-10,IN+,Shunt positive input,IIN_SHUNT_HI,PB-100 sense,Zero-current baseline,0-60 A shunt range and calibration close during schematic review
+9,IN-,Shunt negative input,IIN_SHUNT_LO,PB-100 sense,Zero-current baseline,0.5mΩ 0-60 A shunt range and calibration close during schematic review
+10,IN+,Shunt positive input,IIN_SHUNT_HI,PB-100 sense,Zero-current baseline,0.5mΩ 0-60 A shunt range and calibration close during schematic review

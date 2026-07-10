@@ -28,6 +28,7 @@ order.
 | Smart high-side switch | TI TPS2HB16-Q1 | TI TPS2HB35-Q1; TI TPS1H100-Q1 | HTSSOP class | Deferred low-current alternate after ADR-0011; requires lower-clamp strategy |
 | Output MOSFET | Infineon OptiMOS automotive 40-60 V | Vishay SQJQ automotive; onsemi F085 automotive | TDSON/PowerPAK/TOLL/LFPAK | Must pass SOA and thermal review per channel; OUT2 keeps larger/parallel escape path |
 | Current monitor | TPS48110 IMON for outputs; TI INA228/INA229 or INA226 for input | External analog monitor; firmware-calibrated ADC path | VSSOP/SOIC class | Per-output telemetry uses controller IMON; total input current uses dedicated shunt monitor |
+| Total current shunt | Bourns CSS4J-4026R-L500F-class 0.5 mΩ four-terminal shunt | Bourns CSS4J-4026R-1L00F-class 1.0 mΩ; Isabellenhuette BVN/BAS or equivalent AEC-Q200 four-terminal family | CSS4J-4026 or reviewed power shunt | 0.5 mΩ gives 30 mV at 60 A and 1.8 W; compatible with INA228 ±40.96 mV range candidate |
 | Temperature sensor | Automotive NTC thermistor | TI TMP117/TMP112-class digital sensor | 0603/0805 or SOT/DFN class | PB-100 uses PCB reference plus two power-zone thermal points |
 | Logic buck regulator | TI LM5164-Q1 | TI LM5013-Q1; TI TPS54360B-Q1/TPS54360-Q1 | SOIC/HSOIC PowerPAD | LM5164-Q1 for 1 A 100 V rail; LM5013-Q1 preferred over 60 V family if more current is needed |
 | Input reverse protection | TI LM74700-Q1/LM74502-Q1 class | ADI/LTC ideal diode controller families | MSOP/SOIC class | Controller family only; MOSFET is tracked separately |
@@ -54,6 +55,9 @@ The current strategy is:
 - Input transient clamp: Vishay SM8S33AHM3/I active HM3 load-dump TVS or
   reviewed equivalent. MCC SM8S33A is treated as EOL evidence only, and Vishay
   HE3 is treated as NFD stock-only evidence; neither may be locked.
+- Total current shunt: 0.5 mΩ four-terminal AEC-Q200 shunt candidate for the
+  0-60 A telemetry range. At 60 A the candidate produces 30 mV and about 1.8 W;
+  at the 40 A board-budget point it produces 20 mV and about 0.8 W.
 
 ## Evidence links
 
@@ -79,6 +83,10 @@ The current strategy is:
   https://www.vishay.com/doc/?88387=
 - TI TPS2HB16-Q1 datasheet is available through LCSC: https://datasheet.lcsc.com/datasheet/pdf/5e972c8f510fd1d0477aeb85de68fc2f.pdf
 - TI INA226AIDGST was listed at LCSC: https://www.lcsc.com/product-detail/current-sense-amplifiers_texas-instruments-ina226aidgst_C2653870.html
+- TI INA228-Q1 supports the shunt-voltage range needed for the 0.5 mΩ current
+  shunt candidate: https://www.ti.com/lit/ds/symlink/ina228-q1.pdf
+- Bourns CSS4J-4026 0.5 mΩ four-terminal AEC-Q200 shunt data was checked:
+  https://www.bourns.com/docs/product-datasheets/css4j-4026.pdf
 - TI TMP117 data sheet was checked for optional digital board-temperature sensing: https://www.ti.com/lit/gpn/TMP117
 - TDK automotive NTC thermistor data was checked for PB-100 power-zone sensing: https://www.farnell.com/datasheets/3920346.pdf
 - TI LM5164QDDATQ1 was listed at LCSC: https://www.lcsc.com/product-detail/C1850350.html

@@ -1142,3 +1142,17 @@ designs and points to the HM3 family. The HM3 branch preserves the same 33 V
 stand-off, 53.3 V clamp, 124 A pulse-current class while moving the planning
 baseline to an active AEC-Q101 branch. Schematic freeze still requires clamp
 margin, overshoot, and DO-218AC assembly handling validation.
+
+## 2026-07-10 — PB-100 total-current shunt candidate
+
+Decision: PB-100 total input current measurement now uses a 0.5 mΩ
+four-terminal AEC-Q200 shunt candidate, with Bourns CSS4J-4026R-L500F-class as
+the preferred sourcing direction. INA228-Q1-class monitoring should use the
+±40.96 mV shunt range candidate for the 0-60 A telemetry span.
+
+Reason: A 0.5 mΩ shunt produces 30 mV at 60 A and about 1.8 W, while producing
+20 mV and about 0.8 W at the 40 A board-budget target. This keeps measurement
+loss and heating low while retaining enough signal for the dedicated input
+current monitor. Schematic freeze still requires exact orderable suffix,
+JLCPCB/PCBWay assembly class, Kelvin footprint, copper heating, and calibration
+review.
