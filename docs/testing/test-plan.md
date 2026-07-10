@@ -91,15 +91,35 @@ ordered rule execution, and stale-telemetry denial in one processing step.
 
 ## PB-100 schematic-review traceability
 
+- Bring-up and logic-rail tests trace to
+  `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`.
 - OUT2 pulse tests trace to
-  `hardware/power-board/PB-100/PB-100-out2-soa.md`.
+  `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
+  and `hardware/power-board/PB-100/PB-100-out2-soa.md`.
+- Output overcurrent, fuse, and class-limit tests trace to
+  `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
+  and
+  `hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv`.
 - CAN1 listen-only tests trace to
-  `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`.
+  `hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv`,
+  `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`, and
+  `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`.
 - Input reverse-protection tests trace to
+  `hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv` and
   `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`.
-- Current-budget tests trace to `docs/adr/ADR-0008-pb-100-current-budget.md`.
+- TVS/load-dump tests trace to
+  `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`.
+- Current telemetry and current-budget tests trace to
+  `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`,
+  `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`, and
+  `docs/adr/ADR-0008-pb-100-current-budget.md`.
+- Thermal derating tests trace to
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`.
 - B2B interface tests trace to
+  `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv` and
   `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`.
+- Vibration, connector, fuse, and harness ownership tests trace to
+  `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`.
 
 ## Motorcycle test
 

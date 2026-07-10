@@ -4575,6 +4575,35 @@ def validate_schematic_package() -> None:
             fail(f"{path.relative_to(REPO_ROOT)} must include release artifact {artifact}")
 
 
+def validate_test_plan_traceability() -> None:
+    path = REPO_ROOT / "docs" / "testing" / "test-plan.md"
+    text = read_text(path)
+    required_trace_artifacts = (
+        "PB-100-logic-power-rail-trace.csv",
+        "PB-100-high-medium-output-baseline-trace.csv",
+        "PB-100-low-current-output-baseline-trace.csv",
+        "PB-100-can1-tx-disable-trace.csv",
+        "PB-100-input-reverse-package-trace.csv",
+        "PB-100-tvs-load-dump-margin-trace.csv",
+        "PB-100-current-telemetry-trace.csv",
+        "PB-100-board-current-budget-trace.csv",
+        "PB-100-thermal-telemetry-trace.csv",
+        "PB-100-b2b-interface-trace.csv",
+        "PB-100-assembly-readiness-trace.csv",
+    )
+    for token in required_trace_artifacts:
+        if token not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} must include trace artifact {token}")
+    for bench_id in (f"PB-BENCH-{index:03d}" for index in range(1, 16)):
+        if bench_id not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} must include bench test {bench_id}")
+    lower_text = text.lower()
+    if "do not run first-power" not in lower_text or "motorcycle" not in lower_text:
+        fail(f"{path.relative_to(REPO_ROOT)} must keep motorcycle first-power safety boundary")
+    if "can1 listen-only" not in lower_text or "no vehicle-can transmit frame" not in lower_text:
+        fail(f"{path.relative_to(REPO_ROOT)} must keep CAN1 listen-only bench test")
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -4617,6 +4646,7 @@ def main() -> int:
     validate_review_release_manifest()
     validate_schematic_readiness_review()
     validate_schematic_package()
+    validate_test_plan_traceability()
     validate_output_channel_pin_contract()
     validate_output_controller_pin_template()
     validate_output_net_expansion()

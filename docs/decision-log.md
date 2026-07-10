@@ -1465,3 +1465,15 @@ the package document itself.
 Reason: The schematic package is the governing input bundle for capture work.
 It must point reviewers to the actual KiCad source files, not only the planning
 documents, while still explicitly excluding PCB layout scope.
+
+## 2026-07-10 — PB-100 bench test traceability synchronization
+
+Decision: PB-100 bench test plan now traces logic rail, output class, CAN1,
+input reverse, TVS/load-dump, current telemetry, board-current, thermal, B2B,
+and assembly/vibration tests to the dedicated PB-100 trace artifacts. The
+PB-100 validator now fails if the test plan drops these trace links or bench
+test IDs.
+
+Reason: Bench validation is freeze evidence. The test plan must point to the
+same trace artifacts used by the schematic freeze gates so bench execution does
+not validate against stale source documents.
