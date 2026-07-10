@@ -238,6 +238,14 @@ BOARD_CURRENT_BUDGET_TRACE_COLUMNS = (
     "Freeze state",
     "Remaining work",
 )
+TVS_LOAD_DUMP_MARGIN_TRACE_COLUMNS = (
+    "Protected item",
+    "Voltage class",
+    "Active TVS branch",
+    "Clamp or stress point",
+    "Margin state",
+    "Schematic freeze action",
+)
 LOGIC_POWER_DESIGN_VALUE_COLUMNS = (
     "Design item",
     "Related net",
@@ -479,6 +487,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-test-point-plan.csv",
     "hardware/power-board/PB-100/PB-100-fault-response-matrix.csv",
     "hardware/power-board/PB-100/PB-100-can1-safety-verification.csv",
+    "hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv",
     "hardware/power-board/PB-100/kicad/PB-100.kicad_sch",
     "hardware/power-board/PB-100/kicad/lib/PB100.kicad_sym",
     "firmware/configs/hardware/pb-100-capabilities.json",
@@ -1500,6 +1509,10 @@ def validate_schematic_freeze_gap_register() -> None:
     for token in ("PB-100-board-current-budget-trace.csv", "40 A", "firmware config", "shunt"):
         if token not in current_budget_text:
             fail(f"Board current budget gap must keep {token} explicit")
+    tvs_text = " ".join(rows_by_gate["TVS/load-dump protection"].values())
+    for token in ("PB-100-tvs-load-dump-margin-trace.csv", "60 V", "DO-218AC", "overshoot"):
+        if token not in tvs_text:
+            fail(f"TVS/load-dump gap must keep {token} explicit")
     factory_text = " ".join(rows_by_gate["Factory assembly readiness"].values()).lower()
     if "assembly" not in factory_text or "alternat" not in factory_text:
         fail("Factory assembly readiness gap must keep assembly and alternatives explicit")
@@ -2619,6 +2632,7 @@ def validate_tvs_candidate_consistency() -> None:
         "hardware/power-board/PB-100/PB-100-protection-validation.csv",
         "hardware/power-board/PB-100/PB-100-logic-power-rails.md",
         "hardware/power-board/PB-100/PB-100-input-power-design-values.csv",
+        "hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv",
     )
     for relative_path in active_tvs_paths:
         text = read_text(REPO_ROOT / relative_path)
@@ -2628,6 +2642,79 @@ def validate_tvs_candidate_consistency() -> None:
             fail(f"{relative_path} must not treat Vishay HE3 TVS as the active baseline")
         if "SM8S33AHM3" not in text:
             fail(f"{relative_path} must reference active SM8S33AHM3 TVS evidence")
+
+
+def validate_tvs_load_dump_margin_trace() -> None:
+    path = PB100_DIR / "PB-100-tvs-load-dump-margin-trace.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty TVS/load-dump margin trace: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in TVS_LOAD_DUMP_MARGIN_TRACE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    required_items = {
+        "TPS48110 high-side controller",
+        "SIDR626LDP output MOSFET",
+        "IAUTN06S5N008 input reverse MOSFET",
+        "BUK7S1R2-80M input reverse MOSFET",
+        "LM5164QDDATQ1 buck",
+        "LM5013-Q1 buck alternate",
+        "TPS54360B-Q1 buck alternate",
+        "TPS2HB35 direct smart switch",
+    }
+    rows_by_item: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        protected_item = row["Protected item"].strip()
+        if protected_item in rows_by_item:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate protected item {protected_item}")
+        if protected_item not in required_items:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown protected item {protected_item}")
+        rows_by_item[protected_item] = row
+        for column in TVS_LOAD_DUMP_MARGIN_TRACE_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        row_text = " ".join(row.values())
+        for token in ("SM8S33AHM3", "53.3 V", "schematic freeze"):
+            if token not in row_text:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: TVS margin row must include {token}")
+
+    missing_items = sorted(required_items - rows_by_item.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing TVS margin items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    for protected_item in ("SIDR626LDP output MOSFET", "IAUTN06S5N008 input reverse MOSFET"):
+        row_text = " ".join(rows_by_item[protected_item].values()).lower()
+        if "60 v" not in row_text or "conditional limited margin" not in row_text or "overshoot" not in row_text:
+            fail(f"{protected_item} must keep 60 V conditional overshoot margin explicit")
+
+    smart_switch_text = " ".join(rows_by_item["TPS2HB35 direct smart switch"].values()).lower()
+    for token in ("40 v", "deferred by adr-0011", "future adr", "lower-clamp"):
+        if token not in smart_switch_text:
+            fail(f"TPS2HB35 TVS margin row must preserve {token}")
+
+    for protected_item in (
+        "TPS48110 high-side controller",
+        "BUK7S1R2-80M input reverse MOSFET",
+        "LM5164QDDATQ1 buck",
+        "LM5013-Q1 buck alternate",
+    ):
+        if "Pass with margin" not in rows_by_item[protected_item]["Margin state"]:
+            fail(f"{protected_item} must remain pass-with-margin against active HM3 TVS")
+
+    protection_text = read_text(PB100_DIR / "PB-100-protection-validation.csv")
+    for token in ("Active SM8S33AHM3-class TVS", "53.3V clamp", "Conditional limited margin"):
+        if token not in protection_text:
+            fail(f"protection validation must preserve {token}")
 
 
 def validate_thermal_telemetry_baseline() -> None:
@@ -3188,6 +3275,7 @@ def main() -> int:
     validate_assembly_sourcing_recheck()
     validate_sourcing_evidence_snapshot()
     validate_tvs_candidate_consistency()
+    validate_tvs_load_dump_margin_trace()
     validate_thermal_telemetry_baseline()
     validate_b2b_connector_candidate()
     validate_validation_traceability()

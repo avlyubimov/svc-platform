@@ -48,6 +48,10 @@ Current coverage:
   Vishay `SM8S33AHE3_A/I` is NFD evidence only, so schematic freeze must select
   `SM8S33AHM3/I` or an equivalent active load-dump TVS and validate clamp
   margin.
+- TVS/load-dump margin now has a downstream voltage-class trace for the active
+  `SM8S33AHM3/I` branch and its 53.3 V clamp point; schematic freeze must still
+  close 60 V overshoot margin, DO-218AC assembly handling, and any lower-clamp
+  future path through a review or ADR.
 - Thermal telemetry now has a TDK `NTCGS103JF103FT8`-class 10 kΩ 150 °C
   AEC-Q200 NTC candidate for all three thermal points; schematic freeze must
   still close divider values, ADC scaling, placement, assembly class, and

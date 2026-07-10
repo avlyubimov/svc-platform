@@ -1221,3 +1221,16 @@ Reason: The 40 A budget is a safety boundary spanning hardware, configuration,
 telemetry, firmware, and garage-installed fuse/connectors. A dedicated trace
 file makes drift machine-checkable without changing the accepted PB-100 current
 budget or starting PCB copper/layout work.
+
+## 2026-07-10 — PB-100 TVS/load-dump downstream margin trace
+
+Decision: PB-100 schematic planning now includes
+`PB-100-tvs-load-dump-margin-trace.csv` as the downstream voltage-class margin
+trace for the active Vishay `SM8S33AHM3/I` branch. The trace preserves the
+53.3 V clamp point against 40 V, 60 V, 80 V, and 100 V downstream classes.
+
+Reason: The active TVS candidate is acceptable for 100 V devices and useful for
+60 V MOSFET planning only if overshoot is controlled. A dedicated margin trace
+keeps the 40 V smart-switch path deferred by ADR-0011, keeps 60 V devices
+conditional, and avoids silently treating the TVS clamp as a PCB-layout-ready
+decision.

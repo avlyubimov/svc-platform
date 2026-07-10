@@ -85,7 +85,7 @@ The schematic review packet consists of:
 | Review release manifest | Every required freeze-packet artifact exists and remains synchronized with validation hooks |
 | OUT2 SOA | Data-sheet SOA extraction against `PB-100-out2-soa-envelope.csv` |
 | Input reverse protection | Input power values, final MOSFET package choice, Q1 pin evidence, and 40 A copper/thermal review |
-| TVS/load dump | Clamp and overshoot margin against every selected downstream device |
+| TVS/load dump | Clamp and overshoot margin trace against every selected downstream voltage class |
 | Logic power | LM5164 pin template, logic power design values, final buck current budget, EMI parts, UVLO, feedback, and power-good implementation |
 | Current telemetry | INA228 pin template, board-current budget trace, ADC scaling, filtering, calibration plan, and total-current monitor choice |
 | Thermal telemetry | Final sensor values, placement notes, and derating thresholds |
