@@ -77,11 +77,12 @@ Current coverage:
   calibration.
 - JPB1 board-to-board planning now has a Hirose `FX18-100P-0.8SV10` plus
   `FX18-100S-0.8SV20` candidate pair; schematic freeze must still close stack
-  height, footprint drawing, vibration retention, assembly handling, and LB-100
-  MCU resource binding.
-- JPB1 now has a B2B interface trace tying the FX18 candidate pair, 100-pin map,
-  output controls/fault/current telemetry, board telemetry, CAN1 safety
-  crossing, and LB-100 resource-binding blockers together.
+  height, footprint drawing, vibration retention, assembly handling, and exact
+  LB-100 MCU pin binding.
+- JPB1 now has a B2B interface trace and LB-100 resource-class binding tying
+  the FX18 candidate pair, 100-pin map, output controls/fault/current telemetry,
+  board telemetry, CAN1 safety crossing, and exact MCU pin-binding blockers
+  together.
 - Q1 input reverse MOSFET pin evidence is captured from the Infineon
   `IAUTN06S5N008` data sheet; schematic freeze must still close TOLL footprint,
   40 A copper/thermal review, assembly handling, and gate clamp behavior.

@@ -1503,3 +1503,17 @@ Reason: Schematic capture needs a connected sheet hierarchy before component
 placement. Linking placeholder sheets is a schematic-scaffold step only: it
 does not place components, lock footprints, create a PCB layout, or generate
 manufacturing outputs.
+
+## 2026-07-10 — PB-100 B2B LB-100 resource-class binding
+
+Decision: PB-100 schematic planning now includes
+`PB-100-b2b-lb100-resource-binding.csv` as the resource-class binding between
+`JPB1` pins and LB-100 planning resources. The artifact covers power, ground,
+GPIO/PWM, GPIO input/interrupt, ADC, I2C, SPI, FDCAN, UART, external expansion,
+and spare-reserve classes while explicitly avoiding exact STM32H5 package pin
+assignments before LB-100 schematic review.
+
+Reason: The B2B freeze gap needed more than a pin map but should not invent
+LB-100 MCU pins before LB-100 schematic capture. A resource-class binding
+narrows the gap and is now checked by the PB-100 validator without authorizing
+connector placement or PCB layout.

@@ -116,7 +116,8 @@ ordered rule execution, and stale-telemetry denial in one processing step.
 - Thermal derating tests trace to
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`.
 - B2B interface tests trace to
-  `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv` and
+  `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`,
+  `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`, and
   `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`.
 - Vibration, connector, fuse, and harness ownership tests trace to
   `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`.

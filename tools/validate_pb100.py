@@ -302,6 +302,16 @@ B2B_INTERFACE_TRACE_COLUMNS = (
     "Default state or safety boundary",
     "Freeze dependency",
 )
+B2B_RESOURCE_BINDING_COLUMNS = (
+    "Binding item",
+    "JPB1 pins",
+    "Nets",
+    "Requirement scope",
+    "LB-100 resource class",
+    "Direction",
+    "STM32H5 planning note",
+    "Freeze dependency",
+)
 TVS_LOAD_DUMP_MARGIN_TRACE_COLUMNS = (
     "Protected item",
     "Voltage class",
@@ -420,7 +430,10 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-low-current-output-baseline-trace.csv",
     ),
     "CAP-TEL": ("PB-100-current-telemetry-trace.csv", "PB-100-thermal-telemetry-trace.csv"),
-    "CAP-B2B": ("PB-100-b2b-interface-trace.csv",),
+    "CAP-B2B": (
+        "PB-100-b2b-interface-trace.csv",
+        "PB-100-b2b-lb100-resource-binding.csv",
+    ),
     "CAP-CAN1": ("PB-100-can1-tx-disable-trace.csv",),
 }
 REVIEW_RELEASE_MANIFEST_COLUMNS = (
@@ -590,6 +603,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv",
     "hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv",
+    "hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv",
     "hardware/power-board/PB-100/PB-100-output-net-expansion.csv",
     "hardware/power-board/PB-100/PB-100-test-point-plan.csv",
     "hardware/power-board/PB-100/PB-100-fault-response-matrix.csv",
@@ -1722,7 +1736,11 @@ def validate_schematic_freeze_gap_register() -> None:
     required_checklist_evidence = {
         "CAN1 safety policy": ("PB-100-can1-tx-disable-trace.csv", "PB-100-can1-safety-verification.csv"),
         "Board current budget": ("PB-100-board-current-budget-trace.csv", "PB-100-input-power-design-values.csv"),
-        "Board-to-board interface": ("PB-100-b2b-interface-trace.csv", "PB-100-b2b-pin-map.csv"),
+        "Board-to-board interface": (
+            "PB-100-b2b-interface-trace.csv",
+            "PB-100-b2b-lb100-resource-binding.csv",
+            "PB-100-b2b-pin-map.csv",
+        ),
         "High/medium output stage": ("PB-100-high-medium-output-baseline-trace.csv", "PB-100-out2-soa.md"),
         "Low-current output stage": ("PB-100-low-current-output-baseline-trace.csv", "ADR-0011"),
         "Input reverse protection": ("PB-100-input-reverse-package-trace.csv", "PB-100-input-reverse-protection.md"),
@@ -1794,9 +1812,10 @@ def validate_schematic_freeze_gap_register() -> None:
     b2b_text = " ".join(rows_by_gate["Board-to-board interface"].values())
     for token in (
         "PB-100-b2b-interface-trace.csv",
+        "PB-100-b2b-lb100-resource-binding.csv",
         "FX18-100P-0.8SV10",
         "FX18-100S-0.8SV20",
-        "LB-100 MCU binding",
+        "exact LB-100 MCU pin binding",
     ):
         if token not in b2b_text:
             fail(f"Board-to-board interface gap must keep {token} explicit")
@@ -4130,6 +4149,108 @@ def validate_b2b_connector_candidate() -> None:
             fail(f"B2B_CONNECTOR sourcing evidence must explicitly track {token}")
 
 
+def parse_pin_span_set(value: str) -> set[str]:
+    pins: set[str] = set()
+    for part in value.split(";"):
+        token = part.strip()
+        if not token:
+            continue
+        if "-" in token:
+            start_text, end_text = [piece.strip() for piece in token.split("-", 1)]
+            start = int(start_text)
+            end = int(end_text)
+            pins.update(str(pin) for pin in range(start, end + 1))
+        else:
+            pins.add(token)
+    return pins
+
+
+def validate_b2b_resource_binding() -> None:
+    path = PB100_DIR / "PB-100-b2b-lb100-resource-binding.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty B2B LB-100 resource binding: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in B2B_RESOURCE_BINDING_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    expected_pins = {
+        "Ground and analog return": set(str(pin) for pin in range(1, 13)),
+        "Protected 5V supply to LB-100": set(str(pin) for pin in range(13, 17)),
+        "LB 3V3 IO reference to PB-100": set(str(pin) for pin in range(17, 19)),
+        "Power-good and wake status": set(str(pin) for pin in range(19, 21)),
+        "Output control commands": set(str(pin) for pin in range(21, 31)),
+        "Output fault inputs": set(str(pin) for pin in range(31, 41)),
+        "Per-output current telemetry": set(str(pin) for pin in range(41, 51)),
+        "Board analog telemetry and identity": {"51", "52", "53", "54", "55", "60", "66"},
+        "Board fault summary": {"56"},
+        "PB-side monitor bus and interrupt": set(str(pin) for pin in range(57, 60)),
+        "Future SPI monitor bus": set(str(pin) for pin in range(61, 66)),
+        "CAN1 safety crossing": set(str(pin) for pin in range(67, 71)),
+        "CAN2 expansion route": set(str(pin) for pin in range(71, 73)),
+        "LIN RS485 and UART expansion": set(str(pin) for pin in range(73, 80)),
+        "External ADC digital and 5V enable": set(str(pin) for pin in range(80, 85)),
+        "Spare reserve pins": set(str(pin) for pin in range(85, 101)),
+    }
+    required_tokens = {
+        "Output control commands": ("OUT1_CTL..OUT10_CTL", "GPIO/PWM"),
+        "Output fault inputs": ("OUT1_FLT..OUT10_FLT", "GPIO input"),
+        "Per-output current telemetry": ("OUT1_IMON..OUT10_IMON", "ADC"),
+        "Board analog telemetry and identity": ("VBAT_SENSE", "IIN_SENSE", "TEMP_PCB", "PB_ID_ADC", "ADC"),
+        "Board fault summary": ("PB_FAULT", "GPIO input"),
+        "PB-side monitor bus and interrupt": ("PB_I2C_SCL", "PB_I2C_SDA", "I2C", "interrupt"),
+        "CAN1 safety crossing": ("CAN1_TX_ROUTE", "DNP/open", "FDCAN", "future-ADR"),
+        "CAN2 expansion route": ("CAN2_RX_ROUTE", "CAN2_TX_ROUTE", "FDCAN"),
+        "LIN RS485 and UART expansion": ("LIN_TX", "RS485_DE", "UART"),
+        "Spare reserve pins": ("SPARE_01..SPARE_16", "reserve"),
+    }
+
+    pin_map_rows = list(csv.DictReader((PB100_DIR / "PB-100-b2b-pin-map.csv").open(newline="", encoding="utf-8")))
+    pin_map_pins = {row["Pin"].strip() for row in pin_map_rows}
+    seen_items = set()
+    covered_pins: set[str] = set()
+    for row_number, row in enumerate(rows, 2):
+        item = row["Binding item"].strip()
+        if item in seen_items:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate binding item {item}")
+        seen_items.add(item)
+        if item not in expected_pins:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown binding item {item}")
+        for column in B2B_RESOURCE_BINDING_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        row_pins = parse_pin_span_set(row["JPB1 pins"])
+        if row_pins != expected_pins[item]:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unexpected pin set for {item}")
+        covered_pins.update(row_pins)
+        row_text = " ".join(row.values())
+        if "No exact STM32H5" not in row_text and "No MCU pin assignment" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: must avoid exact STM32H5 pin assignment")
+        for token in required_tokens.get(item, ()):
+            if token not in row_text:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: missing token {token}")
+
+    missing_items = sorted(set(expected_pins) - seen_items)
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing binding items: "
+            f"{', '.join(missing_items)}"
+        )
+    if covered_pins != pin_map_pins:
+        missing_pins = sorted(pin_map_pins - covered_pins, key=int)
+        extra_pins = sorted(covered_pins - pin_map_pins, key=int)
+        fail(
+            "B2B LB-100 resource binding pin coverage mismatch: "
+            f"missing={missing_pins}, extra={extra_pins}"
+        )
+
+
 def validate_validation_traceability() -> None:
     path = PB100_DIR / "PB-100-validation-traceability.csv"
     validate_csv(path)
@@ -4199,6 +4320,11 @@ def validate_validation_traceability() -> None:
     for freeze_gate, token in required_primary_artifacts.items():
         if not any(token in row["Primary artifact"] for row in gates_with_tests[freeze_gate]):
             fail(f"validation traceability for {freeze_gate} must include {token}")
+    if not any(
+        "PB-100-b2b-lb100-resource-binding.csv" in row["Primary artifact"]
+        for row in gates_with_tests["Board-to-board interface"]
+    ):
+        fail("validation traceability for Board-to-board interface must include PB-100-b2b-lb100-resource-binding.csv")
 
     missing_gates = sorted(gate for gate, gate_rows in gates_with_tests.items() if not gate_rows)
     if missing_gates:
@@ -4645,6 +4771,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-board-current-budget-trace.csv",
         "PB-100-thermal-telemetry-trace.csv",
         "PB-100-b2b-interface-trace.csv",
+        "PB-100-b2b-lb100-resource-binding.csv",
         "PB-100-assembly-readiness-trace.csv",
     )
     for token in required_trace_artifacts:
@@ -4731,6 +4858,7 @@ def main() -> int:
     validate_thermal_telemetry_baseline()
     validate_b2b_interface_trace()
     validate_b2b_connector_candidate()
+    validate_b2b_resource_binding()
     validate_validation_traceability()
     validate_test_point_plan()
     validate_fault_response_matrix()

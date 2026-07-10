@@ -20,6 +20,7 @@ It is not a PCB layout package.
 - `production/bom/pb100_symbol_bom_map.csv`
 - `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`
+- `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`
 - `production/bom/pb100_assembly_sourcing_recheck.csv`
 - `production/bom/pb100_sourcing_evidence_snapshot.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
@@ -108,6 +109,9 @@ Schematic-planning pin map CSV:
 B2B interface trace CSV:
 `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`.
 
+LB-100 resource-class binding CSV:
+`hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`.
+
 | Signal group | Count target | Direction | Notes |
 |---|---:|---|---|
 | Power and grounds | 20-30 pins | PB-100/LB-100 | Multiple grounds and supply pins for current return and signal integrity |
@@ -124,8 +128,9 @@ as a schematic-planning input, but stack height, vendor footprint drawing,
 vibration retention, PCBA handling, and LB-100 MCU pin binding remain
 schematic-review items. The B2B interface trace ties the candidate pair,
 power/status pins, output controls/faults/current telemetry, board telemetry,
-CAN1 safety crossing, and reserve pins back to the LB-100 resource-binding
-review.
+CAN1 safety crossing, and reserve pins back to the LB-100 resource-class
+binding review. Exact STM32H5 package pins remain a LB-100 schematic-review
+item.
 
 ## Output channel matrix
 
