@@ -52,6 +52,9 @@ Current coverage:
   `SM8S33AHM3/I` branch and its 53.3 V clamp point; schematic freeze must still
   close 60 V overshoot margin, DO-218AC assembly handling, and any lower-clamp
   future path through a review or ADR.
+- OUT5, OUT8, and OUT9 now have a low-current baseline trace enforcing the
+  ADR-0011 external-controller plus external 60 V MOSFET architecture and
+  blocking any direct 40 V smart-switch rail without a future ADR.
 - Thermal telemetry now has a TDK `NTCGS103JF103FT8`-class 10 kΩ 150 °C
   AEC-Q200 NTC candidate for all three thermal points; schematic freeze must
   still close divider values, ADC scaling, placement, assembly class, and

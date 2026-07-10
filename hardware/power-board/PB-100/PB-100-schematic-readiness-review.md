@@ -81,6 +81,7 @@ The schematic review packet consists of:
 | Output controller template | TPS48110 threshold, timing, bootstrap, gate-drive, and current-sense values reviewed per channel class |
 | Output net expansion | Every `OUTn_*` template net expanded to `OUT1_*` through `OUT10_*`, with JPB1-facing control/fault/current nets checked |
 | Output stage design values | High, medium, and low class threshold, timing, gate-drive, sense, and clamp values selected without role-specific names |
+| Low-current baseline trace | OUT5/OUT8/OUT9 are machine-checked against ADR-0011, capabilities, matrix, config, and output contracts |
 | Capture work queue | Every KiCad sheet has source artifacts, refs, blockers, freeze evidence, and explicit no-layout boundary |
 | Review release manifest | Every required freeze-packet artifact exists and remains synchronized with validation hooks |
 | OUT2 SOA | Data-sheet SOA extraction against `PB-100-out2-soa-envelope.csv` |

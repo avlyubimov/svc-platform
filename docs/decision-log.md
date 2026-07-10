@@ -1234,3 +1234,16 @@ Reason: The active TVS candidate is acceptable for 100 V devices and useful for
 keeps the 40 V smart-switch path deferred by ADR-0011, keeps 60 V devices
 conditional, and avoids silently treating the TVS clamp as a PCB-layout-ready
 decision.
+
+## 2026-07-10 — PB-100 low-current output baseline trace
+
+Decision: PB-100 schematic planning now includes
+`PB-100-low-current-output-baseline-trace.csv` for OUT5, OUT8, and OUT9. The
+trace locks the schematic-planning baseline to TPS48110-class external
+controller plus external 60 V N-MOSFET stages while preserving configuration
+role assignment.
+
+Reason: ADR-0011 rejected direct 40 V smart-switch rails behind the active
+SM8S33AHM3-class TVS for Rev.1. A dedicated trace makes that decision
+machine-checkable across output matrix, output contracts, hardware capability
+manifest, and config defaults without finalizing resistor values or PCB layout.

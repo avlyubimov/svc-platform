@@ -212,6 +212,15 @@ OUTPUT_STAGE_DESIGN_VALUE_COLUMNS = (
     "Freeze dependency",
     "Notes",
 )
+LOW_CURRENT_OUTPUT_BASELINE_TRACE_COLUMNS = (
+    "Output",
+    "Capability class",
+    "Fuse target A",
+    "Current limit A",
+    "Switch architecture",
+    "Role boundary",
+    "Freeze dependency",
+)
 OUTPUT_NET_EXPANSION_COLUMNS = (
     "Output",
     "Net pattern",
@@ -483,6 +492,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv",
     "hardware/power-board/PB-100/PB-100-review-release-manifest.csv",
     "hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv",
+    "hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-output-net-expansion.csv",
     "hardware/power-board/PB-100/PB-100-test-point-plan.csv",
     "hardware/power-board/PB-100/PB-100-fault-response-matrix.csv",
@@ -1505,6 +1515,10 @@ def validate_schematic_freeze_gap_register() -> None:
     input_text = " ".join(rows_by_gate["Input reverse protection"].values())
     if "Q1" not in input_text or "40 A" not in input_text or "TOLL" not in input_text:
         fail("Input reverse protection gap must keep Q1 TOLL and 40 A review explicit")
+    low_current_text = " ".join(rows_by_gate["Low-current output stage"].values())
+    for token in ("PB-100-low-current-output-baseline-trace.csv", "OUT5", "OUT8", "OUT9", "no direct 40 V"):
+        if token not in low_current_text:
+            fail(f"Low-current output stage gap must keep {token} explicit")
     current_budget_text = " ".join(rows_by_gate["Board current budget"].values())
     for token in ("PB-100-board-current-budget-trace.csv", "40 A", "firmware config", "shunt"):
         if token not in current_budget_text:
@@ -2155,6 +2169,104 @@ def validate_output_stage_design_values() -> None:
         fail("high-current output-stage design values must keep OUT2 SOA explicit")
     if "external controller" not in " ".join(class_text["Low current"]).lower():
         fail("low-current output-stage design values must preserve external-controller baseline")
+
+
+def validate_low_current_output_baseline_trace() -> None:
+    path = PB100_DIR / "PB-100-low-current-output-baseline-trace.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty low-current output baseline trace: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in LOW_CURRENT_OUTPUT_BASELINE_TRACE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    expected_outputs = {"OUT5", "OUT8", "OUT9"}
+    rows_by_output: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        output = row["Output"].strip()
+        if output in rows_by_output:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate output {output}")
+        if output not in expected_outputs:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unexpected low-current output {output}")
+        rows_by_output[output] = row
+        for column in LOW_CURRENT_OUTPUT_BASELINE_TRACE_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        row_text = " ".join(row.values())
+        for token in (
+            "Low current",
+            "5",
+            "4",
+            "TPS48110AQDGXRQ1 plus external 60V N-MOSFET",
+            "configuration only",
+            "no direct 40 V smart-switch rail",
+            "future ADR",
+            "schematic freeze",
+        ):
+            if token not in row_text:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: low-current row must include {token}")
+
+    missing_outputs = sorted(expected_outputs - rows_by_output.keys())
+    if missing_outputs:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing low-current outputs: "
+            f"{', '.join(missing_outputs)}"
+        )
+
+    matrix_rows = list(csv.DictReader((PB100_DIR / "PB-100-output-channel-matrix.csv").open(newline="", encoding="utf-8")))
+    matrix_by_output = {row["Output"].strip(): row for row in matrix_rows}
+    capabilities = json.loads(read_text(REPO_ROOT / "firmware" / "configs" / "hardware" / "pb-100-capabilities.json"))
+    capability_by_output = {row["id"]: row for row in capabilities["outputs"]}
+    config_example = json.loads(read_text(REPO_ROOT / "firmware" / "configs" / "config-example.json"))
+    config_by_output = {row["id"]: row for row in config_example["outputs"]}
+
+    for output in sorted(expected_outputs):
+        trace_row = rows_by_output[output]
+        matrix_row = matrix_by_output.get(output)
+        capability_row = capability_by_output.get(output)
+        config_row = config_by_output.get(output)
+        if matrix_row is None or capability_row is None or config_row is None:
+            fail(f"{output} must exist in matrix, capability manifest, and config example")
+        if matrix_row["Class"].strip() != "Low current":
+            fail(f"{output} must remain Low current in output channel matrix")
+        if matrix_row["Initial switch direction"].strip() != trace_row["Switch architecture"].strip():
+            fail(f"{output} switch architecture must match output channel matrix")
+        if int(matrix_row["Target fuse A"]) != int(trace_row["Fuse target A"]):
+            fail(f"{output} fuse target must match output channel matrix")
+        if int(matrix_row["Target current limit A"]) != int(trace_row["Current limit A"]):
+            fail(f"{output} current limit must match output channel matrix")
+        if capability_row["class"] != "Low current":
+            fail(f"{output} must remain Low current in capability manifest")
+        if capability_row["target_fuse_a"] != int(trace_row["Fuse target A"]):
+            fail(f"{output} capability fuse target must match low-current trace")
+        if capability_row["target_current_limit_a"] != int(trace_row["Current limit A"]):
+            fail(f"{output} capability current limit must match low-current trace")
+        if config_row["fuse_a"] != int(trace_row["Fuse target A"]):
+            fail(f"{output} config example fuse must match low-current trace")
+        if config_row["current_limit_a"] != int(trace_row["Current limit A"]):
+            fail(f"{output} config example current limit must match low-current trace")
+
+    output_contract_text = read_text(PB100_DIR / "PB-100-output-channel-pin-contract.csv")
+    for output in sorted(expected_outputs):
+        if f"{output}_CTL" not in output_contract_text or f"{output}_IMON" not in output_contract_text:
+            fail(f"output pin contract must include {output} control and current telemetry nets")
+
+    low_current_design_rows = [
+        row
+        for row in csv.DictReader((PB100_DIR / "PB-100-output-stage-design-values.csv").open(newline="", encoding="utf-8"))
+        if row["Output class"].strip() == "Low current"
+    ]
+    if len(low_current_design_rows) != len(REQUIRED_OUTPUT_STAGE_ITEMS):
+        fail("low-current output-stage design values must cover every required design item")
+    low_current_text = " ".join(" ".join(row.values()) for row in low_current_design_rows).lower()
+    if "external controller baseline" not in low_current_text or "no direct 40 v smart-switch rail" not in low_current_text:
+        fail("low-current design values must keep external-controller baseline and no direct 40 V rail explicit")
 
 
 def validate_input_power_design_values() -> None:
@@ -3263,6 +3375,7 @@ def main() -> int:
     validate_output_channel_pin_contract()
     validate_output_controller_pin_template()
     validate_output_net_expansion()
+    validate_low_current_output_baseline_trace()
     validate_input_and_power_pin_templates()
     validate_input_protection_pin_contract()
     validate_logic_power_design_placeholders()
