@@ -1494,8 +1494,10 @@ without weakening datasheet provenance for real components.
 ## 2026-07-10 — PB-100 top-level KiCad sheet linking
 
 Decision: PB-100 top-level KiCad schematic now links every child sheet listed
-in `PB-100-kicad-sheet-manifest.csv`. The PB-100 validator now fails if a child
-sheet exists in the manifest but is not linked from `PB-100.kicad_sch`.
+in `PB-100-kicad-sheet-manifest.csv`, and the capture work queue marks CAP-TOP
+as `Linked scaffold`. The PB-100 validator now fails if a child sheet exists in
+the manifest but is not linked from `PB-100.kicad_sch` or if CAP-TOP loses its
+child-link plus ERC/netlist evidence.
 
 Reason: Schematic capture needs a connected sheet hierarchy before component
 placement. Linking placeholder sheets is a schematic-scaffold step only: it

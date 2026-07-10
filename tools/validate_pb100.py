@@ -569,6 +569,7 @@ REQUIRED_CAPTURE_WORK_ITEMS = {
 }
 ALLOWED_CAPTURE_STATUSES = {
     "Scaffold ready",
+    "Linked scaffold",
     "Planned capture",
     "Blocked pending symbol",
     "Review-defined",
@@ -4482,6 +4483,12 @@ def validate_schematic_capture_work_queue() -> None:
             row_text = " ".join(row.values()).lower()
             if "dnp/open" not in row_text or "future adr" not in row_text:
                 fail("CAN1 capture work must keep DNP/open and future ADR explicit")
+        if work_item == "CAP-TOP":
+            row_text = " ".join(row.values()).lower()
+            if "linked" not in row["Capture status"].lower():
+                fail("top-level capture work must mark child sheet links complete")
+            if "child sheets linked" not in row_text or "erc/netlist" not in row_text:
+                fail("top-level capture work must keep child-link and ERC/netlist evidence")
         if work_item == "CAP-TP" and "footprint" not in row["Blocker"].lower():
             fail("test point capture work must keep footprint/placement blocker explicit")
 
