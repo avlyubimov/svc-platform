@@ -257,6 +257,14 @@ BOARD_CURRENT_BUDGET_TRACE_COLUMNS = (
     "Freeze state",
     "Remaining work",
 )
+CURRENT_TELEMETRY_TRACE_COLUMNS = (
+    "Measurement group",
+    "Signals",
+    "Range target A",
+    "Primary hardware path",
+    "Firmware safety use",
+    "Freeze dependency",
+)
 TVS_LOAD_DUMP_MARGIN_TRACE_COLUMNS = (
     "Protected item",
     "Voltage class",
@@ -512,6 +520,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv",
     "hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv",
+    "hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-output-net-expansion.csv",
     "hardware/power-board/PB-100/PB-100-test-point-plan.csv",
     "hardware/power-board/PB-100/PB-100-fault-response-matrix.csv",
@@ -1551,6 +1560,10 @@ def validate_schematic_freeze_gap_register() -> None:
     for token in ("PB-100-tvs-load-dump-margin-trace.csv", "60 V", "DO-218AC", "overshoot"):
         if token not in tvs_text:
             fail(f"TVS/load-dump gap must keep {token} explicit")
+    current_telemetry_text = " ".join(rows_by_gate["Current telemetry"].values())
+    for token in ("PB-100-current-telemetry-trace.csv", "0.5mΩ", "ADC or I2C", "firmware safety"):
+        if token not in current_telemetry_text:
+            fail(f"Current telemetry gap must keep {token} explicit")
     factory_text = " ".join(rows_by_gate["Factory assembly readiness"].values()).lower()
     if "pb-100-assembly-readiness-trace.csv" not in factory_text or "assembly" not in factory_text or "alternat" not in factory_text:
         fail("Factory assembly readiness gap must keep assembly and alternatives explicit")
@@ -2688,6 +2701,88 @@ def validate_board_current_budget_trace() -> None:
             fail(f"board-current budget trace must include {token}")
 
 
+def validate_current_telemetry_trace() -> None:
+    path = PB100_DIR / "PB-100-current-telemetry-trace.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty current telemetry trace: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in CURRENT_TELEMETRY_TRACE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    expected_groups = {
+        "OUT2 high-current telemetry": ("0-30", {"OUT2_IMON"}),
+        "OUT1 medium 12A telemetry": ("0-20", {"OUT1_IMON"}),
+        "Medium 8A telemetry": ("0-15", {"OUT3_IMON", "OUT4_IMON", "OUT6_IMON", "OUT7_IMON", "OUT10_IMON"}),
+        "Low 4A telemetry": ("0-8", {"OUT5_IMON", "OUT8_IMON", "OUT9_IMON"}),
+        "Total input telemetry": ("0-60", {"IIN_SENSE"}),
+    }
+    rows_by_group: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        group = row["Measurement group"].strip()
+        if group in rows_by_group:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate measurement group {group}")
+        if group not in expected_groups:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown measurement group {group}")
+        rows_by_group[group] = row
+        for column in CURRENT_TELEMETRY_TRACE_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        expected_range, expected_signals = expected_groups[group]
+        if row["Range target A"].strip() != expected_range:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: range must be {expected_range}")
+        if set(row["Signals"].split()) != expected_signals:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: signals must be {' '.join(sorted(expected_signals))}")
+        row_text = " ".join(row.values()).lower()
+        for token in ("schematic freeze", "calibration"):
+            if token not in row_text:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: current telemetry row must include {token}")
+
+    missing_groups = sorted(set(expected_groups) - set(rows_by_group))
+    if missing_groups:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing telemetry groups: "
+            f"{', '.join(missing_groups)}"
+        )
+
+    map_rows = list(csv.DictReader((PB100_DIR / "PB-100-current-telemetry-map.csv").open(newline="", encoding="utf-8")))
+    map_by_signal = {row["Signal"].strip(): row for row in map_rows}
+    capabilities = json.loads(read_text(REPO_ROOT / "firmware" / "configs" / "hardware" / "pb-100-capabilities.json"))
+    capability_signals = set(capabilities["telemetry"]["current_signals"])
+    expected_all_signals = set().union(*(signals for _, signals in expected_groups.values()))
+    if not expected_all_signals <= capability_signals:
+        fail("current telemetry trace signals must be exposed in PB-100 capability manifest")
+
+    for expected_range, signals in expected_groups.values():
+        for signal in signals:
+            row = map_by_signal.get(signal)
+            if row is None:
+                fail(f"current telemetry map must include {signal}")
+            if row["Range A"].strip() != expected_range:
+                fail(f"{signal} current telemetry map range must be {expected_range}")
+            if signal == "IIN_SENSE":
+                row_text = " ".join(row.values())
+                for token in ("0.5mΩ", "40A", "60A"):
+                    if token not in row_text:
+                        fail(f"IIN_SENSE map row must preserve {token}")
+
+    trace_text = read_text(path)
+    for token in ("0.5 mOhm", "40 A budget", "stale-telemetry safe-off", "ADC or I2C"):
+        if token not in trace_text:
+            fail(f"current telemetry trace must include {token}")
+
+    firmware_readme = read_text(REPO_ROOT / "firmware" / "README.md").lower()
+    for token in ("telemetry snapshot", "staleness", "stale-data fail", "safe behavior"):
+        if token not in firmware_readme:
+            fail(f"firmware README must keep telemetry safety coverage token: {token}")
+
+
 def validate_can1_capture_contract() -> None:
     can1_doc = read_text(PB100_DIR / "PB-100-can1-tx-disable.md").lower()
     for token in (
@@ -3621,6 +3716,7 @@ def main() -> int:
     validate_output_stage_design_values()
     validate_input_power_design_values()
     validate_board_current_budget_trace()
+    validate_current_telemetry_trace()
     validate_logic_power_design_values()
     validate_can1_safety_verification()
     validate_can1_capture_contract()

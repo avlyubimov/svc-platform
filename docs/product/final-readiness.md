@@ -58,6 +58,9 @@ Current coverage:
 - OUT2 and medium-current outputs now have a baseline trace tying their fuse
   classes, configured current limits, TPS48110 external-MOSFET architecture,
   telemetry nets, and SOA/fuse/inductive-clamp freeze blockers together.
+- Current telemetry now has a trace tying per-output IMON ranges, total
+  `IIN_SENSE`, 0.5 mΩ shunt measurement, 40 A budget enforcement, and
+  stale-telemetry safe-off behavior together.
 - Factory-vs-garage assembly ownership now has a dedicated trace for critical
   PB-100 symbol keys; schematic freeze must still recheck JLCPCB/PCBWay
   assembly class, distributor continuity, garage connector derating, crimp

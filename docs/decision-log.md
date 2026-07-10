@@ -1273,3 +1273,15 @@ Reason: High/medium output validation spans fuse class, configured current
 limit, telemetry net, gate-drive values, sense path, OUT2 SOA, and inductive
 clamp decisions. A dedicated trace makes those dependencies machine-checkable
 without assigning accessory roles or starting PCB layout.
+
+## 2026-07-10 — PB-100 current telemetry trace
+
+Decision: PB-100 schematic planning now includes
+`PB-100-current-telemetry-trace.csv` for per-output IMON ranges and total input
+current telemetry. The trace keeps `IIN_SENSE` tied to the dedicated 0.5 mΩ
+input shunt monitor and to board-level 40 A budget enforcement.
+
+Reason: Current telemetry is a firmware safety input, not only a measurement
+feature. The trace makes range targets, ADC/I2C ownership, calibration, RC
+filtering, stale-telemetry safe-off behavior, and shunt Kelvin review
+machine-checkable before schematic freeze.
