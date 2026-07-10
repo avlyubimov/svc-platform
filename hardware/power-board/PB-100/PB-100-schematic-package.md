@@ -19,6 +19,7 @@ It is not a PCB layout package.
 - `firmware/configs/hardware/pb-100-capabilities.json`
 - `production/bom/pb100_symbol_bom_map.csv`
 - `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`
+- `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`
 - `production/bom/pb100_assembly_sourcing_recheck.csv`
 - `production/bom/pb100_sourcing_evidence_snapshot.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
@@ -100,6 +101,9 @@ Logical pin-budget CSV:
 Schematic-planning pin map CSV:
 `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`.
 
+B2B interface trace CSV:
+`hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`.
+
 | Signal group | Count target | Direction | Notes |
 |---|---:|---|---|
 | Power and grounds | 20-30 pins | PB-100/LB-100 | Multiple grounds and supply pins for current return and signal integrity |
@@ -114,7 +118,10 @@ The initial 100-pin mezzanine target is now a Hirose FX18 candidate pair:
 `FX18-100P-0.8SV10` plus `FX18-100S-0.8SV20`. `JPB1` pin assignment is captured
 as a schematic-planning input, but stack height, vendor footprint drawing,
 vibration retention, PCBA handling, and LB-100 MCU pin binding remain
-schematic-review items.
+schematic-review items. The B2B interface trace ties the candidate pair,
+power/status pins, output controls/faults/current telemetry, board telemetry,
+CAN1 safety crossing, and reserve pins back to the LB-100 resource-binding
+review.
 
 ## Output channel matrix
 

@@ -281,6 +281,14 @@ LOGIC_POWER_RAIL_TRACE_COLUMNS = (
     "Safety boundary",
     "Freeze dependency",
 )
+B2B_INTERFACE_TRACE_COLUMNS = (
+    "Trace item",
+    "Signals",
+    "Pin span",
+    "LB-100 resource class",
+    "Default state or safety boundary",
+    "Freeze dependency",
+)
 TVS_LOAD_DUMP_MARGIN_TRACE_COLUMNS = (
     "Protected item",
     "Voltage class",
@@ -539,6 +547,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv",
+    "hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv",
     "hardware/power-board/PB-100/PB-100-output-net-expansion.csv",
     "hardware/power-board/PB-100/PB-100-test-point-plan.csv",
     "hardware/power-board/PB-100/PB-100-fault-response-matrix.csv",
@@ -1590,6 +1599,15 @@ def validate_schematic_freeze_gap_register() -> None:
     for token in ("PB-100-logic-power-rail-trace.csv", "1 A", "power-good", "UVLO"):
         if token not in logic_power_text:
             fail(f"Logic power rails gap must keep {token} explicit")
+    b2b_text = " ".join(rows_by_gate["Board-to-board interface"].values())
+    for token in (
+        "PB-100-b2b-interface-trace.csv",
+        "FX18-100P-0.8SV10",
+        "FX18-100S-0.8SV20",
+        "LB-100 MCU binding",
+    ):
+        if token not in b2b_text:
+            fail(f"Board-to-board interface gap must keep {token} explicit")
     factory_text = " ".join(rows_by_gate["Factory assembly readiness"].values()).lower()
     if "pb-100-assembly-readiness-trace.csv" not in factory_text or "assembly" not in factory_text or "alternat" not in factory_text:
         fail("Factory assembly readiness gap must keep assembly and alternatives explicit")
@@ -3416,6 +3434,166 @@ def validate_thermal_telemetry_baseline() -> None:
             fail(f"THERMAL_NTC sourcing evidence must explicitly track {token}")
 
 
+def validate_b2b_interface_trace() -> None:
+    path = PB100_DIR / "PB-100-b2b-interface-trace.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty B2B interface trace: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in B2B_INTERFACE_TRACE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    required_items = {
+        "Connector candidate",
+        "Power status and grounds",
+        "Output control fault and current",
+        "Board telemetry and PB bus",
+        "CAN1 safety crossing",
+        "Expansion and reserve",
+    }
+    rows_by_item: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        item = row["Trace item"].strip()
+        if item in rows_by_item:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate trace item {item}")
+        if item not in required_items:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown trace item {item}")
+        rows_by_item[item] = row
+        for column in B2B_INTERFACE_TRACE_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        if "schematic freeze" not in " ".join(row.values()).lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze dependency must reference schematic freeze")
+
+    missing_items = sorted(required_items - rows_by_item.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing B2B trace items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    connector_text = " ".join(rows_by_item["Connector candidate"].values())
+    for token in ("FX18-100P-0.8SV10", "FX18-100S-0.8SV20", "No connector placement"):
+        if token not in connector_text:
+            fail(f"B2B connector trace must include {token}")
+
+    pin_map_path = PB100_DIR / "PB-100-b2b-pin-map.csv"
+    validate_csv(pin_map_path)
+    pin_rows = list(csv.DictReader(pin_map_path.open(newline="", encoding="utf-8")))
+    if len(pin_rows) != 100:
+        fail(f"{pin_map_path.relative_to(REPO_ROOT)} must contain exactly 100 JPB1 pins")
+
+    pins = sorted(int(row["Pin"].strip()) for row in pin_rows)
+    if pins != list(range(1, 101)):
+        fail(f"{pin_map_path.relative_to(REPO_ROOT)} must define contiguous pins 1-100")
+    if any(row["Connector"].strip() != "JPB1" for row in pin_rows):
+        fail(f"{pin_map_path.relative_to(REPO_ROOT)} must use connector JPB1 for every pin")
+
+    def rows_for_pin_span(start: int, end: int) -> list[dict[str, str]]:
+        return [row for row in pin_rows if start <= int(row["Pin"].strip()) <= end]
+
+    def nets_for_pin_span(start: int, end: int) -> set[str]:
+        return {row["Net"].strip() for row in rows_for_pin_span(start, end)}
+
+    power_row = rows_by_item["Power status and grounds"]
+    if power_row["Pin span"].strip() != "1-19":
+        fail("B2B power/status trace must cover JPB1 pins 1-19")
+    power_rows = rows_for_pin_span(1, 19)
+    if sum(1 for row in power_rows if row["Net"].strip() == "GND") != 10:
+        fail("B2B pin map must keep ten GND return pins in pins 1-19")
+    if sum(1 for row in power_rows if row["Net"].strip() == "AGND") != 2:
+        fail("B2B pin map must keep two AGND return pins in pins 1-19")
+    if sum(1 for row in power_rows if row["Net"].strip() == "PB_5V_OUT") != 4:
+        fail("B2B pin map must keep four PB_5V_OUT pins in pins 1-19")
+    if sum(1 for row in power_rows if row["Net"].strip() == "LB_3V3_IO") != 2:
+        fail("B2B pin map must keep two LB_3V3_IO pins in pins 1-19")
+    if "PB_PWR_GOOD" not in nets_for_pin_span(1, 19):
+        fail("B2B pin map must expose PB_PWR_GOOD in pins 1-19")
+    if "PB_PWR_GOOD inactive" not in " ".join(power_row.values()):
+        fail("B2B power trace must keep PB_PWR_GOOD inactive-until-valid behavior")
+
+    output_row = rows_by_item["Output control fault and current"]
+    if output_row["Pin span"].strip() != "21-50":
+        fail("B2B output trace must cover JPB1 pins 21-50")
+    output_nets = nets_for_pin_span(21, 50)
+    expected_output_nets = {
+        f"OUT{output}_{suffix}"
+        for output in range(1, 11)
+        for suffix in ("CTL", "FLT", "IMON")
+    }
+    missing_output_nets = sorted(expected_output_nets - output_nets)
+    if missing_output_nets:
+        fail(f"B2B output trace pin span is missing nets: {', '.join(missing_output_nets)}")
+    if "role mapping stays in configuration" not in " ".join(output_row.values()).lower():
+        fail("B2B output trace must preserve configuration-owned role mapping")
+
+    telemetry_row = rows_by_item["Board telemetry and PB bus"]
+    if telemetry_row["Pin span"].strip() != "51-66":
+        fail("B2B telemetry trace must cover JPB1 pins 51-66")
+    expected_telemetry_nets = {
+        "VBAT_SENSE",
+        "IIN_SENSE",
+        "TEMP_PCB",
+        "TEMP_PWR_A",
+        "TEMP_PWR_B",
+        "PB_FAULT",
+        "PB_I2C_SCL",
+        "PB_I2C_SDA",
+        "PB_I2C_INT",
+        "PB_ID_ADC",
+        "ADC_REF",
+    }
+    missing_telemetry_nets = sorted(expected_telemetry_nets - nets_for_pin_span(51, 66))
+    if missing_telemetry_nets:
+        fail(f"B2B telemetry trace pin span is missing nets: {', '.join(missing_telemetry_nets)}")
+    for token in expected_telemetry_nets:
+        if token not in telemetry_row["Signals"]:
+            fail(f"B2B telemetry trace must include signal {token}")
+    if "calibration stays outside firmware constants" not in " ".join(telemetry_row.values()).lower():
+        fail("B2B telemetry trace must keep calibration outside firmware constants")
+
+    can_row = rows_by_item["CAN1 safety crossing"]
+    if can_row["Pin span"].strip() != "67-70":
+        fail("B2B CAN1 trace must cover JPB1 pins 67-70")
+    expected_can_nets = {"CAN1_TX_DISABLE_CMD", "CAN1_TX_DISABLED_STATUS", "CAN1_RX_ROUTE", "CAN1_TX_ROUTE"}
+    missing_can_nets = sorted(expected_can_nets - nets_for_pin_span(67, 70))
+    if missing_can_nets:
+        fail(f"B2B CAN1 trace pin span is missing nets: {', '.join(missing_can_nets)}")
+    can_text = " ".join(can_row.values()).lower()
+    if "dnp/open" not in can_text or "future adr" not in can_text or "disabled-status" not in can_text:
+        fail("B2B CAN1 trace must preserve DNP/open future-ADR disabled-status boundary")
+
+    expansion_row = rows_by_item["Expansion and reserve"]
+    if expansion_row["Pin span"].strip() != "71-100":
+        fail("B2B expansion trace must cover JPB1 pins 71-100")
+    expansion_nets = nets_for_pin_span(71, 100)
+    expected_expansion_tokens = {
+        "CAN2",
+        "LIN",
+        "RS485",
+        "UART",
+        "EXT_ADC",
+        "EXT_DIG",
+        "EXT_5V_EN",
+        "SPARE_01..SPARE_16",
+    }
+    expansion_text = " ".join(expansion_row.values())
+    for token in expected_expansion_tokens:
+        if token not in expansion_text:
+            fail(f"B2B expansion trace must include {token}")
+    expected_spares = {f"SPARE_{index:02d}" for index in range(1, 17)}
+    missing_spares = sorted(expected_spares - expansion_nets)
+    if missing_spares:
+        fail(f"B2B expansion trace pin span is missing reserves: {', '.join(missing_spares)}")
+
+
 def validate_b2b_connector_candidate() -> None:
     required_tokens = (
         "FX18-100P-0.8SV10",
@@ -3924,6 +4102,7 @@ def main() -> int:
     validate_tvs_candidate_consistency()
     validate_tvs_load_dump_margin_trace()
     validate_thermal_telemetry_baseline()
+    validate_b2b_interface_trace()
     validate_b2b_connector_candidate()
     validate_validation_traceability()
     validate_test_point_plan()

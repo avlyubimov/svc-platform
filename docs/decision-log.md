@@ -1311,3 +1311,15 @@ Reason: Logic power is a safety dependency for output default-off behavior and
 LB-100 startup. A dedicated trace makes the protected input rail, 5 V budget,
 power-good timing, rail-invalid output behavior, and lower-voltage fallback
 risk machine-checkable before schematic freeze.
+## 2026-07-10 — PB-100 JPB1 B2B interface trace
+
+Decision: PB-100 schematic planning now includes
+`PB-100-b2b-interface-trace.csv` for the 100-pin `JPB1` interface. The trace
+ties the Hirose FX18 candidate pair, power/status pins,
+output controls/faults/current telemetry, board telemetry, CAN1 safety
+crossing, and expansion reserves to the LB-100 resource-binding review.
+
+Reason: The B2B connector is a lifecycle boundary between PB-100 and LB-100. A
+dedicated trace makes pin-map drift, CAN1 safety crossing, power-good behavior,
+and LB-100 resource assumptions machine-checkable without starting connector
+placement or PCB layout.
