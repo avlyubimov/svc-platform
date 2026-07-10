@@ -77,6 +77,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
+- `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv`
 - `docs/testing/test-plan.md`
 - `production/bom/factory_bom_draft.csv`
 - `production/bom/garage_bom_draft.csv`

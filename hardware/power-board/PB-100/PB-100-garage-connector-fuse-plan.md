@@ -44,6 +44,8 @@ Detailed map CSV:
 - Per-channel fuse holders must remain user-serviceable after enclosure design.
 - Wire gauge must be checked against connector contacts, fuse rating, harness
   length, and motorcycle installation route.
+- Crimp tooling, contact insertion/removal tools, strain relief, and service
+  access must remain feasible for garage installation.
 
 ## Evidence links
 

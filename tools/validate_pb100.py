@@ -344,6 +344,13 @@ CAN1_TX_DISABLE_TRACE_COLUMNS = (
     "Blocked change",
     "Freeze dependency",
 )
+GARAGE_CONNECTOR_FUSE_PLAN_COLUMNS = (
+    "Interface",
+    "Target current or fuse",
+    "Connector or fuse family",
+    "Status",
+    "Notes",
+)
 ASSEMBLY_SOURCING_RECHECK_COLUMNS = (
     "Symbol key",
     "Assembly owner",
@@ -611,6 +618,8 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-can1-safety-verification.csv",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv",
     "hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv",
+    "hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md",
+    "hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv",
     "hardware/power-board/PB-100/kicad/PB-100.kicad_sch",
     "hardware/power-board/PB-100/kicad/lib/PB100.kicad_sym",
     "firmware/configs/hardware/pb-100-capabilities.json",
@@ -3709,6 +3718,82 @@ def validate_assembly_readiness_trace() -> None:
             fail(f"safety DNP assembly trace must preserve {token}")
 
 
+def validate_garage_connector_fuse_plan() -> None:
+    csv_path = PB100_DIR / "PB-100-garage-connector-fuse-plan.csv"
+    validate_csv(csv_path)
+    rows = list(csv.DictReader(csv_path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty garage connector/fuse plan: {csv_path.relative_to(REPO_ROOT)}")
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in GARAGE_CONNECTOR_FUSE_PLAN_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{csv_path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    required_interfaces = {
+        "Battery input",
+        "Main harness fuse",
+        "OUT1",
+        "OUT2",
+        "OUT3",
+        "OUT4",
+        "OUT5",
+        "OUT6",
+        "OUT7",
+        "OUT8",
+        "OUT9",
+        "OUT10",
+        "CAN/service",
+        "External inputs",
+        "Per-channel fuses",
+    }
+    rows_by_interface: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        interface = row["Interface"].strip()
+        if interface in rows_by_interface:
+            fail(f"{csv_path.relative_to(REPO_ROOT)}:{row_number}: duplicate interface {interface}")
+        rows_by_interface[interface] = row
+        for column in GARAGE_CONNECTOR_FUSE_PLAN_COLUMNS:
+            if not row[column].strip():
+                fail(f"{csv_path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if row["Status"].strip() not in {"Candidate", "Conditional"}:
+            fail(f"{csv_path.relative_to(REPO_ROOT)}:{row_number}: invalid Status {row['Status'].strip()}")
+
+    missing_interfaces = sorted(required_interfaces - rows_by_interface.keys())
+    if missing_interfaces:
+        fail(
+            f"{csv_path.relative_to(REPO_ROOT)} is missing interfaces: "
+            f"{', '.join(missing_interfaces)}"
+        )
+    for output in ("OUT1", "OUT2"):
+        row_text = " ".join(rows_by_interface[output].values())
+        if "DTP" not in row_text or "DT 13A class is too close" not in row_text and output == "OUT1":
+            fail(f"{output} garage connector plan must keep DTP class and DT margin note")
+    for output in ("OUT3", "OUT4", "OUT5", "OUT6", "OUT7", "OUT8", "OUT9", "OUT10"):
+        row_text = " ".join(rows_by_interface[output].values())
+        if "DT" not in row_text:
+            fail(f"{output} garage connector plan must use DT class")
+    if "DTM" not in " ".join(rows_by_interface["CAN/service"].values()):
+        fail("CAN/service garage connector plan must use DTM signal class")
+    if "MINI/ATO" not in " ".join(rows_by_interface["Per-channel fuses"].values()):
+        fail("per-channel fuses must stay on MINI/ATO blade family")
+    if rows_by_interface["Battery input"]["Status"].strip() != "Conditional":
+        fail("battery input connector must remain conditional until derating review closes")
+
+    doc_path = PB100_DIR / "PB-100-garage-connector-fuse-plan.md"
+    doc_text = read_text(doc_path).lower()
+    for token in ("wire gauge", "crimp", "service", "enclosure", "does not freeze exact connector mpns"):
+        if token not in doc_text:
+            fail(f"{doc_path.relative_to(REPO_ROOT)} must preserve garage boundary token {token}")
+
+    garage_bom_text = read_text(REPO_ROOT / "production" / "bom" / "garage_bom_draft.csv")
+    for token in ("Deutsch DTP", "Deutsch DT", "Deutsch DTM", "Mini/ATO", "Automotive wire", "Enclosure"):
+        if token not in garage_bom_text:
+            fail(f"garage BOM must preserve {token}")
+
+
 def evidence_link_is_valid(value: str) -> bool:
     return value.startswith(("https://", "http://", "docs/", "hardware/", "production/"))
 
@@ -4852,6 +4937,7 @@ def main() -> int:
     validate_can1_capture_contract()
     validate_assembly_sourcing_recheck()
     validate_assembly_readiness_trace()
+    validate_garage_connector_fuse_plan()
     validate_sourcing_evidence_snapshot()
     validate_tvs_candidate_consistency()
     validate_tvs_load_dump_margin_trace()

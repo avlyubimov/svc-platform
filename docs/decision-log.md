@@ -1517,3 +1517,15 @@ Reason: The B2B freeze gap needed more than a pin map but should not invent
 LB-100 MCU pins before LB-100 schematic capture. A resource-class binding
 narrows the gap and is now checked by the PB-100 validator without authorizing
 connector placement or PCB layout.
+
+## 2026-07-10 — PB-100 garage connector/fuse scope validation
+
+Decision: PB-100 release manifest now includes the garage connector/fuse plan
+and interface matrix. The PB-100 validator checks DTP/DT/DTM connector class
+use, MINI/ATO per-output fuse scope, conditional battery-input derating, garage
+BOM coverage, and crimp/tooling/service-access boundaries.
+
+Reason: Garage-installed items must stay limited to user-serviceable
+connectors, fuses, enclosure, wiring, and harness hardware. Machine-checking
+the existing plan prevents factory/garage ownership drift without changing
+component requirements or starting PCB layout.
