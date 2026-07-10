@@ -43,6 +43,7 @@ hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv,Outputs
 hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv,Outputs,TPS48110 output pin template,Required,validate_output_controller_pin_template,Conditional
 hardware/power-board/PB-100/PB-100-output-stage-design-values.csv,Outputs,Output stage design values,Required,validate_output_stage_design_values,Conditional
 hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv,Telemetry,Current telemetry and firmware safety trace,Required,validate_current_telemetry_trace,Conditional
+hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv,Telemetry,Current telemetry freeze review,Required,validate_current_telemetry_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-current-telemetry-map.csv,Telemetry,Current telemetry map,Required,CSV width validation,Ready
 hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv,Telemetry,Thermal telemetry and firmware safety trace,Required,validate_thermal_telemetry_trace,Conditional
 hardware/power-board/PB-100/PB-100-thermal-telemetry-map.csv,Telemetry,Thermal telemetry map,Required,CSV width validation,Ready

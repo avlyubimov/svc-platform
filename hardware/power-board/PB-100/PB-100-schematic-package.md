@@ -33,6 +33,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`
+- `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
 - `hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv`
@@ -80,6 +81,10 @@ It is not a PCB layout package.
   protected copper distribution, firmware config, telemetry enforcement, and
   no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`.
+- Current telemetry freeze review: 0.5 mΩ shunt range, INA228-class monitor
+  headroom, Kelvin sense, ADC/I2C ownership, per-output IMON scaling,
+  calibration configuration, and stale-telemetry safe faults are tracked in
+  `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`.
 - Outputs: 10 generic high-side protected channels.
 - CAN1: read-only by default; TX physically disabled.
 

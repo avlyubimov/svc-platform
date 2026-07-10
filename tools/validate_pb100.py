@@ -286,6 +286,14 @@ CURRENT_TELEMETRY_TRACE_COLUMNS = (
     "Firmware safety use",
     "Freeze dependency",
 )
+CURRENT_TELEMETRY_FREEZE_REVIEW_COLUMNS = (
+    "Review item",
+    "Required boundary",
+    "Primary evidence",
+    "Schematic freeze check",
+    "Pass condition",
+    "Blocked action",
+)
 THERMAL_TELEMETRY_TRACE_COLUMNS = (
     "Thermal zone",
     "Signal",
@@ -454,7 +462,11 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-high-medium-output-baseline-trace.csv",
         "PB-100-low-current-output-baseline-trace.csv",
     ),
-    "CAP-TEL": ("PB-100-current-telemetry-trace.csv", "PB-100-thermal-telemetry-trace.csv"),
+    "CAP-TEL": (
+        "PB-100-current-telemetry-trace.csv",
+        "PB-100-current-telemetry-freeze-review.csv",
+        "PB-100-thermal-telemetry-trace.csv",
+    ),
     "CAP-B2B": (
         "PB-100-b2b-interface-trace.csv",
         "PB-100-b2b-lb100-resource-binding.csv",
@@ -597,6 +609,16 @@ REQUIRED_BOARD_CURRENT_BUDGET_FREEZE_REVIEW_ITEMS = {
     "Output oversubscription boundary",
     "Layout authorization boundary",
 }
+REQUIRED_CURRENT_TELEMETRY_FREEZE_REVIEW_ITEMS = {
+    "Total shunt range",
+    "Monitor range",
+    "Kelvin and copper heating",
+    "ADC or I2C ownership",
+    "Per-output IMON scaling",
+    "Calibration configuration",
+    "Stale telemetry safe fault",
+    "Bench validation path",
+}
 REQUIRED_FAULT_IDS = {
     "PBFLT-INPUT-REV",
     "PBFLT-LOAD-DUMP",
@@ -644,6 +666,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv",
+    "hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv",
@@ -1803,7 +1826,11 @@ def validate_schematic_freeze_gap_register() -> None:
         "Input reverse protection": ("PB-100-input-reverse-package-trace.csv", "PB-100-input-reverse-protection.md"),
         "TVS/load-dump protection": ("PB-100-tvs-load-dump-margin-trace.csv", "PB-100-protection-validation.csv"),
         "Logic power rails": ("PB-100-logic-power-rail-trace.csv", "PB-100-logic-power-budget.csv"),
-        "Current telemetry": ("PB-100-current-telemetry-trace.csv", "PB-100-current-telemetry-map.csv"),
+        "Current telemetry": (
+            "PB-100-current-telemetry-trace.csv",
+            "PB-100-current-telemetry-freeze-review.csv",
+            "PB-100-current-telemetry-map.csv",
+        ),
         "Thermal telemetry": ("PB-100-thermal-telemetry-trace.csv", "PB-100-thermal-telemetry-map.csv"),
         "Factory assembly readiness": ("PB-100-assembly-readiness-trace.csv", "pb100_sourcing_evidence_snapshot.csv"),
         "Garage assembly readiness": ("PB-100-assembly-readiness-trace.csv", "PB-100-garage-connector-fuse-plan.md"),
@@ -1862,7 +1889,13 @@ def validate_schematic_freeze_gap_register() -> None:
         if token not in tvs_text:
             fail(f"TVS/load-dump gap must keep {token} explicit")
     current_telemetry_text = " ".join(rows_by_gate["Current telemetry"].values())
-    for token in ("PB-100-current-telemetry-trace.csv", "0.5mΩ", "ADC or I2C", "firmware safety"):
+    for token in (
+        "PB-100-current-telemetry-trace.csv",
+        "PB-100-current-telemetry-freeze-review.csv",
+        "0.5mΩ",
+        "ADC or I2C",
+        "firmware safety",
+    ):
         if token not in current_telemetry_text:
             fail(f"Current telemetry gap must keep {token} explicit")
     thermal_telemetry_text = " ".join(rows_by_gate["Thermal telemetry"].values())
@@ -3602,6 +3635,106 @@ def validate_current_telemetry_trace() -> None:
             fail(f"firmware README must keep telemetry safety coverage token: {token}")
 
 
+def validate_current_telemetry_freeze_review() -> None:
+    path = PB100_DIR / "PB-100-current-telemetry-freeze-review.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty current telemetry freeze review: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in CURRENT_TELEMETRY_FREEZE_REVIEW_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_item: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        review_item = row["Review item"].strip()
+        if review_item not in REQUIRED_CURRENT_TELEMETRY_FREEZE_REVIEW_ITEMS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown current telemetry review item {review_item}")
+        if review_item in rows_by_item:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate current telemetry review item {review_item}")
+        rows_by_item[review_item] = row
+        for column in CURRENT_TELEMETRY_FREEZE_REVIEW_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if review_item == "Calibration configuration" and "not firmware constants" not in row_text:
+            fail("current telemetry freeze review must keep calibration out of firmware constants")
+        if review_item == "Stale telemetry safe fault" and "safe" not in row_text:
+            fail("current telemetry freeze review must keep stale telemetry fail-safe behavior")
+
+    missing_items = sorted(REQUIRED_CURRENT_TELEMETRY_FREEZE_REVIEW_ITEMS - rows_by_item.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing current telemetry review items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    review_text = read_text(path)
+    for token in (
+        "0.5mΩ",
+        "20mV at 40A",
+        "30mV at 60A",
+        "±40.96mV",
+        "INA228-Q1",
+        "INA229-Q1",
+        "INA226",
+        "IIN_SHUNT_HI",
+        "IIN_SHUNT_LO",
+        "Kelvin",
+        "IIN_SENSE",
+        "PB_I2C_SCL",
+        "PB_I2C_SDA",
+        "PB_I2C_INT",
+        "ADC I2C",
+        "OUT1_IMON",
+        "OUT10_IMON",
+        "configuration data not firmware constants",
+        "stale-telemetry denial",
+        "PB-BENCH-005",
+        "PB-BENCH-006",
+        "PB-BENCH-010",
+    ):
+        if token not in review_text:
+            fail(f"current telemetry freeze review must include {token}")
+
+    current_doc = read_text(PB100_DIR / "PB-100-current-telemetry.md")
+    for token in ("0.5 mΩ", "20 mV", "0.8 W", "30 mV", "1.8 W", "±40.96 mV"):
+        if token not in current_doc:
+            fail(f"current telemetry strategy must support freeze review token {token}")
+
+    net_domain_text = read_text(PB100_DIR / "PB-100-schematic-net-domain-plan.csv")
+    for token in ("IIN_SHUNT_HI", "IIN_SHUNT_LO", "Kelvin", "IIN_SENSE"):
+        if token not in net_domain_text:
+            fail(f"net-domain plan must support current telemetry freeze review token {token}")
+
+    b2b_binding_text = read_text(PB100_DIR / "PB-100-b2b-lb100-resource-binding.csv")
+    for token in ("ADC", "I2C", "IIN_SENSE", "PB_I2C_SCL", "PB_I2C_SDA"):
+        if token not in b2b_binding_text:
+            fail(f"B2B resource binding must support current telemetry freeze review token {token}")
+
+    firmware_joined = "\n".join(
+        (
+            read_text(REPO_ROOT / "firmware" / "tests" / "test_telemetry.c"),
+            read_text(REPO_ROOT / "firmware" / "tests" / "test_rule_runtime.c"),
+            read_text(REPO_ROOT / "firmware" / "tests" / "test_system_safety.c"),
+        )
+    )
+    for token in (
+        "test_total_current_power_budget_input",
+        "test_telemetry_wrapper_denies_stale_matching_rule",
+        "test_invalid_telemetry_forces_cutoff",
+        "test_stale_telemetry_forces_cutoff",
+    ):
+        if token not in firmware_joined:
+            fail(f"firmware tests must retain current telemetry safe-fault token {token}")
+
+
 def validate_thermal_telemetry_trace() -> None:
     path = PB100_DIR / "PB-100-thermal-telemetry-trace.csv"
     validate_csv(path)
@@ -4645,6 +4778,9 @@ def validate_validation_traceability() -> None:
         if freeze_gate == "Board current budget":
             if "pb-100-board-current-budget-freeze-review.csv" not in row_text:
                 fail("Board current validation trace must include 40 A freeze review")
+        if freeze_gate == "Current telemetry":
+            if "pb-100-current-telemetry-freeze-review.csv" not in row_text:
+                fail("Current telemetry validation trace must include freeze review")
         if freeze_gate == "Input reverse protection":
             if "q1" not in row_text or "40 a" not in row_text:
                 fail("Input reverse validation trace must keep Q1 and 40 A explicit")
@@ -5120,6 +5256,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-input-reverse-package-trace.csv",
         "PB-100-tvs-load-dump-margin-trace.csv",
         "PB-100-current-telemetry-trace.csv",
+        "PB-100-current-telemetry-freeze-review.csv",
         "PB-100-board-current-budget-trace.csv",
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-thermal-telemetry-trace.csv",
@@ -5198,6 +5335,7 @@ def main() -> int:
     validate_board_current_budget_trace()
     validate_board_current_budget_freeze_review()
     validate_current_telemetry_trace()
+    validate_current_telemetry_freeze_review()
     validate_thermal_telemetry_trace()
     validate_logic_power_rail_trace()
     validate_logic_power_design_values()

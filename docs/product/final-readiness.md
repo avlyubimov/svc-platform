@@ -61,6 +61,10 @@ Current coverage:
 - Current telemetry now has a trace tying per-output IMON ranges, total
   `IIN_SENSE`, 0.5 mΩ shunt measurement, 40 A budget enforcement, and
   stale-telemetry safe-off behavior together.
+- Current telemetry freeze review now ties the 0.5 mΩ shunt range,
+  INA228-class monitor headroom, Kelvin sense, ADC/I2C ownership, calibration
+  configuration, stale-telemetry safe faults, and bench validation IDs into
+  `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`.
 - Thermal telemetry now has a trace tying `TEMP_PCB`, `TEMP_PWR_A`, and
   `TEMP_PWR_B` to the TDK NTC candidate, default 85/105/75 °C thresholds,
   configuration-owned calibration, and firmware thermal fail-safe behavior.

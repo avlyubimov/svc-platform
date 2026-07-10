@@ -1562,3 +1562,20 @@ Reason: The 40 A board budget must be reviewable before PCB layout starts, but
 it must not imply copper geometry, footprint placement, or manufacturing
 authorization. A dedicated freeze-review artifact keeps schematic constraints,
 firmware enforcement, and remaining layout-blocked work explicit.
+
+## 2026-07-10 — PB-100 current telemetry freeze review
+
+Decision: PB-100 schematic planning now includes
+`PB-100-current-telemetry-freeze-review.csv`, tying the 0.5 mΩ total-current
+shunt range, INA228-Q1-class ±40.96 mV monitor candidate, INA229/INA226
+alternates, Kelvin sense nets, ADC/I2C ownership, per-output IMON class ranges,
+configuration-owned calibration, stale-telemetry fail-safe behavior, and bench
+validation IDs into one review artifact. The PB-100 validator now checks this
+artifact against the current telemetry strategy, net-domain plan, B2B resource
+binding, firmware tests, freeze checklist, validation traceability, and review
+packet.
+
+Reason: Current telemetry is both measurement hardware and firmware safety
+input. Schematic freeze must preserve range, calibration, interface ownership,
+and stale-data behavior without authorizing high-current copper layout or
+hard-coded firmware calibration constants.
