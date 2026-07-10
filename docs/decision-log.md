@@ -1432,3 +1432,14 @@ Reason: The capture plan is the human execution entry point while the capture
 work queue and KiCad sheet notes are machine-checked. Keeping all three aligned
 prevents schematic capture from using stale source documents after trace files
 have become the freeze-gate evidence.
+
+## 2026-07-10 — PB-100 KiCad sheet manifest trace input synchronization
+
+Decision: PB-100 KiCad sheet manifest now lists the same dedicated trace inputs
+as the capture plan and work queue for each child schematic sheet. The PB-100
+validator now fails if a manifest row drops a required trace artifact for its
+sheet.
+
+Reason: The manifest is the KiCad-facing source index. If it lags the
+trace-driven capture plan, schematic work can start from obsolete planning
+inputs even while the release packet appears complete.

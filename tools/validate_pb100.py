@@ -1331,6 +1331,22 @@ def validate_kicad_sheet_manifest() -> None:
         if sheet_kind == "child" and not (KICAD_DIR / "sheets" / sheet_file).exists():
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: child sheet file is missing: {sheet_file}")
 
+    manifest_rows_by_sheet = {row["Sheet file"].strip(): row for row in rows}
+    capture_queue_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-schematic-capture-work-queue.csv").open(newline="", encoding="utf-8"))
+    )
+    capture_rows_by_work_item = {row["Work item"].strip(): row for row in capture_queue_rows}
+    for work_item, tokens in CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM.items():
+        if work_item not in capture_rows_by_work_item:
+            fail(f"KiCad sheet manifest trace check is missing capture work item {work_item}")
+        sheet_file = capture_rows_by_work_item[work_item]["Sheet file"].strip()
+        if sheet_file not in manifest_rows_by_sheet:
+            fail(f"{path.relative_to(REPO_ROOT)} must include manifest row for {sheet_file}")
+        primary_artifacts = manifest_rows_by_sheet[sheet_file]["Primary artifacts"]
+        for token in tokens:
+            if token not in primary_artifacts:
+                fail(f"{path.relative_to(REPO_ROOT)} {sheet_file} row must include {token}")
+
     sheet_reference_rows = list(
         csv.DictReader((PB100_DIR / "PB-100-schematic-sheet-reference-map.csv").open(newline="", encoding="utf-8"))
     )
