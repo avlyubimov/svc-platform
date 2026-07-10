@@ -29,7 +29,7 @@ order.
 | Output MOSFET | Infineon OptiMOS automotive 40-60 V | Vishay SQJQ automotive; onsemi F085 automotive | TDSON/PowerPAK/TOLL/LFPAK | Must pass SOA and thermal review per channel; OUT2 keeps larger/parallel escape path |
 | Current monitor | TPS48110 IMON for outputs; TI INA228/INA229 or INA226 for input | External analog monitor; firmware-calibrated ADC path | VSSOP/SOIC class | Per-output telemetry uses controller IMON; total input current uses dedicated shunt monitor |
 | Total current shunt | Bourns CSS4J-4026R-L500F-class 0.5 mΩ four-terminal shunt | Bourns CSS4J-4026R-1L00F-class 1.0 mΩ; Isabellenhuette BVN/BAS or equivalent AEC-Q200 four-terminal family | CSS4J-4026 or reviewed power shunt | 0.5 mΩ gives 30 mV at 60 A and 1.8 W; compatible with INA228 ±40.96 mV range candidate |
-| Temperature sensor | Automotive NTC thermistor | TI TMP117/TMP112-class digital sensor | 0603/0805 or SOT/DFN class | PB-100 uses PCB reference plus two power-zone thermal points |
+| Temperature sensor | TDK NTCGS103JF103FT8-class 10 kΩ AEC-Q200 NTC | Vishay NTCS0402E3 10 kΩ AEC-Q200 150 °C class; Murata NCU18XH103D6SRB-class 10 kΩ 0603 AEC-Q200 150 °C; TI TMP117/TMP112-class digital sensor optional | 0402 preferred for NTC; SOT/DFN only for optional digital sensor | PB-100 uses PCB reference plus two power-zone thermal points; divider values and calibration remain schematic-freeze items |
 | Logic buck regulator | TI LM5164-Q1 | TI LM5013-Q1; TI TPS54360B-Q1/TPS54360-Q1 | SOIC/HSOIC PowerPAD | LM5164-Q1 for 1 A 100 V rail; LM5013-Q1 preferred over 60 V family if more current is needed |
 | Input reverse protection | TI LM74700-Q1/LM74502-Q1 class | ADI/LTC ideal diode controller families | MSOP/SOIC class | Controller family only; MOSFET is tracked separately |
 | Input reverse MOSFET | Infineon OptiMOS 5 60 V TOLL low-Rds class | Nexperia LFPAK88 80 V; parallel Vishay SIDR626 PowerPAK | TOLL/LFPAK88/PowerPAK | Single 2.1 mOhm MOSFET is rejected for 40 A input thermal |
@@ -58,6 +58,9 @@ The current strategy is:
 - Total current shunt: 0.5 mΩ four-terminal AEC-Q200 shunt candidate for the
   0-60 A telemetry range. At 60 A the candidate produces 30 mV and about 1.8 W;
   at the 40 A board-budget point it produces 20 mV and about 0.8 W.
+- Thermal telemetry: TDK `NTCGS103JF103FT8`-class 10 kΩ AEC-Q200 NTC candidate
+  for `TEMP_PCB`, `TEMP_PWR_A`, and `TEMP_PWR_B`. The schematic must still
+  close divider values, ADC scaling, placement, and calibration.
 
 ## Evidence links
 
@@ -88,7 +91,12 @@ The current strategy is:
 - Bourns CSS4J-4026 0.5 mΩ four-terminal AEC-Q200 shunt data was checked:
   https://www.bourns.com/docs/product-datasheets/css4j-4026.pdf
 - TI TMP117 data sheet was checked for optional digital board-temperature sensing: https://www.ti.com/lit/gpn/TMP117
-- TDK automotive NTC thermistor data was checked for PB-100 power-zone sensing: https://www.farnell.com/datasheets/3920346.pdf
+- TDK NTCGS103JF103FT8 10 kΩ 150 °C AEC-Q200 NTC product page was checked for
+  PB-100 thermal sensing: https://product.tdk.com/en/search/sensor/ntc/chip-ntc-thermistor/info?part_no=NTCGS103JF103FT8
+- Vishay NTCS0402E3 0402 150 °C NTC family was checked as an alternate:
+  https://www.vishay.com/en/product/29003/
+- Murata NCU automotive NTC part list was checked as an alternate:
+  https://www.murata.com/-/media/webrenewal/tool/library/common-pdf/static-model/component-list-ntc-2508.ashx?cvid=20250930011345000000&la=en
 - TI LM5164QDDATQ1 was listed at LCSC: https://www.lcsc.com/product-detail/C1850350.html
 - TI LM5164-Q1 is active as a 6-100 V 1 A automotive buck regulator: https://www.ti.com/product/LM5164-Q1
 - TI LM5013-Q1 is active as a 6-100 V 3.5 A automotive buck regulator: https://www.ti.com/product/LM5013-Q1

@@ -48,6 +48,10 @@ Current coverage:
   Vishay `SM8S33AHE3_A/I` is NFD evidence only, so schematic freeze must select
   `SM8S33AHM3/I` or an equivalent active load-dump TVS and validate clamp
   margin.
+- Thermal telemetry now has a TDK `NTCGS103JF103FT8`-class 10 kΩ 150 °C
+  AEC-Q200 NTC candidate for all three thermal points; schematic freeze must
+  still close divider values, ADC scaling, placement, assembly class, and
+  calibration.
 - Close PB-100 CAN1 TX-disable schematic evidence.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.

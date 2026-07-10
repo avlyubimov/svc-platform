@@ -2470,6 +2470,63 @@ def validate_tvs_candidate_consistency() -> None:
             fail(f"{relative_path} must reference active SM8S33AHM3 TVS evidence")
 
 
+def validate_thermal_telemetry_baseline() -> None:
+    map_path = PB100_DIR / "PB-100-thermal-telemetry-map.csv"
+    validate_csv(map_path)
+    rows = list(csv.DictReader(map_path.open(newline="", encoding="utf-8")))
+    rows_by_signal = {row["Signal"].strip(): row for row in rows}
+    required_signals = {"TEMP_PCB", "TEMP_PWR_A", "TEMP_PWR_B"}
+    missing_signals = sorted(required_signals - rows_by_signal.keys())
+    if missing_signals:
+        fail(
+            f"{map_path.relative_to(REPO_ROOT)} is missing thermal signals: "
+            f"{', '.join(missing_signals)}"
+        )
+
+    for signal in sorted(required_signals):
+        row = rows_by_signal[signal]
+        row_text = " ".join(row.values())
+        for token in ("NTCGS103JF103FT8", "10k", "150", "85C", "105C", "75C", "TBD"):
+            if token not in row_text:
+                fail(
+                    f"{map_path.relative_to(REPO_ROOT)} thermal row {signal} "
+                    f"must include {token}"
+                )
+        if row["Telemetry path"].strip() != "LB ADC":
+            fail(f"{map_path.relative_to(REPO_ROOT)} thermal row {signal} must use LB ADC")
+
+    checked_paths = (
+        PB100_DIR / "PB-100-thermal-telemetry.md",
+        PB100_DIR / "PB-100-symbol-mpn-readiness.csv",
+        PB100_DIR / "PB-100-symbol-capture-worklist.csv",
+        PB100_DIR / "PB-100-schematic-instance-plan.csv",
+        REPO_ROOT / "production" / "bom" / "factory_bom_draft.csv",
+        REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv",
+        REPO_ROOT / "production" / "bom" / "pb100_sourcing_evidence_snapshot.csv",
+        REPO_ROOT / "docs" / "production" / "component-family-shortlist.md",
+    )
+    for path in checked_paths:
+        text = read_text(path)
+        if "NTCGS103JF103FT8" not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} must reference the TDK thermal NTC candidate")
+
+    thermal_doc = read_text(PB100_DIR / "PB-100-thermal-telemetry.md")
+    for token in ("85 °C warn", "105 °C cutoff", "75 °C recovery"):
+        if token not in thermal_doc:
+            fail(f"thermal telemetry strategy must document default threshold {token}")
+
+    evidence_rows = list(
+        csv.DictReader((REPO_ROOT / "production" / "bom" / "pb100_sourcing_evidence_snapshot.csv").open(newline="", encoding="utf-8"))
+    )
+    thermal_evidence = next((row for row in evidence_rows if row["Symbol key"].strip() == "THERMAL_NTC"), None)
+    if thermal_evidence is None:
+        fail("missing THERMAL_NTC sourcing evidence row")
+    evidence_text = " ".join(thermal_evidence.values()).lower()
+    for token in ("ntcgs103jf103ft8", "aec-q200", "150c", "open:", "vishay"):
+        if token not in evidence_text:
+            fail(f"THERMAL_NTC sourcing evidence must explicitly track {token}")
+
+
 def validate_validation_traceability() -> None:
     path = PB100_DIR / "PB-100-validation-traceability.csv"
     validate_csv(path)
@@ -2931,6 +2988,7 @@ def main() -> int:
     validate_assembly_sourcing_recheck()
     validate_sourcing_evidence_snapshot()
     validate_tvs_candidate_consistency()
+    validate_thermal_telemetry_baseline()
     validate_validation_traceability()
     validate_test_point_plan()
     validate_fault_response_matrix()

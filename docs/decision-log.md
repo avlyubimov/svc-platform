@@ -1156,3 +1156,17 @@ loss and heating low while retaining enough signal for the dedicated input
 current monitor. Schematic freeze still requires exact orderable suffix,
 JLCPCB/PCBWay assembly class, Kelvin footprint, copper heating, and calibration
 review.
+
+## 2026-07-10 — PB-100 thermal NTC candidate
+
+Decision: PB-100 thermal telemetry now uses a TDK `NTCGS103JF103FT8`-class
+10 kΩ AEC-Q200 NTC as the preferred schematic-planning direction for
+`TEMP_PCB`, `TEMP_PWR_A`, and `TEMP_PWR_B`. Vishay `NTCS0402E3` and Murata
+`NCU18XH103D6SRB`-class automotive NTC families remain alternates.
+
+Reason: The selected TDK class supports a 150 °C operating maximum and an
+AEC-Q200 automotive grade while keeping all three thermal points on one common
+10 kΩ curve. This closes the sensor-family gap without freezing divider values
+or calibration constants. Schematic freeze still requires ADC scaling,
+placement, self-heating review, JLCPCB/PCBWay assembly handling, and bench
+calibration.
