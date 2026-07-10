@@ -1477,3 +1477,16 @@ test IDs.
 Reason: Bench validation is freeze evidence. The test plan must point to the
 same trace artifacts used by the schematic freeze gates so bench execution does
 not validate against stale source documents.
+
+## 2026-07-10 — PB-100 internal symbol trace provenance
+
+Decision: PB-100 internal class symbols for the buck inductor, board-ID
+resistor, and CAN1 TX-disable element now use dedicated trace artifacts as
+their readiness and worklist provenance. Datasheet-backed concrete symbols keep
+their manufacturer datasheets as symbol sources. The PB-100 validator now fails
+if these internal symbols drift away from their trace sources.
+
+Reason: Internal class symbols are schematic-planning constructs rather than
+manufacturer-defined parts. Their freeze evidence comes from the trace files,
+so readiness/worklist provenance must follow the same trace-first contract
+without weakening datasheet provenance for real components.

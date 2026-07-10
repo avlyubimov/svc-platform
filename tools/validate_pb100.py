@@ -83,6 +83,11 @@ REQUIRED_SYMBOL_KEYS = {
     "MAIN_FUSE_HOLDER",
     "CAN1_TX_DISABLE",
 }
+INTERNAL_SYMBOL_TRACE_SOURCE_BY_KEY = {
+    "LOGIC_BUCK_INDUCTOR": "hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv",
+    "BOARD_ID_RESISTOR": "hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv",
+    "CAN1_TX_DISABLE": "hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv",
+}
 SYMBOL_WORKLIST_COLUMNS = (
     "Symbol key",
     "Concrete symbol name",
@@ -876,6 +881,29 @@ def validate_symbol_mpn_readiness() -> None:
             f"{path.relative_to(REPO_ROOT)} is missing required symbol keys: "
             f"{', '.join(missing_keys)}"
         )
+
+
+def validate_symbol_trace_provenance() -> None:
+    readiness_path = PB100_DIR / "PB-100-symbol-mpn-readiness.csv"
+    readiness_rows = list(csv.DictReader(readiness_path.open(newline="", encoding="utf-8")))
+    readiness_by_key = {row["Symbol key"].strip(): row for row in readiness_rows}
+    worklist_path = PB100_DIR / "PB-100-symbol-capture-worklist.csv"
+    worklist_rows = list(csv.DictReader(worklist_path.open(newline="", encoding="utf-8")))
+    worklist_by_key = {row["Symbol key"].strip(): row for row in worklist_rows}
+    for symbol_key, expected_source in INTERNAL_SYMBOL_TRACE_SOURCE_BY_KEY.items():
+        source_path = REPO_ROOT / expected_source
+        if not source_path.exists():
+            fail(f"missing internal symbol trace source: {expected_source}")
+        if symbol_key not in readiness_by_key:
+            fail(f"{readiness_path.relative_to(REPO_ROOT)} is missing {symbol_key}")
+        if symbol_key not in worklist_by_key:
+            fail(f"{worklist_path.relative_to(REPO_ROOT)} is missing {symbol_key}")
+        readiness_source = readiness_by_key[symbol_key]["Primary source"].strip()
+        if readiness_source != expected_source:
+            fail(f"{symbol_key} readiness primary source must be {expected_source}")
+        worklist_source = worklist_by_key[symbol_key]["Symbol source"].strip()
+        if worklist_source != expected_source:
+            fail(f"{symbol_key} worklist symbol source must be {expected_source}")
 
 
 def validate_symbol_capture_worklist() -> None:
@@ -4629,6 +4657,7 @@ def main() -> int:
     validate_kicad_no_role_tokens()
     validate_instance_plan()
     validate_symbol_mpn_readiness()
+    validate_symbol_trace_provenance()
     validate_symbol_capture_worklist()
     validate_symbol_capture_progress()
     validate_symbol_pin_evidence()
