@@ -58,6 +58,15 @@ Current coverage:
 - OUT2 and medium-current outputs now have a baseline trace tying their fuse
   classes, configured current limits, TPS48110 external-MOSFET architecture,
   telemetry nets, and SOA/fuse/inductive-clamp freeze blockers together.
+- High/medium output freeze review now ties TPS48110 baseline, OUT2 SOA,
+  medium fuse paths, gate-drive default-off behavior, sense/telemetry,
+  thresholds, clamp strategy, thermal review, and no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv`.
+- Low-current output freeze review now ties OUT5/OUT8/OUT9 5 A/4 A class,
+  ADR-0011 external-controller baseline, no direct 40 V smart-switch rail,
+  gate-drive defaults, telemetry, fault timing, clamp strategy, sourcing,
+  and configuration separation into
+  `hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv`.
 - Current telemetry now has a trace tying per-output IMON ranges, total
   `IIN_SENSE`, 0.5 mΩ shunt measurement, 40 A budget enforcement, and
   stale-telemetry safe-off behavior together.

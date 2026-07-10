@@ -51,7 +51,9 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv`
+- `hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
+- `hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-output-net-expansion.csv`
 - `hardware/power-board/PB-100/PB-100-output-stage-design-values.csv`
@@ -90,6 +92,10 @@ It is not a PCB layout package.
   placement zones, 85/105/75 °C thresholds, firmware fail-safe behavior,
   calibration, assembly alternates, and bench validation are tracked in
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`.
+- Output freeze reviews: high/medium and low-current stages keep TPS48110 plus
+  external MOSFET boundaries, OUT2 SOA, gate-drive defaults, sense/telemetry,
+  fault thresholds, clamp strategy, low-current ADR-0011 no-smart-switch
+  boundary, and no-layout constraints in dedicated review artifacts.
 - Outputs: 10 generic high-side protected channels.
 - CAN1: read-only by default; TX physically disabled.
 

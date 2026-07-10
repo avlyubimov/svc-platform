@@ -236,6 +236,14 @@ HIGH_MEDIUM_OUTPUT_BASELINE_TRACE_COLUMNS = (
     "Telemetry path",
     "Freeze dependency",
 )
+OUTPUT_FREEZE_REVIEW_COLUMNS = (
+    "Review item",
+    "Required boundary",
+    "Primary evidence",
+    "Schematic freeze check",
+    "Pass condition",
+    "Blocked action",
+)
 OUTPUT_NET_EXPANSION_COLUMNS = (
     "Output",
     "Net pattern",
@@ -464,11 +472,15 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
     "CAP-LOGIC": ("PB-100-logic-power-rail-trace.csv",),
     "CAP-OUT-TEMPLATE": (
         "PB-100-high-medium-output-baseline-trace.csv",
+        "PB-100-high-medium-output-freeze-review.csv",
         "PB-100-low-current-output-baseline-trace.csv",
+        "PB-100-low-current-output-freeze-review.csv",
     ),
     "CAP-OUT-INST": (
         "PB-100-high-medium-output-baseline-trace.csv",
+        "PB-100-high-medium-output-freeze-review.csv",
         "PB-100-low-current-output-baseline-trace.csv",
+        "PB-100-low-current-output-freeze-review.csv",
     ),
     "CAP-TEL": (
         "PB-100-current-telemetry-trace.csv",
@@ -562,6 +574,26 @@ REQUIRED_OUTPUT_STAGE_ITEMS = {
     "Gate drive resistors",
     "Current sense topology",
     "Inductive clamp strategy",
+}
+REQUIRED_HIGH_MEDIUM_OUTPUT_FREEZE_REVIEW_ITEMS = {
+    "Controller baseline",
+    "OUT2 SOA envelope",
+    "Medium fuse paths",
+    "Gate drive default off",
+    "Sense and telemetry",
+    "Fault timing and thresholds",
+    "Inductive clamp strategy",
+    "Thermal and layout boundary",
+}
+REQUIRED_LOW_CURRENT_OUTPUT_FREEZE_REVIEW_ITEMS = {
+    "ADR-0011 boundary",
+    "Fuse and current class",
+    "Gate drive default off",
+    "Sense and telemetry",
+    "Threshold and timer values",
+    "Clamp and load handling",
+    "Thermal and sourcing boundary",
+    "Configuration separation",
 }
 REQUIRED_INPUT_POWER_ITEMS = {
     "Battery positive derating",
@@ -683,7 +715,9 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv",
     "hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv",
+    "hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv",
+    "hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv",
@@ -1841,8 +1875,16 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-b2b-lb100-resource-binding.csv",
             "PB-100-b2b-pin-map.csv",
         ),
-        "High/medium output stage": ("PB-100-high-medium-output-baseline-trace.csv", "PB-100-out2-soa.md"),
-        "Low-current output stage": ("PB-100-low-current-output-baseline-trace.csv", "ADR-0011"),
+        "High/medium output stage": (
+            "PB-100-high-medium-output-baseline-trace.csv",
+            "PB-100-high-medium-output-freeze-review.csv",
+            "PB-100-out2-soa.md",
+        ),
+        "Low-current output stage": (
+            "PB-100-low-current-output-baseline-trace.csv",
+            "PB-100-low-current-output-freeze-review.csv",
+            "ADR-0011",
+        ),
         "Input reverse protection": ("PB-100-input-reverse-package-trace.csv", "PB-100-input-reverse-protection.md"),
         "TVS/load-dump protection": ("PB-100-tvs-load-dump-margin-trace.csv", "PB-100-protection-validation.csv"),
         "Logic power rails": ("PB-100-logic-power-rail-trace.csv", "PB-100-logic-power-budget.csv"),
@@ -1891,11 +1933,25 @@ def validate_schematic_freeze_gap_register() -> None:
         if token not in input_text:
             fail(f"Input reverse protection gap must keep {token} explicit")
     high_medium_text = " ".join(rows_by_gate["High/medium output stage"].values())
-    for token in ("PB-100-high-medium-output-baseline-trace.csv", "OUT2", "SOA", "gate drive", "sense"):
+    for token in (
+        "PB-100-high-medium-output-baseline-trace.csv",
+        "PB-100-high-medium-output-freeze-review.csv",
+        "OUT2",
+        "SOA",
+        "gate drive",
+        "sense",
+    ):
         if token not in high_medium_text:
             fail(f"High/medium output stage gap must keep {token} explicit")
     low_current_text = " ".join(rows_by_gate["Low-current output stage"].values())
-    for token in ("PB-100-low-current-output-baseline-trace.csv", "OUT5", "OUT8", "OUT9", "no direct 40 V"):
+    for token in (
+        "PB-100-low-current-output-baseline-trace.csv",
+        "PB-100-low-current-output-freeze-review.csv",
+        "OUT5",
+        "OUT8",
+        "OUT9",
+        "no direct 40 V",
+    ):
         if token not in low_current_text:
             fail(f"Low-current output stage gap must keep {token} explicit")
     current_budget_text = " ".join(rows_by_gate["Board current budget"].values())
@@ -2817,6 +2873,177 @@ def validate_high_medium_output_baseline_trace() -> None:
             fail(f"high/medium output-stage design values must include {token}")
     if "OUT1 OUT3 OUT4 OUT6 OUT7 OUT10" not in medium_design_text:
         fail("medium-current design values must keep the medium output set explicit")
+
+
+def validate_high_medium_output_freeze_review() -> None:
+    path = PB100_DIR / "PB-100-high-medium-output-freeze-review.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty high/medium output freeze review: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in OUTPUT_FREEZE_REVIEW_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_item: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        review_item = row["Review item"].strip()
+        if review_item not in REQUIRED_HIGH_MEDIUM_OUTPUT_FREEZE_REVIEW_ITEMS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown high/medium output review item {review_item}")
+        if review_item in rows_by_item:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate high/medium output review item {review_item}")
+        rows_by_item[review_item] = row
+        for column in OUTPUT_FREEZE_REVIEW_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+
+    missing_items = sorted(REQUIRED_HIGH_MEDIUM_OUTPUT_FREEZE_REVIEW_ITEMS - rows_by_item.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing high/medium output review items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    review_text = read_text(path)
+    for token in (
+        "TPS48110AQDGXRQ1",
+        "OUT2",
+        "20A fuse",
+        "18A configured limit",
+        "40A 1s",
+        "80A 100ms",
+        "OUT2 escape path",
+        "OUT1",
+        "OUT3 OUT4 OUT6 OUT7 OUT10",
+        "OUTn_PU",
+        "OUTn_PD",
+        "OUTn_CTL",
+        "OUTn_CS_P",
+        "OUTn_CS_N",
+        "OUTn_IMON",
+        "OUTn_IWRN_SET",
+        "OUTn_ISCP_SET",
+        "OUTn_TMR",
+        "OUTn_LOAD",
+        "No PCB layout",
+    ):
+        if token not in review_text:
+            fail(f"high/medium output freeze review must include {token}")
+
+    for token in (
+        "PB-100-high-medium-output-baseline-trace.csv",
+        "PB-100-output-controller-pin-template.csv",
+        "PB-100-output-stage-design-values.csv",
+        "PB-100-current-telemetry-freeze-review.csv",
+        "PB-100-thermal-telemetry-freeze-review.csv",
+    ):
+        if token not in review_text:
+            fail(f"high/medium output freeze review must cite {token}")
+
+    high_medium_text = read_text(PB100_DIR / "PB-100-high-medium-output-baseline-trace.csv")
+    for token in ("OUT2", "OUT1", "OUT3 OUT4 OUT6 OUT7 OUT10", "TPS48110AQDGXRQ1 plus external 60V N-MOSFET"):
+        if token not in high_medium_text:
+            fail(f"high/medium baseline trace must support freeze review token {token}")
+
+    soa_text = read_text(PB100_DIR / "PB-100-out2-soa-envelope.csv")
+    for token in ("40", "1 s", "80", "100 ms", "10 ms max"):
+        if token not in soa_text:
+            fail(f"OUT2 SOA envelope must support freeze review token {token}")
+
+    firmware_tests = read_text(REPO_ROOT / "firmware" / "tests" / "test_output_manager.c")
+    for token in ("test_init_keeps_all_outputs_off", "test_invalid_telemetry_is_denied"):
+        if token not in firmware_tests:
+            fail(f"output manager tests must retain high/medium freeze review token {token}")
+
+
+def validate_low_current_output_freeze_review() -> None:
+    path = PB100_DIR / "PB-100-low-current-output-freeze-review.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty low-current output freeze review: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in OUTPUT_FREEZE_REVIEW_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_item: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        review_item = row["Review item"].strip()
+        if review_item not in REQUIRED_LOW_CURRENT_OUTPUT_FREEZE_REVIEW_ITEMS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown low-current output review item {review_item}")
+        if review_item in rows_by_item:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate low-current output review item {review_item}")
+        rows_by_item[review_item] = row
+        for column in OUTPUT_FREEZE_REVIEW_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+
+    missing_items = sorted(REQUIRED_LOW_CURRENT_OUTPUT_FREEZE_REVIEW_ITEMS - rows_by_item.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing low-current output review items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    review_text = read_text(path)
+    for token in (
+        "ADR-0011",
+        "OUT5",
+        "OUT8",
+        "OUT9",
+        "5A fuse",
+        "4A configured current limit",
+        "TPS48110AQDGXRQ1",
+        "external 60V N-MOSFET",
+        "no direct 40V smart-switch rail",
+        "future ADR",
+        "OUTn_CTL",
+        "OUTn_PU",
+        "OUTn_PD",
+        "OUT5_IMON",
+        "OUT8_IMON",
+        "OUT9_IMON",
+        "0-8A",
+        "OUTn_IWRN_SET",
+        "OUTn_ISCP_SET",
+        "OUTn_TMR",
+        "configuration and rules",
+    ):
+        if token not in review_text:
+            fail(f"low-current output freeze review must include {token}")
+
+    low_current_text = read_text(PB100_DIR / "PB-100-low-current-output-baseline-trace.csv")
+    for token in ("OUT5", "OUT8", "OUT9", "no direct 40 V smart-switch rail", "future ADR"):
+        if token not in low_current_text:
+            fail(f"low-current baseline trace must support freeze review token {token}")
+
+    design_values_text = read_text(PB100_DIR / "PB-100-output-stage-design-values.csv")
+    for token in ("Low current", "OUT5 OUT8 OUT9", "No direct 40 V smart-switch rail"):
+        if token not in design_values_text:
+            fail(f"output-stage design values must support low-current freeze review token {token}")
+
+    firmware_joined = "\n".join(
+        (
+            read_text(REPO_ROOT / "firmware" / "tests" / "test_role_resolver.c"),
+            read_text(REPO_ROOT / "firmware" / "tests" / "test_rule_runtime.c"),
+            read_text(REPO_ROOT / "firmware" / "tests" / "test_output_manager.c"),
+        )
+    )
+    for token in ("test_missing_role_is_reported", "test_fault_dispatch_runs_before_rule_actions", "test_init_keeps_all_outputs_off"):
+        if token not in firmware_joined:
+            fail(f"firmware tests must retain low-current freeze review token {token}")
 
 
 def validate_input_power_design_values() -> None:
@@ -4912,6 +5139,12 @@ def validate_validation_traceability() -> None:
         if freeze_gate == "Thermal telemetry":
             if "pb-100-thermal-telemetry-freeze-review.csv" not in row_text:
                 fail("Thermal telemetry validation trace must include freeze review")
+        if freeze_gate == "High/medium output stage":
+            if "pb-100-high-medium-output-freeze-review.csv" not in row_text:
+                fail("High/medium output validation trace must include freeze review")
+        if freeze_gate == "Low-current output stage":
+            if "pb-100-low-current-output-freeze-review.csv" not in row_text:
+                fail("Low-current output validation trace must include freeze review")
         if freeze_gate == "Input reverse protection":
             if "q1" not in row_text or "40 a" not in row_text:
                 fail("Input reverse validation trace must keep Q1 and 40 A explicit")
@@ -5381,7 +5614,9 @@ def validate_test_plan_traceability() -> None:
     required_trace_artifacts = (
         "PB-100-logic-power-rail-trace.csv",
         "PB-100-high-medium-output-baseline-trace.csv",
+        "PB-100-high-medium-output-freeze-review.csv",
         "PB-100-low-current-output-baseline-trace.csv",
+        "PB-100-low-current-output-freeze-review.csv",
         "PB-100-can1-tx-disable-trace.csv",
         "PB-100-can1-production-dnp-review.csv",
         "PB-100-input-reverse-package-trace.csv",
@@ -5457,7 +5692,9 @@ def main() -> int:
     validate_output_controller_pin_template()
     validate_output_net_expansion()
     validate_low_current_output_baseline_trace()
+    validate_low_current_output_freeze_review()
     validate_high_medium_output_baseline_trace()
+    validate_high_medium_output_freeze_review()
     validate_input_and_power_pin_templates()
     validate_input_protection_pin_contract()
     validate_logic_power_design_placeholders()

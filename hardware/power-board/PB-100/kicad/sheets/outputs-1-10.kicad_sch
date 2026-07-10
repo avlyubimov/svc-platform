@@ -10,10 +10,10 @@
     (company "SVC Platform")
     (comment 9 "Work queue: CAP-OUT-INST. Output instances capture follows output net expansion.")
     (comment 1 "Placeholder sheet. Instantiate OUT1 through OUT10 generic channels here.")
-    (comment 2 "Sources: PB-100-high-medium-output-baseline-trace.csv, PB-100-low-current-output-baseline-trace.csv, PB-100-schematic-instance-plan.csv.")
+    (comment 2 "Sources: PB-100-high-medium-output-baseline-trace.csv, PB-100-high-medium-output-freeze-review.csv, PB-100-low-current-output-baseline-trace.csv, PB-100-low-current-output-freeze-review.csv, PB-100-schematic-instance-plan.csv.")
   )
   (lib_symbols)
-  (text "Output capture notes:\n- Source traces: PB-100-high-medium-output-baseline-trace.csv, PB-100-low-current-output-baseline-trace.csv\n- Instantiate U101..U110 controllers\n- Instantiate Q101..Q110 output MOSFETs\n- Instantiate F101..F110 user-serviceable fuses\n- Instantiate J101..J110 output connectors\n- OUT2 must preserve larger/parallel MOSFET escape path until SOA is proven\n\nNo role-specific net names."
+  (text "Output capture notes:\n- Source traces: PB-100-high-medium-output-baseline-trace.csv, PB-100-high-medium-output-freeze-review.csv, PB-100-low-current-output-baseline-trace.csv, PB-100-low-current-output-freeze-review.csv\n- Instantiate U101..U110 controllers\n- Instantiate Q101..Q110 output MOSFETs\n- Instantiate F101..F110 user-serviceable fuses\n- Instantiate J101..J110 output connectors\n- OUT2 must preserve larger/parallel MOSFET escape path until SOA is proven\n- OUT5/OUT8/OUT9 keep external-controller baseline and no direct 40 V smart-switch rail\n\nNo role-specific net names."
     (at 25 30 0)
     (effects (font (size 2.0 2.0)) (justify left top))
     (uuid "f7894140-3d89-4b61-a336-2976e194d5df")

@@ -95,11 +95,14 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`.
 - OUT2 pulse tests trace to
   `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
+  `hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv`
   and `hardware/power-board/PB-100/PB-100-out2-soa.md`.
 - Output overcurrent, fuse, and class-limit tests trace to
   `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
+  `hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv`
   and
-  `hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv`.
+  `hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv`
+  plus `hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv`.
 - CAN1 listen-only tests trace to
   `hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv`,
   `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`, and

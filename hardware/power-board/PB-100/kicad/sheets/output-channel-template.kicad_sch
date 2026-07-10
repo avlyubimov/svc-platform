@@ -10,10 +10,10 @@
     (company "SVC Platform")
     (comment 9 "Work queue: CAP-OUT-TEMPLATE. Output template capture follows controller pin template.")
     (comment 1 "Placeholder sheet. Capture one generic TPS48110 + MOSFET output stage pattern here.")
-    (comment 2 "Sources: PB-100-high-medium-output-baseline-trace.csv and PB-100-low-current-output-baseline-trace.csv. Use OUTn nets only.")
+    (comment 2 "Sources: PB-100-high-medium-output-baseline-trace.csv, PB-100-high-medium-output-freeze-review.csv, PB-100-low-current-output-baseline-trace.csv, PB-100-low-current-output-freeze-review.csv. Use OUTn nets only.")
   )
   (lib_symbols)
-  (text "Generic output channel template:\n- Source traces: PB-100-high-medium-output-baseline-trace.csv, PB-100-low-current-output-baseline-trace.csv\n- U10n TPS48110-class high-side controller\n- Q10n external MOSFET\n- F10n user-serviceable fuse\n- J10n output connector\n- OUTn_CTL, OUTn_FLT, OUTn_IMON\n- OUTn_GATE, OUTn_SRC, OUTn_LOAD\n\nTemplate must remain role-agnostic."
+  (text "Generic output channel template:\n- Source traces: PB-100-high-medium-output-baseline-trace.csv, PB-100-high-medium-output-freeze-review.csv, PB-100-low-current-output-baseline-trace.csv, PB-100-low-current-output-freeze-review.csv\n- U10n TPS48110-class high-side controller\n- Q10n external MOSFET\n- F10n user-serviceable fuse\n- J10n output connector\n- OUTn_CTL, OUTn_FLT, OUTn_IMON\n- OUTn_GATE, OUTn_SRC, OUTn_LOAD\n- Gate drive, sense, threshold, timer, clamp, and no-smart-switch boundaries remain freeze-review items\n\nTemplate must remain role-agnostic."
     (at 25 30 0)
     (effects (font (size 2.0 2.0)) (justify left top))
     (uuid "e597ef9f-d7f2-4925-b4a7-e15b11ec070f")

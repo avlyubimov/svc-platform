@@ -1596,3 +1596,24 @@ Reason: Thermal telemetry is a layout-sensitive safety input. Schematic freeze
 must keep sensor count, threshold ownership, fail-safe behavior, and calibration
 evidence explicit without allowing premature sensor placement or thermal-copper
 layout.
+
+## 2026-07-10 — PB-100 output-stage freeze reviews
+
+Decision: PB-100 schematic planning now includes
+`PB-100-high-medium-output-freeze-review.csv` and
+`PB-100-low-current-output-freeze-review.csv`. The high/medium review ties the
+TPS48110 external-MOSFET baseline, OUT2 SOA envelope, medium-current fuse
+paths, gate-drive default-off behavior, sense/telemetry, fault thresholds,
+inductive clamp strategy, thermal review, and no-layout boundary together. The
+low-current review ties OUT5/OUT8/OUT9 5 A fuse and 4 A current-limit classes,
+ADR-0011 external-controller architecture, no-direct-40 V-smart-switch
+boundary, gate-drive defaults, telemetry, threshold/timer values, clamp
+strategy, sourcing, and configuration separation together. The PB-100 validator
+now checks both artifacts against output traces, design values, firmware tests,
+freeze checklist, validation traceability, capture sheet notes, and review
+packet membership.
+
+Reason: Output stages are the remaining high-risk path between schematic
+planning and board layout. The reviews preserve electrical and firmware safety
+constraints without hard-coding roles, locking values prematurely, or
+authorizing MOSFET/fuse/connector placement.

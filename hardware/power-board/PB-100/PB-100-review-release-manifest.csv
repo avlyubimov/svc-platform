@@ -39,7 +39,9 @@ hardware/power-board/PB-100/PB-100-logic-power-design-values.csv,Logic power,Log
 hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv,Logic power,Logic value placeholders,Required,validate_logic_power_design_placeholders,Conditional
 hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv,Outputs,Output channel contract,Required,validate_output_channel_pin_contract,Conditional
 hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv,Outputs,Low-current external-controller baseline trace,Required,validate_low_current_output_baseline_trace,Conditional
+hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv,Outputs,Low-current output freeze review,Required,validate_low_current_output_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv,Outputs,High and medium output-stage baseline trace,Required,validate_high_medium_output_baseline_trace,Conditional
+hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv,Outputs,High and medium output freeze review,Required,validate_high_medium_output_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv,Outputs,TPS48110 output pin template,Required,validate_output_controller_pin_template,Conditional
 hardware/power-board/PB-100/PB-100-output-stage-design-values.csv,Outputs,Output stage design values,Required,validate_output_stage_design_values,Conditional
 hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv,Telemetry,Current telemetry and firmware safety trace,Required,validate_current_telemetry_trace,Conditional
