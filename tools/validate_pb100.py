@@ -270,6 +270,14 @@ BOARD_CURRENT_BUDGET_TRACE_COLUMNS = (
     "Freeze state",
     "Remaining work",
 )
+BOARD_CURRENT_BUDGET_FREEZE_REVIEW_COLUMNS = (
+    "Review item",
+    "Required boundary",
+    "Primary evidence",
+    "Schematic freeze check",
+    "Pass condition",
+    "Blocked action",
+)
 CURRENT_TELEMETRY_TRACE_COLUMNS = (
     "Measurement group",
     "Signals",
@@ -434,6 +442,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
     "CAP-INP": (
         "PB-100-input-reverse-package-trace.csv",
         "PB-100-board-current-budget-trace.csv",
+        "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-tvs-load-dump-margin-trace.csv",
     ),
     "CAP-LOGIC": ("PB-100-logic-power-rail-trace.csv",),
@@ -578,6 +587,16 @@ REQUIRED_CAN1_PRODUCTION_DNP_REVIEW_ITEMS = {
     "Future change process",
     "Factory DNP ownership",
 }
+REQUIRED_BOARD_CURRENT_BUDGET_FREEZE_REVIEW_ITEMS = {
+    "Main fuse and input connector",
+    "Q1 reverse path thermal",
+    "Input shunt and Kelvin path",
+    "Protected copper distribution",
+    "Firmware configuration budget",
+    "Telemetry enforcement",
+    "Output oversubscription boundary",
+    "Layout authorization boundary",
+}
 REQUIRED_FAULT_IDS = {
     "PBFLT-INPUT-REV",
     "PBFLT-LOAD-DUMP",
@@ -621,6 +640,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv",
     "hardware/power-board/PB-100/PB-100-review-release-manifest.csv",
     "hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv",
+    "hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv",
@@ -1655,6 +1675,7 @@ def validate_schematic_readiness_dashboard() -> None:
         "Output stage design values": ("PB-100-high-medium-output-baseline-trace.csv", "PB-100-low-current-output-baseline-trace.csv"),
         "Input power design values": (
             "PB-100-board-current-budget-trace.csv",
+            "PB-100-board-current-budget-freeze-review.csv",
             "PB-100-input-reverse-package-trace.csv",
             "PB-100-tvs-load-dump-margin-trace.csv",
         ),
@@ -1767,7 +1788,11 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-can1-safety-verification.csv",
             "PB-100-can1-production-dnp-review.csv",
         ),
-        "Board current budget": ("PB-100-board-current-budget-trace.csv", "PB-100-input-power-design-values.csv"),
+        "Board current budget": (
+            "PB-100-board-current-budget-trace.csv",
+            "PB-100-board-current-budget-freeze-review.csv",
+            "PB-100-input-power-design-values.csv",
+        ),
         "Board-to-board interface": (
             "PB-100-b2b-interface-trace.csv",
             "PB-100-b2b-lb100-resource-binding.csv",
@@ -1823,7 +1848,13 @@ def validate_schematic_freeze_gap_register() -> None:
         if token not in low_current_text:
             fail(f"Low-current output stage gap must keep {token} explicit")
     current_budget_text = " ".join(rows_by_gate["Board current budget"].values())
-    for token in ("PB-100-board-current-budget-trace.csv", "40 A", "firmware config", "shunt"):
+    for token in (
+        "PB-100-board-current-budget-trace.csv",
+        "PB-100-board-current-budget-freeze-review.csv",
+        "40 A",
+        "firmware config",
+        "shunt",
+    ):
         if token not in current_budget_text:
             fail(f"Board current budget gap must keep {token} explicit")
     tvs_text = " ".join(rows_by_gate["TVS/load-dump protection"].values())
@@ -3392,6 +3423,103 @@ def validate_board_current_budget_trace() -> None:
             fail(f"board-current budget trace must include {token}")
 
 
+def validate_board_current_budget_freeze_review() -> None:
+    path = PB100_DIR / "PB-100-board-current-budget-freeze-review.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty board-current budget freeze review: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in BOARD_CURRENT_BUDGET_FREEZE_REVIEW_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_item: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        review_item = row["Review item"].strip()
+        if review_item not in REQUIRED_BOARD_CURRENT_BUDGET_FREEZE_REVIEW_ITEMS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown board-current review item {review_item}")
+        if review_item in rows_by_item:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate board-current review item {review_item}")
+        rows_by_item[review_item] = row
+        for column in BOARD_CURRENT_BUDGET_FREEZE_REVIEW_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if review_item == "Layout authorization boundary":
+            if "no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text:
+                fail("board-current freeze review must block PCB layout explicitly")
+        if review_item == "Firmware configuration budget":
+            if "total_current_limit_a" not in row_text or "configuration stays separate from firmware" not in row_text:
+                fail("board-current freeze review must keep config/firmware separation explicit")
+
+    missing_items = sorted(REQUIRED_BOARD_CURRENT_BUDGET_FREEZE_REVIEW_ITEMS - rows_by_item.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing board-current review items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    review_text = read_text(path)
+    for token in (
+        "50 A",
+        "40 A",
+        "0.5mΩ",
+        "20mV at 40A",
+        "0.8W",
+        "30mV at 60A",
+        "1.8W",
+        "82 A",
+        "Q1",
+        "TOLL",
+        "LFPAK88",
+        "dual PowerPAK",
+        "Kelvin",
+        "ADC or I2C",
+        "configuration stays separate from firmware",
+        "No PCB layout copper geometry",
+        "PB-100.kicad_pcb",
+    ):
+        if token not in review_text:
+            fail(f"board-current budget freeze review must include {token}")
+
+    capabilities = json.loads(read_text(REPO_ROOT / "firmware" / "configs" / "hardware" / "pb-100-capabilities.json"))
+    power_budget = capabilities["power_budget"]
+    if power_budget["main_fuse_target_a"] != 50:
+        fail("board-current freeze review requires 50 A main fuse target")
+    if power_budget["board_continuous_target_a"] != 40:
+        fail("board-current freeze review requires 40 A board continuous target")
+    if power_budget["default_total_current_limit_a"] != 40:
+        fail("board-current freeze review requires 40 A default total-current limit")
+    output_limit_sum = sum(output["target_current_limit_a"] for output in capabilities["outputs"])
+    if output_limit_sum != 82:
+        fail(f"board-current freeze review expects 82 A output oversubscription, got {output_limit_sum} A")
+
+    config_example = json.loads(read_text(REPO_ROOT / "firmware" / "configs" / "config-example.json"))
+    if config_example["power_budget"]["total_current_limit_a"] != 40:
+        fail("board-current freeze review requires config example 40 A total_current_limit_a")
+
+    input_power_text = read_text(PB100_DIR / "PB-100-input-power-design-values.csv")
+    for token in ("0.5mΩ", "20mV at 40A", "0.8W board-budget", "30mV at 60A", "Kelvin"):
+        if token not in input_power_text:
+            fail(f"input power design values must support board-current freeze review token {token}")
+
+    board_current_text = read_text(PB100_DIR / "PB-100-board-current-budget-trace.csv")
+    for token in ("50 A", "40 A", "0-60 A", "0.5 mOhm", "82 A", "configuration separate from firmware"):
+        if token not in board_current_text:
+            fail(f"board-current trace must support freeze review token {token}")
+
+    kicad_prep_text = read_text(PB100_DIR / "PB-100-kicad-prep.md").lower()
+    for token in ("copper", "current-carrying", "layout"):
+        if token not in kicad_prep_text:
+            fail(f"KiCad prep must retain board-current layout blocker token {token}")
+
+
 def validate_current_telemetry_trace() -> None:
     path = PB100_DIR / "PB-100-current-telemetry-trace.csv"
     validate_csv(path)
@@ -4514,6 +4642,9 @@ def validate_validation_traceability() -> None:
                 fail("CAN1 validation trace must keep DNP/open read-only and future ADR explicit")
             if "pb-100-can1-production-dnp-review.csv" not in row_text:
                 fail("CAN1 validation trace must include production DNP review")
+        if freeze_gate == "Board current budget":
+            if "pb-100-board-current-budget-freeze-review.csv" not in row_text:
+                fail("Board current validation trace must include 40 A freeze review")
         if freeze_gate == "Input reverse protection":
             if "q1" not in row_text or "40 a" not in row_text:
                 fail("Input reverse validation trace must keep Q1 and 40 A explicit")
@@ -4990,6 +5121,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-tvs-load-dump-margin-trace.csv",
         "PB-100-current-telemetry-trace.csv",
         "PB-100-board-current-budget-trace.csv",
+        "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-thermal-telemetry-trace.csv",
         "PB-100-b2b-interface-trace.csv",
         "PB-100-b2b-lb100-resource-binding.csv",
@@ -5064,6 +5196,7 @@ def main() -> int:
     validate_input_power_design_values()
     validate_input_reverse_package_trace()
     validate_board_current_budget_trace()
+    validate_board_current_budget_freeze_review()
     validate_current_telemetry_trace()
     validate_thermal_telemetry_trace()
     validate_logic_power_rail_trace()

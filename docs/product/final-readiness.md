@@ -94,6 +94,10 @@ Current coverage:
   telemetry range, and 0.5 mΩ shunt operating point together; schematic freeze
   must still close connector derating, shunt copper, calibration, and thermal
   evidence.
+- The 40 A board-current freeze review now ties connector derating, Q1 thermal
+  path, shunt Kelvin path, protected copper distribution, firmware config,
+  telemetry enforcement, and the no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`.
 - Close PB-100 CAN1 TX-disable schematic evidence using the `JP_CAN1`
   DNP/open link plus `U_CAN1` default-disabled/readback contract.
 - CAN1 TX-disable now has a trace tying `JP_CAN1`, `U_CAN1`,

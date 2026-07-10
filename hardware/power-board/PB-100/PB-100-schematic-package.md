@@ -30,6 +30,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
+- `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
@@ -75,6 +76,10 @@ It is not a PCB layout package.
 - Main harness fuse target: 50 A.
 - Board continuous-current target: at least 40 A after thermal validation.
 - Default configuration total-current limit: 40 A.
+- 40 A freeze review: connector derating, Q1 thermal path, shunt Kelvin path,
+  protected copper distribution, firmware config, telemetry enforcement, and
+  no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`.
 - Outputs: 10 generic high-side protected channels.
 - CAN1: read-only by default; TX physically disabled.
 

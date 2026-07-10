@@ -1545,3 +1545,20 @@ Reason: CAN1 read-only behavior is a constitutional hardware safety rule. The
 schematic freeze gate needs explicit production ownership of the DNP/open TX
 path so configuration or firmware cannot silently create a vehicle-CAN TX path
 without a future ADR and deliberate hardware action.
+
+## 2026-07-10 — PB-100 40 A board-current freeze review
+
+Decision: PB-100 schematic planning now includes
+`PB-100-board-current-budget-freeze-review.csv`, tying the 50 A main fuse
+target, 40 A board/configuration limit, input connector derating, Q1 reverse
+path thermal review, 0.5 mΩ four-terminal shunt Kelvin path, protected copper
+distribution, 0-60 A total-current telemetry, 82 A output-limit
+oversubscription boundary, and no-layout authorization boundary into one
+review artifact. The PB-100 validator now checks this artifact against the
+hardware capability manifest, config example, input power values, current
+budget trace, and KiCad no-layout constraints.
+
+Reason: The 40 A board budget must be reviewable before PCB layout starts, but
+it must not imply copper geometry, footprint placement, or manufacturing
+authorization. A dedicated freeze-review artifact keeps schematic constraints,
+firmware enforcement, and remaining layout-blocked work explicit.

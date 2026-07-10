@@ -112,7 +112,9 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`.
 - Current telemetry and current-budget tests trace to
   `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`,
-  `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`, and
+  `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`,
+  `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`,
+  and
   `docs/adr/ADR-0008-pb-100-current-budget.md`.
 - Thermal derating tests trace to
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`.
