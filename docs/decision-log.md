@@ -1311,6 +1311,19 @@ Reason: Logic power is a safety dependency for output default-off behavior and
 LB-100 startup. A dedicated trace makes the protected input rail, 5 V budget,
 power-good timing, rail-invalid output behavior, and lower-voltage fallback
 risk machine-checkable before schematic freeze.
+## 2026-07-10 — PB-100 CAN1 TX-disable trace
+
+Decision: PB-100 schematic planning now includes
+`PB-100-can1-tx-disable-trace.csv` for the vehicle-CAN read-only boundary. The
+trace ties `JP_CAN1`, `U_CAN1`, `CAN1_TX_ROUTE`,
+`CAN1_TX_DISABLED_STATUS`, firmware listen-only behavior, DNP BOM ownership, and
+the future-ADR plus explicit-hardware-action process together.
+
+Reason: CAN1 TX safety is a physical safety boundary, not a configuration
+setting. A dedicated trace keeps the DNP/open missing-link, disabled-status
+readback, firmware denial, and production ownership synchronized before
+schematic freeze.
+
 ## 2026-07-10 — PB-100 Q1 input reverse package trace
 
 Decision: PB-100 schematic planning now includes

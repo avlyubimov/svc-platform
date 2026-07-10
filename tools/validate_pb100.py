@@ -321,6 +321,14 @@ CAN1_SAFETY_VERIFICATION_COLUMNS = (
     "Pass condition",
     "Blocked change",
 )
+CAN1_TX_DISABLE_TRACE_COLUMNS = (
+    "Trace item",
+    "Signal or artifact",
+    "Rev.1 physical default",
+    "Verification boundary",
+    "Blocked change",
+    "Freeze dependency",
+)
 ASSEMBLY_SOURCING_RECHECK_COLUMNS = (
     "Symbol key",
     "Assembly owner",
@@ -560,6 +568,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-output-net-expansion.csv",
     "hardware/power-board/PB-100/PB-100-test-point-plan.csv",
     "hardware/power-board/PB-100/PB-100-fault-response-matrix.csv",
+    "hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv",
     "hardware/power-board/PB-100/PB-100-can1-safety-verification.csv",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv",
     "hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv",
@@ -1574,9 +1583,19 @@ def validate_schematic_freeze_gap_register() -> None:
             f"{', '.join(extra_gates)}"
         )
 
-    can_text = " ".join(rows_by_gate["CAN1 safety policy"].values()).lower()
+    can_gap_text = " ".join(rows_by_gate["CAN1 safety policy"].values())
+    can_text = can_gap_text.lower()
     if "dnp/open" not in can_text or "default" not in can_text:
         fail("CAN1 safety policy gap must keep DNP/open default explicit")
+    for token in (
+        "PB-100-can1-tx-disable-trace.csv",
+        "JP_CAN1",
+        "U_CAN1",
+        "future ADR",
+        "explicit hardware action",
+    ):
+        if token not in can_gap_text:
+            fail(f"CAN1 safety policy gap must keep {token} explicit")
     input_text = " ".join(rows_by_gate["Input reverse protection"].values())
     for token in (
         "PB-100-input-reverse-package-trace.csv",
@@ -2766,6 +2785,165 @@ def validate_logic_power_design_values() -> None:
             f"{path.relative_to(REPO_ROOT)} is missing logic-power design items: "
             f"{', '.join(missing_items)}"
         )
+
+
+def validate_can1_tx_disable_trace() -> None:
+    path = PB100_DIR / "PB-100-can1-tx-disable-trace.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty CAN1 TX-disable trace: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in CAN1_TX_DISABLE_TRACE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    required_items = {
+        "Policy baseline",
+        "TX missing-link",
+        "Disable command default",
+        "Disabled status readback",
+        "RX independence",
+        "Firmware listen-only",
+        "Production ownership",
+    }
+    rows_by_item: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        item = row["Trace item"].strip()
+        if item in rows_by_item:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate trace item {item}")
+        if item not in required_items:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown trace item {item}")
+        rows_by_item[item] = row
+        for column in CAN1_TX_DISABLE_TRACE_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        if "schematic freeze" not in " ".join(row.values()).lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze dependency must reference schematic freeze")
+
+    missing_items = sorted(required_items - rows_by_item.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing CAN1 trace items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    trace_text = read_text(path)
+    for token in (
+        "ADR-0002",
+        "Architecture v1.0",
+        "configuration cannot enable TX",
+        "future ADR",
+        "explicit hardware action",
+        "CAN1_TX_ROUTE",
+        "JP_CAN1",
+        "DNP/open",
+        "no default-populated TX",
+        "CAN1_TX_DISABLE_CMD",
+        "U_CAN1",
+        "hardware pull",
+        "LB-100 is reset unpowered or absent",
+        "CAN1_TX_DISABLED_STATUS",
+        "physical disabled state",
+        "not firmware-only",
+        "CAN1_RX_ROUTE",
+        "listen-only RX",
+        "firmware/services/can_safety.c",
+        "CAN1 TX denied",
+        "CAN2 expansion TX remains separate",
+        "CAN1_TX_DISABLE",
+        "Default DNP/open",
+        "JLCPCB PCBWay",
+    ):
+        if token not in trace_text:
+            fail(f"CAN1 TX-disable trace must include {token}")
+
+    safety_rows = list(csv.DictReader((PB100_DIR / "PB-100-can1-safety-verification.csv").open(newline="", encoding="utf-8")))
+    safety_by_requirement = {row["Requirement"].strip(): row for row in safety_rows}
+    for requirement in REQUIRED_CAN1_SAFETY_REQUIREMENTS:
+        if requirement not in safety_by_requirement:
+            fail(f"CAN1 safety matrix must include {requirement}")
+    tx_path_text = " ".join(safety_by_requirement["TX physical path"].values()).lower()
+    for token in ("can1_tx_route", "dnp/open", "no default-populated tx", "future-adr"):
+        if token not in tx_path_text:
+            fail(f"CAN1 TX physical path safety row must include {token}")
+    status_text = " ".join(safety_by_requirement["Disabled status"].values()).lower()
+    if "physical disabled state" not in status_text or "not firmware-only" not in status_text:
+        fail("CAN1 disabled-status safety row must require physical non-firmware-only readback")
+    firmware_row_text = " ".join(safety_by_requirement["Firmware safety"].values()).lower()
+    if "listen-only" not in firmware_row_text or "blocks tx" not in firmware_row_text:
+        fail("CAN1 firmware safety row must keep listen-only TX block explicit")
+
+    net_domain_rows = list(csv.DictReader((PB100_DIR / "PB-100-schematic-net-domain-plan.csv").open(newline="", encoding="utf-8")))
+    net_domain_by_pattern = {row["Net pattern"].strip(): row for row in net_domain_rows}
+    expected_net_defaults = {
+        "CAN1_TX_DISABLE_CMD": "Disable asserted by hardware pull",
+        "CAN1_TX_DISABLED_STATUS": "Asserted when disabled",
+        "CAN1_RX_ROUTE": "DNP unless CAN1 crosses PB-100",
+        "CAN1_TX_ROUTE": "DNP/open by default",
+    }
+    for net_pattern, expected_default in expected_net_defaults.items():
+        row = net_domain_by_pattern.get(net_pattern)
+        if row is None:
+            fail(f"CAN1 net-domain plan must include {net_pattern}")
+        if row["Default state"].strip() != expected_default:
+            fail(f"CAN1 net-domain default for {net_pattern} must remain {expected_default}")
+
+    b2b_rows = list(csv.DictReader((PB100_DIR / "PB-100-b2b-pin-map.csv").open(newline="", encoding="utf-8")))
+    b2b_nets = {row["Net"].strip() for row in b2b_rows}
+    for net in expected_net_defaults:
+        if net not in b2b_nets:
+            fail(f"CAN1 signal {net} must remain visible in JPB1 pin map")
+
+    capabilities = json.loads(read_text(REPO_ROOT / "firmware" / "configs" / "hardware" / "pb-100-capabilities.json"))
+    can1 = capabilities["safety"]["can1"]
+    if can1["vehicle_can_read_only_default"] is not True:
+        fail("PB-100 capability manifest must keep CAN1 vehicle_can_read_only_default true")
+    if can1["tx_route_population"] != "DNP/open":
+        fail("PB-100 capability manifest must keep CAN1 tx_route_population DNP/open")
+    if can1["tx_requires_future_adr"] is not True:
+        fail("PB-100 capability manifest must keep CAN1 tx_requires_future_adr true")
+    if can1["hardware_action_required_for_tx"] is not True:
+        fail("PB-100 capability manifest must keep CAN1 hardware_action_required_for_tx true")
+    if can1["disabled_status_signal"] != "CAN1_TX_DISABLED_STATUS":
+        fail("PB-100 capability manifest must keep CAN1 disabled status signal")
+
+    firmware_text = read_text(REPO_ROOT / "firmware" / "services" / "can_safety.c")
+    for token in ("SVC_CAN_TX_DENY", "SVC_CAN_PORT_CAN2_EXPANSION", "SVC_CAN_TX_ALLOW"):
+        if token not in firmware_text:
+            fail(f"CAN safety firmware must include {token}")
+    firmware_tests = read_text(REPO_ROOT / "firmware" / "tests" / "test_can_safety.c")
+    for token in (
+        "test_can1_tx_is_denied_when_disabled_status_true",
+        "test_can1_tx_is_denied_when_disabled_status_false",
+        "test_can2_tx_is_allowed_for_expansion",
+    ):
+        if token not in firmware_tests:
+            fail(f"CAN safety tests must include {token}")
+
+    checked_texts = {
+        "CAN1 TX-disable input": read_text(PB100_DIR / "PB-100-can1-tx-disable.md"),
+        "CAN safety doc": read_text(REPO_ROOT / "docs" / "can" / "can-safety.md"),
+        "BOM map": read_text(REPO_ROOT / "production" / "bom" / "pb100_symbol_bom_map.csv"),
+        "Factory BOM": read_text(REPO_ROOT / "production" / "bom" / "factory_bom_draft.csv"),
+        "Assembly recheck": read_text(REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv"),
+        "Sourcing evidence": read_text(REPO_ROOT / "production" / "bom" / "pb100_sourcing_evidence_snapshot.csv"),
+        "Assembly readiness": read_text(PB100_DIR / "PB-100-assembly-readiness-trace.csv"),
+        "Test plan": read_text(REPO_ROOT / "docs" / "testing" / "test-plan.md"),
+    }
+    for label, text in checked_texts.items():
+        lower_text = text.lower()
+        if "can1" not in lower_text:
+            fail(f"{label} must retain CAN1 safety content")
+        if label in {"BOM map", "Factory BOM", "Assembly recheck", "Sourcing evidence", "Assembly readiness"}:
+            for token in ("dnp/open", "no default-populated"):
+                if token not in lower_text:
+                    fail(f"{label} must retain CAN1 {token} production boundary")
 
 
 def validate_can1_safety_verification() -> None:
@@ -4259,6 +4437,7 @@ def main() -> int:
     validate_thermal_telemetry_trace()
     validate_logic_power_rail_trace()
     validate_logic_power_design_values()
+    validate_can1_tx_disable_trace()
     validate_can1_safety_verification()
     validate_can1_capture_contract()
     validate_assembly_sourcing_recheck()

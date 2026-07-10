@@ -95,6 +95,9 @@ Current coverage:
   evidence.
 - Close PB-100 CAN1 TX-disable schematic evidence using the `JP_CAN1`
   DNP/open link plus `U_CAN1` default-disabled/readback contract.
+- CAN1 TX-disable now has a trace tying `JP_CAN1`, `U_CAN1`,
+  `CAN1_TX_ROUTE`, `CAN1_TX_DISABLED_STATUS`, firmware listen-only behavior,
+  DNP BOM ownership, and the future-ADR hardware-action boundary together.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.
 - Synchronize factory and garage BOM drafts with final selections.
