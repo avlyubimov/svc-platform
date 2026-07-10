@@ -1312,6 +1312,18 @@ LB-100 startup. A dedicated trace makes the protected input rail, 5 V budget,
 power-good timing, rail-invalid output behavior, and lower-voltage fallback
 risk machine-checkable before schematic freeze.
 
+## 2026-07-10 — PB-100 KiCad sheet note trace synchronization
+
+Decision: PB-100 KiCad placeholder sheets now reference the same dedicated trace
+artifacts as their capture work queue rows. Validation fails if a sheet note
+drops the required trace source for input protection, logic power, outputs,
+telemetry, B2B, or CAN1.
+
+Reason: The sheets are still placeholders, but their capture notes are the
+entry point for schematic work. Keeping sheet notes aligned with trace evidence
+reduces the risk of capturing from stale assumptions without starting PCB
+layout.
+
 ## 2026-07-10 — PB-100 capture work queue trace evidence synchronization
 
 Decision: PB-100 schematic capture work queue now lists the dedicated trace

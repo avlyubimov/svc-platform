@@ -4422,10 +4422,18 @@ def validate_schematic_capture_work_queue() -> None:
     }
     rows_by_work_item = {row["Work item"].strip(): row for row in rows}
     for work_item, tokens in required_source_artifacts.items():
-        source_artifacts = rows_by_work_item[work_item]["Primary source artifacts"]
+        work_row = rows_by_work_item[work_item]
+        source_artifacts = work_row["Primary source artifacts"]
         for token in tokens:
             if token not in source_artifacts:
                 fail(f"capture work queue {work_item} must include source artifact {token}")
+        sheet_file = work_row["Sheet file"].strip()
+        if sheet_file in manifest_sheets:
+            sheet_path = KICAD_DIR / sheet_file if sheet_file == "PB-100.kicad_sch" else KICAD_DIR / "sheets" / sheet_file
+            sheet_text = read_text(sheet_path)
+            for token in tokens:
+                if token not in sheet_text:
+                    fail(f"{sheet_path.relative_to(REPO_ROOT)} must mention source artifact {token}")
 
     missing_work_items = sorted(REQUIRED_CAPTURE_WORK_ITEMS - seen_work_items)
     if missing_work_items:
