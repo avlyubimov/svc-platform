@@ -9,11 +9,11 @@
     (rev "sheet-placeholder")
     (company "SVC Platform")
     (comment 9 "Work queue: CAP-B2B. B2B capture follows JPB1 pin map.")
-    (comment 1 "Placeholder sheet. Capture JPB1 100-pin interface here.")
+    (comment 1 "Placeholder sheet. Capture JPB1 100-pin FX18 candidate interface here.")
     (comment 2 "Source: PB-100-b2b-pin-map.csv.")
   )
   (lib_symbols)
-  (text "B2B capture notes:\n- JPB1 follows PB-100-b2b-pin-map.csv\n- Multiple GND and AGND pins\n- PB_5V_OUT exported to LB-100\n- LB_3V3_IO imported from LB-100\n- OUT control/fault/IMON nets\n- PB telemetry and expansion nets\n- CAN1 TX disable command/status nets\n\nConnector MPN still conditional."
+  (text "B2B capture notes:\n- JPB1 follows PB-100-b2b-pin-map.csv\n- Candidate pair: FX18-100P-0.8SV10 plus FX18-100S-0.8SV20\n- 100 positions, 0.8 mm pitch, 20 mm stack-height candidate\n- Multiple GND and AGND pins\n- PB_5V_OUT exported to LB-100\n- LB_3V3_IO imported from LB-100\n- OUT control/fault/IMON nets\n- PB telemetry and expansion nets\n- CAN1 TX disable command/status nets\n\nFootprint placement remains blocked until schematic freeze."
     (at 25 30 0)
     (effects (font (size 2.0 2.0)) (justify left top))
     (uuid "c31bcdde-d9b1-45bd-9847-6d5550fad29a")

@@ -102,9 +102,11 @@ Schematic-planning pin map CSV:
 | Configuration/ID | 2-4 signals | PB-100 to LB-100 | Revision ID, EEPROM, or resistor-coded identity |
 | Expansion reserve | 10-20 pins | Mixed | Spare GPIO/ADC/I2C/SPI/UART capacity |
 
-The initial 100-pin mezzanine target remains plausible. `JPB1` pin assignment is
-now captured as a schematic-planning input, but final connector MPN and LB-100
-MCU pin binding remain schematic-review items.
+The initial 100-pin mezzanine target is now a Hirose FX18 candidate pair:
+`FX18-100P-0.8SV10` plus `FX18-100S-0.8SV20`. `JPB1` pin assignment is captured
+as a schematic-planning input, but stack height, vendor footprint drawing,
+vibration retention, PCBA handling, and LB-100 MCU pin binding remain
+schematic-review items.
 
 ## Output channel matrix
 

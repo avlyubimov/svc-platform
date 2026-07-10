@@ -52,6 +52,10 @@ Current coverage:
   AEC-Q200 NTC candidate for all three thermal points; schematic freeze must
   still close divider values, ADC scaling, placement, assembly class, and
   calibration.
+- JPB1 board-to-board planning now has a Hirose `FX18-100P-0.8SV10` plus
+  `FX18-100S-0.8SV20` candidate pair; schematic freeze must still close stack
+  height, footprint drawing, vibration retention, assembly handling, and LB-100
+  MCU resource binding.
 - Close PB-100 CAN1 TX-disable schematic evidence using the `JP_CAN1`
   DNP/open link plus `U_CAN1` default-disabled/readback contract.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.

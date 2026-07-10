@@ -34,6 +34,7 @@ order.
 | Input reverse protection | TI LM74700-Q1/LM74502-Q1 class | ADI/LTC ideal diode controller families | MSOP/SOIC class | Controller family only; MOSFET is tracked separately |
 | Input reverse MOSFET | Infineon OptiMOS 5 60 V TOLL low-Rds class | Nexperia LFPAK88 80 V; parallel Vishay SIDR626 PowerPAK | TOLL/LFPAK88/PowerPAK | Single 2.1 mOhm MOSFET is rejected for 40 A input thermal |
 | Input TVS/load dump | Vishay SM8S33AHM3/I active HM3 TVS | Vishay SM8S33AHE3_A/I NFD stock-only; Littelfuse SLD8S33A; Diodes DM8W33AQ-13; Bourns SM8S33A-Q class | DO-218AC/SMC as needed | MCC SM8S33A source is EOL and HE3 is NFD evidence only; final clamp voltage depends on MOSFET and buck ratings |
+| PB-100/LB-100 board-to-board connector | Hirose FX18-100P-0.8SV10 plus FX18-100S-0.8SV20 candidate pair | Samtec Q Strip/high-density mezzanine class; Molex SlimStack 100-position class | 100-position 0.8 mm FX18 20 mm stack candidate | Candidate pair supports 100-position JPB1 planning; stack height vibration retention footprint and PCBA handling remain schematic-freeze items |
 | FRAM | Fujitsu/Infineon MB85 I2C/SPI FRAM | Cypress/Infineon Excelon FRAM | SOIC/TSSOP/DFN | Configuration and black-box storage |
 | RTC | Microchip MCP7940 class | NXP PCF8523/PCF8563; DS3231 class | SOIC/TSSOP/DFN/module | Prefer low-IQ SMD IC over hobby module |
 | IMU | Bosch BMI270/BMI323 | TDK ICM-42688 class | LGA | Optional for Rev.1 if layout risk is high |
@@ -61,6 +62,10 @@ The current strategy is:
 - Thermal telemetry: TDK `NTCGS103JF103FT8`-class 10 kΩ AEC-Q200 NTC candidate
   for `TEMP_PCB`, `TEMP_PWR_A`, and `TEMP_PWR_B`. The schematic must still
   close divider values, ADC scaling, placement, and calibration.
+- Board-to-board interface: Hirose `FX18-100P-0.8SV10` plus
+  `FX18-100S-0.8SV20` candidate pair for `JPB1`. The schematic must still close
+  exact stack height, footprint drawing, vibration retention, assembly handling,
+  and LB-100 MCU resource binding.
 
 ## Evidence links
 
@@ -97,6 +102,13 @@ The current strategy is:
   https://www.vishay.com/en/product/29003/
 - Murata NCU automotive NTC part list was checked as an alternate:
   https://www.murata.com/-/media/webrenewal/tool/library/common-pdf/static-model/component-list-ntc-2508.ashx?cvid=20250930011345000000&la=en
+- Hirose FX18-100P-0.8SV10 product page was checked for the PB-100/LB-100
+  candidate plug: https://www.hirose.com/product/p/CL0579-0034-1-00
+- Hirose FX18-100S-0.8SV20 product page was checked for the PB-100/LB-100
+  candidate receptacle: https://www.hirose.com/product/p/CL0579-0038-2-00
+- Hirose FX18 series catalog was checked for 0.8 mm pitch, 100-position, and
+  power/MF-contact planning evidence:
+  https://www.hirose.com/product/series/catalogdownload?category=FX18
 - TI LM5164QDDATQ1 was listed at LCSC: https://www.lcsc.com/product-detail/C1850350.html
 - TI LM5164-Q1 is active as a 6-100 V 1 A automotive buck regulator: https://www.ti.com/product/LM5164-Q1
 - TI LM5013-Q1 is active as a 6-100 V 3.5 A automotive buck regulator: https://www.ti.com/product/LM5013-Q1

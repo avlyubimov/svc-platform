@@ -9,9 +9,9 @@ Input TVS,Vishay SM8S33AHM3/I,DO-218AC,KiCad stock or custom,Verify,High-current
 Logic buck,LM5164QDDATQ1,SO PowerPAD-8,KiCad stock candidate,Verify,TI DDA package drawing required before lock
 Logic buck alternate,LM5013-Q1,SO PowerPAD-8,KiCad stock candidate,Verify,Higher-current 100V fallback
 Total input current monitor,INA228 or INA226 class,VSSOP/SOIC,KiCad stock candidate,Verify,Final monitor MPN not locked
-Thermal sensors,Automotive NTC,0603 or 0805,KiCad stock candidate,Verify,Use AEC-Q200 part if available
+Thermal sensors,TDK NTCGS103JF103FT8-class 10k NTC,0402,KiCad stock candidate,Verify,Use 150C AEC-Q200 part and close divider calibration before lock
 Optional digital temp,TMP117 or TMP112 class,DFN/SOT class,KiCad stock candidate,Optional,DNP if analog NTC strategy is sufficient
-B2B connector,JPB1 100-pin mezzanine,TBD,Vendor drawing required,Vendor TBD,No placement until connector family selected
+B2B connector,Hirose FX18-100P-0.8SV10 plus FX18-100S-0.8SV20 candidate pair,100-position 0.8 mm FX18 20 mm stack candidate,Vendor drawing required,Candidate pair,No placement until stack height vibration and assembly review close
 Output fuses,User-serviceable fuse holders,TBD,Vendor drawing required,Garage item,Footprint depends on fuse format and enclosure
 High-current connectors,Output and battery connectors,TBD,Vendor drawing required,Garage item,Connector current rating and derating still conditional
 CAN1 TX disable hardware,DNP link gate or solder jumper,TBD,KiCad stock or custom,Verify,Must default open or disabled

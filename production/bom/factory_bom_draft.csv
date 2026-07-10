@@ -18,7 +18,7 @@ Power,TVS protection,Vishay SM8S33AHM3/I active HM3 branch for 60V+ Rev.1 output
 Power,Reverse protection,LM74700QDBVRQ1 or LM74700QDRQ1; LM74502-Q1 alternative,SOT-23/SOIC plus external FET,1,Factory,Core,Input reverse polarity
 Power,DC/DC,LM5164QDDATQ1 default; LM5013-Q1 high-current 100V alternate; TPS54360B-Q1 conditional 60V alternate,SOIC/HSOIC PowerPAD,1,Factory,Core,Logic power current and TVS margin decide final family
 Power,Buck inductor,Automotive shielded power inductor class,TBD after regulator design,1,Factory,Core,Value saturation current and heating close with LM5164-Q1 design
-Power,PB-100/LB-100 board-to-board connector,100-pin mezzanine connector class,Vendor footprint TBD,1,Factory,Core,Final connector pair and vibration retention pending review
+Power,PB-100/LB-100 board-to-board connector,Hirose FX18-100P-0.8SV10 plus FX18-100S-0.8SV20 candidate pair,100-position 0.8 mm FX18 20 mm stack candidate,1,Factory,Core,Pair candidate selected; footprint stack height vibration and assembly handling pending review
 Power,Board identity resistor network,Precision resistor divider class,0603/0805,1,Factory,Should,PB_ID_ADC fallback board revision identity
 Power,Test points,Generic bring-up and telemetry test points,PCB pads or SMT test points,TBD,Factory,Should,Exact count from schematic review before layout
 Power,CAN1 TX disable DNP link,DNP 0R link or default-open jumper/gate,0603/0805 or logic gate TBD,1,Factory,Core,Default DNP/open vehicle-CAN TX path per ADR-0002

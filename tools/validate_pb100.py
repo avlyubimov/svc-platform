@@ -2528,6 +2528,7 @@ def validate_thermal_telemetry_baseline() -> None:
         PB100_DIR / "PB-100-symbol-mpn-readiness.csv",
         PB100_DIR / "PB-100-symbol-capture-worklist.csv",
         PB100_DIR / "PB-100-schematic-instance-plan.csv",
+        PB100_DIR / "PB-100-kicad-footprint-plan.csv",
         REPO_ROOT / "production" / "bom" / "factory_bom_draft.csv",
         REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv",
         REPO_ROOT / "production" / "bom" / "pb100_sourcing_evidence_snapshot.csv",
@@ -2553,6 +2554,44 @@ def validate_thermal_telemetry_baseline() -> None:
     for token in ("ntcgs103jf103ft8", "aec-q200", "150c", "open:", "vishay"):
         if token not in evidence_text:
             fail(f"THERMAL_NTC sourcing evidence must explicitly track {token}")
+
+
+def validate_b2b_connector_candidate() -> None:
+    required_tokens = (
+        "FX18-100P-0.8SV10",
+        "FX18-100S-0.8SV20",
+        "100",
+        "0.8",
+    )
+    checked_paths = (
+        PB100_DIR / "PB-100-symbol-mpn-readiness.csv",
+        PB100_DIR / "PB-100-symbol-capture-worklist.csv",
+        PB100_DIR / "PB-100-schematic-instance-plan.csv",
+        PB100_DIR / "PB-100-kicad-footprint-plan.csv",
+        PB100_DIR / "PB-100-schematic-freeze-gap-register.csv",
+        PB100_DIR / "PB-100-schematic-package.md",
+        KICAD_DIR / "sheets" / "b2b-interface.kicad_sch",
+        REPO_ROOT / "production" / "bom" / "factory_bom_draft.csv",
+        REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv",
+        REPO_ROOT / "production" / "bom" / "pb100_sourcing_evidence_snapshot.csv",
+        REPO_ROOT / "docs" / "production" / "component-family-shortlist.md",
+    )
+    for path in checked_paths:
+        text = read_text(path)
+        for token in required_tokens:
+            if token not in text:
+                fail(f"{path.relative_to(REPO_ROOT)} must reference B2B connector candidate token {token}")
+
+    evidence_rows = list(
+        csv.DictReader((REPO_ROOT / "production" / "bom" / "pb100_sourcing_evidence_snapshot.csv").open(newline="", encoding="utf-8"))
+    )
+    b2b_evidence = next((row for row in evidence_rows if row["Symbol key"].strip() == "B2B_CONNECTOR"), None)
+    if b2b_evidence is None:
+        fail("missing B2B_CONNECTOR sourcing evidence row")
+    evidence_text = " ".join(b2b_evidence.values()).lower()
+    for token in ("20mm", "500", "open:", "vibration", "assembly"):
+        if token not in evidence_text:
+            fail(f"B2B_CONNECTOR sourcing evidence must explicitly track {token}")
 
 
 def validate_validation_traceability() -> None:
@@ -3018,6 +3057,7 @@ def main() -> int:
     validate_sourcing_evidence_snapshot()
     validate_tvs_candidate_consistency()
     validate_thermal_telemetry_baseline()
+    validate_b2b_connector_candidate()
     validate_validation_traceability()
     validate_test_point_plan()
     validate_fault_response_matrix()

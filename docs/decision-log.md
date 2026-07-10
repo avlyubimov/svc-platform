@@ -1183,3 +1183,16 @@ Documenting the capture contract and BOM ownership before final schematic
 wiring keeps the default state auditable: no default-populated TX item,
 configuration cannot enable TX, and any future transmit support still requires
 a future ADR plus explicit hardware action.
+
+## 2026-07-10 — PB-100/LB-100 JPB1 connector candidate pair
+
+Decision: JPB1 board-to-board planning now uses a Hirose FX18 candidate pair:
+`FX18-100P-0.8SV10` plus `FX18-100S-0.8SV20`. The pair is treated as a
+schematic-planning candidate only and does not authorize footprint placement or
+PCB layout.
+
+Reason: The FX18 family matches the existing 100-position 0.8 mm mezzanine
+direction and gives a concrete pair for sourcing and footprint review. The
+candidate still needs stack-height confirmation, vendor drawing review,
+vibration retention assessment, PCBA assembly handling review, and LB-100 MCU
+resource binding before the board-to-board freeze gate can close.

@@ -14,7 +14,7 @@ THERMAL_NTC,factory_bom_draft.csv,Temp sensor,3,Populated,Factory,Candidate,TEMP
 BOARD_ID_RESISTOR,factory_bom_draft.csv,Board identity resistor network,1,Populated,Factory,Value TBD,PB_ID_ADC fallback identity
 TEST_POINT,factory_bom_draft.csv,Test points,TBD,PCB feature,Factory,Review,No placement before schematic freeze
 DIGITAL_TEMP_OPTION,factory_bom_draft.csv,Temp sensor,Optional DNP,Optional DNP,Factory,Optional,Only if analog NTC accuracy is insufficient
-B2B_CONNECTOR,factory_bom_draft.csv,PB-100/LB-100 board-to-board connector,1,Populated,Factory,Vendor TBD,Final mezzanine connector MPN pending review
+B2B_CONNECTOR,factory_bom_draft.csv,PB-100/LB-100 board-to-board connector,1,Populated,Factory,Hirose FX18 candidate pair,FX18-100P-0.8SV10 plus FX18-100S-0.8SV20 pending footprint stack-height and assembly review
 OUTPUT_CONNECTOR,garage_bom_draft.csv,Deutsch output connector sets,10,Garage installed,Garage,Candidate,DTP class for OUT1/OUT2 and DT class for OUT3-OUT10
 OUTPUT_FUSE_HOLDER,garage_bom_draft.csv,Per-output fuse holders,10,Garage installed,Garage,Candidate,Final holder style depends on enclosure
 MAIN_FUSE_HOLDER,garage_bom_draft.csv,Littelfuse MAXI fuse holder,1,Garage installed,Garage,Candidate,Install near battery per ADR-0008
