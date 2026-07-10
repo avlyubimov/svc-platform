@@ -15,7 +15,7 @@
     (comment 4 "Outputs are generic OUT1..OUT10; roles are configuration-only.")
   )
   (lib_symbols)
-  (text "PB-100 schematic scaffold only.\n\nDo not create PCB layout from this project until PB-100 schematic freeze is closed.\n\nPrimary inputs:\n- ../PB-100-schematic-capture-plan.md\n- ../PB-100-schematic-instance-plan.csv\n- ../PB-100-net-naming.md\n- ../PB-100-schematic-freeze-checklist.md"
+  (text "PB-100 schematic scaffold only.\n\nDo not create PCB layout from this project until PB-100 schematic freeze is closed.\n\nPrimary inputs:\n- ../PB-100-schematic-capture-plan.md\n- ../PB-100-schematic-instance-plan.csv\n- ../PB-100-net-naming.md\n- ../PB-100-schematic-freeze-checklist.md\n- ../PB-100-kicad-sheet-manifest.csv"
     (at 30 35 0)
     (effects
       (font
@@ -35,4 +35,215 @@
     )
     (uuid "b6ec4a8a-8991-44dc-bc7f-db7929292c48")
   )
+  (sheet
+    (at 25 125)
+    (size 50 20)
+    (stroke
+      (width 0.1524)
+      (type solid)
+    )
+    (fill
+      (color 0 0 0 0.0000)
+    )
+    (uuid "775a708a-bc10-50b7-865e-a9dd2342a679")
+    (property "Sheetname" "input-protection"
+      (at 25 123.73 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left bottom)
+      )
+    )
+    (property "Sheetfile" "sheets/input-protection.kicad_sch"
+      (at 25 146.59 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+    )
+  )
+  (sheet
+    (at 85 125)
+    (size 50 20)
+    (stroke
+      (width 0.1524)
+      (type solid)
+    )
+    (fill
+      (color 0 0 0 0.0000)
+    )
+    (uuid "9b7bea54-837e-581b-8f0a-703eaf31efca")
+    (property "Sheetname" "logic-power"
+      (at 85 123.73 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left bottom)
+      )
+    )
+    (property "Sheetfile" "sheets/logic-power.kicad_sch"
+      (at 85 146.59 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+    )
+  )
+  (sheet
+    (at 145 125)
+    (size 50 20)
+    (stroke
+      (width 0.1524)
+      (type solid)
+    )
+    (fill
+      (color 0 0 0 0.0000)
+    )
+    (uuid "f9cd182d-a80d-5e7c-86b4-802c7dd2af4e")
+    (property "Sheetname" "output-channel-template"
+      (at 145 123.73 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left bottom)
+      )
+    )
+    (property "Sheetfile" "sheets/output-channel-template.kicad_sch"
+      (at 145 146.59 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+    )
+  )
+  (sheet
+    (at 205 125)
+    (size 50 20)
+    (stroke
+      (width 0.1524)
+      (type solid)
+    )
+    (fill
+      (color 0 0 0 0.0000)
+    )
+    (uuid "f7d6b35e-237d-52e9-9479-87d1148e3a34")
+    (property "Sheetname" "outputs-1-10"
+      (at 205 123.73 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left bottom)
+      )
+    )
+    (property "Sheetfile" "sheets/outputs-1-10.kicad_sch"
+      (at 205 146.59 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+    )
+  )
+  (sheet
+    (at 25 165)
+    (size 50 20)
+    (stroke
+      (width 0.1524)
+      (type solid)
+    )
+    (fill
+      (color 0 0 0 0.0000)
+    )
+    (uuid "84bbd9f2-a65b-54df-bf65-1ecd5060da1f")
+    (property "Sheetname" "telemetry"
+      (at 25 163.73 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left bottom)
+      )
+    )
+    (property "Sheetfile" "sheets/telemetry.kicad_sch"
+      (at 25 186.59 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+    )
+  )
+  (sheet
+    (at 85 165)
+    (size 50 20)
+    (stroke
+      (width 0.1524)
+      (type solid)
+    )
+    (fill
+      (color 0 0 0 0.0000)
+    )
+    (uuid "1f6a4e2b-9bd1-55b6-8cbd-9ba91fa0d4f8")
+    (property "Sheetname" "b2b-interface"
+      (at 85 163.73 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left bottom)
+      )
+    )
+    (property "Sheetfile" "sheets/b2b-interface.kicad_sch"
+      (at 85 186.59 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+    )
+  )
+  (sheet
+    (at 145 165)
+    (size 50 20)
+    (stroke
+      (width 0.1524)
+      (type solid)
+    )
+    (fill
+      (color 0 0 0 0.0000)
+    )
+    (uuid "1af68b81-10b0-5461-9124-39421a2a6932")
+    (property "Sheetname" "can1-safety"
+      (at 145 163.73 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left bottom)
+      )
+    )
+    (property "Sheetfile" "sheets/can1-safety.kicad_sch"
+      (at 145 186.59 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+    )
+  )
+
 )

@@ -1490,3 +1490,14 @@ Reason: Internal class symbols are schematic-planning constructs rather than
 manufacturer-defined parts. Their freeze evidence comes from the trace files,
 so readiness/worklist provenance must follow the same trace-first contract
 without weakening datasheet provenance for real components.
+
+## 2026-07-10 — PB-100 top-level KiCad sheet linking
+
+Decision: PB-100 top-level KiCad schematic now links every child sheet listed
+in `PB-100-kicad-sheet-manifest.csv`. The PB-100 validator now fails if a child
+sheet exists in the manifest but is not linked from `PB-100.kicad_sch`.
+
+Reason: Schematic capture needs a connected sheet hierarchy before component
+placement. Linking placeholder sheets is a schematic-scaffold step only: it
+does not place components, lock footprints, create a PCB layout, or generate
+manufacturing outputs.

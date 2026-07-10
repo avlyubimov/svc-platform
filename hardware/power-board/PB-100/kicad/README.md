@@ -7,7 +7,7 @@ This directory contains the preliminary KiCad project scaffold for PB-100.
 ## Current boundary
 
 - `PB-100.kicad_pro`: project metadata scaffold.
-- `PB-100.kicad_sch`: top-level schematic note sheet.
+- `PB-100.kicad_sch`: top-level schematic note sheet with linked child sheets.
 - `sheets/*.kicad_sch`: child schematic placeholder sheets for capture.
 - `sym-lib-table`: project-local symbol library table.
 - `fp-lib-table`: project-local footprint library table.
@@ -63,8 +63,8 @@ manufacturing outputs are also blocked by repository validation.
 
 1. Open `PB-100.kicad_pro` in KiCad.
 2. Let KiCad normalize project settings if needed.
-3. Link or normalize child schematic sheets listed in
-   `PB-100-schematic-capture-plan.md`.
+3. Review linked child schematic sheets listed in
+   `PB-100-schematic-capture-plan.md` and capture their contents.
 4. Review preliminary concrete MPN symbols against the official data sheets
    listed in `PB-100-symbol-capture-worklist.csv`.
 5. Replace abstract block symbols only after package drawings and pinouts are
@@ -83,8 +83,10 @@ The validator intentionally fails if layout/manufacturing artifacts appear befor
 the PB-100 schematic freeze checklist is closed.
 
 If `kicad-cli` is installed, the validator also runs schematic ERC, requires
-zero reported violations, and exports a temporary KiCad S-expression netlist. If
-`kicad-cli` is not available, the text-level KiCad scaffold checks still run.
+zero reported violations, exports a temporary KiCad S-expression netlist, and
+checks that all child sheets in `PB-100-kicad-sheet-manifest.csv` are linked from
+the top-level schematic. If `kicad-cli` is not available, the text-level KiCad
+scaffold checks still run.
 
 KiCad schematic and symbol files are also checked for accessory-role tokens such
 as `FOG`, `USB`, `SEAT`, `CHIGEE`, `DVR`, and `BRAKE`. PB-100 artifacts must use

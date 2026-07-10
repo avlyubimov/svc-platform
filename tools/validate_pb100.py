@@ -668,6 +668,27 @@ def validate_kicad_scaffold() -> None:
         validate_s_expression_balance(KICAD_DIR / table_name)
     validate_s_expression_balance(KICAD_DIR / "lib" / "PB100.kicad_sym")
     validate_no_layout_artifacts()
+    validate_kicad_top_sheet_links()
+
+
+def validate_kicad_top_sheet_links() -> None:
+    top_path = KICAD_DIR / "PB-100.kicad_sch"
+    top_text = read_text(top_path)
+    manifest_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-kicad-sheet-manifest.csv").open(newline="", encoding="utf-8"))
+    )
+    child_sheets = [row["Sheet file"].strip() for row in manifest_rows if row["Sheet kind"].strip() == "child"]
+    for sheet_file in child_sheets:
+        sheet_path = KICAD_DIR / "sheets" / sheet_file
+        if not sheet_path.exists():
+            fail(f"missing child sheet linked by manifest: {sheet_path.relative_to(REPO_ROOT)}")
+        sheet_name = sheet_file.removesuffix(".kicad_sch")
+        sheetfile_token = f'(property "Sheetfile" "sheets/{sheet_file}"'
+        sheetname_token = f'(property "Sheetname" "{sheet_name}"'
+        if sheetfile_token not in top_text:
+            fail(f"{top_path.relative_to(REPO_ROOT)} must link sheets/{sheet_file}")
+        if sheetname_token not in top_text:
+            fail(f"{top_path.relative_to(REPO_ROOT)} must name child sheet {sheet_name}")
 
 
 def validate_kicad_cli_checks() -> None:
