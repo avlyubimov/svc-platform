@@ -1312,6 +1312,18 @@ LB-100 startup. A dedicated trace makes the protected input rail, 5 V budget,
 power-good timing, rail-invalid output behavior, and lower-voltage fallback
 risk machine-checkable before schematic freeze.
 
+## 2026-07-10 — PB-100 readiness dashboard trace evidence synchronization
+
+Decision: PB-100 schematic-readiness dashboard now references the dedicated
+trace artifacts on the rows where they are the machine-checked evidence source.
+Validation fails if the dashboard drops trace evidence for output baselines,
+input reverse protection, TVS/load-dump, logic power, telemetry, CAN1 safety, or
+assembly readiness.
+
+Reason: The dashboard is the cross-artifact review view. Keeping it aligned with
+the release manifest and freeze checklist prevents stale readiness summaries
+from hiding a missing trace before schematic freeze.
+
 ## 2026-07-10 — PB-100 freeze checklist trace evidence synchronization
 
 Decision: PB-100 schematic-freeze checklist evidence now includes the dedicated

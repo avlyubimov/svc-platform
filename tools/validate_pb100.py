@@ -1510,6 +1510,34 @@ def validate_schematic_readiness_dashboard() -> None:
     if "dnp/open" not in can_text or "future adr" not in can_text:
         fail("CAN1 safety dashboard row must keep DNP/open and future ADR explicit")
 
+    required_dashboard_evidence = {
+        "Symbol readiness": ("PB-100-input-reverse-package-trace.csv",),
+        "Output pin contract": ("PB-100-high-medium-output-baseline-trace.csv", "PB-100-low-current-output-baseline-trace.csv"),
+        "Output stage design values": ("PB-100-high-medium-output-baseline-trace.csv", "PB-100-low-current-output-baseline-trace.csv"),
+        "Input power design values": (
+            "PB-100-board-current-budget-trace.csv",
+            "PB-100-input-reverse-package-trace.csv",
+            "PB-100-tvs-load-dump-margin-trace.csv",
+        ),
+        "Logic power design values": ("PB-100-logic-power-rail-trace.csv",),
+        "Input protection contract": ("PB-100-input-reverse-package-trace.csv",),
+        "Hardware capability manifest": (
+            "PB-100-current-telemetry-trace.csv",
+            "PB-100-thermal-telemetry-trace.csv",
+            "PB-100-can1-tx-disable-trace.csv",
+        ),
+        "Logic power values": ("PB-100-logic-power-rail-trace.csv",),
+        "BOM synchronization": ("PB-100-assembly-readiness-trace.csv",),
+        "Assembly sourcing recheck": ("PB-100-assembly-readiness-trace.csv",),
+        "CAN1 safety": ("PB-100-can1-tx-disable-trace.csv",),
+        "CAN1 safety verification": ("PB-100-can1-tx-disable-trace.csv",),
+    }
+    for area, tokens in required_dashboard_evidence.items():
+        evidence = rows_by_area[area]["Evidence"]
+        for token in tokens:
+            if token not in evidence:
+                fail(f"readiness dashboard evidence for {area} must include {token}")
+
 
 def freeze_checklist_rows_by_gate() -> dict[str, dict[str, str]]:
     text = read_text(PB100_DIR / "PB-100-schematic-freeze-checklist.md")
