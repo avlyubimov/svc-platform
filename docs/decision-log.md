@@ -1653,3 +1653,22 @@ Reason: The selected load-dump clamp determines whether 60 V MOSFET and buck
 alternates are acceptable. Schematic freeze must preserve voltage-class
 boundaries and obsolete/NFD source exclusions without authorizing D1 footprint,
 pulse-current return copper, placement, or manufacturing output.
+
+## 2026-07-10 — PB-100 logic power freeze review
+
+Decision: PB-100 schematic planning now includes
+`PB-100-logic-power-freeze-review.csv`, tying the LM5164-Q1-class 100 V 1 A
+preferred regulator, LM5013-Q1-class 100 V fallback, TPS54360B-Q1-class 60 V
+conditional path, protected `VBAT_PROT` sequencing, 1000 mA `PB_5V_OUT` budget,
+UVLO safe-off behavior, `PB_PWR_GOOD`, switch-node EMI boundary, inductor and
+capacitor class review, factory sourcing gate, and no-layout boundary into one
+review artifact. The PB-100 validator now checks this artifact against the
+logic rail trace, logic budget, design values, buck pin template, sourcing
+recheck, freeze checklist, validation traceability, KiCad sheet notes, and
+release manifest.
+
+Reason: Logic power is a safety dependency for controller default-off behavior
+and LB-100 status. Schematic freeze needs explicit regulator-family, load
+budget, UVLO, PGOOD, magnetics, and sourcing boundaries before any U3/L1 value,
+footprint, switch-node copper, placement, or manufacturing output is
+authorized.

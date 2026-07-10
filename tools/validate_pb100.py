@@ -471,7 +471,10 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-tvs-load-dump-margin-trace.csv",
         "PB-100-tvs-load-dump-freeze-review.csv",
     ),
-    "CAP-LOGIC": ("PB-100-logic-power-rail-trace.csv",),
+    "CAP-LOGIC": (
+        "PB-100-logic-power-rail-trace.csv",
+        "PB-100-logic-power-freeze-review.csv",
+    ),
     "CAP-OUT-TEMPLATE": (
         "PB-100-high-medium-output-baseline-trace.csv",
         "PB-100-high-medium-output-freeze-review.csv",
@@ -644,6 +647,18 @@ REQUIRED_LOGIC_POWER_VALUE_ITEMS = {
     "Power-good pull-up",
     "Higher-current fallback",
 }
+REQUIRED_LOGIC_POWER_FREEZE_REVIEW_ITEMS = {
+    "Regulator family boundary",
+    "Protected input sequence",
+    "PB_5V_OUT ownership",
+    "Cold-crank UVLO safe-off",
+    "Programming values remain TBD",
+    "Switch node and EMI boundary",
+    "Inductor and capacitor class",
+    "Power-good interface",
+    "Assembly and sourcing gate",
+    "Layout authorization boundary",
+}
 REQUIRED_CAN1_SAFETY_REQUIREMENTS = {
     "Vehicle CAN read-only default",
     "TX physical path",
@@ -746,6 +761,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv",
+    "hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv",
@@ -1782,14 +1798,20 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-tvs-load-dump-margin-trace.csv",
             "PB-100-tvs-load-dump-freeze-review.csv",
         ),
-        "Logic power design values": ("PB-100-logic-power-rail-trace.csv",),
+        "Logic power design values": (
+            "PB-100-logic-power-rail-trace.csv",
+            "PB-100-logic-power-freeze-review.csv",
+        ),
         "Input protection contract": ("PB-100-input-reverse-package-trace.csv",),
         "Hardware capability manifest": (
             "PB-100-current-telemetry-trace.csv",
             "PB-100-thermal-telemetry-trace.csv",
             "PB-100-can1-tx-disable-trace.csv",
         ),
-        "Logic power values": ("PB-100-logic-power-rail-trace.csv",),
+        "Logic power values": (
+            "PB-100-logic-power-rail-trace.csv",
+            "PB-100-logic-power-freeze-review.csv",
+        ),
         "BOM synchronization": ("PB-100-assembly-readiness-trace.csv",),
         "Assembly sourcing recheck": ("PB-100-assembly-readiness-trace.csv",),
         "CAN1 safety": ("PB-100-can1-tx-disable-trace.csv", "PB-100-can1-production-dnp-review.csv"),
@@ -1921,7 +1943,11 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-tvs-load-dump-freeze-review.csv",
             "PB-100-protection-validation.csv",
         ),
-        "Logic power rails": ("PB-100-logic-power-rail-trace.csv", "PB-100-logic-power-budget.csv"),
+        "Logic power rails": (
+            "PB-100-logic-power-rail-trace.csv",
+            "PB-100-logic-power-freeze-review.csv",
+            "PB-100-logic-power-budget.csv",
+        ),
         "Current telemetry": (
             "PB-100-current-telemetry-trace.csv",
             "PB-100-current-telemetry-freeze-review.csv",
@@ -2030,7 +2056,13 @@ def validate_schematic_freeze_gap_register() -> None:
         if token not in thermal_telemetry_text:
             fail(f"Thermal telemetry gap must keep {token} explicit")
     logic_power_text = " ".join(rows_by_gate["Logic power rails"].values())
-    for token in ("PB-100-logic-power-rail-trace.csv", "1 A", "power-good", "UVLO"):
+    for token in (
+        "PB-100-logic-power-rail-trace.csv",
+        "PB-100-logic-power-freeze-review.csv",
+        "1 A",
+        "power-good",
+        "UVLO",
+    ):
         if token not in logic_power_text:
             fail(f"Logic power rails gap must keep {token} explicit")
     b2b_text = " ".join(rows_by_gate["Board-to-board interface"].values())
@@ -3440,6 +3472,119 @@ def validate_logic_power_design_values() -> None:
             f"{path.relative_to(REPO_ROOT)} is missing logic-power design items: "
             f"{', '.join(missing_items)}"
         )
+
+
+def validate_logic_power_freeze_review() -> None:
+    path = PB100_DIR / "PB-100-logic-power-freeze-review.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty logic-power freeze review: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in OUTPUT_FREEZE_REVIEW_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_item: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        review_item = row["Review item"].strip()
+        if review_item not in REQUIRED_LOGIC_POWER_FREEZE_REVIEW_ITEMS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown logic-power review item {review_item}")
+        if review_item in rows_by_item:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate logic-power review item {review_item}")
+        rows_by_item[review_item] = row
+        for column in OUTPUT_FREEZE_REVIEW_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+
+    missing_items = sorted(REQUIRED_LOGIC_POWER_FREEZE_REVIEW_ITEMS - rows_by_item.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing logic-power review items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    review_text = read_text(path)
+    for token in (
+        "LM5164-Q1-class",
+        "100 V 1 A",
+        "LM5013-Q1-class",
+        "TPS54360B-Q1-class",
+        "TVS margin",
+        "VBAT_PROT",
+        "VBAT_RAW",
+        "PB_5V_OUT",
+        "1000 mA",
+        "accessory loads",
+        "BUCK_EN_UVLO",
+        "OUT1..OUT10",
+        "LB_3V3_IO",
+        "BUCK_RON_SET",
+        "BUCK_FB",
+        "BUCK_BST",
+        "BUCK_SW",
+        "L1",
+        "CIN",
+        "COUT",
+        "AEC-Q200",
+        "PB_PWR_GOOD",
+        "LOGIC_BUCK",
+        "LOGIC_BUCK_INDUCTOR",
+        "LM5164QDDATQ1",
+        "SO PowerPAD",
+        "JLCPCB PCBWay",
+        "critical alternatives",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+    ):
+        if token not in review_text:
+            fail(f"logic-power freeze review must include {token}")
+
+    rail_text = read_text(PB100_DIR / "PB-100-logic-power-rail-trace.csv")
+    for token in (
+        "LM5164-Q1-class 100 V 1 A",
+        "LM5013-Q1-class 100 V fallback",
+        "TPS54360B-Q1-class 60 V path remains conditional",
+        "PB_5V_OUT must not power accessory loads",
+        "PB_PWR_GOOD",
+        "default off",
+    ):
+        if token not in rail_text:
+            fail(f"logic power rail trace must support freeze review token {token}")
+
+    budget_text = read_text(PB100_DIR / "PB-100-logic-power-budget.csv")
+    for token in ("Initial total", "1000", "LM5013-Q1-class"):
+        if token not in budget_text:
+            fail(f"logic power budget must support freeze review token {token}")
+
+    design_text = read_text(PB100_DIR / "PB-100-logic-power-design-values.csv")
+    for token in (
+        "BUCK_EN_UVLO",
+        "BUCK_RON_SET",
+        "BUCK_FB",
+        "BUCK_BST",
+        "BUCK_SW",
+        "PB_PWR_GOOD",
+        "TBD not final",
+        "No layout geometry before freeze",
+    ):
+        if token not in design_text:
+            fail(f"logic power design values must support freeze review token {token}")
+
+    pin_template_text = read_text(PB100_DIR / "PB-100-logic-buck-pin-template.csv")
+    for token in ("VIN", "EN/UVLO", "RON", "FB", "PGOOD", "BST", "SW", "EP"):
+        if token not in pin_template_text:
+            fail(f"logic buck pin template must support freeze review token {token}")
+
+    sourcing_text = read_text(REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv")
+    for token in ("LOGIC_BUCK", "LOGIC_BUCK_INDUCTOR", "LM5164QDDATQ1", "LM5013-Q1", "TPS54360B-Q1"):
+        if token not in sourcing_text:
+            fail(f"assembly sourcing recheck must support logic-power freeze review token {token}")
 
 
 def validate_can1_tx_disable_trace() -> None:
@@ -5395,6 +5540,11 @@ def validate_validation_traceability() -> None:
                 fail("TVS/load-dump validation trace must include freeze review")
             if "60 v" not in row_text or "overshoot" not in row_text:
                 fail("TVS/load-dump validation trace must keep 60 V overshoot explicit")
+        if freeze_gate == "Logic power rails":
+            if "pb-100-logic-power-freeze-review.csv" not in row_text:
+                fail("Logic power validation trace must include freeze review")
+            if "pb_5v_out" not in row_text or "uvlo" not in row_text:
+                fail("Logic power validation trace must keep PB_5V_OUT and UVLO explicit")
         if freeze_gate == "Factory assembly readiness" and "sourcing recheck" not in row_text:
             fail("Factory assembly validation trace must require sourcing recheck")
         if freeze_gate == "Garage assembly readiness" and "garage" not in row_text:
@@ -5860,6 +6010,7 @@ def validate_test_plan_traceability() -> None:
     text = read_text(path)
     required_trace_artifacts = (
         "PB-100-logic-power-rail-trace.csv",
+        "PB-100-logic-power-freeze-review.csv",
         "PB-100-high-medium-output-baseline-trace.csv",
         "PB-100-high-medium-output-freeze-review.csv",
         "PB-100-low-current-output-baseline-trace.csv",
@@ -5959,6 +6110,7 @@ def main() -> int:
     validate_thermal_telemetry_freeze_review()
     validate_logic_power_rail_trace()
     validate_logic_power_design_values()
+    validate_logic_power_freeze_review()
     validate_can1_tx_disable_trace()
     validate_can1_safety_verification()
     validate_can1_production_dnp_review()

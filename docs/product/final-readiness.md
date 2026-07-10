@@ -88,6 +88,11 @@ Current coverage:
 - Logic power now has a trace tying the LM5164-Q1-class 100 V 1 A default,
   LM5013-Q1-class 100 V fallback, protected `PB_5V_OUT`, `PB_PWR_GOOD`, and
   rail-invalid default-off behavior together.
+- Logic power freeze review now ties LM5164/LM5013/TPS54360B regulator
+  boundaries, protected `VBAT_PROT` sequencing, 1000 mA `PB_5V_OUT` budget,
+  UVLO safe-off behavior, PGOOD, inductor/capacitor classes, sourcing, and
+  no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`.
 - Factory-vs-garage assembly ownership now has a dedicated trace for critical
   PB-100 symbol keys; schematic freeze must still recheck JLCPCB/PCBWay
   assembly class, distributor continuity, garage connector derating, crimp

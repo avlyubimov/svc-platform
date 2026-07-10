@@ -92,7 +92,8 @@ ordered rule execution, and stale-telemetry denial in one processing step.
 ## PB-100 schematic-review traceability
 
 - Bring-up and logic-rail tests trace to
-  `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`.
+  `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv` and
+  `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`.
 - OUT2 pulse tests trace to
   `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
   `hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv`

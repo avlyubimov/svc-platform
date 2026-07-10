@@ -48,6 +48,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
@@ -98,6 +99,11 @@ It is not a PCB layout package.
   margin, 60 V MOSFET overshoot dependency, 80 V Q1 alternate, 40 V
   smart-switch ADR boundary, sourcing gate, and no-layout boundary are tracked
   in `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`.
+- Logic power freeze review: LM5164/LM5013/TPS54360B regulator boundaries,
+  protected `VBAT_PROT` sequencing, 1000 mA `PB_5V_OUT` budget, UVLO safe-off,
+  PGOOD, inductor/capacitor classes, sourcing, and no-layout boundary are
+  tracked in
+  `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`.
 - Thermal telemetry freeze review: NTC sensor class, divider/ADC scaling,
   placement zones, 85/105/75 °C thresholds, firmware fail-safe behavior,
   calibration, assembly alternates, and bench validation are tracked in
@@ -212,6 +218,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-budget.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`

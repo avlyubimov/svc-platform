@@ -35,6 +35,7 @@ hardware/power-board/PB-100/PB-100-input-power-design-values.csv,Input protectio
 hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv,Input protection,Q1 reverse-protection package and thermal trace,Required,validate_input_reverse_package_trace,Conditional
 hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv,Input protection,Q1 reverse-protection freeze review,Required,validate_input_reverse_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv,Logic power,Protected 5 V logic power rail trace,Required,validate_logic_power_rail_trace,Conditional
+hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv,Logic power,Logic power freeze review,Required,validate_logic_power_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv,Logic power,LM5164 pin template,Required,validate_input_and_power_pin_templates,Conditional
 hardware/power-board/PB-100/PB-100-logic-power-design-values.csv,Logic power,Logic power design values,Required,validate_logic_power_design_values,Conditional
 hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv,Logic power,Logic value placeholders,Required,validate_logic_power_design_placeholders,Conditional
