@@ -32,7 +32,7 @@ order.
 | Logic buck regulator | TI LM5164-Q1 | TI LM5013-Q1; TI TPS54360B-Q1/TPS54360-Q1 | SOIC/HSOIC PowerPAD | LM5164-Q1 for 1 A 100 V rail; LM5013-Q1 preferred over 60 V family if more current is needed |
 | Input reverse protection | TI LM74700-Q1/LM74502-Q1 class | ADI/LTC ideal diode controller families | MSOP/SOIC class | Controller family only; MOSFET is tracked separately |
 | Input reverse MOSFET | Infineon OptiMOS 5 60 V TOLL low-Rds class | Nexperia LFPAK88 80 V; parallel Vishay SIDR626 PowerPAK | TOLL/LFPAK88/PowerPAK | Single 2.1 mOhm MOSFET is rejected for 40 A input thermal |
-| Input TVS/load dump | Active AEC-Q101 SM8S33AHE3_A/I-class TVS | Littelfuse SLD8S33A; Diodes DM8W33AQ-13; Bourns SM8S33A-Q class | DO-218AB/SMC as needed | MCC SM8S33A source is EOL and must not be locked; final clamp voltage depends on MOSFET and buck ratings |
+| Input TVS/load dump | Vishay SM8S33AHM3/I active HM3 TVS | Vishay SM8S33AHE3_A/I NFD stock-only; Littelfuse SLD8S33A; Diodes DM8W33AQ-13; Bourns SM8S33A-Q class | DO-218AC/SMC as needed | MCC SM8S33A source is EOL and HE3 is NFD evidence only; final clamp voltage depends on MOSFET and buck ratings |
 | FRAM | Fujitsu/Infineon MB85 I2C/SPI FRAM | Cypress/Infineon Excelon FRAM | SOIC/TSSOP/DFN | Configuration and black-box storage |
 | RTC | Microchip MCP7940 class | NXP PCF8523/PCF8563; DS3231 class | SOIC/TSSOP/DFN/module | Prefer low-IQ SMD IC over hobby module |
 | IMU | Bosch BMI270/BMI323 | TDK ICM-42688 class | LGA | Optional for Rev.1 if layout risk is high |
@@ -51,9 +51,9 @@ The current strategy is:
 - Input reverse protection: LM74700QDBVRQ1-class ideal-diode controller.
 - Input reverse MOSFET: IAUTN06S5N008ATMA1-class low-Rds TOLL device, with
   BUK7S1R2-80M-class LFPAK88 and dual SIDR626LDP fallback alternatives.
-- Input transient clamp: active AEC-Q101 SM8S33AHE3_A/I-class load-dump TVS or
-  reviewed equivalent. MCC SM8S33A is treated as EOL evidence only and must not
-  be locked.
+- Input transient clamp: Vishay SM8S33AHM3/I active HM3 load-dump TVS or
+  reviewed equivalent. MCC SM8S33A is treated as EOL evidence only, and Vishay
+  HE3 is treated as NFD stock-only evidence; neither may be locked.
 
 ## Evidence links
 
@@ -73,8 +73,10 @@ The current strategy is:
 - Nexperia BUK7S1R2-80M data sheet lists an 80 V 1.2 mOhm automotive LFPAK88 MOSFET: https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf
 - MCC SM8S33A reference now shows EOL/obsolete status and is retained only as a
   cautionary sourcing note: https://www.mccsemi.com/products/esd-protection-and-power-tvs/tvs/SM8S33A
-- Vishay SM8S HE3 AEC-Q101 DO-218AB data was checked as the active TVS class
-  direction: https://www.vishay.com/doc/?88387=
+- Vishay SM8S HM3 AEC-Q101 DO-218AC data was checked as the active TVS class
+  direction: https://www.vishay.com/docs/98647/sm8s85ahm3.pdf
+- Vishay SM8S HE3 data is now treated as NFD stock-only evidence:
+  https://www.vishay.com/doc/?88387=
 - TI TPS2HB16-Q1 datasheet is available through LCSC: https://datasheet.lcsc.com/datasheet/pdf/5e972c8f510fd1d0477aeb85de68fc2f.pdf
 - TI INA226AIDGST was listed at LCSC: https://www.lcsc.com/product-detail/current-sense-amplifiers_texas-instruments-ina226aidgst_C2653870.html
 - TI TMP117 data sheet was checked for optional digital board-temperature sensing: https://www.ti.com/lit/gpn/TMP117

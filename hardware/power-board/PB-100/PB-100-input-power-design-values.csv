@@ -1,6 +1,6 @@
 Block,Design item,Related net,Value status,Candidate direction,Freeze dependency,Notes
 Input connector,Battery positive derating,VBAT_RAW,TBD not final,Select garage connector current rating and wire gauge,Close connector derating before schematic freeze,Garage-installed item remains off-board unless reviewed
-TVS/load dump,TVS clamp selection,VBAT_RAW,TBD not final,Select active AEC-Q101 SM8S33AHE3_A/I-class or reviewed alternate. Do not lock MCC SM8S33A EOL source,Close downstream absolute maximum margin before schematic freeze,Must protect controller MOSFET buck and monitor inputs
+TVS/load dump,TVS clamp selection,VBAT_RAW,TBD not final,Select Vishay SM8S33AHM3/I or reviewed alternate. Do not lock MCC SM8S33A EOL or Vishay HE3 NFD source,Close downstream absolute maximum margin before schematic freeze,Must protect controller MOSFET buck and monitor inputs
 Ideal diode controller,Charge-pump capacitor,LM74700_VCAP,TBD not final,Use LM74700 datasheet sizing after package review,Close capacitor value and voltage rating before schematic freeze,No footprint lock before review
 Ideal diode controller,Enable network,INPUT_PROT_EN,TBD not final,Default enabled unless service-disable option is accepted,Close default enable behavior before schematic freeze,Must fail safe under reverse polarity
 Ideal diode controller,Gate clamp and discharge,INPUT_FET_GATE,TBD not final,Select gate resistor clamp and discharge path after Q1 review,Close gate stress and turn-off timing before schematic freeze,Q1 symbol remains pending

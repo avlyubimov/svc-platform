@@ -2446,16 +2446,25 @@ def validate_tvs_candidate_consistency() -> None:
         if stale_tvs_source in text:
             fail(f"{relative_path} must not use MCC SM8S33A as active TVS source")
 
-    for relative_path in (
+    active_tvs_paths = (
+        "hardware/power-board/PB-100/PB-100-symbol-capture-worklist.csv",
+        "hardware/power-board/PB-100/PB-100-power-path-candidates.csv",
+        "hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv",
         "hardware/power-board/PB-100/PB-100-schematic-instance-plan.csv",
         "hardware/power-board/PB-100/PB-100-preliminary-validation.md",
         "hardware/power-board/PB-100/PB-100-kicad-footprint-plan.csv",
         "hardware/power-board/PB-100/PB-100-protection-validation.csv",
         "hardware/power-board/PB-100/PB-100-logic-power-rails.md",
-    ):
+        "hardware/power-board/PB-100/PB-100-input-power-design-values.csv",
+    )
+    for relative_path in active_tvs_paths:
         text = read_text(REPO_ROOT / relative_path)
         if "SM8S33A-class" in text:
-            fail(f"{relative_path} must use active SM8S33AHE3-class TVS wording")
+            fail(f"{relative_path} must use active SM8S33AHM3-class TVS wording")
+        if "SM8S33AHE3-class" in text or "SM8S33AHE3_A/I-class" in text:
+            fail(f"{relative_path} must not treat Vishay HE3 TVS as the active baseline")
+        if "SM8S33AHM3" not in text:
+            fail(f"{relative_path} must reference active SM8S33AHM3 TVS evidence")
 
 
 def validate_validation_traceability() -> None:

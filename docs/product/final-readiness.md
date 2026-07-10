@@ -1,7 +1,7 @@
 # Final Readiness
 
 Status: In progress  
-Last updated: 2026-07-09
+Last updated: 2026-07-10
 
 This document defines what “ready” means for the current repository state. It
 does not authorize PB-100 PCB layout.
@@ -44,9 +44,10 @@ Current coverage:
 - Select final critical MPNs and at least two alternatives for each critical
   component family.
 - Recheck JLCPCB/PCBWay assembly availability and package suitability.
-- Resolve the TVS active-MPN blocker: MCC `SM8S33A` is EOL evidence only, so
-  schematic freeze must select an active AEC-Q101 SM8S33AHE3-class or equivalent
-  load-dump TVS and validate clamp margin.
+- Resolve the TVS active-MPN blocker: MCC `SM8S33A` is EOL evidence only and
+  Vishay `SM8S33AHE3_A/I` is NFD evidence only, so schematic freeze must select
+  `SM8S33AHM3/I` or an equivalent active load-dump TVS and validate clamp
+  margin.
 - Close PB-100 CAN1 TX-disable schematic evidence.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.

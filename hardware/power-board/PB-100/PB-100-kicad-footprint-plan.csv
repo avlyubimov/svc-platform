@@ -5,7 +5,7 @@ OUT2 escape MOSFET,IAUTN06S5N008ATMA1 or BUK7S1R2-80M,TOLL or LFPAK88,Custom fro
 Reverse protection controller,LM74700QDBVRQ1,SOT-23-6,KiCad stock candidate,Verify,DBV package drawing required before lock
 Input reverse MOSFET,IAUTN06S5N008ATMA1,TOLL,Custom from Infineon package drawing,Custom required,Preferred input thermal strategy
 Input reverse MOSFET alternate,BUK7S1R2-80M,LFPAK88,Custom from Nexperia package drawing,Conditional,Higher-voltage alternate
-Input TVS,Active AEC-Q101 SM8S33AHE3_A/I-class,DO-218AB,KiCad stock or custom,Verify,High-current TVS footprint must match final active MPN
+Input TVS,Vishay SM8S33AHM3/I,DO-218AC,KiCad stock or custom,Verify,High-current TVS footprint must match final active MPN
 Logic buck,LM5164QDDATQ1,SO PowerPAD-8,KiCad stock candidate,Verify,TI DDA package drawing required before lock
 Logic buck alternate,LM5013-Q1,SO PowerPAD-8,KiCad stock candidate,Verify,Higher-current 100V fallback
 Total input current monitor,INA228 or INA226 class,VSSOP/SOIC,KiCad stock candidate,Verify,Final monitor MPN not locked

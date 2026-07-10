@@ -17,8 +17,9 @@ does not approve schematic freeze or PCB layout.
   SO-8DC.
 - IAUTN06S5N008: 60 V automotive N-MOSFET, 0.76 mOhm max at VGS = 10 V, TOLL.
 - BUK7S1R2-80M: 80 V automotive N-MOSFET, 1.2 mOhm class, LFPAK88.
-- Active AEC-Q101 SM8S33AHE3-class TVS: 33 V standoff, 53.3 V clamp at
-  rated pulse current. MCC SM8S33A is EOL evidence only and must not be locked.
+- Active AEC-Q101 SM8S33AHM3-class TVS: 33 V standoff, 53.3 V clamp at
+  rated pulse current in the HM3 DO-218AC branch. MCC SM8S33A is EOL evidence
+  only and Vishay HE3 is NFD stock-only evidence; neither may be locked.
 
 ## Preliminary findings
 
@@ -33,9 +34,9 @@ does not approve schematic freeze or PCB layout.
 - LM74700QDBVRQ1-class reverse protection is compatible with the 12 V input
   target and cold-crank requirement when paired with a dedicated low-Rds input
   MOSFET strategy.
-- Active SM8S33AHE3-class input TVS is compatible with 60 V MOSFET planning but leaves
+- Active SM8S33AHM3-class input TVS is compatible with 60 V MOSFET planning but leaves
   limited voltage margin against 60 V absolute maximum ratings.
-- Active SM8S33AHE3-class input TVS is not automatically compatible with 40 V integrated
+- Active SM8S33AHM3-class input TVS is not automatically compatible with 40 V integrated
   smart switches. ADR-0011 resolves the Rev.1 conflict by moving OUT5, OUT8,
   and OUT9 to the external-controller output architecture.
 

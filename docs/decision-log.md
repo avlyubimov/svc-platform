@@ -1129,3 +1129,16 @@ Reason: The schema is part of the configuration contract and should reject
 unsupported rule-string shapes before firmware-specific validation runs. Keeping
 the schema patterns machine-checked against the repository validator prevents
 ambient-light rule support and future grammar changes from drifting.
+
+## 2026-07-10 — PB-100 TVS HM3 sourcing correction
+
+Decision: PB-100 input TVS planning now uses Vishay `SM8S33AHM3/I` as the
+preferred active 33 V load-dump TVS candidate. The older Vishay
+`SM8S33AHE3_A/I` evidence is retained only as NFD stock-only evidence, and the
+MCC `SM8S33A` source remains EOL evidence only.
+
+Reason: Vishay's current HE3-family datasheet marks that branch not for new
+designs and points to the HM3 family. The HM3 branch preserves the same 33 V
+stand-off, 53.3 V clamp, 124 A pulse-current class while moving the planning
+baseline to an active AEC-Q101 branch. Schematic freeze still requires clamp
+margin, overshoot, and DO-218AC assembly handling validation.
