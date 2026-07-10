@@ -221,6 +221,16 @@ LOW_CURRENT_OUTPUT_BASELINE_TRACE_COLUMNS = (
     "Role boundary",
     "Freeze dependency",
 )
+HIGH_MEDIUM_OUTPUT_BASELINE_TRACE_COLUMNS = (
+    "Output group",
+    "Outputs",
+    "Capability class",
+    "Fuse targets A",
+    "Current limits A",
+    "Switch architecture",
+    "Telemetry path",
+    "Freeze dependency",
+)
 OUTPUT_NET_EXPANSION_COLUMNS = (
     "Output",
     "Net pattern",
@@ -501,6 +511,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-review-release-manifest.csv",
     "hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv",
     "hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv",
+    "hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-output-net-expansion.csv",
     "hardware/power-board/PB-100/PB-100-test-point-plan.csv",
     "hardware/power-board/PB-100/PB-100-fault-response-matrix.csv",
@@ -1524,6 +1535,10 @@ def validate_schematic_freeze_gap_register() -> None:
     input_text = " ".join(rows_by_gate["Input reverse protection"].values())
     if "Q1" not in input_text or "40 A" not in input_text or "TOLL" not in input_text:
         fail("Input reverse protection gap must keep Q1 TOLL and 40 A review explicit")
+    high_medium_text = " ".join(rows_by_gate["High/medium output stage"].values())
+    for token in ("PB-100-high-medium-output-baseline-trace.csv", "OUT2", "SOA", "gate drive", "sense"):
+        if token not in high_medium_text:
+            fail(f"High/medium output stage gap must keep {token} explicit")
     low_current_text = " ".join(rows_by_gate["Low-current output stage"].values())
     for token in ("PB-100-low-current-output-baseline-trace.csv", "OUT5", "OUT8", "OUT9", "no direct 40 V"):
         if token not in low_current_text:
@@ -2276,6 +2291,137 @@ def validate_low_current_output_baseline_trace() -> None:
     low_current_text = " ".join(" ".join(row.values()) for row in low_current_design_rows).lower()
     if "external controller baseline" not in low_current_text or "no direct 40 v smart-switch rail" not in low_current_text:
         fail("low-current design values must keep external-controller baseline and no direct 40 V rail explicit")
+
+
+def parse_space_separated_outputs(value: str) -> list[str]:
+    return [part.strip() for part in value.split() if part.strip()]
+
+
+def validate_high_medium_output_baseline_trace() -> None:
+    path = PB100_DIR / "PB-100-high-medium-output-baseline-trace.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty high/medium output baseline trace: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in HIGH_MEDIUM_OUTPUT_BASELINE_TRACE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    expected_groups = {
+        "High current": {
+            "outputs": ["OUT2"],
+            "class": "High current",
+            "fuses": "20",
+            "limits": "18",
+        },
+        "Medium current 12A": {
+            "outputs": ["OUT1"],
+            "class": "Medium current",
+            "fuses": "15",
+            "limits": "12",
+        },
+        "Medium current 8A": {
+            "outputs": ["OUT3", "OUT4", "OUT6", "OUT7", "OUT10"],
+            "class": "Medium current",
+            "fuses": "10",
+            "limits": "8",
+        },
+    }
+    rows_by_group: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        group = row["Output group"].strip()
+        if group in rows_by_group:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate output group {group}")
+        if group not in expected_groups:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unexpected output group {group}")
+        rows_by_group[group] = row
+        for column in HIGH_MEDIUM_OUTPUT_BASELINE_TRACE_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        row_text = " ".join(row.values())
+        for token in ("TPS48110AQDGXRQ1 plus external 60V N-MOSFET", "schematic freeze"):
+            if token not in row_text:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: high/medium row must include {token}")
+
+    missing_groups = sorted(set(expected_groups) - set(rows_by_group))
+    if missing_groups:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing output groups: "
+            f"{', '.join(missing_groups)}"
+        )
+
+    matrix_rows = list(csv.DictReader((PB100_DIR / "PB-100-output-channel-matrix.csv").open(newline="", encoding="utf-8")))
+    matrix_by_output = {row["Output"].strip(): row for row in matrix_rows}
+    capabilities = json.loads(read_text(REPO_ROOT / "firmware" / "configs" / "hardware" / "pb-100-capabilities.json"))
+    capability_by_output = {row["id"]: row for row in capabilities["outputs"]}
+    config_example = json.loads(read_text(REPO_ROOT / "firmware" / "configs" / "config-example.json"))
+    config_by_output = {row["id"]: row for row in config_example["outputs"]}
+
+    covered_outputs: set[str] = set()
+    for group, expected in expected_groups.items():
+        row = rows_by_group[group]
+        outputs = parse_space_separated_outputs(row["Outputs"])
+        if outputs != expected["outputs"]:
+            fail(f"{group} outputs must be {' '.join(expected['outputs'])}")
+        if row["Capability class"].strip() != expected["class"]:
+            fail(f"{group} class must be {expected['class']}")
+        if row["Fuse targets A"].strip() != expected["fuses"]:
+            fail(f"{group} fuse target must be {expected['fuses']}")
+        if row["Current limits A"].strip() != expected["limits"]:
+            fail(f"{group} current limit must be {expected['limits']}")
+        covered_outputs.update(outputs)
+        for output in outputs:
+            matrix_row = matrix_by_output.get(output)
+            capability_row = capability_by_output.get(output)
+            config_row = config_by_output.get(output)
+            if matrix_row is None or capability_row is None or config_row is None:
+                fail(f"{output} must exist in matrix, capability manifest, and config example")
+            if matrix_row["Class"].strip() != expected["class"]:
+                fail(f"{output} must remain {expected['class']} in output channel matrix")
+            if matrix_row["Initial switch direction"].strip() != "TPS48110AQDGXRQ1 plus external 60V N-MOSFET":
+                fail(f"{output} must keep TPS48110 external MOSFET switch direction")
+            if int(matrix_row["Target fuse A"]) != int(expected["fuses"]):
+                fail(f"{output} fuse target must match high/medium trace")
+            if int(matrix_row["Target current limit A"]) != int(expected["limits"]):
+                fail(f"{output} current limit must match high/medium trace")
+            if capability_row["class"] != expected["class"]:
+                fail(f"{output} must remain {expected['class']} in capability manifest")
+            if capability_row["target_fuse_a"] != int(expected["fuses"]):
+                fail(f"{output} capability fuse target must match high/medium trace")
+            if capability_row["target_current_limit_a"] != int(expected["limits"]):
+                fail(f"{output} capability current limit must match high/medium trace")
+            if config_row["fuse_a"] != int(expected["fuses"]):
+                fail(f"{output} config example fuse must match high/medium trace")
+            if config_row["current_limit_a"] != int(expected["limits"]):
+                fail(f"{output} config example current limit must match high/medium trace")
+            if f"{output}_IMON" not in row["Telemetry path"]:
+                fail(f"{output} telemetry path must include {output}_IMON")
+
+    if covered_outputs != {"OUT1", "OUT2", "OUT3", "OUT4", "OUT6", "OUT7", "OUT10"}:
+        fail("high/medium trace must cover OUT1 OUT2 OUT3 OUT4 OUT6 OUT7 OUT10")
+
+    high_design_text = " ".join(
+        " ".join(row.values())
+        for row in csv.DictReader((PB100_DIR / "PB-100-output-stage-design-values.csv").open(newline="", encoding="utf-8"))
+        if row["Output class"].strip() == "High current"
+    )
+    medium_design_text = " ".join(
+        " ".join(row.values())
+        for row in csv.DictReader((PB100_DIR / "PB-100-output-stage-design-values.csv").open(newline="", encoding="utf-8"))
+        if row["Output class"].strip() == "Medium current"
+    )
+    if "OUT2" not in high_design_text or "SOA" not in high_design_text:
+        fail("high-current design values must keep OUT2 SOA explicit")
+    for token in ("Current sense topology", "Gate drive resistors", "Inductive clamp strategy"):
+        if token not in high_design_text or token not in medium_design_text:
+            fail(f"high/medium output-stage design values must include {token}")
+    if "OUT1 OUT3 OUT4 OUT6 OUT7 OUT10" not in medium_design_text:
+        fail("medium-current design values must keep the medium output set explicit")
 
 
 def validate_input_power_design_values() -> None:
@@ -3468,6 +3614,7 @@ def main() -> int:
     validate_output_controller_pin_template()
     validate_output_net_expansion()
     validate_low_current_output_baseline_trace()
+    validate_high_medium_output_baseline_trace()
     validate_input_and_power_pin_templates()
     validate_input_protection_pin_contract()
     validate_logic_power_design_placeholders()

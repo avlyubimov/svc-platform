@@ -55,6 +55,9 @@ Current coverage:
 - OUT5, OUT8, and OUT9 now have a low-current baseline trace enforcing the
   ADR-0011 external-controller plus external 60 V MOSFET architecture and
   blocking any direct 40 V smart-switch rail without a future ADR.
+- OUT2 and medium-current outputs now have a baseline trace tying their fuse
+  classes, configured current limits, TPS48110 external-MOSFET architecture,
+  telemetry nets, and SOA/fuse/inductive-clamp freeze blockers together.
 - Factory-vs-garage assembly ownership now has a dedicated trace for critical
   PB-100 symbol keys; schematic freeze must still recheck JLCPCB/PCBWay
   assembly class, distributor continuity, garage connector derating, crimp

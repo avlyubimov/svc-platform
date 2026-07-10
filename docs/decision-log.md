@@ -1260,3 +1260,16 @@ Reason: Assembly readiness spans symbol readiness, BOM ownership, sourcing
 evidence, and garage-install boundaries. A single trace makes owner drift
 machine-checkable without locking MPNs, footprints, pick-place data, or PCB
 layout.
+
+## 2026-07-10 — PB-100 high/medium output baseline trace
+
+Decision: PB-100 schematic planning now includes
+`PB-100-high-medium-output-baseline-trace.csv` for OUT2 and the medium-current
+output groups. The trace keeps the Rev.1 baseline on TPS48110-class controllers
+plus external 60 V N-MOSFETs, with OUT2 retaining its escape path until SOA is
+closed.
+
+Reason: High/medium output validation spans fuse class, configured current
+limit, telemetry net, gate-drive values, sense path, OUT2 SOA, and inductive
+clamp decisions. A dedicated trace makes those dependencies machine-checkable
+without assigning accessory roles or starting PCB layout.
