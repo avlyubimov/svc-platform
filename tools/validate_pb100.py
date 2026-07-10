@@ -399,6 +399,25 @@ SCHEMATIC_CAPTURE_WORK_QUEUE_COLUMNS = (
     "Freeze close evidence",
     "Layout boundary",
 )
+CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
+    "CAP-INP": (
+        "PB-100-input-reverse-package-trace.csv",
+        "PB-100-board-current-budget-trace.csv",
+        "PB-100-tvs-load-dump-margin-trace.csv",
+    ),
+    "CAP-LOGIC": ("PB-100-logic-power-rail-trace.csv",),
+    "CAP-OUT-TEMPLATE": (
+        "PB-100-high-medium-output-baseline-trace.csv",
+        "PB-100-low-current-output-baseline-trace.csv",
+    ),
+    "CAP-OUT-INST": (
+        "PB-100-high-medium-output-baseline-trace.csv",
+        "PB-100-low-current-output-baseline-trace.csv",
+    ),
+    "CAP-TEL": ("PB-100-current-telemetry-trace.csv", "PB-100-thermal-telemetry-trace.csv"),
+    "CAP-B2B": ("PB-100-b2b-interface-trace.csv",),
+    "CAP-CAN1": ("PB-100-can1-tx-disable-trace.csv",),
+}
 REVIEW_RELEASE_MANIFEST_COLUMNS = (
     "Artifact",
     "Category",
@@ -4401,27 +4420,8 @@ def validate_schematic_capture_work_queue() -> None:
         if work_item == "CAP-TP" and "footprint" not in row["Blocker"].lower():
             fail("test point capture work must keep footprint/placement blocker explicit")
 
-    required_source_artifacts = {
-        "CAP-INP": (
-            "PB-100-input-reverse-package-trace.csv",
-            "PB-100-board-current-budget-trace.csv",
-            "PB-100-tvs-load-dump-margin-trace.csv",
-        ),
-        "CAP-LOGIC": ("PB-100-logic-power-rail-trace.csv",),
-        "CAP-OUT-TEMPLATE": (
-            "PB-100-high-medium-output-baseline-trace.csv",
-            "PB-100-low-current-output-baseline-trace.csv",
-        ),
-        "CAP-OUT-INST": (
-            "PB-100-high-medium-output-baseline-trace.csv",
-            "PB-100-low-current-output-baseline-trace.csv",
-        ),
-        "CAP-TEL": ("PB-100-current-telemetry-trace.csv", "PB-100-thermal-telemetry-trace.csv"),
-        "CAP-B2B": ("PB-100-b2b-interface-trace.csv",),
-        "CAP-CAN1": ("PB-100-can1-tx-disable-trace.csv",),
-    }
     rows_by_work_item = {row["Work item"].strip(): row for row in rows}
-    for work_item, tokens in required_source_artifacts.items():
+    for work_item, tokens in CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM.items():
         work_row = rows_by_work_item[work_item]
         source_artifacts = work_row["Primary source artifacts"]
         for token in tokens:
@@ -4454,6 +4454,32 @@ def validate_schematic_capture_work_queue() -> None:
                 f"{path.relative_to(REPO_ROOT)} does not cover refs on {sheet_file}: "
                 f"{', '.join(missing_refs)}"
             )
+
+
+def validate_schematic_capture_plan() -> None:
+    path = PB100_DIR / "PB-100-schematic-capture-plan.md"
+    text = read_text(path)
+    lower_text = text.lower()
+    if "does not authorize pcb\nlayout" not in lower_text:
+        fail(f"{path.relative_to(REPO_ROOT)} must explicitly avoid PCB layout authorization")
+    if "do not create `pb-100.kicad_pcb`" not in lower_text:
+        fail(f"{path.relative_to(REPO_ROOT)} must block PB-100.kicad_pcb creation")
+
+    queue_path = PB100_DIR / "PB-100-schematic-capture-work-queue.csv"
+    queue_rows = list(csv.DictReader(queue_path.open(newline="", encoding="utf-8")))
+    rows_by_work_item = {row["Work item"].strip(): row for row in queue_rows}
+    plan_lines = text.splitlines()
+    for work_item, tokens in CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM.items():
+        if work_item not in rows_by_work_item:
+            fail(f"{queue_path.relative_to(REPO_ROOT)} is missing capture work item {work_item}")
+        sheet_file = rows_by_work_item[work_item]["Sheet file"].strip()
+        sheet_lines = [line for line in plan_lines if f"`{sheet_file}`" in line]
+        if not sheet_lines:
+            fail(f"{path.relative_to(REPO_ROOT)} must include capture row for {sheet_file}")
+        sheet_text = " ".join(sheet_lines)
+        for token in tokens:
+            if token not in sheet_text:
+                fail(f"{path.relative_to(REPO_ROOT)} {sheet_file} row must include {token}")
 
 
 def validate_review_release_manifest() -> None:
@@ -4543,6 +4569,7 @@ def main() -> int:
     validate_schematic_readiness_dashboard()
     validate_schematic_freeze_gap_register()
     validate_schematic_capture_work_queue()
+    validate_schematic_capture_plan()
     validate_review_release_manifest()
     validate_output_channel_pin_contract()
     validate_output_controller_pin_template()

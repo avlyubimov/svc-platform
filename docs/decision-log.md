@@ -1420,3 +1420,15 @@ Reason: The B2B connector is a lifecycle boundary between PB-100 and LB-100. A
 dedicated trace makes pin-map drift, CAN1 safety crossing, power-good behavior,
 and LB-100 resource assumptions machine-checkable without starting connector
 placement or PCB layout.
+
+## 2026-07-10 — PB-100 capture plan trace input synchronization
+
+Decision: PB-100 schematic capture plan now lists the same dedicated trace
+inputs as the capture work queue for input protection, logic power, outputs,
+telemetry, B2B, and CAN1 safety. The PB-100 validator now fails if the capture
+plan drops any required trace artifact for these capture rows.
+
+Reason: The capture plan is the human execution entry point while the capture
+work queue and KiCad sheet notes are machine-checked. Keeping all three aligned
+prevents schematic capture from using stale source documents after trace files
+have become the freeze-gate evidence.
