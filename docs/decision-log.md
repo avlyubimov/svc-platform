@@ -1312,6 +1312,18 @@ LB-100 startup. A dedicated trace makes the protected input rail, 5 V budget,
 power-good timing, rail-invalid output behavior, and lower-voltage fallback
 risk machine-checkable before schematic freeze.
 
+## 2026-07-10 — PB-100 validation traceability trace synchronization
+
+Decision: PB-100 validation traceability now uses each conditional freeze
+gate's dedicated trace artifact as a primary validation artifact. Validation
+fails if CAN1 safety, current budget, B2B, output stages, input reverse
+protection, TVS/load-dump, logic power, telemetry, or assembly readiness lose
+their trace link.
+
+Reason: Freeze validation must point at the same trace evidence used by the
+manifest, checklist, and dashboard. This keeps review tests aligned with the
+machine-checked close evidence.
+
 ## 2026-07-10 — PB-100 readiness dashboard trace evidence synchronization
 
 Decision: PB-100 schematic-readiness dashboard now references the dedicated

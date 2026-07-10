@@ -4085,6 +4085,24 @@ def validate_validation_traceability() -> None:
             fail("Garage assembly validation trace must keep garage scope explicit")
         gates_with_tests[freeze_gate].append(row)
 
+    required_primary_artifacts = {
+        "CAN1 safety policy": "PB-100-can1-tx-disable-trace.csv",
+        "Board current budget": "PB-100-board-current-budget-trace.csv",
+        "Board-to-board interface": "PB-100-b2b-interface-trace.csv",
+        "High/medium output stage": "PB-100-high-medium-output-baseline-trace.csv",
+        "Low-current output stage": "PB-100-low-current-output-baseline-trace.csv",
+        "Input reverse protection": "PB-100-input-reverse-package-trace.csv",
+        "TVS/load-dump protection": "PB-100-tvs-load-dump-margin-trace.csv",
+        "Logic power rails": "PB-100-logic-power-rail-trace.csv",
+        "Current telemetry": "PB-100-current-telemetry-trace.csv",
+        "Thermal telemetry": "PB-100-thermal-telemetry-trace.csv",
+        "Factory assembly readiness": "PB-100-assembly-readiness-trace.csv",
+        "Garage assembly readiness": "PB-100-assembly-readiness-trace.csv",
+    }
+    for freeze_gate, token in required_primary_artifacts.items():
+        if not any(token in row["Primary artifact"] for row in gates_with_tests[freeze_gate]):
+            fail(f"validation traceability for {freeze_gate} must include {token}")
+
     missing_gates = sorted(gate for gate, gate_rows in gates_with_tests.items() if not gate_rows)
     if missing_gates:
         fail(
