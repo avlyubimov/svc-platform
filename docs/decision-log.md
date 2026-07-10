@@ -1312,6 +1312,17 @@ LB-100 startup. A dedicated trace makes the protected input rail, 5 V budget,
 power-good timing, rail-invalid output behavior, and lower-voltage fallback
 risk machine-checkable before schematic freeze.
 
+## 2026-07-10 — PB-100 symbol readiness created-status synchronization
+
+Decision: PB-100 symbol readiness now marks preliminary symbols as created when
+the symbol capture worklist already records created pin evidence. Validation
+fails if a worklist-created symbol regresses to a vague required/pending status
+in `PB-100-symbol-mpn-readiness.csv`.
+
+Reason: Schematic capture needs a clear distinction between missing symbols and
+created preliminary symbols that still need datasheet or package review. This
+keeps symbol readiness accurate without locking footprints or starting layout.
+
 ## 2026-07-10 — PB-100 validation traceability trace synchronization
 
 Decision: PB-100 validation traceability now uses each conditional freeze

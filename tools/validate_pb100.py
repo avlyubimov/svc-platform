@@ -784,6 +784,13 @@ def validate_symbol_mpn_readiness() -> None:
         )
 
     seen_keys = set()
+    worklist_path = PB100_DIR / "PB-100-symbol-capture-worklist.csv"
+    worklist_rows = list(csv.DictReader(worklist_path.open(newline="", encoding="utf-8")))
+    created_worklist_keys = {
+        row["Symbol key"].strip()
+        for row in worklist_rows
+        if "preliminary symbol created" in row["Pin evidence status"].strip().lower()
+    }
     for row_number, row in enumerate(rows, 2):
         symbol_key = row["Symbol key"].strip()
         if not symbol_key:
@@ -838,6 +845,11 @@ def validate_symbol_mpn_readiness() -> None:
 
         if row["KiCad symbol status"].strip().lower() in {"final", "locked"}:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: symbol status must not be final/locked")
+        if symbol_key in created_worklist_keys and "created" not in row["KiCad symbol status"].lower():
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: symbol {symbol_key} "
+                "is created in worklist but readiness status does not say created"
+            )
 
     missing_keys = sorted(REQUIRED_SYMBOL_KEYS - seen_keys)
     if missing_keys:
