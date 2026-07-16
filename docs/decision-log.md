@@ -1726,3 +1726,46 @@ machine-checked schematic baseline without pretending the schematic is frozen.
 Passive abstract pins keep ERC useful for hierarchy and net continuity while
 final pin electrical types, values, footprints, SOA, sourcing evidence, and
 independent power-electronics review remain schematic-freeze blockers.
+
+## 2026-07-16 — PB-100 board-release blockers are explicit
+
+Decision: PB-100 now has
+`hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`, with
+one active release blocker for every conditional schematic-freeze gate. The
+validator checks that those rows stay synchronized with the freeze checklist and
+that each row explicitly blocks PCB layout.
+
+Reason: After preliminary schematic capture, the next risk is treating
+documentation volume as board readiness. PCB layout must remain blocked until
+values, footprints, sourcing, SOA, thermal, connector, and production evidence
+are actually closed for every conditional gate.
+
+## 2026-07-16 — PB-100 logic-power candidate values
+
+Decision: PB-100 logic-power planning now has a value-bearing but not-final
+LM5164-Q1 candidate network in
+`hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md` and
+`hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`. The current
+candidate uses a 5 V / 1 A `PB_5V_OUT` target, about 300 kHz switching, 41.2 kΩ
+RON programming, 158 kΩ / 49.9 kΩ feedback, 332 kΩ / 100 kΩ UVLO, 2.2 nF
+bootstrap, 47 µH inductor class, 2 × 22 µF output capacitance class, and 47 kΩ
+PGOOD pull-up.
+
+Reason: The board-release path needs concrete schematic-review values instead
+of open TBD fields. These values are still not final: LM5164 orderability,
+actual LB-100 load budget, inductor saturation/DCR, capacitor derating, EMI,
+PGOOD timing, and switch-node ringing remain schematic-freeze blockers.
+
+## 2026-07-16 — PB-100 thermal telemetry candidate divider
+
+Decision: PB-100 thermal telemetry planning now has a value-bearing but
+not-final NTC divider candidate in
+`hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`.
+The current candidate uses the TDK 10 kΩ 3435 K NTC class with a 4.7 kΩ pull-up
+to `LB_3V3_IO`, 1 kΩ ADC series resistor, and 10 nF ADC filter for all three
+thermal signals.
+
+Reason: The default 85 °C warn, 105 °C cutoff, and 75 °C recovery thresholds
+need concrete ADC voltage coverage before schematic review. The values remain
+not final until LB-100 ADC settling, NTC self-heating, sensor placement,
+calibration, and assembly sourcing are reviewed.

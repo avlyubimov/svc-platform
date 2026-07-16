@@ -8,6 +8,7 @@ hardware/power-board/PB-100/PB-100-review-release-manifest.csv,Review package,Fr
 hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv,Review package,Cross-artifact readiness dashboard,Required,validate_schematic_readiness_dashboard,Conditional
 hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md,Review package,Freeze gate checklist,Required,validate_schematic_freeze_gap_register,Open
 hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv,Review package,Conditional gate gap register,Required,validate_schematic_freeze_gap_register,Conditional
+hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv,Review package,Board-release blocker register,Required,validate_board_release_blocker_register,Conditional
 hardware/power-board/PB-100/PB-100-validation-traceability.csv,Validation,Freeze-gate validation trace,Required,validate_validation_traceability,Conditional
 hardware/power-board/PB-100/PB-100-schematic-capture-plan.md,Schematic capture,Capture process,Required,Document reviewed,Ready
 hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv,Schematic capture,Sheet-level capture work queue,Required,validate_schematic_capture_work_queue,Conditional
@@ -37,6 +38,7 @@ hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv,Input protect
 hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv,Logic power,Protected 5 V logic power rail trace,Required,validate_logic_power_rail_trace,Conditional
 hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv,Logic power,Logic power freeze review,Required,validate_logic_power_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv,Logic power,LM5164 pin template,Required,validate_input_and_power_pin_templates,Conditional
+hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md,Logic power,LM5164 candidate value calculation,Required,Document reviewed,Conditional
 hardware/power-board/PB-100/PB-100-logic-power-design-values.csv,Logic power,Logic power design values,Required,validate_logic_power_design_values,Conditional
 hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv,Logic power,Logic value placeholders,Required,validate_logic_power_design_placeholders,Conditional
 hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv,Outputs,Output channel contract,Required,validate_output_channel_pin_contract,Conditional
@@ -51,6 +53,7 @@ hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv,Telemetry
 hardware/power-board/PB-100/PB-100-current-telemetry-map.csv,Telemetry,Current telemetry map,Required,CSV width validation,Ready
 hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv,Telemetry,Thermal telemetry and firmware safety trace,Required,validate_thermal_telemetry_trace,Conditional
 hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv,Telemetry,Thermal telemetry freeze review,Required,validate_thermal_telemetry_freeze_review,Conditional
+hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md,Telemetry,NTC divider candidate calculation,Required,Document reviewed,Conditional
 hardware/power-board/PB-100/PB-100-thermal-telemetry-map.csv,Telemetry,Thermal telemetry map,Required,CSV width validation,Ready
 hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv,Protection,TVS/load-dump downstream margin trace,Required,validate_tvs_load_dump_margin_trace,Conditional
 hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv,Protection,TVS/load-dump freeze review,Required,validate_tvs_load_dump_freeze_review,Conditional

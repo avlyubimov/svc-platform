@@ -46,6 +46,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/kicad/PB-100.kicad_sch`
 - `hardware/power-board/PB-100/kicad/lib/PB100.kicad_sym`
 - `hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`
@@ -64,6 +65,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-net-naming.md`
 - `hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv`
+- `hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`
 - `hardware/power-board/PB-100/PB-100-validation-traceability.csv`
 - `hardware/power-board/PB-100/PB-100-test-point-plan.csv`
 - `hardware/power-board/PB-100/PB-100-fault-response-matrix.csv`
@@ -76,6 +78,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`
 
 ## Electrical baseline
 

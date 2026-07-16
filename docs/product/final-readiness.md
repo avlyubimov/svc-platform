@@ -35,7 +35,7 @@ Current coverage:
 | Architecture v1.0 | Ready | Frozen by ADR; PB-100 requirement changes still need ADR |
 | PB-100 requirements | Ready for schematic planning | Baseline is frozen; schematic freeze remains open |
 | PB-100 KiCad scaffold | Preliminary capture | Child sheets now contain ERC-clean preliminary capture content and exported netlist coverage; schematic freeze remains open |
-| PB-100 PCB/layout | Blocked | Layout, Gerber, drill, placement, and manufacturing zips are blocked |
+| PB-100 PCB/layout | Blocked | Layout, Gerber, drill, placement, and manufacturing zips are blocked by the board-release blocker register |
 | Firmware safety core | Host-test ready | Output, delayed battery cutoff, runtime load shedding, thermal derate/cutoff, CAN, telemetry, events, logging, config, runtime boot, CAN-to-rule bridge, ambient-light rule conditions, ordered rule sets, multi-action rule compilation, rule runtime, and rule paths covered |
 | Configuration format | Host-test ready | JSON schema, rule grammar, rule-action mapping, PB-100 capability manifest, compiled capability baseline, config store, config update, and examples are validated |
 | Production package | Draft | BOMs and component families need final sourcing and schematic evidence |
@@ -45,6 +45,9 @@ Current coverage:
 - Replace preliminary abstract/class KiCad instances with final schematic
   symbols, reviewed electrical pin types, values, footprints, and MPN-specific
   package evidence.
+- Close every row in
+  `hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`; any
+  remaining row blocks PCB layout and board release.
 - Keep all child sheets free of `sheet-placeholder` markers, ERC-clean, and
   covered by exported KiCad netlist component/net thresholds.
 - Select final critical MPNs and at least two alternatives for each critical
@@ -145,6 +148,13 @@ Current coverage:
 - Synchronize factory and garage BOM drafts with final selections.
 - Keep `make check` passing with local `kicad-cli` available, zero ERC
   violations, and a successful KiCad S-expression netlist export.
+- Logic power now has candidate LM5164 values in
+  `hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md`, but
+  those values remain not final until load budget, sourcing, EMI, and stability
+  review close.
+- Thermal telemetry now has candidate NTC divider values in
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`,
+  but placement, ADC settling, calibration, and assembly review remain open.
 
 ## Required before PCB layout
 

@@ -170,6 +170,16 @@ SCHEMATIC_FREEZE_GAP_REGISTER_COLUMNS = (
     "Validator coverage",
     "Next close action",
 )
+BOARD_RELEASE_BLOCKER_REGISTER_COLUMNS = (
+    "Gate",
+    "Blocker ID",
+    "Status",
+    "Blocking evidence",
+    "Required close evidence",
+    "External dependency",
+    "Next engineering action",
+    "Layout impact",
+)
 OUTPUT_CHANNEL_PIN_CONTRACT_COLUMNS = (
     "Output",
     "Controller ref",
@@ -751,6 +761,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv",
     "hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md",
     "hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv",
+    "hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv",
     "hardware/power-board/PB-100/PB-100-validation-traceability.csv",
     "hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv",
     "hardware/power-board/PB-100/PB-100-review-release-manifest.csv",
@@ -764,8 +775,10 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv",
+    "hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md",
     "hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv",
+    "hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md",
     "hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv",
@@ -2120,6 +2133,72 @@ def validate_schematic_freeze_gap_register() -> None:
     garage_text = " ".join(rows_by_gate["Garage assembly readiness"].values()).lower()
     if "pb-100-assembly-readiness-trace.csv" not in garage_text or "garage" not in garage_text or "user" not in garage_text:
         fail("Garage assembly readiness gap must keep garage/user scope explicit")
+
+
+def validate_board_release_blocker_register() -> None:
+    path = PB100_DIR / "PB-100-board-release-blocker-register.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty board release blocker register: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in BOARD_RELEASE_BLOCKER_REGISTER_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    gates_by_status = freeze_checklist_gates_by_status()
+    conditional_gates = {gate for gate, status in gates_by_status.items() if status == "Conditional"}
+    seen_gates = set()
+    seen_blockers = set()
+    for row_number, row in enumerate(rows, 2):
+        gate = row["Gate"].strip()
+        blocker_id = row["Blocker ID"].strip()
+        status = row["Status"].strip()
+        if gate in seen_gates:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Gate {gate}")
+        seen_gates.add(gate)
+        if blocker_id in seen_blockers:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Blocker ID {blocker_id}")
+        seen_blockers.add(blocker_id)
+        if gate not in gates_by_status:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown freeze checklist gate {gate}")
+        if gate not in conditional_gates:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: gate {gate} is "
+                f"{gates_by_status[gate]} in freeze checklist and must not have a release blocker row"
+            )
+        if not blocker_id.startswith("PBREL-"):
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocker ID must start with PBREL-")
+        if status != "Conditional":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: release blockers must remain Conditional")
+        for column in BOARD_RELEASE_BLOCKER_REGISTER_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        row_text = " ".join(row.values()).lower()
+        if "block" not in row["Layout impact"].lower() or "layout" not in row["Layout impact"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Layout impact must explicitly block layout")
+        if "final" not in row["Required close evidence"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Required close evidence must require final evidence")
+        if "review" not in row_text and "test" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: release blocker must require review or test")
+        validate_no_role_tokens_in_row(path, row_number, row)
+
+    missing_gates = sorted(conditional_gates - seen_gates)
+    extra_gates = sorted(seen_gates - conditional_gates)
+    if missing_gates:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing release blockers for gates: "
+            f"{', '.join(missing_gates)}"
+        )
+    if extra_gates:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} has blockers for non-conditional gates: "
+            f"{', '.join(extra_gates)}"
+        )
 
 
 def validate_output_channel_pin_contract() -> None:
@@ -6121,6 +6200,7 @@ def main() -> int:
     validate_bom_symbol_map()
     validate_schematic_readiness_dashboard()
     validate_schematic_freeze_gap_register()
+    validate_board_release_blocker_register()
     validate_schematic_capture_work_queue()
     validate_schematic_capture_plan()
     validate_review_release_manifest()
