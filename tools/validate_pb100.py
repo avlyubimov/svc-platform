@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import csv
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -14,6 +15,9 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 PB100_DIR = REPO_ROOT / "hardware" / "power-board" / "PB-100"
 KICAD_DIR = PB100_DIR / "kicad"
 PRODUCTION_DIR = REPO_ROOT / "production"
+REQUIRED_KICAD_CLI_VERSION = "10.0.4"
+MIN_KICAD_COMPONENTS = 20
+MIN_KICAD_NETS = 20
 DISALLOWED_LAYOUT_SUFFIXES = {
     ".kicad_pcb",
     ".drl",
@@ -850,6 +854,7 @@ def validate_kicad_scaffold() -> None:
     validate_s_expression_balance(KICAD_DIR / "lib" / "PB100.kicad_sym")
     validate_no_layout_artifacts()
     validate_kicad_top_sheet_links()
+    validate_kicad_no_sheet_placeholders()
 
 
 def validate_kicad_top_sheet_links() -> None:
@@ -872,11 +877,33 @@ def validate_kicad_top_sheet_links() -> None:
             fail(f"{top_path.relative_to(REPO_ROOT)} must name child sheet {sheet_name}")
 
 
+def validate_kicad_no_sheet_placeholders() -> None:
+    for schematic_path in sorted(KICAD_DIR.rglob("*.kicad_sch")):
+        text = read_text(schematic_path).lower()
+        for token in ("sheet-placeholder", "placeholder sheet"):
+            if token in text:
+                fail(
+                    f"{schematic_path.relative_to(REPO_ROOT)} still contains `{token}`; "
+                    "PB-100 child sheets must contain captured schematic content before ERC/netlist validation"
+                )
+
+
 def validate_kicad_cli_checks() -> None:
     kicad_cli = shutil.which("kicad-cli")
     if kicad_cli is None:
-        print("PB-100 KiCad CLI checks skipped: kicad-cli not found")
-        return
+        fail("kicad-cli is required for PB-100 validation; install KiCad CLI before running make check")
+
+    version_result = subprocess.run(
+        [kicad_cli, "--version"],
+        check=False,
+        text=True,
+        capture_output=True)
+    if version_result.returncode != 0:
+        details = "\n".join(part for part in (version_result.stdout.strip(), version_result.stderr.strip()) if part)
+        fail(f"unable to read kicad-cli version: {details}")
+    actual_version = version_result.stdout.strip()
+    if actual_version != REQUIRED_KICAD_CLI_VERSION:
+        fail(f"kicad-cli version {actual_version} is not the required {REQUIRED_KICAD_CLI_VERSION}")
 
     with tempfile.TemporaryDirectory(prefix="svc-pb100-kicad-") as temp_dir:
         report_path = Path(temp_dir) / "PB-100-erc.json"
@@ -934,6 +961,18 @@ def validate_kicad_cli_netlist_export(kicad_cli: str, temp_dir: Path) -> None:
     if "(export" not in netlist_text or "(design" not in netlist_text:
         fail("KiCad netlist export did not produce a valid PB-100 netlist")
     validate_s_expression_balance(netlist_path)
+    component_count = len(re.findall(r"(?m)^\s*\(comp\b", netlist_text))
+    net_count = len(re.findall(r"(?m)^\s*\(net\b", netlist_text))
+    if component_count < MIN_KICAD_COMPONENTS:
+        fail(
+            f"KiCad netlist has {component_count} components; "
+            f"expected at least {MIN_KICAD_COMPONENTS}"
+        )
+    if net_count < MIN_KICAD_NETS:
+        fail(
+            f"KiCad netlist has {net_count} electrical nets; "
+            f"expected at least {MIN_KICAD_NETS}"
+        )
     print("PB-100 KiCad netlist export passed")
 
 

@@ -37,11 +37,12 @@ Current host tests cover:
   CAN1 read-only policy, and config electrical limits without role assumptions.
   PB-100's compiled capability constant is checked against the JSON hardware
   capability manifest by repository validation.
-- PB-100 board-level power budget service.
+- PB-100 board-level power budget service and configured load-shed ordering.
 - Output Manager safe default-off, enable/disable, budget denial, telemetry
-  denial, and fault lockout behavior.
-- Battery protection warning, cutoff latch, recovery, and invalid telemetry
-  behavior.
+  denial, priority shedding, PWM increase revalidation, thermal derating, and
+  fault lockout behavior.
+- Battery protection warning, delayed cutoff latch using `shutdown_delay_s`,
+  recovery, and invalid telemetry behavior.
 - Event Bus FIFO order, overflow rejection, and empty-pop behavior.
 - Event Dispatcher output overcurrent/fault handling through Output Manager.
 - Event Log fixed-size diagnostic ring buffer with overwrite/drop accounting.
@@ -53,8 +54,9 @@ Current host tests cover:
   condition state while retaining non-rule events for safety dispatch.
 - Rule Runtime step that runs bridge, fault dispatch, and ordered rule
   evaluation in a safety-preserving order.
-- System Safety Coordinator integration between battery cutoff, Event Bus, and
-  Output Manager output shutdown.
+- System Safety Coordinator integration between battery cutoff, power-budget
+  shedding, thermal derating/cutoff, Event Bus, and Output Manager output
+  shutdown.
 - Role Resolver and Rule Engine skeleton for role-based actions through Output
   Manager.
 - Rule condition state tracking for engine, high-beam, left-indicator, and
@@ -73,5 +75,5 @@ Current host tests cover:
 - Telemetry-backed System Safety and Rule Engine wrappers for stale-data fail
   safe behavior.
 - Thermal Protection allow/derate/cutoff decisions for PB-100 thermal zones.
-- Thermal System Safety shutdown through Output Manager on cutoff/stale
-  telemetry.
+- Thermal System Safety derating through Output Manager at warning threshold and
+  shutdown through Output Manager on cutoff/stale telemetry.

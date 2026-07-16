@@ -28,6 +28,34 @@ static svc_system_safety_t initialized_safety(void)
     return safety;
 }
 
+static svc_system_safety_result_t update_battery_below_cutoff_after_shutdown_delay(
+    svc_system_safety_t *safety,
+    svc_output_manager_t *manager,
+    svc_event_bus_t *bus,
+    uint16_t measured_mv)
+{
+    svc_telemetry_snapshot_t telemetry = {0};
+    svc_telemetry_snapshot_init(&telemetry);
+    svc_telemetry_update_battery(&telemetry, 12600U, true, 0U);
+    assert(svc_system_safety_update_from_telemetry(
+        safety,
+        manager,
+        bus,
+        &telemetry,
+        0U,
+        SVC_TELEMETRY_DEFAULT_STALE_MS).battery.action == SVC_BATTERY_ACTION_ALLOW);
+
+    const uint32_t cutoff_time_ms = (uint32_t)SVC_DEFAULT_BATTERY_SHUTDOWN_DELAY_S * 1000U;
+    svc_telemetry_update_battery(&telemetry, measured_mv, true, cutoff_time_ms);
+    return svc_system_safety_update_from_telemetry(
+        safety,
+        manager,
+        bus,
+        &telemetry,
+        cutoff_time_ms,
+        SVC_TELEMETRY_DEFAULT_STALE_MS);
+}
+
 static void test_warn_publishes_event_without_disabling_outputs(void)
 {
     svc_output_manager_t manager = initialized_output_manager();
@@ -67,12 +95,11 @@ static void test_cutoff_disables_active_outputs_and_publishes_event(void)
     assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT9, 1000U, true).status == SVC_OUTPUT_MANAGER_OK);
     assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT5, 5000U, true).status == SVC_OUTPUT_MANAGER_OK);
 
-    const svc_system_safety_result_t result = svc_system_safety_update_battery(
+    const svc_system_safety_result_t result = update_battery_below_cutoff_after_shutdown_delay(
         &safety,
         &manager,
         &bus,
-        11700U,
-        true);
+        11700U);
 
     const uint16_t expected_disabled_mask = mask_for(SVC_OUTPUT_OUT5) | mask_for(SVC_OUTPUT_OUT9);
     assert(result.battery.action == SVC_BATTERY_ACTION_CUTOFF);
@@ -124,12 +151,11 @@ static void test_event_publish_failure_still_disables_outputs(void)
     assert(svc_event_bus_is_full(&bus));
     assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT9, 1000U, true).status == SVC_OUTPUT_MANAGER_OK);
 
-    const svc_system_safety_result_t result = svc_system_safety_update_battery(
+    const svc_system_safety_result_t result = update_battery_below_cutoff_after_shutdown_delay(
         &safety,
         &manager,
         &bus,
-        11700U,
-        true);
+        11700U);
 
     assert(result.battery.action == SVC_BATTERY_ACTION_CUTOFF);
     assert(result.event_publish_attempted);
@@ -146,7 +172,7 @@ static void test_recovery_does_not_reenable_outputs(void)
     svc_event_bus_init(&bus);
 
     assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT9, 1000U, true).status == SVC_OUTPUT_MANAGER_OK);
-    assert(svc_system_safety_update_battery(&safety, &manager, &bus, 11700U, true).battery.action == SVC_BATTERY_ACTION_CUTOFF);
+    assert(update_battery_below_cutoff_after_shutdown_delay(&safety, &manager, &bus, 11700U).battery.action == SVC_BATTERY_ACTION_CUTOFF);
 
     const svc_system_safety_result_t result = svc_system_safety_update_battery(
         &safety,
@@ -209,6 +235,28 @@ static void test_stale_telemetry_forces_cutoff(void)
     assert(result.active_output_mask == 0U);
 }
 
+static void test_battery_cutoff_waits_for_shutdown_delay(void)
+{
+    svc_output_manager_t manager = initialized_output_manager();
+    svc_system_safety_t safety = initialized_safety();
+    svc_event_bus_t bus = {0};
+    svc_event_bus_init(&bus);
+
+    assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT9, 1000U, true).status == SVC_OUTPUT_MANAGER_OK);
+
+    const svc_system_safety_result_t result = svc_system_safety_update_battery(
+        &safety,
+        &manager,
+        &bus,
+        11700U,
+        true);
+
+    assert(result.battery.action == SVC_BATTERY_ACTION_WARN);
+    assert(!result.battery.cutoff_latched);
+    assert(result.disabled_output_mask == 0U);
+    assert((result.active_output_mask & mask_for(SVC_OUTPUT_OUT9)) != 0U);
+}
+
 static svc_telemetry_snapshot_t thermal_telemetry_all_at(int16_t temperature_c, uint32_t now_ms)
 {
     svc_telemetry_snapshot_t telemetry = {0};
@@ -241,11 +289,45 @@ static void test_thermal_derate_publishes_event_without_disabling_outputs(void)
     assert(result.event_publish_attempted);
     assert(result.event_published);
     assert(result.disabled_output_mask == 0U);
+    assert(result.derated_output_mask == mask_for(SVC_OUTPUT_OUT9));
     assert((result.active_output_mask & mask_for(SVC_OUTPUT_OUT9)) != 0U);
+    assert(svc_output_manager_pwm_duty_percent(&manager, SVC_OUTPUT_OUT9) == SVC_THERMAL_DERATE_PWM_MAX_PERCENT);
 
     svc_event_t event = {0};
     assert(svc_event_bus_pop(&bus, &event));
     assert(event.type == SVC_EVENT_THERMAL_DERATE);
+}
+
+static void test_runtime_power_budget_sheds_active_loads(void)
+{
+    svc_output_manager_t manager = initialized_output_manager();
+    svc_system_safety_t safety = initialized_safety();
+    svc_event_bus_t bus = {0};
+    svc_event_bus_init(&bus);
+
+    assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT2, 1000U, true).status == SVC_OUTPUT_MANAGER_OK);
+    assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT3, 19000U, true).status == SVC_OUTPUT_MANAGER_OK);
+    assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT9, 27000U, true).status == SVC_OUTPUT_MANAGER_OK);
+
+    const svc_system_power_budget_safety_result_t result = svc_system_safety_update_power_budget(
+        &safety,
+        &manager,
+        &bus,
+        45000U,
+        true);
+
+    assert(result.budget.status == SVC_OUTPUT_MANAGER_OK);
+    assert(result.disabled_output_mask == mask_for(SVC_OUTPUT_OUT2));
+    assert((result.active_output_mask & mask_for(SVC_OUTPUT_OUT2)) == 0U);
+    assert((result.active_output_mask & mask_for(SVC_OUTPUT_OUT3)) != 0U);
+    assert((result.active_output_mask & mask_for(SVC_OUTPUT_OUT9)) != 0U);
+    assert(result.event_publish_attempted);
+    assert(result.event_published);
+
+    svc_event_t event = {0};
+    assert(svc_event_bus_pop(&bus, &event));
+    assert(event.type == SVC_EVENT_POWER_BUDGET_SHED);
+    assert(event.value == 45000U);
 }
 
 static void test_thermal_cutoff_disables_active_outputs(void)
@@ -310,8 +392,10 @@ int main(void)
     test_recovery_does_not_reenable_outputs();
     test_uninitialized_safety_fails_safe();
     test_stale_telemetry_forces_cutoff();
+    test_battery_cutoff_waits_for_shutdown_delay();
     test_thermal_derate_publishes_event_without_disabling_outputs();
     test_thermal_cutoff_disables_active_outputs();
     test_stale_thermal_telemetry_disables_active_outputs();
+    test_runtime_power_budget_sheds_active_loads();
     return 0;
 }

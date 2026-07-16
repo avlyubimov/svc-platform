@@ -20,6 +20,22 @@
 - Board-level current budget enforcement
 - Priority-based load shedding
 
+## Sleep, wake, and parking current
+- Device is permanently battery-connected and must define off-ignition current
+  budgets before final LB-100 power selection.
+- Sleep mode target current at battery input: ≤1.0 mA; hard maximum: ≤2.0 mA.
+- Deep-sleep target current at battery input: ≤250 µA; hard maximum: ≤500 µA.
+- Enter sleep within 60 seconds after ignition/accessory-off when no service
+  session or configured delayed-output action is active.
+- Enter deep sleep within 24 hours of continuous parking.
+- Allowed Rev.1 wake sources: ignition/accessory sense, USB/service power,
+  service button, RTC/maintenance timer, and listen-only CAN1 wake only if CAN1
+  TX remains physically disabled.
+- All PB-100 outputs remain off in sleep and deep sleep unless a future ADR
+  explicitly defines a wake-safe always-on output class.
+- Maximum parking drain budget: ≤0.35 Ah over the first parked week and ≤0.45 Ah
+  over one parked month after deep sleep transition.
+
 ## Manufacturing
 - SMD factory assembly
 - THT/large connectors installed manually

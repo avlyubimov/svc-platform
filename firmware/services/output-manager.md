@@ -24,6 +24,10 @@ state changes.
 - Invalid device configuration keeps outputs off.
 - Board over-budget state refuses new loads before shedding active loads.
 - Lower-priority loads shed before higher-priority loads.
+- New load requests may shed already-active lower-priority loads when doing so
+  keeps the request inside the configured board-current budget.
+- Runtime budget enforcement sheds active loads in configured priority order
+  when measured total current is already above the configured limit.
 - Battery cutoff shutdown is applied through the System Safety Coordinator, not
   by feature code directly manipulating outputs.
 - Output overcurrent and fault events are applied through the Event Dispatcher,
@@ -32,6 +36,10 @@ state changes.
   output ID.
 - PWM duty-cycle state is owned by the Output Manager. Partial duty is denied
   when the output configuration has `pwm_allowed = false`.
+- Increasing PWM on an already-active output repeats total-budget and telemetry
+  validation; lowering PWM remains allowed because it reduces load.
+- Thermal derating reduces PWM-capable active outputs to the configured derate
+  ceiling and disables non-PWM low-priority loads.
 
 Initial host-testable implementation:
 
