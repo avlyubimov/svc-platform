@@ -8,6 +8,7 @@ hardware/power-board/PB-100/PB-100-review-release-manifest.csv,Review package,Fr
 hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv,Review package,Cross-artifact readiness dashboard,Required,validate_schematic_readiness_dashboard,Conditional
 hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md,Review package,Freeze gate checklist,Required,validate_schematic_freeze_gap_register,Open
 hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv,Review package,Conditional gate gap register,Required,validate_schematic_freeze_gap_register,Conditional
+hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv,Review package,Board-release blocker register,Required,validate_board_release_blocker_register,Conditional
 hardware/power-board/PB-100/PB-100-validation-traceability.csv,Validation,Freeze-gate validation trace,Required,validate_validation_traceability,Conditional
 hardware/power-board/PB-100/PB-100-schematic-capture-plan.md,Schematic capture,Capture process,Required,Document reviewed,Ready
 hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv,Schematic capture,Sheet-level capture work queue,Required,validate_schematic_capture_work_queue,Conditional

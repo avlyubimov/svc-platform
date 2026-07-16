@@ -1726,3 +1726,16 @@ machine-checked schematic baseline without pretending the schematic is frozen.
 Passive abstract pins keep ERC useful for hierarchy and net continuity while
 final pin electrical types, values, footprints, SOA, sourcing evidence, and
 independent power-electronics review remain schematic-freeze blockers.
+
+## 2026-07-16 — PB-100 board-release blockers are explicit
+
+Decision: PB-100 now has
+`hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`, with
+one active release blocker for every conditional schematic-freeze gate. The
+validator checks that those rows stay synchronized with the freeze checklist and
+that each row explicitly blocks PCB layout.
+
+Reason: After preliminary schematic capture, the next risk is treating
+documentation volume as board readiness. PCB layout must remain blocked until
+values, footprints, sourcing, SOA, thermal, connector, and production evidence
+are actually closed for every conditional gate.

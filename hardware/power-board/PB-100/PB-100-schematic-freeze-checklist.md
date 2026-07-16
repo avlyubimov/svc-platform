@@ -43,8 +43,11 @@ this checklist can close.
 
 ## Active blockers
 
-No active planning blockers remain. Conditional gates still require schematic
-evidence before freeze.
+No unresolved architecture-planning blockers remain. Board-release blockers are
+still active for every `Conditional` gate and are tracked in
+`hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`.
+PCB layout and manufacturing output remain blocked until that register is empty
+because every required gate has moved to `Closed`.
 
 ## Resolved blockers
 
@@ -63,6 +66,7 @@ Before marking this checklist `Closed`, the review packet must include:
 - Updated schematic package.
 - Updated review release manifest.
 - Updated schematic readiness dashboard.
+- Updated board-release blocker register with one row per conditional gate.
 - Updated schematic capture work queue.
 - Updated schematic freeze gap register with one row per conditional gate.
 - Updated validation traceability register with one row per conditional gate.

@@ -14,3 +14,5 @@
   placeholder sheets, and enforce ERC/netlist/component/net gates.
 - Added preliminary PB-100 KiCad child-sheet capture content that passes ERC and
   netlist export while keeping PCB layout blocked until schematic freeze.
+- Added a PB-100 board-release blocker register so every conditional schematic
+  freeze gate explicitly blocks PCB layout until its close evidence is complete.

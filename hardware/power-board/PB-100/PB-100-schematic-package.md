@@ -64,6 +64,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-net-naming.md`
 - `hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv`
+- `hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`
 - `hardware/power-board/PB-100/PB-100-validation-traceability.csv`
 - `hardware/power-board/PB-100/PB-100-test-point-plan.csv`
 - `hardware/power-board/PB-100/PB-100-fault-response-matrix.csv`

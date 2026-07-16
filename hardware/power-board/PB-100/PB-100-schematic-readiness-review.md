@@ -10,7 +10,11 @@ all active planning blockers. It does not authorize PCB layout.
 ## Outcome
 
 - Architecture v1.0 and PB-100 baseline requirements are frozen by ADR.
-- No active PB-100 planning blockers remain in the freeze checklist.
+- No active PB-100 architecture-planning blockers remain in the freeze
+  checklist.
+- Board-release blockers remain active for every conditional gate and are
+  tracked in
+  `hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`.
 - All formerly open schematic-readiness gates now have evidence.
 - Remaining gates are conditional because they need schematic-level evidence,
   final component sourcing checks, SOA extraction, connector derating, and
@@ -25,6 +29,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv`
+- `hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`
 - `hardware/power-board/PB-100/PB-100-validation-traceability.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv`
 - `hardware/power-board/PB-100/PB-100-test-point-plan.csv`
