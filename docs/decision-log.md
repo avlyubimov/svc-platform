@@ -1769,3 +1769,20 @@ Reason: The default 85 °C warn, 105 °C cutoff, and 75 °C recovery thresholds
 need concrete ADC voltage coverage before schematic review. The values remain
 not final until LB-100 ADC settling, NTC self-heating, sensor placement,
 calibration, and assembly sourcing are reviewed.
+
+## 2026-07-16 — PB-100 current telemetry candidate values
+
+Decision: PB-100 total-current telemetry planning now has a value-bearing but
+not-final monitor and shunt candidate in
+`hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`.
+The current candidate keeps the 0.5 mΩ four-terminal shunt, uses the
+INA228-Q1-class ±40.96 mV range, records 20 mV at 40 A and 30 mV at 60 A,
+uses `A1 = GND` and `A0 = GND` as a candidate `0x40` I2C address, keeps
+`PB_I2C` pull-ups LB-owned by default, and adds candidate shunt-input and
+VBUS filter values for schematic review.
+
+Reason: The current telemetry blocker needed concrete schematic-review values
+instead of open address, pull-up, filter, and calibration placeholders. These
+values remain not final until the LB-100 I2C plan, shunt footprint, Kelvin
+routing, copper heating, VBUS surge stress, exact monitor suffix, and bench
+calibration process are reviewed.

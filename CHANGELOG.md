@@ -20,3 +20,5 @@
   keeping them not final before freeze.
 - Added candidate PB-100 NTC divider values for schematic review while keeping
   thermal placement and calibration open.
+- Added candidate PB-100 total-current telemetry values for schematic review
+  while keeping shunt copper, bus ownership, and calibration open.

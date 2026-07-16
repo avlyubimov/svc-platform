@@ -35,6 +35,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
 - `hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv`
@@ -94,6 +95,11 @@ It is not a PCB layout package.
   headroom, Kelvin sense, ADC/I2C ownership, per-output IMON scaling,
   calibration configuration, and stale-telemetry safe faults are tracked in
   `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`.
+- Current telemetry candidate values: 0.5 mΩ shunt operating points,
+  INA228-class ±40.96 mV range, candidate `0x40` address straps, LB-owned
+  pull-up boundary, input filter, VBUS filter, and calibration boundary are
+  tracked in
+  `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`.
 - Input reverse freeze review: LM74700 gate/default-off behavior, TOLL/LFPAK88
   and PowerPAK alternates, protected measurement sequence, HM3 TVS dependency,
   sourcing gate, and no-layout boundary are tracked in

@@ -87,6 +87,10 @@ Current coverage:
   INA228-class monitor headroom, Kelvin sense, ADC/I2C ownership, calibration
   configuration, stale-telemetry safe faults, and bench validation IDs into
   `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`.
+- Current telemetry candidate values now document the 0.5 mΩ shunt operating
+  points, INA228-class ±40.96 mV range, candidate `0x40` address straps,
+  LB-owned pull-up boundary, input/VBUS filters, and calibration boundary in
+  `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`.
 - Thermal telemetry now has a trace tying `TEMP_PCB`, `TEMP_PWR_A`, and
   `TEMP_PWR_B` to the TDK NTC candidate, default 85/105/75 °C thresholds,
   configuration-owned calibration, and firmware thermal fail-safe behavior.
