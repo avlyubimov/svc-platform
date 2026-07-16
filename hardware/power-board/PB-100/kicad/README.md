@@ -82,11 +82,15 @@ python3 tools/validate_pb100.py
 The validator intentionally fails if layout/manufacturing artifacts appear before
 the PB-100 schematic freeze checklist is closed.
 
-If `kicad-cli` is installed, the validator also runs schematic ERC, requires
-zero reported violations, exports a temporary KiCad S-expression netlist, and
-checks that all child sheets in `PB-100-kicad-sheet-manifest.csv` are linked from
-the top-level schematic. If `kicad-cli` is not available, the text-level KiCad
-scaffold checks still run.
+The validator requires `kicad-cli` version `10.0.4`. It fails if KiCad is
+missing or a different version is installed.
+
+The validator also rejects `sheet-placeholder`/`Placeholder sheet` markers,
+runs schematic ERC, requires zero reported violations, exports a temporary KiCad
+S-expression netlist, checks that all child sheets in
+`PB-100-kicad-sheet-manifest.csv` are linked from the top-level schematic, and
+requires at least 20 schematic components plus 20 electrical nets in the exported
+netlist. Empty child sheets are therefore not allowed to pass CI.
 
 KiCad schematic and symbol files are also checked for accessory-role tokens such
 as `FOG`, `USB`, `SEAT`, `CHIGEE`, `DVR`, and `BRAKE`. PB-100 artifacts must use
