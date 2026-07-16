@@ -1786,3 +1786,21 @@ instead of open address, pull-up, filter, and calibration placeholders. These
 values remain not final until the LB-100 I2C plan, shunt footprint, Kelvin
 routing, copper heating, VBUS surge stress, exact monitor suffix, and bench
 calibration process are reviewed.
+
+## 2026-07-16 — PB-100 CAN1 TX-disable candidate values
+
+Decision: PB-100 CAN1 safety planning now has a value-bearing but not-final
+default-disabled hardware candidate in
+`hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`.
+The current candidate keeps `JP_CAN1` DNP/open as a 0 Ω 0603 link or
+normally-open solder bridge, uses an `SN74LVC1G125-Q1`-class 3-state gate for
+`U_CAN1`, pulls the physical `OE` disable node high with 47 kΩ, biases
+downstream TXD recessive with 47 kΩ, and reads the physical disable node back
+to `CAN1_TX_DISABLED_STATUS` through a 1 kΩ series path plus 100 kΩ pull-up.
+
+Reason: CAN1 read-only behavior is a constitutional hardware safety rule. The
+release blocker needed concrete schematic-review values for the default-open
+link, default-disabled gate, and physical status readback without creating any
+default-populated vehicle-CAN TX path. These values remain not final until
+factory DNP handling, exact gate package, reset/unpowered bench behavior,
+direct DNP-link detection need, and independent CAN safety review close.

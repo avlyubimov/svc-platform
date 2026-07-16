@@ -147,6 +147,10 @@ Current coverage:
   `CAN1_TX_ROUTE`, `CAN1_TX_DISABLED_STATUS`, firmware listen-only behavior,
   DNP BOM ownership, the production DNP review, and the future-ADR
   hardware-action boundary together.
+- CAN1 TX-disable candidate values now document the 0 Ω DNP/open link,
+  `SN74LVC1G125-Q1`-class default-disabled gate, 47 kΩ pulls, physical
+  `OE`-node status readback, and reset/unpowered bench checks in
+  `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.
 - Synchronize factory and garage BOM drafts with final selections.

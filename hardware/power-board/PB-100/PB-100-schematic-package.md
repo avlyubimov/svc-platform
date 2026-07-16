@@ -27,6 +27,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv`
 - `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`
 - `hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv`
+- `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
@@ -147,6 +148,10 @@ It is not a PCB layout package.
 - CAN1 production DNP review: `JP_CAN1` remains DNP/open, `U_CAN1` defaults
   disabled, `CAN1_TX_DISABLED_STATUS` reports physical disabled state, and
   future CAN1 TX requires ADR plus hardware action.
+- CAN1 TX-disable candidate values: 0 Ω DNP/open `JP_CAN1`, 47 kΩ default
+  disable pull, `SN74LVC1G125-Q1`-class `U_CAN1`, 47 kΩ downstream recessive
+  bias, and 1 kΩ/100 kΩ physical-status readback are tracked in
+  `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`.
 
 ## Board-to-board signal budget
 

@@ -790,6 +790,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv",
     "hardware/power-board/PB-100/PB-100-can1-safety-verification.csv",
     "hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv",
+    "hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv",
