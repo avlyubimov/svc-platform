@@ -16,3 +16,5 @@
   netlist export while keeping PCB layout blocked until schematic freeze.
 - Added a PB-100 board-release blocker register so every conditional schematic
   freeze gate explicitly blocks PCB layout until its close evidence is complete.
+- Added candidate LM5164-Q1 logic-power values for schematic review while
+  keeping them not final before freeze.

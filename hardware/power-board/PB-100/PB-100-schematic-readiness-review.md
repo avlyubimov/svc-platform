@@ -74,6 +74,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
 - `hardware/power-board/PB-100/PB-100-kicad-sheet-manifest.csv`

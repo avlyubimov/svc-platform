@@ -148,6 +148,10 @@ Current coverage:
 - Synchronize factory and garage BOM drafts with final selections.
 - Keep `make check` passing with local `kicad-cli` available, zero ERC
   violations, and a successful KiCad S-expression netlist export.
+- Logic power now has candidate LM5164 values in
+  `hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md`, but
+  those values remain not final until load budget, sourcing, EMI, and stability
+  review close.
 
 ## Required before PCB layout
 

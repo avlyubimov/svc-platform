@@ -777,6 +777,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv",
+    "hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md",
     "hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv",
