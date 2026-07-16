@@ -21,6 +21,8 @@ typedef struct {
     svc_power_budget_decision_t budget_decision;
     uint16_t active_output_mask;
     uint16_t locked_output_mask;
+    uint16_t shed_output_mask;
+    uint16_t derated_output_mask;
     uint8_t pwm_duty_percent;
 } svc_output_manager_result_t;
 
@@ -51,6 +53,15 @@ svc_output_manager_result_t svc_output_manager_request_pwm(
     uint8_t duty_percent,
     uint32_t measured_total_current_ma,
     bool telemetry_valid);
+
+svc_output_manager_result_t svc_output_manager_enforce_budget(
+    svc_output_manager_t *manager,
+    uint32_t measured_total_current_ma,
+    bool telemetry_valid);
+
+svc_output_manager_result_t svc_output_manager_apply_thermal_derate(
+    svc_output_manager_t *manager,
+    uint8_t max_pwm_duty_percent);
 
 svc_output_manager_result_t svc_output_manager_apply_fault(
     svc_output_manager_t *manager,

@@ -16,6 +16,8 @@ The Power Budget Service protects PB-100 from over-subscription.
 - Budget-available decision for requested output starts.
 - Load-shed requests ordered by configured priority.
 - Over-budget events for logging and diagnostics.
+- Runtime enforcement input to the Output Manager/System Safety loop so active
+  loads are shed instead of only refusing future starts.
 
 Initial host-testable implementation:
 
@@ -33,6 +35,10 @@ Initial host-testable implementation:
 If telemetry is missing or invalid, the service must choose the safer state:
 deny new high-current loads and keep affected outputs off until diagnostics are
 valid again.
+
+When telemetry is valid and measured total current exceeds the configured board
+limit, active outputs are shed in `shed_order` priority order until the
+configured limit is reached or no active loads remain.
 
 Telemetry validity/staleness is provided by:
 

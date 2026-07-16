@@ -13,6 +13,7 @@ typedef enum {
 
 typedef struct {
     bool cutoff_latched;
+    uint16_t undervoltage_duration_s;
 } svc_battery_monitor_t;
 
 typedef struct {
@@ -20,6 +21,7 @@ typedef struct {
     uint16_t measured_mv;
     bool telemetry_valid;
     bool cutoff_latched;
+    uint16_t undervoltage_duration_s;
 } svc_battery_result_t;
 
 bool svc_battery_config_is_valid(const svc_battery_config_t *config);
@@ -31,3 +33,10 @@ svc_battery_result_t svc_battery_update(
     const svc_battery_config_t *config,
     uint16_t measured_mv,
     bool telemetry_valid);
+
+svc_battery_result_t svc_battery_update_elapsed_s(
+    svc_battery_monitor_t *monitor,
+    const svc_battery_config_t *config,
+    uint16_t measured_mv,
+    bool telemetry_valid,
+    uint16_t elapsed_s);

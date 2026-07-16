@@ -1672,3 +1672,42 @@ and LB-100 status. Schematic freeze needs explicit regulator-family, load
 budget, UVLO, PGOOD, magnetics, and sourcing boundaries before any U3/L1 value,
 footprint, switch-node copper, placement, or manufacturing output is
 authorized.
+
+## 2026-07-16 — System sleep, wake, and parking-current limits
+
+Decision: ADR-0012 defines off-ignition sleep and deep-sleep current budgets,
+wake sources, transition timing, and long-parking drain limits. Sleep targets
+≤1.0 mA with a 2.0 mA hard maximum. Deep sleep targets ≤250 µA with a 500 µA
+hard maximum. The system must enter sleep within 60 seconds after
+ignition/accessory-off and deep sleep within 24 hours of continuous parking.
+Parking drain is limited to 0.35 Ah over the first parked week and 0.45 Ah over
+one parked month after deep-sleep transition.
+
+Reason: SVC is permanently connected to the motorcycle battery. LB-100 power
+selection and firmware state-machine work need explicit parasitic-current and
+wake-source limits before logic-power choices or vehicle installation can be
+treated as safe.
+
+## 2026-07-16 — Firmware safety loop closes delayed cutoff, shedding, and derate gaps
+
+Decision: Firmware host logic now applies `battery.shutdown_delay_s` before
+low-voltage cutoff, revalidates budget and telemetry before PWM increases,
+sheds lower-priority loads during new load requests and runtime total-current
+enforcement, and applies thermal derate through the Output Manager by reducing
+PWM-capable outputs and disabling non-PWM low-priority loads.
+
+Reason: These behaviors are safety requirements, not diagnostics only. The
+working control loop must actively protect battery health, PB-100 current
+budget, and thermal margin instead of only computing advisory states.
+
+## 2026-07-16 — PB-100 KiCad CI is fail-closed
+
+Decision: PB-100 validation now requires `kicad-cli` 10.0.4, rejects
+`sheet-placeholder`/`Placeholder sheet` markers, requires ERC and KiCad
+S-expression netlist export, and rejects exported netlists with fewer than 20
+components or 20 electrical nets. GitHub Actions installs the fixed KiCad CLI
+before running `make check`.
+
+Reason: Empty or placeholder schematics must not pass CI. The repository should
+fail loudly until PB-100 child sheets contain captured schematic content with
+real components and electrical nets.

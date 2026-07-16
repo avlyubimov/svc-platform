@@ -16,6 +16,8 @@ Telemetry Snapshot and configuration thresholds.
 - `CUTOFF` at or above cutoff threshold.
 - Cutoff latches per zone until temperature falls to recovery threshold.
 - Missing, invalid, or stale temperature telemetry forces cutoff.
+- System Safety applies thermal derate by reducing PWM-capable outputs and
+  disabling non-PWM low-priority loads through the Output Manager.
 - System Safety applies thermal cutoff by disabling active outputs through the
   Output Manager.
 

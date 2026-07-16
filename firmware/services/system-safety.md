@@ -8,6 +8,12 @@ letting feature code bypass the Output Manager.
 - Run battery protection updates.
 - Publish low-battery warning and cutoff events on state transitions.
 - Disable all active outputs through the Output Manager on battery cutoff.
+- Apply `battery.shutdown_delay_s` before low-voltage cutoff when battery
+  telemetry remains continuously below the cutoff threshold.
+- Run total-current budget enforcement from telemetry and shed active loads
+  through the Output Manager when measured current exceeds the configured limit.
+- Publish power-budget shedding events when runtime enforcement disables loads.
+- Apply thermal derating through the Output Manager at thermal warning.
 - Disable all active outputs through the Output Manager on thermal cutoff.
 - Treat invalid battery telemetry as cutoff.
 - Treat invalid or stale thermal telemetry as cutoff.
@@ -41,5 +47,7 @@ Battery telemetry validity/staleness is provided by:
 telemetry into the same cutoff path as invalid raw telemetry.
 
 Thermal safety uses `svc_system_safety_update_thermal_from_telemetry()` to
-publish thermal derate/cutoff events and to shut down active outputs on thermal
-cutoff. Thermal recovery does not automatically re-enable previous loads.
+publish thermal derate/cutoff events, reduce PWM-capable outputs to
+`SVC_THERMAL_DERATE_PWM_MAX_PERCENT` during derate, disable non-PWM
+low-priority loads, and shut down active outputs on thermal cutoff. Thermal
+recovery does not automatically re-enable previous loads.
