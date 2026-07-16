@@ -1804,3 +1804,21 @@ link, default-disabled gate, and physical status readback without creating any
 default-populated vehicle-CAN TX path. These values remain not final until
 factory DNP handling, exact gate package, reset/unpowered bench behavior,
 direct DNP-link detection need, and independent CAN safety review close.
+
+## 2026-07-16 — PB-100/LB-100 pin-binding precheck
+
+Decision: PB-100 board-to-board planning now has an LB-100 resource-budget
+precheck in
+`hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`. The
+precheck requires the STM32H563 LQFP-100 schematic review to account for 10
+PWM-capable output controls, 10 output fault inputs, 10 per-output ADC current
+inputs, 6 board analog/ID measurements plus reference strategy, `PB_I2C`, CAN1
+read-only safety pins, and future expansion reserves before exact pin binding
+can close.
+
+Reason: The B2B blocker cannot be closed by the PB-100 pin map alone. Exact
+STM32H5 package pins must be assigned in the LB-100 schematic with USB, SWD,
+clock, storage, BLE, sensors, sleep/wake, ADC, timer, FDCAN, UART, and SPI
+conflicts visible. This precheck is deliberately not an exact pinout and keeps
+connector placement and layout blocked until the real LB-100 pinout audit
+passes.

@@ -57,6 +57,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`
+- `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv`
 - `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`
@@ -126,7 +127,7 @@ The schematic review packet consists of:
 | Test points | Bring-up, telemetry, output, fused-output, and CAN1 safety test points are defined without footprint or placement lock |
 | Fault response | Input, logic, B2B, output, thermal, current-budget, CAN1, and identity faults have safe hardware defaults and firmware responses |
 | Hardware capabilities | Role-free PB-100 capabilities align with output matrix, telemetry maps, config defaults, and CAN1 read-only policy |
-| B2B interface | JPB1 connector trace, pin assignment review, CAN1 safety crossing, LB-100 resource-class binding, and exact LB-100 MCU pin binding |
+| B2B interface | JPB1 connector trace, pin assignment review, CAN1 safety crossing, LB-100 resource-class binding, LB-100 pin-binding precheck, and exact LB-100 MCU pin binding |
 | CAN1 safety | CAN1 TX-disable trace, production DNP review, CAN1 TX-disable design calculation, DNP/open TX path, default disable state, status readback, DNP BOM ownership, firmware listen-only behavior, and future ADR hardware-action process |
 | Factory assembly | JLCPCB/PCBWay assembly class, distributor continuity, and alternates for critical MPNs; ownership is traced in `PB-100-assembly-readiness-trace.csv`, `PB-100-symbol-mpn-readiness.csv`, `pb100_assembly_sourcing_recheck.csv`, and `pb100_sourcing_evidence_snapshot.csv` |
 | Garage assembly | Connector, fuse, enclosure, harness items, current derating, wire gauge, crimp tooling, and service access remain user-installable per `PB-100-assembly-readiness-trace.csv` |

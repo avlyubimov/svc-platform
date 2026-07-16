@@ -122,6 +122,10 @@ Current coverage:
   the FX18 candidate pair, 100-pin map, output controls/fault/current telemetry,
   board telemetry, CAN1 safety crossing, and exact MCU pin-binding blockers
   together.
+- B2B/LB-100 pin binding now has a resource-budget precheck for STM32H563
+  LQFP-100 schematic review, covering 10 PWM-capable controls, 16 ADC-class
+  measurements, fault/wake inputs, `PB_I2C`, CAN1 safety, and reserved
+  expansion without assigning exact STM32 pins.
 - Q1 input reverse MOSFET pin evidence is captured from the Infineon
   `IAUTN06S5N008` data sheet; schematic freeze must still close TOLL footprint,
   40 A copper/thermal review, assembly handling, and gate clamp behavior.

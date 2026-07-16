@@ -21,6 +21,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`
+- `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`
 - `production/bom/pb100_assembly_sourcing_recheck.csv`
 - `production/bom/pb100_sourcing_evidence_snapshot.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
@@ -167,6 +168,9 @@ B2B interface trace CSV:
 LB-100 resource-class binding CSV:
 `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`.
 
+LB-100 pin-binding precheck:
+`hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`.
+
 | Signal group | Count target | Direction | Notes |
 |---|---:|---|---|
 | Power and grounds | 20-30 pins | PB-100/LB-100 | Multiple grounds and supply pins for current return and signal integrity |
@@ -186,6 +190,9 @@ power/status pins, output controls/faults/current telemetry, board telemetry,
 CAN1 safety crossing, and reserve pins back to the LB-100 resource-class
 binding review. Exact STM32H5 package pins remain a LB-100 schematic-review
 item.
+
+The pin-binding precheck defines the LB-100 resource budget that must be proven
+before exact STM32H563 LQFP-100 package pins can close.
 
 ## Output channel matrix
 

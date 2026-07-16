@@ -64,6 +64,7 @@ hardware/power-board/PB-100/PB-100-thermal-estimates.csv,Thermal,Thermal estimat
 hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv,Outputs,OUT2 SOA envelope,Required,CSV width validation,Conditional
 hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv,B2B interface,JPB1 connector and LB resource trace,Required,validate_b2b_interface_trace,Conditional
 hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv,B2B interface,LB-100 resource-class binding,Required,validate_b2b_resource_binding,Conditional
+hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md,B2B interface,LB-100 STM32H5 resource precheck,Required,Document reviewed,Conditional
 hardware/power-board/PB-100/PB-100-b2b-pin-map.csv,B2B interface,JPB1 pin map,Required,validate_jpb1_symbol_from_pin_map,Conditional
 hardware/power-board/PB-100/PB-100-b2b-pin-budget.csv,B2B interface,JPB1 pin budget,Required,CSV width validation,Ready
 hardware/power-board/PB-100/kicad,KiCad scaffold,Project scaffold directory,Required,validate_kicad_scaffold,Ready
