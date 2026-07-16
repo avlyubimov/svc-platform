@@ -78,6 +78,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`
 
 ## Electrical baseline
 

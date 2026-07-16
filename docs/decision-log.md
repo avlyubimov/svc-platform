@@ -1755,3 +1755,17 @@ Reason: The board-release path needs concrete schematic-review values instead
 of open TBD fields. These values are still not final: LM5164 orderability,
 actual LB-100 load budget, inductor saturation/DCR, capacitor derating, EMI,
 PGOOD timing, and switch-node ringing remain schematic-freeze blockers.
+
+## 2026-07-16 — PB-100 thermal telemetry candidate divider
+
+Decision: PB-100 thermal telemetry planning now has a value-bearing but
+not-final NTC divider candidate in
+`hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`.
+The current candidate uses the TDK 10 kΩ 3435 K NTC class with a 4.7 kΩ pull-up
+to `LB_3V3_IO`, 1 kΩ ADC series resistor, and 10 nF ADC filter for all three
+thermal signals.
+
+Reason: The default 85 °C warn, 105 °C cutoff, and 75 °C recovery thresholds
+need concrete ADC voltage coverage before schematic review. The values remain
+not final until LB-100 ADC settling, NTC self-heating, sensor placement,
+calibration, and assembly sourcing are reviewed.

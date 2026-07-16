@@ -28,9 +28,12 @@ Initial schematic-planning sensor direction is a TDK
 - Same NTC class for `TEMP_PCB`, `TEMP_PWR_A`, and `TEMP_PWR_B` unless
   schematic review proves a mixed sensor set is needed.
 
-The ADC divider value is still a schematic-freeze item. It must keep thermistor
-self-heating low, preserve useful ADC resolution around the default thermal
-thresholds, and include calibration constants outside firmware binaries.
+The first ADC divider candidate is documented in
+`hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`.
+It uses a 4.7 kΩ pull-up to `LB_3V3_IO`, the 10 kΩ NTC to `GND`, a 1 kΩ ADC
+series resistor, and a 10 nF local filter capacitor. These values are candidate
+values only. Schematic freeze must still review thermistor self-heating, ADC
+settling, placement, calibration, and assembly sourcing.
 
 ## Measurement map
 
@@ -61,7 +64,8 @@ The map is tied to thermal zones, not accessory roles.
 - Place `TEMP_PCB` away from direct heat sources enough to represent board
   ambient/reference temperature.
 - Route analog thermistor dividers to `LB_3V3_IO` ADC domain.
-- Keep divider current low enough to avoid self-heating.
+- Keep divider current low enough to avoid self-heating; the current candidate
+  is about 224 µA at 25 °C.
 - Provide calibration constants through configuration or board identity data.
 - Recheck JLCPCB/PCBWay assembly support for selected sensors before schematic
   freeze.

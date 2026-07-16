@@ -152,6 +152,9 @@ Current coverage:
   `hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md`, but
   those values remain not final until load budget, sourcing, EMI, and stability
   review close.
+- Thermal telemetry now has candidate NTC divider values in
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`,
+  but placement, ADC settling, calibration, and assembly review remain open.
 
 ## Required before PCB layout
 

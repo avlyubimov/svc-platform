@@ -18,3 +18,5 @@
   freeze gate explicitly blocks PCB layout until its close evidence is complete.
 - Added candidate LM5164-Q1 logic-power values for schematic review while
   keeping them not final before freeze.
+- Added candidate PB-100 NTC divider values for schematic review while keeping
+  thermal placement and calibration open.

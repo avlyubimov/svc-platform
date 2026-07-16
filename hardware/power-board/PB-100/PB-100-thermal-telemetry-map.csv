@@ -1,4 +1,4 @@
 Measurement,Signal,Location target,Primary sensor,Range C,Telemetry path,Requirement,Notes
-PCB temperature,TEMP_PCB,Board reference away from direct MOSFET heat,TDK NTCGS103JF103FT8-class 10k NTC,-40 to 150,LB ADC,Core,Default thresholds 85C warn 105C cutoff 75C recovery; divider calibration TBD
-Power zone A,TEMP_PWR_A,OUT2 and input reverse-protection hot zone,TDK NTCGS103JF103FT8-class 10k NTC,-40 to 150,LB ADC,Core,Default thresholds 85C warn 105C cutoff 75C recovery; divider calibration TBD
-Power zone B,TEMP_PWR_B,Medium-output MOSFET cluster or logic buck hot zone,TDK NTCGS103JF103FT8-class 10k NTC,-40 to 150,LB ADC,Should,Default thresholds 85C warn 105C cutoff 75C recovery; divider calibration TBD
+PCB temperature,TEMP_PCB,Board reference away from direct MOSFET heat,TDK NTCGS103JF103FT8-class 10k NTC with 4.7kΩ pull-up candidate,-40 to 150,LB ADC,Core,Default thresholds 85C warn 105C cutoff 75C recovery; calibration TBD not final
+Power zone A,TEMP_PWR_A,OUT2 and input reverse-protection hot zone,TDK NTCGS103JF103FT8-class 10k NTC with 4.7kΩ pull-up candidate,-40 to 150,LB ADC,Core,Default thresholds 85C warn 105C cutoff 75C recovery; calibration TBD not final
+Power zone B,TEMP_PWR_B,Medium-output MOSFET cluster or logic buck hot zone,TDK NTCGS103JF103FT8-class 10k NTC with 4.7kΩ pull-up candidate,-40 to 150,LB ADC,Should,Default thresholds 85C warn 105C cutoff 75C recovery; calibration TBD not final
