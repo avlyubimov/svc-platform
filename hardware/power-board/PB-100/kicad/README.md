@@ -1,14 +1,16 @@
 # PB-100 KiCad Project
 
-Status: Schematic scaffold only; no PCB layout
+Status: Preliminary schematic capture; no PCB layout
 
-This directory contains the preliminary KiCad project scaffold for PB-100.
+This directory contains the preliminary KiCad project for PB-100.
 
 ## Current boundary
 
 - `PB-100.kicad_pro`: project metadata scaffold.
 - `PB-100.kicad_sch`: top-level schematic note sheet with linked child sheets.
-- `sheets/*.kicad_sch`: child schematic placeholder sheets for capture.
+- `sheets/*.kicad_sch`: preliminary child schematic capture sheets with
+  role-agnostic `OUT1`..`OUT10` nets, CAN1 DNP/open notes, and ERC-clean
+  abstract class instances.
 - `sym-lib-table`: project-local symbol library table.
 - `fp-lib-table`: project-local footprint library table.
 - `lib/PB100.kicad_sym`: preliminary abstract block symbols, first
@@ -64,10 +66,12 @@ manufacturing outputs are also blocked by repository validation.
 1. Open `PB-100.kicad_pro` in KiCad.
 2. Let KiCad normalize project settings if needed.
 3. Review linked child schematic sheets listed in
-   `PB-100-schematic-capture-plan.md` and capture their contents.
+   `PB-100-schematic-capture-plan.md` against the trace and freeze-review
+   artifacts.
 4. Review preliminary concrete MPN symbols against the official data sheets
    listed in `PB-100-symbol-capture-worklist.csv`.
-5. Replace abstract block symbols only after package drawings and pinouts are
+5. Replace abstract class instances with final electrical symbols, values, and
+   footprints only after package drawings, pinouts, SOA, and sourcing gates are
    checked.
 6. Do not create a PCB layout until the freeze checklist is closed.
 
@@ -91,6 +95,12 @@ S-expression netlist, checks that all child sheets in
 `PB-100-kicad-sheet-manifest.csv` are linked from the top-level schematic, and
 requires at least 20 schematic components plus 20 electrical nets in the exported
 netlist. Empty child sheets are therefore not allowed to pass CI.
+
+The current child sheets use passive preliminary class-symbol pins so ERC checks
+hierarchy, net continuity, and capture completeness without treating abstract
+planning symbols as final electrical models. Schematic freeze must replace those
+abstract instances with reviewed final pin electrical types, values, footprints,
+and MPN selections.
 
 KiCad schematic and symbol files are also checked for accessory-role tokens such
 as `FOG`, `USB`, `SEAT`, `CHIGEE`, `DVR`, and `BRAKE`. PB-100 artifacts must use

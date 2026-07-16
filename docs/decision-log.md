@@ -1711,3 +1711,18 @@ before running `make check`.
 Reason: Empty or placeholder schematics must not pass CI. The repository should
 fail loudly until PB-100 child sheets contain captured schematic content with
 real components and electrical nets.
+
+## 2026-07-16 — PB-100 preliminary KiCad child-sheet capture
+
+Decision: PB-100 child sheets now contain preliminary schematic capture content
+for input protection, logic power, generic output channels, telemetry, B2B
+interface, and CAN1 safety. The capture uses role-agnostic `OUT1`..`OUT10`
+nets, keeps CAN1 TX DNP/open with no default-populated TX path, exports a KiCad
+S-expression netlist above the component/net thresholds, and passes ERC with
+passive preliminary class-symbol pins.
+
+Reason: The repository needed to move past placeholder sheets into a real
+machine-checked schematic baseline without pretending the schematic is frozen.
+Passive abstract pins keep ERC useful for hierarchy and net continuity while
+final pin electrical types, values, footprints, SOA, sourcing evidence, and
+independent power-electronics review remain schematic-freeze blockers.

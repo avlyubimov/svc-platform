@@ -34,7 +34,7 @@ Current coverage:
 |---|---|---|
 | Architecture v1.0 | Ready | Frozen by ADR; PB-100 requirement changes still need ADR |
 | PB-100 requirements | Ready for schematic planning | Baseline is frozen; schematic freeze remains open |
-| PB-100 KiCad scaffold | Blocked for strict CI | Child sheets are still placeholders; strict validation now fails until captured schematic content replaces them |
+| PB-100 KiCad scaffold | Preliminary capture | Child sheets now contain ERC-clean preliminary capture content and exported netlist coverage; schematic freeze remains open |
 | PB-100 PCB/layout | Blocked | Layout, Gerber, drill, placement, and manufacturing zips are blocked |
 | Firmware safety core | Host-test ready | Output, delayed battery cutoff, runtime load shedding, thermal derate/cutoff, CAN, telemetry, events, logging, config, runtime boot, CAN-to-rule bridge, ambient-light rule conditions, ordered rule sets, multi-action rule compilation, rule runtime, and rule paths covered |
 | Configuration format | Host-test ready | JSON schema, rule grammar, rule-action mapping, PB-100 capability manifest, compiled capability baseline, config store, config update, and examples are validated |
@@ -42,9 +42,11 @@ Current coverage:
 
 ## Required before schematic freeze
 
-- Replace abstract KiCad block symbols with final schematic symbols.
-- Replace all child-sheet `sheet-placeholder` markers with captured schematic
-  content; strict validation intentionally fails until this is done.
+- Replace preliminary abstract/class KiCad instances with final schematic
+  symbols, reviewed electrical pin types, values, footprints, and MPN-specific
+  package evidence.
+- Keep all child sheets free of `sheet-placeholder` markers, ERC-clean, and
+  covered by exported KiCad netlist component/net thresholds.
 - Select final critical MPNs and at least two alternatives for each critical
   component family.
 - Recheck JLCPCB/PCBWay assembly availability and package suitability.
@@ -141,8 +143,8 @@ Current coverage:
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.
 - Synchronize factory and garage BOM drafts with final selections.
-- Run `make check` with local `kicad-cli` available, zero ERC violations, and a
-  successful KiCad S-expression netlist export.
+- Keep `make check` passing with local `kicad-cli` available, zero ERC
+  violations, and a successful KiCad S-expression netlist export.
 
 ## Required before PCB layout
 
