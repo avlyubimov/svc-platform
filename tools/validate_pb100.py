@@ -349,6 +349,14 @@ THERMAL_TELEMETRY_FREEZE_REVIEW_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+THERMAL_TELEMETRY_VALUE_FREEZE_CHECKLIST_COLUMNS = (
+    "Check ID",
+    "Review item",
+    "Required close evidence",
+    "Primary artifacts",
+    "Pass condition",
+    "Blocked action",
+)
 LOGIC_POWER_RAIL_TRACE_COLUMNS = (
     "Trace item",
     "Net or ref",
@@ -570,6 +578,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-current-telemetry-value-freeze-checklist.csv",
         "PB-100-thermal-telemetry-trace.csv",
         "PB-100-thermal-telemetry-freeze-review.csv",
+        "PB-100-thermal-telemetry-value-freeze-checklist.csv",
     ),
     "CAP-B2B": (
         "PB-100-b2b-interface-trace.csv",
@@ -863,6 +872,18 @@ REQUIRED_THERMAL_TELEMETRY_FREEZE_REVIEW_ITEMS = {
     "Assembly and alternates",
     "Bench validation path",
 }
+REQUIRED_THERMAL_TELEMETRY_VALUE_FREEZE_CHECKS = {
+    "THERM-FRZ-001",
+    "THERM-FRZ-002",
+    "THERM-FRZ-003",
+    "THERM-FRZ-004",
+    "THERM-FRZ-005",
+    "THERM-FRZ-006",
+    "THERM-FRZ-007",
+    "THERM-FRZ-008",
+    "THERM-FRZ-009",
+    "THERM-FRZ-010",
+}
 REQUIRED_FAULT_IDS = {
     "PBFLT-INPUT-REV",
     "PBFLT-LOAD-DUMP",
@@ -921,6 +942,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md",
+    "hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md",
@@ -2180,6 +2202,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "Thermal telemetry": (
             "PB-100-thermal-telemetry-trace.csv",
             "PB-100-thermal-telemetry-freeze-review.csv",
+            "PB-100-thermal-telemetry-value-freeze-checklist.csv",
             "PB-100-thermal-telemetry-map.csv",
         ),
         "Factory assembly readiness": ("PB-100-assembly-readiness-trace.csv", "pb100_sourcing_evidence_snapshot.csv"),
@@ -2280,6 +2303,7 @@ def validate_schematic_freeze_gap_register() -> None:
     for token in (
         "PB-100-thermal-telemetry-trace.csv",
         "PB-100-thermal-telemetry-freeze-review.csv",
+        "PB-100-thermal-telemetry-value-freeze-checklist.csv",
         "NTCGS103JF103FT8",
         "self-heating",
         "firmware thresholds",
@@ -5220,6 +5244,99 @@ def validate_thermal_telemetry_freeze_review() -> None:
             fail(f"firmware tests must retain thermal freeze review token {token}")
 
 
+def validate_thermal_telemetry_value_freeze_checklist() -> None:
+    path = PB100_DIR / "PB-100-thermal-telemetry-value-freeze-checklist.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty thermal telemetry value freeze checklist: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [
+        column for column in THERMAL_TELEMETRY_VALUE_FREEZE_CHECKLIST_COLUMNS if column not in fieldnames
+    ]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_check: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        check_id = row["Check ID"].strip()
+        if check_id not in REQUIRED_THERMAL_TELEMETRY_VALUE_FREEZE_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown thermal telemetry check {check_id}")
+        if check_id in rows_by_check:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate thermal telemetry check {check_id}")
+        rows_by_check[check_id] = row
+        for column in THERMAL_TELEMETRY_VALUE_FREEZE_CHECKLIST_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+
+    missing_checks = sorted(REQUIRED_THERMAL_TELEMETRY_VALUE_FREEZE_CHECKS - rows_by_check.keys())
+    if missing_checks:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing thermal telemetry checks: "
+            f"{', '.join(missing_checks)}"
+        )
+
+    checklist_text = read_text(path)
+    for token in (
+        "NTCGS103JF103FT8",
+        "10k",
+        "150C",
+        "AEC-Q200",
+        "TEMP_PCB",
+        "TEMP_PWR_A",
+        "TEMP_PWR_B",
+        "Vishay NTCS0402E3",
+        "Murata NCU18",
+        "4.7kΩ",
+        "LB_3V3_IO",
+        "10kΩ NTC",
+        "1kΩ",
+        "10nF",
+        "0.95 V at 75 °C",
+        "0.78 V at 85 °C",
+        "0.52 V at 105 °C",
+        "224µA",
+        "0.50mW",
+        "0.31mW",
+        "ADC settling",
+        "85C warn 105C cutoff 75C recovery",
+        "telemetry.thermal",
+        "10000Ω",
+        "3435 K",
+        "4700Ω",
+        "1000Ω",
+        "1000 ms",
+        "-40 to 150 °C",
+        "test_stale_thermal_telemetry_forces_cutoff",
+        "PB-BENCH-009",
+        "THERMAL_NTC",
+        "JLCPCB PCBWay",
+        "TMP117/TMP112",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+    ):
+        if token not in checklist_text:
+            fail(f"thermal telemetry value freeze checklist must include {token}")
+
+    calculation_text = read_text(PB100_DIR / "PB-100-thermal-telemetry-design-calculation.md")
+    for token in ("4.7 kΩ", "1 kΩ", "10 nF", "0.78 V", "0.52 V", "0.50 mW", "3435 K"):
+        if token not in calculation_text:
+            fail(f"thermal telemetry design calculation must support checklist token {token}")
+
+    config_text = read_text(REPO_ROOT / "firmware" / "configs" / "config-example.json")
+    for token in ("\"warn_c\": 85", "\"cutoff_c\": 105", "\"recovery_c\": 75"):
+        if token not in config_text:
+            fail(f"thermal config example must support value checklist token {token}")
+
+
 def validate_logic_power_rail_trace() -> None:
     path = PB100_DIR / "PB-100-logic-power-rail-trace.csv"
     validate_csv(path)
@@ -6470,6 +6587,8 @@ def validate_validation_traceability() -> None:
         if freeze_gate == "Thermal telemetry":
             if "pb-100-thermal-telemetry-freeze-review.csv" not in row_text:
                 fail("Thermal telemetry validation trace must include freeze review")
+            if "pb-100-thermal-telemetry-value-freeze-checklist.csv" not in row_text:
+                fail("Thermal telemetry validation trace must include value freeze checklist")
         if freeze_gate == "High/medium output stage":
             if "pb-100-high-medium-output-freeze-review.csv" not in row_text:
                 fail("High/medium output validation trace must include freeze review")
@@ -6998,6 +7117,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-board-current-budget-design-calculation.md",
         "PB-100-thermal-telemetry-trace.csv",
         "PB-100-thermal-telemetry-freeze-review.csv",
+        "PB-100-thermal-telemetry-value-freeze-checklist.csv",
         "PB-100-b2b-interface-trace.csv",
         "PB-100-b2b-lb100-resource-binding.csv",
         "PB-100-b2b-lb100-pin-audit-checklist.csv",
@@ -7085,6 +7205,7 @@ def main() -> int:
     validate_current_telemetry_value_freeze_checklist()
     validate_thermal_telemetry_trace()
     validate_thermal_telemetry_freeze_review()
+    validate_thermal_telemetry_value_freeze_checklist()
     validate_logic_power_rail_trace()
     validate_logic_power_design_values()
     validate_logic_power_freeze_review()

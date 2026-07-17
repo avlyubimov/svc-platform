@@ -2031,3 +2031,19 @@ package heating, Kelvin footprint, monitor orderability, address and pull-up
 ownership, alert behavior, ADC/I2C mapping, bench calibration, and stale-data
 safety must close before telemetry routing, shunt copper, footprints, or
 `PB-100.kicad_pcb` work can be locked.
+
+## 2026-07-17 — PB-100 thermal telemetry value freeze checklist
+
+Decision: PB-100 thermal-telemetry review now has
+`hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`.
+The checklist ties the TDK `NTCGS103JF103FT8` 10 kΩ NTC class, `TEMP_PCB`,
+`TEMP_PWR_A`, and `TEMP_PWR_B` placement zones, 4.7 kΩ/1 kΩ/10 nF divider
+candidate, self-heating estimate, LB ADC settling, 85/105/75 °C configuration
+thresholds, stale thermal fail-safe behavior, bench validation, sourcing
+alternates, and no-layout boundary into one machine-checked artifact.
+
+Reason: PBREL-010 cannot close from the candidate divider calculation alone.
+ADC settling, physical placement, self-heating, bench calibration, firmware
+threshold ownership, NTC sourcing, and stale-telemetry fail-safe evidence must
+close before sensor placement, thermal copper, footprints, or
+`PB-100.kicad_pcb` work can be locked.

@@ -92,6 +92,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`
 
 ## Electrical baseline
 
@@ -153,6 +154,11 @@ It is not a PCB layout package.
   placement zones, 85/105/75 °C thresholds, firmware fail-safe behavior,
   calibration, assembly alternates, and bench validation are tracked in
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`.
+- Thermal telemetry value checklist: sensor class, placement zones,
+  divider/ADC scaling, self-heating, ADC settling, configuration calibration,
+  firmware fail-safe, bench validation, sourcing, and no-layout boundary are
+  tracked in
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`.
 - Output freeze reviews: high/medium and low-current stages keep TPS48110 plus
   external MOSFET boundaries, OUT2 SOA, gate-drive defaults, sense/telemetry,
   fault thresholds, clamp strategy, low-current ADR-0011 no-smart-switch
@@ -319,6 +325,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-map.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-estimates.csv`
 - `hardware/power-board/PB-100/PB-100-protection-validation.csv`
