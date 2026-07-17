@@ -1985,3 +1985,18 @@ network values can be locked. The checklist keeps the 60 V preferred path
 conditional on overshoot and sourcing evidence, retains 80 V and dual-device
 alternates, and blocks Q1 placement, copper geometry, and `PB-100.kicad_pcb`
 until schematic freeze closes.
+
+## 2026-07-17 — PB-100 TVS overshoot escape checklist
+
+Decision: PB-100 TVS/load-dump review now has
+`hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`.
+The checklist ties the active `SM8S33AHM3/I` HM3 source snapshot, 53.3 V clamp
+at 124 A, 60 V MOSFET overshoot acceptance, `BUK7S1R2-80M` 80 V LFPAK88
+escape path, 100 V downstream default, ADR-0011 40 V boundary, schematic-value
+dependencies, sourcing review, and no-layout boundary into one machine-checked
+artifact.
+
+Reason: PBREL-007 cannot close from clamp math alone. The 60 V MOSFET paths
+need measured or simulated overshoot evidence, otherwise affected paths must
+migrate to an 80 V or higher class before schematic values, footprints, copper,
+or `PB-100.kicad_pcb` work can be locked.

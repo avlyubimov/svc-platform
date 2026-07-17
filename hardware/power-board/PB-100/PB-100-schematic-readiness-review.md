@@ -98,6 +98,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
@@ -126,7 +127,7 @@ The schematic review packet consists of:
 | Review release manifest | Every required freeze-packet artifact exists and remains synchronized with validation hooks |
 | OUT2 SOA | Data-sheet SOA extraction against `PB-100-out2-soa-envelope.csv` |
 | Input reverse protection | Input reverse package trace, input reverse freeze review, Q1 freeze checklist, input power values, Q1 pin evidence, and 40 A copper/thermal review |
-| TVS/load dump | Clamp and overshoot margin trace plus TVS freeze review against every selected downstream voltage class |
+| TVS/load dump | Clamp and overshoot margin trace plus TVS freeze review and overshoot escape checklist against every selected downstream voltage class |
 | Logic power | Logic power rail trace, logic power freeze review, LM5164 pin template, logic power design values, final buck current budget, EMI parts, UVLO, feedback, and power-good implementation |
 | Current telemetry | Current telemetry trace, current telemetry freeze review, current telemetry design calculation, INA228 pin template, board-current budget trace, 40 A freeze review, board-current design calculation, ADC scaling, filtering, calibration plan, and total-current monitor choice |
 | Thermal telemetry | Thermal telemetry trace, thermal telemetry freeze review, final sensor values, divider values, placement notes, calibration, and derating thresholds |

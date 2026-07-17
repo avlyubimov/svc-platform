@@ -80,6 +80,11 @@ Current coverage:
   100 V pass-with-margin paths, 60 V overshoot dependencies, 40 V smart-switch
   ADR boundary, sourcing gate, and no-layout boundary into
   `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`.
+- TVS/load-dump overshoot closure now has
+  `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`,
+  which keeps the active HM3 MPN evidence, 60 V overshoot acceptance criteria,
+  80 V MOSFET escape path, 100 V downstream default, and no-layout boundary in
+  one machine-checked artifact.
 - MOSFET voltage-margin review now makes the 80 V review escape path explicit
   for 60 V output and input-reverse MOSFET paths unless overshoot evidence
   accepts the active TVS clamp margin.
