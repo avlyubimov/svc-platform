@@ -40,6 +40,7 @@ hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv,Logic power,Protec
 hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv,Logic power,Logic power freeze review,Required,validate_logic_power_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv,Logic power,LM5164 pin template,Required,validate_input_and_power_pin_templates,Conditional
 hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md,Logic power,LM5164 candidate value calculation,Required,Document reviewed,Conditional
+hardware/logic-board/LB-100/LB-100-power-budget-precheck.md,Logic power,LB-100 5V load-budget precheck,Required,Document reviewed,Conditional
 hardware/power-board/PB-100/PB-100-logic-power-design-values.csv,Logic power,Logic power design values,Required,validate_logic_power_design_values,Conditional
 hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv,Logic power,Logic value placeholders,Required,validate_logic_power_design_placeholders,Conditional
 hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv,Outputs,Output channel contract,Required,validate_output_channel_pin_contract,Conditional

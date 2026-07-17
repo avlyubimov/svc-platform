@@ -52,6 +52,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`
+- `hardware/logic-board/LB-100/LB-100-power-budget-precheck.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
@@ -120,6 +121,9 @@ It is not a PCB layout package.
   PGOOD, inductor/capacitor classes, sourcing, and no-layout boundary are
   tracked in
   `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`.
+- LB-100 power budget precheck: LB-100 has a 500 mA sustained allocation from
+  `PB_5V_OUT`; exceeding it keeps the LM5013-Q1-class fallback active before
+  PB-100 schematic freeze.
 - Thermal telemetry freeze review: NTC sensor class, divider/ADC scaling,
   placement zones, 85/105/75 °C thresholds, firmware fail-safe behavior,
   calibration, assembly alternates, and bench validation are tracked in

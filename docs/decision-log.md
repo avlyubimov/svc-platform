@@ -1856,3 +1856,13 @@ Reason: The active TVS clamp point leaves limited headroom below 60 V absolute
 maximum MOSFET ratings. The release path must either prove the 60 V overshoot
 margin or move affected MOSFET paths to an 80 V or higher class before
 schematic freeze and PCB layout.
+
+## 2026-07-17 — LB-100 power-budget precheck for PB-100 logic rail
+
+Decision: LB-100 schematic review now has
+`hardware/logic-board/LB-100/LB-100-power-budget-precheck.md`, tying the initial
+500 mA sustained LB-100 allocation to the PB-100 `PB_5V_OUT` 1 A budget.
+
+Reason: PB-100 cannot freeze the LM5164-Q1-class logic buck until LB-100 proves
+its load budget. If LB-100 exceeds the 500 mA allocation, PB-100 must retain the
+LM5013-Q1-class higher-current fallback before schematic freeze.

@@ -182,6 +182,8 @@ Current coverage:
   `hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md`, but
   those values remain not final until load budget, sourcing, EMI, and stability
   review close.
+- LB-100 now has a `PB_5V_OUT` load-budget precheck with a 500 mA sustained
+  allocation; exceeding it keeps the PB-100 LM5013-Q1-class fallback active.
 - Thermal telemetry now has candidate NTC divider values in
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`,
   but placement, ADC settling, calibration, and assembly review remain open.

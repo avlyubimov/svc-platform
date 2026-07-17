@@ -80,6 +80,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`
+- `hardware/logic-board/LB-100/LB-100-power-budget-precheck.md`
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
 - `hardware/power-board/PB-100/PB-100-kicad-sheet-manifest.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv`
