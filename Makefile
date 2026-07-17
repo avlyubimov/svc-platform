@@ -1,4 +1,4 @@
-.PHONY: check validate-pb100 validate-config firmware-test clean
+.PHONY: check validate-pb100 validate-config firmware-test pb100-release-status pb100-release-gate clean
 
 check: validate-pb100 validate-config firmware-test
 
@@ -10,6 +10,12 @@ validate-config:
 
 firmware-test:
 	$(MAKE) -C firmware test
+
+pb100-release-status:
+	python3 tools/pb100_release_status.py
+
+pb100-release-gate:
+	python3 tools/pb100_release_status.py --fail-on-blocked
 
 clean:
 	$(MAKE) -C firmware clean

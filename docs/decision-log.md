@@ -1822,3 +1822,13 @@ clock, storage, BLE, sensors, sleep/wake, ADC, timer, FDCAN, UART, and SPI
 conflicts visible. This precheck is deliberately not an exact pinout and keeps
 connector placement and layout blocked until the real LB-100 pinout audit
 passes.
+
+## 2026-07-17 — PB-100 board-print release gate
+
+Decision: PB-100 now has `tools/pb100_release_status.py` plus
+`make pb100-release-status` and `make pb100-release-gate`.
+
+Reason: The project needs a direct machine-readable answer for whether PB-100
+can be sent for board printing. The gate reports the schematic-freeze status,
+active board-release blockers, KiCad PCB presence, and manufacturing output
+presence instead of relying on a manual reading of the release packet.

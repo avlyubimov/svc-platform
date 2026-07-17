@@ -14,6 +14,18 @@ Run from the repository root:
 make check
 ```
 
+For board-order status, run:
+
+```bash
+make pb100-release-status
+```
+
+For a release job that must fail while PB-100 is not printable, run:
+
+```bash
+make pb100-release-gate
+```
+
 Current coverage:
 
 - PB-100 CSV and KiCad scaffold validation.
@@ -27,6 +39,9 @@ Current coverage:
 - Firmware host-test suite.
 - Firmware hardware-capability, config-store, config-update, and runtime-boot
   startup safety validation.
+- PB-100 board-print release-status reporting from the schematic-freeze
+  checklist, board-release blocker register, KiCad PCB presence, and
+  manufacturing output presence.
 
 ## Current readiness
 
