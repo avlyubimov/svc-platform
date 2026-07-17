@@ -2058,6 +2058,22 @@ needs a formula-backed bridge between the LM74700 controller datasheet,
 `INPUT_FET_GATE` behavior, 40 A Q1 MOSFET candidates, TVS/load-dump dependency,
 and the still-open final gate network, footprint, and copper decisions.
 
+## 2026-07-17 — PB-100 input reverse Q1 closeout precheck
+
+Decision: PB-100 input reverse-protection review now has
+`hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`.
+The precheck bridges the LM74700-Q1 source boundary, VCAP/gate default-off
+behavior, ideal-diode reverse-current behavior, RDS(on) thermal window,
+TOLL/LFPAK88/PowerPAK package alternatives, TVS overshoot dependency, protected
+measurement sequence, assembly sourcing, input capture synchronization, and
+no-layout manufacturing boundary to PBREL-006.
+
+Reason: The Q1 freeze checklist and derivation precheck define the evidence,
+but print-readiness review also needs a machine-checked closeout bridge that
+prevents Q1 placement, high-current copper, thermal relief, `PB-100.kicad_pcb`,
+Gerbers, drills, pick-place, or manufacturing ZIP work until input reverse
+package, gate, thermal, TVS, and assembly evidence close.
+
 ## 2026-07-17 — PB-100 TVS overshoot escape checklist
 
 Decision: PB-100 TVS/load-dump review now has

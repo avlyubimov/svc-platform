@@ -64,6 +64,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
 - `hardware/power-board/PB-100/kicad/PB-100.kicad_sch`
@@ -163,6 +164,12 @@ It is not a PCB layout package.
   measurement sequence, assembly alternates, and no-layout boundary are tracked
   in
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`.
+- Input reverse Q1 closeout precheck: controller source boundary, VCAP/gate
+  default-off behavior, ideal-diode reverse-current behavior, RDS(on) thermal
+  window, TOLL/LFPAK88/PowerPAK alternatives, TVS overshoot dependency,
+  protected measurement sequence, assembly sourcing, input capture sync, and
+  no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`.
 - TVS/load-dump freeze review: active SM8S33AHM3/I HM3 branch, 100 V device
   margin, 60 V MOSFET overshoot dependency, 80 V Q1 alternate, 40 V
   smart-switch ADR boundary, sourcing gate, and no-layout boundary are tracked
@@ -404,6 +411,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-input-protection-pin-contract.csv`

@@ -126,7 +126,8 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv`,
   `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`,
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`,
-  `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`, and
+  `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`,
+  `hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`, and
   `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`.
 - TVS/load-dump tests trace to
   `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv` and

@@ -249,6 +249,12 @@ Current coverage:
   protected measurement sequence, assembly alternates, and no-layout boundary
   to
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`.
+- Q1 input reverse closeout precheck now bridges LM74700-Q1 source boundary,
+  VCAP/gate default-off behavior, ideal-diode reverse-current behavior,
+  RDS(on) thermal window, TOLL/LFPAK88/PowerPAK alternatives, TVS overshoot
+  dependency, protected measurement sequence, assembly sourcing, capture sync,
+  and no-layout boundary to
+  `hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`.
 - The PB-100 board-current budget now has a cross-artifact trace tying the
   50 A main fuse target, 40 A board/configuration limit, 0-60 A total-current
   telemetry range, and 0.5 mΩ shunt operating point together; schematic freeze
