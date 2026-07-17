@@ -348,6 +348,14 @@ CURRENT_TELEMETRY_VALUE_FREEZE_CHECKLIST_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+CURRENT_TELEMETRY_VALUE_DERIVATION_PRECHECK_COLUMNS = (
+    "Derivation ID",
+    "Scope",
+    "Formula or source basis",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
 THERMAL_TELEMETRY_TRACE_COLUMNS = (
     "Thermal zone",
     "Signal",
@@ -654,6 +662,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-current-telemetry-trace.csv",
         "PB-100-current-telemetry-freeze-review.csv",
         "PB-100-current-telemetry-value-freeze-checklist.csv",
+        "PB-100-current-telemetry-value-derivation-precheck.csv",
         "PB-100-thermal-telemetry-trace.csv",
         "PB-100-thermal-telemetry-freeze-review.csv",
         "PB-100-thermal-telemetry-value-freeze-checklist.csv",
@@ -1029,6 +1038,18 @@ REQUIRED_CURRENT_TELEMETRY_VALUE_FREEZE_CHECKS = {
     "CUR-FRZ-009",
     "CUR-FRZ-010",
 }
+REQUIRED_CURRENT_TELEMETRY_VALUE_DERIVATION_CHECKS = {
+    "CUR-DER-001",
+    "CUR-DER-002",
+    "CUR-DER-003",
+    "CUR-DER-004",
+    "CUR-DER-005",
+    "CUR-DER-006",
+    "CUR-DER-007",
+    "CUR-DER-008",
+    "CUR-DER-009",
+    "CUR-DER-010",
+}
 REQUIRED_THERMAL_TELEMETRY_FREEZE_REVIEW_ITEMS = {
     "Sensor class",
     "Divider and ADC scaling",
@@ -1132,6 +1153,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md",
     "hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv",
+    "hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md",
@@ -2436,6 +2458,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-current-telemetry-trace.csv",
             "PB-100-current-telemetry-freeze-review.csv",
             "PB-100-current-telemetry-value-freeze-checklist.csv",
+            "PB-100-current-telemetry-value-derivation-precheck.csv",
             "PB-100-current-telemetry-map.csv",
         ),
         "Thermal telemetry": (
@@ -2546,6 +2569,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-current-telemetry-trace.csv",
         "PB-100-current-telemetry-freeze-review.csv",
         "PB-100-current-telemetry-value-freeze-checklist.csv",
+        "PB-100-current-telemetry-value-derivation-precheck.csv",
         "0.5mΩ",
         "ADC or I2C",
         "firmware safety",
@@ -5793,6 +5817,118 @@ def validate_current_telemetry_value_freeze_checklist() -> None:
             fail(f"config example must support current telemetry checklist token {token}")
 
 
+def validate_current_telemetry_value_derivation_precheck() -> None:
+    path = PB100_DIR / "PB-100-current-telemetry-value-derivation-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty current telemetry value derivation precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [
+        column for column in CURRENT_TELEMETRY_VALUE_DERIVATION_PRECHECK_COLUMNS if column not in fieldnames
+    ]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        derivation_id = row["Derivation ID"].strip()
+        if derivation_id not in REQUIRED_CURRENT_TELEMETRY_VALUE_DERIVATION_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown current telemetry derivation item {derivation_id}")
+        if derivation_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate current telemetry derivation item {derivation_id}")
+        rows_by_id[derivation_id] = row
+        for column in CURRENT_TELEMETRY_VALUE_DERIVATION_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if derivation_id == "CUR-DER-001" and ("vshunt" not in row_text or "pshunt" not in row_text):
+            fail("current telemetry derivation precheck must include shunt voltage and power formulas")
+        if derivation_id == "CUR-DER-008" and ("telemetry.total_current" not in row_text or "firmware constants" not in row_text):
+            fail("current telemetry derivation precheck must keep calibration out of firmware constants")
+        if derivation_id == "CUR-DER-010" and ("pb-100.kicad_pcb" not in row_text or "manufacturing" not in row_text):
+            fail("current telemetry derivation precheck must block layout and manufacturing outputs")
+
+    missing_items = sorted(REQUIRED_CURRENT_TELEMETRY_VALUE_DERIVATION_CHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing current telemetry derivation items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "Vshunt = I * Rshunt",
+        "Pshunt = I^2 * Rshunt",
+        "0.5mΩ",
+        "40A gives 20mV",
+        "50A gives 25mV",
+        "60A gives 30mV",
+        "81.92A",
+        "40.96mV",
+        "INA228-Q1",
+        "INA229-Q1",
+        "INA226",
+        "±40.96mV",
+        "±163.84mV",
+        "-0.3V to +85V",
+        "2.7V to 5.5V",
+        "16 I2C addresses",
+        "LB_3V3_IO",
+        "0x40",
+        "IIN_SHUNT_HI",
+        "IIN_SHUNT_LO",
+        "10Ω",
+        "1nF C0G",
+        "PB_I2C_SCL",
+        "PB_I2C_SDA",
+        "4.7kΩ to 10kΩ",
+        "PB_I2C_INT",
+        "47kΩ",
+        "VBAT_PROT",
+        "VBAT_RAW",
+        "1kΩ",
+        "1nF 100V",
+        "PB-100-tvs-overshoot-validation-precheck.csv",
+        "OUT1_IMON",
+        "OUT10_IMON",
+        "0-30A",
+        "0-20A",
+        "0-15A",
+        "0-8A",
+        "telemetry.total_current",
+        "telemetry.output_current",
+        "500µΩ",
+        "40960µV",
+        "1000 ms",
+        "60000 mA",
+        "PB-BENCH-005",
+        "PB-BENCH-006",
+        "PB-BENCH-010",
+        "total_current_limit_a 40",
+        "JLCPCB PCBWay",
+        "CSS4J-4026R-L500F",
+        "1.0mΩ fallback",
+        "Isabellenhuette BVN/BAS",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+    ):
+        if token not in precheck_text:
+            fail(f"current telemetry value derivation precheck must include {token}")
+
+    calculation_text = read_text(PB100_DIR / "PB-100-current-telemetry-design-calculation.md")
+    for token in ("Vshunt", "Pshunt", "500 µΩ", "40960 µV", "0x40", "10 Ω", "1 nF"):
+        if token not in calculation_text:
+            fail(f"current telemetry design calculation must support derivation token {token}")
+
+
 def validate_thermal_telemetry_trace() -> None:
     path = PB100_DIR / "PB-100-thermal-telemetry-trace.csv"
     validate_csv(path)
@@ -7703,6 +7839,8 @@ def validate_validation_traceability() -> None:
                 fail("Current telemetry validation trace must include freeze review")
             if "pb-100-current-telemetry-value-freeze-checklist.csv" not in row_text:
                 fail("Current telemetry validation trace must include value freeze checklist")
+            if "pb-100-current-telemetry-value-derivation-precheck.csv" not in row_text:
+                fail("Current telemetry validation trace must include value derivation precheck")
         if freeze_gate == "Thermal telemetry":
             if "pb-100-thermal-telemetry-freeze-review.csv" not in row_text:
                 fail("Thermal telemetry validation trace must include freeze review")
@@ -8257,6 +8395,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-current-telemetry-trace.csv",
         "PB-100-current-telemetry-freeze-review.csv",
         "PB-100-current-telemetry-value-freeze-checklist.csv",
+        "PB-100-current-telemetry-value-derivation-precheck.csv",
         "PB-100-board-current-budget-trace.csv",
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-board-current-budget-design-calculation.md",
@@ -8355,6 +8494,7 @@ def main() -> int:
     validate_current_telemetry_trace()
     validate_current_telemetry_freeze_review()
     validate_current_telemetry_value_freeze_checklist()
+    validate_current_telemetry_value_derivation_precheck()
     validate_thermal_telemetry_trace()
     validate_thermal_telemetry_freeze_review()
     validate_thermal_telemetry_value_freeze_checklist()

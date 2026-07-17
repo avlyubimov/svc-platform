@@ -2100,6 +2100,21 @@ ownership, alert behavior, ADC/I2C mapping, bench calibration, and stale-data
 safety must close before telemetry routing, shunt copper, footprints, or
 `PB-100.kicad_pcb` work can be locked.
 
+## 2026-07-17 — PB-100 current telemetry value derivation precheck
+
+Decision: PB-100 current-telemetry review now has
+`hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`.
+The precheck ties `Vshunt = I * Rshunt`, `Pshunt = I^2 * Rshunt`,
+INA228/INA229 monitor range, Kelvin/filter network, I2C ownership, alert
+boundary, VBUS protected-rail stress, per-output IMON scaling,
+configuration-owned calibration, bench safe-fault path, sourcing, and
+no-layout boundary to PBREL-009.
+
+Reason: PBREL-009 needs a formula-backed bridge between the value checklist,
+current telemetry calculation, board-current budget, firmware configuration
+contract, and factory sourcing before shunt, monitor, routing, or calibration
+values can close.
+
 ## 2026-07-17 — PB-100 thermal telemetry value freeze checklist
 
 Decision: PB-100 thermal-telemetry review now has

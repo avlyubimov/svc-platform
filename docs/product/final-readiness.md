@@ -132,6 +132,11 @@ Current coverage:
   tying shunt range, monitor family, Kelvin/filter network, I2C ownership,
   alert behavior, VBUS stress, per-output IMON scaling, configuration
   calibration, stale safe-fault tests, sourcing, and no-layout boundary.
+- Current telemetry value derivation precheck now ties shunt voltage/power
+  formulas, INA228/INA229 monitor ranges, Kelvin/filter network, I2C ownership,
+  VBUS stress, per-output IMON scaling, configuration calibration, bench
+  safe-fault path, sourcing, and no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`.
 - Total-current and per-output IMON calibration now have a firmware
   configuration contract in `firmware/configs/config-example.json`,
   `firmware/configs/svc-config.schema.json`, and `firmware/core/svc_config.h`;
