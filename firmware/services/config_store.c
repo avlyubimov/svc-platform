@@ -48,6 +48,13 @@ static uint32_t config_checksum(const svc_device_config_t *config, uint32_t sequ
         checksum = mix_u32(checksum, (uint32_t)config->power_budget.shed_order[priority_index]);
     }
 
+    checksum = mix_u32(checksum, config->telemetry.total_current.shunt_microohm);
+    checksum = mix_u32(checksum, config->telemetry.total_current.monitor_range_uv);
+    checksum = mix_i32(checksum, config->telemetry.total_current.zero_offset_ma);
+    checksum = mix_u32(checksum, config->telemetry.total_current.gain_ppm);
+    checksum = mix_u32(checksum, config->telemetry.total_current.stale_timeout_ms);
+    checksum = mix_u32(checksum, config->telemetry.total_current.plausible_max_ma);
+
     for (size_t output_index = 0U; output_index < SVC_OUTPUT_COUNT; ++output_index) {
         const svc_output_config_t *output = &config->outputs[output_index];
         checksum = mix_u32(checksum, (uint32_t)output->id);

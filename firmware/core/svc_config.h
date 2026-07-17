@@ -15,6 +15,12 @@
 #define SVC_DEFAULT_THERMAL_WARN_C 85
 #define SVC_DEFAULT_THERMAL_CUTOFF_C 105
 #define SVC_DEFAULT_THERMAL_RECOVERY_C 75
+#define SVC_DEFAULT_TOTAL_CURRENT_SHUNT_UOHM 500U
+#define SVC_DEFAULT_TOTAL_CURRENT_MONITOR_RANGE_UV 40960U
+#define SVC_DEFAULT_TOTAL_CURRENT_ZERO_OFFSET_MA 0
+#define SVC_DEFAULT_TOTAL_CURRENT_GAIN_PPM 1000000U
+#define SVC_DEFAULT_TELEMETRY_STALE_TIMEOUT_MS 1000U
+#define SVC_DEFAULT_TOTAL_CURRENT_PLAUSIBLE_MAX_MA 60000U
 
 typedef enum {
     SVC_OUTPUT_OUT1 = 0,
@@ -69,9 +75,23 @@ typedef struct {
 } svc_thermal_zone_config_t;
 
 typedef struct {
+    uint16_t shunt_microohm;
+    uint32_t monitor_range_uv;
+    int32_t zero_offset_ma;
+    uint32_t gain_ppm;
+    uint32_t stale_timeout_ms;
+    uint32_t plausible_max_ma;
+} svc_total_current_telemetry_config_t;
+
+typedef struct {
+    svc_total_current_telemetry_config_t total_current;
+} svc_telemetry_config_t;
+
+typedef struct {
     svc_battery_config_t battery;
     svc_thermal_zone_config_t thermal[SVC_THERMAL_ZONE_COUNT];
     svc_power_budget_config_t power_budget;
+    svc_telemetry_config_t telemetry;
     svc_output_config_t outputs[SVC_OUTPUT_COUNT];
 } svc_device_config_t;
 

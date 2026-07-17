@@ -225,6 +225,29 @@ def validate_schema(schema: dict[str, Any], allowed_roles: set[str]) -> None:
     if then_schema.get("items", {}).get("pattern") != RULE_ACTION_PATTERN:
         fail("schema rule.then item pattern must match supported firmware rule actions")
 
+    required = schema.get("required", [])
+    if "telemetry" not in required:
+        fail("schema must require top-level telemetry calibration")
+
+    telemetry_schema = schema.get("properties", {}).get("telemetry", {})
+    if telemetry_schema.get("additionalProperties") is not False:
+        fail("schema telemetry object must reject additional properties")
+    total_current_ref = telemetry_schema.get("properties", {}).get("total_current", {}).get("$ref")
+    if total_current_ref != "#/$defs/totalCurrentTelemetry":
+        fail("schema telemetry.total_current must reference $defs.totalCurrentTelemetry")
+
+    total_current_schema = schema.get("$defs", {}).get("totalCurrentTelemetry", {})
+    expected_required = [
+        "shunt_microohm",
+        "monitor_range_uv",
+        "zero_offset_ma",
+        "gain_ppm",
+        "stale_timeout_ms",
+        "plausible_max_ma",
+    ]
+    if total_current_schema.get("required") != expected_required:
+        fail("schema totalCurrentTelemetry required fields are out of sync")
+
 
 def validate_battery(config: dict[str, Any], defines: dict[str, int]) -> None:
     battery = require_dict(config, "battery")
@@ -294,6 +317,70 @@ def validate_power_budget(config: dict[str, Any], defines: dict[str, int]) -> No
         fail("power_budget.shed_priority_order does not match C default")
     if sorted(shed_order) != ["A", "B", "C"]:
         fail("power_budget.shed_priority_order must contain A, B, and C once")
+
+
+def validate_telemetry(config: dict[str, Any], defines: dict[str, int]) -> None:
+    telemetry = require_dict(config, "telemetry")
+    total_current = require_dict(telemetry, "total_current")
+    actual = {
+        "telemetry.total_current.shunt_microohm": decimal_to_int(
+            total_current.get("shunt_microohm"),
+            "telemetry.total_current.shunt_microohm",
+        ),
+        "telemetry.total_current.monitor_range_uv": decimal_to_int(
+            total_current.get("monitor_range_uv"),
+            "telemetry.total_current.monitor_range_uv",
+        ),
+        "telemetry.total_current.zero_offset_ma": decimal_to_int(
+            total_current.get("zero_offset_ma"),
+            "telemetry.total_current.zero_offset_ma",
+        ),
+        "telemetry.total_current.gain_ppm": decimal_to_int(
+            total_current.get("gain_ppm"),
+            "telemetry.total_current.gain_ppm",
+        ),
+        "telemetry.total_current.stale_timeout_ms": decimal_to_int(
+            total_current.get("stale_timeout_ms"),
+            "telemetry.total_current.stale_timeout_ms",
+        ),
+        "telemetry.total_current.plausible_max_ma": decimal_to_int(
+            total_current.get("plausible_max_ma"),
+            "telemetry.total_current.plausible_max_ma",
+        ),
+    }
+    expected = {
+        "telemetry.total_current.shunt_microohm": defines["SVC_DEFAULT_TOTAL_CURRENT_SHUNT_UOHM"],
+        "telemetry.total_current.monitor_range_uv": defines["SVC_DEFAULT_TOTAL_CURRENT_MONITOR_RANGE_UV"],
+        "telemetry.total_current.zero_offset_ma": defines["SVC_DEFAULT_TOTAL_CURRENT_ZERO_OFFSET_MA"],
+        "telemetry.total_current.gain_ppm": defines["SVC_DEFAULT_TOTAL_CURRENT_GAIN_PPM"],
+        "telemetry.total_current.stale_timeout_ms": defines["SVC_DEFAULT_TELEMETRY_STALE_TIMEOUT_MS"],
+        "telemetry.total_current.plausible_max_ma": defines["SVC_DEFAULT_TOTAL_CURRENT_PLAUSIBLE_MAX_MA"],
+    }
+    if actual != expected:
+        fail(f"telemetry.total_current does not match C defaults: {actual} != {expected}")
+
+    if actual["telemetry.total_current.shunt_microohm"] <= 0:
+        fail("telemetry.total_current.shunt_microohm must be positive")
+    if actual["telemetry.total_current.monitor_range_uv"] <= 0:
+        fail("telemetry.total_current.monitor_range_uv must be positive")
+    if actual["telemetry.total_current.gain_ppm"] <= 0:
+        fail("telemetry.total_current.gain_ppm must be positive")
+    if actual["telemetry.total_current.stale_timeout_ms"] <= 0:
+        fail("telemetry.total_current.stale_timeout_ms must be positive")
+    if actual["telemetry.total_current.plausible_max_ma"] <= 0:
+        fail("telemetry.total_current.plausible_max_ma must be positive")
+
+    total_current_limit_ma = decimal_amps_to_ma(
+        require_dict(config, "power_budget").get("total_current_limit_a"),
+        "power_budget.total_current_limit_a",
+    )
+    monitor_full_scale_ma = (
+        actual["telemetry.total_current.monitor_range_uv"] * 1000
+    ) // actual["telemetry.total_current.shunt_microohm"]
+    if actual["telemetry.total_current.plausible_max_ma"] < total_current_limit_ma:
+        fail("telemetry.total_current.plausible_max_ma must cover the configured current limit")
+    if actual["telemetry.total_current.plausible_max_ma"] > monitor_full_scale_ma:
+        fail("telemetry.total_current.plausible_max_ma exceeds monitor electrical full-scale")
 
 
 def validate_outputs(config: dict[str, Any], allowed_roles: set[str]) -> None:
@@ -703,6 +790,7 @@ def main() -> int:
     validate_battery(config, defines)
     validate_thermal(config, defines)
     validate_power_budget(config, defines)
+    validate_telemetry(config, defines)
     validate_outputs(config, allowed_roles)
     capabilities = validate_pb100_capabilities(config)
     validate_hardware_capability_service(capabilities)

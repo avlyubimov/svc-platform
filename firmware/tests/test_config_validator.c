@@ -57,6 +57,27 @@ static void test_invalid_power_budget_config_is_rejected(void)
     assert(result.output_index == SVC_CONFIG_OUTPUT_INDEX_NONE);
 }
 
+static void test_invalid_telemetry_config_is_rejected(void)
+{
+    svc_device_config_t config = svc_default_config;
+    config.telemetry.total_current.shunt_microohm = 0U;
+
+    const svc_config_validation_result_t result = svc_config_validate_device(&config);
+
+    assert(result.status == SVC_CONFIG_INVALID_TELEMETRY);
+    assert(result.output_index == SVC_CONFIG_OUTPUT_INDEX_NONE);
+}
+
+static void test_total_current_plausibility_must_fit_monitor_range(void)
+{
+    svc_device_config_t config = svc_default_config;
+    config.telemetry.total_current.plausible_max_ma = 82000U;
+
+    const svc_config_validation_result_t result = svc_config_validate_device(&config);
+
+    assert(result.status == SVC_CONFIG_INVALID_TELEMETRY);
+}
+
 static void test_invalid_thermal_config_is_rejected(void)
 {
     svc_device_config_t config = svc_default_config;
@@ -96,6 +117,8 @@ int main(void)
     test_invalid_battery_config_is_rejected();
     test_invalid_thermal_config_is_rejected();
     test_invalid_power_budget_config_is_rejected();
+    test_invalid_telemetry_config_is_rejected();
+    test_total_current_plausibility_must_fit_monitor_range();
     test_output_manager_rejects_invalid_role_config();
     test_system_safety_rejects_invalid_role_config();
     return 0;

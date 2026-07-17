@@ -14,6 +14,36 @@ static svc_config_validation_result_t make_result(
     };
 }
 
+static uint32_t total_current_full_scale_ma(const svc_total_current_telemetry_config_t *config)
+{
+    return (uint32_t)(((uint64_t)config->monitor_range_uv * 1000ULL) / config->shunt_microohm);
+}
+
+static bool svc_telemetry_config_is_valid(
+    const svc_telemetry_config_t *telemetry,
+    const svc_power_budget_config_t *power_budget)
+{
+    if (telemetry == NULL || power_budget == NULL) {
+        return false;
+    }
+
+    const svc_total_current_telemetry_config_t *total_current = &telemetry->total_current;
+    if (total_current->shunt_microohm == 0U ||
+        total_current->monitor_range_uv == 0U ||
+        total_current->gain_ppm == 0U ||
+        total_current->stale_timeout_ms == 0U ||
+        total_current->plausible_max_ma == 0U) {
+        return false;
+    }
+    if (total_current->plausible_max_ma < power_budget->total_current_limit_ma) {
+        return false;
+    }
+    if (total_current->plausible_max_ma > total_current_full_scale_ma(total_current)) {
+        return false;
+    }
+    return true;
+}
+
 bool svc_output_role_is_valid(output_role_t role)
 {
     return role >= OUT_ROLE_NONE && role < OUT_ROLE_COUNT;
@@ -32,6 +62,9 @@ svc_config_validation_result_t svc_config_validate_device(const svc_device_confi
     }
     if (!svc_power_budget_validate_config(config)) {
         return make_result(SVC_CONFIG_INVALID_POWER_BUDGET, SVC_CONFIG_OUTPUT_INDEX_NONE);
+    }
+    if (!svc_telemetry_config_is_valid(&config->telemetry, &config->power_budget)) {
+        return make_result(SVC_CONFIG_INVALID_TELEMETRY, SVC_CONFIG_OUTPUT_INDEX_NONE);
     }
 
     for (size_t output_index = 0U; output_index < SVC_OUTPUT_COUNT; ++output_index) {

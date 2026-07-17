@@ -54,7 +54,7 @@ and fuse/short-pulse validation.
 | Shunt input filter | 10 Ω series in each `IN+`/`IN-` sense leg plus 1 nF C0G differential capacitor candidate | Provides an EMI/transient filter point without large DC error | INA228 error and surge review |
 | VBUS sense | 1 kΩ series from `VBAT_PROT` to `VBUS` plus 1 nF 100 V local filter capacitor candidate | Keeps bus-voltage telemetry on the protected rail | Load-dump and leakage review |
 | Analog fallback | `IIN_SENSE` remains LB-visible for fast firmware budget checks or monitor-derived fallback | Keeps board-budget enforcement independent of summed per-output IMON | Final ADC or I2C ownership |
-| Calibration | Nominal shunt value, measured shunt value, offset, gain, and monitor range in configuration data | Keeps calibration out of firmware constants | Bench calibration flow |
+| Calibration | `telemetry.total_current` carries nominal shunt value, zero offset, gain, monitor range, stale timeout, and plausible-current limit | Keeps calibration out of firmware constants | Bench calibration flow and per-output IMON calibration |
 
 ## Calibration boundary
 
@@ -67,6 +67,16 @@ record must include at least:
 - monitor range setting;
 - conversion timing/averaging used for safety decisions;
 - stale-data timeout and implausible-data limits.
+
+The first firmware-facing configuration contract is `telemetry.total_current`
+in `firmware/configs/config-example.json` and `svc_telemetry_config_t` in
+`firmware/core/svc_config.h`. The current defaults mirror this schematic-review
+candidate: 500 µΩ shunt resistance, 40960 µV monitor range, 0 mA offset,
+1000000 ppm gain, 1000 ms stale timeout, and 60000 mA plausible maximum.
+`tools/validate_config.py` and `firmware/services/config_validator.c` verify
+that the plausible-current limit covers the 40 A board budget without exceeding
+the monitor full-scale. Per-output IMON calibration remains a schematic-freeze
+item.
 
 ## Freeze blockers
 

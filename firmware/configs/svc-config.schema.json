@@ -8,6 +8,7 @@
     "battery",
     "thermal",
     "power_budget",
+    "telemetry",
     "outputs"
   ],
   "additionalProperties": false,
@@ -122,6 +123,18 @@
           "items": {
             "$ref": "#/$defs/loadPriority"
           }
+        }
+      }
+    },
+    "telemetry": {
+      "type": "object",
+      "required": [
+        "total_current"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "total_current": {
+          "$ref": "#/$defs/totalCurrentTelemetry"
         }
       }
     },
@@ -266,6 +279,43 @@
         },
         "recovery_c": {
           "type": "integer"
+        }
+      }
+    },
+    "totalCurrentTelemetry": {
+      "type": "object",
+      "required": [
+        "shunt_microohm",
+        "monitor_range_uv",
+        "zero_offset_ma",
+        "gain_ppm",
+        "stale_timeout_ms",
+        "plausible_max_ma"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "shunt_microohm": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "monitor_range_uv": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "zero_offset_ma": {
+          "type": "integer"
+        },
+        "gain_ppm": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "stale_timeout_ms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "plausible_max_ma": {
+          "type": "integer",
+          "minimum": 1
         }
       }
     },

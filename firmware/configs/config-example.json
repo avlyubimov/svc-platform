@@ -39,6 +39,16 @@
       "A"
     ]
   },
+  "telemetry": {
+    "total_current": {
+      "shunt_microohm": 500,
+      "monitor_range_uv": 40960,
+      "zero_offset_ma": 0,
+      "gain_ppm": 1000000,
+      "stale_timeout_ms": 1000,
+      "plausible_max_ma": 60000
+    }
+  },
   "outputs": [
     {
       "id": "OUT1",

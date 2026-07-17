@@ -20,6 +20,16 @@ const svc_device_config_t svc_default_config = {
             SVC_PRIORITY_A
         }
     },
+    .telemetry = {
+        .total_current = {
+            .shunt_microohm = SVC_DEFAULT_TOTAL_CURRENT_SHUNT_UOHM,
+            .monitor_range_uv = SVC_DEFAULT_TOTAL_CURRENT_MONITOR_RANGE_UV,
+            .zero_offset_ma = SVC_DEFAULT_TOTAL_CURRENT_ZERO_OFFSET_MA,
+            .gain_ppm = SVC_DEFAULT_TOTAL_CURRENT_GAIN_PPM,
+            .stale_timeout_ms = SVC_DEFAULT_TELEMETRY_STALE_TIMEOUT_MS,
+            .plausible_max_ma = SVC_DEFAULT_TOTAL_CURRENT_PLAUSIBLE_MAX_MA
+        }
+    },
     .outputs = {
         {SVC_OUTPUT_OUT1, OUT_ROLE_USB, 15U, 12000U, true, SVC_PRIORITY_B},
         {SVC_OUTPUT_OUT2, OUT_ROLE_CIGARETTE_SOCKET, 20U, 18000U, false, SVC_PRIORITY_C},

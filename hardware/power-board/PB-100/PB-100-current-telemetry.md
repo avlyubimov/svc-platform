@@ -34,6 +34,13 @@ The current candidate keeps `INA228-Q1` on the ±40.96 mV shunt range, uses
 pull-ups owned by LB-100 unless reviewed otherwise, and reserves optional
 PB-side DNP pull-ups/filter parts for schematic review.
 
+The matching firmware configuration contract is now represented by
+`telemetry.total_current` in `firmware/configs/config-example.json` and by
+`svc_telemetry_config_t` in `firmware/core/svc_config.h`. The configuration
+holds the 500 µΩ shunt value, 40960 µV monitor range, zero offset, gain,
+stale timeout, and plausible-current limit so these values are not embedded in
+telemetry driver code.
+
 ## Measurement map
 
 Detailed map CSV:

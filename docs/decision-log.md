@@ -1866,3 +1866,19 @@ Decision: LB-100 schematic review now has
 Reason: PB-100 cannot freeze the LM5164-Q1-class logic buck until LB-100 proves
 its load budget. If LB-100 exceeds the 500 mA allocation, PB-100 must retain the
 LM5013-Q1-class higher-current fallback before schematic freeze.
+
+## 2026-07-17 — PB-100 total-current calibration config contract
+
+Decision: PB-100 total-current telemetry planning now has a firmware
+configuration contract for the schematic-review candidate. `telemetry.total_current`
+in `firmware/configs/config-example.json` and `svc_telemetry_config_t` in
+`firmware/core/svc_config.h` carry the 500 µΩ shunt value, 40960 µV monitor
+range, zero offset, 1000000 ppm gain, 1000 ms stale timeout, and 60000 mA
+plausible maximum. The C validator, JSON validator, and config-store checksum
+now cover those fields.
+
+Reason: PBREL-009 required evidence that current telemetry calibration is not
+buried in firmware constants. This closes the total-current configuration
+contract while keeping bench calibration, per-output IMON calibration, shunt
+Kelvin footprint, copper heating, and ADC/I2C ownership open before schematic
+freeze.

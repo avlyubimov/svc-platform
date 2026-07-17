@@ -109,6 +109,10 @@ Current coverage:
   points, INA228-class ±40.96 mV range, candidate `0x40` address straps,
   LB-owned pull-up boundary, input/VBUS filters, and calibration boundary in
   `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`.
+- Total-current telemetry calibration now has a firmware configuration contract
+  in `firmware/configs/config-example.json`, `firmware/configs/svc-config.schema.json`,
+  and `firmware/core/svc_config.h`; per-output IMON calibration and bench
+  calibration evidence remain schematic-freeze blockers.
 - Thermal telemetry now has a trace tying `TEMP_PCB`, `TEMP_PWR_A`, and
   `TEMP_PWR_B` to the TDK NTC candidate, default 85/105/75 °C thresholds,
   configuration-owned calibration, and firmware thermal fail-safe behavior.
