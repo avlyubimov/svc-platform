@@ -167,6 +167,10 @@ Current coverage:
   path, shunt Kelvin path, protected copper distribution, firmware config,
   telemetry enforcement, and the no-layout boundary into
   `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`.
+- The board-current design calculation now computes the 0.5 mΩ shunt operating
+  points, Q1 candidate dissipation, and copper loss boundary for the 50 A fuse,
+  40 A continuous budget, and 0-60 A telemetry range in
+  `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`.
 - Close PB-100 CAN1 TX-disable schematic evidence using the `JP_CAN1`
   DNP/open link plus `U_CAN1` default-disabled/readback contract.
 - CAN1 TX-disable now has a trace tying `JP_CAN1`, `U_CAN1`,

@@ -1926,3 +1926,18 @@ needs a concrete bench and production-inspection checklist proving that
 `CAN1_TX_ROUTE` remains DNP/open, `CAN1_TX_DISABLED_STATUS` is physical
 readback rather than firmware-only state, and no vehicle-CAN transmit frame is
 observed in Rev.1 default assembly.
+
+## 2026-07-17 — PB-100 board-current path design calculation
+
+Decision: PB-100 board-current review now has
+`hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`.
+The calculation records the 50 A main-fuse review point, 40 A continuous board
+budget, 0-60 A total-current telemetry range, 0.5 mΩ four-terminal shunt
+dissipation, Q1 reverse-protection candidate dissipation, and pre-layout copper
+loss boundary.
+
+Reason: PBREL-002 needs numeric evidence before layout, but it must not create
+layout geometry. The calculation keeps the accepted current-budget architecture
+explicit while preserving the no-`PB-100.kicad_pcb` boundary until connector
+derating, shunt package heating, Q1 thermal path, protected distribution, and
+bench telemetry calibration close.

@@ -34,6 +34,7 @@ hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv,Input prote
 hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv,Telemetry,INA228 pin template,Required,validate_input_and_power_pin_templates,Conditional
 hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv,Telemetry,Board current budget trace,Required,validate_board_current_budget_trace,Conditional
 hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv,Telemetry,40 A board-current freeze review,Required,validate_board_current_budget_freeze_review,Conditional
+hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md,Telemetry,40 A board-current path design calculation,Required,validate_board_current_budget_design_calculation,Conditional
 hardware/power-board/PB-100/PB-100-input-power-design-values.csv,Input protection,Input power design values,Required,validate_input_power_design_values,Conditional
 hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv,Input protection,Q1 reverse-protection package and thermal trace,Required,validate_input_reverse_package_trace,Conditional
 hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv,Input protection,Q1 reverse-protection freeze review,Required,validate_input_reverse_freeze_review,Conditional

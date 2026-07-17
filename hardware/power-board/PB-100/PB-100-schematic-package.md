@@ -36,6 +36,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`
@@ -148,6 +149,10 @@ It is not a PCB layout package.
 
 - Battery input protection: main input connector, reverse protection, TVS/load
   dump clamp, input current measurement, battery voltage measurement.
+- Board-current budget calculation: 50 A main fuse, 40 A continuous budget,
+  0-60 A telemetry range, 0.5 mΩ shunt dissipation, Q1 candidate dissipation,
+  and no-layout copper boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`.
 - Logic power: protected 5 V/3.3 V rails for LB-100 interface and telemetry.
 - Output channels: fuse, high-side switch/controller, current sense, fault
   signal, flyback/inductive-load handling where required.
