@@ -2015,6 +2015,19 @@ conditional on overshoot and sourcing evidence, retains 80 V and dual-device
 alternates, and blocks Q1 placement, copper geometry, and `PB-100.kicad_pcb`
 until schematic freeze closes.
 
+## 2026-07-17 — PB-100 input reverse Q1 derivation precheck
+
+Decision: PB-100 input reverse-protection review now has
+`hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`.
+The precheck ties TI LM74700-Q1 VCAP/gate-driver behavior, ideal-diode
+thresholds, MOSFET RDS(on) operating window, TVS stress, protected measurement
+sequence, assembly alternates, and the no-layout boundary to PBREL-006.
+
+Reason: PBREL-006 cannot close from Q1 package rows alone. The release packet
+needs a formula-backed bridge between the LM74700 controller datasheet,
+`INPUT_FET_GATE` behavior, 40 A Q1 MOSFET candidates, TVS/load-dump dependency,
+and the still-open final gate network, footprint, and copper decisions.
+
 ## 2026-07-17 — PB-100 TVS overshoot escape checklist
 
 Decision: PB-100 TVS/load-dump review now has

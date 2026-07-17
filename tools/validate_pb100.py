@@ -292,6 +292,14 @@ INPUT_REVERSE_Q1_FREEZE_CHECKLIST_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+INPUT_REVERSE_Q1_DERIVATION_PRECHECK_COLUMNS = (
+    "Derivation ID",
+    "Scope",
+    "Formula or source basis",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
 BOARD_CURRENT_BUDGET_TRACE_COLUMNS = (
     "Check",
     "Target",
@@ -594,6 +602,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-input-reverse-package-trace.csv",
         "PB-100-input-reverse-freeze-review.csv",
         "PB-100-input-reverse-q1-freeze-checklist.csv",
+        "PB-100-input-reverse-q1-derivation-precheck.csv",
         "PB-100-board-current-budget-trace.csv",
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-board-current-budget-design-calculation.md",
@@ -778,6 +787,18 @@ REQUIRED_INPUT_REVERSE_Q1_FREEZE_CHECKS = {
     "Q1-FRZ-007",
     "Q1-FRZ-008",
     "Q1-FRZ-009",
+}
+REQUIRED_INPUT_REVERSE_Q1_DERIVATION_CHECKS = {
+    "Q1-DER-001",
+    "Q1-DER-002",
+    "Q1-DER-003",
+    "Q1-DER-004",
+    "Q1-DER-005",
+    "Q1-DER-006",
+    "Q1-DER-007",
+    "Q1-DER-008",
+    "Q1-DER-009",
+    "Q1-DER-010",
 }
 REQUIRED_TVS_LOAD_DUMP_FREEZE_REVIEW_ITEMS = {
     "Active HM3 branch",
@@ -1080,6 +1101,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv",
+    "hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv",
     "hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv",
     "hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv",
     "hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv",
@@ -2148,7 +2170,11 @@ def validate_schematic_readiness_dashboard() -> None:
         fail("CAN1 safety dashboard row must keep DNP/open and future ADR explicit")
 
     required_dashboard_evidence = {
-        "Symbol readiness": ("PB-100-input-reverse-package-trace.csv", "PB-100-input-reverse-q1-freeze-checklist.csv"),
+        "Symbol readiness": (
+            "PB-100-input-reverse-package-trace.csv",
+            "PB-100-input-reverse-q1-freeze-checklist.csv",
+            "PB-100-input-reverse-q1-derivation-precheck.csv",
+        ),
         "Output pin contract": ("PB-100-high-medium-output-baseline-trace.csv", "PB-100-low-current-output-baseline-trace.csv"),
         "Output stage design values": (
             "PB-100-high-medium-output-baseline-trace.csv",
@@ -2162,6 +2188,7 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-board-current-budget-design-calculation.md",
             "PB-100-board-current-budget-value-freeze-checklist.csv",
             "PB-100-input-reverse-package-trace.csv",
+            "PB-100-input-reverse-q1-derivation-precheck.csv",
             "PB-100-tvs-load-dump-margin-trace.csv",
             "PB-100-tvs-load-dump-freeze-review.csv",
             "PB-100-tvs-overshoot-escape-checklist.csv",
@@ -2171,7 +2198,11 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-logic-power-freeze-review.csv",
             "PB-100-logic-power-value-freeze-checklist.csv",
         ),
-        "Input protection contract": ("PB-100-input-reverse-package-trace.csv", "PB-100-input-reverse-q1-freeze-checklist.csv"),
+        "Input protection contract": (
+            "PB-100-input-reverse-package-trace.csv",
+            "PB-100-input-reverse-q1-freeze-checklist.csv",
+            "PB-100-input-reverse-q1-derivation-precheck.csv",
+        ),
         "Hardware capability manifest": (
             "PB-100-current-telemetry-trace.csv",
             "PB-100-thermal-telemetry-trace.csv",
@@ -2337,6 +2368,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-input-reverse-package-trace.csv",
             "PB-100-input-reverse-freeze-review.csv",
             "PB-100-input-reverse-q1-freeze-checklist.csv",
+            "PB-100-input-reverse-q1-derivation-precheck.csv",
             "PB-100-input-reverse-protection.md",
         ),
         "TVS/load-dump protection": (
@@ -2401,6 +2433,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-input-reverse-package-trace.csv",
         "PB-100-input-reverse-freeze-review.csv",
         "PB-100-input-reverse-q1-freeze-checklist.csv",
+        "PB-100-input-reverse-q1-derivation-precheck.csv",
         "Q1",
         "40 A",
         "IAUTN06S5N008",
@@ -4141,6 +4174,79 @@ def validate_input_reverse_q1_freeze_checklist() -> None:
     ):
         if token not in checklist_text:
             fail(f"input reverse Q1 freeze checklist must include {token}")
+
+
+def validate_input_reverse_q1_derivation_precheck() -> None:
+    path = PB100_DIR / "PB-100-input-reverse-q1-derivation-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty input reverse Q1 derivation precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in INPUT_REVERSE_Q1_DERIVATION_PRECHECK_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        derivation_id = row["Derivation ID"].strip()
+        if derivation_id not in REQUIRED_INPUT_REVERSE_Q1_DERIVATION_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown Q1 derivation item {derivation_id}")
+        if derivation_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Q1 derivation item {derivation_id}")
+        rows_by_id[derivation_id] = row
+        for column in INPUT_REVERSE_Q1_DERIVATION_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        row_text = " ".join(row.values()).lower()
+        if derivation_id == "Q1-DER-002" and ("equation 1" not in row_text or "0.1uf" not in row_text):
+            fail("Q1 derivation precheck must include VCAP Equation 1 and 0.1uF minimum")
+        if derivation_id == "Q1-DER-003" and ("gate" not in row_text or "anode" not in row_text or "disabled" not in row_text):
+            fail("Q1 derivation precheck must keep gate default-off conditions explicit")
+        if derivation_id == "Q1-DER-005" and ("0.5mω" not in row_text or "1.25mω" not in row_text):
+            fail("Q1 derivation precheck must include 40 A RDS(on) operating window")
+        if derivation_id == "Q1-DER-010" and ("pb-100.kicad_pcb" not in row_text or "manufacturing" not in row_text):
+            fail("Q1 derivation precheck must block layout and manufacturing outputs")
+
+    missing_items = sorted(REQUIRED_INPUT_REVERSE_Q1_DERIVATION_CHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing Q1 derivation items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "TI LM74700-Q1",
+        "LM74502-Q1",
+        "INPUT_FET_GATE",
+        "LM74700_VCAP",
+        "Equation 1",
+        "6.6V",
+        "0.1uF",
+        "10 times MOSFET CISS",
+        "20mV",
+        "50mV",
+        "-11mV",
+        "0.5mΩ",
+        "1.25mΩ",
+        "IAUTN06S5N008ATMA1",
+        "BUK7S1R2-80M",
+        "dual SIDR626LDP",
+        "SM8S33AHM3/I",
+        "VBAT_REV_PROT",
+        "IIN_SHUNT_HI",
+        "IIN_SHUNT_LO",
+        "VBAT_PROT",
+        "JLCPCB PCBWay",
+        "PB-100.kicad_pcb",
+    ):
+        if token not in precheck_text:
+            fail(f"input reverse Q1 derivation precheck must include {token}")
 
 
 def validate_logic_power_design_values() -> None:
@@ -7390,6 +7496,8 @@ def validate_validation_traceability() -> None:
                 fail("Input reverse validation trace must include freeze review")
             if "pb-100-input-reverse-q1-freeze-checklist.csv" not in row_text:
                 fail("Input reverse validation trace must include Q1 freeze checklist")
+            if "pb-100-input-reverse-q1-derivation-precheck.csv" not in row_text:
+                fail("Input reverse validation trace must include Q1 derivation precheck")
         if freeze_gate == "Input reverse protection":
             if "q1" not in row_text or "40 a" not in row_text:
                 fail("Input reverse validation trace must keep Q1 and 40 A explicit")
@@ -7902,6 +8010,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-input-reverse-package-trace.csv",
         "PB-100-input-reverse-freeze-review.csv",
         "PB-100-input-reverse-q1-freeze-checklist.csv",
+        "PB-100-input-reverse-q1-derivation-precheck.csv",
         "PB-100-tvs-load-dump-margin-trace.csv",
         "PB-100-tvs-load-dump-freeze-review.csv",
         "PB-100-tvs-overshoot-escape-checklist.csv",
@@ -8001,6 +8110,7 @@ def main() -> int:
     validate_input_reverse_package_trace()
     validate_input_reverse_freeze_review()
     validate_input_reverse_q1_freeze_checklist()
+    validate_input_reverse_q1_derivation_precheck()
     validate_board_current_budget_trace()
     validate_board_current_budget_freeze_review()
     validate_board_current_budget_design_calculation()
