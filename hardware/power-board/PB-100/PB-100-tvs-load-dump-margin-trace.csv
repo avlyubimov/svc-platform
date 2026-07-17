@@ -1,7 +1,7 @@
 Protected item,Voltage class,Active TVS branch,Clamp or stress point,Margin state,Schematic freeze action
 TPS48110 high-side controller,100 V absolute family,Vishay SM8S33AHM3/I HM3 DO-218AC,53.3 V clamp at 124 A,Pass with margin,Confirm pulse waveform local parasitics and OV divider values before schematic freeze
-SIDR626LDP output MOSFET,60 V VDS,Vishay SM8S33AHM3/I HM3 DO-218AC,53.3 V clamp at 124 A,Conditional limited margin,Validate overshoot or move affected output class to 80 V MOSFET or lower clamp before schematic freeze
-IAUTN06S5N008 input reverse MOSFET,60 V VDS,Vishay SM8S33AHM3/I HM3 DO-218AC,53.3 V clamp at 124 A,Conditional limited margin,Validate overshoot or use BUK7S1R2-80M 80 V alternate before schematic freeze
+SIDR626LDP output MOSFET,60 V VDS,Vishay SM8S33AHM3/I HM3 DO-218AC,53.3 V clamp at 124 A,Conditional limited margin,Validate overshoot or move affected output class to 80 V MOSFET before schematic freeze; PB-100-mosfet-voltage-margin-review.md now prefers the 80 V review escape path if SOA and assembly pass
+IAUTN06S5N008 input reverse MOSFET,60 V VDS,Vishay SM8S33AHM3/I HM3 DO-218AC,53.3 V clamp at 124 A,Conditional limited margin,Validate overshoot or use BUK7S1R2-80M 80 V alternate before schematic freeze; PB-100-mosfet-voltage-margin-review.md keeps the 60 V TOLL path conditional until overshoot evidence closes
 BUK7S1R2-80M input reverse MOSFET,80 V VDS,Vishay SM8S33AHM3/I HM3 DO-218AC,53.3 V clamp at 124 A,Pass with margin,Confirm package assembly and thermal path before schematic freeze
 LM5164QDDATQ1 buck,100 V input,Vishay SM8S33AHM3/I HM3 DO-218AC,53.3 V clamp at 124 A,Pass with margin,Confirm final buck input network EMI damping and capacitor voltage before schematic freeze
 LM5013-Q1 buck alternate,100 V input,Vishay SM8S33AHM3/I HM3 DO-218AC,53.3 V clamp at 124 A,Pass with margin,Keep as higher-current 100 V fallback if 5 V budget exceeds LM5164 before schematic freeze

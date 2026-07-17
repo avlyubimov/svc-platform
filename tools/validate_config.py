@@ -210,6 +210,10 @@ def validate_schema(schema: dict[str, Any], allowed_roles: set[str]) -> None:
     if schema_priorities != ["A", "B", "C"]:
         fail("schema loadPriority enum must be A, B, C")
 
+    thermal_zone_ids = require_schema_enum(schema, "thermalZoneId")
+    if thermal_zone_ids != ["PCB", "POWER_ZONE_A", "POWER_ZONE_B"]:
+        fail("schema thermalZoneId enum must be PCB, POWER_ZONE_A, POWER_ZONE_B")
+
     outputs_schema = schema.get("properties", {}).get("outputs", {})
     if outputs_schema.get("minItems") != 10 or outputs_schema.get("maxItems") != 10:
         fail("schema outputs array must require exactly 10 items")
@@ -224,6 +228,70 @@ def validate_schema(schema: dict[str, Any], allowed_roles: set[str]) -> None:
         fail("schema rule.then must require at least one action")
     if then_schema.get("items", {}).get("pattern") != RULE_ACTION_PATTERN:
         fail("schema rule.then item pattern must match supported firmware rule actions")
+
+    required = schema.get("required", [])
+    if "telemetry" not in required:
+        fail("schema must require top-level telemetry calibration")
+
+    telemetry_schema = schema.get("properties", {}).get("telemetry", {})
+    if telemetry_schema.get("additionalProperties") is not False:
+        fail("schema telemetry object must reject additional properties")
+    if telemetry_schema.get("required") != ["total_current", "output_current", "thermal"]:
+        fail("schema telemetry required fields are out of sync")
+    total_current_ref = telemetry_schema.get("properties", {}).get("total_current", {}).get("$ref")
+    if total_current_ref != "#/$defs/totalCurrentTelemetry":
+        fail("schema telemetry.total_current must reference $defs.totalCurrentTelemetry")
+    output_current_schema = telemetry_schema.get("properties", {}).get("output_current", {})
+    if output_current_schema.get("minItems") != 10 or output_current_schema.get("maxItems") != 10:
+        fail("schema telemetry.output_current array must require exactly 10 items")
+    output_current_ref = output_current_schema.get("items", {}).get("$ref")
+    if output_current_ref != "#/$defs/outputCurrentTelemetry":
+        fail("schema telemetry.output_current must reference $defs.outputCurrentTelemetry")
+    thermal_telemetry_schema = telemetry_schema.get("properties", {}).get("thermal", {})
+    if thermal_telemetry_schema.get("minItems") != 3 or thermal_telemetry_schema.get("maxItems") != 3:
+        fail("schema telemetry.thermal array must require exactly 3 items")
+    thermal_telemetry_ref = thermal_telemetry_schema.get("items", {}).get("$ref")
+    if thermal_telemetry_ref != "#/$defs/thermalTelemetry":
+        fail("schema telemetry.thermal must reference $defs.thermalTelemetry")
+
+    total_current_schema = schema.get("$defs", {}).get("totalCurrentTelemetry", {})
+    expected_required = [
+        "shunt_microohm",
+        "monitor_range_uv",
+        "zero_offset_ma",
+        "gain_ppm",
+        "stale_timeout_ms",
+        "plausible_max_ma",
+    ]
+    if total_current_schema.get("required") != expected_required:
+        fail("schema totalCurrentTelemetry required fields are out of sync")
+
+    output_current_schema = schema.get("$defs", {}).get("outputCurrentTelemetry", {})
+    expected_output_required = [
+        "id",
+        "range_ma",
+        "zero_offset_ma",
+        "gain_ppm",
+        "stale_timeout_ms",
+        "plausible_max_ma",
+    ]
+    if output_current_schema.get("required") != expected_output_required:
+        fail("schema outputCurrentTelemetry required fields are out of sync")
+
+    thermal_telemetry_schema = schema.get("$defs", {}).get("thermalTelemetry", {})
+    expected_thermal_required = [
+        "id",
+        "ntc_nominal_ohm",
+        "ntc_beta_k",
+        "pullup_ohm",
+        "adc_series_ohm",
+        "filter_nf",
+        "stale_timeout_ms",
+        "plausible_min_c",
+        "plausible_max_c",
+    ]
+    if thermal_telemetry_schema.get("required") != expected_thermal_required:
+        fail("schema thermalTelemetry required fields are out of sync")
 
 
 def validate_battery(config: dict[str, Any], defines: dict[str, int]) -> None:
@@ -294,6 +362,212 @@ def validate_power_budget(config: dict[str, Any], defines: dict[str, int]) -> No
         fail("power_budget.shed_priority_order does not match C default")
     if sorted(shed_order) != ["A", "B", "C"]:
         fail("power_budget.shed_priority_order must contain A, B, and C once")
+
+
+def validate_telemetry(config: dict[str, Any], defines: dict[str, int]) -> None:
+    telemetry = require_dict(config, "telemetry")
+    total_current = require_dict(telemetry, "total_current")
+    actual = {
+        "telemetry.total_current.shunt_microohm": decimal_to_int(
+            total_current.get("shunt_microohm"),
+            "telemetry.total_current.shunt_microohm",
+        ),
+        "telemetry.total_current.monitor_range_uv": decimal_to_int(
+            total_current.get("monitor_range_uv"),
+            "telemetry.total_current.monitor_range_uv",
+        ),
+        "telemetry.total_current.zero_offset_ma": decimal_to_int(
+            total_current.get("zero_offset_ma"),
+            "telemetry.total_current.zero_offset_ma",
+        ),
+        "telemetry.total_current.gain_ppm": decimal_to_int(
+            total_current.get("gain_ppm"),
+            "telemetry.total_current.gain_ppm",
+        ),
+        "telemetry.total_current.stale_timeout_ms": decimal_to_int(
+            total_current.get("stale_timeout_ms"),
+            "telemetry.total_current.stale_timeout_ms",
+        ),
+        "telemetry.total_current.plausible_max_ma": decimal_to_int(
+            total_current.get("plausible_max_ma"),
+            "telemetry.total_current.plausible_max_ma",
+        ),
+    }
+    expected = {
+        "telemetry.total_current.shunt_microohm": defines["SVC_DEFAULT_TOTAL_CURRENT_SHUNT_UOHM"],
+        "telemetry.total_current.monitor_range_uv": defines["SVC_DEFAULT_TOTAL_CURRENT_MONITOR_RANGE_UV"],
+        "telemetry.total_current.zero_offset_ma": defines["SVC_DEFAULT_TOTAL_CURRENT_ZERO_OFFSET_MA"],
+        "telemetry.total_current.gain_ppm": defines["SVC_DEFAULT_TOTAL_CURRENT_GAIN_PPM"],
+        "telemetry.total_current.stale_timeout_ms": defines["SVC_DEFAULT_TELEMETRY_STALE_TIMEOUT_MS"],
+        "telemetry.total_current.plausible_max_ma": defines["SVC_DEFAULT_TOTAL_CURRENT_PLAUSIBLE_MAX_MA"],
+    }
+    if actual != expected:
+        fail(f"telemetry.total_current does not match C defaults: {actual} != {expected}")
+
+    if actual["telemetry.total_current.shunt_microohm"] <= 0:
+        fail("telemetry.total_current.shunt_microohm must be positive")
+    if actual["telemetry.total_current.monitor_range_uv"] <= 0:
+        fail("telemetry.total_current.monitor_range_uv must be positive")
+    if actual["telemetry.total_current.gain_ppm"] <= 0:
+        fail("telemetry.total_current.gain_ppm must be positive")
+    if actual["telemetry.total_current.stale_timeout_ms"] <= 0:
+        fail("telemetry.total_current.stale_timeout_ms must be positive")
+    if actual["telemetry.total_current.plausible_max_ma"] <= 0:
+        fail("telemetry.total_current.plausible_max_ma must be positive")
+
+    total_current_limit_ma = decimal_amps_to_ma(
+        require_dict(config, "power_budget").get("total_current_limit_a"),
+        "power_budget.total_current_limit_a",
+    )
+    monitor_full_scale_ma = (
+        actual["telemetry.total_current.monitor_range_uv"] * 1000
+    ) // actual["telemetry.total_current.shunt_microohm"]
+    if actual["telemetry.total_current.plausible_max_ma"] < total_current_limit_ma:
+        fail("telemetry.total_current.plausible_max_ma must cover the configured current limit")
+    if actual["telemetry.total_current.plausible_max_ma"] > monitor_full_scale_ma:
+        fail("telemetry.total_current.plausible_max_ma exceeds monitor electrical full-scale")
+
+    output_current = require_list(telemetry, "output_current")
+    if len(output_current) != 10:
+        fail(f"expected 10 telemetry.output_current entries, found {len(output_current)}")
+    config_outputs = require_list(config, "outputs")
+    for index, output_calibration in enumerate(output_current):
+        if not isinstance(output_calibration, dict):
+            fail(f"telemetry.output_current[{index}] must be an object")
+        expected_id = f"OUT{index + 1}"
+        if output_calibration.get("id") != expected_id:
+            fail(f"telemetry.output_current[{index}].id must be {expected_id}")
+
+        range_ma = decimal_to_int(
+            output_calibration.get("range_ma"),
+            f"telemetry.output_current[{index}].range_ma",
+        )
+        zero_offset_ma = decimal_to_int(
+            output_calibration.get("zero_offset_ma"),
+            f"telemetry.output_current[{index}].zero_offset_ma",
+        )
+        gain_ppm = decimal_to_int(
+            output_calibration.get("gain_ppm"),
+            f"telemetry.output_current[{index}].gain_ppm",
+        )
+        stale_timeout_ms = decimal_to_int(
+            output_calibration.get("stale_timeout_ms"),
+            f"telemetry.output_current[{index}].stale_timeout_ms",
+        )
+        plausible_max_ma = decimal_to_int(
+            output_calibration.get("plausible_max_ma"),
+            f"telemetry.output_current[{index}].plausible_max_ma",
+        )
+        expected_range_ma = defines[f"SVC_DEFAULT_OUT{index + 1}_CURRENT_RANGE_MA"]
+        expected_output = {
+            "range_ma": expected_range_ma,
+            "zero_offset_ma": defines["SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA"],
+            "gain_ppm": defines["SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM"],
+            "stale_timeout_ms": defines["SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS"],
+            "plausible_max_ma": expected_range_ma,
+        }
+        actual_output = {
+            "range_ma": range_ma,
+            "zero_offset_ma": zero_offset_ma,
+            "gain_ppm": gain_ppm,
+            "stale_timeout_ms": stale_timeout_ms,
+            "plausible_max_ma": plausible_max_ma,
+        }
+        if actual_output != expected_output:
+            fail(
+                f"telemetry.output_current[{index}] does not match C defaults: "
+                f"{actual_output} != {expected_output}"
+            )
+        if range_ma <= 0 or gain_ppm <= 0 or stale_timeout_ms <= 0 or plausible_max_ma <= 0:
+            fail(f"telemetry.output_current[{index}] range/gain/stale/plausible values must be positive")
+        if plausible_max_ma > range_ma:
+            fail(f"telemetry.output_current[{index}].plausible_max_ma exceeds range_ma")
+        output_limit_ma = decimal_amps_to_ma(
+            config_outputs[index].get("current_limit_a"),
+            f"outputs[{index}].current_limit_a",
+        )
+        if plausible_max_ma < output_limit_ma:
+            fail(f"telemetry.output_current[{index}].plausible_max_ma must cover configured current limit")
+
+    thermal_calibration = require_list(telemetry, "thermal")
+    if len(thermal_calibration) != 3:
+        fail(f"expected 3 telemetry.thermal entries, found {len(thermal_calibration)}")
+    thermal_thresholds = require_dict(config, "thermal")
+    thermal_zone_keys = ("pcb", "power_zone_a", "power_zone_b")
+    thermal_zone_ids = ("PCB", "POWER_ZONE_A", "POWER_ZONE_B")
+    for index, thermal_zone in enumerate(thermal_calibration):
+        if not isinstance(thermal_zone, dict):
+            fail(f"telemetry.thermal[{index}] must be an object")
+        if thermal_zone.get("id") != thermal_zone_ids[index]:
+            fail(f"telemetry.thermal[{index}].id must be {thermal_zone_ids[index]}")
+
+        actual_thermal = {
+            "ntc_nominal_ohm": decimal_to_int(
+                thermal_zone.get("ntc_nominal_ohm"),
+                f"telemetry.thermal[{index}].ntc_nominal_ohm",
+            ),
+            "ntc_beta_k": decimal_to_int(
+                thermal_zone.get("ntc_beta_k"),
+                f"telemetry.thermal[{index}].ntc_beta_k",
+            ),
+            "pullup_ohm": decimal_to_int(
+                thermal_zone.get("pullup_ohm"),
+                f"telemetry.thermal[{index}].pullup_ohm",
+            ),
+            "adc_series_ohm": decimal_to_int(
+                thermal_zone.get("adc_series_ohm"),
+                f"telemetry.thermal[{index}].adc_series_ohm",
+            ),
+            "filter_nf": decimal_to_int(
+                thermal_zone.get("filter_nf"),
+                f"telemetry.thermal[{index}].filter_nf",
+            ),
+            "stale_timeout_ms": decimal_to_int(
+                thermal_zone.get("stale_timeout_ms"),
+                f"telemetry.thermal[{index}].stale_timeout_ms",
+            ),
+            "plausible_min_c": decimal_to_int(
+                thermal_zone.get("plausible_min_c"),
+                f"telemetry.thermal[{index}].plausible_min_c",
+            ),
+            "plausible_max_c": decimal_to_int(
+                thermal_zone.get("plausible_max_c"),
+                f"telemetry.thermal[{index}].plausible_max_c",
+            ),
+        }
+        expected_thermal = {
+            "ntc_nominal_ohm": defines["SVC_DEFAULT_THERMAL_NTC_NOMINAL_OHM"],
+            "ntc_beta_k": defines["SVC_DEFAULT_THERMAL_NTC_BETA_K"],
+            "pullup_ohm": defines["SVC_DEFAULT_THERMAL_PULLUP_OHM"],
+            "adc_series_ohm": defines["SVC_DEFAULT_THERMAL_ADC_SERIES_OHM"],
+            "filter_nf": defines["SVC_DEFAULT_THERMAL_FILTER_NF"],
+            "stale_timeout_ms": defines["SVC_DEFAULT_THERMAL_STALE_TIMEOUT_MS"],
+            "plausible_min_c": defines["SVC_DEFAULT_THERMAL_PLAUSIBLE_MIN_C"],
+            "plausible_max_c": defines["SVC_DEFAULT_THERMAL_PLAUSIBLE_MAX_C"],
+        }
+        if actual_thermal != expected_thermal:
+            fail(
+                f"telemetry.thermal[{index}] does not match C defaults: "
+                f"{actual_thermal} != {expected_thermal}"
+            )
+        if any(actual_thermal[key] <= 0 for key in (
+            "ntc_nominal_ohm",
+            "ntc_beta_k",
+            "pullup_ohm",
+            "adc_series_ohm",
+            "filter_nf",
+            "stale_timeout_ms",
+        )):
+            fail(f"telemetry.thermal[{index}] NTC/divider/filter/stale values must be positive")
+        if actual_thermal["plausible_min_c"] >= actual_thermal["plausible_max_c"]:
+            fail(f"telemetry.thermal[{index}] plausible range must be increasing")
+        threshold = require_dict(thermal_thresholds, thermal_zone_keys[index])
+        recovery_c = decimal_to_int(threshold.get("recovery_c"), f"thermal.{thermal_zone_keys[index]}.recovery_c")
+        cutoff_c = decimal_to_int(threshold.get("cutoff_c"), f"thermal.{thermal_zone_keys[index]}.cutoff_c")
+        if actual_thermal["plausible_min_c"] > recovery_c:
+            fail(f"telemetry.thermal[{index}].plausible_min_c must cover recovery threshold")
+        if actual_thermal["plausible_max_c"] < cutoff_c:
+            fail(f"telemetry.thermal[{index}].plausible_max_c must cover cutoff threshold")
 
 
 def validate_outputs(config: dict[str, Any], allowed_roles: set[str]) -> None:
@@ -703,6 +977,7 @@ def main() -> int:
     validate_battery(config, defines)
     validate_thermal(config, defines)
     validate_power_budget(config, defines)
+    validate_telemetry(config, defines)
     validate_outputs(config, allowed_roles)
     capabilities = validate_pb100_capabilities(config)
     validate_hardware_capability_service(capabilities)

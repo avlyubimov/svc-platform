@@ -12,4 +12,10 @@ This folder contains production artifacts:
 - Future Gerber, Pick&Place, assembly notes, and JLCPCB/PCBWay settings after
   schematic freeze and layout authorization.
 
+Use `make pb100-release-status` from the repository root before any PB-100 board
+order discussion. It reports the schematic-freeze state, active board-release
+blockers, KiCad PCB presence, and manufacturing output presence. Use
+`make pb100-release-gate` when a failing shell status is required for a release
+job.
+
 Do not treat Excel as source of truth. CSV/Markdown files are the source; Excel is generated for convenience.

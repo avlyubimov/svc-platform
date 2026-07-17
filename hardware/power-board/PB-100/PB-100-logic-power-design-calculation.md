@@ -11,6 +11,9 @@ manufacturing output.
 - Regulator family: `LM5164-Q1`, 6 V to 100 V input, 1 A synchronous buck.
 - Output rail: `PB_5V_OUT`.
 - Output target: 5.0 V, up to 1 A budget before LB-100 load review.
+- LB-100 allocation: 500 mA sustained until
+  `hardware/logic-board/LB-100/LB-100-power-budget-precheck.md` is closed by
+  schematic review.
 - Input rail: `VBAT_PROT` after reverse protection and TVS.
 - Design priority: wide input survival, safe UVLO, low BOM risk, and no layout
   release before schematic freeze.
@@ -54,6 +57,8 @@ manufacturing output.
 ## Freeze blockers
 
 - Confirm actual LB-100 plus PB-side 5 V load budget.
+- Close `hardware/logic-board/LB-100/LB-100-power-budget-precheck.md` or keep
+  the LM5013-Q1-class higher-current fallback active.
 - Verify LM5164QDDATQ1 orderability or choose LM5164QDDARQ1 / LM5013-Q1 path.
 - Select an AEC-Q200 shielded inductor with saturation, RMS, DCR, and package
   evidence.

@@ -5,7 +5,7 @@
 
 #include "svc_config.h"
 
-#define SVC_TELEMETRY_DEFAULT_STALE_MS 1000U
+#define SVC_TELEMETRY_DEFAULT_STALE_MS SVC_DEFAULT_TELEMETRY_STALE_TIMEOUT_MS
 
 typedef struct {
     uint16_t battery_mv;

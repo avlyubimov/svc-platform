@@ -14,6 +14,18 @@ Run from the repository root:
 make check
 ```
 
+For board-order status, run:
+
+```bash
+make pb100-release-status
+```
+
+For a release job that must fail while PB-100 is not printable, run:
+
+```bash
+make pb100-release-gate
+```
+
 Current coverage:
 
 - PB-100 CSV and KiCad scaffold validation.
@@ -27,6 +39,9 @@ Current coverage:
 - Firmware host-test suite.
 - Firmware hardware-capability, config-store, config-update, and runtime-boot
   startup safety validation.
+- PB-100 board-print release-status reporting from the schematic-freeze
+  checklist, board-release blocker register, KiCad PCB presence, and
+  manufacturing output presence.
 
 ## Current readiness
 
@@ -65,6 +80,9 @@ Current coverage:
   100 V pass-with-margin paths, 60 V overshoot dependencies, 40 V smart-switch
   ADR boundary, sourcing gate, and no-layout boundary into
   `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`.
+- MOSFET voltage-margin review now makes the 80 V review escape path explicit
+  for 60 V output and input-reverse MOSFET paths unless overshoot evidence
+  accepts the active TVS clamp margin.
 - OUT5, OUT8, and OUT9 now have a low-current baseline trace enforcing the
   ADR-0011 external-controller plus external 60 V MOSFET architecture and
   blocking any direct 40 V smart-switch rail without a future ADR.
@@ -80,6 +98,11 @@ Current coverage:
   gate-drive defaults, telemetry, fault timing, clamp strategy, sourcing,
   and configuration separation into
   `hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv`.
+- Output-stage value freeze checklist now ties controller baseline, OUT2
+  SOA/fuse energy, medium fuse paths, low-current ADR-0011 boundary,
+  threshold/timer networks, gate default-off behavior, sense/ADC scaling,
+  inductive clamp, MOSFET voltage margin, and no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`.
 - Current telemetry now has a trace tying per-output IMON ranges, total
   `IIN_SENSE`, 0.5 mΩ shunt measurement, 40 A budget enforcement, and
   stale-telemetry safe-off behavior together.
@@ -91,6 +114,10 @@ Current coverage:
   points, INA228-class ±40.96 mV range, candidate `0x40` address straps,
   LB-owned pull-up boundary, input/VBUS filters, and calibration boundary in
   `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`.
+- Total-current and per-output IMON calibration now have a firmware
+  configuration contract in `firmware/configs/config-example.json`,
+  `firmware/configs/svc-config.schema.json`, and `firmware/core/svc_config.h`;
+  ADC scaling and bench calibration evidence remain schematic-freeze blockers.
 - Thermal telemetry now has a trace tying `TEMP_PCB`, `TEMP_PWR_A`, and
   `TEMP_PWR_B` to the TDK NTC candidate, default 85/105/75 °C thresholds,
   configuration-owned calibration, and firmware thermal fail-safe behavior.
@@ -126,6 +153,12 @@ Current coverage:
   LQFP-100 schematic review, covering 10 PWM-capable controls, 16 ADC-class
   measurements, fault/wake inputs, `PB_I2C`, CAN1 safety, and reserved
   expansion without assigning exact STM32 pins.
+- B2B/LB-100 pin binding now has an audit checklist covering the exact
+  STM32H563 LQFP-100 pinout audit, 16 ADC-capable measurement inputs or reviewed
+  mux strategy, output default-low PWM routing, CAN1 DNP/open crossing, FX18
+  footprint drawing, stack height, vibration retention, assembly handling, and
+  no-layout boundary in
+  `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`.
 - Q1 input reverse MOSFET pin evidence is captured from the Infineon
   `IAUTN06S5N008` data sheet; schematic freeze must still close TOLL footprint,
   40 A copper/thermal review, assembly handling, and gate clamp behavior.
@@ -145,6 +178,10 @@ Current coverage:
   path, shunt Kelvin path, protected copper distribution, firmware config,
   telemetry enforcement, and the no-layout boundary into
   `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`.
+- The board-current design calculation now computes the 0.5 mΩ shunt operating
+  points, Q1 candidate dissipation, and copper loss boundary for the 50 A fuse,
+  40 A continuous budget, and 0-60 A telemetry range in
+  `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`.
 - Close PB-100 CAN1 TX-disable schematic evidence using the `JP_CAN1`
   DNP/open link plus `U_CAN1` default-disabled/readback contract.
 - CAN1 TX-disable now has a trace tying `JP_CAN1`, `U_CAN1`,
@@ -155,6 +192,10 @@ Current coverage:
   `SN74LVC1G125-Q1`-class default-disabled gate, 47 kΩ pulls, physical
   `OE`-node status readback, and reset/unpowered bench checks in
   `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`.
+- CAN1 reset and DNP bench evidence now has a checklist covering LB-100 reset,
+  LB-100 unpowered, production DNP/open inspection, physical disabled-status
+  readback, RX listen-only independence, and future-ADR hardware-action checks
+  in `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.
 - Synchronize factory and garage BOM drafts with final selections.
@@ -164,9 +205,16 @@ Current coverage:
   `hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md`, but
   those values remain not final until load budget, sourcing, EMI, and stability
   review close.
+- LB-100 now has a `PB_5V_OUT` load-budget precheck with a 500 mA sustained
+  allocation; exceeding it keeps the PB-100 LM5013-Q1-class fallback active.
 - Thermal telemetry now has candidate NTC divider values in
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`,
   but placement, ADC settling, calibration, and assembly review remain open.
+- Thermal telemetry divider calibration now has a firmware configuration
+  contract in `firmware/configs/config-example.json`,
+  `firmware/configs/svc-config.schema.json`, and `firmware/core/svc_config.h`;
+  ADC settling, placement, self-heating, sourcing, and bench calibration remain
+  schematic-freeze blockers.
 
 ## Required before PCB layout
 

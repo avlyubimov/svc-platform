@@ -1,0 +1,169 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import csv
+import re
+import sys
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+PB100_DIR = REPO_ROOT / "hardware" / "power-board" / "PB-100"
+CHECKLIST = PB100_DIR / "PB-100-schematic-freeze-checklist.md"
+BLOCKERS = PB100_DIR / "PB-100-board-release-blocker-register.csv"
+KICAD_DIR = PB100_DIR / "kicad"
+
+MANUFACTURING_SUFFIXES = {
+    ".drl",
+    ".gbr",
+    ".gbl",
+    ".gbo",
+    ".gbs",
+    ".gko",
+    ".gm1",
+    ".gtl",
+    ".gto",
+    ".gts",
+    ".kicad_pos",
+    ".pos",
+    ".xln",
+}
+MANUFACTURING_NAME_FRAGMENTS = (
+    "gerber",
+    "drill",
+    "pick-place",
+    "pick_and_place",
+    "pickplace",
+    "placement",
+)
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Report whether PB-100 is ready for PCB layout or board printing."
+    )
+    parser.add_argument(
+        "--fail-on-blocked",
+        action="store_true",
+        help="return a non-zero exit code when PB-100 is not board-print ready",
+    )
+    return parser.parse_args()
+
+
+def checklist_status() -> str:
+    text = CHECKLIST.read_text(encoding="utf-8")
+    match = re.search(r"^Status:\s*(.+?)\s*$", text, flags=re.MULTILINE)
+    if not match:
+        return "Unknown"
+    return match.group(1)
+
+
+def checklist_gates() -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
+    for line in CHECKLIST.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if len(cells) != 4:
+            continue
+        if cells[0] in {"Gate", "---"}:
+            continue
+        rows.append(
+            {
+                "Gate": cells[0].strip("`"),
+                "Status": cells[1].strip("`"),
+                "Evidence": cells[2],
+                "Close condition": cells[3],
+            }
+        )
+    return rows
+
+
+def release_blockers() -> list[dict[str, str]]:
+    with BLOCKERS.open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
+def layout_files() -> list[Path]:
+    return sorted(KICAD_DIR.rglob("*.kicad_pcb"))
+
+
+def manufacturing_files() -> list[Path]:
+    files: list[Path] = []
+    for path in PB100_DIR.rglob("*"):
+        if not path.is_file():
+            continue
+        lowered_name = path.name.lower()
+        if path.suffix.lower() in MANUFACTURING_SUFFIXES:
+            files.append(path)
+            continue
+        if path.suffix.lower() == ".zip" and any(
+            fragment in lowered_name for fragment in MANUFACTURING_NAME_FRAGMENTS
+        ):
+            files.append(path)
+    return sorted(files)
+
+
+def relative(path: Path) -> str:
+    return str(path.relative_to(REPO_ROOT))
+
+
+def main() -> int:
+    args = parse_args()
+
+    status = checklist_status()
+    gates = checklist_gates()
+    blockers = release_blockers()
+    active_gates = [row for row in gates if row["Status"] != "Closed"]
+    active_blockers = [row for row in blockers if row["Status"] != "Closed"]
+    pcbs = layout_files()
+    manufacturing = manufacturing_files()
+
+    board_print_ready = (
+        status == "Closed"
+        and not active_gates
+        and not active_blockers
+        and bool(pcbs)
+        and bool(manufacturing)
+    )
+    layout_ready = status == "Closed" and not active_gates and not active_blockers
+
+    print("PB-100 release status")
+    print(f"  Schematic freeze checklist: {status}")
+    print(f"  Layout authorization: {'READY' if layout_ready else 'BLOCKED'}")
+    print(f"  Board-print package: {'READY' if board_print_ready else 'NO-GO'}")
+    print(f"  Active freeze gates: {len(active_gates)}")
+    print(f"  Active release blockers: {len(active_blockers)}")
+    print(f"  KiCad PCB files: {len(pcbs)}")
+    print(f"  Manufacturing output files: {len(manufacturing)}")
+
+    if active_blockers:
+        print("")
+        print("Active release blockers:")
+        for row in active_blockers:
+            gate = row["Gate"]
+            blocker_id = row["Blocker ID"]
+            action = row["Next engineering action"]
+            print(f"  - {blocker_id}: {gate} - {action}")
+
+    if pcbs:
+        print("")
+        print("KiCad PCB files:")
+        for path in pcbs:
+            print(f"  - {relative(path)}")
+
+    if manufacturing:
+        print("")
+        print("Manufacturing output files:")
+        for path in manufacturing:
+            print(f"  - {relative(path)}")
+
+    if args.fail_on_blocked and not board_print_ready:
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -97,18 +97,21 @@ ordered rule execution, and stale-telemetry denial in one processing step.
 - OUT2 pulse tests trace to
   `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
   `hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv`
+  `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`
   and `hardware/power-board/PB-100/PB-100-out2-soa.md`.
 - Output overcurrent, fuse, and class-limit tests trace to
   `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
   `hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv`
   and
   `hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv`
-  plus `hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv`.
+  plus `hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv`
+  and `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`.
 - CAN1 listen-only tests trace to
   `hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv`,
   `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`, and
   `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`, plus
-  `hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv`.
+  `hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv` and
+  `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`.
 - Input reverse-protection tests trace to
   `hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv`,
   `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`, and
@@ -121,6 +124,7 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`,
   `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`,
   `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`,
+  `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`,
   and
   `docs/adr/ADR-0008-pb-100-current-budget.md`.
 - Thermal derating tests trace to
@@ -128,7 +132,8 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`.
 - B2B interface tests trace to
   `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`,
-  `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`, and
+  `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`,
+  `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`, and
   `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`.
 - Vibration, connector, fuse, and harness ownership tests trace to
   `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`.

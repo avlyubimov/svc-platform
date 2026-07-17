@@ -57,6 +57,12 @@ the physical gate-control node to `CAN1_TX_DISABLED_STATUS` through a 1 kΩ
 series path plus 100 kΩ default pull-up. These are schematic-review candidates,
 not final MPN or footprint locks.
 
+Reset, unpowered, DNP/open inspection, disabled-status readback, RX
+listen-only independence, and future-ADR hardware-action checks are tracked in
+`hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`. The
+checklist is a schematic-freeze bench evidence plan; it does not authorize
+CAN1 TX support.
+
 ## Rev.1 capture contract
 
 The schematic capture packet must show these two refs if CAN1 safety crosses
@@ -97,3 +103,5 @@ production state.
   hardware action.
 - Factory BOM output marks `JP_CAN1` or equivalent TX link DNP/open and not a
   default-populated TX item.
+- PB-BENCH-012 records reset/unpowered behavior, production DNP/open
+  inspection, and physical disabled-status readback before schematic freeze.

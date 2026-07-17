@@ -20,6 +20,120 @@ const svc_device_config_t svc_default_config = {
             SVC_PRIORITY_A
         }
     },
+    .telemetry = {
+        .total_current = {
+            .shunt_microohm = SVC_DEFAULT_TOTAL_CURRENT_SHUNT_UOHM,
+            .monitor_range_uv = SVC_DEFAULT_TOTAL_CURRENT_MONITOR_RANGE_UV,
+            .zero_offset_ma = SVC_DEFAULT_TOTAL_CURRENT_ZERO_OFFSET_MA,
+            .gain_ppm = SVC_DEFAULT_TOTAL_CURRENT_GAIN_PPM,
+            .stale_timeout_ms = SVC_DEFAULT_TELEMETRY_STALE_TIMEOUT_MS,
+            .plausible_max_ma = SVC_DEFAULT_TOTAL_CURRENT_PLAUSIBLE_MAX_MA
+        },
+        .output_current = {
+            [SVC_OUTPUT_OUT1] = {
+                SVC_DEFAULT_OUT1_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT1_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT2] = {
+                SVC_DEFAULT_OUT2_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT2_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT3] = {
+                SVC_DEFAULT_OUT3_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT3_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT4] = {
+                SVC_DEFAULT_OUT4_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT4_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT5] = {
+                SVC_DEFAULT_OUT5_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT5_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT6] = {
+                SVC_DEFAULT_OUT6_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT6_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT7] = {
+                SVC_DEFAULT_OUT7_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT7_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT8] = {
+                SVC_DEFAULT_OUT8_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT8_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT9] = {
+                SVC_DEFAULT_OUT9_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT9_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT10] = {
+                SVC_DEFAULT_OUT10_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT10_CURRENT_RANGE_MA
+            }
+        },
+        .thermal = {
+            [SVC_THERMAL_ZONE_PCB] = {
+                SVC_DEFAULT_THERMAL_NTC_NOMINAL_OHM,
+                SVC_DEFAULT_THERMAL_NTC_BETA_K,
+                SVC_DEFAULT_THERMAL_PULLUP_OHM,
+                SVC_DEFAULT_THERMAL_ADC_SERIES_OHM,
+                SVC_DEFAULT_THERMAL_FILTER_NF,
+                SVC_DEFAULT_THERMAL_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_THERMAL_PLAUSIBLE_MIN_C,
+                SVC_DEFAULT_THERMAL_PLAUSIBLE_MAX_C
+            },
+            [SVC_THERMAL_ZONE_PWR_A] = {
+                SVC_DEFAULT_THERMAL_NTC_NOMINAL_OHM,
+                SVC_DEFAULT_THERMAL_NTC_BETA_K,
+                SVC_DEFAULT_THERMAL_PULLUP_OHM,
+                SVC_DEFAULT_THERMAL_ADC_SERIES_OHM,
+                SVC_DEFAULT_THERMAL_FILTER_NF,
+                SVC_DEFAULT_THERMAL_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_THERMAL_PLAUSIBLE_MIN_C,
+                SVC_DEFAULT_THERMAL_PLAUSIBLE_MAX_C
+            },
+            [SVC_THERMAL_ZONE_PWR_B] = {
+                SVC_DEFAULT_THERMAL_NTC_NOMINAL_OHM,
+                SVC_DEFAULT_THERMAL_NTC_BETA_K,
+                SVC_DEFAULT_THERMAL_PULLUP_OHM,
+                SVC_DEFAULT_THERMAL_ADC_SERIES_OHM,
+                SVC_DEFAULT_THERMAL_FILTER_NF,
+                SVC_DEFAULT_THERMAL_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_THERMAL_PLAUSIBLE_MIN_C,
+                SVC_DEFAULT_THERMAL_PLAUSIBLE_MAX_C
+            }
+        }
+    },
     .outputs = {
         {SVC_OUTPUT_OUT1, OUT_ROLE_USB, 15U, 12000U, true, SVC_PRIORITY_B},
         {SVC_OUTPUT_OUT2, OUT_ROLE_CIGARETTE_SOCKET, 20U, 18000U, false, SVC_PRIORITY_C},

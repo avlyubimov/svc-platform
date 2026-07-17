@@ -32,6 +32,21 @@ STM32F407/F429 acceptable for early firmware prototyping.
 - RS485 footprint
 - external inputs
 
+## Power budget precheck
+
+- LB-100 Rev.1 schematic review must budget its `PB_5V_OUT` load before PB-100
+  schematic freeze.
+- Initial LB-100 allocation from PB-100 is 500 mA sustained.
+- If LB-100 needs more than 500 mA sustained from `PB_5V_OUT`, PB-100 must keep
+  the LM5013-Q1-class higher-current 100 V buck fallback active before schematic
+  freeze.
+- `LB_3V3_IO` is a PB-side logic reference and pull-up domain, not an accessory
+  supply.
+- Sleep and deep-sleep current evidence must satisfy ADR-0012 before vehicle
+  installation.
+
+Detailed precheck: `hardware/logic-board/LB-100/LB-100-power-budget-precheck.md`.
+
 ## Safety boundaries
 
 - CAN1 vehicle interface is read-only by default.

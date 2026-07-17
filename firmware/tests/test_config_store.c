@@ -25,6 +25,16 @@ static void test_rejects_checksum_corruption(void)
     assert(svc_config_store_validate_record(&record) == SVC_CONFIG_STORE_INVALID_CHECKSUM);
 }
 
+static void test_rejects_telemetry_checksum_corruption(void)
+{
+    svc_config_record_t record = {0};
+    assert(svc_config_store_build_record(&svc_default_config, 1U, &record) == SVC_CONFIG_STORE_OK);
+
+    record.config.telemetry.thermal[SVC_THERMAL_ZONE_PCB].plausible_max_c += 1;
+
+    assert(svc_config_store_validate_record(&record) == SVC_CONFIG_STORE_INVALID_CHECKSUM);
+}
+
 static void test_selects_newest_valid_slot(void)
 {
     svc_config_record_t older_record = {0};
@@ -111,6 +121,7 @@ int main(void)
 {
     test_builds_and_validates_config_record();
     test_rejects_checksum_corruption();
+    test_rejects_telemetry_checksum_corruption();
     test_selects_newest_valid_slot();
     test_fallback_default_when_slots_are_invalid();
     test_persisted_config_survives_default_change();

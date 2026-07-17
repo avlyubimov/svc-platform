@@ -24,7 +24,7 @@ placement, thermal copper, or manufacturing output.
 | NTC | 10 kΩ B25/85 3435 K | Matches TDK preferred class and alternates | Exact suffix sourcing |
 | ADC series resistor | 1 kΩ 1% | Limits ADC/input transient current and isolates filter cap | LB-100 ADC sample timing |
 | ADC filter capacitor | 10 nF X7R to GND | Local noise filter without heavy response delay | ADC settling and leakage |
-| Calibration | Per-board config/calibration table | Keeps thresholds out of firmware constants | Bench calibration |
+| Calibration | `telemetry.thermal` per-zone config/calibration table | Keeps divider calibration out of firmware constants | Bench calibration |
 
 ## Calculated divider points
 
@@ -57,3 +57,17 @@ dissipation constant, airflow/enclosure assumptions, and bench calibration.
 - Recheck TDK, Vishay, and Murata NTC orderability and assembly handling.
 - Store calibration constants outside firmware binaries.
 - Keep PCB layout blocked until schematic freeze closes.
+
+## Calibration boundary
+
+Firmware must not hard-code the NTC divider values. The first firmware-facing
+configuration contract is `telemetry.thermal` in
+`firmware/configs/config-example.json` and `svc_telemetry_config_t` in
+`firmware/core/svc_config.h`. The current defaults mirror this
+schematic-review candidate for all three zones: 10000 Ω NTC nominal value,
+3435 K beta, 4700 Ω pull-up, 1000 Ω ADC series resistor, 10 nF filter, 1000 ms
+stale timeout, and -40 °C to 150 °C plausible range.
+`tools/validate_config.py` and `firmware/services/config_validator.c` verify
+that each plausible range covers the configured recovery and cutoff thresholds.
+ADC settling, sensor placement, self-heating, sourcing, and bench calibration
+remain schematic-freeze items.

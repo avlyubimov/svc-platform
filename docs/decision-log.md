@@ -1822,3 +1822,150 @@ clock, storage, BLE, sensors, sleep/wake, ADC, timer, FDCAN, UART, and SPI
 conflicts visible. This precheck is deliberately not an exact pinout and keeps
 connector placement and layout blocked until the real LB-100 pinout audit
 passes.
+
+## 2026-07-17 — PB-100 board-print release gate
+
+Decision: PB-100 now has `tools/pb100_release_status.py` plus
+`make pb100-release-status` and `make pb100-release-gate`.
+
+Reason: The project needs a direct machine-readable answer for whether PB-100
+can be sent for board printing. The gate reports the schematic-freeze status,
+active board-release blockers, KiCad PCB presence, and manufacturing output
+presence instead of relying on a manual reading of the release packet.
+
+## 2026-07-17 — PB-100 garage connector class narrowing
+
+Decision: PB-100 garage assembly planning now narrows output connectors to DTP
+for OUT1 and OUT2, DT for OUT3 through OUT10, DTM for CAN/service/signal wiring,
+and a MAXI near-battery main fuse holder class. The battery input path remains
+conditional and explicitly excludes DT or DTP as the 50 A input connector class.
+
+Reason: Board release needs the user-installed connector and fuse scope to be
+concrete enough for harness planning while still blocking PCB layout until exact
+housings, contacts, seals, crimp tooling, fuse holder, enclosure service access,
+and derating evidence close.
+
+## 2026-07-17 — PB-100 MOSFET voltage-margin review path
+
+Decision: PB-100 schematic review now treats 60 V MOSFET paths behind the active
+`SM8S33AHM3/I` TVS branch as conditional until overshoot evidence closes, and
+makes an 80 V MOSFET review escape path explicit for output and input-reverse
+MOSFET selections.
+
+Reason: The active TVS clamp point leaves limited headroom below 60 V absolute
+maximum MOSFET ratings. The release path must either prove the 60 V overshoot
+margin or move affected MOSFET paths to an 80 V or higher class before
+schematic freeze and PCB layout.
+
+## 2026-07-17 — LB-100 power-budget precheck for PB-100 logic rail
+
+Decision: LB-100 schematic review now has
+`hardware/logic-board/LB-100/LB-100-power-budget-precheck.md`, tying the initial
+500 mA sustained LB-100 allocation to the PB-100 `PB_5V_OUT` 1 A budget.
+
+Reason: PB-100 cannot freeze the LM5164-Q1-class logic buck until LB-100 proves
+its load budget. If LB-100 exceeds the 500 mA allocation, PB-100 must retain the
+LM5013-Q1-class higher-current fallback before schematic freeze.
+
+## 2026-07-17 — PB-100 total-current calibration config contract
+
+Decision: PB-100 total-current telemetry planning now has a firmware
+configuration contract for the schematic-review candidate. `telemetry.total_current`
+in `firmware/configs/config-example.json` and `svc_telemetry_config_t` in
+`firmware/core/svc_config.h` carry the 500 µΩ shunt value, 40960 µV monitor
+range, zero offset, 1000000 ppm gain, 1000 ms stale timeout, and 60000 mA
+plausible maximum. The C validator, JSON validator, and config-store checksum
+now cover those fields.
+
+Reason: PBREL-009 required evidence that current telemetry calibration is not
+buried in firmware constants. This closes the total-current configuration
+contract while keeping bench calibration, per-output IMON calibration, shunt
+Kelvin footprint, copper heating, and ADC/I2C ownership open before schematic
+freeze.
+
+## 2026-07-17 — PB-100 per-output IMON calibration config contract
+
+Decision: PB-100 current telemetry configuration now includes role-free
+`telemetry.output_current` records for `OUT1` through `OUT10`. Each record
+carries the IMON range, zero offset, gain, stale timeout, and plausible-current
+limit. The defaults match the PB-100 telemetry map: OUT1 20 A, OUT2 30 A,
+OUT3/OUT4/OUT6/OUT7/OUT10 15 A, and OUT5/OUT8/OUT9 8 A.
+
+Reason: PBREL-009 covers both total input current and per-output telemetry.
+Adding per-output calibration records keeps IMON scaling out of driver constants
+and lets schema/C validation prove each configured output limit is covered
+without closing ADC scaling, bench calibration, Kelvin routing, copper heating,
+or LB-100 bus ownership before schematic freeze.
+
+## 2026-07-17 — PB-100 thermal telemetry calibration config contract
+
+Decision: PB-100 thermal telemetry configuration now includes
+`telemetry.thermal` records for `TEMP_PCB`, `TEMP_PWR_A`, and `TEMP_PWR_B`.
+Each record carries the NTC nominal value, beta value, pull-up value, ADC series
+resistor, filter capacitor, stale timeout, and plausible-temperature range. The
+defaults mirror the schematic-review candidate: 10 kΩ NTC, 3435 K beta,
+4.7 kΩ pull-up, 1 kΩ ADC series resistor, 10 nF filter, 1000 ms stale timeout,
+and -40 °C to 150 °C plausible range.
+
+Reason: PBREL-010 needed calibration ownership to be explicit before schematic
+freeze. The config contract keeps thermal divider constants out of driver code
+and lets validation prove each plausible range covers the configured recovery
+and cutoff thresholds. ADC settling, sensor placement, self-heating, sourcing,
+and bench calibration remain open before PCB layout.
+
+## 2026-07-17 — PB-100 CAN1 reset and DNP bench checklist
+
+Decision: PB-100 CAN1 safety review now has
+`hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`. The
+checklist covers LB-100 reset, LB-100 unpowered, production DNP/open inspection,
+physical disabled-status readback, RX listen-only independence, and the future
+ADR plus explicit hardware-action boundary.
+
+Reason: PBREL-001 cannot close from schematic notes alone. The release packet
+needs a concrete bench and production-inspection checklist proving that
+`CAN1_TX_ROUTE` remains DNP/open, `CAN1_TX_DISABLED_STATUS` is physical
+readback rather than firmware-only state, and no vehicle-CAN transmit frame is
+observed in Rev.1 default assembly.
+
+## 2026-07-17 — PB-100 board-current path design calculation
+
+Decision: PB-100 board-current review now has
+`hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`.
+The calculation records the 50 A main-fuse review point, 40 A continuous board
+budget, 0-60 A total-current telemetry range, 0.5 mΩ four-terminal shunt
+dissipation, Q1 reverse-protection candidate dissipation, and pre-layout copper
+loss boundary.
+
+Reason: PBREL-002 needs numeric evidence before layout, but it must not create
+layout geometry. The calculation keeps the accepted current-budget architecture
+explicit while preserving the no-`PB-100.kicad_pcb` boundary until connector
+derating, shunt package heating, Q1 thermal path, protected distribution, and
+bench telemetry calibration close.
+
+## 2026-07-17 — PB-100 B2B LB-100 pin audit checklist
+
+Decision: PB-100 board-to-board review now has
+`hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`. The
+checklist covers the exact STM32H563 LQFP-100 pinout audit, ADC capacity,
+output PWM default-low behavior, fault/wake routing, CAN1 read-only crossing,
+PB-side bus and expansion conflicts, FX18 footprint drawing, stack height,
+vibration retention, assembly handling, and no-layout boundary.
+
+Reason: PBREL-003 cannot close from a resource-class precheck alone. The release
+packet needs a machine-checked audit list that preserves the current JPB1 map
+while making the remaining LB-100 pinout and FX18 mechanical evidence explicit
+before any connector placement or `PB-100.kicad_pcb` work.
+
+## 2026-07-17 — PB-100 output-stage value freeze checklist
+
+Decision: PB-100 output-stage review now has
+`hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`.
+The checklist covers TPS48110 baseline, OUT2 SOA and fuse energy, medium output
+fuse paths, low-current ADR-0011 boundary, threshold and timer networks, gate
+default-off behavior, sense telemetry and ADC scaling, inductive clamp and
+MOSFET voltage margin, and no-layout boundary.
+
+Reason: PBREL-004 and PBREL-005 need a shared close-work list before final
+component values can be locked. The checklist keeps output channels generic,
+keeps role mapping in configuration, and blocks MOSFET/fuse/connector placement
+or `PB-100.kicad_pcb` work until schematic freeze evidence closes.

@@ -54,7 +54,7 @@ and fuse/short-pulse validation.
 | Shunt input filter | 10 Ω series in each `IN+`/`IN-` sense leg plus 1 nF C0G differential capacitor candidate | Provides an EMI/transient filter point without large DC error | INA228 error and surge review |
 | VBUS sense | 1 kΩ series from `VBAT_PROT` to `VBUS` plus 1 nF 100 V local filter capacitor candidate | Keeps bus-voltage telemetry on the protected rail | Load-dump and leakage review |
 | Analog fallback | `IIN_SENSE` remains LB-visible for fast firmware budget checks or monitor-derived fallback | Keeps board-budget enforcement independent of summed per-output IMON | Final ADC or I2C ownership |
-| Calibration | Nominal shunt value, measured shunt value, offset, gain, and monitor range in configuration data | Keeps calibration out of firmware constants | Bench calibration flow |
+| Calibration | `telemetry.total_current` and `telemetry.output_current` carry nominal shunt value, per-output ranges, zero offsets, gains, monitor range, stale timeouts, and plausible-current limits | Keeps calibration out of firmware constants | Bench calibration flow and ADC scaling |
 
 ## Calibration boundary
 
@@ -67,6 +67,19 @@ record must include at least:
 - monitor range setting;
 - conversion timing/averaging used for safety decisions;
 - stale-data timeout and implausible-data limits.
+
+The first firmware-facing configuration contract is `telemetry.total_current`
+and `telemetry.output_current` in `firmware/configs/config-example.json` and
+`svc_telemetry_config_t` in `firmware/core/svc_config.h`. The current
+total-current defaults mirror this schematic-review candidate: 500 µΩ shunt
+resistance, 40960 µV monitor range, 0 mA offset, 1000000 ppm gain, 1000 ms
+stale timeout, and 60000 mA plausible maximum. Per-output IMON defaults mirror
+the map ranges: OUT1 20000 mA, OUT2 30000 mA, OUT3/OUT4/OUT6/OUT7/OUT10
+15000 mA, and OUT5/OUT8/OUT9 8000 mA.
+`tools/validate_config.py` and `firmware/services/config_validator.c` verify
+that plausible-current limits cover the configured current limits without
+exceeding their monitor or IMON class ranges. Bench calibration and ADC scaling
+remain schematic-freeze items.
 
 ## Freeze blockers
 

@@ -21,6 +21,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`
+- `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`
 - `production/bom/pb100_assembly_sourcing_recheck.csv`
 - `production/bom/pb100_sourcing_evidence_snapshot.csv`
@@ -28,12 +29,15 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv`
 - `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`
 - `hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv`
+- `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`
@@ -51,6 +55,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`
+- `hardware/logic-board/LB-100/LB-100-power-budget-precheck.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
@@ -61,6 +66,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
 - `hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-output-net-expansion.csv`
 - `hardware/power-board/PB-100/PB-100-output-stage-design-values.csv`
@@ -110,11 +116,18 @@ It is not a PCB layout package.
   margin, 60 V MOSFET overshoot dependency, 80 V Q1 alternate, 40 V
   smart-switch ADR boundary, sourcing gate, and no-layout boundary are tracked
   in `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`.
+- MOSFET voltage-margin review: 60 V MOSFET paths behind the active HM3 TVS
+  branch need explicit overshoot evidence or migration to the 80 V review
+  escape path before schematic freeze. See
+  `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`.
 - Logic power freeze review: LM5164/LM5013/TPS54360B regulator boundaries,
   protected `VBAT_PROT` sequencing, 1000 mA `PB_5V_OUT` budget, UVLO safe-off,
   PGOOD, inductor/capacitor classes, sourcing, and no-layout boundary are
   tracked in
   `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`.
+- LB-100 power budget precheck: LB-100 has a 500 mA sustained allocation from
+  `PB_5V_OUT`; exceeding it keeps the LM5013-Q1-class fallback active before
+  PB-100 schematic freeze.
 - Thermal telemetry freeze review: NTC sensor class, divider/ADC scaling,
   placement zones, 85/105/75 °C thresholds, firmware fail-safe behavior,
   calibration, assembly alternates, and bench validation are tracked in
@@ -123,6 +136,11 @@ It is not a PCB layout package.
   external MOSFET boundaries, OUT2 SOA, gate-drive defaults, sense/telemetry,
   fault thresholds, clamp strategy, low-current ADR-0011 no-smart-switch
   boundary, and no-layout constraints in dedicated review artifacts.
+- Output value freeze checklist: controller baseline, OUT2 SOA/fuse energy,
+  medium fuse paths, low-current ADR-0011 boundary, threshold/timer networks,
+  gate default-off behavior, sense/ADC scaling, inductive clamp, MOSFET voltage
+  margin, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`.
 - Outputs: 10 generic high-side protected channels.
 - CAN1: read-only by default; TX physically disabled.
 
@@ -138,6 +156,10 @@ It is not a PCB layout package.
 
 - Battery input protection: main input connector, reverse protection, TVS/load
   dump clamp, input current measurement, battery voltage measurement.
+- Board-current budget calculation: 50 A main fuse, 40 A continuous budget,
+  0-60 A telemetry range, 0.5 mΩ shunt dissipation, Q1 candidate dissipation,
+  and no-layout copper boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`.
 - Logic power: protected 5 V/3.3 V rails for LB-100 interface and telemetry.
 - Output channels: fuse, high-side switch/controller, current sense, fault
   signal, flyback/inductive-load handling where required.
@@ -153,6 +175,10 @@ It is not a PCB layout package.
   disable pull, `SN74LVC1G125-Q1`-class `U_CAN1`, 47 kΩ downstream recessive
   bias, and 1 kΩ/100 kΩ physical-status readback are tracked in
   `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`.
+- CAN1 reset and DNP bench checklist: LB-100 reset, LB-100 unpowered,
+  production DNP/open inspection, physical disabled-status readback, RX
+  listen-only independence, and future-ADR hardware-action checks are tracked in
+  `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`.
 
 ## Board-to-board signal budget
 
@@ -167,6 +193,9 @@ B2B interface trace CSV:
 
 LB-100 resource-class binding CSV:
 `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`.
+
+LB-100 pin audit and FX18 checklist:
+`hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`.
 
 LB-100 pin-binding precheck:
 `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`.
@@ -193,6 +222,10 @@ item.
 
 The pin-binding precheck defines the LB-100 resource budget that must be proven
 before exact STM32H563 LQFP-100 package pins can close.
+The pin audit checklist keeps the exact STM32H563 LQFP-100 pinout audit, ADC
+capacity, output PWM default-low behavior, fault/wake routing, CAN1 read-only
+crossing, FX18 footprint drawing, stack height, vibration retention, assembly
+handling, and no-layout boundary visible before connector placement.
 
 ## Output channel matrix
 
@@ -256,6 +289,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-output-stage-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`

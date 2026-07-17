@@ -14,6 +14,74 @@ static svc_config_validation_result_t make_result(
     };
 }
 
+static uint32_t total_current_full_scale_ma(const svc_total_current_telemetry_config_t *config)
+{
+    return (uint32_t)(((uint64_t)config->monitor_range_uv * 1000ULL) / config->shunt_microohm);
+}
+
+static bool svc_telemetry_config_is_valid(
+    const svc_telemetry_config_t *telemetry,
+    const svc_power_budget_config_t *power_budget,
+    const svc_output_config_t *outputs,
+    const svc_thermal_zone_config_t *thermal_zones)
+{
+    if (telemetry == NULL || power_budget == NULL || outputs == NULL || thermal_zones == NULL) {
+        return false;
+    }
+
+    const svc_total_current_telemetry_config_t *total_current = &telemetry->total_current;
+    if (total_current->shunt_microohm == 0U ||
+        total_current->monitor_range_uv == 0U ||
+        total_current->gain_ppm == 0U ||
+        total_current->stale_timeout_ms == 0U ||
+        total_current->plausible_max_ma == 0U) {
+        return false;
+    }
+    if (total_current->plausible_max_ma < power_budget->total_current_limit_ma) {
+        return false;
+    }
+    if (total_current->plausible_max_ma > total_current_full_scale_ma(total_current)) {
+        return false;
+    }
+
+    for (size_t output_index = 0U; output_index < SVC_OUTPUT_COUNT; ++output_index) {
+        const svc_output_current_telemetry_config_t *output_current =
+            &telemetry->output_current[output_index];
+        if (output_current->range_ma == 0U ||
+            output_current->gain_ppm == 0U ||
+            output_current->stale_timeout_ms == 0U ||
+            output_current->plausible_max_ma == 0U) {
+            return false;
+        }
+        if (output_current->plausible_max_ma < outputs[output_index].current_limit_ma) {
+            return false;
+        }
+        if (output_current->plausible_max_ma > output_current->range_ma) {
+            return false;
+        }
+    }
+
+    for (size_t zone_index = 0U; zone_index < SVC_THERMAL_ZONE_COUNT; ++zone_index) {
+        const svc_thermal_telemetry_config_t *thermal = &telemetry->thermal[zone_index];
+        if (thermal->ntc_nominal_ohm == 0U ||
+            thermal->ntc_beta_k == 0U ||
+            thermal->pullup_ohm == 0U ||
+            thermal->adc_series_ohm == 0U ||
+            thermal->filter_nf == 0U ||
+            thermal->stale_timeout_ms == 0U) {
+            return false;
+        }
+        if (thermal->plausible_min_c >= thermal->plausible_max_c) {
+            return false;
+        }
+        if (thermal->plausible_min_c > thermal_zones[zone_index].recovery_c ||
+            thermal->plausible_max_c < thermal_zones[zone_index].cutoff_c) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool svc_output_role_is_valid(output_role_t role)
 {
     return role >= OUT_ROLE_NONE && role < OUT_ROLE_COUNT;
@@ -32,6 +100,13 @@ svc_config_validation_result_t svc_config_validate_device(const svc_device_confi
     }
     if (!svc_power_budget_validate_config(config)) {
         return make_result(SVC_CONFIG_INVALID_POWER_BUDGET, SVC_CONFIG_OUTPUT_INDEX_NONE);
+    }
+    if (!svc_telemetry_config_is_valid(
+            &config->telemetry,
+            &config->power_budget,
+            config->outputs,
+            config->thermal)) {
+        return make_result(SVC_CONFIG_INVALID_TELEMETRY, SVC_CONFIG_OUTPUT_INDEX_NONE);
     }
 
     for (size_t output_index = 0U; output_index < SVC_OUTPUT_COUNT; ++output_index) {
