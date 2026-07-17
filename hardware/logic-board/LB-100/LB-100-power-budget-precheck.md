@@ -47,4 +47,5 @@ LB-100 regulators, power switches, sleep hardware, or exact MCU pins.
 - PB-100 budget table: `hardware/power-board/PB-100/PB-100-logic-power-budget.csv`.
 - PB-100 logic calculation: `hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md`.
 - PB-100 logic freeze review: `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`.
+- PB-100 logic value checklist: `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`.
 - Sleep and parking-current ADR: `docs/adr/ADR-0012-system-sleep-wake-and-parking-current.md`.

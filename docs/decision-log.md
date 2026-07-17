@@ -2000,3 +2000,18 @@ Reason: PBREL-007 cannot close from clamp math alone. The 60 V MOSFET paths
 need measured or simulated overshoot evidence, otherwise affected paths must
 migrate to an 80 V or higher class before schematic values, footprints, copper,
 or `PB-100.kicad_pcb` work can be locked.
+
+## 2026-07-17 — PB-100 logic-power value freeze checklist
+
+Decision: PB-100 logic-power review now has
+`hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`.
+The checklist ties LM5164-Q1/LM5013-Q1/TPS54360B-Q1 family selection,
+`PB_5V_OUT` 1000 mA budget and LB-100 500 mA allocation, `VBAT_PROT` input
+filtering, UVLO, RON, feedback, bootstrap, L1/COUT, `PB_PWR_GOOD`, switch-node
+EMI, factory sourcing, and the no-layout boundary into one machine-checked
+artifact.
+
+Reason: PBREL-008 cannot close from candidate equations alone. The buck family,
+load budget, external values, magnetics, capacitors, PGOOD behavior, EMI
+evidence, and sourcing must close before U3/L1/CIN/COUT values, footprints,
+switch-node geometry, or `PB-100.kicad_pcb` work can be locked.

@@ -15,7 +15,7 @@ KiCad scaffold directory:
 |---|---|---|
 | `PB-100.kicad_sch` | Top-level sheet, title block, review notes, sheet links | This file plus all child sheets |
 | `input-protection.kicad_sch` | Battery input, reverse protection, TVS, input current/voltage sense | `PB-100-input-reverse-package-trace.csv`, `PB-100-input-reverse-freeze-review.csv`, `PB-100-input-reverse-q1-freeze-checklist.csv`, `PB-100-board-current-budget-trace.csv`, `PB-100-board-current-budget-freeze-review.csv`, `PB-100-board-current-budget-design-calculation.md`, `PB-100-tvs-load-dump-margin-trace.csv`, `PB-100-tvs-load-dump-freeze-review.csv`, `PB-100-tvs-overshoot-escape-checklist.csv`, `PB-100-input-protection-pin-contract.csv`, `PB-100-input-controller-pin-template.csv`, `PB-100-current-monitor-pin-template.csv`, `PB-100-input-power-design-values.csv`, `PB-100-protection-validation.csv` |
-| `logic-power.kicad_sch` | Protected `PB_5V_OUT`, power-good, UVLO, local filters | `PB-100-logic-power-rail-trace.csv`, `PB-100-logic-power-freeze-review.csv`, `PB-100-logic-buck-pin-template.csv`, `PB-100-logic-power-design-values.csv`, `PB-100-logic-power-design-placeholders.csv`, `PB-100-logic-power-budget.csv` |
+| `logic-power.kicad_sch` | Protected `PB_5V_OUT`, power-good, UVLO, local filters | `PB-100-logic-power-rail-trace.csv`, `PB-100-logic-power-freeze-review.csv`, `PB-100-logic-power-value-freeze-checklist.csv`, `PB-100-logic-buck-pin-template.csv`, `PB-100-logic-power-design-values.csv`, `PB-100-logic-power-design-placeholders.csv`, `PB-100-logic-power-budget.csv` |
 | `output-channel-template.kicad_sch` | Generic high-side output channel pattern | `PB-100-high-medium-output-baseline-trace.csv`, `PB-100-high-medium-output-freeze-review.csv`, `PB-100-low-current-output-baseline-trace.csv`, `PB-100-low-current-output-freeze-review.csv`, `PB-100-output-stage-value-freeze-checklist.csv`, `PB-100-output-controller-pin-template.csv`, `PB-100-output-channel-pin-contract.csv`, `PB-100-output-stage-design-values.csv` |
 | `outputs-1-10.kicad_sch` | Ten instantiated generic outputs | `PB-100-high-medium-output-baseline-trace.csv`, `PB-100-high-medium-output-freeze-review.csv`, `PB-100-low-current-output-baseline-trace.csv`, `PB-100-low-current-output-freeze-review.csv`, `PB-100-output-stage-value-freeze-checklist.csv`, `PB-100-schematic-instance-symbol-map.csv`, `PB-100-output-net-expansion.csv`, `PB-100-output-channel-pin-contract.csv` |
 | `telemetry.kicad_sch` | Total input current, voltage, thermal sensors, board ID | `PB-100-current-telemetry-trace.csv`, `PB-100-current-telemetry-freeze-review.csv`, `PB-100-thermal-telemetry-trace.csv`, `PB-100-thermal-telemetry-freeze-review.csv`, `PB-100-thermal-telemetry-map.csv`, `PB-100-current-telemetry-map.csv`, `PB-100-fault-response-matrix.csv` |
@@ -56,7 +56,7 @@ lock footprints or placement.
    board-current design calculation, TVS margin trace, TVS freeze review, TVS
    overshoot escape checklist, and input-protection pin contract.
 8. Capture `logic-power.kicad_sch` from the logic-power rail trace, freeze
-   review, and value placeholders.
+   review, value freeze checklist, and value placeholders.
 9. Capture one generic output template from the output-channel pin contract and
    output net expansion, then copy it to OUT1 through OUT10.
 10. Capture current and thermal telemetry sheets.

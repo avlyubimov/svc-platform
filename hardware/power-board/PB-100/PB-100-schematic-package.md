@@ -60,6 +60,7 @@ It is not a PCB layout package.
 - `hardware/logic-board/LB-100/LB-100-power-budget-precheck.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
@@ -135,6 +136,10 @@ It is not a PCB layout package.
   PGOOD, inductor/capacitor classes, sourcing, and no-layout boundary are
   tracked in
   `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`.
+- Logic power value checklist: LM5164/LM5013 selection, load budget, UVLO,
+  RON, feedback, bootstrap, L1/COUT, `PB_PWR_GOOD`, switch-node EMI, sourcing,
+  and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`.
 - LB-100 power budget precheck: LB-100 has a 500 mA sustained allocation from
   `PB_5V_OUT`; exceeding it keeps the LM5013-Q1-class fallback active before
   PB-100 schematic freeze.
@@ -284,6 +289,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-budget.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`

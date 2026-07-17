@@ -138,6 +138,11 @@ Current coverage:
   UVLO safe-off behavior, PGOOD, inductor/capacitor classes, sourcing, and
   no-layout boundary into
   `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`.
+- Logic power value closure now has
+  `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`,
+  tying LM5164/LM5013 family selection, `PB_5V_OUT` budget, UVLO, RON,
+  feedback, bootstrap, L1/COUT, `PB_PWR_GOOD`, switch-node EMI, sourcing, and
+  no-layout boundaries into one machine-checked artifact.
 - Factory-vs-garage assembly ownership now has a dedicated trace for critical
   PB-100 symbol keys; schematic freeze must still recheck JLCPCB/PCBWay
   assembly class, distributor continuity, garage connector derating, crimp
@@ -213,7 +218,8 @@ Current coverage:
 - Logic power now has candidate LM5164 values in
   `hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md`, but
   those values remain not final until load budget, sourcing, EMI, and stability
-  review close.
+  review close; the close-work list is tracked in
+  `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`.
 - LB-100 now has a `PB_5V_OUT` load-budget precheck with a 500 mA sustained
   allocation; exceeding it keeps the PB-100 LM5013-Q1-class fallback active.
 - Thermal telemetry now has candidate NTC divider values in
