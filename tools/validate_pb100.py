@@ -462,6 +462,14 @@ LOGIC_POWER_VALUE_FREEZE_CHECKLIST_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+LOGIC_POWER_VALUE_DERIVATION_PRECHECK_COLUMNS = (
+    "Derivation ID",
+    "Scope",
+    "Formula or source basis",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
 OUTPUT_STAGE_VALUE_FREEZE_CHECKLIST_COLUMNS = (
     "Check ID",
     "Output class",
@@ -624,6 +632,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-logic-power-rail-trace.csv",
         "PB-100-logic-power-freeze-review.csv",
         "PB-100-logic-power-value-freeze-checklist.csv",
+        "PB-100-logic-power-value-derivation-precheck.csv",
     ),
     "CAP-OUT-TEMPLATE": (
         "PB-100-high-medium-output-baseline-trace.csv",
@@ -879,6 +888,18 @@ REQUIRED_LOGIC_POWER_VALUE_FREEZE_CHECKS = {
     "LOGIC-FRZ-009",
     "LOGIC-FRZ-010",
 }
+REQUIRED_LOGIC_POWER_VALUE_DERIVATION_CHECKS = {
+    "LOGIC-DER-001",
+    "LOGIC-DER-002",
+    "LOGIC-DER-003",
+    "LOGIC-DER-004",
+    "LOGIC-DER-005",
+    "LOGIC-DER-006",
+    "LOGIC-DER-007",
+    "LOGIC-DER-008",
+    "LOGIC-DER-009",
+    "LOGIC-DER-010",
+}
 REQUIRED_CAN1_SAFETY_REQUIREMENTS = {
     "Vehicle CAN read-only default",
     "TX physical path",
@@ -1119,6 +1140,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md",
     "hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv",
+    "hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv",
@@ -2220,6 +2242,7 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-logic-power-rail-trace.csv",
             "PB-100-logic-power-freeze-review.csv",
             "PB-100-logic-power-value-freeze-checklist.csv",
+            "PB-100-logic-power-value-derivation-precheck.csv",
         ),
         "Input protection contract": (
             "PB-100-input-reverse-package-trace.csv",
@@ -2235,6 +2258,7 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-logic-power-rail-trace.csv",
             "PB-100-logic-power-freeze-review.csv",
             "PB-100-logic-power-value-freeze-checklist.csv",
+            "PB-100-logic-power-value-derivation-precheck.csv",
         ),
         "B2B LB-100 pin precheck": (
             "PB-100-b2b-lb100-pin-binding-precheck.md",
@@ -2405,6 +2429,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-logic-power-rail-trace.csv",
             "PB-100-logic-power-freeze-review.csv",
             "PB-100-logic-power-value-freeze-checklist.csv",
+            "PB-100-logic-power-value-derivation-precheck.csv",
             "PB-100-logic-power-budget.csv",
         ),
         "Current telemetry": (
@@ -2543,6 +2568,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-logic-power-rail-trace.csv",
         "PB-100-logic-power-freeze-review.csv",
         "PB-100-logic-power-value-freeze-checklist.csv",
+        "PB-100-logic-power-value-derivation-precheck.csv",
         "1 A",
         "power-good",
         "UVLO",
@@ -4553,6 +4579,111 @@ def validate_logic_power_value_freeze_checklist() -> None:
     for token in ("500 mA", "PB_5V_OUT", "LM5013-Q1-class", "PB_PWR_GOOD"):
         if token not in lb_precheck_text:
             fail(f"LB-100 power-budget precheck must support logic-power freeze checklist token {token}")
+
+
+def validate_logic_power_value_derivation_precheck() -> None:
+    path = PB100_DIR / "PB-100-logic-power-value-derivation-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty logic-power value derivation precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in LOGIC_POWER_VALUE_DERIVATION_PRECHECK_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        derivation_id = row["Derivation ID"].strip()
+        if derivation_id not in REQUIRED_LOGIC_POWER_VALUE_DERIVATION_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown logic-power derivation item {derivation_id}")
+        if derivation_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate logic-power derivation item {derivation_id}")
+        rows_by_id[derivation_id] = row
+        for column in LOGIC_POWER_VALUE_DERIVATION_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if derivation_id == "LOGIC-DER-004" and ("vin =" not in row_text or "uvlo" not in row_text):
+            fail("logic-power derivation precheck must include UVLO threshold equation")
+        if derivation_id == "LOGIC-DER-005" and ("fsw" not in row_text or "rron" not in row_text):
+            fail("logic-power derivation precheck must include RON frequency equation")
+        if derivation_id == "LOGIC-DER-006" and ("vout =" not in row_text or "1.2v" not in row_text):
+            fail("logic-power derivation precheck must include feedback equation and 1.2V reference")
+        if derivation_id == "LOGIC-DER-010" and ("pb-100.kicad_pcb" not in row_text or "manufacturing" not in row_text):
+            fail("logic-power derivation precheck must block layout and manufacturing outputs")
+
+    missing_items = sorted(REQUIRED_LOGIC_POWER_VALUE_DERIVATION_CHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing logic-power derivation items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "TI LM5164-Q1",
+        "6 V to 100 V input 1 A",
+        "TI LM5013-Q1",
+        "100 V 3.5 A",
+        "TPS54360B-Q1",
+        "60 V conditional alternate",
+        "PB_5V_OUT",
+        "1000 mA",
+        "500 mA LB-100",
+        "accessory loads",
+        "VBAT_PROT",
+        "VBAT_RAW",
+        "2.2µF 100V X7R",
+        "0.1µF",
+        "10µF 100V",
+        "PB-100-tvs-overshoot-validation-precheck.csv",
+        "332kΩ",
+        "100kΩ",
+        "6.48 V rising UVLO",
+        "4.75 V shutdown",
+        "OUT1..OUT10",
+        "LB_3V3_IO",
+        "fSW ≈ VOUT × 2500 / RRON(kΩ)",
+        "41.2kΩ",
+        "300kHz",
+        "VOUT = VFB × (1 + RFB_TOP / RFB_BOT)",
+        "158kΩ",
+        "49.9kΩ",
+        "5.0V",
+        "1.2V",
+        "2.2nF 50V X7R",
+        "PB_PWR_GOOD",
+        "47kΩ",
+        "10nF DNP",
+        "47µH",
+        "AEC-Q200",
+        "Isat at least 2.2A",
+        "Irms at least 1.2A",
+        "2x22µF 10V X7R",
+        "DC-bias",
+        "DNP RC snubber",
+        "JLCPCB PCBWay",
+        "LM5164QDDATQ1",
+        "LM5164QDDARQ1",
+        "LOGIC_BUCK_INDUCTOR",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+    ):
+        if token not in precheck_text:
+            fail(f"logic-power value derivation precheck must include {token}")
+
+    checklist_text = read_text(PB100_DIR / "PB-100-logic-power-value-freeze-checklist.csv")
+    for token in ("LOGIC-FRZ-004", "LOGIC-FRZ-005", "LOGIC-FRZ-006", "LOGIC-FRZ-007"):
+        if token not in checklist_text:
+            fail(f"logic-power value freeze checklist must support derivation token {token}")
 
 
 def validate_can1_tx_disable_trace() -> None:
@@ -7615,6 +7746,8 @@ def validate_validation_traceability() -> None:
                 fail("Logic power validation trace must include freeze review")
             if "pb-100-logic-power-value-freeze-checklist.csv" not in row_text:
                 fail("Logic power validation trace must include value freeze checklist")
+            if "pb-100-logic-power-value-derivation-precheck.csv" not in row_text:
+                fail("Logic power validation trace must include value derivation precheck")
             if "pb_5v_out" not in row_text or "uvlo" not in row_text:
                 fail("Logic power validation trace must keep PB_5V_OUT and UVLO explicit")
         if freeze_gate == "Factory assembly readiness":
@@ -8120,6 +8253,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-logic-power-rail-trace.csv",
         "PB-100-logic-power-freeze-review.csv",
         "PB-100-logic-power-value-freeze-checklist.csv",
+        "PB-100-logic-power-value-derivation-precheck.csv",
         "PB-100-current-telemetry-trace.csv",
         "PB-100-current-telemetry-freeze-review.csv",
         "PB-100-current-telemetry-value-freeze-checklist.csv",
@@ -8228,6 +8362,7 @@ def main() -> int:
     validate_logic_power_design_values()
     validate_logic_power_freeze_review()
     validate_logic_power_value_freeze_checklist()
+    validate_logic_power_value_derivation_precheck()
     validate_can1_tx_disable_trace()
     validate_can1_safety_verification()
     validate_can1_production_dnp_review()

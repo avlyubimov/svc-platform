@@ -161,6 +161,11 @@ Current coverage:
   tying LM5164/LM5013 family selection, `PB_5V_OUT` budget, UVLO, RON,
   feedback, bootstrap, L1/COUT, `PB_PWR_GOOD`, switch-node EMI, sourcing, and
   no-layout boundaries into one machine-checked artifact.
+- Logic power value derivation precheck now ties official TI buck-family source
+  boundaries, `PB_5V_OUT` load budget, UVLO/RON/feedback formulas, bootstrap
+  and PGOOD interface, magnetics/capacitor review, sourcing, and no-layout
+  boundary into
+  `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`.
 - Factory-vs-garage assembly ownership now has a dedicated trace for critical
   PB-100 symbol keys plus
   `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`;
@@ -264,7 +269,9 @@ Current coverage:
   `hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md`, but
   those values remain not final until load budget, sourcing, EMI, and stability
   review close; the close-work list is tracked in
-  `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`.
+  `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`
+  plus
+  `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`.
 - LB-100 now has a `PB_5V_OUT` load-budget precheck with a 500 mA sustained
   allocation; exceeding it keeps the PB-100 LM5013-Q1-class fallback active.
 - Thermal telemetry now has candidate NTC divider values in

@@ -2071,6 +2071,19 @@ load budget, external values, magnetics, capacitors, PGOOD behavior, EMI
 evidence, and sourcing must close before U3/L1/CIN/COUT values, footprints,
 switch-node geometry, or `PB-100.kicad_pcb` work can be locked.
 
+## 2026-07-17 — PB-100 logic-power value derivation precheck
+
+Decision: PB-100 logic-power review now has
+`hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`.
+The precheck ties official TI LM5164-Q1/LM5013-Q1/TPS54360B-Q1 source
+boundaries, `PB_5V_OUT` budget, UVLO/RON/feedback formulas, bootstrap and
+PGOOD interface, L1/COUT review, switch-node EMI, factory sourcing, and
+no-layout boundary to PBREL-008.
+
+Reason: PBREL-008 needs a formula-backed bridge between the value checklist,
+LM5164 candidate calculation, LB-100 load-budget contract, TVS/load-dump stress,
+and factory sourcing before logic-power values or footprints can close.
+
 ## 2026-07-17 — PB-100 current telemetry value freeze checklist
 
 Decision: PB-100 current-telemetry review now has

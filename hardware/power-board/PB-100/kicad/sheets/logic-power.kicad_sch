@@ -10,7 +10,7 @@
     (company "SVC Platform")
     (comment 9 "Work queue: CAP-LOGIC. Preliminary schematic capture follows PB-100-schematic-capture-work-queue.csv.")
     (comment 1 "Preliminary capture for PB_5V_OUT buck regulator and power-good.")
-    (comment 2 "Sources: PB-100-logic-power-rail-trace.csv, PB-100-logic-power-freeze-review.csv, PB-100-logic-power-value-freeze-checklist.csv, PB-100-logic-power-design-values.csv, PB-100-logic-power-budget.csv.")
+    (comment 2 "Sources: PB-100-logic-power-rail-trace.csv, PB-100-logic-power-freeze-review.csv, PB-100-logic-power-value-freeze-checklist.csv, PB-100-logic-power-value-derivation-precheck.csv, PB-100-logic-power-design-values.csv, PB-100-logic-power-budget.csv.")
   )
   (lib_symbols
   (symbol "PB100:PB100_BUCK_INDUCTOR_CLASS_PRELIM"
@@ -78,7 +78,7 @@
     (pin passive line (at 17.78 -7.62 180) (length 5.08) (name "EP" (effects (font (size 1.27 1.27)))) (number "EP" (effects (font (size 1.27 1.27)))))
   )
   )
-  (text "Logic power capture notes:\n- Source trace: PB-100-logic-power-rail-trace.csv\n- Freeze review: PB-100-logic-power-freeze-review.csv\n- Value freeze checklist: PB-100-logic-power-value-freeze-checklist.csv\n- U3 LM5164-Q1-class preferred buck\n- LM5013-Q1-class high-current fallback\n- PB_5V_OUT exported to JPB1\n- PB_PWR_GOOD to LB-100\n- OUT controls default off if PB_5V_OUT or LB_3V3_IO is absent\n\nNo PCB layout from this preliminary capture."
+  (text "Logic power capture notes:\n- Source trace: PB-100-logic-power-rail-trace.csv\n- Freeze review: PB-100-logic-power-freeze-review.csv\n- Value freeze checklist: PB-100-logic-power-value-freeze-checklist.csv\n- Value derivation precheck: PB-100-logic-power-value-derivation-precheck.csv\n- U3 LM5164-Q1-class preferred buck\n- LM5013-Q1-class high-current fallback\n- PB_5V_OUT exported to JPB1\n- PB_PWR_GOOD to LB-100\n- OUT controls default off if PB_5V_OUT or LB_3V3_IO is absent\n\nNo PCB layout from this preliminary capture."
     (at 20 20 0)
     (effects (font (size 2.0 2.0)) (justify left top))
     (uuid "e8995041-ce05-5cbd-adf0-cf2d093543da")
