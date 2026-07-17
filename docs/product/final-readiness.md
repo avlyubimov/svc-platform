@@ -226,6 +226,11 @@ Current coverage:
   LB-100 unpowered, production DNP/open inspection, physical disabled-status
   readback, RX listen-only independence, and future-ADR hardware-action checks
   in `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`.
+- CAN1 default-disable closure now has
+  `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`,
+  tying the DNP/open missing link, default-disabled gate values, TXD recessive
+  bias, physical status readback, firmware/capability boundary, bench path, and
+  no-layout boundary into one machine-checked artifact.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.
 - Synchronize factory and garage BOM drafts with final selections.

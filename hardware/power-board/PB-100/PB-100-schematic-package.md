@@ -32,6 +32,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv`
 - `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`
+- `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
@@ -218,6 +219,11 @@ It is not a PCB layout package.
   production DNP/open inspection, physical disabled-status readback, RX
   listen-only independence, and future-ADR hardware-action checks are tracked in
   `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`.
+- CAN1 default-disable freeze checklist: policy boundary, `JP_CAN1` DNP/open
+  missing link, `U_CAN1` disabled default, TXD recessive bias, physical
+  disabled-status readback, DNP-link detect boundary, RX independence, firmware
+  and capability boundary, bench path, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`.
 
 ## Board-to-board signal budget
 

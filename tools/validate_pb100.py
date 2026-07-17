@@ -472,6 +472,14 @@ CAN1_RESET_BENCH_CHECKLIST_COLUMNS = (
     "Pass condition",
     "Blocked release action",
 )
+CAN1_DEFAULT_DISABLE_FREEZE_CHECKLIST_COLUMNS = (
+    "Check ID",
+    "Review item",
+    "Required close evidence",
+    "Primary artifacts",
+    "Pass condition",
+    "Blocked action",
+)
 GARAGE_CONNECTOR_FUSE_PLAN_COLUMNS = (
     "Interface",
     "Target current or fuse",
@@ -601,7 +609,11 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-b2b-lb100-resource-binding.csv",
         "PB-100-b2b-lb100-pin-audit-checklist.csv",
     ),
-    "CAP-CAN1": ("PB-100-can1-tx-disable-trace.csv", "PB-100-can1-production-dnp-review.csv"),
+    "CAP-CAN1": (
+        "PB-100-can1-tx-disable-trace.csv",
+        "PB-100-can1-production-dnp-review.csv",
+        "PB-100-can1-default-disable-freeze-checklist.csv",
+    ),
 }
 REVIEW_RELEASE_MANIFEST_COLUMNS = (
     "Artifact",
@@ -824,6 +836,18 @@ REQUIRED_CAN1_RESET_BENCH_CHECKS = {
     "CAN1-RST-005",
     "CAN1-RST-006",
 }
+REQUIRED_CAN1_DEFAULT_DISABLE_FREEZE_CHECKS = {
+    "CAN1-FRZ-001",
+    "CAN1-FRZ-002",
+    "CAN1-FRZ-003",
+    "CAN1-FRZ-004",
+    "CAN1-FRZ-005",
+    "CAN1-FRZ-006",
+    "CAN1-FRZ-007",
+    "CAN1-FRZ-008",
+    "CAN1-FRZ-009",
+    "CAN1-FRZ-010",
+}
 REQUIRED_B2B_LB100_PIN_AUDIT_ITEMS = {
     "B2B-AUD-001",
     "B2B-AUD-002",
@@ -1002,6 +1026,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv",
     "hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv",
     "hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md",
+    "hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv",
@@ -2102,8 +2127,16 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-factory-assembly-freeze-checklist.csv",
             "PB-100-garage-install-freeze-checklist.csv",
         ),
-        "CAN1 safety": ("PB-100-can1-tx-disable-trace.csv", "PB-100-can1-production-dnp-review.csv"),
-        "CAN1 safety verification": ("PB-100-can1-tx-disable-trace.csv", "PB-100-can1-reset-bench-checklist.csv"),
+        "CAN1 safety": (
+            "PB-100-can1-tx-disable-trace.csv",
+            "PB-100-can1-production-dnp-review.csv",
+            "PB-100-can1-default-disable-freeze-checklist.csv",
+        ),
+        "CAN1 safety verification": (
+            "PB-100-can1-tx-disable-trace.csv",
+            "PB-100-can1-reset-bench-checklist.csv",
+            "PB-100-can1-default-disable-freeze-checklist.csv",
+        ),
     }
     for area, tokens in required_dashboard_evidence.items():
         evidence = rows_by_area[area]["Evidence"]
@@ -2200,6 +2233,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-can1-tx-disable-trace.csv",
             "PB-100-can1-safety-verification.csv",
             "PB-100-can1-production-dnp-review.csv",
+            "PB-100-can1-default-disable-freeze-checklist.csv",
         ),
         "Board current budget": (
             "PB-100-board-current-budget-trace.csv",
@@ -2280,6 +2314,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-can1-tx-disable-trace.csv",
         "PB-100-can1-production-dnp-review.csv",
         "PB-100-can1-reset-bench-checklist.csv",
+        "PB-100-can1-default-disable-freeze-checklist.csv",
         "JP_CAN1",
         "U_CAN1",
         "future ADR",
@@ -4546,6 +4581,106 @@ def validate_can1_production_dnp_review() -> None:
     ):
         if token not in firmware_tests:
             fail(f"CAN1 production DNP review requires firmware test {token}")
+
+
+def validate_can1_default_disable_freeze_checklist() -> None:
+    path = PB100_DIR / "PB-100-can1-default-disable-freeze-checklist.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty CAN1 default-disable freeze checklist: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [
+        column for column in CAN1_DEFAULT_DISABLE_FREEZE_CHECKLIST_COLUMNS if column not in fieldnames
+    ]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_check: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        check_id = row["Check ID"].strip()
+        if check_id not in REQUIRED_CAN1_DEFAULT_DISABLE_FREEZE_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown CAN1 freeze check {check_id}")
+        if check_id in rows_by_check:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate CAN1 freeze check {check_id}")
+        rows_by_check[check_id] = row
+        for column in CAN1_DEFAULT_DISABLE_FREEZE_CHECKLIST_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+        if "can1_tx_route" in row_text and "dnp/open" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1_TX_ROUTE rows must keep DNP/open explicit")
+        if "configuration" in row_text and "cannot enable tx" not in row_text and "do not use firmware capability configuration" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: configuration must not enable CAN1 TX")
+
+    missing_checks = sorted(REQUIRED_CAN1_DEFAULT_DISABLE_FREEZE_CHECKS - rows_by_check.keys())
+    if missing_checks:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing CAN1 freeze checks: "
+            f"{', '.join(missing_checks)}"
+        )
+
+    checklist_text = read_text(path)
+    for token in (
+        "ADR-0002",
+        "read-only by default",
+        "future ADR",
+        "explicit hardware action",
+        "CAN1_TX_ROUTE",
+        "JP_CAN1",
+        "0Ω 0603",
+        "DNP/open",
+        "no default-populated vehicle-CAN TX path",
+        "U_CAN1",
+        "SN74LVC1G125-Q1",
+        "OE high disabled",
+        "47k",
+        "CAN1_TX_DISABLE_CMD",
+        "LB_3V3_IO",
+        "TXD recessive",
+        "transceiver VIO",
+        "CAN1_TX_DISABLED_STATUS",
+        "1k",
+        "100k",
+        "1nF DNP",
+        "not firmware-only",
+        "physical disabled state",
+        "DNP link detect",
+        "CAN1_RX_ROUTE",
+        "listen-only RX",
+        "can_safety",
+        "CAN2 expansion TX remains separate",
+        "vehicle_can_read_only_default",
+        "hardware_action_required_for_tx",
+        "PB-BENCH-012",
+        "CAN1-RST-001",
+        "CAN1-RST-006",
+        "no vehicle-CAN transmit frame",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+    ):
+        if token not in checklist_text:
+            fail(f"CAN1 default-disable freeze checklist must include {token}")
+
+    design_text = read_text(PB100_DIR / "PB-100-can1-tx-disable-design-calculation.md")
+    for token in ("0 Ω 0603", "SN74LVC1G125-Q1", "47 kΩ", "1 kΩ", "100 kΩ", "1 nF DNP"):
+        if token not in design_text:
+            fail(f"CAN1 design calculation must support checklist token {token}")
+
+    reset_text = read_text(PB100_DIR / "PB-100-can1-reset-bench-checklist.csv")
+    for token in ("PB-BENCH-012", "no vehicle-CAN transmit frame", "not from firmware-only"):
+        if token not in reset_text:
+            fail(f"CAN1 reset bench checklist must support freeze checklist token {token}")
 
 
 def validate_can1_reset_bench_checklist() -> None:
@@ -6873,6 +7008,8 @@ def validate_validation_traceability() -> None:
                 fail("CAN1 validation trace must keep DNP/open read-only and future ADR explicit")
             if "pb-100-can1-production-dnp-review.csv" not in row_text:
                 fail("CAN1 validation trace must include production DNP review")
+            if "pb-100-can1-default-disable-freeze-checklist.csv" not in row_text:
+                fail("CAN1 validation trace must include default-disable freeze checklist")
         if freeze_gate == "Board current budget":
             if "pb-100-board-current-budget-freeze-review.csv" not in row_text:
                 fail("Board current validation trace must include 40 A freeze review")
@@ -7404,6 +7541,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-output-stage-value-freeze-checklist.csv",
         "PB-100-can1-tx-disable-trace.csv",
         "PB-100-can1-production-dnp-review.csv",
+        "PB-100-can1-default-disable-freeze-checklist.csv",
         "PB-100-can1-reset-bench-checklist.csv",
         "PB-100-input-reverse-package-trace.csv",
         "PB-100-input-reverse-freeze-review.csv",
@@ -7520,6 +7658,7 @@ def main() -> int:
     validate_can1_tx_disable_trace()
     validate_can1_safety_verification()
     validate_can1_production_dnp_review()
+    validate_can1_default_disable_freeze_checklist()
     validate_can1_reset_bench_checklist()
     validate_can1_capture_contract()
     validate_assembly_sourcing_recheck()

@@ -2081,3 +2081,20 @@ wire-gauge derating, enclosure entry, service access, and spare handling must
 close before garage purchase lock, installation signoff, connector footprints,
 fuse-holder footprints, enclosure release, manufacturing output, or
 `PB-100.kicad_pcb` work can be released.
+
+## 2026-07-17 — PB-100 CAN1 default-disable freeze checklist
+
+Decision: PB-100 CAN1 safety review now has
+`hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`.
+The checklist ties ADR-0002 policy, `JP_CAN1` DNP/open missing link,
+`U_CAN1` default-disabled gate behavior, 47 kΩ pulls, TXD recessive bias,
+1 kΩ/100 kΩ physical disabled-status readback, optional DNP filtering,
+DNP-link detect boundary, RX listen-only independence, firmware/capability
+boundary, PB-BENCH-012, and the no-layout boundary into one machine-checked
+artifact.
+
+Reason: PBREL-001 cannot close from policy text or candidate values alone. The
+physical missing link, reset/unpowered default-disable behavior, production DNP
+handling, physical status readback, firmware listen-only behavior, and bench
+evidence must close before CAN1 footprints, routing, manufacturing output, or
+`PB-100.kicad_pcb` work can be released.
