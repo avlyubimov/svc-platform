@@ -1955,3 +1955,17 @@ Reason: PBREL-003 cannot close from a resource-class precheck alone. The release
 packet needs a machine-checked audit list that preserves the current JPB1 map
 while making the remaining LB-100 pinout and FX18 mechanical evidence explicit
 before any connector placement or `PB-100.kicad_pcb` work.
+
+## 2026-07-17 — PB-100 output-stage value freeze checklist
+
+Decision: PB-100 output-stage review now has
+`hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`.
+The checklist covers TPS48110 baseline, OUT2 SOA and fuse energy, medium output
+fuse paths, low-current ADR-0011 boundary, threshold and timer networks, gate
+default-off behavior, sense telemetry and ADC scaling, inductive clamp and
+MOSFET voltage margin, and no-layout boundary.
+
+Reason: PBREL-004 and PBREL-005 need a shared close-work list before final
+component values can be locked. The checklist keeps output channels generic,
+keeps role mapping in configuration, and blocks MOSFET/fuse/connector placement
+or `PB-100.kicad_pcb` work until schematic freeze evidence closes.

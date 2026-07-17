@@ -66,6 +66,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
 - `hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-output-net-expansion.csv`
 - `hardware/power-board/PB-100/PB-100-output-stage-design-values.csv`
@@ -135,6 +136,11 @@ It is not a PCB layout package.
   external MOSFET boundaries, OUT2 SOA, gate-drive defaults, sense/telemetry,
   fault thresholds, clamp strategy, low-current ADR-0011 no-smart-switch
   boundary, and no-layout constraints in dedicated review artifacts.
+- Output value freeze checklist: controller baseline, OUT2 SOA/fuse energy,
+  medium fuse paths, low-current ADR-0011 boundary, threshold/timer networks,
+  gate default-off behavior, sense/ADC scaling, inductive clamp, MOSFET voltage
+  margin, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`.
 - Outputs: 10 generic high-side protected channels.
 - CAN1: read-only by default; TX physically disabled.
 

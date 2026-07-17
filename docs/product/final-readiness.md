@@ -98,6 +98,11 @@ Current coverage:
   gate-drive defaults, telemetry, fault timing, clamp strategy, sourcing,
   and configuration separation into
   `hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv`.
+- Output-stage value freeze checklist now ties controller baseline, OUT2
+  SOA/fuse energy, medium fuse paths, low-current ADR-0011 boundary,
+  threshold/timer networks, gate default-off behavior, sense/ADC scaling,
+  inductive clamp, MOSFET voltage margin, and no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`.
 - Current telemetry now has a trace tying per-output IMON ranges, total
   `IIN_SENSE`, 0.5 mΩ shunt measurement, 40 A budget enforcement, and
   stale-telemetry safe-off behavior together.

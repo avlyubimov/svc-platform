@@ -382,6 +382,14 @@ LOGIC_POWER_DESIGN_VALUE_COLUMNS = (
     "Freeze dependency",
     "Notes",
 )
+OUTPUT_STAGE_VALUE_FREEZE_CHECKLIST_COLUMNS = (
+    "Check ID",
+    "Output class",
+    "Required close evidence",
+    "Primary artifacts",
+    "Pass condition",
+    "Blocked action",
+)
 CAN1_SAFETY_VERIFICATION_COLUMNS = (
     "Requirement",
     "Signal or artifact",
@@ -512,12 +520,14 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-high-medium-output-freeze-review.csv",
         "PB-100-low-current-output-baseline-trace.csv",
         "PB-100-low-current-output-freeze-review.csv",
+        "PB-100-output-stage-value-freeze-checklist.csv",
     ),
     "CAP-OUT-INST": (
         "PB-100-high-medium-output-baseline-trace.csv",
         "PB-100-high-medium-output-freeze-review.csv",
         "PB-100-low-current-output-baseline-trace.csv",
         "PB-100-low-current-output-freeze-review.csv",
+        "PB-100-output-stage-value-freeze-checklist.csv",
     ),
     "CAP-TEL": (
         "PB-100-current-telemetry-trace.csv",
@@ -730,6 +740,17 @@ REQUIRED_B2B_LB100_PIN_AUDIT_ITEMS = {
     "B2B-AUD-008",
     "B2B-AUD-009",
 }
+REQUIRED_OUTPUT_STAGE_VALUE_FREEZE_CHECKS = {
+    "OUTVAL-001",
+    "OUTVAL-002",
+    "OUTVAL-003",
+    "OUTVAL-004",
+    "OUTVAL-005",
+    "OUTVAL-006",
+    "OUTVAL-007",
+    "OUTVAL-008",
+    "OUTVAL-009",
+}
 REQUIRED_BOARD_CURRENT_BUDGET_FREEZE_REVIEW_ITEMS = {
     "Main fuse and input connector",
     "Q1 reverse path thermal",
@@ -810,6 +831,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv",
+    "hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md",
@@ -1886,7 +1908,11 @@ def validate_schematic_readiness_dashboard() -> None:
     required_dashboard_evidence = {
         "Symbol readiness": ("PB-100-input-reverse-package-trace.csv",),
         "Output pin contract": ("PB-100-high-medium-output-baseline-trace.csv", "PB-100-low-current-output-baseline-trace.csv"),
-        "Output stage design values": ("PB-100-high-medium-output-baseline-trace.csv", "PB-100-low-current-output-baseline-trace.csv"),
+        "Output stage design values": (
+            "PB-100-high-medium-output-baseline-trace.csv",
+            "PB-100-low-current-output-baseline-trace.csv",
+            "PB-100-output-stage-value-freeze-checklist.csv",
+        ),
         "Input power design values": (
             "PB-100-board-current-budget-trace.csv",
             "PB-100-board-current-budget-freeze-review.csv",
@@ -2029,11 +2055,13 @@ def validate_schematic_freeze_gap_register() -> None:
         "High/medium output stage": (
             "PB-100-high-medium-output-baseline-trace.csv",
             "PB-100-high-medium-output-freeze-review.csv",
+            "PB-100-output-stage-value-freeze-checklist.csv",
             "PB-100-out2-soa.md",
         ),
         "Low-current output stage": (
             "PB-100-low-current-output-baseline-trace.csv",
             "PB-100-low-current-output-freeze-review.csv",
+            "PB-100-output-stage-value-freeze-checklist.csv",
             "ADR-0011",
         ),
         "Input reverse protection": (
@@ -2101,6 +2129,7 @@ def validate_schematic_freeze_gap_register() -> None:
     for token in (
         "PB-100-high-medium-output-baseline-trace.csv",
         "PB-100-high-medium-output-freeze-review.csv",
+        "PB-100-output-stage-value-freeze-checklist.csv",
         "OUT2",
         "SOA",
         "gate drive",
@@ -2112,6 +2141,7 @@ def validate_schematic_freeze_gap_register() -> None:
     for token in (
         "PB-100-low-current-output-baseline-trace.csv",
         "PB-100-low-current-output-freeze-review.csv",
+        "PB-100-output-stage-value-freeze-checklist.csv",
         "OUT5",
         "OUT8",
         "OUT9",
@@ -2889,6 +2919,78 @@ def validate_output_stage_design_values() -> None:
         fail("high-current output-stage design values must keep OUT2 SOA explicit")
     if "external controller" not in " ".join(class_text["Low current"]).lower():
         fail("low-current output-stage design values must preserve external-controller baseline")
+
+
+def validate_output_stage_value_freeze_checklist() -> None:
+    path = PB100_DIR / "PB-100-output-stage-value-freeze-checklist.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty output-stage value freeze checklist: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in OUTPUT_STAGE_VALUE_FREEZE_CHECKLIST_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_check: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        check_id = row["Check ID"].strip()
+        if check_id not in REQUIRED_OUTPUT_STAGE_VALUE_FREEZE_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown output-stage value check {check_id}")
+        if check_id in rows_by_check:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate output-stage value check {check_id}")
+        rows_by_check[check_id] = row
+        for column in OUTPUT_STAGE_VALUE_FREEZE_CHECKLIST_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if check_id == "OUTVAL-002" and ("out2" not in row_text or "soa" not in row_text or "escape path" not in row_text):
+            fail("OUT2 output-stage checklist row must keep SOA and escape path explicit")
+        if check_id == "OUTVAL-004" and ("no direct 40 v smart-switch rail" not in row_text or "adr" not in row_text):
+            fail("low-current output-stage checklist row must keep no-direct-40V-smart-switch ADR boundary")
+        if check_id == "OUTVAL-006" and ("default-off" not in row_text or "reset" not in row_text):
+            fail("output gate-drive checklist row must keep default-off reset boundary")
+        if check_id == "OUTVAL-007" and ("0-30a" not in row_text or "0-20a" not in row_text or "0-8a" not in row_text):
+            fail("output telemetry checklist row must keep all class telemetry ranges")
+        if check_id == "OUTVAL-009" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
+            fail("output no-layout checklist row must block PCB layout explicitly")
+
+    missing_checks = sorted(REQUIRED_OUTPUT_STAGE_VALUE_FREEZE_CHECKS - rows_by_check.keys())
+    if missing_checks:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing output-stage value checks: "
+            f"{', '.join(missing_checks)}"
+        )
+
+    checklist_text = read_text(path)
+    for token in (
+        "TPS48110AQDGXRQ1",
+        "OUT2",
+        "20A fuse",
+        "18A configured limit",
+        "40A 1s",
+        "80A 100ms",
+        "OUTn_IWRN_SET",
+        "OUTn_ISCP_SET",
+        "OUTn_TMR",
+        "OUTn_PU",
+        "OUTn_PD",
+        "OUTn_CS_P",
+        "OUTn_CS_N",
+        "0-30A",
+        "0-20A",
+        "0-8A",
+        "60V/80V",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+    ):
+        if token not in checklist_text:
+            fail(f"output-stage value freeze checklist must include {token}")
 
 
 def validate_low_current_output_baseline_trace() -> None:
@@ -5882,9 +5984,13 @@ def validate_validation_traceability() -> None:
         if freeze_gate == "High/medium output stage":
             if "pb-100-high-medium-output-freeze-review.csv" not in row_text:
                 fail("High/medium output validation trace must include freeze review")
+            if "pb-100-output-stage-value-freeze-checklist.csv" not in row_text:
+                fail("High/medium output validation trace must include value freeze checklist")
         if freeze_gate == "Low-current output stage":
             if "pb-100-low-current-output-freeze-review.csv" not in row_text:
                 fail("Low-current output validation trace must include freeze review")
+            if "pb-100-output-stage-value-freeze-checklist.csv" not in row_text:
+                fail("Low-current output validation trace must include value freeze checklist")
         if freeze_gate == "Input reverse protection":
             if "pb-100-input-reverse-freeze-review.csv" not in row_text:
                 fail("Input reverse validation trace must include freeze review")
@@ -6376,6 +6482,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-high-medium-output-freeze-review.csv",
         "PB-100-low-current-output-baseline-trace.csv",
         "PB-100-low-current-output-freeze-review.csv",
+        "PB-100-output-stage-value-freeze-checklist.csv",
         "PB-100-can1-tx-disable-trace.csv",
         "PB-100-can1-production-dnp-review.csv",
         "PB-100-can1-reset-bench-checklist.csv",
@@ -6460,6 +6567,7 @@ def main() -> int:
     validate_low_current_output_freeze_review()
     validate_high_medium_output_baseline_trace()
     validate_high_medium_output_freeze_review()
+    validate_output_stage_value_freeze_checklist()
     validate_input_and_power_pin_templates()
     validate_input_protection_pin_contract()
     validate_logic_power_design_placeholders()
