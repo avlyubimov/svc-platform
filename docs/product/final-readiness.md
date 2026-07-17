@@ -89,6 +89,11 @@ Current coverage:
   60 V overshoot acceptance method, 80 V escape, measurement/simulation setup,
   factory alternates, and no-layout boundary into
   `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`.
+- TVS overshoot closeout precheck now ties active source, overshoot method,
+  60 V acceptance, 80 V escape, 100 V downstream defaults, 40 V ADR boundary,
+  schematic-value dependencies, sourcing, validation sync, and no-layout
+  boundary to
+  `hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv`.
 - MOSFET voltage-margin review now makes the 80 V review escape path explicit
   for 60 V output and input-reverse MOSFET paths unless overshoot evidence
   accepts the active TVS clamp margin.
@@ -116,6 +121,11 @@ Current coverage:
   equations and TPS48110Q1EVM reference positions to PB-100 high, medium, and
   low current value derivation in
   `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`.
+- Output-stage closeout precheck now bridges source formulas, class maps,
+  design-item completeness, thresholds/timers, bootstrap/default-off behavior,
+  telemetry scaling, SOA/fuse/clamp evidence, low-current ADR-0011 boundary,
+  instance synchronization, and no-layout boundary in
+  `hardware/power-board/PB-100/PB-100-output-stage-closeout-precheck.csv`.
 - Current telemetry now has a trace tying per-output IMON ranges, total
   `IIN_SENSE`, 0.5 mΩ shunt measurement, 40 A budget enforcement, and
   stale-telemetry safe-off behavior together.
@@ -220,6 +230,11 @@ Current coverage:
   read-only crossing, STM32H563 LQFP-100 audit, cross-artifact synchronization,
   and no-layout boundary to
   `hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`.
+- B2B/LB-100 review now has a closeout precheck bridging the JPB1 100-pin map,
+  FX18 footprint/stack/vibration evidence, exact STM32H563 LQFP-100 pinout
+  audit, ADC/PWM/resource limits, CAN1 DNP/open crossing, and no-layout
+  manufacturing boundary to
+  `hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv`.
 - Q1 input reverse MOSFET pin evidence is captured from the Infineon
   `IAUTN06S5N008` data sheet; schematic freeze must still close TOLL footprint,
   40 A copper/thermal review, assembly handling, and gate clamp behavior.
@@ -239,6 +254,12 @@ Current coverage:
   protected measurement sequence, assembly alternates, and no-layout boundary
   to
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`.
+- Q1 input reverse closeout precheck now bridges LM74700-Q1 source boundary,
+  VCAP/gate default-off behavior, ideal-diode reverse-current behavior,
+  RDS(on) thermal window, TOLL/LFPAK88/PowerPAK alternatives, TVS overshoot
+  dependency, protected measurement sequence, assembly sourcing, capture sync,
+  and no-layout boundary to
+  `hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`.
 - The PB-100 board-current budget now has a cross-artifact trace tying the
   50 A main fuse target, 40 A board/configuration limit, 0-60 A total-current
   telemetry range, and 0.5 mΩ shunt operating point together; schematic freeze
@@ -258,6 +279,11 @@ Current coverage:
   wire derating, Q1/shunt operating points, copper pre-layout loss boundary,
   firmware enforcement, telemetry enforcement, bench path, and no-layout
   boundary into one machine-checked artifact.
+- Board-current value derivation now has
+  `hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv`,
+  tying shunt/Q1 formulas, connector/wire derating, firmware enforcement,
+  telemetry enforcement, sourcing ownership, and no-layout boundary into one
+  machine-checked artifact.
 - Close PB-100 CAN1 TX-disable schematic evidence using the `JP_CAN1`
   DNP/open link plus `U_CAN1` default-disabled/readback contract.
 - CAN1 TX-disable now has a trace tying `JP_CAN1`, `U_CAN1`,
@@ -276,6 +302,11 @@ Current coverage:
   `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`,
   tying the DNP/open missing link, default-disabled gate values, TXD recessive
   bias, physical status readback, firmware/capability boundary, bench path, and
+  no-layout boundary into one machine-checked artifact.
+- CAN1 default-disable derivation now has
+  `hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv`,
+  tying policy/configuration, physical missing-link, gate polarity, status
+  readback, firmware/capability/bench evidence, factory DNP sourcing, and
   no-layout boundary into one machine-checked artifact.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.

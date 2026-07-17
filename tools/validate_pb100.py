@@ -300,6 +300,14 @@ INPUT_REVERSE_Q1_DERIVATION_PRECHECK_COLUMNS = (
     "Required PB-100 close evidence",
     "Blocked action",
 )
+INPUT_REVERSE_Q1_CLOSEOUT_PRECHECK_COLUMNS = (
+    "Precheck ID",
+    "Scope",
+    "Required evidence bridge",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
 BOARD_CURRENT_BUDGET_TRACE_COLUMNS = (
     "Check",
     "Target",
@@ -322,6 +330,14 @@ BOARD_CURRENT_BUDGET_VALUE_FREEZE_CHECKLIST_COLUMNS = (
     "Required close evidence",
     "Primary artifacts",
     "Pass condition",
+    "Blocked action",
+)
+BOARD_CURRENT_BUDGET_VALUE_DERIVATION_PRECHECK_COLUMNS = (
+    "Derivation ID",
+    "Scope",
+    "Formula or source basis",
+    "Project input",
+    "Required PB-100 close evidence",
     "Blocked action",
 )
 CURRENT_TELEMETRY_TRACE_COLUMNS = (
@@ -446,6 +462,14 @@ B2B_INTERFACE_FREEZE_CHECKLIST_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+B2B_INTERFACE_CLOSEOUT_PRECHECK_COLUMNS = (
+    "Precheck ID",
+    "Scope",
+    "Required evidence bridge",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
 TVS_LOAD_DUMP_MARGIN_TRACE_COLUMNS = (
     "Protected item",
     "Voltage class",
@@ -468,6 +492,14 @@ TVS_OVERSHOOT_VALIDATION_PRECHECK_COLUMNS = (
     "Required setup",
     "Primary artifacts",
     "Pass condition",
+    "Blocked action",
+)
+TVS_OVERSHOOT_CLOSEOUT_PRECHECK_COLUMNS = (
+    "Precheck ID",
+    "Scope",
+    "Required evidence bridge",
+    "Project input",
+    "Required PB-100 close evidence",
     "Blocked action",
 )
 LOGIC_POWER_DESIGN_VALUE_COLUMNS = (
@@ -503,6 +535,22 @@ OUTPUT_STAGE_VALUE_FREEZE_CHECKLIST_COLUMNS = (
     "Blocked action",
 )
 OUTPUT_STAGE_VALUE_DERIVATION_PRECHECK_COLUMNS = (
+    "Derivation ID",
+    "Scope",
+    "Formula or source basis",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
+OUTPUT_STAGE_CLOSEOUT_PRECHECK_COLUMNS = (
+    "Precheck ID",
+    "Scope",
+    "Required evidence bridge",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
+CAN1_DEFAULT_DISABLE_DERIVATION_PRECHECK_COLUMNS = (
     "Derivation ID",
     "Scope",
     "Formula or source basis",
@@ -651,14 +699,17 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-input-reverse-freeze-review.csv",
         "PB-100-input-reverse-q1-freeze-checklist.csv",
         "PB-100-input-reverse-q1-derivation-precheck.csv",
+        "PB-100-input-reverse-q1-closeout-precheck.csv",
         "PB-100-board-current-budget-trace.csv",
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-board-current-budget-design-calculation.md",
         "PB-100-board-current-budget-value-freeze-checklist.csv",
+        "PB-100-board-current-budget-value-derivation-precheck.csv",
         "PB-100-tvs-load-dump-margin-trace.csv",
         "PB-100-tvs-load-dump-freeze-review.csv",
         "PB-100-tvs-overshoot-escape-checklist.csv",
         "PB-100-tvs-overshoot-validation-precheck.csv",
+        "PB-100-tvs-overshoot-closeout-precheck.csv",
     ),
     "CAP-LOGIC": (
         "PB-100-logic-power-rail-trace.csv",
@@ -673,6 +724,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-low-current-output-freeze-review.csv",
         "PB-100-output-stage-value-freeze-checklist.csv",
         "PB-100-output-stage-value-derivation-precheck.csv",
+        "PB-100-output-stage-closeout-precheck.csv",
     ),
     "CAP-OUT-INST": (
         "PB-100-high-medium-output-baseline-trace.csv",
@@ -681,6 +733,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-low-current-output-freeze-review.csv",
         "PB-100-output-stage-value-freeze-checklist.csv",
         "PB-100-output-stage-value-derivation-precheck.csv",
+        "PB-100-output-stage-closeout-precheck.csv",
     ),
     "CAP-TEL": (
         "PB-100-current-telemetry-trace.csv",
@@ -697,11 +750,13 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-b2b-lb100-resource-binding.csv",
         "PB-100-b2b-lb100-pin-audit-checklist.csv",
         "PB-100-b2b-interface-freeze-checklist.csv",
+        "PB-100-b2b-interface-closeout-precheck.csv",
     ),
     "CAP-CAN1": (
         "PB-100-can1-tx-disable-trace.csv",
         "PB-100-can1-production-dnp-review.csv",
         "PB-100-can1-default-disable-freeze-checklist.csv",
+        "PB-100-can1-default-disable-derivation-precheck.csv",
     ),
 }
 REVIEW_RELEASE_MANIFEST_COLUMNS = (
@@ -852,6 +907,18 @@ REQUIRED_INPUT_REVERSE_Q1_DERIVATION_CHECKS = {
     "Q1-DER-009",
     "Q1-DER-010",
 }
+REQUIRED_INPUT_REVERSE_Q1_CLOSEOUT_PRECHECKS = {
+    "Q1-CLS-001",
+    "Q1-CLS-002",
+    "Q1-CLS-003",
+    "Q1-CLS-004",
+    "Q1-CLS-005",
+    "Q1-CLS-006",
+    "Q1-CLS-007",
+    "Q1-CLS-008",
+    "Q1-CLS-009",
+    "Q1-CLS-010",
+}
 REQUIRED_TVS_LOAD_DUMP_FREEZE_REVIEW_ITEMS = {
     "Active HM3 branch",
     "100V device margin",
@@ -885,6 +952,18 @@ REQUIRED_TVS_OVERSHOOT_VALIDATION_CHECKS = {
     "TVS-VAL-008",
     "TVS-VAL-009",
     "TVS-VAL-010",
+}
+REQUIRED_TVS_OVERSHOOT_CLOSEOUT_PRECHECKS = {
+    "TVS-CLS-001",
+    "TVS-CLS-002",
+    "TVS-CLS-003",
+    "TVS-CLS-004",
+    "TVS-CLS-005",
+    "TVS-CLS-006",
+    "TVS-CLS-007",
+    "TVS-CLS-008",
+    "TVS-CLS-009",
+    "TVS-CLS-010",
 }
 REQUIRED_LOGIC_POWER_VALUE_ITEMS = {
     "Input filter",
@@ -973,6 +1052,18 @@ REQUIRED_CAN1_DEFAULT_DISABLE_FREEZE_CHECKS = {
     "CAN1-FRZ-009",
     "CAN1-FRZ-010",
 }
+REQUIRED_CAN1_DEFAULT_DISABLE_DERIVATION_CHECKS = {
+    "CAN1-DER-001",
+    "CAN1-DER-002",
+    "CAN1-DER-003",
+    "CAN1-DER-004",
+    "CAN1-DER-005",
+    "CAN1-DER-006",
+    "CAN1-DER-007",
+    "CAN1-DER-008",
+    "CAN1-DER-009",
+    "CAN1-DER-010",
+}
 REQUIRED_B2B_LB100_PIN_AUDIT_ITEMS = {
     "B2B-AUD-001",
     "B2B-AUD-002",
@@ -995,6 +1086,18 @@ REQUIRED_B2B_INTERFACE_FREEZE_CHECKS = {
     "B2B-FRZ-008",
     "B2B-FRZ-009",
     "B2B-FRZ-010",
+}
+REQUIRED_B2B_INTERFACE_CLOSEOUT_PRECHECKS = {
+    "B2B-CLS-001",
+    "B2B-CLS-002",
+    "B2B-CLS-003",
+    "B2B-CLS-004",
+    "B2B-CLS-005",
+    "B2B-CLS-006",
+    "B2B-CLS-007",
+    "B2B-CLS-008",
+    "B2B-CLS-009",
+    "B2B-CLS-010",
 }
 REQUIRED_OUTPUT_STAGE_VALUE_FREEZE_CHECKS = {
     "OUTVAL-001",
@@ -1019,6 +1122,18 @@ REQUIRED_OUTPUT_STAGE_VALUE_DERIVATION_CHECKS = {
     "OUTDRV-009",
     "OUTDRV-010",
 }
+REQUIRED_OUTPUT_STAGE_CLOSEOUT_PRECHECKS = {
+    "OUTCLS-001",
+    "OUTCLS-002",
+    "OUTCLS-003",
+    "OUTCLS-004",
+    "OUTCLS-005",
+    "OUTCLS-006",
+    "OUTCLS-007",
+    "OUTCLS-008",
+    "OUTCLS-009",
+    "OUTCLS-010",
+}
 REQUIRED_BOARD_CURRENT_BUDGET_FREEZE_REVIEW_ITEMS = {
     "Main fuse and input connector",
     "Q1 reverse path thermal",
@@ -1040,6 +1155,18 @@ REQUIRED_BOARD_CURRENT_BUDGET_VALUE_FREEZE_CHECKS = {
     "BUDGET-FRZ-008",
     "BUDGET-FRZ-009",
     "BUDGET-FRZ-010",
+}
+REQUIRED_BOARD_CURRENT_BUDGET_VALUE_DERIVATION_CHECKS = {
+    "BUDGET-DER-001",
+    "BUDGET-DER-002",
+    "BUDGET-DER-003",
+    "BUDGET-DER-004",
+    "BUDGET-DER-005",
+    "BUDGET-DER-006",
+    "BUDGET-DER-007",
+    "BUDGET-DER-008",
+    "BUDGET-DER-009",
+    "BUDGET-DER-010",
 }
 REQUIRED_CURRENT_TELEMETRY_FREEZE_REVIEW_ITEMS = {
     "Total shunt range",
@@ -1204,12 +1331,14 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md",
     "hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv",
+    "hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv",
     "hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv",
+    "hardware/power-board/PB-100/PB-100-output-stage-closeout-precheck.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md",
@@ -1229,10 +1358,12 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv",
+    "hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv",
     "hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv",
     "hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv",
     "hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv",
     "hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv",
+    "hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv",
     "hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md",
     "hardware/power-board/PB-100/PB-100-output-net-expansion.csv",
     "hardware/power-board/PB-100/PB-100-test-point-plan.csv",
@@ -1243,10 +1374,12 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv",
     "hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md",
     "hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv",
+    "hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv",
     "hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv",
+    "hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv",
     "hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv",
     "hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv",
@@ -2304,6 +2437,7 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-input-reverse-package-trace.csv",
             "PB-100-input-reverse-q1-freeze-checklist.csv",
             "PB-100-input-reverse-q1-derivation-precheck.csv",
+            "PB-100-input-reverse-q1-closeout-precheck.csv",
         ),
         "Output pin contract": ("PB-100-high-medium-output-baseline-trace.csv", "PB-100-low-current-output-baseline-trace.csv"),
         "Output stage design values": (
@@ -2311,14 +2445,17 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-low-current-output-baseline-trace.csv",
             "PB-100-output-stage-value-freeze-checklist.csv",
             "PB-100-output-stage-value-derivation-precheck.csv",
+            "PB-100-output-stage-closeout-precheck.csv",
         ),
         "Input power design values": (
             "PB-100-board-current-budget-trace.csv",
             "PB-100-board-current-budget-freeze-review.csv",
             "PB-100-board-current-budget-design-calculation.md",
             "PB-100-board-current-budget-value-freeze-checklist.csv",
+            "PB-100-board-current-budget-value-derivation-precheck.csv",
             "PB-100-input-reverse-package-trace.csv",
             "PB-100-input-reverse-q1-derivation-precheck.csv",
+            "PB-100-input-reverse-q1-closeout-precheck.csv",
             "PB-100-tvs-load-dump-margin-trace.csv",
             "PB-100-tvs-load-dump-freeze-review.csv",
             "PB-100-tvs-overshoot-escape-checklist.csv",
@@ -2334,6 +2471,7 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-input-reverse-package-trace.csv",
             "PB-100-input-reverse-q1-freeze-checklist.csv",
             "PB-100-input-reverse-q1-derivation-precheck.csv",
+            "PB-100-input-reverse-q1-closeout-precheck.csv",
         ),
         "Hardware capability manifest": (
             "PB-100-current-telemetry-trace.csv",
@@ -2350,6 +2488,7 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-b2b-lb100-pin-binding-precheck.md",
             "PB-100-b2b-lb100-pin-audit-checklist.csv",
             "PB-100-b2b-interface-freeze-checklist.csv",
+            "PB-100-b2b-interface-closeout-precheck.csv",
         ),
         "BOM synchronization": (
             "PB-100-assembly-readiness-trace.csv",
@@ -2367,11 +2506,13 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-can1-tx-disable-trace.csv",
             "PB-100-can1-production-dnp-review.csv",
             "PB-100-can1-default-disable-freeze-checklist.csv",
+            "PB-100-can1-default-disable-derivation-precheck.csv",
         ),
         "CAN1 safety verification": (
             "PB-100-can1-tx-disable-trace.csv",
             "PB-100-can1-reset-bench-checklist.csv",
             "PB-100-can1-default-disable-freeze-checklist.csv",
+            "PB-100-can1-default-disable-derivation-precheck.csv",
         ),
     }
     for area, tokens in required_dashboard_evidence.items():
@@ -2470,12 +2611,14 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-can1-safety-verification.csv",
             "PB-100-can1-production-dnp-review.csv",
             "PB-100-can1-default-disable-freeze-checklist.csv",
+            "PB-100-can1-default-disable-derivation-precheck.csv",
         ),
         "Board current budget": (
             "PB-100-board-current-budget-trace.csv",
             "PB-100-board-current-budget-freeze-review.csv",
             "PB-100-board-current-budget-design-calculation.md",
             "PB-100-board-current-budget-value-freeze-checklist.csv",
+            "PB-100-board-current-budget-value-derivation-precheck.csv",
             "PB-100-input-power-design-values.csv",
         ),
         "Board-to-board interface": (
@@ -2483,6 +2626,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-b2b-lb100-resource-binding.csv",
             "PB-100-b2b-lb100-pin-audit-checklist.csv",
             "PB-100-b2b-interface-freeze-checklist.csv",
+            "PB-100-b2b-interface-closeout-precheck.csv",
             "PB-100-b2b-pin-map.csv",
         ),
         "High/medium output stage": (
@@ -2490,6 +2634,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-high-medium-output-freeze-review.csv",
             "PB-100-output-stage-value-freeze-checklist.csv",
             "PB-100-output-stage-value-derivation-precheck.csv",
+            "PB-100-output-stage-closeout-precheck.csv",
             "PB-100-out2-soa.md",
         ),
         "Low-current output stage": (
@@ -2497,6 +2642,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-low-current-output-freeze-review.csv",
             "PB-100-output-stage-value-freeze-checklist.csv",
             "PB-100-output-stage-value-derivation-precheck.csv",
+            "PB-100-output-stage-closeout-precheck.csv",
             "ADR-0011",
         ),
         "Input reverse protection": (
@@ -2504,6 +2650,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-input-reverse-freeze-review.csv",
             "PB-100-input-reverse-q1-freeze-checklist.csv",
             "PB-100-input-reverse-q1-derivation-precheck.csv",
+            "PB-100-input-reverse-q1-closeout-precheck.csv",
             "PB-100-input-reverse-protection.md",
         ),
         "TVS/load-dump protection": (
@@ -2562,6 +2709,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-can1-production-dnp-review.csv",
         "PB-100-can1-reset-bench-checklist.csv",
         "PB-100-can1-default-disable-freeze-checklist.csv",
+        "PB-100-can1-default-disable-derivation-precheck.csv",
         "JP_CAN1",
         "U_CAN1",
         "future ADR",
@@ -2575,6 +2723,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-input-reverse-freeze-review.csv",
         "PB-100-input-reverse-q1-freeze-checklist.csv",
         "PB-100-input-reverse-q1-derivation-precheck.csv",
+        "PB-100-input-reverse-q1-closeout-precheck.csv",
         "Q1",
         "40 A",
         "IAUTN06S5N008",
@@ -2589,6 +2738,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-high-medium-output-freeze-review.csv",
         "PB-100-output-stage-value-freeze-checklist.csv",
         "PB-100-output-stage-value-derivation-precheck.csv",
+        "PB-100-output-stage-closeout-precheck.csv",
         "OUT2",
         "SOA",
         "gate drive",
@@ -2602,6 +2752,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-low-current-output-freeze-review.csv",
         "PB-100-output-stage-value-freeze-checklist.csv",
         "PB-100-output-stage-value-derivation-precheck.csv",
+        "PB-100-output-stage-closeout-precheck.csv",
         "OUT5",
         "OUT8",
         "OUT9",
@@ -2615,6 +2766,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-board-current-budget-design-calculation.md",
         "PB-100-board-current-budget-value-freeze-checklist.csv",
+        "PB-100-board-current-budget-value-derivation-precheck.csv",
         "40 A",
         "firmware config",
         "shunt",
@@ -2675,6 +2827,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-b2b-lb100-resource-binding.csv",
         "PB-100-b2b-lb100-pin-audit-checklist.csv",
         "PB-100-b2b-interface-freeze-checklist.csv",
+        "PB-100-b2b-interface-closeout-precheck.csv",
         "FX18-100P-0.8SV10",
         "FX18-100S-0.8SV20",
         "exact LB-100 MCU pin binding",
@@ -3552,6 +3705,170 @@ def validate_output_stage_value_derivation_precheck() -> None:
             fail(f"output-stage value derivation precheck must include {token}")
 
 
+def validate_output_stage_closeout_precheck() -> None:
+    path = PB100_DIR / "PB-100-output-stage-closeout-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty output-stage closeout precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in OUTPUT_STAGE_CLOSEOUT_PRECHECK_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        precheck_id = row["Precheck ID"].strip()
+        if precheck_id not in REQUIRED_OUTPUT_STAGE_CLOSEOUT_PRECHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown output closeout precheck {precheck_id}")
+        if precheck_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate output closeout precheck {precheck_id}")
+        rows_by_id[precheck_id] = row
+        for column in OUTPUT_STAGE_CLOSEOUT_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+        if precheck_id == "OUTCLS-002" and ("out2" not in row_text or "out5" not in row_text or "out10" not in row_text):
+            fail("output closeout class-map row must cover OUT2, low-current, and OUT10 classes")
+        if precheck_id == "OUTCLS-008" and ("adr-0011" not in row_text or "no direct 40 v smart-switch rail" not in row_text):
+            fail("output closeout low-current row must preserve ADR-0011 no-direct-40V-smart-switch boundary")
+        if precheck_id == "OUTCLS-010" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
+            fail("output closeout no-layout row must block PCB layout explicitly")
+
+    missing_items = sorted(REQUIRED_OUTPUT_STAGE_CLOSEOUT_PRECHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing output closeout prechecks: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "TI TPS4811-Q1",
+        "TPS48110AQDGXRQ1",
+        "TPS48110Q1EVM",
+        "Equation 1",
+        "Equation 4",
+        "Equation 6",
+        "Equation 7",
+        "Equation 11",
+        "Equation 12",
+        "Equation 13",
+        "High current",
+        "Medium current",
+        "Low current",
+        "OUT2",
+        "OUT10",
+        "OUT5",
+        "OUT8",
+        "OUT9",
+        "20A fuse",
+        "18A configured limit",
+        "15A/12A",
+        "10A/8A",
+        "5A fuse",
+        "4A configured limit",
+        "OV threshold divider",
+        "Current warning threshold",
+        "Short-circuit threshold",
+        "Fault timer",
+        "Bootstrap capacitor",
+        "Gate drive resistors",
+        "Current sense topology",
+        "Inductive clamp strategy",
+        "Value status TBD not final",
+        "OUTn_IWRN_SET",
+        "OUTn_ISCP_SET",
+        "OUTn_TMR",
+        "RSET",
+        "RSNS",
+        "VOS_SET",
+        "RIWRN",
+        "RISCP",
+        "CTMR",
+        "10ms",
+        "OUTn_BST",
+        "OUTn_PU",
+        "OUTn_PD",
+        "OUTn_CTL",
+        "OUTn_INP",
+        "default-off",
+        "reset",
+        "gate pull-down",
+        "Qg_total",
+        "C1",
+        "OUTn_CS_P",
+        "OUTn_CS_N",
+        "OUTn_IMON",
+        "0-30A",
+        "0-20A",
+        "0-8A",
+        "LB-100 ADC",
+        "OUT2 SOA",
+        "fuse energy",
+        "40A 1s",
+        "80A 100ms",
+        "60V/80V",
+        "PB-100-tvs-load-dump-margin-trace.csv",
+        "PB-100-mosfet-voltage-margin-review.md",
+        "ADR-0011",
+        "external-controller",
+        "60V N-MOSFET",
+        "no direct 40 V smart-switch rail",
+        "no direct 40V smart-switch rail",
+        "output-channel-template.kicad_sch",
+        "outputs-1-10.kicad_sch",
+        "PB-100-output-net-expansion.csv",
+        "PB-100-schematic-instance-symbol-map.csv",
+        "OUT1 through OUT10",
+        "generic OUTn names",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "MOSFET placement",
+        "fuse placement",
+        "connector placement",
+        "high-current copper",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "manufacturing ZIP",
+    ):
+        if token not in precheck_text:
+            fail(f"output-stage closeout precheck must include {token}")
+
+    design_rows = list(csv.DictReader((PB100_DIR / "PB-100-output-stage-design-values.csv").open(newline="", encoding="utf-8")))
+    seen_items: dict[str, set[str]] = {output_class: set() for output_class in REQUIRED_OUTPUT_STAGE_CLASSES}
+    for row in design_rows:
+        output_class = row["Output class"].strip()
+        if output_class in seen_items:
+            seen_items[output_class].add(row["Design item"].strip())
+            if "tbd not final" not in row["Value status"].lower():
+                fail("output-stage closeout precheck requires design values to remain non-final before freeze")
+    for output_class, items in seen_items.items():
+        missing_items = sorted(REQUIRED_OUTPUT_STAGE_ITEMS - items)
+        if missing_items:
+            fail(
+                f"output-stage closeout precheck requires {output_class} design values to include: "
+                f"{', '.join(missing_items)}"
+            )
+
+    freeze_text = read_text(PB100_DIR / "PB-100-output-stage-value-freeze-checklist.csv")
+    derivation_text = read_text(PB100_DIR / "PB-100-output-stage-value-derivation-precheck.csv")
+    for token in ("OUTVAL-002", "OUTVAL-004", "OUTVAL-009"):
+        if token not in freeze_text:
+            fail(f"output-stage closeout precheck requires freeze checklist token {token}")
+    for token in ("OUTDRV-004", "OUTDRV-005", "OUTDRV-006", "OUTDRV-007", "OUTDRV-010"):
+        if token not in derivation_text:
+            fail(f"output-stage closeout precheck requires derivation token {token}")
+
+
 def validate_low_current_output_baseline_trace() -> None:
     path = PB100_DIR / "PB-100-low-current-output-baseline-trace.csv"
     validate_csv(path)
@@ -4396,6 +4713,132 @@ def validate_input_reverse_q1_derivation_precheck() -> None:
             fail(f"input reverse Q1 derivation precheck must include {token}")
 
 
+def validate_input_reverse_q1_closeout_precheck() -> None:
+    path = PB100_DIR / "PB-100-input-reverse-q1-closeout-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty input reverse Q1 closeout precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in INPUT_REVERSE_Q1_CLOSEOUT_PRECHECK_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        precheck_id = row["Precheck ID"].strip()
+        if precheck_id not in REQUIRED_INPUT_REVERSE_Q1_CLOSEOUT_PRECHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown Q1 closeout precheck {precheck_id}")
+        if precheck_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Q1 closeout precheck {precheck_id}")
+        rows_by_id[precheck_id] = row
+        for column in INPUT_REVERSE_Q1_CLOSEOUT_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+        if precheck_id == "Q1-CLS-005" and (
+            "iautn06s5n008atma1" not in row_text
+            or "buk7s1r2-80m" not in row_text
+            or "dual sidr626ldp" not in row_text
+        ):
+            fail("Q1 closeout package row must keep preferred and alternate paths explicit")
+        if precheck_id == "Q1-CLS-010" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
+            fail("Q1 closeout no-layout row must block PCB layout explicitly")
+
+    missing_items = sorted(REQUIRED_INPUT_REVERSE_Q1_CLOSEOUT_PRECHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing Q1 closeout prechecks: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "TI LM74700-Q1",
+        "LM74700QDBVRQ1",
+        "LM74502-Q1",
+        "Equation 1",
+        "TDRV_EN",
+        "C(VCAP)",
+        "V(VCAP_UVLOR)",
+        "300uA",
+        "0.1uF",
+        "VCAP",
+        "CISS",
+        "EN",
+        "VCAP-to-ANODE",
+        "GATE internally connected to ANODE",
+        "INPUT_FET_GATE",
+        "20mV forward regulation",
+        "50mV conduction",
+        "-11mV reverse-current shutdown",
+        "VBAT_RAW",
+        "VBAT_REV_PROT",
+        "VBAT_PROT",
+        "0.5mΩ to 1.25mΩ",
+        "RDS(on)",
+        "40A",
+        "IAUTN06S5N008ATMA1",
+        "60 V TOLL",
+        "PG-HSOF-8-1",
+        "0.76mΩ",
+        "2.43W at 40A",
+        "BUK7S1R2-80M",
+        "80 V",
+        "LFPAK88",
+        "1.2mΩ",
+        "3.84W at 40A",
+        "dual SIDR626LDP",
+        "PowerPAK",
+        "20A per FET",
+        "1.68W per FET",
+        "single SIDR626LDP is rejected",
+        "SM8S33AHM3/I",
+        "TVS",
+        "60 V overshoot",
+        "80V-class escape",
+        "IIN_SHUNT_HI",
+        "IIN_SHUNT_LO",
+        "0.5mΩ shunt",
+        "50A fuse",
+        "JLCPCB PCBWay",
+        "at least two alternatives",
+        "input-protection.kicad_sch",
+        "CAP-INP",
+        "PB-100-input-power-design-values.csv",
+        "PB-100-input-protection-pin-contract.csv",
+        "PB-100-input-controller-pin-template.csv",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Q1 placement",
+        "high-current copper",
+        "thermal relief",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "manufacturing ZIP",
+    ):
+        if token not in precheck_text:
+            fail(f"input reverse Q1 closeout precheck must include {token}")
+
+    for supporting_artifact, tokens in {
+        "PB-100-input-reverse-q1-freeze-checklist.csv": ("Q1-FRZ-003", "Q1-FRZ-009"),
+        "PB-100-input-reverse-q1-derivation-precheck.csv": ("Q1-DER-002", "Q1-DER-010"),
+        "PB-100-input-reverse-package-trace.csv": ("IAUTN06S5N008ATMA1", "BUK7S1R2-80M", "Dual SIDR626LDP"),
+    }.items():
+        supporting_text = read_text(PB100_DIR / supporting_artifact)
+        for token in tokens:
+            if token not in supporting_text:
+                fail(f"Q1 closeout precheck requires {supporting_artifact} token {token}")
+
+
 def validate_logic_power_design_values() -> None:
     path = PB100_DIR / "PB-100-logic-power-design-values.csv"
     validate_csv(path)
@@ -5196,6 +5639,128 @@ def validate_can1_default_disable_freeze_checklist() -> None:
             fail(f"CAN1 reset bench checklist must support freeze checklist token {token}")
 
 
+def validate_can1_default_disable_derivation_precheck() -> None:
+    path = PB100_DIR / "PB-100-can1-default-disable-derivation-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty CAN1 default-disable derivation precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [
+        column for column in CAN1_DEFAULT_DISABLE_DERIVATION_PRECHECK_COLUMNS if column not in fieldnames
+    ]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        derivation_id = row["Derivation ID"].strip()
+        if derivation_id not in REQUIRED_CAN1_DEFAULT_DISABLE_DERIVATION_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown CAN1 derivation item {derivation_id}")
+        if derivation_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate CAN1 derivation item {derivation_id}")
+        rows_by_id[derivation_id] = row
+        for column in CAN1_DEFAULT_DISABLE_DERIVATION_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+        if "can1_tx_route" in row_text and "dnp/open" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1_TX_ROUTE derivation rows must keep DNP/open explicit")
+        if "configuration" in row_text and "cannot enable tx" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1 configuration rows must state configuration cannot enable TX")
+
+    missing_items = sorted(REQUIRED_CAN1_DEFAULT_DISABLE_DERIVATION_CHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing CAN1 derivation items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "ADR-0002",
+        "read-only by default",
+        "configuration cannot enable TX",
+        "future ADR",
+        "explicit hardware action",
+        "CAN1_TX_ROUTE",
+        "JP_CAN1",
+        "0Ω 0603",
+        "0 Ω 0603",
+        "DNP/open",
+        "no default-populated vehicle-CAN TX path",
+        "normally-open solder bridge",
+        "U_CAN1",
+        "SN74LVC1G125-Q1",
+        "OE high disabled",
+        "47 kΩ",
+        "47k",
+        "CAN1_TX_DISABLE_CMD",
+        "LB_3V3_IO",
+        "TXD recessive",
+        "transceiver VIO",
+        "CAN1_TX_DISABLED_STATUS",
+        "1 kΩ",
+        "1k",
+        "100 kΩ",
+        "100k",
+        "1 nF DNP",
+        "1nF DNP",
+        "not firmware-only",
+        "physical disabled state",
+        "DNP link detect",
+        "CAN1_RX_ROUTE",
+        "listen-only RX",
+        "can_safety",
+        "CAN2 expansion TX remains separate",
+        "vehicle_can_read_only_default",
+        "tx_route_population DNP/open",
+        "tx_requires_future_adr",
+        "hardware_action_required_for_tx",
+        "PB-BENCH-012",
+        "CAN1-RST-001",
+        "CAN1-RST-006",
+        "no vehicle-CAN transmit frame",
+        "factory_bom_draft.csv",
+        "pb100_symbol_bom_map.csv",
+        "pb100_assembly_sourcing_recheck.csv",
+        "JLCPCB/PCBWay",
+        "DNP 0R",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "CAN1 TX route layout",
+        "jumper footprint",
+        "fabrication package",
+    ):
+        if token not in precheck_text:
+            fail(f"CAN1 default-disable derivation precheck must include {token}")
+
+    design_text = read_text(PB100_DIR / "PB-100-can1-tx-disable-design-calculation.md")
+    for token in ("0 Ω 0603", "SN74LVC1G125-Q1", "47 kΩ", "1 kΩ", "100 kΩ", "1 nF DNP"):
+        if token not in design_text:
+            fail(f"CAN1 design calculation must support derivation token {token}")
+
+    reset_text = read_text(PB100_DIR / "PB-100-can1-reset-bench-checklist.csv")
+    for token in ("PB-BENCH-012", "no vehicle-CAN transmit frame", "future ADR", "explicit hardware action"):
+        if token not in reset_text:
+            fail(f"CAN1 reset bench checklist must support derivation token {token}")
+
+    sourcing_text = read_text(REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv")
+    for token in ("CAN1_TX_DISABLE", "DNP/open", "no default-populated TX", "future ADR"):
+        if token not in sourcing_text:
+            fail(f"assembly sourcing recheck must support CAN1 derivation token {token}")
+
+
 def validate_can1_reset_bench_checklist() -> None:
     path = PB100_DIR / "PB-100-can1-reset-bench-checklist.csv"
     validate_csv(path)
@@ -5591,6 +6156,124 @@ def validate_board_current_budget_value_freeze_checklist() -> None:
     ):
         if token not in firmware_text:
             fail(f"firmware/config budget evidence must support board-current checklist token {token}")
+
+
+def validate_board_current_budget_value_derivation_precheck() -> None:
+    path = PB100_DIR / "PB-100-board-current-budget-value-derivation-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty board-current budget value derivation precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [
+        column for column in BOARD_CURRENT_BUDGET_VALUE_DERIVATION_PRECHECK_COLUMNS if column not in fieldnames
+    ]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        derivation_id = row["Derivation ID"].strip()
+        if derivation_id not in REQUIRED_BOARD_CURRENT_BUDGET_VALUE_DERIVATION_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown board-current derivation item {derivation_id}")
+        if derivation_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate board-current derivation item {derivation_id}")
+        rows_by_id[derivation_id] = row
+        for column in BOARD_CURRENT_BUDGET_VALUE_DERIVATION_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+
+    missing_items = sorted(REQUIRED_BOARD_CURRENT_BUDGET_VALUE_DERIVATION_CHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing board-current derivation items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "ADR-0008",
+        "50A main harness fuse",
+        "50 A main fuse",
+        "40 A board continuous-current target",
+        "40 A default total_current_limit_a",
+        "82 A summed output limits",
+        "configuration separate from firmware",
+        "VBAT_RAW",
+        "INPUT_REVERSE_FET",
+        "VBAT_REV_PROT",
+        "TOTAL_CURRENT_SHUNT",
+        "0.5mΩ",
+        "VBAT_PROT",
+        "Vshunt = I * Rshunt",
+        "Pshunt = I^2 * Rshunt",
+        "20mV and 0.8W at 40A",
+        "25mV and 1.25W at 50A",
+        "30mV and 1.8W at 60A",
+        "IAUTN06S5N008ATMA1",
+        "TOLL",
+        "0.76mΩ",
+        "2.43 W at 40 A",
+        "BUK7S1R2-80M",
+        "LFPAK88",
+        "3.84 W at 40 A",
+        "dual SIDR626LDP",
+        "3.36 W total at 40 A",
+        "Every 1 mΩ",
+        "1.6 W at 40 A",
+        "2.5 W at 50 A",
+        "6mm2 / 10AWG",
+        "MAXI",
+        "total_current_limit_a",
+        "power_budget",
+        "PB-BENCH-010",
+        "PB-BENCH-006",
+        "stale telemetry denial",
+        "IIN_SENSE",
+        "IIN_SHUNT_HI",
+        "IIN_SHUNT_LO",
+        "0-60 A",
+        "Kelvin",
+        "ADC or I2C",
+        "INPUT_CONNECTOR",
+        "MAIN_FUSE_HOLDER",
+        "factory_bom_draft.csv",
+        "garage_bom_draft.csv",
+        "pb100_assembly_sourcing_recheck.csv",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "high-current copper",
+        "shunt copper",
+        "Q1 copper",
+    ):
+        if token not in precheck_text:
+            fail(f"board-current budget value derivation precheck must include {token}")
+
+    design_text = read_text(PB100_DIR / "PB-100-board-current-budget-design-calculation.md")
+    for token in ("20 mV at 40 A", "0.8 W at 40 A", "1.6 W at 40 A", "3.6 W at 60 A"):
+        if token not in design_text:
+            fail(f"board-current design calculation must support derivation token {token}")
+
+    firmware_text = "\n".join(
+        (
+            read_text(REPO_ROOT / "firmware" / "configs" / "config-example.json"),
+            read_text(REPO_ROOT / "firmware" / "tests" / "test_power_budget.c"),
+            read_text(REPO_ROOT / "firmware" / "tests" / "test_rule_runtime.c"),
+        )
+    )
+    for token in ("total_current_limit_a", "40", "test_denies_output_over_budget", "stale"):
+        if token not in firmware_text:
+            fail(f"firmware/config budget evidence must support board-current derivation token {token}")
 
 
 def validate_current_telemetry_trace() -> None:
@@ -7702,6 +8385,113 @@ def validate_tvs_overshoot_validation_precheck() -> None:
             fail(f"TVS overshoot validation precheck must include {token}")
 
 
+def validate_tvs_overshoot_closeout_precheck() -> None:
+    path = PB100_DIR / "PB-100-tvs-overshoot-closeout-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty TVS overshoot closeout precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in TVS_OVERSHOOT_CLOSEOUT_PRECHECK_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        precheck_id = row["Precheck ID"].strip()
+        if precheck_id not in REQUIRED_TVS_OVERSHOOT_CLOSEOUT_PRECHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown TVS closeout precheck {precheck_id}")
+        if precheck_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate TVS closeout precheck {precheck_id}")
+        rows_by_id[precheck_id] = row
+        for column in TVS_OVERSHOOT_CLOSEOUT_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+        if precheck_id == "TVS-CLS-002" and ("vstress" not in row_text or "lloop" not in row_text):
+            fail("TVS closeout method row must keep Vstress and Lloop explicit")
+        if precheck_id == "TVS-CLS-010" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
+            fail("TVS closeout no-layout row must block PCB layout explicitly")
+
+    missing_items = sorted(REQUIRED_TVS_OVERSHOOT_CLOSEOUT_PRECHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing TVS closeout prechecks: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "SM8S33AHM3/I",
+        "HM3 DO-218AC",
+        "AEC-Q101",
+        "53.3 V clamp at 124 A",
+        "MCC SM8S33A EOL",
+        "Vishay HE3 NFD",
+        "60 V acceptance",
+        "Vstress = Vclamp + Lloop * di/dt",
+        "probe fixture parasitics",
+        "source impedance",
+        "SIDR626LDP",
+        "IAUTN06S5N008",
+        "BUK7S1R2-80M",
+        "LFPAK88",
+        "80 V output MOSFET",
+        "TPS48110",
+        "LM5164QDDATQ1",
+        "LM5013-Q1",
+        "TPS54360B-Q1",
+        "TPS2HB35",
+        "ADR-0011",
+        "future ADR",
+        "OV divider",
+        "buck input network",
+        "input filter capacitor",
+        "TBD not final",
+        "VBAT_PROT",
+        "INPUT_TVS",
+        "SLD8S33A",
+        "DM8W33AQ-13",
+        "SM8S33A-Q",
+        "JLCPCB PCBWay",
+        "at least two viable alternates",
+        "input-protection.kicad_sch",
+        "CAP-INP",
+        "PB-100-test-point-plan.csv",
+        "PB-100-protection-validation.csv",
+        "docs/testing/test-plan.md",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "D1 placement",
+        "pulse-current return copper",
+        "via strategy",
+        "thermal relief",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "manufacturing ZIP",
+    ):
+        if token not in precheck_text:
+            fail(f"TVS overshoot closeout precheck must include {token}")
+
+    for supporting_artifact, tokens in {
+        "PB-100-tvs-overshoot-escape-checklist.csv": ("TVS-FRZ-002", "TVS-FRZ-009"),
+        "PB-100-tvs-overshoot-validation-precheck.csv": ("TVS-VAL-002", "TVS-VAL-010"),
+        "PB-100-tvs-load-dump-freeze-review.csv": ("60V MOSFET conditional margin", "Layout authorization boundary"),
+    }.items():
+        supporting_text = read_text(PB100_DIR / supporting_artifact)
+        for token in tokens:
+            if token not in supporting_text:
+                fail(f"TVS closeout precheck requires {supporting_artifact} token {token}")
+
+
 def validate_thermal_telemetry_baseline() -> None:
     map_path = PB100_DIR / "PB-100-thermal-telemetry-map.csv"
     validate_csv(map_path)
@@ -8097,6 +8887,124 @@ def validate_b2b_interface_freeze_checklist() -> None:
             fail(f"B2B interface freeze checklist must include {token}")
 
 
+def validate_b2b_interface_closeout_precheck() -> None:
+    path = PB100_DIR / "PB-100-b2b-interface-closeout-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty B2B interface closeout precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in B2B_INTERFACE_CLOSEOUT_PRECHECK_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        precheck_id = row["Precheck ID"].strip()
+        if precheck_id not in REQUIRED_B2B_INTERFACE_CLOSEOUT_PRECHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown B2B closeout precheck {precheck_id}")
+        if precheck_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate B2B closeout precheck {precheck_id}")
+        rows_by_id[precheck_id] = row
+        for column in B2B_INTERFACE_CLOSEOUT_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+        if "can1_tx_route" in row_text and "dnp/open" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1_TX_ROUTE rows must keep DNP/open explicit")
+        if precheck_id == "B2B-CLS-010" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
+            fail("B2B closeout no-layout row must block PCB layout explicitly")
+
+    missing_items = sorted(REQUIRED_B2B_INTERFACE_CLOSEOUT_PRECHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing B2B closeout prechecks: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "JPB1",
+        "100-position",
+        "0.8 mm",
+        "PB-100-b2b-pin-map.csv",
+        "100 JPB1 pins",
+        "PB-100-b2b-lb100-resource-binding.csv",
+        "PB-100-b2b-lb100-pin-binding-precheck.md",
+        "PB-100-b2b-lb100-pin-audit-checklist.csv",
+        "PB-100-b2b-interface-freeze-checklist.csv",
+        "FX18-100P-0.8SV10",
+        "FX18-100S-0.8SV20",
+        "20 mm",
+        "footprint drawing",
+        "courtyard",
+        "pin-1",
+        "stack height",
+        "vibration retention",
+        "assembly handling",
+        "tray",
+        "JLCPCB PCBWay",
+        "STM32H563",
+        "LQFP-100",
+        "Exact LB-100 pinout",
+        "16 ADC",
+        "external ADC/mux",
+        "10 GPIO/PWM",
+        "default-low",
+        "PB_PWR_GOOD",
+        "PB_WAKE_REQ",
+        "OUT1_CTL",
+        "OUT10_IMON",
+        "IIN_SENSE",
+        "TEMP_PWR_A",
+        "PB_I2C_SCL",
+        "PB_I2C_SDA",
+        "PB_I2C_INT",
+        "CAN1_TX_DISABLE_CMD",
+        "CAN1_TX_DISABLED_STATUS",
+        "CAN1_RX_ROUTE",
+        "CAN1_TX_ROUTE",
+        "DNP/open",
+        "future ADR",
+        "CAN2",
+        "LIN",
+        "RS485",
+        "UART",
+        "EXT_ADC",
+        "architecture review",
+        "PB_5V_OUT",
+        "LB_3V3_IO",
+        "PB_PWR_GOOD",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "connector placement",
+        "board outline",
+        "stack-height lock",
+        "manufacturing ZIP",
+    ):
+        if token not in precheck_text:
+            fail(f"B2B interface closeout precheck must include {token}")
+
+    pin_rows = list(csv.DictReader((PB100_DIR / "PB-100-b2b-pin-map.csv").open(newline="", encoding="utf-8")))
+    if len(pin_rows) != 100:
+        fail("B2B closeout precheck requires PB-100-b2b-pin-map.csv to contain 100 JPB1 pins")
+
+    audit_text = read_text(PB100_DIR / "PB-100-b2b-lb100-pin-audit-checklist.csv")
+    for token in ("STM32H563", "LQFP-100", "16 ADC", "FX18-100P-0.8SV10", "FX18-100S-0.8SV20"):
+        if token not in audit_text:
+            fail(f"B2B pin audit checklist must support closeout precheck token {token}")
+
+
 def parse_pin_span_set(value: str) -> set[str]:
     pins: set[str] = set()
     for part in value.split(";"):
@@ -8246,6 +9154,8 @@ def validate_validation_traceability() -> None:
                 fail("CAN1 validation trace must include production DNP review")
             if "pb-100-can1-default-disable-freeze-checklist.csv" not in row_text:
                 fail("CAN1 validation trace must include default-disable freeze checklist")
+            if "pb-100-can1-default-disable-derivation-precheck.csv" not in row_text:
+                fail("CAN1 validation trace must include default-disable derivation precheck")
         if freeze_gate == "Board current budget":
             if "pb-100-board-current-budget-freeze-review.csv" not in row_text:
                 fail("Board current validation trace must include 40 A freeze review")
@@ -8253,6 +9163,8 @@ def validate_validation_traceability() -> None:
                 fail("Board current validation trace must include design calculation")
             if "pb-100-board-current-budget-value-freeze-checklist.csv" not in row_text:
                 fail("Board current validation trace must include value freeze checklist")
+            if "pb-100-board-current-budget-value-derivation-precheck.csv" not in row_text:
+                fail("Board current validation trace must include value derivation precheck")
         if freeze_gate == "Current telemetry":
             if "pb-100-current-telemetry-freeze-review.csv" not in row_text:
                 fail("Current telemetry validation trace must include freeze review")
@@ -8274,6 +9186,8 @@ def validate_validation_traceability() -> None:
                 fail("High/medium output validation trace must include value freeze checklist")
             if "pb-100-output-stage-value-derivation-precheck.csv" not in row_text:
                 fail("High/medium output validation trace must include value derivation precheck")
+            if "pb-100-output-stage-closeout-precheck.csv" not in row_text:
+                fail("High/medium output validation trace must include closeout precheck")
         if freeze_gate == "Low-current output stage":
             if "pb-100-low-current-output-freeze-review.csv" not in row_text:
                 fail("Low-current output validation trace must include freeze review")
@@ -8281,6 +9195,8 @@ def validate_validation_traceability() -> None:
                 fail("Low-current output validation trace must include value freeze checklist")
             if "pb-100-output-stage-value-derivation-precheck.csv" not in row_text:
                 fail("Low-current output validation trace must include value derivation precheck")
+            if "pb-100-output-stage-closeout-precheck.csv" not in row_text:
+                fail("Low-current output validation trace must include closeout precheck")
         if freeze_gate == "Input reverse protection":
             if "pb-100-input-reverse-freeze-review.csv" not in row_text:
                 fail("Input reverse validation trace must include freeze review")
@@ -8288,6 +9204,8 @@ def validate_validation_traceability() -> None:
                 fail("Input reverse validation trace must include Q1 freeze checklist")
             if "pb-100-input-reverse-q1-derivation-precheck.csv" not in row_text:
                 fail("Input reverse validation trace must include Q1 derivation precheck")
+            if "pb-100-input-reverse-q1-closeout-precheck.csv" not in row_text:
+                fail("Input reverse validation trace must include Q1 closeout precheck")
         if freeze_gate == "Input reverse protection":
             if "q1" not in row_text or "40 a" not in row_text:
                 fail("Input reverse validation trace must keep Q1 and 40 A explicit")
@@ -8357,6 +9275,11 @@ def validate_validation_traceability() -> None:
         for row in gates_with_tests["Board-to-board interface"]
     ):
         fail("validation traceability for Board-to-board interface must include PB-100-b2b-interface-freeze-checklist.csv")
+    if not any(
+        "PB-100-b2b-interface-closeout-precheck.csv" in row["Primary artifact"]
+        for row in gates_with_tests["Board-to-board interface"]
+    ):
+        fail("validation traceability for Board-to-board interface must include PB-100-b2b-interface-closeout-precheck.csv")
 
     missing_gates = sorted(gate for gate, gate_rows in gates_with_tests.items() if not gate_rows)
     if missing_gates:
@@ -8801,14 +9724,17 @@ def validate_test_plan_traceability() -> None:
         "PB-100-low-current-output-freeze-review.csv",
         "PB-100-output-stage-value-freeze-checklist.csv",
         "PB-100-output-stage-value-derivation-precheck.csv",
+        "PB-100-output-stage-closeout-precheck.csv",
         "PB-100-can1-tx-disable-trace.csv",
         "PB-100-can1-production-dnp-review.csv",
         "PB-100-can1-default-disable-freeze-checklist.csv",
+        "PB-100-can1-default-disable-derivation-precheck.csv",
         "PB-100-can1-reset-bench-checklist.csv",
         "PB-100-input-reverse-package-trace.csv",
         "PB-100-input-reverse-freeze-review.csv",
         "PB-100-input-reverse-q1-freeze-checklist.csv",
         "PB-100-input-reverse-q1-derivation-precheck.csv",
+        "PB-100-input-reverse-q1-closeout-precheck.csv",
         "PB-100-tvs-load-dump-margin-trace.csv",
         "PB-100-tvs-load-dump-freeze-review.csv",
         "PB-100-tvs-overshoot-escape-checklist.csv",
@@ -8825,6 +9751,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-board-current-budget-design-calculation.md",
         "PB-100-board-current-budget-value-freeze-checklist.csv",
+        "PB-100-board-current-budget-value-derivation-precheck.csv",
         "PB-100-thermal-telemetry-trace.csv",
         "PB-100-thermal-telemetry-freeze-review.csv",
         "PB-100-thermal-telemetry-value-freeze-checklist.csv",
@@ -8833,6 +9760,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-b2b-lb100-resource-binding.csv",
         "PB-100-b2b-lb100-pin-audit-checklist.csv",
         "PB-100-b2b-interface-freeze-checklist.csv",
+        "PB-100-b2b-interface-closeout-precheck.csv",
         "PB-100-assembly-readiness-trace.csv",
         "PB-100-factory-assembly-freeze-checklist.csv",
         "PB-100-factory-assembly-sourcing-precheck.csv",
@@ -8906,6 +9834,7 @@ def main() -> int:
     validate_high_medium_output_freeze_review()
     validate_output_stage_value_freeze_checklist()
     validate_output_stage_value_derivation_precheck()
+    validate_output_stage_closeout_precheck()
     validate_input_and_power_pin_templates()
     validate_input_protection_pin_contract()
     validate_logic_power_design_placeholders()
@@ -8915,10 +9844,12 @@ def main() -> int:
     validate_input_reverse_freeze_review()
     validate_input_reverse_q1_freeze_checklist()
     validate_input_reverse_q1_derivation_precheck()
+    validate_input_reverse_q1_closeout_precheck()
     validate_board_current_budget_trace()
     validate_board_current_budget_freeze_review()
     validate_board_current_budget_design_calculation()
     validate_board_current_budget_value_freeze_checklist()
+    validate_board_current_budget_value_derivation_precheck()
     validate_current_telemetry_trace()
     validate_current_telemetry_freeze_review()
     validate_current_telemetry_value_freeze_checklist()
@@ -8936,6 +9867,7 @@ def main() -> int:
     validate_can1_safety_verification()
     validate_can1_production_dnp_review()
     validate_can1_default_disable_freeze_checklist()
+    validate_can1_default_disable_derivation_precheck()
     validate_can1_reset_bench_checklist()
     validate_can1_capture_contract()
     validate_assembly_sourcing_recheck()
@@ -8951,11 +9883,13 @@ def main() -> int:
     validate_tvs_load_dump_freeze_review()
     validate_tvs_overshoot_escape_checklist()
     validate_tvs_overshoot_validation_precheck()
+    validate_tvs_overshoot_closeout_precheck()
     validate_thermal_telemetry_baseline()
     validate_b2b_interface_trace()
     validate_b2b_connector_candidate()
     validate_b2b_lb100_pin_audit_checklist()
     validate_b2b_interface_freeze_checklist()
+    validate_b2b_interface_closeout_precheck()
     validate_b2b_resource_binding()
     validate_validation_traceability()
     validate_test_point_plan()

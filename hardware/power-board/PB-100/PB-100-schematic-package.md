@@ -25,6 +25,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`
 - `production/bom/pb100_assembly_sourcing_recheck.csv`
 - `production/bom/pb100_sourcing_evidence_snapshot.csv`
@@ -36,16 +37,19 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`
@@ -61,6 +65,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
 - `hardware/power-board/PB-100/kicad/PB-100.kicad_sch`
@@ -83,6 +88,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-output-stage-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-output-net-expansion.csv`
 - `hardware/power-board/PB-100/PB-100-output-stage-design-values.csv`
@@ -122,6 +128,11 @@ It is not a PCB layout package.
   pre-layout boundary, firmware enforcement, telemetry enforcement, bench
   validation, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv`.
+- 40 A board-current value derivation precheck: current-budget contract,
+  protected current path, shunt and Q1 formulas, copper pre-layout loss, garage
+  fuse/wire derating, firmware and telemetry enforcement, BOM sourcing, and
+  no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv`.
 - Current telemetry freeze review: 0.5 mΩ shunt range, INA228-class monitor
   headroom, Kelvin sense, ADC/I2C ownership, per-output IMON scaling,
   calibration configuration, and stale-telemetry safe faults are tracked in
@@ -154,6 +165,12 @@ It is not a PCB layout package.
   measurement sequence, assembly alternates, and no-layout boundary are tracked
   in
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`.
+- Input reverse Q1 closeout precheck: controller source boundary, VCAP/gate
+  default-off behavior, ideal-diode reverse-current behavior, RDS(on) thermal
+  window, TOLL/LFPAK88/PowerPAK alternatives, TVS overshoot dependency,
+  protected measurement sequence, assembly sourcing, input capture sync, and
+  no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`.
 - TVS/load-dump freeze review: active SM8S33AHM3/I HM3 branch, 100 V device
   margin, 60 V MOSFET overshoot dependency, 80 V Q1 alternate, 40 V
   smart-switch ADR boundary, sourcing gate, and no-layout boundary are tracked
@@ -167,6 +184,11 @@ It is not a PCB layout package.
   setup, 60 V acceptance versus 80 V escape, factory alternates, and no-layout
   boundary are tracked in
   `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`.
+- TVS overshoot closeout precheck: active source, overshoot method, 60 V
+  acceptance, 80 V escape, 100 V downstream defaults, 40 V ADR boundary,
+  schematic-value dependencies, sourcing, validation sync, and no-layout
+  boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv`.
 - MOSFET voltage-margin review: 60 V MOSFET paths behind the active HM3 TVS
   branch need explicit overshoot evidence or migration to the 80 V review
   escape path before schematic freeze. See
@@ -235,6 +257,11 @@ It is not a PCB layout package.
   reference positions are mapped to PB-100 high, medium, and low current
   value derivation in
   `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`.
+- Output-stage closeout precheck: source formulas, class maps, design-item
+  completeness, thresholds/timers, bootstrap/default-off behavior, telemetry
+  scaling, SOA/fuse/clamp evidence, low-current ADR-0011 boundary, instance
+  synchronization, and no-layout boundary are bridged in
+  `hardware/power-board/PB-100/PB-100-output-stage-closeout-precheck.csv`.
 - Outputs: 10 generic high-side protected channels.
 - CAN1: read-only by default; TX physically disabled.
 
@@ -278,6 +305,12 @@ It is not a PCB layout package.
   disabled-status readback, DNP-link detect boundary, RX independence, firmware
   and capability boundary, bench path, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`.
+- CAN1 default-disable derivation precheck: policy/configuration boundary,
+  physical missing-link barrier, default-disabled gate polarity, TXD recessive
+  bias, physical disabled-status readback, optional DNP link detect,
+  listen-only RX independence, firmware/capability/bench evidence, factory DNP
+  sourcing bridge, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv`.
 
 ## Board-to-board signal budget
 
@@ -298,6 +331,9 @@ LB-100 pin audit and FX18 checklist:
 
 B2B interface freeze checklist:
 `hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`.
+
+B2B interface closeout precheck:
+`hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv`.
 
 LB-100 pin-binding precheck:
 `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`.
@@ -332,6 +368,10 @@ The B2B interface freeze checklist ties that audit to power/status pins,
 role-free output signals, board telemetry, `PB_I2C`, CAN1 read-only crossing,
 resource-class reservations, cross-artifact synchronization, and the no-layout
 boundary for PBREL-003.
+The B2B interface closeout precheck bridges that freeze checklist to the JPB1
+100-pin map, FX18 footprint/stack/vibration evidence, exact STM32H563 LQFP-100
+pinout audit, ADC/PWM/resource limits, CAN1 DNP/open crossing, and the explicit
+no-layout/manufacturing-output boundary.
 
 ## Output channel matrix
 
@@ -377,6 +417,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-input-protection-pin-contract.csv`
@@ -407,6 +448,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv`

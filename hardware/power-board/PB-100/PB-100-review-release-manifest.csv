@@ -26,6 +26,7 @@ hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv,Safety,CAN1 pr
 hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv,Safety,CAN1 reset and DNP bench checklist,Required,validate_can1_reset_bench_checklist,Conditional
 hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md,Safety,CAN1 default-disabled candidate value calculation,Required,Document reviewed,Conditional
 hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv,Safety,CAN1 default-disable freeze checklist,Required,validate_can1_default_disable_freeze_checklist,Conditional
+hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv,Safety,CAN1 default-disable derivation precheck,Required,validate_can1_default_disable_derivation_precheck,Conditional
 hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv,Symbols,Symbol and MPN readiness,Required,validate_symbol_mpn_readiness,Conditional
 hardware/power-board/PB-100/PB-100-symbol-capture-worklist.csv,Symbols,Symbol capture worklist,Required,validate_symbol_capture_worklist,Conditional
 hardware/power-board/PB-100/PB-100-symbol-pin-evidence.csv,Symbols,Symbol pin evidence,Required,validate_symbol_pin_evidence,Conditional
@@ -37,11 +38,13 @@ hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv,Telemetry,Boar
 hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv,Telemetry,40 A board-current freeze review,Required,validate_board_current_budget_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md,Telemetry,40 A board-current path design calculation,Required,validate_board_current_budget_design_calculation,Conditional
 hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv,Telemetry,40 A board-current value freeze checklist,Required,validate_board_current_budget_value_freeze_checklist,Conditional
+hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv,Telemetry,40 A board-current value derivation precheck,Required,validate_board_current_budget_value_derivation_precheck,Conditional
 hardware/power-board/PB-100/PB-100-input-power-design-values.csv,Input protection,Input power design values,Required,validate_input_power_design_values,Conditional
 hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv,Input protection,Q1 reverse-protection package and thermal trace,Required,validate_input_reverse_package_trace,Conditional
 hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv,Input protection,Q1 reverse-protection freeze review,Required,validate_input_reverse_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv,Input protection,Q1 gate thermal and assembly freeze checklist,Required,validate_input_reverse_q1_freeze_checklist,Conditional
 hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv,Input protection,Q1 LM74700 derivation precheck,Required,validate_input_reverse_q1_derivation_precheck,Conditional
+hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv,Input protection,Q1 input reverse closeout precheck,Required,validate_input_reverse_q1_closeout_precheck,Conditional
 hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv,Logic power,Protected 5 V logic power rail trace,Required,validate_logic_power_rail_trace,Conditional
 hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv,Logic power,Logic power freeze review,Required,validate_logic_power_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv,Logic power,LM5164 pin template,Required,validate_input_and_power_pin_templates,Conditional
@@ -60,6 +63,7 @@ hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv,Outputs,TP
 hardware/power-board/PB-100/PB-100-output-stage-design-values.csv,Outputs,Output stage design values,Required,validate_output_stage_design_values,Conditional
 hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv,Outputs,Output stage value freeze checklist,Required,validate_output_stage_value_freeze_checklist,Conditional
 hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv,Outputs,Output stage value derivation precheck,Required,validate_output_stage_value_derivation_precheck,Conditional
+hardware/power-board/PB-100/PB-100-output-stage-closeout-precheck.csv,Outputs,Output stage closeout precheck,Required,validate_output_stage_closeout_precheck,Conditional
 hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv,Telemetry,Current telemetry and firmware safety trace,Required,validate_current_telemetry_trace,Conditional
 hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv,Telemetry,Current telemetry freeze review,Required,validate_current_telemetry_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md,Telemetry,Total-current monitor candidate value calculation,Required,Document reviewed,Conditional
@@ -76,6 +80,7 @@ hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv,Protection,TVS
 hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv,Protection,TVS/load-dump freeze review,Required,validate_tvs_load_dump_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv,Protection,TVS overshoot and 80 V escape checklist,Required,validate_tvs_overshoot_escape_checklist,Conditional
 hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv,Protection,TVS overshoot validation precheck,Required,validate_tvs_overshoot_validation_precheck,Conditional
+hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv,Protection,TVS overshoot closeout precheck,Required,validate_tvs_overshoot_closeout_precheck,Conditional
 hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md,Protection,60V MOSFET voltage-margin review escape path,Required,Document reviewed,Conditional
 hardware/power-board/PB-100/PB-100-protection-validation.csv,Protection,TVS/load-dump protection review,Required,CSV width validation,Conditional
 hardware/power-board/PB-100/PB-100-thermal-estimates.csv,Thermal,Thermal estimate table,Required,CSV width validation,Conditional
@@ -84,6 +89,7 @@ hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv,B2B interface,JPB1 co
 hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv,B2B interface,LB-100 resource-class binding,Required,validate_b2b_resource_binding,Conditional
 hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv,B2B interface,LB-100 pin audit and FX18 checklist,Required,validate_b2b_lb100_pin_audit_checklist,Conditional
 hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv,B2B interface,B2B freeze review gate checklist,Required,validate_b2b_interface_freeze_checklist,Conditional
+hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv,B2B interface,B2B interface closeout precheck,Required,validate_b2b_interface_closeout_precheck,Conditional
 hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md,B2B interface,LB-100 STM32H5 resource precheck,Required,Document reviewed,Conditional
 hardware/power-board/PB-100/PB-100-b2b-pin-map.csv,B2B interface,JPB1 pin map,Required,validate_jpb1_symbol_from_pin_map,Conditional
 hardware/power-board/PB-100/PB-100-b2b-pin-budget.csv,B2B interface,JPB1 pin budget,Required,CSV width validation,Ready

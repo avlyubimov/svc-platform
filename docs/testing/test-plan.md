@@ -102,6 +102,7 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv`
   `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`
   `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`
+  `hardware/power-board/PB-100/PB-100-output-stage-closeout-precheck.csv`
   and `hardware/power-board/PB-100/PB-100-out2-soa.md`.
 - Output overcurrent, fuse, and class-limit tests trace to
   `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
@@ -110,25 +111,30 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv`
   plus `hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv`
   plus `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`
-  and `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`.
+  `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`
+  and `hardware/power-board/PB-100/PB-100-output-stage-closeout-precheck.csv`.
 - CAN1 listen-only tests trace to
   `hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv`,
   `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`, and
   `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`, plus
   `hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv` and
   `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`, and
-  `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`.
+  `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`
+  plus
+  `hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv`.
 - Input reverse-protection tests trace to
   `hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv`,
   `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`,
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`,
-  `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`, and
+  `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`,
+  `hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`, and
   `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`.
 - TVS/load-dump tests trace to
   `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv` and
   `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`, and
   `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv` plus
-  `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`.
+  `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`
+  and `hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv`.
 - Current telemetry and current-budget tests trace to
   `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`,
   `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`,
@@ -138,6 +144,7 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`,
   `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`,
   `hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv`,
+  `hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv`,
   and
   `docs/adr/ADR-0008-pb-100-current-budget.md`.
 - Thermal derating tests trace to
@@ -150,7 +157,8 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`,
   `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`,
   `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`,
-  `hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`, and
+  `hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`,
+  `hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv`, and
   `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`.
 - Vibration, connector, fuse, and harness ownership tests trace to
   `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv` and

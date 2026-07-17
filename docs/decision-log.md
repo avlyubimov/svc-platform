@@ -1970,6 +1970,20 @@ freeze packet also needs a reviewer-facing gate that links B2B electrical,
 mechanical, LB-100 resource, CAN1 safety, and no-layout conditions before any
 mezzanine placement or manufacturing-output work.
 
+## 2026-07-17 — PB-100 B2B interface closeout precheck
+
+Decision: PB-100 board-to-board release review now has
+`hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv`. The
+precheck bridges the JPB1 100-position pin map, FX18 footprint drawing,
+20 mm stack-height evidence, vibration and assembly handling, exact STM32H563
+LQFP-100 pinout audit, ADC/PWM/resource limits, CAN1 DNP/open crossing, and
+no-layout manufacturing boundary to PBREL-003.
+
+Reason: The B2B freeze checklist names the gate, but print-readiness review
+also needs a machine-checked closeout bridge that prevents connector placement,
+stack-height lock, `PB-100.kicad_pcb`, Gerbers, drills, pick-place, or
+manufacturing ZIP work until LB-100 pinout and FX18 mechanical evidence close.
+
 ## 2026-07-17 — PB-100 output-stage value freeze checklist
 
 Decision: PB-100 output-stage review now has
@@ -1998,6 +2012,22 @@ schematic freeze packet needs a formula-backed bridge between controller
 datasheet equations, OUT2 SOA/current limits, the low-current ADR-0011
 boundary, telemetry ranges, and still-open final value-bearing schematic
 instances.
+
+## 2026-07-17 — PB-100 output-stage closeout precheck
+
+Decision: PB-100 output-stage review now has
+`hardware/power-board/PB-100/PB-100-output-stage-closeout-precheck.csv`. The
+precheck bridges TI TPS4811-Q1/TPS48110Q1EVM formulas, high/medium/low output
+class maps, design-item completeness, threshold and timer derivations,
+bootstrap/default-off behavior, current telemetry scaling, SOA/fuse/clamp
+evidence, low-current ADR-0011 boundary, template/instance synchronization, and
+no-layout manufacturing boundary to PBREL-004/PBREL-005.
+
+Reason: The value checklist and derivation precheck define what must close, but
+the print-readiness packet also needs a machine-checked bridge that prevents
+MOSFET placement, fuse placement, connector placement, high-current copper,
+`PB-100.kicad_pcb`, Gerbers, drills, pick-place, or manufacturing ZIP work
+until final output values and low-current ADR boundaries close.
 
 ## 2026-07-17 — PB-100 input reverse Q1 freeze checklist
 
@@ -2028,6 +2058,22 @@ needs a formula-backed bridge between the LM74700 controller datasheet,
 `INPUT_FET_GATE` behavior, 40 A Q1 MOSFET candidates, TVS/load-dump dependency,
 and the still-open final gate network, footprint, and copper decisions.
 
+## 2026-07-17 — PB-100 input reverse Q1 closeout precheck
+
+Decision: PB-100 input reverse-protection review now has
+`hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`.
+The precheck bridges the LM74700-Q1 source boundary, VCAP/gate default-off
+behavior, ideal-diode reverse-current behavior, RDS(on) thermal window,
+TOLL/LFPAK88/PowerPAK package alternatives, TVS overshoot dependency, protected
+measurement sequence, assembly sourcing, input capture synchronization, and
+no-layout manufacturing boundary to PBREL-006.
+
+Reason: The Q1 freeze checklist and derivation precheck define the evidence,
+but print-readiness review also needs a machine-checked closeout bridge that
+prevents Q1 placement, high-current copper, thermal relief, `PB-100.kicad_pcb`,
+Gerbers, drills, pick-place, or manufacturing ZIP work until input reverse
+package, gate, thermal, TVS, and assembly evidence close.
+
 ## 2026-07-17 — PB-100 TVS overshoot escape checklist
 
 Decision: PB-100 TVS/load-dump review now has
@@ -2055,6 +2101,22 @@ alternatives, and no-layout boundary to PBREL-007.
 Reason: PBREL-007 needs a measurable or simulatable acceptance method before
 60 V paths or 80 V migration can close. This prevents relying on datasheet
 clamp math alone.
+
+## 2026-07-17 — PB-100 TVS overshoot closeout precheck
+
+Decision: PB-100 TVS/load-dump review now has
+`hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv`. The
+precheck bridges the active HM3 TVS source, overshoot method, 60 V MOSFET
+acceptance, 80 V escape path, 100 V downstream defaults, 40 V ADR boundary,
+schematic-value dependencies, D1 sourcing, validation synchronization, and
+no-layout manufacturing boundary to PBREL-007.
+
+Reason: The overshoot checklist and validation precheck define the review, but
+print-readiness also needs a machine-checked closeout bridge that prevents D1
+placement, pulse-current return copper, via strategy, thermal relief,
+`PB-100.kicad_pcb`, Gerbers, drills, pick-place, or manufacturing ZIP work
+until measured or simulated 60 V overshoot evidence or the 80 V escape decision
+closes.
 
 ## 2026-07-17 — PB-100 logic-power value freeze checklist
 
@@ -2226,6 +2288,22 @@ handling, physical status readback, firmware listen-only behavior, and bench
 evidence must close before CAN1 footprints, routing, manufacturing output, or
 `PB-100.kicad_pcb` work can be released.
 
+## 2026-07-17 — PB-100 CAN1 default-disable derivation precheck
+
+Decision: PB-100 CAN1 safety review now has
+`hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv`.
+The precheck ties ADR-0002 policy/configuration boundaries, `JP_CAN1` DNP/open
+missing-link evidence, `U_CAN1` default-disabled gate polarity, TXD recessive
+bias, physical disabled-status readback, optional DNP link detect, RX
+listen-only independence, firmware/capability/bench evidence, factory DNP
+sourcing, and no-layout boundary to PBREL-001.
+
+Reason: PBREL-001 needs a closeable bridge between policy, value calculation,
+freeze checklist, production DNP review, reset bench evidence, sourcing/BOM
+ownership, and board-print no-go boundary. It prevents configuration,
+firmware-only status, or BOM-only claims from being treated as CAN1 TX safety
+closure.
+
 ## 2026-07-17 — PB-100 board-current budget value freeze checklist
 
 Decision: PB-100 board-current review now has
@@ -2243,3 +2321,18 @@ protected distribution, firmware-visible budget enforcement, bench calibration,
 and no-layout boundary must close before high-current copper, shunt copper,
 connector footprint lock, manufacturing output, or `PB-100.kicad_pcb` work can
 be released.
+
+## 2026-07-17 — PB-100 board-current budget value derivation precheck
+
+Decision: PB-100 board-current review now has
+`hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv`.
+The precheck ties ADR-0008 targets, protected high-current path sequence,
+0.5 mΩ shunt formulas, Q1 thermal operating points, copper pre-layout loss,
+garage fuse/connector/wire derating, firmware budget enforcement, telemetry
+enforcement, sourcing/BOM ownership, and no-layout boundary to PBREL-002.
+
+Reason: PBREL-002 needs a formula-backed bridge between the trace, design
+calculation, value checklist, input reverse review, current telemetry review,
+garage sourcing, firmware tests, and board-print no-go boundary before any
+high-current copper, shunt copper, connector footprint, or manufacturing output
+can be released.

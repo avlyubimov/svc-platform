@@ -14,13 +14,13 @@ KiCad scaffold directory:
 | Sheet | Purpose | Primary artifacts |
 |---|---|---|
 | `PB-100.kicad_sch` | Top-level sheet, title block, review notes, sheet links | This file plus all child sheets |
-| `input-protection.kicad_sch` | Battery input, reverse protection, TVS, input current/voltage sense | `PB-100-input-reverse-package-trace.csv`, `PB-100-input-reverse-freeze-review.csv`, `PB-100-input-reverse-q1-freeze-checklist.csv`, `PB-100-input-reverse-q1-derivation-precheck.csv`, `PB-100-board-current-budget-trace.csv`, `PB-100-board-current-budget-freeze-review.csv`, `PB-100-board-current-budget-design-calculation.md`, `PB-100-board-current-budget-value-freeze-checklist.csv`, `PB-100-tvs-load-dump-margin-trace.csv`, `PB-100-tvs-load-dump-freeze-review.csv`, `PB-100-tvs-overshoot-escape-checklist.csv`, `PB-100-tvs-overshoot-validation-precheck.csv`, `PB-100-input-protection-pin-contract.csv`, `PB-100-input-controller-pin-template.csv`, `PB-100-current-monitor-pin-template.csv`, `PB-100-input-power-design-values.csv`, `PB-100-protection-validation.csv` |
+| `input-protection.kicad_sch` | Battery input, reverse protection, TVS, input current/voltage sense | `PB-100-input-reverse-package-trace.csv`, `PB-100-input-reverse-freeze-review.csv`, `PB-100-input-reverse-q1-freeze-checklist.csv`, `PB-100-input-reverse-q1-derivation-precheck.csv`, `PB-100-input-reverse-q1-closeout-precheck.csv`, `PB-100-board-current-budget-trace.csv`, `PB-100-board-current-budget-freeze-review.csv`, `PB-100-board-current-budget-design-calculation.md`, `PB-100-board-current-budget-value-freeze-checklist.csv`, `PB-100-board-current-budget-value-derivation-precheck.csv`, `PB-100-tvs-load-dump-margin-trace.csv`, `PB-100-tvs-load-dump-freeze-review.csv`, `PB-100-tvs-overshoot-escape-checklist.csv`, `PB-100-tvs-overshoot-validation-precheck.csv`, `PB-100-tvs-overshoot-closeout-precheck.csv`, `PB-100-input-protection-pin-contract.csv`, `PB-100-input-controller-pin-template.csv`, `PB-100-current-monitor-pin-template.csv`, `PB-100-input-power-design-values.csv`, `PB-100-protection-validation.csv` |
 | `logic-power.kicad_sch` | Protected `PB_5V_OUT`, power-good, UVLO, local filters | `PB-100-logic-power-rail-trace.csv`, `PB-100-logic-power-freeze-review.csv`, `PB-100-logic-power-value-freeze-checklist.csv`, `PB-100-logic-power-value-derivation-precheck.csv`, `PB-100-logic-buck-pin-template.csv`, `PB-100-logic-power-design-values.csv`, `PB-100-logic-power-design-placeholders.csv`, `PB-100-logic-power-budget.csv` |
-| `output-channel-template.kicad_sch` | Generic high-side output channel pattern | `PB-100-high-medium-output-baseline-trace.csv`, `PB-100-high-medium-output-freeze-review.csv`, `PB-100-low-current-output-baseline-trace.csv`, `PB-100-low-current-output-freeze-review.csv`, `PB-100-output-stage-value-freeze-checklist.csv`, `PB-100-output-stage-value-derivation-precheck.csv`, `PB-100-output-controller-pin-template.csv`, `PB-100-output-channel-pin-contract.csv`, `PB-100-output-stage-design-values.csv` |
-| `outputs-1-10.kicad_sch` | Ten instantiated generic outputs | `PB-100-high-medium-output-baseline-trace.csv`, `PB-100-high-medium-output-freeze-review.csv`, `PB-100-low-current-output-baseline-trace.csv`, `PB-100-low-current-output-freeze-review.csv`, `PB-100-output-stage-value-freeze-checklist.csv`, `PB-100-output-stage-value-derivation-precheck.csv`, `PB-100-schematic-instance-symbol-map.csv`, `PB-100-output-net-expansion.csv`, `PB-100-output-channel-pin-contract.csv` |
+| `output-channel-template.kicad_sch` | Generic high-side output channel pattern | `PB-100-high-medium-output-baseline-trace.csv`, `PB-100-high-medium-output-freeze-review.csv`, `PB-100-low-current-output-baseline-trace.csv`, `PB-100-low-current-output-freeze-review.csv`, `PB-100-output-stage-value-freeze-checklist.csv`, `PB-100-output-stage-value-derivation-precheck.csv`, `PB-100-output-stage-closeout-precheck.csv`, `PB-100-output-controller-pin-template.csv`, `PB-100-output-channel-pin-contract.csv`, `PB-100-output-stage-design-values.csv` |
+| `outputs-1-10.kicad_sch` | Ten instantiated generic outputs | `PB-100-high-medium-output-baseline-trace.csv`, `PB-100-high-medium-output-freeze-review.csv`, `PB-100-low-current-output-baseline-trace.csv`, `PB-100-low-current-output-freeze-review.csv`, `PB-100-output-stage-value-freeze-checklist.csv`, `PB-100-output-stage-value-derivation-precheck.csv`, `PB-100-output-stage-closeout-precheck.csv`, `PB-100-schematic-instance-symbol-map.csv`, `PB-100-output-net-expansion.csv`, `PB-100-output-channel-pin-contract.csv` |
 | `telemetry.kicad_sch` | Total input current, voltage, thermal sensors, board ID | `PB-100-current-telemetry-trace.csv`, `PB-100-current-telemetry-freeze-review.csv`, `PB-100-current-telemetry-value-freeze-checklist.csv`, `PB-100-current-telemetry-value-derivation-precheck.csv`, `PB-100-thermal-telemetry-trace.csv`, `PB-100-thermal-telemetry-freeze-review.csv`, `PB-100-thermal-telemetry-value-freeze-checklist.csv`, `PB-100-thermal-telemetry-value-derivation-precheck.csv`, `PB-100-thermal-telemetry-map.csv`, `PB-100-current-telemetry-map.csv`, `PB-100-fault-response-matrix.csv` |
-| `b2b-interface.kicad_sch` | `JPB1` PB-100 to LB-100 interface | `PB-100-b2b-interface-trace.csv`, `PB-100-b2b-lb100-resource-binding.csv`, `PB-100-b2b-lb100-pin-audit-checklist.csv`, `PB-100-b2b-interface-freeze-checklist.csv`, `PB-100-b2b-pin-map.csv`, `PB-100-b2b-pin-budget.csv` |
-| `can1-safety.kicad_sch` | CAN1 TX disable/readback and DNP/open TX path | `PB-100-can1-tx-disable-trace.csv`, `PB-100-can1-tx-disable.md`, `PB-100-can1-safety-verification.csv`, `PB-100-can1-production-dnp-review.csv`, `PB-100-can1-default-disable-freeze-checklist.csv`, `PB-100-schematic-net-domain-plan.csv` |
+| `b2b-interface.kicad_sch` | `JPB1` PB-100 to LB-100 interface | `PB-100-b2b-interface-trace.csv`, `PB-100-b2b-lb100-resource-binding.csv`, `PB-100-b2b-lb100-pin-audit-checklist.csv`, `PB-100-b2b-interface-freeze-checklist.csv`, `PB-100-b2b-interface-closeout-precheck.csv`, `PB-100-b2b-pin-map.csv`, `PB-100-b2b-pin-budget.csv` |
+| `can1-safety.kicad_sch` | CAN1 TX disable/readback and DNP/open TX path | `PB-100-can1-tx-disable-trace.csv`, `PB-100-can1-tx-disable.md`, `PB-100-can1-safety-verification.csv`, `PB-100-can1-production-dnp-review.csv`, `PB-100-can1-default-disable-freeze-checklist.csv`, `PB-100-can1-default-disable-derivation-precheck.csv`, `PB-100-schematic-net-domain-plan.csv` |
 
 Placeholder child sheets are tracked in
 `hardware/power-board/PB-100/kicad/sheets/`.
@@ -50,14 +50,14 @@ lock footprints or placement.
    work item in `PB-100-symbol-capture-worklist.csv`.
 5. Use `PB-100-schematic-capture-work-queue.csv` to execute sheet capture.
 6. Capture `b2b-interface.kicad_sch` from the B2B trace, LB-100
-   resource-class binding, pin audit checklist, B2B freeze checklist, and
-   `JPB1` pin map.
+   resource-class binding, pin audit checklist, B2B freeze checklist, B2B
+   closeout precheck, and `JPB1` pin map.
 7. Capture `input-protection.kicad_sch` from the input reverse package trace,
    input reverse freeze review, Q1 freeze checklist, Q1 derivation precheck,
-   board-current 40 A freeze review,
+   Q1 closeout precheck, board-current 40 A freeze review,
    board-current design calculation, TVS margin trace, TVS freeze review, TVS
-   overshoot escape checklist, TVS overshoot validation precheck, and
-   input-protection pin contract.
+   overshoot escape checklist, TVS overshoot validation precheck, TVS closeout
+   precheck, and input-protection pin contract.
 8. Capture `logic-power.kicad_sch` from the logic-power rail trace, freeze
    review, value freeze checklist, value derivation precheck, and value
    placeholders.
