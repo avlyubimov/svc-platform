@@ -108,10 +108,12 @@ hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md,Garage assembly
 hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv,Garage assembly,Garage connector fuse interface matrix,Required,validate_garage_connector_fuse_plan,Conditional
 hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv,Garage assembly,Garage install freeze checklist,Required,validate_garage_install_freeze_checklist,Conditional
 hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv,Garage assembly,Garage install sourcing precheck,Required,validate_garage_install_sourcing_precheck,Conditional
+hardware/power-board/PB-100/PB-100-garage-install-closeout-precheck.csv,Garage assembly,Garage install closeout precheck,Required,validate_garage_install_closeout_precheck,Conditional
 production/bom/garage_bom_draft.csv,Production,Garage BOM draft,Required,validate_bom_symbol_map,Conditional
 production/bom/pb100_symbol_bom_map.csv,Production,Symbol-to-BOM map,Required,validate_bom_symbol_map,Conditional
 hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv,Production,Factory and garage assembly ownership trace,Required,validate_assembly_readiness_trace,Conditional
 hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv,Production,Factory assembly freeze checklist,Required,validate_factory_assembly_freeze_checklist,Conditional
 hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv,Production,Factory assembly sourcing precheck,Required,validate_factory_assembly_sourcing_precheck,Conditional
+hardware/power-board/PB-100/PB-100-factory-assembly-closeout-precheck.csv,Production,Factory assembly closeout precheck,Required,validate_factory_assembly_closeout_precheck,Conditional
 production/bom/pb100_assembly_sourcing_recheck.csv,Production,Assembly sourcing recheck,Required,validate_assembly_sourcing_recheck,Conditional
 production/bom/pb100_sourcing_evidence_snapshot.csv,Production,Sourcing evidence snapshot,Required,validate_sourcing_evidence_snapshot,Conditional

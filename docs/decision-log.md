@@ -2288,6 +2288,23 @@ snapshot, and board-print no-go boundary. It prevents stale assembly-platform
 or distributor evidence from being treated as sufficient for MPN, footprint,
 pick-place, PCBA order, or layout release.
 
+## 2026-07-17 — PB-100 factory assembly closeout precheck
+
+Decision: PB-100 factory-assembly review now has
+`hardware/power-board/PB-100/PB-100-factory-assembly-closeout-precheck.csv`.
+The closeout precheck ties factory-owned critical key ownership, critical
+alternates, JLCPCB/PCBWay assembly-platform handling, power-path package
+handling, TVS source hygiene, logic/current/thermal sourcing, B2B/CAN1
+production handling, BOM evidence synchronization, inspection/rework evidence,
+and no-layout manufacturing boundary to PBREL-011.
+
+Reason: PBREL-011 cannot close from the factory freeze checklist and sourcing
+precheck alone. Board-print readiness needs a final evidence bridge that keeps
+current assembly-platform support, authorized distributor continuity, exact
+orderable suffixes, DNP/open inspection, rework risk, and BOM synchronization
+explicit before any MPN lock, footprint lock, pick-place, PCBA order package,
+fabrication package, or `PB-100.kicad_pcb` work is released.
+
 ## 2026-07-17 — PB-100 garage install freeze checklist
 
 Decision: PB-100 garage assembly review now has
@@ -2319,6 +2336,25 @@ garage freeze checklist, connector/fuse plan, garage BOM, sourcing recheck,
 evidence snapshot, and board-print no-go boundary. It prevents connector/fuse
 family classes from being treated as purchase-ready kits or PCB-footprint
 authorization.
+
+## 2026-07-17 — PB-100 garage install closeout precheck
+
+Decision: PB-100 garage assembly review now has
+`hardware/power-board/PB-100/PB-100-garage-install-closeout-precheck.csv`.
+The closeout precheck ties user-installed critical key ownership, the 50 A
+battery/MAXI path, DTP/DT/DTM connector classes, user-serviceable fuses,
+purchase-ready kits, wire/harness derating, enclosure service and vibration
+evidence, BOM/source synchronization, and no-layout manufacturing boundary to
+PBREL-012.
+
+Reason: PBREL-012 cannot close from garage connector family choices alone.
+Board-print readiness needs a final evidence bridge that keeps exact housings,
+contacts, seals, wedgelocks, boots, backshells, crimp tooling, spare contacts,
+wire gauge, enclosure service access, vibration inspection, and garage/PB-100
+scope separation explicit before purchase lock, installation signoff,
+connector footprints, fuse-holder footprints, enclosure CAD release,
+fabrication package, manufacturing output, or `PB-100.kicad_pcb` work is
+released.
 
 ## 2026-07-17 — PB-100 CAN1 default-disable freeze checklist
 
