@@ -10,7 +10,7 @@
     (company "SVC Platform")
     (comment 9 "Work queue: CAP-OUT-TEMPLATE. Preliminary schematic capture follows PB-100-schematic-capture-work-queue.csv.")
     (comment 1 "Preliminary generic TPS48110 plus MOSFET output-stage template.")
-    (comment 2 "Sources: PB-100-output-controller-pin-template.csv, PB-100-output-channel-pin-contract.csv, PB-100-output-stage-design-values.csv, PB-100-output-stage-value-freeze-checklist.csv, PB-100-output-stage-value-derivation-precheck.csv.")
+    (comment 2 "Sources: PB-100-output-controller-pin-template.csv, PB-100-output-channel-pin-contract.csv, PB-100-output-stage-design-values.csv, PB-100-output-stage-value-freeze-checklist.csv, PB-100-output-stage-value-derivation-precheck.csv, PB-100-output-stage-closeout-precheck.csv.")
   )
   (lib_symbols
   (symbol "PB100:PB100_ERC_PASSIVE_ANCHOR_PRELIM"
@@ -63,7 +63,7 @@
     (pin passive line (at -20.32 -7.62 0) (length 5.08) (name "GND" (effects (font (size 1.27 1.27)))) (number "6" (effects (font (size 1.27 1.27)))))
   )
   )
-  (text "Output channel template capture notes:\n- Source traces: PB-100-high-medium-output-baseline-trace.csv, PB-100-high-medium-output-freeze-review.csv, PB-100-low-current-output-baseline-trace.csv, PB-100-low-current-output-freeze-review.csv, PB-100-output-stage-value-freeze-checklist.csv, PB-100-output-stage-value-derivation-precheck.csv\n- Template nets use OUTn_* only and remain role-agnostic\n- Threshold, timing, bootstrap, sense, and clamp values remain schematic-freeze work\n\nNo PCB layout from this preliminary capture."
+  (text "Output channel template capture notes:\n- Source traces: PB-100-high-medium-output-baseline-trace.csv, PB-100-high-medium-output-freeze-review.csv, PB-100-low-current-output-baseline-trace.csv, PB-100-low-current-output-freeze-review.csv, PB-100-output-stage-value-freeze-checklist.csv, PB-100-output-stage-value-derivation-precheck.csv, PB-100-output-stage-closeout-precheck.csv\n- Template nets use OUTn_* only and remain role-agnostic\n- Threshold, timing, bootstrap, sense, clamp values, and output closeout remain schematic-freeze work\n\nNo PCB layout from this preliminary capture."
     (at 20 20 0)
     (effects (font (size 2.0 2.0)) (justify left top))
     (uuid "2c0603d1-5d59-5263-bea9-17803874166d")

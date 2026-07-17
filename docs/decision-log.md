@@ -2013,6 +2013,22 @@ datasheet equations, OUT2 SOA/current limits, the low-current ADR-0011
 boundary, telemetry ranges, and still-open final value-bearing schematic
 instances.
 
+## 2026-07-17 — PB-100 output-stage closeout precheck
+
+Decision: PB-100 output-stage review now has
+`hardware/power-board/PB-100/PB-100-output-stage-closeout-precheck.csv`. The
+precheck bridges TI TPS4811-Q1/TPS48110Q1EVM formulas, high/medium/low output
+class maps, design-item completeness, threshold and timer derivations,
+bootstrap/default-off behavior, current telemetry scaling, SOA/fuse/clamp
+evidence, low-current ADR-0011 boundary, template/instance synchronization, and
+no-layout manufacturing boundary to PBREL-004/PBREL-005.
+
+Reason: The value checklist and derivation precheck define what must close, but
+the print-readiness packet also needs a machine-checked bridge that prevents
+MOSFET placement, fuse placement, connector placement, high-current copper,
+`PB-100.kicad_pcb`, Gerbers, drills, pick-place, or manufacturing ZIP work
+until final output values and low-current ADR boundaries close.
+
 ## 2026-07-17 — PB-100 input reverse Q1 freeze checklist
 
 Decision: PB-100 input reverse-protection review now has

@@ -116,6 +116,11 @@ Current coverage:
   equations and TPS48110Q1EVM reference positions to PB-100 high, medium, and
   low current value derivation in
   `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`.
+- Output-stage closeout precheck now bridges source formulas, class maps,
+  design-item completeness, thresholds/timers, bootstrap/default-off behavior,
+  telemetry scaling, SOA/fuse/clamp evidence, low-current ADR-0011 boundary,
+  instance synchronization, and no-layout boundary in
+  `hardware/power-board/PB-100/PB-100-output-stage-closeout-precheck.csv`.
 - Current telemetry now has a trace tying per-output IMON ranges, total
   `IIN_SENSE`, 0.5 mΩ shunt measurement, 40 A budget enforcement, and
   stale-telemetry safe-off behavior together.

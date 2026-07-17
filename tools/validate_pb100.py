@@ -526,6 +526,14 @@ OUTPUT_STAGE_VALUE_DERIVATION_PRECHECK_COLUMNS = (
     "Required PB-100 close evidence",
     "Blocked action",
 )
+OUTPUT_STAGE_CLOSEOUT_PRECHECK_COLUMNS = (
+    "Precheck ID",
+    "Scope",
+    "Required evidence bridge",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
 CAN1_DEFAULT_DISABLE_DERIVATION_PRECHECK_COLUMNS = (
     "Derivation ID",
     "Scope",
@@ -698,6 +706,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-low-current-output-freeze-review.csv",
         "PB-100-output-stage-value-freeze-checklist.csv",
         "PB-100-output-stage-value-derivation-precheck.csv",
+        "PB-100-output-stage-closeout-precheck.csv",
     ),
     "CAP-OUT-INST": (
         "PB-100-high-medium-output-baseline-trace.csv",
@@ -706,6 +715,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-low-current-output-freeze-review.csv",
         "PB-100-output-stage-value-freeze-checklist.csv",
         "PB-100-output-stage-value-derivation-precheck.csv",
+        "PB-100-output-stage-closeout-precheck.csv",
     ),
     "CAP-TEL": (
         "PB-100-current-telemetry-trace.csv",
@@ -1070,6 +1080,18 @@ REQUIRED_OUTPUT_STAGE_VALUE_DERIVATION_CHECKS = {
     "OUTDRV-009",
     "OUTDRV-010",
 }
+REQUIRED_OUTPUT_STAGE_CLOSEOUT_PRECHECKS = {
+    "OUTCLS-001",
+    "OUTCLS-002",
+    "OUTCLS-003",
+    "OUTCLS-004",
+    "OUTCLS-005",
+    "OUTCLS-006",
+    "OUTCLS-007",
+    "OUTCLS-008",
+    "OUTCLS-009",
+    "OUTCLS-010",
+}
 REQUIRED_BOARD_CURRENT_BUDGET_FREEZE_REVIEW_ITEMS = {
     "Main fuse and input connector",
     "Q1 reverse path thermal",
@@ -1274,6 +1296,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv",
+    "hardware/power-board/PB-100/PB-100-output-stage-closeout-precheck.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md",
@@ -2377,6 +2400,7 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-low-current-output-baseline-trace.csv",
             "PB-100-output-stage-value-freeze-checklist.csv",
             "PB-100-output-stage-value-derivation-precheck.csv",
+            "PB-100-output-stage-closeout-precheck.csv",
         ),
         "Input power design values": (
             "PB-100-board-current-budget-trace.csv",
@@ -2563,6 +2587,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-high-medium-output-freeze-review.csv",
             "PB-100-output-stage-value-freeze-checklist.csv",
             "PB-100-output-stage-value-derivation-precheck.csv",
+            "PB-100-output-stage-closeout-precheck.csv",
             "PB-100-out2-soa.md",
         ),
         "Low-current output stage": (
@@ -2570,6 +2595,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-low-current-output-freeze-review.csv",
             "PB-100-output-stage-value-freeze-checklist.csv",
             "PB-100-output-stage-value-derivation-precheck.csv",
+            "PB-100-output-stage-closeout-precheck.csv",
             "ADR-0011",
         ),
         "Input reverse protection": (
@@ -2663,6 +2689,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-high-medium-output-freeze-review.csv",
         "PB-100-output-stage-value-freeze-checklist.csv",
         "PB-100-output-stage-value-derivation-precheck.csv",
+        "PB-100-output-stage-closeout-precheck.csv",
         "OUT2",
         "SOA",
         "gate drive",
@@ -2676,6 +2703,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-low-current-output-freeze-review.csv",
         "PB-100-output-stage-value-freeze-checklist.csv",
         "PB-100-output-stage-value-derivation-precheck.csv",
+        "PB-100-output-stage-closeout-precheck.csv",
         "OUT5",
         "OUT8",
         "OUT9",
@@ -3626,6 +3654,170 @@ def validate_output_stage_value_derivation_precheck() -> None:
     ):
         if token not in precheck_text:
             fail(f"output-stage value derivation precheck must include {token}")
+
+
+def validate_output_stage_closeout_precheck() -> None:
+    path = PB100_DIR / "PB-100-output-stage-closeout-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty output-stage closeout precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in OUTPUT_STAGE_CLOSEOUT_PRECHECK_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        precheck_id = row["Precheck ID"].strip()
+        if precheck_id not in REQUIRED_OUTPUT_STAGE_CLOSEOUT_PRECHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown output closeout precheck {precheck_id}")
+        if precheck_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate output closeout precheck {precheck_id}")
+        rows_by_id[precheck_id] = row
+        for column in OUTPUT_STAGE_CLOSEOUT_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+        if precheck_id == "OUTCLS-002" and ("out2" not in row_text or "out5" not in row_text or "out10" not in row_text):
+            fail("output closeout class-map row must cover OUT2, low-current, and OUT10 classes")
+        if precheck_id == "OUTCLS-008" and ("adr-0011" not in row_text or "no direct 40 v smart-switch rail" not in row_text):
+            fail("output closeout low-current row must preserve ADR-0011 no-direct-40V-smart-switch boundary")
+        if precheck_id == "OUTCLS-010" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
+            fail("output closeout no-layout row must block PCB layout explicitly")
+
+    missing_items = sorted(REQUIRED_OUTPUT_STAGE_CLOSEOUT_PRECHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing output closeout prechecks: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "TI TPS4811-Q1",
+        "TPS48110AQDGXRQ1",
+        "TPS48110Q1EVM",
+        "Equation 1",
+        "Equation 4",
+        "Equation 6",
+        "Equation 7",
+        "Equation 11",
+        "Equation 12",
+        "Equation 13",
+        "High current",
+        "Medium current",
+        "Low current",
+        "OUT2",
+        "OUT10",
+        "OUT5",
+        "OUT8",
+        "OUT9",
+        "20A fuse",
+        "18A configured limit",
+        "15A/12A",
+        "10A/8A",
+        "5A fuse",
+        "4A configured limit",
+        "OV threshold divider",
+        "Current warning threshold",
+        "Short-circuit threshold",
+        "Fault timer",
+        "Bootstrap capacitor",
+        "Gate drive resistors",
+        "Current sense topology",
+        "Inductive clamp strategy",
+        "Value status TBD not final",
+        "OUTn_IWRN_SET",
+        "OUTn_ISCP_SET",
+        "OUTn_TMR",
+        "RSET",
+        "RSNS",
+        "VOS_SET",
+        "RIWRN",
+        "RISCP",
+        "CTMR",
+        "10ms",
+        "OUTn_BST",
+        "OUTn_PU",
+        "OUTn_PD",
+        "OUTn_CTL",
+        "OUTn_INP",
+        "default-off",
+        "reset",
+        "gate pull-down",
+        "Qg_total",
+        "C1",
+        "OUTn_CS_P",
+        "OUTn_CS_N",
+        "OUTn_IMON",
+        "0-30A",
+        "0-20A",
+        "0-8A",
+        "LB-100 ADC",
+        "OUT2 SOA",
+        "fuse energy",
+        "40A 1s",
+        "80A 100ms",
+        "60V/80V",
+        "PB-100-tvs-load-dump-margin-trace.csv",
+        "PB-100-mosfet-voltage-margin-review.md",
+        "ADR-0011",
+        "external-controller",
+        "60V N-MOSFET",
+        "no direct 40 V smart-switch rail",
+        "no direct 40V smart-switch rail",
+        "output-channel-template.kicad_sch",
+        "outputs-1-10.kicad_sch",
+        "PB-100-output-net-expansion.csv",
+        "PB-100-schematic-instance-symbol-map.csv",
+        "OUT1 through OUT10",
+        "generic OUTn names",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "MOSFET placement",
+        "fuse placement",
+        "connector placement",
+        "high-current copper",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "manufacturing ZIP",
+    ):
+        if token not in precheck_text:
+            fail(f"output-stage closeout precheck must include {token}")
+
+    design_rows = list(csv.DictReader((PB100_DIR / "PB-100-output-stage-design-values.csv").open(newline="", encoding="utf-8")))
+    seen_items: dict[str, set[str]] = {output_class: set() for output_class in REQUIRED_OUTPUT_STAGE_CLASSES}
+    for row in design_rows:
+        output_class = row["Output class"].strip()
+        if output_class in seen_items:
+            seen_items[output_class].add(row["Design item"].strip())
+            if "tbd not final" not in row["Value status"].lower():
+                fail("output-stage closeout precheck requires design values to remain non-final before freeze")
+    for output_class, items in seen_items.items():
+        missing_items = sorted(REQUIRED_OUTPUT_STAGE_ITEMS - items)
+        if missing_items:
+            fail(
+                f"output-stage closeout precheck requires {output_class} design values to include: "
+                f"{', '.join(missing_items)}"
+            )
+
+    freeze_text = read_text(PB100_DIR / "PB-100-output-stage-value-freeze-checklist.csv")
+    derivation_text = read_text(PB100_DIR / "PB-100-output-stage-value-derivation-precheck.csv")
+    for token in ("OUTVAL-002", "OUTVAL-004", "OUTVAL-009"):
+        if token not in freeze_text:
+            fail(f"output-stage closeout precheck requires freeze checklist token {token}")
+    for token in ("OUTDRV-004", "OUTDRV-005", "OUTDRV-006", "OUTDRV-007", "OUTDRV-010"):
+        if token not in derivation_text:
+            fail(f"output-stage closeout precheck requires derivation token {token}")
 
 
 def validate_low_current_output_baseline_trace() -> None:
@@ -8712,6 +8904,8 @@ def validate_validation_traceability() -> None:
                 fail("High/medium output validation trace must include value freeze checklist")
             if "pb-100-output-stage-value-derivation-precheck.csv" not in row_text:
                 fail("High/medium output validation trace must include value derivation precheck")
+            if "pb-100-output-stage-closeout-precheck.csv" not in row_text:
+                fail("High/medium output validation trace must include closeout precheck")
         if freeze_gate == "Low-current output stage":
             if "pb-100-low-current-output-freeze-review.csv" not in row_text:
                 fail("Low-current output validation trace must include freeze review")
@@ -8719,6 +8913,8 @@ def validate_validation_traceability() -> None:
                 fail("Low-current output validation trace must include value freeze checklist")
             if "pb-100-output-stage-value-derivation-precheck.csv" not in row_text:
                 fail("Low-current output validation trace must include value derivation precheck")
+            if "pb-100-output-stage-closeout-precheck.csv" not in row_text:
+                fail("Low-current output validation trace must include closeout precheck")
         if freeze_gate == "Input reverse protection":
             if "pb-100-input-reverse-freeze-review.csv" not in row_text:
                 fail("Input reverse validation trace must include freeze review")
@@ -9244,6 +9440,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-low-current-output-freeze-review.csv",
         "PB-100-output-stage-value-freeze-checklist.csv",
         "PB-100-output-stage-value-derivation-precheck.csv",
+        "PB-100-output-stage-closeout-precheck.csv",
         "PB-100-can1-tx-disable-trace.csv",
         "PB-100-can1-production-dnp-review.csv",
         "PB-100-can1-default-disable-freeze-checklist.csv",
@@ -9352,6 +9549,7 @@ def main() -> int:
     validate_high_medium_output_freeze_review()
     validate_output_stage_value_freeze_checklist()
     validate_output_stage_value_derivation_precheck()
+    validate_output_stage_closeout_precheck()
     validate_input_and_power_pin_templates()
     validate_input_protection_pin_contract()
     validate_logic_power_design_placeholders()
