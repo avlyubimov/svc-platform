@@ -93,6 +93,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`

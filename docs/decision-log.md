@@ -1844,3 +1844,15 @@ Reason: Board release needs the user-installed connector and fuse scope to be
 concrete enough for harness planning while still blocking PCB layout until exact
 housings, contacts, seals, crimp tooling, fuse holder, enclosure service access,
 and derating evidence close.
+
+## 2026-07-17 — PB-100 MOSFET voltage-margin review path
+
+Decision: PB-100 schematic review now treats 60 V MOSFET paths behind the active
+`SM8S33AHM3/I` TVS branch as conditional until overshoot evidence closes, and
+makes an 80 V MOSFET review escape path explicit for output and input-reverse
+MOSFET selections.
+
+Reason: The active TVS clamp point leaves limited headroom below 60 V absolute
+maximum MOSFET ratings. The release path must either prove the 60 V overshoot
+margin or move affected MOSFET paths to an 80 V or higher class before
+schematic freeze and PCB layout.

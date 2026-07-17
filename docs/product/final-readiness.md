@@ -80,6 +80,9 @@ Current coverage:
   100 V pass-with-margin paths, 60 V overshoot dependencies, 40 V smart-switch
   ADR boundary, sourcing gate, and no-layout boundary into
   `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`.
+- MOSFET voltage-margin review now makes the 80 V review escape path explicit
+  for 60 V output and input-reverse MOSFET paths unless overshoot evidence
+  accepts the active TVS clamp margin.
 - OUT5, OUT8, and OUT9 now have a low-current baseline trace enforcing the
   ADR-0011 external-controller plus external 60 V MOSFET architecture and
   blocking any direct 40 V smart-switch rail without a future ADR.

@@ -59,6 +59,7 @@ hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md,Telem
 hardware/power-board/PB-100/PB-100-thermal-telemetry-map.csv,Telemetry,Thermal telemetry map,Required,CSV width validation,Ready
 hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv,Protection,TVS/load-dump downstream margin trace,Required,validate_tvs_load_dump_margin_trace,Conditional
 hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv,Protection,TVS/load-dump freeze review,Required,validate_tvs_load_dump_freeze_review,Conditional
+hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md,Protection,60V MOSFET voltage-margin review escape path,Required,Document reviewed,Conditional
 hardware/power-board/PB-100/PB-100-protection-validation.csv,Protection,TVS/load-dump protection review,Required,CSV width validation,Conditional
 hardware/power-board/PB-100/PB-100-thermal-estimates.csv,Thermal,Thermal estimate table,Required,CSV width validation,Conditional
 hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv,Outputs,OUT2 SOA envelope,Required,CSV width validation,Conditional

@@ -32,6 +32,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
@@ -110,6 +111,10 @@ It is not a PCB layout package.
   margin, 60 V MOSFET overshoot dependency, 80 V Q1 alternate, 40 V
   smart-switch ADR boundary, sourcing gate, and no-layout boundary are tracked
   in `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`.
+- MOSFET voltage-margin review: 60 V MOSFET paths behind the active HM3 TVS
+  branch need explicit overshoot evidence or migration to the 80 V review
+  escape path before schematic freeze. See
+  `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`.
 - Logic power freeze review: LM5164/LM5013/TPS54360B regulator boundaries,
   protected `VBAT_PROT` sequencing, 1000 mA `PB_5V_OUT` budget, UVLO safe-off,
   PGOOD, inductor/capacitor classes, sourcing, and no-layout boundary are
@@ -256,6 +261,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-output-stage-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`

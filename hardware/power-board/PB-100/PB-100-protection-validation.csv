@@ -1,8 +1,8 @@
 Protected item,Relevant limit,Protection candidate,Protection value,Preliminary result,Required action
 TPS48110 high-side controller,100V absolute family,Active SM8S33AHM3-class TVS,53.3V clamp,Pass with margin,Confirm pulse waveform and local layout parasitics
-SIDR626LDP output MOSFET,60V VDS,Active SM8S33AHM3-class TVS,53.3V clamp,Conditional limited margin,Validate transient overshoot or move to 80V MOSFET/lower clamp TVS
+SIDR626LDP output MOSFET,60V VDS,Active SM8S33AHM3-class TVS,53.3V clamp,Conditional limited margin,Validate transient overshoot or move to 80V MOSFET review path before schematic freeze
 LM74700 reverse controller,65V input range,Active SM8S33AHM3-class TVS,53.3V clamp,Pass with margin,Confirm LM74700 variant absolute max and external MOSFET stress
-IAUTN06S5N008 input reverse MOSFET,60V VDS,Active SM8S33AHM3-class TVS,53.3V clamp,Conditional limited margin,Validate transient overshoot or use 80V alternate
+IAUTN06S5N008 input reverse MOSFET,60V VDS,Active SM8S33AHM3-class TVS,53.3V clamp,Conditional limited margin,Validate transient overshoot or use BUK7S1R2-80M 80V alternate before schematic freeze
 BUK7S1R2-80M input reverse MOSFET,80V VDS,Active SM8S33AHM3-class TVS,53.3V clamp,Pass with margin,Confirm package assembly and availability
 TPS2HB35 smart switch,40V load-dump class,Active SM8S33AHM3-class TVS,53.3V clamp,Deferred not Rev.1 baseline,Keep out unless future ADR adds lower clamp strategy
 TPS2HB35 smart switch,40V load-dump class,SM8S24A/SMCJ24A-class TVS,about 39V clamp,Optional future alternate,Validate jump-start load-dump and derating before any future use
