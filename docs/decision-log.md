@@ -2353,6 +2353,23 @@ ownership, and board-print no-go boundary. It prevents configuration,
 firmware-only status, or BOM-only claims from being treated as CAN1 TX safety
 closure.
 
+## 2026-07-17 — PB-100 CAN1 default-disable closeout precheck
+
+Decision: PB-100 CAN1 safety review now has
+`hardware/power-board/PB-100/PB-100-can1-default-disable-closeout-precheck.csv`.
+The precheck bridges ADR-0002 policy, `JP_CAN1` DNP/open missing-link evidence,
+`U_CAN1` default-disabled gate behavior, TXD recessive bias, physical
+disabled-status readback, DNP link-detect boundary, RX listen-only independence,
+firmware/capability/bench evidence, factory DNP sourcing, and no-layout
+manufacturing boundary to PBREL-001.
+
+Reason: The freeze checklist and derivation precheck define the CAN1 safety
+inputs, but print-readiness also needs a machine-checked closeout bridge that
+prevents CAN1 TX route layout, jumper footprint lock, `PB-100.kicad_pcb`,
+Gerbers, drills, pick-place, or manufacturing ZIP work until the physical
+missing link, gate polarity, disabled-status readback, DNP handling, bench
+evidence, and sourcing close.
+
 ## 2026-07-17 — PB-100 board-current budget value freeze checklist
 
 Decision: PB-100 board-current review now has

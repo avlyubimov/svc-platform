@@ -324,6 +324,11 @@ Current coverage:
   tying policy/configuration, physical missing-link, gate polarity, status
   readback, firmware/capability/bench evidence, factory DNP sourcing, and
   no-layout boundary into one machine-checked artifact.
+- CAN1 default-disable closeout precheck now has
+  `hardware/power-board/PB-100/PB-100-can1-default-disable-closeout-precheck.csv`,
+  bridging policy, DNP/open missing-link evidence, default-disabled gate,
+  physical status readback, RX independence, firmware/capability/bench evidence,
+  factory DNP sourcing, and no-layout boundary to PBREL-001.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.
 - Synchronize factory and garage BOM drafts with final selections.

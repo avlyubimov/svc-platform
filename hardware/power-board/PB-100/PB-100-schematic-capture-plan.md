@@ -20,7 +20,7 @@ KiCad scaffold directory:
 | `outputs-1-10.kicad_sch` | Ten instantiated generic outputs | `PB-100-high-medium-output-baseline-trace.csv`, `PB-100-high-medium-output-freeze-review.csv`, `PB-100-low-current-output-baseline-trace.csv`, `PB-100-low-current-output-freeze-review.csv`, `PB-100-output-stage-value-freeze-checklist.csv`, `PB-100-output-stage-value-derivation-precheck.csv`, `PB-100-output-stage-closeout-precheck.csv`, `PB-100-schematic-instance-symbol-map.csv`, `PB-100-output-net-expansion.csv`, `PB-100-output-channel-pin-contract.csv` |
 | `telemetry.kicad_sch` | Total input current, voltage, thermal sensors, board ID | `PB-100-current-telemetry-trace.csv`, `PB-100-current-telemetry-freeze-review.csv`, `PB-100-current-telemetry-value-freeze-checklist.csv`, `PB-100-current-telemetry-value-derivation-precheck.csv`, `PB-100-current-telemetry-closeout-precheck.csv`, `PB-100-thermal-telemetry-trace.csv`, `PB-100-thermal-telemetry-freeze-review.csv`, `PB-100-thermal-telemetry-value-freeze-checklist.csv`, `PB-100-thermal-telemetry-value-derivation-precheck.csv`, `PB-100-thermal-telemetry-closeout-precheck.csv`, `PB-100-thermal-telemetry-map.csv`, `PB-100-current-telemetry-map.csv`, `PB-100-fault-response-matrix.csv` |
 | `b2b-interface.kicad_sch` | `JPB1` PB-100 to LB-100 interface | `PB-100-b2b-interface-trace.csv`, `PB-100-b2b-lb100-resource-binding.csv`, `PB-100-b2b-lb100-pin-audit-checklist.csv`, `PB-100-b2b-interface-freeze-checklist.csv`, `PB-100-b2b-interface-closeout-precheck.csv`, `PB-100-b2b-pin-map.csv`, `PB-100-b2b-pin-budget.csv` |
-| `can1-safety.kicad_sch` | CAN1 TX disable/readback and DNP/open TX path | `PB-100-can1-tx-disable-trace.csv`, `PB-100-can1-tx-disable.md`, `PB-100-can1-safety-verification.csv`, `PB-100-can1-production-dnp-review.csv`, `PB-100-can1-default-disable-freeze-checklist.csv`, `PB-100-can1-default-disable-derivation-precheck.csv`, `PB-100-schematic-net-domain-plan.csv` |
+| `can1-safety.kicad_sch` | CAN1 TX disable/readback and DNP/open TX path | `PB-100-can1-tx-disable-trace.csv`, `PB-100-can1-tx-disable.md`, `PB-100-can1-safety-verification.csv`, `PB-100-can1-production-dnp-review.csv`, `PB-100-can1-default-disable-freeze-checklist.csv`, `PB-100-can1-default-disable-derivation-precheck.csv`, `PB-100-can1-default-disable-closeout-precheck.csv`, `PB-100-schematic-net-domain-plan.csv` |
 
 Placeholder child sheets are tracked in
 `hardware/power-board/PB-100/kicad/sheets/`.
@@ -66,7 +66,7 @@ lock footprints or placement.
 10. Capture current and thermal telemetry sheets from the telemetry traces,
     freeze reviews, current and thermal closeout prechecks, current and
     thermal value derivation prechecks, and value checklists.
-11. Add CAN1 TX-disable hardware with Rev.1 TX route DNP/open.
+11. Add CAN1 TX-disable hardware with Rev.1 TX route DNP/open and closeout precheck evidence.
 12. Add schematic test-point candidates from `PB-100-test-point-plan.csv`
     without locking footprints or placement.
 13. Run schematic ERC and update the freeze checklist with evidence.
