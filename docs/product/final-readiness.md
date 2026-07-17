@@ -174,6 +174,11 @@ Current coverage:
   configuration calibration, firmware fail-safe, sourcing, and no-layout
   boundary into
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`.
+- Thermal telemetry closeout precheck now bridges the NTC source class, divider
+  equations and values, placement zones, self-heating, ADC settling,
+  configuration-owned calibration, firmware fail-safe behavior, bench
+  validation, sourcing/symbol synchronization, and no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`.
 - Logic power now has a trace tying the LM5164-Q1-class 100 V 1 A default,
   LM5013-Q1-class 100 V fallback, protected `PB_5V_OUT`, `PB_PWR_GOOD`, and
   rail-invalid default-off behavior together.
@@ -340,6 +345,8 @@ Current coverage:
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`
   plus
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`.
+- Thermal telemetry closeout precheck now adds a machine-checked bridge in
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`.
 - Thermal telemetry divider calibration now has a firmware configuration
   contract in `firmware/configs/config-example.json`,
   `firmware/configs/svc-config.schema.json`, and `firmware/core/svc_config.h`;

@@ -413,6 +413,14 @@ THERMAL_TELEMETRY_VALUE_DERIVATION_PRECHECK_COLUMNS = (
     "Required PB-100 close evidence",
     "Blocked action",
 )
+THERMAL_TELEMETRY_CLOSEOUT_PRECHECK_COLUMNS = (
+    "Precheck ID",
+    "Scope",
+    "Required evidence bridge",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
 FACTORY_ASSEMBLY_FREEZE_CHECKLIST_COLUMNS = (
     "Check ID",
     "Review item",
@@ -762,6 +770,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-thermal-telemetry-freeze-review.csv",
         "PB-100-thermal-telemetry-value-freeze-checklist.csv",
         "PB-100-thermal-telemetry-value-derivation-precheck.csv",
+        "PB-100-thermal-telemetry-closeout-precheck.csv",
     ),
     "CAP-B2B": (
         "PB-100-b2b-interface-trace.csv",
@@ -1278,6 +1287,18 @@ REQUIRED_THERMAL_TELEMETRY_VALUE_DERIVATION_CHECKS = {
     "THERM-DER-009",
     "THERM-DER-010",
 }
+REQUIRED_THERMAL_TELEMETRY_CLOSEOUT_PRECHECKS = {
+    "THERM-CLS-001",
+    "THERM-CLS-002",
+    "THERM-CLS-003",
+    "THERM-CLS-004",
+    "THERM-CLS-005",
+    "THERM-CLS-006",
+    "THERM-CLS-007",
+    "THERM-CLS-008",
+    "THERM-CLS-009",
+    "THERM-CLS-010",
+}
 REQUIRED_FACTORY_ASSEMBLY_FREEZE_CHECKS = {
     "FACT-FRZ-001",
     "FACT-FRZ-002",
@@ -1392,6 +1413,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv",
+    "hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md",
@@ -2733,6 +2755,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-thermal-telemetry-freeze-review.csv",
             "PB-100-thermal-telemetry-value-freeze-checklist.csv",
             "PB-100-thermal-telemetry-value-derivation-precheck.csv",
+            "PB-100-thermal-telemetry-closeout-precheck.csv",
             "PB-100-thermal-telemetry-map.csv",
         ),
         "Factory assembly readiness": (
@@ -2859,6 +2882,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-thermal-telemetry-freeze-review.csv",
         "PB-100-thermal-telemetry-value-freeze-checklist.csv",
         "PB-100-thermal-telemetry-value-derivation-precheck.csv",
+        "PB-100-thermal-telemetry-closeout-precheck.csv",
         "NTCGS103JF103FT8",
         "self-heating",
         "firmware thresholds",
@@ -7386,6 +7410,130 @@ def validate_thermal_telemetry_value_derivation_precheck() -> None:
             fail(f"thermal telemetry design calculation must support derivation token {token}")
 
 
+def validate_thermal_telemetry_closeout_precheck() -> None:
+    path = PB100_DIR / "PB-100-thermal-telemetry-closeout-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty thermal telemetry closeout precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in THERMAL_TELEMETRY_CLOSEOUT_PRECHECK_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        precheck_id = row["Precheck ID"].strip()
+        if precheck_id not in REQUIRED_THERMAL_TELEMETRY_CLOSEOUT_PRECHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown thermal telemetry closeout precheck {precheck_id}")
+        if precheck_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate thermal telemetry closeout precheck {precheck_id}")
+        rows_by_id[precheck_id] = row
+        for column in THERMAL_TELEMETRY_CLOSEOUT_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+        if precheck_id == "THERM-CLS-002" and ("rntc =" not in row_text or "vadc =" not in row_text):
+            fail("thermal telemetry closeout value row must include RNTC and VADC equations")
+        if precheck_id == "THERM-CLS-004" and "pntc" not in row_text:
+            fail("thermal telemetry closeout self-heating row must include PNTC")
+        if precheck_id == "THERM-CLS-010" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
+            fail("thermal telemetry closeout no-layout row must block PCB layout explicitly")
+
+    missing_items = sorted(REQUIRED_THERMAL_TELEMETRY_CLOSEOUT_PRECHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing thermal telemetry closeout prechecks: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "TDK NTCGS103JF103FT8",
+        "10k",
+        "150C",
+        "AEC-Q200",
+        "TEMP_PCB",
+        "TEMP_PWR_A",
+        "TEMP_PWR_B",
+        "Vishay NTCS0402E3",
+        "Murata NCU18",
+        "THERMAL_NTC",
+        "JLCPCB PCBWay",
+        "TMP117/TMP112",
+        "RNTC = R25 * exp(B * (1/T - 1/T25))",
+        "VADC = 3.3 V * RNTC / (4.7 kΩ + RNTC)",
+        "R25 10000Ω",
+        "3435 K",
+        "4.7kΩ",
+        "LB_3V3_IO",
+        "10kΩ NTC",
+        "1kΩ",
+        "10nF X7R",
+        "0.95 V at 75 °C",
+        "0.78 V at 85 °C",
+        "0.52 V at 105 °C",
+        "OUT2",
+        "input reverse hot zone",
+        "medium-output or logic-buck hot zone",
+        "PNTC = I^2 * RNTC",
+        "224µA",
+        "0.50mW",
+        "0.31mW",
+        "LB ADC",
+        "ADC settling",
+        "external ADC/mux",
+        "telemetry.thermal",
+        "4700Ω",
+        "1000Ω",
+        "10 nF",
+        "1000 ms",
+        "85C warn 105C cutoff 75C recovery",
+        "-40 to 150 °C",
+        "PBFLT-THERM-HIGH",
+        "PBFLT-THERM-STALE",
+        "test_stale_thermal_telemetry_forces_cutoff",
+        "test_stale_thermal_telemetry_disables_active_outputs",
+        "PB-BENCH-009",
+        "PB-100-symbol-mpn-readiness.csv",
+        "production/bom/factory_bom_draft.csv",
+        "production/bom/pb100_sourcing_evidence_snapshot.csv",
+        "telemetry.kicad_sch",
+        "CAP-TEL",
+        "PB-100-thermal-telemetry-map.csv",
+        "PB-100-thermal-telemetry-value-freeze-checklist.csv",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "manufacturing ZIP",
+        "sensor placement",
+        "thermal copper",
+        "board outline",
+    ):
+        if token not in precheck_text:
+            fail(f"thermal telemetry closeout precheck must include {token}")
+
+    for supporting_artifact, tokens in {
+        "PB-100-thermal-telemetry-value-freeze-checklist.csv": ("THERM-FRZ-001", "THERM-FRZ-010"),
+        "PB-100-thermal-telemetry-value-derivation-precheck.csv": ("THERM-DER-001", "THERM-DER-010"),
+        "PB-100-thermal-telemetry-freeze-review.csv": ("Sensor class", "Bench validation path"),
+        "PB-100-b2b-lb100-resource-binding.csv": ("TEMP_PCB", "TEMP_PWR_A", "TEMP_PWR_B"),
+    }.items():
+        supporting_text = read_text(PB100_DIR / supporting_artifact)
+        for token in tokens:
+            if token not in supporting_text:
+                fail(f"thermal telemetry closeout precheck requires {supporting_artifact} token {token}")
+
+
 def validate_logic_power_rail_trace() -> None:
     path = PB100_DIR / "PB-100-logic-power-rail-trace.csv"
     validate_csv(path)
@@ -9511,6 +9659,8 @@ def validate_validation_traceability() -> None:
                 fail("Thermal telemetry validation trace must include value freeze checklist")
             if "pb-100-thermal-telemetry-value-derivation-precheck.csv" not in row_text:
                 fail("Thermal telemetry validation trace must include value derivation precheck")
+            if "pb-100-thermal-telemetry-closeout-precheck.csv" not in row_text:
+                fail("Thermal telemetry validation trace must include closeout precheck")
         if freeze_gate == "High/medium output stage":
             if "pb-100-high-medium-output-freeze-review.csv" not in row_text:
                 fail("High/medium output validation trace must include freeze review")
@@ -10092,6 +10242,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-thermal-telemetry-freeze-review.csv",
         "PB-100-thermal-telemetry-value-freeze-checklist.csv",
         "PB-100-thermal-telemetry-value-derivation-precheck.csv",
+        "PB-100-thermal-telemetry-closeout-precheck.csv",
         "PB-100-b2b-interface-trace.csv",
         "PB-100-b2b-lb100-resource-binding.csv",
         "PB-100-b2b-lb100-pin-audit-checklist.csv",
@@ -10195,6 +10346,7 @@ def main() -> int:
     validate_thermal_telemetry_freeze_review()
     validate_thermal_telemetry_value_freeze_checklist()
     validate_thermal_telemetry_value_derivation_precheck()
+    validate_thermal_telemetry_closeout_precheck()
     validate_logic_power_rail_trace()
     validate_logic_power_design_values()
     validate_logic_power_freeze_review()

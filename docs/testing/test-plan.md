@@ -154,7 +154,8 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`, and
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`
   plus
-  `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`.
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`,
+  and `hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`.
 - B2B interface tests trace to
   `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`,
   `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`,

@@ -2240,6 +2240,22 @@ thermal telemetry calculation, configuration contract, bench validation, and
 factory sourcing before thermal values, sensor placement, or footprints can
 close.
 
+## 2026-07-17 — PB-100 thermal telemetry closeout precheck
+
+Decision: PB-100 thermal-telemetry review now has
+`hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`.
+The precheck bridges the NTC source class, divider equations and values,
+placement zones, self-heating, ADC settling, configuration-owned calibration,
+firmware fail-safe behavior, bench validation, sourcing/symbol synchronization,
+and no-layout manufacturing boundary to PBREL-010.
+
+Reason: The thermal telemetry value checklist and derivation precheck define the
+candidate values, but print-readiness also needs a machine-checked closeout
+bridge that prevents sensor placement, thermal copper, board-zone keepouts,
+`PB-100.kicad_pcb`, Gerbers, drills, pick-place, or manufacturing ZIP work until
+sensor package, ADC settling, placement, self-heating, calibration, sourcing,
+and bench evidence close.
+
 ## 2026-07-17 — PB-100 factory assembly freeze checklist
 
 Decision: PB-100 factory assembly review now has

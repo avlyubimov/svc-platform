@@ -114,6 +114,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`
 
 ## Electrical baseline
 
@@ -236,6 +237,11 @@ It is not a PCB layout package.
   configuration calibration, firmware fail-safe, sourcing, and no-layout
   boundary are tracked in
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`.
+- Thermal telemetry closeout precheck: NTC source class, divider equations and
+  values, placement zones, self-heating, ADC settling, configuration-owned
+  calibration, firmware fail-safe, bench validation, sourcing/symbol
+  synchronization, and no-layout manufacturing boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`.
 - Factory assembly freeze checklist: factory-owned critical keys, alternate
   coverage, JLCPCB/PCBWay assembly class, date-stamped distributor continuity,
   package handling, TVS source hygiene, B2B/CAN1 production notes, BOM evidence
@@ -471,6 +477,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-map.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-estimates.csv`
 - `hardware/power-board/PB-100/PB-100-protection-validation.csv`
