@@ -21,6 +21,19 @@
 #define SVC_DEFAULT_TOTAL_CURRENT_GAIN_PPM 1000000U
 #define SVC_DEFAULT_TELEMETRY_STALE_TIMEOUT_MS 1000U
 #define SVC_DEFAULT_TOTAL_CURRENT_PLAUSIBLE_MAX_MA 60000U
+#define SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA 0
+#define SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM 1000000U
+#define SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS 1000U
+#define SVC_DEFAULT_OUT1_CURRENT_RANGE_MA 20000U
+#define SVC_DEFAULT_OUT2_CURRENT_RANGE_MA 30000U
+#define SVC_DEFAULT_OUT3_CURRENT_RANGE_MA 15000U
+#define SVC_DEFAULT_OUT4_CURRENT_RANGE_MA 15000U
+#define SVC_DEFAULT_OUT5_CURRENT_RANGE_MA 8000U
+#define SVC_DEFAULT_OUT6_CURRENT_RANGE_MA 15000U
+#define SVC_DEFAULT_OUT7_CURRENT_RANGE_MA 15000U
+#define SVC_DEFAULT_OUT8_CURRENT_RANGE_MA 8000U
+#define SVC_DEFAULT_OUT9_CURRENT_RANGE_MA 8000U
+#define SVC_DEFAULT_OUT10_CURRENT_RANGE_MA 15000U
 
 typedef enum {
     SVC_OUTPUT_OUT1 = 0,
@@ -84,7 +97,16 @@ typedef struct {
 } svc_total_current_telemetry_config_t;
 
 typedef struct {
+    uint32_t range_ma;
+    int32_t zero_offset_ma;
+    uint32_t gain_ppm;
+    uint32_t stale_timeout_ms;
+    uint32_t plausible_max_ma;
+} svc_output_current_telemetry_config_t;
+
+typedef struct {
     svc_total_current_telemetry_config_t total_current;
+    svc_output_current_telemetry_config_t output_current[SVC_OUTPUT_COUNT];
 } svc_telemetry_config_t;
 
 typedef struct {

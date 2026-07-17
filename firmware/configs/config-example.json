@@ -47,7 +47,89 @@
       "gain_ppm": 1000000,
       "stale_timeout_ms": 1000,
       "plausible_max_ma": 60000
-    }
+    },
+    "output_current": [
+      {
+        "id": "OUT1",
+        "range_ma": 20000,
+        "zero_offset_ma": 0,
+        "gain_ppm": 1000000,
+        "stale_timeout_ms": 1000,
+        "plausible_max_ma": 20000
+      },
+      {
+        "id": "OUT2",
+        "range_ma": 30000,
+        "zero_offset_ma": 0,
+        "gain_ppm": 1000000,
+        "stale_timeout_ms": 1000,
+        "plausible_max_ma": 30000
+      },
+      {
+        "id": "OUT3",
+        "range_ma": 15000,
+        "zero_offset_ma": 0,
+        "gain_ppm": 1000000,
+        "stale_timeout_ms": 1000,
+        "plausible_max_ma": 15000
+      },
+      {
+        "id": "OUT4",
+        "range_ma": 15000,
+        "zero_offset_ma": 0,
+        "gain_ppm": 1000000,
+        "stale_timeout_ms": 1000,
+        "plausible_max_ma": 15000
+      },
+      {
+        "id": "OUT5",
+        "range_ma": 8000,
+        "zero_offset_ma": 0,
+        "gain_ppm": 1000000,
+        "stale_timeout_ms": 1000,
+        "plausible_max_ma": 8000
+      },
+      {
+        "id": "OUT6",
+        "range_ma": 15000,
+        "zero_offset_ma": 0,
+        "gain_ppm": 1000000,
+        "stale_timeout_ms": 1000,
+        "plausible_max_ma": 15000
+      },
+      {
+        "id": "OUT7",
+        "range_ma": 15000,
+        "zero_offset_ma": 0,
+        "gain_ppm": 1000000,
+        "stale_timeout_ms": 1000,
+        "plausible_max_ma": 15000
+      },
+      {
+        "id": "OUT8",
+        "range_ma": 8000,
+        "zero_offset_ma": 0,
+        "gain_ppm": 1000000,
+        "stale_timeout_ms": 1000,
+        "plausible_max_ma": 8000
+      },
+      {
+        "id": "OUT9",
+        "range_ma": 8000,
+        "zero_offset_ma": 0,
+        "gain_ppm": 1000000,
+        "stale_timeout_ms": 1000,
+        "plausible_max_ma": 8000
+      },
+      {
+        "id": "OUT10",
+        "range_ma": 15000,
+        "zero_offset_ma": 0,
+        "gain_ppm": 1000000,
+        "stale_timeout_ms": 1000,
+        "plausible_max_ma": 15000
+      }
+    ]
   },
   "outputs": [
     {

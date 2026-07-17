@@ -21,9 +21,10 @@ static uint32_t total_current_full_scale_ma(const svc_total_current_telemetry_co
 
 static bool svc_telemetry_config_is_valid(
     const svc_telemetry_config_t *telemetry,
-    const svc_power_budget_config_t *power_budget)
+    const svc_power_budget_config_t *power_budget,
+    const svc_output_config_t *outputs)
 {
-    if (telemetry == NULL || power_budget == NULL) {
+    if (telemetry == NULL || power_budget == NULL || outputs == NULL) {
         return false;
     }
 
@@ -40,6 +41,23 @@ static bool svc_telemetry_config_is_valid(
     }
     if (total_current->plausible_max_ma > total_current_full_scale_ma(total_current)) {
         return false;
+    }
+
+    for (size_t output_index = 0U; output_index < SVC_OUTPUT_COUNT; ++output_index) {
+        const svc_output_current_telemetry_config_t *output_current =
+            &telemetry->output_current[output_index];
+        if (output_current->range_ma == 0U ||
+            output_current->gain_ppm == 0U ||
+            output_current->stale_timeout_ms == 0U ||
+            output_current->plausible_max_ma == 0U) {
+            return false;
+        }
+        if (output_current->plausible_max_ma < outputs[output_index].current_limit_ma) {
+            return false;
+        }
+        if (output_current->plausible_max_ma > output_current->range_ma) {
+            return false;
+        }
     }
     return true;
 }
@@ -63,7 +81,7 @@ svc_config_validation_result_t svc_config_validate_device(const svc_device_confi
     if (!svc_power_budget_validate_config(config)) {
         return make_result(SVC_CONFIG_INVALID_POWER_BUDGET, SVC_CONFIG_OUTPUT_INDEX_NONE);
     }
-    if (!svc_telemetry_config_is_valid(&config->telemetry, &config->power_budget)) {
+    if (!svc_telemetry_config_is_valid(&config->telemetry, &config->power_budget, config->outputs)) {
         return make_result(SVC_CONFIG_INVALID_TELEMETRY, SVC_CONFIG_OUTPUT_INDEX_NONE);
     }
 

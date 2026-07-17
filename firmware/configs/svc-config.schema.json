@@ -129,12 +129,21 @@
     "telemetry": {
       "type": "object",
       "required": [
-        "total_current"
+        "total_current",
+        "output_current"
       ],
       "additionalProperties": false,
       "properties": {
         "total_current": {
           "$ref": "#/$defs/totalCurrentTelemetry"
+        },
+        "output_current": {
+          "type": "array",
+          "minItems": 10,
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/$defs/outputCurrentTelemetry"
+          }
         }
       }
     },
@@ -299,6 +308,42 @@
           "minimum": 1
         },
         "monitor_range_uv": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "zero_offset_ma": {
+          "type": "integer"
+        },
+        "gain_ppm": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "stale_timeout_ms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "plausible_max_ma": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "outputCurrentTelemetry": {
+      "type": "object",
+      "required": [
+        "id",
+        "range_ma",
+        "zero_offset_ma",
+        "gain_ppm",
+        "stale_timeout_ms",
+        "plausible_max_ma"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/outputId"
+        },
+        "range_ma": {
           "type": "integer",
           "minimum": 1
         },

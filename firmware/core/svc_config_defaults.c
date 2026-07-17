@@ -28,6 +28,78 @@ const svc_device_config_t svc_default_config = {
             .gain_ppm = SVC_DEFAULT_TOTAL_CURRENT_GAIN_PPM,
             .stale_timeout_ms = SVC_DEFAULT_TELEMETRY_STALE_TIMEOUT_MS,
             .plausible_max_ma = SVC_DEFAULT_TOTAL_CURRENT_PLAUSIBLE_MAX_MA
+        },
+        .output_current = {
+            [SVC_OUTPUT_OUT1] = {
+                SVC_DEFAULT_OUT1_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT1_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT2] = {
+                SVC_DEFAULT_OUT2_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT2_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT3] = {
+                SVC_DEFAULT_OUT3_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT3_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT4] = {
+                SVC_DEFAULT_OUT4_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT4_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT5] = {
+                SVC_DEFAULT_OUT5_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT5_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT6] = {
+                SVC_DEFAULT_OUT6_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT6_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT7] = {
+                SVC_DEFAULT_OUT7_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT7_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT8] = {
+                SVC_DEFAULT_OUT8_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT8_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT9] = {
+                SVC_DEFAULT_OUT9_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT9_CURRENT_RANGE_MA
+            },
+            [SVC_OUTPUT_OUT10] = {
+                SVC_DEFAULT_OUT10_CURRENT_RANGE_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA,
+                SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM,
+                SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_OUT10_CURRENT_RANGE_MA
+            }
         }
     },
     .outputs = {

@@ -54,6 +54,15 @@ static uint32_t config_checksum(const svc_device_config_t *config, uint32_t sequ
     checksum = mix_u32(checksum, config->telemetry.total_current.gain_ppm);
     checksum = mix_u32(checksum, config->telemetry.total_current.stale_timeout_ms);
     checksum = mix_u32(checksum, config->telemetry.total_current.plausible_max_ma);
+    for (size_t output_index = 0U; output_index < SVC_OUTPUT_COUNT; ++output_index) {
+        const svc_output_current_telemetry_config_t *output_current =
+            &config->telemetry.output_current[output_index];
+        checksum = mix_u32(checksum, output_current->range_ma);
+        checksum = mix_i32(checksum, output_current->zero_offset_ma);
+        checksum = mix_u32(checksum, output_current->gain_ppm);
+        checksum = mix_u32(checksum, output_current->stale_timeout_ms);
+        checksum = mix_u32(checksum, output_current->plausible_max_ma);
+    }
 
     for (size_t output_index = 0U; output_index < SVC_OUTPUT_COUNT; ++output_index) {
         const svc_output_config_t *output = &config->outputs[output_index];

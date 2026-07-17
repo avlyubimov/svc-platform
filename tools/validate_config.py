@@ -232,9 +232,17 @@ def validate_schema(schema: dict[str, Any], allowed_roles: set[str]) -> None:
     telemetry_schema = schema.get("properties", {}).get("telemetry", {})
     if telemetry_schema.get("additionalProperties") is not False:
         fail("schema telemetry object must reject additional properties")
+    if telemetry_schema.get("required") != ["total_current", "output_current"]:
+        fail("schema telemetry required fields are out of sync")
     total_current_ref = telemetry_schema.get("properties", {}).get("total_current", {}).get("$ref")
     if total_current_ref != "#/$defs/totalCurrentTelemetry":
         fail("schema telemetry.total_current must reference $defs.totalCurrentTelemetry")
+    output_current_schema = telemetry_schema.get("properties", {}).get("output_current", {})
+    if output_current_schema.get("minItems") != 10 or output_current_schema.get("maxItems") != 10:
+        fail("schema telemetry.output_current array must require exactly 10 items")
+    output_current_ref = output_current_schema.get("items", {}).get("$ref")
+    if output_current_ref != "#/$defs/outputCurrentTelemetry":
+        fail("schema telemetry.output_current must reference $defs.outputCurrentTelemetry")
 
     total_current_schema = schema.get("$defs", {}).get("totalCurrentTelemetry", {})
     expected_required = [
@@ -247,6 +255,18 @@ def validate_schema(schema: dict[str, Any], allowed_roles: set[str]) -> None:
     ]
     if total_current_schema.get("required") != expected_required:
         fail("schema totalCurrentTelemetry required fields are out of sync")
+
+    output_current_schema = schema.get("$defs", {}).get("outputCurrentTelemetry", {})
+    expected_output_required = [
+        "id",
+        "range_ma",
+        "zero_offset_ma",
+        "gain_ppm",
+        "stale_timeout_ms",
+        "plausible_max_ma",
+    ]
+    if output_current_schema.get("required") != expected_output_required:
+        fail("schema outputCurrentTelemetry required fields are out of sync")
 
 
 def validate_battery(config: dict[str, Any], defines: dict[str, int]) -> None:
@@ -381,6 +401,68 @@ def validate_telemetry(config: dict[str, Any], defines: dict[str, int]) -> None:
         fail("telemetry.total_current.plausible_max_ma must cover the configured current limit")
     if actual["telemetry.total_current.plausible_max_ma"] > monitor_full_scale_ma:
         fail("telemetry.total_current.plausible_max_ma exceeds monitor electrical full-scale")
+
+    output_current = require_list(telemetry, "output_current")
+    if len(output_current) != 10:
+        fail(f"expected 10 telemetry.output_current entries, found {len(output_current)}")
+    config_outputs = require_list(config, "outputs")
+    for index, output_calibration in enumerate(output_current):
+        if not isinstance(output_calibration, dict):
+            fail(f"telemetry.output_current[{index}] must be an object")
+        expected_id = f"OUT{index + 1}"
+        if output_calibration.get("id") != expected_id:
+            fail(f"telemetry.output_current[{index}].id must be {expected_id}")
+
+        range_ma = decimal_to_int(
+            output_calibration.get("range_ma"),
+            f"telemetry.output_current[{index}].range_ma",
+        )
+        zero_offset_ma = decimal_to_int(
+            output_calibration.get("zero_offset_ma"),
+            f"telemetry.output_current[{index}].zero_offset_ma",
+        )
+        gain_ppm = decimal_to_int(
+            output_calibration.get("gain_ppm"),
+            f"telemetry.output_current[{index}].gain_ppm",
+        )
+        stale_timeout_ms = decimal_to_int(
+            output_calibration.get("stale_timeout_ms"),
+            f"telemetry.output_current[{index}].stale_timeout_ms",
+        )
+        plausible_max_ma = decimal_to_int(
+            output_calibration.get("plausible_max_ma"),
+            f"telemetry.output_current[{index}].plausible_max_ma",
+        )
+        expected_range_ma = defines[f"SVC_DEFAULT_OUT{index + 1}_CURRENT_RANGE_MA"]
+        expected_output = {
+            "range_ma": expected_range_ma,
+            "zero_offset_ma": defines["SVC_DEFAULT_OUTPUT_CURRENT_ZERO_OFFSET_MA"],
+            "gain_ppm": defines["SVC_DEFAULT_OUTPUT_CURRENT_GAIN_PPM"],
+            "stale_timeout_ms": defines["SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS"],
+            "plausible_max_ma": expected_range_ma,
+        }
+        actual_output = {
+            "range_ma": range_ma,
+            "zero_offset_ma": zero_offset_ma,
+            "gain_ppm": gain_ppm,
+            "stale_timeout_ms": stale_timeout_ms,
+            "plausible_max_ma": plausible_max_ma,
+        }
+        if actual_output != expected_output:
+            fail(
+                f"telemetry.output_current[{index}] does not match C defaults: "
+                f"{actual_output} != {expected_output}"
+            )
+        if range_ma <= 0 or gain_ppm <= 0 or stale_timeout_ms <= 0 or plausible_max_ma <= 0:
+            fail(f"telemetry.output_current[{index}] range/gain/stale/plausible values must be positive")
+        if plausible_max_ma > range_ma:
+            fail(f"telemetry.output_current[{index}].plausible_max_ma exceeds range_ma")
+        output_limit_ma = decimal_amps_to_ma(
+            config_outputs[index].get("current_limit_a"),
+            f"outputs[{index}].current_limit_a",
+        )
+        if plausible_max_ma < output_limit_ma:
+            fail(f"telemetry.output_current[{index}].plausible_max_ma must cover configured current limit")
 
 
 def validate_outputs(config: dict[str, Any], allowed_roles: set[str]) -> None:

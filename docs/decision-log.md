@@ -1882,3 +1882,17 @@ buried in firmware constants. This closes the total-current configuration
 contract while keeping bench calibration, per-output IMON calibration, shunt
 Kelvin footprint, copper heating, and ADC/I2C ownership open before schematic
 freeze.
+
+## 2026-07-17 — PB-100 per-output IMON calibration config contract
+
+Decision: PB-100 current telemetry configuration now includes role-free
+`telemetry.output_current` records for `OUT1` through `OUT10`. Each record
+carries the IMON range, zero offset, gain, stale timeout, and plausible-current
+limit. The defaults match the PB-100 telemetry map: OUT1 20 A, OUT2 30 A,
+OUT3/OUT4/OUT6/OUT7/OUT10 15 A, and OUT5/OUT8/OUT9 8 A.
+
+Reason: PBREL-009 covers both total input current and per-output telemetry.
+Adding per-output calibration records keeps IMON scaling out of driver constants
+and lets schema/C validation prove each configured output limit is covered
+without closing ADC scaling, bench calibration, Kelvin routing, copper heating,
+or LB-100 bus ownership before schematic freeze.
