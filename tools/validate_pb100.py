@@ -372,6 +372,14 @@ CURRENT_TELEMETRY_VALUE_DERIVATION_PRECHECK_COLUMNS = (
     "Required PB-100 close evidence",
     "Blocked action",
 )
+CURRENT_TELEMETRY_CLOSEOUT_PRECHECK_COLUMNS = (
+    "Precheck ID",
+    "Scope",
+    "Required evidence bridge",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
 THERMAL_TELEMETRY_TRACE_COLUMNS = (
     "Thermal zone",
     "Signal",
@@ -749,6 +757,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-current-telemetry-freeze-review.csv",
         "PB-100-current-telemetry-value-freeze-checklist.csv",
         "PB-100-current-telemetry-value-derivation-precheck.csv",
+        "PB-100-current-telemetry-closeout-precheck.csv",
         "PB-100-thermal-telemetry-trace.csv",
         "PB-100-thermal-telemetry-freeze-review.csv",
         "PB-100-thermal-telemetry-value-freeze-checklist.csv",
@@ -1223,6 +1232,18 @@ REQUIRED_CURRENT_TELEMETRY_VALUE_DERIVATION_CHECKS = {
     "CUR-DER-009",
     "CUR-DER-010",
 }
+REQUIRED_CURRENT_TELEMETRY_CLOSEOUT_PRECHECKS = {
+    "CUR-CLS-001",
+    "CUR-CLS-002",
+    "CUR-CLS-003",
+    "CUR-CLS-004",
+    "CUR-CLS-005",
+    "CUR-CLS-006",
+    "CUR-CLS-007",
+    "CUR-CLS-008",
+    "CUR-CLS-009",
+    "CUR-CLS-010",
+}
 REQUIRED_THERMAL_TELEMETRY_FREEZE_REVIEW_ITEMS = {
     "Sensor class",
     "Divider and ADC scaling",
@@ -1365,6 +1386,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md",
     "hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv",
+    "hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md",
@@ -2496,6 +2518,12 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-input-reverse-q1-derivation-precheck.csv",
             "PB-100-input-reverse-q1-closeout-precheck.csv",
         ),
+        "Current monitor template": (
+            "PB-100-current-monitor-pin-template.csv",
+            "PB-100-current-telemetry-value-freeze-checklist.csv",
+            "PB-100-current-telemetry-value-derivation-precheck.csv",
+            "PB-100-current-telemetry-closeout-precheck.csv",
+        ),
         "Hardware capability manifest": (
             "PB-100-current-telemetry-trace.csv",
             "PB-100-thermal-telemetry-trace.csv",
@@ -2697,6 +2725,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-current-telemetry-freeze-review.csv",
             "PB-100-current-telemetry-value-freeze-checklist.csv",
             "PB-100-current-telemetry-value-derivation-precheck.csv",
+            "PB-100-current-telemetry-closeout-precheck.csv",
             "PB-100-current-telemetry-map.csv",
         ),
         "Thermal telemetry": (
@@ -2817,6 +2846,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-current-telemetry-freeze-review.csv",
         "PB-100-current-telemetry-value-freeze-checklist.csv",
         "PB-100-current-telemetry-value-derivation-precheck.csv",
+        "PB-100-current-telemetry-closeout-precheck.csv",
         "0.5mΩ",
         "ADC or I2C",
         "firmware safety",
@@ -6838,6 +6868,152 @@ def validate_current_telemetry_value_derivation_precheck() -> None:
             fail(f"current telemetry design calculation must support derivation token {token}")
 
 
+def validate_current_telemetry_closeout_precheck() -> None:
+    path = PB100_DIR / "PB-100-current-telemetry-closeout-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty current telemetry closeout precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in CURRENT_TELEMETRY_CLOSEOUT_PRECHECK_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        precheck_id = row["Precheck ID"].strip()
+        if precheck_id not in REQUIRED_CURRENT_TELEMETRY_CLOSEOUT_PRECHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown current telemetry closeout precheck {precheck_id}")
+        if precheck_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate current telemetry closeout precheck {precheck_id}")
+        rows_by_id[precheck_id] = row
+        for column in CURRENT_TELEMETRY_CLOSEOUT_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+        if precheck_id == "CUR-CLS-001" and ("vshunt" not in row_text or "pshunt" not in row_text):
+            fail("current telemetry closeout shunt row must include Vshunt and Pshunt formulas")
+        if precheck_id == "CUR-CLS-006" and (
+            "out2" not in row_text or "out10" not in row_text or "external adc/mux" not in row_text
+        ):
+            fail("current telemetry closeout IMON row must cover output ranges and external ADC/mux escape")
+        if precheck_id == "CUR-CLS-010" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
+            fail("current telemetry closeout no-layout row must block PCB layout explicitly")
+
+    missing_items = sorted(REQUIRED_CURRENT_TELEMETRY_CLOSEOUT_PRECHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing current telemetry closeout prechecks: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "Vshunt = I * Rshunt",
+        "Pshunt = I^2 * Rshunt",
+        "0.5mΩ",
+        "40A gives 20mV",
+        "50A gives 25mV",
+        "60A gives 30mV",
+        "81.92A",
+        "40.96mV",
+        "TOTAL_CURRENT_SHUNT",
+        "INA228-Q1",
+        "INA229-Q1",
+        "INA226",
+        "±40.96mV",
+        "±163.84mV",
+        "-0.3V to +85V",
+        "2.7V to 5.5V",
+        "16 I2C addresses",
+        "TOTAL_CURRENT_MONITOR",
+        "IIN_SHUNT_HI",
+        "IIN_SHUNT_LO",
+        "Kelvin",
+        "10Ω",
+        "1nF C0G",
+        "PB_I2C_SCL",
+        "PB_I2C_SDA",
+        "PB_I2C_INT",
+        "A1 = GND",
+        "A0 = GND",
+        "0x40",
+        "LB_3V3_IO",
+        "4.7kΩ to 10kΩ",
+        "47kΩ",
+        "VBAT_PROT",
+        "VBAT_RAW",
+        "SM8S33AHM3/I",
+        "1kΩ",
+        "1nF 100V",
+        "85 V VBUS",
+        "60 V overshoot",
+        "OUT1_IMON",
+        "OUT10_IMON",
+        "OUT2 0-30A",
+        "OUT1 0-20A",
+        "0-15A",
+        "0-8A",
+        "16 ADC",
+        "external ADC/mux",
+        "RIMON",
+        "telemetry.total_current",
+        "telemetry.output_current",
+        "500µΩ",
+        "40960µV",
+        "stale_timeout_ms 1000",
+        "plausible_max_ma 60000",
+        "total_current_limit_a 40",
+        "stale-telemetry denial",
+        "PB-BENCH-005",
+        "PB-BENCH-006",
+        "PB-BENCH-010",
+        "40 A board budget",
+        "PBFLT-CUR-STALE",
+        "PBFLT-BUDGET",
+        "CSS4J-4026R-L500F",
+        "1.0mΩ fallback",
+        "Isabellenhuette BVN/BAS",
+        "AEC-Q200",
+        "JLCPCB PCBWay",
+        "PB-100-current-monitor-pin-template.csv",
+        "PB-100-symbol-pin-evidence.csv",
+        "PB-100-symbol-mpn-readiness.csv",
+        "telemetry.kicad_sch",
+        "CAP-TEL",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "manufacturing ZIP",
+        "shunt placement",
+        "Kelvin routing",
+        "monitor footprint",
+        "board outline",
+    ):
+        if token not in precheck_text:
+            fail(f"current telemetry closeout precheck must include {token}")
+
+    for supporting_artifact, tokens in {
+        "PB-100-current-telemetry-value-freeze-checklist.csv": ("CUR-FRZ-001", "CUR-FRZ-010"),
+        "PB-100-current-telemetry-value-derivation-precheck.csv": ("CUR-DER-001", "CUR-DER-010"),
+        "PB-100-current-telemetry-freeze-review.csv": ("Total shunt range", "Bench validation path"),
+        "PB-100-b2b-lb100-resource-binding.csv": ("IIN_SENSE", "PB_I2C_SCL", "PB_I2C_SDA"),
+    }.items():
+        supporting_text = read_text(PB100_DIR / supporting_artifact)
+        for token in tokens:
+            if token not in supporting_text:
+                fail(f"current telemetry closeout precheck requires {supporting_artifact} token {token}")
+
+
 def validate_thermal_telemetry_trace() -> None:
     path = PB100_DIR / "PB-100-thermal-telemetry-trace.csv"
     validate_csv(path)
@@ -9326,6 +9502,8 @@ def validate_validation_traceability() -> None:
                 fail("Current telemetry validation trace must include value freeze checklist")
             if "pb-100-current-telemetry-value-derivation-precheck.csv" not in row_text:
                 fail("Current telemetry validation trace must include value derivation precheck")
+            if "pb-100-current-telemetry-closeout-precheck.csv" not in row_text:
+                fail("Current telemetry validation trace must include closeout precheck")
         if freeze_gate == "Thermal telemetry":
             if "pb-100-thermal-telemetry-freeze-review.csv" not in row_text:
                 fail("Thermal telemetry validation trace must include freeze review")
@@ -9904,6 +10082,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-current-telemetry-freeze-review.csv",
         "PB-100-current-telemetry-value-freeze-checklist.csv",
         "PB-100-current-telemetry-value-derivation-precheck.csv",
+        "PB-100-current-telemetry-closeout-precheck.csv",
         "PB-100-board-current-budget-trace.csv",
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-board-current-budget-design-calculation.md",
@@ -10011,6 +10190,7 @@ def main() -> int:
     validate_current_telemetry_freeze_review()
     validate_current_telemetry_value_freeze_checklist()
     validate_current_telemetry_value_derivation_precheck()
+    validate_current_telemetry_closeout_precheck()
     validate_thermal_telemetry_trace()
     validate_thermal_telemetry_freeze_review()
     validate_thermal_telemetry_value_freeze_checklist()

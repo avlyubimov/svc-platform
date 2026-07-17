@@ -147,6 +147,12 @@ Current coverage:
   VBUS stress, per-output IMON scaling, configuration calibration, bench
   safe-fault path, sourcing, and no-layout boundary into
   `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`.
+- Current telemetry closeout precheck now bridges the shunt formulas, monitor
+  family, Kelvin/filter network, I2C/interrupt ownership, protected VBUS
+  stress, per-output IMON ADC scaling, configuration-owned calibration, bench
+  safe-fault evidence, sourcing/symbol synchronization, and no-layout boundary
+  into
+  `hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`.
 - Total-current and per-output IMON calibration now have a firmware
   configuration contract in `firmware/configs/config-example.json`,
   `firmware/configs/svc-config.schema.json`, and `firmware/core/svc_config.h`;

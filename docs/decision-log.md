@@ -2193,6 +2193,23 @@ current telemetry calculation, board-current budget, firmware configuration
 contract, and factory sourcing before shunt, monitor, routing, or calibration
 values can close.
 
+## 2026-07-17 — PB-100 current telemetry closeout precheck
+
+Decision: PB-100 current-telemetry review now has
+`hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`.
+The precheck bridges the shunt formulas, INA228/INA229/INA226 monitor family,
+Kelvin and input-filter network, I2C address/pull-up/interrupt ownership,
+protected VBUS stress, per-output IMON ADC scaling, configuration-owned
+calibration, bench safe-fault evidence, sourcing/symbol synchronization, and
+no-layout manufacturing boundary to PBREL-009.
+
+Reason: The current telemetry value checklist and derivation precheck define the
+candidate values, but print-readiness also needs a machine-checked closeout
+bridge that prevents shunt placement, Kelvin routing, monitor footprints,
+`PB-100.kicad_pcb`, Gerbers, drills, pick-place, or manufacturing ZIP work until
+shunt package heating, monitor sourcing, LB-100 ADC/I2C ownership, calibration,
+and bench evidence close.
+
 ## 2026-07-17 — PB-100 thermal telemetry value freeze checklist
 
 Decision: PB-100 thermal-telemetry review now has

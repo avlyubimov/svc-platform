@@ -70,6 +70,7 @@ hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv,Telemetry
 hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md,Telemetry,Total-current monitor candidate value calculation,Required,Document reviewed,Conditional
 hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv,Telemetry,Current telemetry value freeze checklist,Required,validate_current_telemetry_value_freeze_checklist,Conditional
 hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv,Telemetry,Current telemetry value derivation precheck,Required,validate_current_telemetry_value_derivation_precheck,Conditional
+hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv,Telemetry,Current telemetry closeout precheck,Required,validate_current_telemetry_closeout_precheck,Conditional
 hardware/power-board/PB-100/PB-100-current-telemetry-map.csv,Telemetry,Current telemetry map,Required,CSV width validation,Ready
 hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv,Telemetry,Thermal telemetry and firmware safety trace,Required,validate_thermal_telemetry_trace,Conditional
 hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv,Telemetry,Thermal telemetry freeze review,Required,validate_thermal_telemetry_freeze_review,Conditional

@@ -56,6 +56,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
 - `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`
@@ -153,6 +154,12 @@ It is not a PCB layout package.
   VBUS stress, per-output IMON scaling, configuration calibration, bench
   safe-fault path, sourcing, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`.
+- Current telemetry closeout precheck: shunt formulas, monitor family, Kelvin
+  and filter network, I2C/interrupt ownership, protected VBUS stress,
+  per-output IMON scaling, configuration-owned calibration, bench safe-fault
+  evidence, sourcing/symbol synchronization, and no-layout manufacturing
+  boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`.
 - Input reverse freeze review: LM74700 gate/default-off behavior, TOLL/LFPAK88
   and PowerPAK alternates, protected measurement sequence, HM3 TVS dependency,
   sourcing gate, and no-layout boundary are tracked in
@@ -444,6 +451,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-current-telemetry-map.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv`
