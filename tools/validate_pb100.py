@@ -567,6 +567,14 @@ GARAGE_INSTALL_FREEZE_CHECKLIST_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+GARAGE_INSTALL_SOURCING_PRECHECK_COLUMNS = (
+    "Precheck ID",
+    "Scope",
+    "Required evidence bridge",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
 ASSEMBLY_SOURCING_RECHECK_COLUMNS = (
     "Symbol key",
     "Assembly owner",
@@ -1137,6 +1145,18 @@ REQUIRED_GARAGE_INSTALL_FREEZE_CHECKS = {
     "GAR-FRZ-009",
     "GAR-FRZ-010",
 }
+REQUIRED_GARAGE_INSTALL_SOURCING_PRECHECKS = {
+    "GAR-SRC-001",
+    "GAR-SRC-002",
+    "GAR-SRC-003",
+    "GAR-SRC-004",
+    "GAR-SRC-005",
+    "GAR-SRC-006",
+    "GAR-SRC-007",
+    "GAR-SRC-008",
+    "GAR-SRC-009",
+    "GAR-SRC-010",
+}
 REQUIRED_FAULT_IDS = {
     "PBFLT-INPUT-REV",
     "PBFLT-LOAD-DUMP",
@@ -1233,6 +1253,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md",
     "hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv",
     "hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv",
+    "hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv",
     "hardware/power-board/PB-100/kicad/PB-100.kicad_sch",
     "hardware/power-board/PB-100/kicad/lib/PB100.kicad_sym",
     "firmware/configs/hardware/pb-100-capabilities.json",
@@ -2523,6 +2544,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-assembly-readiness-trace.csv",
             "PB-100-garage-connector-fuse-plan.md",
             "PB-100-garage-install-freeze-checklist.csv",
+            "PB-100-garage-install-sourcing-precheck.csv",
         ),
     }
     for gate, tokens in required_checklist_evidence.items():
@@ -2672,6 +2694,7 @@ def validate_schematic_freeze_gap_register() -> None:
     if (
         "pb-100-assembly-readiness-trace.csv" not in garage_text
         or "pb-100-garage-install-freeze-checklist.csv" not in garage_text
+        or "pb-100-garage-install-sourcing-precheck.csv" not in garage_text
         or "garage" not in garage_text
         or "user" not in garage_text
     ):
@@ -7094,6 +7117,127 @@ def validate_garage_install_freeze_checklist() -> None:
             fail(f"sourcing evidence snapshot must support garage checklist token {token}")
 
 
+def validate_garage_install_sourcing_precheck() -> None:
+    path = PB100_DIR / "PB-100-garage-install-sourcing-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty garage install sourcing precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [
+        column for column in GARAGE_INSTALL_SOURCING_PRECHECK_COLUMNS if column not in fieldnames
+    ]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        precheck_id = row["Precheck ID"].strip()
+        if precheck_id not in REQUIRED_GARAGE_INSTALL_SOURCING_PRECHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown garage sourcing precheck {precheck_id}")
+        if precheck_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate garage sourcing precheck {precheck_id}")
+        rows_by_id[precheck_id] = row
+        for column in GARAGE_INSTALL_SOURCING_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+
+    missing_checks = sorted(REQUIRED_GARAGE_INSTALL_SOURCING_PRECHECKS - rows_by_id.keys())
+    if missing_checks:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing garage install sourcing prechecks: "
+            f"{', '.join(missing_checks)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "INPUT_CONNECTOR",
+        "OUTPUT_CONNECTOR",
+        "OUTPUT_FUSE_HOLDER",
+        "MAIN_FUSE_HOLDER",
+        "user-installed",
+        "PB-100-assembly-readiness-trace.csv",
+        "PB-100-garage-install-freeze-checklist.csv",
+        "PB-100-garage-connector-fuse-plan.md",
+        "PB-100-garage-connector-fuse-plan.csv",
+        "production/bom/garage_bom_draft.csv",
+        "production/bom/pb100_symbol_bom_map.csv",
+        "production/bom/pb100_assembly_sourcing_recheck.csv",
+        "production/bom/pb100_sourcing_evidence_snapshot.csv",
+        "ring-lug battery lead",
+        "near-battery MAXI 50A",
+        "high-current sealed harness entry",
+        "serviceable gland",
+        "DT and DTP",
+        "50A input path",
+        "6mm2 / 10AWG",
+        "6 mm2 / 10 AWG",
+        "DEUTSCH DTP",
+        "DTP 2-pin",
+        "size 12",
+        "25A",
+        "DEUTSCH DT",
+        "DT 2-pin",
+        "size 16",
+        "DT 13A class is too close",
+        "OUT3 through OUT10",
+        "DEUTSCH DTM",
+        "DTM 4-pin",
+        "DTM 8-pin",
+        "size 20",
+        "7.5A",
+        "MINI/ATO",
+        "5A 10A 15A and 20A",
+        "service cover",
+        "plug/receptacle",
+        "contacts",
+        "seals",
+        "wedgelocks",
+        "boots",
+        "backshells",
+        "crimp tool",
+        "insertion/removal tool",
+        "spare contacts",
+        "2026-07-17",
+        "2.5-4 mm2 / 14-12 AWG",
+        "0.5-1.0 mm2 / 20-18 AWG",
+        "ASA/PETG",
+        "2 mm silicone gasket",
+        "M3 hardware",
+        "PB-BENCH-015",
+        "does not freeze exact connector MPNs",
+        "Open:",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "connector footprints",
+        "fuse-holder footprints",
+        "enclosure CAD release",
+        "manufacturing output",
+    ):
+        if token not in precheck_text:
+            fail(f"garage install sourcing precheck must include {token}")
+
+    plan_text = read_text(PB100_DIR / "PB-100-garage-connector-fuse-plan.md")
+    for token in ("does not freeze exact connector MPNs", "DTP 2-pin", "DT 2-pin", "DTM", "MAXI", "MINI/ATO"):
+        if token not in plan_text:
+            fail(f"garage connector/fuse plan must support sourcing precheck token {token}")
+
+    evidence_text = read_text(REPO_ROOT / "production" / "bom" / "pb100_sourcing_evidence_snapshot.csv")
+    for token in ("2026-07-17", "INPUT_CONNECTOR", "OUTPUT_CONNECTOR", "OUTPUT_FUSE_HOLDER", "MAIN_FUSE_HOLDER", "Open:"):
+        if token not in evidence_text:
+            fail(f"sourcing evidence snapshot must support garage sourcing precheck token {token}")
+
+
 def evidence_link_is_valid(value: str) -> bool:
     return value.startswith(("https://", "http://", "docs/", "hardware/", "production/"))
 
@@ -8177,6 +8321,8 @@ def validate_validation_traceability() -> None:
                 fail("Garage assembly validation trace must keep garage scope explicit")
             if "pb-100-garage-install-freeze-checklist.csv" not in row_text:
                 fail("Garage assembly validation trace must include garage install freeze checklist")
+            if "pb-100-garage-install-sourcing-precheck.csv" not in row_text:
+                fail("Garage assembly validation trace must include garage install sourcing precheck")
         gates_with_tests[freeze_gate].append(row)
 
     required_primary_artifacts = {
@@ -8691,6 +8837,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-factory-assembly-freeze-checklist.csv",
         "PB-100-factory-assembly-sourcing-precheck.csv",
         "PB-100-garage-install-freeze-checklist.csv",
+        "PB-100-garage-install-sourcing-precheck.csv",
     )
     for token in required_trace_artifacts:
         if token not in text:
@@ -8797,6 +8944,7 @@ def main() -> int:
     validate_factory_assembly_sourcing_precheck()
     validate_garage_connector_fuse_plan()
     validate_garage_install_freeze_checklist()
+    validate_garage_install_sourcing_precheck()
     validate_sourcing_evidence_snapshot()
     validate_tvs_candidate_consistency()
     validate_tvs_load_dump_margin_trace()

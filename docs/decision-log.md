@@ -2194,6 +2194,21 @@ close before garage purchase lock, installation signoff, connector footprints,
 fuse-holder footprints, enclosure release, manufacturing output, or
 `PB-100.kicad_pcb` work can be released.
 
+## 2026-07-17 — PB-100 garage install sourcing precheck
+
+Decision: PB-100 garage assembly review now has
+`hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv`.
+The precheck ties garage-owned symbol keys, the 50 A battery/MAXI path,
+DTP/DT/DTM connector boundaries, user-serviceable fuses, purchase-ready kit
+evidence, wire/harness derating, enclosure service review, BOM/source
+synchronization, and no-layout boundary to PBREL-012.
+
+Reason: PBREL-012 needs a closeable sourcing and install bridge between the
+garage freeze checklist, connector/fuse plan, garage BOM, sourcing recheck,
+evidence snapshot, and board-print no-go boundary. It prevents connector/fuse
+family classes from being treated as purchase-ready kits or PCB-footprint
+authorization.
+
 ## 2026-07-17 — PB-100 CAN1 default-disable freeze checklist
 
 Decision: PB-100 CAN1 safety review now has

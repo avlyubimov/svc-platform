@@ -157,7 +157,8 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`,
   `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`,
   plus
-  `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`.
+  `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv` and
+  `hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv`.
 
 ## Motorcycle test
 

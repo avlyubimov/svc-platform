@@ -190,6 +190,9 @@ Current coverage:
   tying the 50 A battery/MAXI path, DTP/DT/DTM connector classes, MINI/ATO fuse
   access, wire gauges, crimp tooling, seals, enclosure service access, BOM
   synchronization, and no-layout boundaries into one machine-checked artifact.
+  `hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv`
+  now adds the closeable sourcing/install bridge for garage-owned keys, wire and
+  harness derating, purchase kits, service access, and no-PCB-migration rules.
 - Thermal telemetry now has a TDK `NTCGS103JF103FT8`-class 10 kΩ 150 °C
   AEC-Q200 NTC candidate for all three thermal points; schematic freeze must
   still close divider values, ADC scaling, placement, assembly class, and
