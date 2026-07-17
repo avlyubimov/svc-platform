@@ -77,6 +77,7 @@ hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv,Outputs,OUT2 SOA envelo
 hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv,B2B interface,JPB1 connector and LB resource trace,Required,validate_b2b_interface_trace,Conditional
 hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv,B2B interface,LB-100 resource-class binding,Required,validate_b2b_resource_binding,Conditional
 hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv,B2B interface,LB-100 pin audit and FX18 checklist,Required,validate_b2b_lb100_pin_audit_checklist,Conditional
+hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv,B2B interface,B2B freeze review gate checklist,Required,validate_b2b_interface_freeze_checklist,Conditional
 hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md,B2B interface,LB-100 STM32H5 resource precheck,Required,Document reviewed,Conditional
 hardware/power-board/PB-100/PB-100-b2b-pin-map.csv,B2B interface,JPB1 pin map,Required,validate_jpb1_symbol_from_pin_map,Conditional
 hardware/power-board/PB-100/PB-100-b2b-pin-budget.csv,B2B interface,JPB1 pin budget,Required,CSV width validation,Ready

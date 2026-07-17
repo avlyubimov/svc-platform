@@ -1956,6 +1956,20 @@ packet needs a machine-checked audit list that preserves the current JPB1 map
 while making the remaining LB-100 pinout and FX18 mechanical evidence explicit
 before any connector placement or `PB-100.kicad_pcb` work.
 
+## 2026-07-17 — PB-100 B2B interface freeze checklist
+
+Decision: PB-100 board-to-board release review now has
+`hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`. The
+checklist ties the FX18 connector pair, power/status pins, role-free output
+signals, board telemetry, `PB_I2C`, CAN1 read-only crossing, STM32H563
+LQFP-100 audit, cross-artifact synchronization, and no-layout boundary to
+PBREL-003.
+
+Reason: The pin audit checklist defines execution evidence, but the schematic
+freeze packet also needs a reviewer-facing gate that links B2B electrical,
+mechanical, LB-100 resource, CAN1 safety, and no-layout conditions before any
+mezzanine placement or manufacturing-output work.
+
 ## 2026-07-17 — PB-100 output-stage value freeze checklist
 
 Decision: PB-100 output-stage review now has

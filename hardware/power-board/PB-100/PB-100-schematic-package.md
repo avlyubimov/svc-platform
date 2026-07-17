@@ -23,6 +23,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`
 - `production/bom/pb100_assembly_sourcing_recheck.csv`
 - `production/bom/pb100_sourcing_evidence_snapshot.csv`
@@ -248,6 +249,9 @@ LB-100 resource-class binding CSV:
 LB-100 pin audit and FX18 checklist:
 `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`.
 
+B2B interface freeze checklist:
+`hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`.
+
 LB-100 pin-binding precheck:
 `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`.
 
@@ -277,6 +281,10 @@ The pin audit checklist keeps the exact STM32H563 LQFP-100 pinout audit, ADC
 capacity, output PWM default-low behavior, fault/wake routing, CAN1 read-only
 crossing, FX18 footprint drawing, stack height, vibration retention, assembly
 handling, and no-layout boundary visible before connector placement.
+The B2B interface freeze checklist ties that audit to power/status pins,
+role-free output signals, board telemetry, `PB_I2C`, CAN1 read-only crossing,
+resource-class reservations, cross-artifact synchronization, and the no-layout
+boundary for PBREL-003.
 
 ## Output channel matrix
 

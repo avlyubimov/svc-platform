@@ -406,6 +406,14 @@ B2B_LB100_PIN_AUDIT_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+B2B_INTERFACE_FREEZE_CHECKLIST_COLUMNS = (
+    "Check ID",
+    "Review item",
+    "Required close evidence",
+    "Primary artifacts",
+    "Pass condition",
+    "Blocked action",
+)
 TVS_LOAD_DUMP_MARGIN_TRACE_COLUMNS = (
     "Protected item",
     "Voltage class",
@@ -617,6 +625,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-b2b-interface-trace.csv",
         "PB-100-b2b-lb100-resource-binding.csv",
         "PB-100-b2b-lb100-pin-audit-checklist.csv",
+        "PB-100-b2b-interface-freeze-checklist.csv",
     ),
     "CAP-CAN1": (
         "PB-100-can1-tx-disable-trace.csv",
@@ -868,6 +877,18 @@ REQUIRED_B2B_LB100_PIN_AUDIT_ITEMS = {
     "B2B-AUD-008",
     "B2B-AUD-009",
 }
+REQUIRED_B2B_INTERFACE_FREEZE_CHECKS = {
+    "B2B-FRZ-001",
+    "B2B-FRZ-002",
+    "B2B-FRZ-003",
+    "B2B-FRZ-004",
+    "B2B-FRZ-005",
+    "B2B-FRZ-006",
+    "B2B-FRZ-007",
+    "B2B-FRZ-008",
+    "B2B-FRZ-009",
+    "B2B-FRZ-010",
+}
 REQUIRED_OUTPUT_STAGE_VALUE_FREEZE_CHECKS = {
     "OUTVAL-001",
     "OUTVAL-002",
@@ -1039,6 +1060,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv",
     "hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv",
     "hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv",
+    "hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md",
     "hardware/power-board/PB-100/PB-100-output-net-expansion.csv",
     "hardware/power-board/PB-100/PB-100-test-point-plan.csv",
@@ -2139,6 +2161,7 @@ def validate_schematic_readiness_dashboard() -> None:
         "B2B LB-100 pin precheck": (
             "PB-100-b2b-lb100-pin-binding-precheck.md",
             "PB-100-b2b-lb100-pin-audit-checklist.csv",
+            "PB-100-b2b-interface-freeze-checklist.csv",
         ),
         "BOM synchronization": (
             "PB-100-assembly-readiness-trace.csv",
@@ -2269,6 +2292,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-b2b-interface-trace.csv",
             "PB-100-b2b-lb100-resource-binding.csv",
             "PB-100-b2b-lb100-pin-audit-checklist.csv",
+            "PB-100-b2b-interface-freeze-checklist.csv",
             "PB-100-b2b-pin-map.csv",
         ),
         "High/medium output stage": (
@@ -2444,6 +2468,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-b2b-interface-trace.csv",
         "PB-100-b2b-lb100-resource-binding.csv",
         "PB-100-b2b-lb100-pin-audit-checklist.csv",
+        "PB-100-b2b-interface-freeze-checklist.csv",
         "FX18-100P-0.8SV10",
         "FX18-100S-0.8SV20",
         "exact LB-100 MCU pin binding",
@@ -6999,6 +7024,82 @@ def validate_b2b_lb100_pin_audit_checklist() -> None:
             fail(f"B2B LB-100 pin audit checklist must include {token}")
 
 
+def validate_b2b_interface_freeze_checklist() -> None:
+    path = PB100_DIR / "PB-100-b2b-interface-freeze-checklist.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty B2B interface freeze checklist: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in B2B_INTERFACE_FREEZE_CHECKLIST_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_check: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        check_id = row["Check ID"].strip()
+        if check_id not in REQUIRED_B2B_INTERFACE_FREEZE_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown B2B freeze check {check_id}")
+        if check_id in rows_by_check:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate B2B freeze check {check_id}")
+        rows_by_check[check_id] = row
+        for column in B2B_INTERFACE_FREEZE_CHECKLIST_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        row_text = " ".join(row.values()).lower()
+        if check_id == "B2B-FRZ-001" and ("fx18-100p-0.8sv10" not in row_text or "stack" not in row_text):
+            fail("B2B connector freeze check must cover FX18 pair and stack evidence")
+        if check_id == "B2B-FRZ-003" and ("role-specific" not in row_text or "default-low" not in row_text):
+            fail("B2B output freeze check must keep role-free default-low output behavior")
+        if check_id == "B2B-FRZ-005" and (
+            "can1_tx_route" not in row_text or "dnp/open" not in row_text or "future adr" not in row_text
+        ):
+            fail("B2B CAN1 freeze check must keep CAN1_TX_ROUTE DNP/open and future ADR gated")
+        if check_id == "B2B-FRZ-007" and (
+            "stm32h563" not in row_text or "lqfp-100" not in row_text or "exact lb-100" not in row_text
+        ):
+            fail("B2B MCU freeze check must require exact STM32H563 LQFP-100 LB-100 pinout audit")
+        if check_id == "B2B-FRZ-010" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
+            fail("B2B freeze checklist must explicitly block PCB layout")
+
+    missing_checks = sorted(REQUIRED_B2B_INTERFACE_FREEZE_CHECKS - rows_by_check.keys())
+    if missing_checks:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing B2B interface freeze checks: "
+            f"{', '.join(missing_checks)}"
+        )
+
+    checklist_text = read_text(path)
+    for token in (
+        "FX18-100P-0.8SV10",
+        "FX18-100S-0.8SV20",
+        "PB_5V_OUT",
+        "LB_3V3_IO",
+        "OUT1_CTL",
+        "OUT10_IMON",
+        "IIN_SENSE",
+        "TEMP_PWR_A",
+        "PB_I2C_SCL",
+        "CAN1_TX_DISABLE_CMD",
+        "CAN1_TX_DISABLED_STATUS",
+        "CAN1_RX_ROUTE",
+        "CAN1_TX_ROUTE",
+        "DNP/open",
+        "future ADR",
+        "STM32H563",
+        "LQFP-100",
+        "PB-100-b2b-lb100-pin-audit-checklist.csv",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+    ):
+        if token not in checklist_text:
+            fail(f"B2B interface freeze checklist must include {token}")
+
+
 def parse_pin_span_set(value: str) -> set[str]:
     pins: set[str] = set()
     for part in value.split(";"):
@@ -7236,6 +7337,11 @@ def validate_validation_traceability() -> None:
         for row in gates_with_tests["Board-to-board interface"]
     ):
         fail("validation traceability for Board-to-board interface must include PB-100-b2b-lb100-pin-audit-checklist.csv")
+    if not any(
+        "PB-100-b2b-interface-freeze-checklist.csv" in row["Primary artifact"]
+        for row in gates_with_tests["Board-to-board interface"]
+    ):
+        fail("validation traceability for Board-to-board interface must include PB-100-b2b-interface-freeze-checklist.csv")
 
     missing_gates = sorted(gate for gate, gate_rows in gates_with_tests.items() if not gate_rows)
     if missing_gates:
@@ -7705,6 +7811,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-b2b-interface-trace.csv",
         "PB-100-b2b-lb100-resource-binding.csv",
         "PB-100-b2b-lb100-pin-audit-checklist.csv",
+        "PB-100-b2b-interface-freeze-checklist.csv",
         "PB-100-assembly-readiness-trace.csv",
         "PB-100-factory-assembly-freeze-checklist.csv",
         "PB-100-garage-install-freeze-checklist.csv",
@@ -7817,6 +7924,7 @@ def main() -> int:
     validate_b2b_interface_trace()
     validate_b2b_connector_candidate()
     validate_b2b_lb100_pin_audit_checklist()
+    validate_b2b_interface_freeze_checklist()
     validate_b2b_resource_binding()
     validate_validation_traceability()
     validate_test_point_plan()

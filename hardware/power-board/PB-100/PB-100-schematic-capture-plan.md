@@ -19,7 +19,7 @@ KiCad scaffold directory:
 | `output-channel-template.kicad_sch` | Generic high-side output channel pattern | `PB-100-high-medium-output-baseline-trace.csv`, `PB-100-high-medium-output-freeze-review.csv`, `PB-100-low-current-output-baseline-trace.csv`, `PB-100-low-current-output-freeze-review.csv`, `PB-100-output-stage-value-freeze-checklist.csv`, `PB-100-output-controller-pin-template.csv`, `PB-100-output-channel-pin-contract.csv`, `PB-100-output-stage-design-values.csv` |
 | `outputs-1-10.kicad_sch` | Ten instantiated generic outputs | `PB-100-high-medium-output-baseline-trace.csv`, `PB-100-high-medium-output-freeze-review.csv`, `PB-100-low-current-output-baseline-trace.csv`, `PB-100-low-current-output-freeze-review.csv`, `PB-100-output-stage-value-freeze-checklist.csv`, `PB-100-schematic-instance-symbol-map.csv`, `PB-100-output-net-expansion.csv`, `PB-100-output-channel-pin-contract.csv` |
 | `telemetry.kicad_sch` | Total input current, voltage, thermal sensors, board ID | `PB-100-current-telemetry-trace.csv`, `PB-100-current-telemetry-freeze-review.csv`, `PB-100-current-telemetry-value-freeze-checklist.csv`, `PB-100-thermal-telemetry-trace.csv`, `PB-100-thermal-telemetry-freeze-review.csv`, `PB-100-thermal-telemetry-value-freeze-checklist.csv`, `PB-100-thermal-telemetry-map.csv`, `PB-100-current-telemetry-map.csv`, `PB-100-fault-response-matrix.csv` |
-| `b2b-interface.kicad_sch` | `JPB1` PB-100 to LB-100 interface | `PB-100-b2b-interface-trace.csv`, `PB-100-b2b-lb100-resource-binding.csv`, `PB-100-b2b-lb100-pin-audit-checklist.csv`, `PB-100-b2b-pin-map.csv`, `PB-100-b2b-pin-budget.csv` |
+| `b2b-interface.kicad_sch` | `JPB1` PB-100 to LB-100 interface | `PB-100-b2b-interface-trace.csv`, `PB-100-b2b-lb100-resource-binding.csv`, `PB-100-b2b-lb100-pin-audit-checklist.csv`, `PB-100-b2b-interface-freeze-checklist.csv`, `PB-100-b2b-pin-map.csv`, `PB-100-b2b-pin-budget.csv` |
 | `can1-safety.kicad_sch` | CAN1 TX disable/readback and DNP/open TX path | `PB-100-can1-tx-disable-trace.csv`, `PB-100-can1-tx-disable.md`, `PB-100-can1-safety-verification.csv`, `PB-100-can1-production-dnp-review.csv`, `PB-100-can1-default-disable-freeze-checklist.csv`, `PB-100-schematic-net-domain-plan.csv` |
 
 Placeholder child sheets are tracked in
@@ -50,7 +50,8 @@ lock footprints or placement.
    work item in `PB-100-symbol-capture-worklist.csv`.
 5. Use `PB-100-schematic-capture-work-queue.csv` to execute sheet capture.
 6. Capture `b2b-interface.kicad_sch` from the B2B trace, LB-100
-   resource-class binding, pin audit checklist, and `JPB1` pin map.
+   resource-class binding, pin audit checklist, B2B freeze checklist, and
+   `JPB1` pin map.
 7. Capture `input-protection.kicad_sch` from the input reverse package trace,
    input reverse freeze review, Q1 freeze checklist, board-current 40 A freeze review,
    board-current design calculation, TVS margin trace, TVS freeze review, TVS

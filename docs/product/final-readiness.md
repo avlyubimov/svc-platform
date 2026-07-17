@@ -185,6 +185,11 @@ Current coverage:
   footprint drawing, stack height, vibration retention, assembly handling, and
   no-layout boundary in
   `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`.
+- B2B/LB-100 review now has a freeze checklist tying the FX18 connector pair,
+  power/status pins, role-free OUTn signals, board telemetry, `PB_I2C`, CAN1
+  read-only crossing, STM32H563 LQFP-100 audit, cross-artifact synchronization,
+  and no-layout boundary to
+  `hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`.
 - Q1 input reverse MOSFET pin evidence is captured from the Infineon
   `IAUTN06S5N008` data sheet; schematic freeze must still close TOLL footprint,
   40 A copper/thermal review, assembly handling, and gate clamp behavior.
