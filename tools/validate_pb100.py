@@ -3051,6 +3051,20 @@ def validate_board_release_blocker_register() -> None:
 
     gates_by_status = freeze_checklist_gates_by_status()
     conditional_gates = {gate for gate, status in gates_by_status.items() if status == "Conditional"}
+    required_closeout_by_gate = {
+        "CAN1 safety policy": "pb-100-can1-default-disable-closeout-precheck.csv",
+        "Board current budget": "pb-100-board-current-budget-closeout-precheck.csv",
+        "Board-to-board interface": "pb-100-b2b-interface-closeout-precheck.csv",
+        "High/medium output stage": "pb-100-output-stage-closeout-precheck.csv",
+        "Low-current output stage": "pb-100-output-stage-closeout-precheck.csv",
+        "Input reverse protection": "pb-100-input-reverse-q1-closeout-precheck.csv",
+        "TVS/load-dump protection": "pb-100-tvs-overshoot-closeout-precheck.csv",
+        "Logic power rails": "pb-100-logic-power-closeout-precheck.csv",
+        "Current telemetry": "pb-100-current-telemetry-closeout-precheck.csv",
+        "Thermal telemetry": "pb-100-thermal-telemetry-closeout-precheck.csv",
+        "Factory assembly readiness": "pb-100-factory-assembly-closeout-precheck.csv",
+        "Garage assembly readiness": "pb-100-garage-install-closeout-precheck.csv",
+    }
     seen_gates = set()
     seen_blockers = set()
     for row_number, row in enumerate(rows, 2):
@@ -3084,6 +3098,11 @@ def validate_board_release_blocker_register() -> None:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Required close evidence must require final evidence")
         if "review" not in row_text and "test" not in row_text:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: release blocker must require review or test")
+        required_closeout = required_closeout_by_gate.get(gate)
+        if required_closeout is None:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: no closeout artifact rule for gate {gate}")
+        if required_closeout not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: release blocker must reference {required_closeout}")
         validate_no_role_tokens_in_row(path, row_number, row)
 
     missing_gates = sorted(conditional_gates - seen_gates)
