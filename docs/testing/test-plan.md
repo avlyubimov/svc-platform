@@ -125,6 +125,7 @@ ordered rule execution, and stale-telemetry denial in one processing step.
 - Current telemetry and current-budget tests trace to
   `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`,
   `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`,
+  `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`,
   `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`,
   `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`,
   `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`,

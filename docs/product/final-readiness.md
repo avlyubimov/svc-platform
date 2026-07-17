@@ -119,6 +119,11 @@ Current coverage:
   points, INA228-class ±40.96 mV range, candidate `0x40` address straps,
   LB-owned pull-up boundary, input/VBUS filters, and calibration boundary in
   `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`.
+- Current telemetry value closure now has
+  `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`,
+  tying shunt range, monitor family, Kelvin/filter network, I2C ownership,
+  alert behavior, VBUS stress, per-output IMON scaling, configuration
+  calibration, stale safe-fault tests, sourcing, and no-layout boundary.
 - Total-current and per-output IMON calibration now have a firmware
   configuration contract in `firmware/configs/config-example.json`,
   `firmware/configs/svc-config.schema.json`, and `firmware/core/svc_config.h`;

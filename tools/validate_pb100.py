@@ -324,6 +324,14 @@ CURRENT_TELEMETRY_FREEZE_REVIEW_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+CURRENT_TELEMETRY_VALUE_FREEZE_CHECKLIST_COLUMNS = (
+    "Check ID",
+    "Review item",
+    "Required close evidence",
+    "Primary artifacts",
+    "Pass condition",
+    "Blocked action",
+)
 THERMAL_TELEMETRY_TRACE_COLUMNS = (
     "Thermal zone",
     "Signal",
@@ -559,6 +567,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
     "CAP-TEL": (
         "PB-100-current-telemetry-trace.csv",
         "PB-100-current-telemetry-freeze-review.csv",
+        "PB-100-current-telemetry-value-freeze-checklist.csv",
         "PB-100-thermal-telemetry-trace.csv",
         "PB-100-thermal-telemetry-freeze-review.csv",
     ),
@@ -832,6 +841,18 @@ REQUIRED_CURRENT_TELEMETRY_FREEZE_REVIEW_ITEMS = {
     "Stale telemetry safe fault",
     "Bench validation path",
 }
+REQUIRED_CURRENT_TELEMETRY_VALUE_FREEZE_CHECKS = {
+    "CUR-FRZ-001",
+    "CUR-FRZ-002",
+    "CUR-FRZ-003",
+    "CUR-FRZ-004",
+    "CUR-FRZ-005",
+    "CUR-FRZ-006",
+    "CUR-FRZ-007",
+    "CUR-FRZ-008",
+    "CUR-FRZ-009",
+    "CUR-FRZ-010",
+}
 REQUIRED_THERMAL_TELEMETRY_FREEZE_REVIEW_ITEMS = {
     "Sensor class",
     "Divider and ADC scaling",
@@ -896,6 +917,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md",
+    "hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md",
@@ -2152,6 +2174,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "Current telemetry": (
             "PB-100-current-telemetry-trace.csv",
             "PB-100-current-telemetry-freeze-review.csv",
+            "PB-100-current-telemetry-value-freeze-checklist.csv",
             "PB-100-current-telemetry-map.csv",
         ),
         "Thermal telemetry": (
@@ -2246,6 +2269,7 @@ def validate_schematic_freeze_gap_register() -> None:
     for token in (
         "PB-100-current-telemetry-trace.csv",
         "PB-100-current-telemetry-freeze-review.csv",
+        "PB-100-current-telemetry-value-freeze-checklist.csv",
         "0.5mΩ",
         "ADC or I2C",
         "firmware safety",
@@ -4898,6 +4922,120 @@ def validate_current_telemetry_freeze_review() -> None:
             fail(f"firmware tests must retain current telemetry safe-fault token {token}")
 
 
+def validate_current_telemetry_value_freeze_checklist() -> None:
+    path = PB100_DIR / "PB-100-current-telemetry-value-freeze-checklist.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty current telemetry value freeze checklist: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [
+        column for column in CURRENT_TELEMETRY_VALUE_FREEZE_CHECKLIST_COLUMNS if column not in fieldnames
+    ]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_check: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        check_id = row["Check ID"].strip()
+        if check_id not in REQUIRED_CURRENT_TELEMETRY_VALUE_FREEZE_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown current telemetry check {check_id}")
+        if check_id in rows_by_check:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate current telemetry check {check_id}")
+        rows_by_check[check_id] = row
+        for column in CURRENT_TELEMETRY_VALUE_FREEZE_CHECKLIST_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+
+    missing_checks = sorted(REQUIRED_CURRENT_TELEMETRY_VALUE_FREEZE_CHECKS - rows_by_check.keys())
+    if missing_checks:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing current telemetry checks: "
+            f"{', '.join(missing_checks)}"
+        )
+
+    checklist_text = read_text(path)
+    for token in (
+        "0.5mΩ",
+        "CSS4J-4026R-L500F",
+        "20mV at 40A",
+        "0.8W",
+        "30mV at 60A",
+        "1.8W",
+        "81.92A",
+        "±40.96mV",
+        "INA228-Q1",
+        "INA229-Q1",
+        "INA226",
+        "85 V VBUS",
+        "2.7 V to 5.5 V",
+        "16 I2C addresses",
+        "IIN_SHUNT_HI",
+        "IIN_SHUNT_LO",
+        "Kelvin",
+        "10Ω",
+        "1nF C0G",
+        "A1 = GND",
+        "A0 = GND",
+        "0x40",
+        "PB_I2C_SCL",
+        "PB_I2C_SDA",
+        "LB_3V3_IO",
+        "4.7kΩ to 10kΩ",
+        "DNP",
+        "PB_I2C_INT",
+        "47kΩ",
+        "diagnostic",
+        "VBAT_PROT",
+        "1kΩ",
+        "1nF 100V",
+        "OUT1_IMON",
+        "OUT10_IMON",
+        "0-30A",
+        "0-20A",
+        "0-15A",
+        "0-8A",
+        "telemetry.total_current",
+        "telemetry.output_current",
+        "500µΩ",
+        "40960µV",
+        "1000 ms",
+        "60000 mA",
+        "calibration data not firmware constants",
+        "PB-BENCH-005",
+        "PB-BENCH-006",
+        "PB-BENCH-010",
+        "stale-telemetry denial",
+        "total_current_limit_a 40",
+        "TOTAL_CURRENT_MONITOR",
+        "TOTAL_CURRENT_SHUNT",
+        "JLCPCB PCBWay",
+        "1.0mΩ fallback",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+    ):
+        if token not in checklist_text:
+            fail(f"current telemetry value freeze checklist must include {token}")
+
+    calculation_text = read_text(PB100_DIR / "PB-100-current-telemetry-design-calculation.md")
+    for token in ("500 µΩ", "40960 µV", "1000 ms", "60000 mA", "0x40", "10 Ω", "1 nF"):
+        if token not in calculation_text:
+            fail(f"current telemetry design calculation must support checklist token {token}")
+
+    config_text = read_text(REPO_ROOT / "firmware" / "configs" / "config-example.json")
+    for token in ('"shunt_microohm": 500', '"stale_timeout_ms": 1000', '"plausible_max_ma": 60000'):
+        if token not in config_text:
+            fail(f"config example must support current telemetry checklist token {token}")
+
+
 def validate_thermal_telemetry_trace() -> None:
     path = PB100_DIR / "PB-100-thermal-telemetry-trace.csv"
     validate_csv(path)
@@ -6327,6 +6465,8 @@ def validate_validation_traceability() -> None:
         if freeze_gate == "Current telemetry":
             if "pb-100-current-telemetry-freeze-review.csv" not in row_text:
                 fail("Current telemetry validation trace must include freeze review")
+            if "pb-100-current-telemetry-value-freeze-checklist.csv" not in row_text:
+                fail("Current telemetry validation trace must include value freeze checklist")
         if freeze_gate == "Thermal telemetry":
             if "pb-100-thermal-telemetry-freeze-review.csv" not in row_text:
                 fail("Thermal telemetry validation trace must include freeze review")
@@ -6852,6 +6992,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-logic-power-value-freeze-checklist.csv",
         "PB-100-current-telemetry-trace.csv",
         "PB-100-current-telemetry-freeze-review.csv",
+        "PB-100-current-telemetry-value-freeze-checklist.csv",
         "PB-100-board-current-budget-trace.csv",
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-board-current-budget-design-calculation.md",
@@ -6941,6 +7082,7 @@ def main() -> int:
     validate_board_current_budget_design_calculation()
     validate_current_telemetry_trace()
     validate_current_telemetry_freeze_review()
+    validate_current_telemetry_value_freeze_checklist()
     validate_thermal_telemetry_trace()
     validate_thermal_telemetry_freeze_review()
     validate_logic_power_rail_trace()

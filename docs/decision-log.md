@@ -2015,3 +2015,19 @@ Reason: PBREL-008 cannot close from candidate equations alone. The buck family,
 load budget, external values, magnetics, capacitors, PGOOD behavior, EMI
 evidence, and sourcing must close before U3/L1/CIN/COUT values, footprints,
 switch-node geometry, or `PB-100.kicad_pcb` work can be locked.
+
+## 2026-07-17 — PB-100 current telemetry value freeze checklist
+
+Decision: PB-100 current-telemetry review now has
+`hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`.
+The checklist ties the 0.5 mΩ total-current shunt, INA228/INA229/INA226 monitor
+family, Kelvin sense and input filter, I2C address and pull-up ownership,
+diagnostic alert behavior, protected `VBAT_PROT` VBUS sense, per-output IMON
+scaling, configuration-owned calibration, stale-telemetry bench tests, sourcing,
+and no-layout boundary into one machine-checked artifact.
+
+Reason: PBREL-009 cannot close from the candidate calculation alone. Shunt
+package heating, Kelvin footprint, monitor orderability, address and pull-up
+ownership, alert behavior, ADC/I2C mapping, bench calibration, and stale-data
+safety must close before telemetry routing, shunt copper, footprints, or
+`PB-100.kicad_pcb` work can be locked.

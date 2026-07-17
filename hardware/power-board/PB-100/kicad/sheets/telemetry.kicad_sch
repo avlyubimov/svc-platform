@@ -10,7 +10,7 @@
     (company "SVC Platform")
     (comment 9 "Work queue: CAP-TEL. Preliminary schematic capture follows PB-100-schematic-capture-work-queue.csv.")
     (comment 1 "Preliminary capture for current, voltage, thermal, and board ID telemetry.")
-    (comment 2 "Sources: PB-100-current-telemetry-trace.csv, PB-100-current-telemetry-freeze-review.csv, PB-100-thermal-telemetry-trace.csv, PB-100-thermal-telemetry-freeze-review.csv, telemetry maps.")
+    (comment 2 "Sources: PB-100-current-telemetry-trace.csv, PB-100-current-telemetry-freeze-review.csv, PB-100-current-telemetry-value-freeze-checklist.csv, PB-100-thermal-telemetry-trace.csv, PB-100-thermal-telemetry-freeze-review.csv, telemetry maps.")
   )
   (lib_symbols
   (symbol "PB100:PB100_BOARD_ID_RESISTOR_CLASS_PRELIM"
@@ -50,7 +50,7 @@
     (pin passive line (at -12.7 -2.54 0) (length 5.08) (name "GND_REF" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27)))))
   )
   )
-  (text "Telemetry capture notes:\n- Source traces: PB-100-current-telemetry-trace.csv, PB-100-current-telemetry-freeze-review.csv, PB-100-thermal-telemetry-trace.csv, PB-100-thermal-telemetry-freeze-review.csv\n- Thermal nets TEMP_PCB, TEMP_PWR_A, TEMP_PWR_B map to LB-100 telemetry\n- Board ID stays separate from vehicle role mapping\n\nNo PCB layout from this preliminary capture."
+  (text "Telemetry capture notes:\n- Source traces: PB-100-current-telemetry-trace.csv, PB-100-current-telemetry-freeze-review.csv, PB-100-current-telemetry-value-freeze-checklist.csv, PB-100-thermal-telemetry-trace.csv, PB-100-thermal-telemetry-freeze-review.csv\n- Thermal nets TEMP_PCB, TEMP_PWR_A, TEMP_PWR_B map to LB-100 telemetry\n- Board ID stays separate from vehicle role mapping\n\nNo PCB layout from this preliminary capture."
     (at 20 20 0)
     (effects (font (size 2.0 2.0)) (justify left top))
     (uuid "f4977f3a-abc2-5d3b-bc29-16f8929d32e6")

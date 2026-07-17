@@ -43,6 +43,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`
+- `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
 - `hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv`
@@ -111,6 +112,11 @@ It is not a PCB layout package.
   pull-up boundary, input filter, VBUS filter, and calibration boundary are
   tracked in
   `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`.
+- Current telemetry value checklist: shunt range, monitor family, Kelvin and
+  input filter, I2C ownership, alert behavior, VBUS stress, per-output IMON
+  scaling, configuration calibration, stale safe-fault tests, sourcing, and
+  no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`.
 - Input reverse freeze review: LM74700 gate/default-off behavior, TOLL/LFPAK88
   and PowerPAK alternates, protected measurement sequence, HM3 TVS dependency,
   sourcing gate, and no-layout boundary are tracked in
@@ -297,6 +303,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-map.csv`
+- `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv`
