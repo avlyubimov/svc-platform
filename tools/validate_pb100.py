@@ -399,6 +399,15 @@ CAN1_PRODUCTION_DNP_REVIEW_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+CAN1_RESET_BENCH_CHECKLIST_COLUMNS = (
+    "Check ID",
+    "Scenario",
+    "Fixture state",
+    "Required observation",
+    "Primary evidence",
+    "Pass condition",
+    "Blocked release action",
+)
 GARAGE_CONNECTOR_FUSE_PLAN_COLUMNS = (
     "Interface",
     "Target current or fuse",
@@ -692,6 +701,14 @@ REQUIRED_CAN1_PRODUCTION_DNP_REVIEW_ITEMS = {
     "Future change process",
     "Factory DNP ownership",
 }
+REQUIRED_CAN1_RESET_BENCH_CHECKS = {
+    "CAN1-RST-001",
+    "CAN1-RST-002",
+    "CAN1-RST-003",
+    "CAN1-RST-004",
+    "CAN1-RST-005",
+    "CAN1-RST-006",
+}
 REQUIRED_BOARD_CURRENT_BUDGET_FREEZE_REVIEW_ITEMS = {
     "Main fuse and input connector",
     "Q1 reverse path thermal",
@@ -791,6 +808,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv",
     "hardware/power-board/PB-100/PB-100-can1-safety-verification.csv",
     "hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv",
+    "hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv",
     "hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv",
@@ -1870,7 +1888,7 @@ def validate_schematic_readiness_dashboard() -> None:
         "BOM synchronization": ("PB-100-assembly-readiness-trace.csv",),
         "Assembly sourcing recheck": ("PB-100-assembly-readiness-trace.csv",),
         "CAN1 safety": ("PB-100-can1-tx-disable-trace.csv", "PB-100-can1-production-dnp-review.csv"),
-        "CAN1 safety verification": ("PB-100-can1-tx-disable-trace.csv",),
+        "CAN1 safety verification": ("PB-100-can1-tx-disable-trace.csv", "PB-100-can1-reset-bench-checklist.csv"),
     }
     for area, tokens in required_dashboard_evidence.items():
         evidence = rows_by_area[area]["Evidence"]
@@ -2029,6 +2047,7 @@ def validate_schematic_freeze_gap_register() -> None:
     for token in (
         "PB-100-can1-tx-disable-trace.csv",
         "PB-100-can1-production-dnp-review.csv",
+        "PB-100-can1-reset-bench-checklist.csv",
         "JP_CAN1",
         "U_CAN1",
         "future ADR",
@@ -4022,6 +4041,68 @@ def validate_can1_production_dnp_review() -> None:
             fail(f"CAN1 production DNP review requires firmware test {token}")
 
 
+def validate_can1_reset_bench_checklist() -> None:
+    path = PB100_DIR / "PB-100-can1-reset-bench-checklist.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty CAN1 reset bench checklist: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in CAN1_RESET_BENCH_CHECKLIST_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_check: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        check_id = row["Check ID"].strip()
+        if check_id not in REQUIRED_CAN1_RESET_BENCH_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown CAN1 reset check {check_id}")
+        if check_id in rows_by_check:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate CAN1 reset check {check_id}")
+        rows_by_check[check_id] = row
+        for column in CAN1_RESET_BENCH_CHECKLIST_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        row_text = " ".join(row.values()).lower()
+        if "can1_tx_route" in row_text and "dnp/open" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1_TX_ROUTE checks must keep DNP/open explicit")
+        if "vehicle-can transmit" in row_text and "no vehicle-can transmit" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1 checks must prohibit vehicle-CAN transmit frames")
+        if check_id == "CAN1-RST-004" and "not from firmware-only" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: disabled status must reject firmware-only evidence")
+        if check_id == "CAN1-RST-006" and ("future adr" not in row_text or "explicit hardware action" not in row_text):
+            fail("CAN1 future TX checklist row must require future ADR plus explicit hardware action")
+
+    missing_checks = sorted(REQUIRED_CAN1_RESET_BENCH_CHECKS - rows_by_check.keys())
+    if missing_checks:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing CAN1 reset checks: "
+            f"{', '.join(missing_checks)}"
+        )
+
+    checklist_text = read_text(path)
+    for token in (
+        "PB-BENCH-012",
+        "CAN1_TX_DISABLE_CMD",
+        "CAN1_TX_DISABLED_STATUS",
+        "CAN1_TX_ROUTE",
+        "JP_CAN1",
+        "U_CAN1",
+        "DNP/open",
+        "47k",
+        "1k/100k",
+        "no vehicle-CAN transmit frame",
+        "future ADR",
+        "explicit hardware action",
+    ):
+        if token not in checklist_text:
+            fail(f"CAN1 reset bench checklist must include {token}")
+
+
 def validate_board_current_budget_trace() -> None:
     path = PB100_DIR / "PB-100-board-current-budget-trace.csv"
     validate_csv(path)
@@ -4672,6 +4753,20 @@ def validate_can1_capture_contract() -> None:
         if token not in production_review:
             fail(f"CAN1 production DNP review must include {token}")
 
+    reset_checklist = read_text(PB100_DIR / "PB-100-can1-reset-bench-checklist.csv").lower()
+    for token in (
+        "pb-bench-012",
+        "reset",
+        "unpowered",
+        "dnp/open",
+        "physical disabled",
+        "no vehicle-can transmit frame",
+        "future adr",
+        "explicit hardware action",
+    ):
+        if token not in reset_checklist:
+            fail(f"CAN1 reset bench checklist must include {token}")
+
     can1_sheet = read_text(KICAD_DIR / "sheets" / "can1-safety.kicad_sch").lower()
     for token in (
         "jp_can1",
@@ -4680,6 +4775,7 @@ def validate_can1_capture_contract() -> None:
         "no default-populated tx",
         "physical disabled state",
         "pb-100-can1-production-dnp-review.csv",
+        "pb-100-can1-reset-bench-checklist.csv",
     ):
         if token not in can1_sheet:
             fail(f"CAN1 safety KiCad sheet capture notes must include {token}")
@@ -6138,6 +6234,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-low-current-output-freeze-review.csv",
         "PB-100-can1-tx-disable-trace.csv",
         "PB-100-can1-production-dnp-review.csv",
+        "PB-100-can1-reset-bench-checklist.csv",
         "PB-100-input-reverse-package-trace.csv",
         "PB-100-input-reverse-freeze-review.csv",
         "PB-100-tvs-load-dump-margin-trace.csv",
@@ -6236,6 +6333,7 @@ def main() -> int:
     validate_can1_tx_disable_trace()
     validate_can1_safety_verification()
     validate_can1_production_dnp_review()
+    validate_can1_reset_bench_checklist()
     validate_can1_capture_contract()
     validate_assembly_sourcing_recheck()
     validate_assembly_readiness_trace()

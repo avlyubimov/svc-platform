@@ -177,6 +177,10 @@ Current coverage:
   `SN74LVC1G125-Q1`-class default-disabled gate, 47 kΩ pulls, physical
   `OE`-node status readback, and reset/unpowered bench checks in
   `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`.
+- CAN1 reset and DNP bench evidence now has a checklist covering LB-100 reset,
+  LB-100 unpowered, production DNP/open inspection, physical disabled-status
+  readback, RX listen-only independence, and future-ADR hardware-action checks
+  in `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.
 - Synchronize factory and garage BOM drafts with final selections.

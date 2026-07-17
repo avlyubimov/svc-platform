@@ -23,6 +23,7 @@ hardware/power-board/PB-100/PB-100-fault-response-matrix.csv,Safety,Fault respon
 hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv,Safety,CAN1 TX-disable DNP and firmware trace,Required,validate_can1_tx_disable_trace,Conditional
 hardware/power-board/PB-100/PB-100-can1-safety-verification.csv,Safety,CAN1 read-only verification,Required,validate_can1_safety_verification,Conditional
 hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv,Safety,CAN1 production DNP review,Required,validate_can1_production_dnp_review,Conditional
+hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv,Safety,CAN1 reset and DNP bench checklist,Required,validate_can1_reset_bench_checklist,Conditional
 hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md,Safety,CAN1 default-disabled candidate value calculation,Required,Document reviewed,Conditional
 hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv,Symbols,Symbol and MPN readiness,Required,validate_symbol_mpn_readiness,Conditional
 hardware/power-board/PB-100/PB-100-symbol-capture-worklist.csv,Symbols,Symbol capture worklist,Required,validate_symbol_capture_worklist,Conditional

@@ -1912,3 +1912,17 @@ freeze. The config contract keeps thermal divider constants out of driver code
 and lets validation prove each plausible range covers the configured recovery
 and cutoff thresholds. ADC settling, sensor placement, self-heating, sourcing,
 and bench calibration remain open before PCB layout.
+
+## 2026-07-17 — PB-100 CAN1 reset and DNP bench checklist
+
+Decision: PB-100 CAN1 safety review now has
+`hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`. The
+checklist covers LB-100 reset, LB-100 unpowered, production DNP/open inspection,
+physical disabled-status readback, RX listen-only independence, and the future
+ADR plus explicit hardware-action boundary.
+
+Reason: PBREL-001 cannot close from schematic notes alone. The release packet
+needs a concrete bench and production-inspection checklist proving that
+`CAN1_TX_ROUTE` remains DNP/open, `CAN1_TX_DISABLED_STATUS` is physical
+readback rather than firmware-only state, and no vehicle-CAN transmit frame is
+observed in Rev.1 default assembly.
