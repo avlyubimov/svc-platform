@@ -438,6 +438,14 @@ TVS_OVERSHOOT_ESCAPE_CHECKLIST_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+TVS_OVERSHOOT_VALIDATION_PRECHECK_COLUMNS = (
+    "Validation ID",
+    "Scope",
+    "Required setup",
+    "Primary artifacts",
+    "Pass condition",
+    "Blocked action",
+)
 LOGIC_POWER_DESIGN_VALUE_COLUMNS = (
     "Design item",
     "Related net",
@@ -610,6 +618,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-tvs-load-dump-margin-trace.csv",
         "PB-100-tvs-load-dump-freeze-review.csv",
         "PB-100-tvs-overshoot-escape-checklist.csv",
+        "PB-100-tvs-overshoot-validation-precheck.csv",
     ),
     "CAP-LOGIC": (
         "PB-100-logic-power-rail-trace.csv",
@@ -821,6 +830,18 @@ REQUIRED_TVS_OVERSHOOT_ESCAPE_CHECKS = {
     "TVS-FRZ-007",
     "TVS-FRZ-008",
     "TVS-FRZ-009",
+}
+REQUIRED_TVS_OVERSHOOT_VALIDATION_CHECKS = {
+    "TVS-VAL-001",
+    "TVS-VAL-002",
+    "TVS-VAL-003",
+    "TVS-VAL-004",
+    "TVS-VAL-005",
+    "TVS-VAL-006",
+    "TVS-VAL-007",
+    "TVS-VAL-008",
+    "TVS-VAL-009",
+    "TVS-VAL-010",
 }
 REQUIRED_LOGIC_POWER_VALUE_ITEMS = {
     "Input filter",
@@ -1118,6 +1139,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv",
+    "hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv",
     "hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv",
     "hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv",
     "hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv",
@@ -2192,6 +2214,7 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-tvs-load-dump-margin-trace.csv",
             "PB-100-tvs-load-dump-freeze-review.csv",
             "PB-100-tvs-overshoot-escape-checklist.csv",
+            "PB-100-tvs-overshoot-validation-precheck.csv",
         ),
         "Logic power design values": (
             "PB-100-logic-power-rail-trace.csv",
@@ -2375,6 +2398,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-tvs-load-dump-margin-trace.csv",
             "PB-100-tvs-load-dump-freeze-review.csv",
             "PB-100-tvs-overshoot-escape-checklist.csv",
+            "PB-100-tvs-overshoot-validation-precheck.csv",
             "PB-100-protection-validation.csv",
         ),
         "Logic power rails": (
@@ -2485,6 +2509,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-tvs-load-dump-margin-trace.csv",
         "PB-100-tvs-load-dump-freeze-review.csv",
         "PB-100-tvs-overshoot-escape-checklist.csv",
+        "PB-100-tvs-overshoot-validation-precheck.csv",
         "60 V",
         "DO-218AC",
         "overshoot",
@@ -6916,6 +6941,81 @@ def validate_tvs_overshoot_escape_checklist() -> None:
             fail(f"MOSFET voltage-margin review must support TVS overshoot token {token}")
 
 
+def validate_tvs_overshoot_validation_precheck() -> None:
+    path = PB100_DIR / "PB-100-tvs-overshoot-validation-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty TVS overshoot validation precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in TVS_OVERSHOOT_VALIDATION_PRECHECK_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        validation_id = row["Validation ID"].strip()
+        if validation_id not in REQUIRED_TVS_OVERSHOOT_VALIDATION_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown TVS validation item {validation_id}")
+        if validation_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate TVS validation item {validation_id}")
+        rows_by_id[validation_id] = row
+        for column in TVS_OVERSHOOT_VALIDATION_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if validation_id == "TVS-VAL-002" and ("vstress" not in row_text or "lloop" not in row_text):
+            fail("TVS validation precheck must include overshoot stress method")
+        if validation_id == "TVS-VAL-006" and ("probe" not in row_text or "bandwidth" not in row_text):
+            fail("TVS validation precheck must include measurement probe bandwidth")
+        if validation_id == "TVS-VAL-007" and ("parasitic" not in row_text or "inductance" not in row_text):
+            fail("TVS validation precheck must include simulation parasitic inductance")
+        if validation_id == "TVS-VAL-010" and ("pb-100.kicad_pcb" not in row_text or "manufacturing" not in row_text):
+            fail("TVS validation precheck must block layout and manufacturing outputs")
+
+    missing_items = sorted(REQUIRED_TVS_OVERSHOOT_VALIDATION_CHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing TVS validation items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "SM8S33AHM3/I",
+        "HM3 DO-218AC",
+        "53.3 V clamp at 124 A",
+        "MCC SM8S33A EOL",
+        "Vishay HE3 NFD",
+        "Vstress = Vclamp + Lloop * di/dt",
+        "SIDR626LDP",
+        "IAUTN06S5N008",
+        "BUK7S1R2-80M",
+        "80 V",
+        "100 V",
+        "TPS48110",
+        "LM5164QDDATQ1",
+        "LM5013-Q1",
+        "VBAT_RAW",
+        "VBAT_PROT",
+        "probe bandwidth",
+        "fixture inductance",
+        "parasitics",
+        "SLD8S33A",
+        "DM8W33AQ-13",
+        "SM8S33A-Q",
+        "JLCPCB PCBWay",
+        "PB-100.kicad_pcb",
+    ):
+        if token not in precheck_text:
+            fail(f"TVS overshoot validation precheck must include {token}")
+
+
 def validate_thermal_telemetry_baseline() -> None:
     map_path = PB100_DIR / "PB-100-thermal-telemetry-map.csv"
     validate_csv(map_path)
@@ -7506,6 +7606,8 @@ def validate_validation_traceability() -> None:
                 fail("TVS/load-dump validation trace must include freeze review")
             if "pb-100-tvs-overshoot-escape-checklist.csv" not in row_text:
                 fail("TVS/load-dump validation trace must include overshoot escape checklist")
+            if "pb-100-tvs-overshoot-validation-precheck.csv" not in row_text:
+                fail("TVS/load-dump validation trace must include overshoot validation precheck")
             if "60 v" not in row_text or "overshoot" not in row_text:
                 fail("TVS/load-dump validation trace must keep 60 V overshoot explicit")
         if freeze_gate == "Logic power rails":
@@ -8014,6 +8116,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-tvs-load-dump-margin-trace.csv",
         "PB-100-tvs-load-dump-freeze-review.csv",
         "PB-100-tvs-overshoot-escape-checklist.csv",
+        "PB-100-tvs-overshoot-validation-precheck.csv",
         "PB-100-logic-power-rail-trace.csv",
         "PB-100-logic-power-freeze-review.csv",
         "PB-100-logic-power-value-freeze-checklist.csv",
@@ -8141,6 +8244,7 @@ def main() -> int:
     validate_tvs_load_dump_margin_trace()
     validate_tvs_load_dump_freeze_review()
     validate_tvs_overshoot_escape_checklist()
+    validate_tvs_overshoot_validation_precheck()
     validate_thermal_telemetry_baseline()
     validate_b2b_interface_trace()
     validate_b2b_connector_candidate()

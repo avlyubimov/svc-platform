@@ -2043,6 +2043,19 @@ need measured or simulated overshoot evidence, otherwise affected paths must
 migrate to an 80 V or higher class before schematic values, footprints, copper,
 or `PB-100.kicad_pcb` work can be locked.
 
+## 2026-07-17 — PB-100 TVS overshoot validation precheck
+
+Decision: PB-100 TVS/load-dump review now has
+`hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`.
+The precheck ties the active `SM8S33AHM3/I` HM3 clamp source,
+`Vstress = Vclamp + Lloop * di/dt`, bench measurement and simulation setup,
+60 V acceptance versus 80 V escape, 100 V downstream check, assembly
+alternatives, and no-layout boundary to PBREL-007.
+
+Reason: PBREL-007 needs a measurable or simulatable acceptance method before
+60 V paths or 80 V migration can close. This prevents relying on datasheet
+clamp math alone.
+
 ## 2026-07-17 — PB-100 logic-power value freeze checklist
 
 Decision: PB-100 logic-power review now has

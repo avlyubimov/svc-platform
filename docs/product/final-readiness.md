@@ -85,6 +85,10 @@ Current coverage:
   which keeps the active HM3 MPN evidence, 60 V overshoot acceptance criteria,
   80 V MOSFET escape path, 100 V downstream default, and no-layout boundary in
   one machine-checked artifact.
+- TVS overshoot validation precheck now ties the active HM3 clamp source,
+  60 V overshoot acceptance method, 80 V escape, measurement/simulation setup,
+  factory alternates, and no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`.
 - MOSFET voltage-margin review now makes the 80 V review escape path explicit
   for 60 V output and input-reverse MOSFET paths unless overshoot evidence
   accepts the active TVS clamp margin.

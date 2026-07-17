@@ -38,6 +38,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`
@@ -151,6 +152,11 @@ It is not a PCB layout package.
   80 V MOSFET escape decision, 100 V downstream boundary, 40 V ADR boundary,
   schematic-value dependencies, sourcing, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`.
+- TVS overshoot validation precheck: waveform/source impedance,
+  `Vstress = Vclamp + Lloop * di/dt`, bench probe and simulation parasitic
+  setup, 60 V acceptance versus 80 V escape, factory alternates, and no-layout
+  boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`.
 - MOSFET voltage-margin review: 60 V MOSFET paths behind the active HM3 TVS
   branch need explicit overshoot evidence or migration to the 80 V review
   escape path before schematic freeze. See
@@ -366,6 +372,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv`
