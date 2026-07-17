@@ -494,6 +494,14 @@ TVS_OVERSHOOT_VALIDATION_PRECHECK_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+TVS_OVERSHOOT_CLOSEOUT_PRECHECK_COLUMNS = (
+    "Precheck ID",
+    "Scope",
+    "Required evidence bridge",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
 LOGIC_POWER_DESIGN_VALUE_COLUMNS = (
     "Design item",
     "Related net",
@@ -701,6 +709,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-tvs-load-dump-freeze-review.csv",
         "PB-100-tvs-overshoot-escape-checklist.csv",
         "PB-100-tvs-overshoot-validation-precheck.csv",
+        "PB-100-tvs-overshoot-closeout-precheck.csv",
     ),
     "CAP-LOGIC": (
         "PB-100-logic-power-rail-trace.csv",
@@ -943,6 +952,18 @@ REQUIRED_TVS_OVERSHOOT_VALIDATION_CHECKS = {
     "TVS-VAL-008",
     "TVS-VAL-009",
     "TVS-VAL-010",
+}
+REQUIRED_TVS_OVERSHOOT_CLOSEOUT_PRECHECKS = {
+    "TVS-CLS-001",
+    "TVS-CLS-002",
+    "TVS-CLS-003",
+    "TVS-CLS-004",
+    "TVS-CLS-005",
+    "TVS-CLS-006",
+    "TVS-CLS-007",
+    "TVS-CLS-008",
+    "TVS-CLS-009",
+    "TVS-CLS-010",
 }
 REQUIRED_LOGIC_POWER_VALUE_ITEMS = {
     "Input filter",
@@ -1358,6 +1379,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv",
     "hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv",
+    "hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv",
     "hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv",
     "hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv",
@@ -8363,6 +8385,113 @@ def validate_tvs_overshoot_validation_precheck() -> None:
             fail(f"TVS overshoot validation precheck must include {token}")
 
 
+def validate_tvs_overshoot_closeout_precheck() -> None:
+    path = PB100_DIR / "PB-100-tvs-overshoot-closeout-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty TVS overshoot closeout precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in TVS_OVERSHOOT_CLOSEOUT_PRECHECK_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        precheck_id = row["Precheck ID"].strip()
+        if precheck_id not in REQUIRED_TVS_OVERSHOOT_CLOSEOUT_PRECHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown TVS closeout precheck {precheck_id}")
+        if precheck_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate TVS closeout precheck {precheck_id}")
+        rows_by_id[precheck_id] = row
+        for column in TVS_OVERSHOOT_CLOSEOUT_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+        if precheck_id == "TVS-CLS-002" and ("vstress" not in row_text or "lloop" not in row_text):
+            fail("TVS closeout method row must keep Vstress and Lloop explicit")
+        if precheck_id == "TVS-CLS-010" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
+            fail("TVS closeout no-layout row must block PCB layout explicitly")
+
+    missing_items = sorted(REQUIRED_TVS_OVERSHOOT_CLOSEOUT_PRECHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing TVS closeout prechecks: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "SM8S33AHM3/I",
+        "HM3 DO-218AC",
+        "AEC-Q101",
+        "53.3 V clamp at 124 A",
+        "MCC SM8S33A EOL",
+        "Vishay HE3 NFD",
+        "60 V acceptance",
+        "Vstress = Vclamp + Lloop * di/dt",
+        "probe fixture parasitics",
+        "source impedance",
+        "SIDR626LDP",
+        "IAUTN06S5N008",
+        "BUK7S1R2-80M",
+        "LFPAK88",
+        "80 V output MOSFET",
+        "TPS48110",
+        "LM5164QDDATQ1",
+        "LM5013-Q1",
+        "TPS54360B-Q1",
+        "TPS2HB35",
+        "ADR-0011",
+        "future ADR",
+        "OV divider",
+        "buck input network",
+        "input filter capacitor",
+        "TBD not final",
+        "VBAT_PROT",
+        "INPUT_TVS",
+        "SLD8S33A",
+        "DM8W33AQ-13",
+        "SM8S33A-Q",
+        "JLCPCB PCBWay",
+        "at least two viable alternates",
+        "input-protection.kicad_sch",
+        "CAP-INP",
+        "PB-100-test-point-plan.csv",
+        "PB-100-protection-validation.csv",
+        "docs/testing/test-plan.md",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "D1 placement",
+        "pulse-current return copper",
+        "via strategy",
+        "thermal relief",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "manufacturing ZIP",
+    ):
+        if token not in precheck_text:
+            fail(f"TVS overshoot closeout precheck must include {token}")
+
+    for supporting_artifact, tokens in {
+        "PB-100-tvs-overshoot-escape-checklist.csv": ("TVS-FRZ-002", "TVS-FRZ-009"),
+        "PB-100-tvs-overshoot-validation-precheck.csv": ("TVS-VAL-002", "TVS-VAL-010"),
+        "PB-100-tvs-load-dump-freeze-review.csv": ("60V MOSFET conditional margin", "Layout authorization boundary"),
+    }.items():
+        supporting_text = read_text(PB100_DIR / supporting_artifact)
+        for token in tokens:
+            if token not in supporting_text:
+                fail(f"TVS closeout precheck requires {supporting_artifact} token {token}")
+
+
 def validate_thermal_telemetry_baseline() -> None:
     map_path = PB100_DIR / "PB-100-thermal-telemetry-map.csv"
     validate_csv(map_path)
@@ -9754,6 +9883,7 @@ def main() -> int:
     validate_tvs_load_dump_freeze_review()
     validate_tvs_overshoot_escape_checklist()
     validate_tvs_overshoot_validation_precheck()
+    validate_tvs_overshoot_closeout_precheck()
     validate_thermal_telemetry_baseline()
     validate_b2b_interface_trace()
     validate_b2b_connector_candidate()

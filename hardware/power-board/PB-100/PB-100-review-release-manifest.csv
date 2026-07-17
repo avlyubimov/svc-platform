@@ -80,6 +80,7 @@ hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv,Protection,TVS
 hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv,Protection,TVS/load-dump freeze review,Required,validate_tvs_load_dump_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv,Protection,TVS overshoot and 80 V escape checklist,Required,validate_tvs_overshoot_escape_checklist,Conditional
 hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv,Protection,TVS overshoot validation precheck,Required,validate_tvs_overshoot_validation_precheck,Conditional
+hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv,Protection,TVS overshoot closeout precheck,Required,validate_tvs_overshoot_closeout_precheck,Conditional
 hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md,Protection,60V MOSFET voltage-margin review escape path,Required,Document reviewed,Conditional
 hardware/power-board/PB-100/PB-100-protection-validation.csv,Protection,TVS/load-dump protection review,Required,CSV width validation,Conditional
 hardware/power-board/PB-100/PB-100-thermal-estimates.csv,Thermal,Thermal estimate table,Required,CSV width validation,Conditional

@@ -89,6 +89,11 @@ Current coverage:
   60 V overshoot acceptance method, 80 V escape, measurement/simulation setup,
   factory alternates, and no-layout boundary into
   `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`.
+- TVS overshoot closeout precheck now ties active source, overshoot method,
+  60 V acceptance, 80 V escape, 100 V downstream defaults, 40 V ADR boundary,
+  schematic-value dependencies, sourcing, validation sync, and no-layout
+  boundary to
+  `hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv`.
 - MOSFET voltage-margin review now makes the 80 V review escape path explicit
   for 60 V output and input-reverse MOSFET paths unless overshoot evidence
   accepts the active TVS clamp margin.

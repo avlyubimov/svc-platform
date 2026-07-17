@@ -133,7 +133,8 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv` and
   `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`, and
   `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv` plus
-  `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`.
+  `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`
+  and `hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv`.
 - Current telemetry and current-budget tests trace to
   `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`,
   `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`,

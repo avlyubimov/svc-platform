@@ -2102,6 +2102,22 @@ Reason: PBREL-007 needs a measurable or simulatable acceptance method before
 60 V paths or 80 V migration can close. This prevents relying on datasheet
 clamp math alone.
 
+## 2026-07-17 — PB-100 TVS overshoot closeout precheck
+
+Decision: PB-100 TVS/load-dump review now has
+`hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv`. The
+precheck bridges the active HM3 TVS source, overshoot method, 60 V MOSFET
+acceptance, 80 V escape path, 100 V downstream defaults, 40 V ADR boundary,
+schematic-value dependencies, D1 sourcing, validation synchronization, and
+no-layout manufacturing boundary to PBREL-007.
+
+Reason: The overshoot checklist and validation precheck define the review, but
+print-readiness also needs a machine-checked closeout bridge that prevents D1
+placement, pulse-current return copper, via strategy, thermal relief,
+`PB-100.kicad_pcb`, Gerbers, drills, pick-place, or manufacturing ZIP work
+until measured or simulated 60 V overshoot evidence or the 80 V escape decision
+closes.
+
 ## 2026-07-17 — PB-100 logic-power value freeze checklist
 
 Decision: PB-100 logic-power review now has
