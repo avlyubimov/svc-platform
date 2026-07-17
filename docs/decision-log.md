@@ -2455,3 +2455,19 @@ high-current copper, shunt copper, Q1 copper, connector placement,
 `PB-100.kicad_pcb`, Gerbers, drills, pick-place, or manufacturing ZIP work until
 connector derating, shunt package/Kelvin evidence, Q1 thermal path, protected
 distribution, telemetry calibration, sourcing, and bench evidence close.
+
+## 2026-07-17 — PB-100 board-print closure matrix
+
+Decision: PB-100 board-print readiness now has
+`hardware/power-board/PB-100/PB-100-board-print-closure-matrix.csv`.
+The matrix maps every active `PBREL-001` through `PBREL-012` release blocker to
+its closeout artifact, current proof state, remaining dated evidence, required
+current-state evidence, and board-print blocked action.
+
+Reason: Closeout artifacts are now present for every active release blocker, but
+PCB print readiness still depends on dated bench, sourcing, thermal, SOA,
+pin-audit, calibration, inspection, and serviceability evidence. The matrix
+keeps those gaps explicit and machine-checked so `PB-100.kicad_pcb`, Gerbers,
+drills, pick-place, fabrication package, manufacturing ZIP, or PCBA order
+package work cannot be treated as authorized while any closure row remains
+Conditional.

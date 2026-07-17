@@ -12,6 +12,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 PB100_DIR = REPO_ROOT / "hardware" / "power-board" / "PB-100"
 CHECKLIST = PB100_DIR / "PB-100-schematic-freeze-checklist.md"
 BLOCKERS = PB100_DIR / "PB-100-board-release-blocker-register.csv"
+CLOSURE_MATRIX = PB100_DIR / "PB-100-board-print-closure-matrix.csv"
 KICAD_DIR = PB100_DIR / "kicad"
 
 MANUFACTURING_SUFFIXES = {
@@ -86,6 +87,13 @@ def release_blockers() -> list[dict[str, str]]:
         return list(csv.DictReader(handle))
 
 
+def board_print_closure_rows() -> list[dict[str, str]]:
+    if not CLOSURE_MATRIX.exists():
+        return []
+    with CLOSURE_MATRIX.open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
 def layout_files() -> list[Path]:
     return sorted(KICAD_DIR.rglob("*.kicad_pcb"))
 
@@ -116,8 +124,10 @@ def main() -> int:
     status = checklist_status()
     gates = checklist_gates()
     blockers = release_blockers()
+    closure_rows = board_print_closure_rows()
     active_gates = [row for row in gates if row["Status"] != "Closed"]
     active_blockers = [row for row in blockers if row["Status"] != "Closed"]
+    active_closure_rows = [row for row in closure_rows if row["Current proof state"] != "Closed"]
     pcbs = layout_files()
     manufacturing = manufacturing_files()
 
@@ -136,6 +146,7 @@ def main() -> int:
     print(f"  Board-print package: {'READY' if board_print_ready else 'NO-GO'}")
     print(f"  Active freeze gates: {len(active_gates)}")
     print(f"  Active release blockers: {len(active_blockers)}")
+    print(f"  Board-print closure rows: {len(active_closure_rows)}")
     print(f"  KiCad PCB files: {len(pcbs)}")
     print(f"  Manufacturing output files: {len(manufacturing)}")
 

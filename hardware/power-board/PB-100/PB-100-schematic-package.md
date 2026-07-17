@@ -534,6 +534,8 @@ Preliminary validation tables:
   `hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv`.
 - Track freeze packet contents in
   `hardware/power-board/PB-100/PB-100-review-release-manifest.csv`.
+- Track board-print blocker closure state in
+  `hardware/power-board/PB-100/PB-100-board-print-closure-matrix.csv`.
 - Validate candidate MPNs in `PB-100-power-path-candidates.csv`.
 - Validate ADR-0011 low-current external-controller implementation.
 - Confirm high-side switch/controller thermal limits.
@@ -543,6 +545,8 @@ Preliminary validation tables:
   absolute maximum ratings.
 - Confirm connector current ratings and derating.
 - Confirm JLCPCB/PCBWay assembly class for selected MPNs.
+- Review `hardware/power-board/PB-100/PB-100-board-print-closure-matrix.csv`
+  against all active PBREL blockers before any board-print package work.
 - Review `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`
   against current factory assembly and distributor evidence.
 - Review `hardware/power-board/PB-100/PB-100-factory-assembly-closeout-precheck.csv`
