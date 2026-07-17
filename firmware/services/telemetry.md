@@ -32,6 +32,13 @@ Per-output IMON calibration uses role-free `OUT1`..`OUT10` records with
 map. `firmware/services/config_validator.c` rejects calibration records that
 cannot cover the configured limits or that exceed their electrical ranges.
 
+Thermal telemetry calibration also lives in `svc_telemetry_config_t`. The
+default PB-100 planning values use a 10000 Ω NTC, 3435 K beta value, 4700 Ω
+pull-up, 1000 Ω ADC series resistor, 10 nF filter, 1000 ms stale timeout, and
+-40 °C to 150 °C plausible range for `TEMP_PCB`, `TEMP_PWR_A`, and
+`TEMP_PWR_B`. The validator rejects thermal calibration that cannot cover the
+configured recovery and cutoff thresholds.
+
 ## Host-testable implementation
 
 - `firmware/services/telemetry.h`

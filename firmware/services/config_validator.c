@@ -22,9 +22,10 @@ static uint32_t total_current_full_scale_ma(const svc_total_current_telemetry_co
 static bool svc_telemetry_config_is_valid(
     const svc_telemetry_config_t *telemetry,
     const svc_power_budget_config_t *power_budget,
-    const svc_output_config_t *outputs)
+    const svc_output_config_t *outputs,
+    const svc_thermal_zone_config_t *thermal_zones)
 {
-    if (telemetry == NULL || power_budget == NULL || outputs == NULL) {
+    if (telemetry == NULL || power_budget == NULL || outputs == NULL || thermal_zones == NULL) {
         return false;
     }
 
@@ -59,6 +60,25 @@ static bool svc_telemetry_config_is_valid(
             return false;
         }
     }
+
+    for (size_t zone_index = 0U; zone_index < SVC_THERMAL_ZONE_COUNT; ++zone_index) {
+        const svc_thermal_telemetry_config_t *thermal = &telemetry->thermal[zone_index];
+        if (thermal->ntc_nominal_ohm == 0U ||
+            thermal->ntc_beta_k == 0U ||
+            thermal->pullup_ohm == 0U ||
+            thermal->adc_series_ohm == 0U ||
+            thermal->filter_nf == 0U ||
+            thermal->stale_timeout_ms == 0U) {
+            return false;
+        }
+        if (thermal->plausible_min_c >= thermal->plausible_max_c) {
+            return false;
+        }
+        if (thermal->plausible_min_c > thermal_zones[zone_index].recovery_c ||
+            thermal->plausible_max_c < thermal_zones[zone_index].cutoff_c) {
+            return false;
+        }
+    }
     return true;
 }
 
@@ -81,7 +101,11 @@ svc_config_validation_result_t svc_config_validate_device(const svc_device_confi
     if (!svc_power_budget_validate_config(config)) {
         return make_result(SVC_CONFIG_INVALID_POWER_BUDGET, SVC_CONFIG_OUTPUT_INDEX_NONE);
     }
-    if (!svc_telemetry_config_is_valid(&config->telemetry, &config->power_budget, config->outputs)) {
+    if (!svc_telemetry_config_is_valid(
+            &config->telemetry,
+            &config->power_budget,
+            config->outputs,
+            config->thermal)) {
         return make_result(SVC_CONFIG_INVALID_TELEMETRY, SVC_CONFIG_OUTPUT_INDEX_NONE);
     }
 

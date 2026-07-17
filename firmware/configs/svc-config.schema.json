@@ -130,7 +130,8 @@
       "type": "object",
       "required": [
         "total_current",
-        "output_current"
+        "output_current",
+        "thermal"
       ],
       "additionalProperties": false,
       "properties": {
@@ -143,6 +144,14 @@
           "maxItems": 10,
           "items": {
             "$ref": "#/$defs/outputCurrentTelemetry"
+          }
+        },
+        "thermal": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/thermalTelemetry"
           }
         }
       }
@@ -291,6 +300,14 @@
         }
       }
     },
+    "thermalZoneId": {
+      "type": "string",
+      "enum": [
+        "PCB",
+        "POWER_ZONE_A",
+        "POWER_ZONE_B"
+      ]
+    },
     "totalCurrentTelemetry": {
       "type": "object",
       "required": [
@@ -325,6 +342,56 @@
         "plausible_max_ma": {
           "type": "integer",
           "minimum": 1
+        }
+      }
+    },
+    "thermalTelemetry": {
+      "type": "object",
+      "required": [
+        "id",
+        "ntc_nominal_ohm",
+        "ntc_beta_k",
+        "pullup_ohm",
+        "adc_series_ohm",
+        "filter_nf",
+        "stale_timeout_ms",
+        "plausible_min_c",
+        "plausible_max_c"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/thermalZoneId"
+        },
+        "ntc_nominal_ohm": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ntc_beta_k": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "pullup_ohm": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "adc_series_ohm": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "filter_nf": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "stale_timeout_ms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "plausible_min_c": {
+          "type": "integer"
+        },
+        "plausible_max_c": {
+          "type": "integer"
         }
       }
     },

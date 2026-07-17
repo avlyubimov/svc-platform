@@ -30,7 +30,7 @@ static void test_rejects_telemetry_checksum_corruption(void)
     svc_config_record_t record = {0};
     assert(svc_config_store_build_record(&svc_default_config, 1U, &record) == SVC_CONFIG_STORE_OK);
 
-    record.config.telemetry.output_current[SVC_OUTPUT_OUT1].zero_offset_ma += 1;
+    record.config.telemetry.thermal[SVC_THERMAL_ZONE_PCB].plausible_max_c += 1;
 
     assert(svc_config_store_validate_record(&record) == SVC_CONFIG_STORE_INVALID_CHECKSUM);
 }

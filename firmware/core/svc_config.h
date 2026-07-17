@@ -34,6 +34,14 @@
 #define SVC_DEFAULT_OUT8_CURRENT_RANGE_MA 8000U
 #define SVC_DEFAULT_OUT9_CURRENT_RANGE_MA 8000U
 #define SVC_DEFAULT_OUT10_CURRENT_RANGE_MA 15000U
+#define SVC_DEFAULT_THERMAL_NTC_NOMINAL_OHM 10000U
+#define SVC_DEFAULT_THERMAL_NTC_BETA_K 3435U
+#define SVC_DEFAULT_THERMAL_PULLUP_OHM 4700U
+#define SVC_DEFAULT_THERMAL_ADC_SERIES_OHM 1000U
+#define SVC_DEFAULT_THERMAL_FILTER_NF 10U
+#define SVC_DEFAULT_THERMAL_STALE_TIMEOUT_MS 1000U
+#define SVC_DEFAULT_THERMAL_PLAUSIBLE_MIN_C -40
+#define SVC_DEFAULT_THERMAL_PLAUSIBLE_MAX_C 150
 
 typedef enum {
     SVC_OUTPUT_OUT1 = 0,
@@ -105,8 +113,20 @@ typedef struct {
 } svc_output_current_telemetry_config_t;
 
 typedef struct {
+    uint32_t ntc_nominal_ohm;
+    uint16_t ntc_beta_k;
+    uint32_t pullup_ohm;
+    uint32_t adc_series_ohm;
+    uint16_t filter_nf;
+    uint32_t stale_timeout_ms;
+    int16_t plausible_min_c;
+    int16_t plausible_max_c;
+} svc_thermal_telemetry_config_t;
+
+typedef struct {
     svc_total_current_telemetry_config_t total_current;
     svc_output_current_telemetry_config_t output_current[SVC_OUTPUT_COUNT];
+    svc_thermal_telemetry_config_t thermal[SVC_THERMAL_ZONE_COUNT];
 } svc_telemetry_config_t;
 
 typedef struct {

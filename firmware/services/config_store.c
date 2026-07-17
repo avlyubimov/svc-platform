@@ -63,6 +63,17 @@ static uint32_t config_checksum(const svc_device_config_t *config, uint32_t sequ
         checksum = mix_u32(checksum, output_current->stale_timeout_ms);
         checksum = mix_u32(checksum, output_current->plausible_max_ma);
     }
+    for (size_t zone_index = 0U; zone_index < SVC_THERMAL_ZONE_COUNT; ++zone_index) {
+        const svc_thermal_telemetry_config_t *thermal = &config->telemetry.thermal[zone_index];
+        checksum = mix_u32(checksum, thermal->ntc_nominal_ohm);
+        checksum = mix_u32(checksum, thermal->ntc_beta_k);
+        checksum = mix_u32(checksum, thermal->pullup_ohm);
+        checksum = mix_u32(checksum, thermal->adc_series_ohm);
+        checksum = mix_u32(checksum, thermal->filter_nf);
+        checksum = mix_u32(checksum, thermal->stale_timeout_ms);
+        checksum = mix_i32(checksum, thermal->plausible_min_c);
+        checksum = mix_i32(checksum, thermal->plausible_max_c);
+    }
 
     for (size_t output_index = 0U; output_index < SVC_OUTPUT_COUNT; ++output_index) {
         const svc_output_config_t *output = &config->outputs[output_index];

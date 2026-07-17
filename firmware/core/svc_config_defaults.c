@@ -100,6 +100,38 @@ const svc_device_config_t svc_default_config = {
                 SVC_DEFAULT_OUTPUT_CURRENT_STALE_TIMEOUT_MS,
                 SVC_DEFAULT_OUT10_CURRENT_RANGE_MA
             }
+        },
+        .thermal = {
+            [SVC_THERMAL_ZONE_PCB] = {
+                SVC_DEFAULT_THERMAL_NTC_NOMINAL_OHM,
+                SVC_DEFAULT_THERMAL_NTC_BETA_K,
+                SVC_DEFAULT_THERMAL_PULLUP_OHM,
+                SVC_DEFAULT_THERMAL_ADC_SERIES_OHM,
+                SVC_DEFAULT_THERMAL_FILTER_NF,
+                SVC_DEFAULT_THERMAL_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_THERMAL_PLAUSIBLE_MIN_C,
+                SVC_DEFAULT_THERMAL_PLAUSIBLE_MAX_C
+            },
+            [SVC_THERMAL_ZONE_PWR_A] = {
+                SVC_DEFAULT_THERMAL_NTC_NOMINAL_OHM,
+                SVC_DEFAULT_THERMAL_NTC_BETA_K,
+                SVC_DEFAULT_THERMAL_PULLUP_OHM,
+                SVC_DEFAULT_THERMAL_ADC_SERIES_OHM,
+                SVC_DEFAULT_THERMAL_FILTER_NF,
+                SVC_DEFAULT_THERMAL_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_THERMAL_PLAUSIBLE_MIN_C,
+                SVC_DEFAULT_THERMAL_PLAUSIBLE_MAX_C
+            },
+            [SVC_THERMAL_ZONE_PWR_B] = {
+                SVC_DEFAULT_THERMAL_NTC_NOMINAL_OHM,
+                SVC_DEFAULT_THERMAL_NTC_BETA_K,
+                SVC_DEFAULT_THERMAL_PULLUP_OHM,
+                SVC_DEFAULT_THERMAL_ADC_SERIES_OHM,
+                SVC_DEFAULT_THERMAL_FILTER_NF,
+                SVC_DEFAULT_THERMAL_STALE_TIMEOUT_MS,
+                SVC_DEFAULT_THERMAL_PLAUSIBLE_MIN_C,
+                SVC_DEFAULT_THERMAL_PLAUSIBLE_MAX_C
+            }
         }
     },
     .outputs = {

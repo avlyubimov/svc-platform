@@ -35,6 +35,13 @@ series resistor, and a 10 nF local filter capacitor. These values are candidate
 values only. Schematic freeze must still review thermistor self-heating, ADC
 settling, placement, calibration, and assembly sourcing.
 
+The matching firmware configuration contract is represented by
+`telemetry.thermal` in `firmware/configs/config-example.json` and by
+`svc_telemetry_config_t` in `firmware/core/svc_config.h`. The configuration
+holds each zone ID, NTC nominal value, beta value, pull-up, ADC series resistor,
+filter capacitor, stale timeout, and plausible-temperature range so divider
+calibration is not embedded in telemetry driver code.
+
 ## Measurement map
 
 Detailed map CSV:

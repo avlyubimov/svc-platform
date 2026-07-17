@@ -191,6 +191,11 @@ Current coverage:
 - Thermal telemetry now has candidate NTC divider values in
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`,
   but placement, ADC settling, calibration, and assembly review remain open.
+- Thermal telemetry divider calibration now has a firmware configuration
+  contract in `firmware/configs/config-example.json`,
+  `firmware/configs/svc-config.schema.json`, and `firmware/core/svc_config.h`;
+  ADC settling, placement, self-heating, sourcing, and bench calibration remain
+  schematic-freeze blockers.
 
 ## Required before PCB layout
 

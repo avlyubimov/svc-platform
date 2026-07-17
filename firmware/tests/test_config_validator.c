@@ -99,6 +99,27 @@ static void test_output_current_plausibility_must_cover_config_limit(void)
     assert(result.status == SVC_CONFIG_INVALID_TELEMETRY);
 }
 
+static void test_thermal_calibration_is_rejected_when_missing_ntc_value(void)
+{
+    svc_device_config_t config = svc_default_config;
+    config.telemetry.thermal[SVC_THERMAL_ZONE_PCB].ntc_nominal_ohm = 0U;
+
+    const svc_config_validation_result_t result = svc_config_validate_device(&config);
+
+    assert(result.status == SVC_CONFIG_INVALID_TELEMETRY);
+}
+
+static void test_thermal_plausibility_must_cover_cutoff_threshold(void)
+{
+    svc_device_config_t config = svc_default_config;
+    config.telemetry.thermal[SVC_THERMAL_ZONE_PWR_A].plausible_max_c =
+        config.thermal[SVC_THERMAL_ZONE_PWR_A].cutoff_c - 1;
+
+    const svc_config_validation_result_t result = svc_config_validate_device(&config);
+
+    assert(result.status == SVC_CONFIG_INVALID_TELEMETRY);
+}
+
 static void test_invalid_thermal_config_is_rejected(void)
 {
     svc_device_config_t config = svc_default_config;
@@ -142,6 +163,8 @@ int main(void)
     test_total_current_plausibility_must_fit_monitor_range();
     test_output_current_calibration_is_rejected_when_missing_range();
     test_output_current_plausibility_must_cover_config_limit();
+    test_thermal_calibration_is_rejected_when_missing_ntc_value();
+    test_thermal_plausibility_must_cover_cutoff_threshold();
     test_output_manager_rejects_invalid_role_config();
     test_system_safety_rejects_invalid_role_config();
     return 0;

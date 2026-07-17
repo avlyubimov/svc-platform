@@ -1896,3 +1896,19 @@ Adding per-output calibration records keeps IMON scaling out of driver constants
 and lets schema/C validation prove each configured output limit is covered
 without closing ADC scaling, bench calibration, Kelvin routing, copper heating,
 or LB-100 bus ownership before schematic freeze.
+
+## 2026-07-17 — PB-100 thermal telemetry calibration config contract
+
+Decision: PB-100 thermal telemetry configuration now includes
+`telemetry.thermal` records for `TEMP_PCB`, `TEMP_PWR_A`, and `TEMP_PWR_B`.
+Each record carries the NTC nominal value, beta value, pull-up value, ADC series
+resistor, filter capacitor, stale timeout, and plausible-temperature range. The
+defaults mirror the schematic-review candidate: 10 kΩ NTC, 3435 K beta,
+4.7 kΩ pull-up, 1 kΩ ADC series resistor, 10 nF filter, 1000 ms stale timeout,
+and -40 °C to 150 °C plausible range.
+
+Reason: PBREL-010 needed calibration ownership to be explicit before schematic
+freeze. The config contract keeps thermal divider constants out of driver code
+and lets validation prove each plausible range covers the configured recovery
+and cutoff thresholds. ADC settling, sensor placement, self-heating, sourcing,
+and bench calibration remain open before PCB layout.

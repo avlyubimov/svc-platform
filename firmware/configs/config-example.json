@@ -129,6 +129,41 @@
         "stale_timeout_ms": 1000,
         "plausible_max_ma": 15000
       }
+    ],
+    "thermal": [
+      {
+        "id": "PCB",
+        "ntc_nominal_ohm": 10000,
+        "ntc_beta_k": 3435,
+        "pullup_ohm": 4700,
+        "adc_series_ohm": 1000,
+        "filter_nf": 10,
+        "stale_timeout_ms": 1000,
+        "plausible_min_c": -40,
+        "plausible_max_c": 150
+      },
+      {
+        "id": "POWER_ZONE_A",
+        "ntc_nominal_ohm": 10000,
+        "ntc_beta_k": 3435,
+        "pullup_ohm": 4700,
+        "adc_series_ohm": 1000,
+        "filter_nf": 10,
+        "stale_timeout_ms": 1000,
+        "plausible_min_c": -40,
+        "plausible_max_c": 150
+      },
+      {
+        "id": "POWER_ZONE_B",
+        "ntc_nominal_ohm": 10000,
+        "ntc_beta_k": 3435,
+        "pullup_ohm": 4700,
+        "adc_series_ohm": 1000,
+        "filter_nf": 10,
+        "stale_timeout_ms": 1000,
+        "plausible_min_c": -40,
+        "plausible_max_c": 150
+      }
     ]
   },
   "outputs": [
