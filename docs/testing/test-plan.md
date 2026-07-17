@@ -142,7 +142,9 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`.
 - Vibration, connector, fuse, and harness ownership tests trace to
   `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv` and
-  `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`.
+  `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`,
+  plus
+  `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`.
 
 ## Motorcycle test
 

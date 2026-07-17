@@ -47,6 +47,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
+- `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-input-protection-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv`
@@ -165,6 +166,11 @@ It is not a PCB layout package.
   package handling, TVS source hygiene, B2B/CAN1 production notes, BOM evidence
   synchronization, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`.
+- Garage install freeze checklist: user-installed connector/fuse scope, 50 A
+  battery/MAXI path, DTP/DT/DTM connector classes, MINI/ATO fuse access,
+  purchase-ready connector kit evidence, wire gauges, enclosure service access,
+  BOM synchronization, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`.
 - Output freeze reviews: high/medium and low-current stages keep TPS48110 plus
   external MOSFET boundaries, OUT2 SOA, gate-drive defaults, sense/telemetry,
   fault thresholds, clamp strategy, low-current ADR-0011 no-smart-switch
@@ -298,6 +304,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv`
+- `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
@@ -370,6 +377,9 @@ Preliminary validation tables:
 - Confirm JLCPCB/PCBWay assembly class for selected MPNs.
 - Review `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`
   against current factory assembly and distributor evidence.
+- Review `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`
+  against purchase-ready connector, fuse, wire, crimp-tooling, seal, and
+  service-access evidence.
 - Close `production/bom/pb100_assembly_sourcing_recheck.csv` and
   `production/bom/pb100_sourcing_evidence_snapshot.csv` rows before schematic
   freeze.

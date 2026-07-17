@@ -158,6 +158,11 @@ Current coverage:
   `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`;
   schematic freeze must still recheck JLCPCB/PCBWay assembly class, distributor
   continuity, garage connector derating, crimp tooling, and service access.
+- Garage install closure now has
+  `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`,
+  tying the 50 A battery/MAXI path, DTP/DT/DTM connector classes, MINI/ATO fuse
+  access, wire gauges, crimp tooling, seals, enclosure service access, BOM
+  synchronization, and no-layout boundaries into one machine-checked artifact.
 - Thermal telemetry now has a TDK `NTCGS103JF103FT8`-class 10 kΩ 150 °C
   AEC-Q200 NTC candidate for all three thermal points; schematic freeze must
   still close divider values, ADC scaling, placement, assembly class, and

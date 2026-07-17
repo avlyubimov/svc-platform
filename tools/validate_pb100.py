@@ -479,6 +479,14 @@ GARAGE_CONNECTOR_FUSE_PLAN_COLUMNS = (
     "Status",
     "Notes",
 )
+GARAGE_INSTALL_FREEZE_CHECKLIST_COLUMNS = (
+    "Check ID",
+    "Review item",
+    "Required close evidence",
+    "Primary artifacts",
+    "Pass condition",
+    "Blocked action",
+)
 ASSEMBLY_SOURCING_RECHECK_COLUMNS = (
     "Symbol key",
     "Assembly owner",
@@ -904,6 +912,18 @@ REQUIRED_FACTORY_ASSEMBLY_FREEZE_CHECKS = {
     "FACT-FRZ-009",
     "FACT-FRZ-010",
 }
+REQUIRED_GARAGE_INSTALL_FREEZE_CHECKS = {
+    "GAR-FRZ-001",
+    "GAR-FRZ-002",
+    "GAR-FRZ-003",
+    "GAR-FRZ-004",
+    "GAR-FRZ-005",
+    "GAR-FRZ-006",
+    "GAR-FRZ-007",
+    "GAR-FRZ-008",
+    "GAR-FRZ-009",
+    "GAR-FRZ-010",
+}
 REQUIRED_FAULT_IDS = {
     "PBFLT-INPUT-REV",
     "PBFLT-LOAD-DUMP",
@@ -989,6 +1009,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md",
     "hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv",
+    "hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv",
     "hardware/power-board/PB-100/kicad/PB-100.kicad_sch",
     "hardware/power-board/PB-100/kicad/lib/PB100.kicad_sym",
     "firmware/configs/hardware/pb-100-capabilities.json",
@@ -2071,8 +2092,16 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-b2b-lb100-pin-binding-precheck.md",
             "PB-100-b2b-lb100-pin-audit-checklist.csv",
         ),
-        "BOM synchronization": ("PB-100-assembly-readiness-trace.csv", "PB-100-factory-assembly-freeze-checklist.csv"),
-        "Assembly sourcing recheck": ("PB-100-assembly-readiness-trace.csv", "PB-100-factory-assembly-freeze-checklist.csv"),
+        "BOM synchronization": (
+            "PB-100-assembly-readiness-trace.csv",
+            "PB-100-factory-assembly-freeze-checklist.csv",
+            "PB-100-garage-install-freeze-checklist.csv",
+        ),
+        "Assembly sourcing recheck": (
+            "PB-100-assembly-readiness-trace.csv",
+            "PB-100-factory-assembly-freeze-checklist.csv",
+            "PB-100-garage-install-freeze-checklist.csv",
+        ),
         "CAN1 safety": ("PB-100-can1-tx-disable-trace.csv", "PB-100-can1-production-dnp-review.csv"),
         "CAN1 safety verification": ("PB-100-can1-tx-disable-trace.csv", "PB-100-can1-reset-bench-checklist.csv"),
     }
@@ -2231,7 +2260,11 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-factory-assembly-freeze-checklist.csv",
             "pb100_sourcing_evidence_snapshot.csv",
         ),
-        "Garage assembly readiness": ("PB-100-assembly-readiness-trace.csv", "PB-100-garage-connector-fuse-plan.md"),
+        "Garage assembly readiness": (
+            "PB-100-assembly-readiness-trace.csv",
+            "PB-100-garage-connector-fuse-plan.md",
+            "PB-100-garage-install-freeze-checklist.csv",
+        ),
     }
     for gate, tokens in required_checklist_evidence.items():
         evidence = checklist_rows_by_gate[gate]["Evidence"]
@@ -2366,7 +2399,12 @@ def validate_schematic_freeze_gap_register() -> None:
     ):
         fail("Factory assembly readiness gap must keep assembly and alternatives explicit")
     garage_text = " ".join(rows_by_gate["Garage assembly readiness"].values()).lower()
-    if "pb-100-assembly-readiness-trace.csv" not in garage_text or "garage" not in garage_text or "user" not in garage_text:
+    if (
+        "pb-100-assembly-readiness-trace.csv" not in garage_text
+        or "pb-100-garage-install-freeze-checklist.csv" not in garage_text
+        or "garage" not in garage_text
+        or "user" not in garage_text
+    ):
         fail("Garage assembly readiness gap must keep garage/user scope explicit")
 
 
@@ -5870,6 +5908,116 @@ def validate_garage_connector_fuse_plan() -> None:
             fail(f"garage BOM must preserve {token}")
 
 
+def validate_garage_install_freeze_checklist() -> None:
+    path = PB100_DIR / "PB-100-garage-install-freeze-checklist.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty garage install freeze checklist: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [
+        column for column in GARAGE_INSTALL_FREEZE_CHECKLIST_COLUMNS if column not in fieldnames
+    ]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_check: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        check_id = row["Check ID"].strip()
+        if check_id not in REQUIRED_GARAGE_INSTALL_FREEZE_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown garage install check {check_id}")
+        if check_id in rows_by_check:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate garage install check {check_id}")
+        rows_by_check[check_id] = row
+        for column in GARAGE_INSTALL_FREEZE_CHECKLIST_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+
+    missing_checks = sorted(REQUIRED_GARAGE_INSTALL_FREEZE_CHECKS - rows_by_check.keys())
+    if missing_checks:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing garage install checks: "
+            f"{', '.join(missing_checks)}"
+        )
+
+    checklist_text = read_text(path)
+    for token in (
+        "INPUT_CONNECTOR",
+        "OUTPUT_CONNECTOR",
+        "OUTPUT_FUSE_HOLDER",
+        "MAIN_FUSE_HOLDER",
+        "user-installed",
+        "MAXI 50A",
+        "DT and DTP",
+        "50A input path",
+        "6mm2 / 10AWG",
+        "DEUTSCH DTP",
+        "size 12",
+        "25A",
+        "DT 13A class is too close",
+        "DEUTSCH DT",
+        "size 16",
+        "OUT3 through OUT10",
+        "DEUTSCH DTM",
+        "DTM 4-pin",
+        "DTM 8-pin",
+        "size 20",
+        "7.5A",
+        "MINI/ATO",
+        "5A 10A 15A and 20A",
+        "service cover",
+        "plug/receptacle",
+        "contacts",
+        "seals",
+        "wedgelocks",
+        "boots",
+        "backshells",
+        "crimp tool",
+        "insertion/removal tool",
+        "spare contacts",
+        "2026-07-17",
+        "2.5-4 mm2 / 14-12 AWG",
+        "0.5-1.0 mm2 / 20-18 AWG",
+        "ASA/PETG",
+        "2 mm silicone gasket",
+        "M3 hardware",
+        "PB-BENCH-015",
+        "garage_bom_draft.csv",
+        "pb100_symbol_bom_map.csv",
+        "pb100_assembly_sourcing_recheck.csv",
+        "pb100_sourcing_evidence_snapshot.csv",
+        "PB-100-garage-connector-fuse-plan.md",
+        "PB-100-garage-connector-fuse-plan.csv",
+        "PB-100-assembly-readiness-trace.csv",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "connector footprints",
+        "fuse-holder footprints",
+    ):
+        if token not in checklist_text:
+            fail(f"garage install freeze checklist must include {token}")
+
+    plan_text = read_text(PB100_DIR / "PB-100-garage-connector-fuse-plan.md")
+    for token in ("does not freeze exact connector MPNs", "DTP 2-pin", "DT 2-pin", "DTM", "MAXI", "MINI/ATO"):
+        if token not in plan_text:
+            fail(f"garage connector/fuse plan must support checklist token {token}")
+
+    evidence_text = read_text(REPO_ROOT / "production" / "bom" / "pb100_sourcing_evidence_snapshot.csv")
+    for token in ("2026-07-17", "OUTPUT_CONNECTOR", "OUTPUT_FUSE_HOLDER", "MAIN_FUSE_HOLDER", "Open:"):
+        if token not in evidence_text:
+            fail(f"sourcing evidence snapshot must support garage checklist token {token}")
+
+
 def evidence_link_is_valid(value: str) -> bool:
     return value.startswith(("https://", "http://", "docs/", "hardware/", "production/"))
 
@@ -6777,8 +6925,11 @@ def validate_validation_traceability() -> None:
                 fail("Factory assembly validation trace must require sourcing recheck")
             if "pb-100-factory-assembly-freeze-checklist.csv" not in row_text:
                 fail("Factory assembly validation trace must include factory assembly freeze checklist")
-        if freeze_gate == "Garage assembly readiness" and "garage" not in row_text:
-            fail("Garage assembly validation trace must keep garage scope explicit")
+        if freeze_gate == "Garage assembly readiness":
+            if "garage" not in row_text:
+                fail("Garage assembly validation trace must keep garage scope explicit")
+            if "pb-100-garage-install-freeze-checklist.csv" not in row_text:
+                fail("Garage assembly validation trace must include garage install freeze checklist")
         gates_with_tests[freeze_gate].append(row)
 
     required_primary_artifacts = {
@@ -7277,6 +7428,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-b2b-lb100-pin-audit-checklist.csv",
         "PB-100-assembly-readiness-trace.csv",
         "PB-100-factory-assembly-freeze-checklist.csv",
+        "PB-100-garage-install-freeze-checklist.csv",
     )
     for token in required_trace_artifacts:
         if token not in text:
@@ -7374,6 +7526,7 @@ def main() -> int:
     validate_assembly_readiness_trace()
     validate_factory_assembly_freeze_checklist()
     validate_garage_connector_fuse_plan()
+    validate_garage_install_freeze_checklist()
     validate_sourcing_evidence_snapshot()
     validate_tvs_candidate_consistency()
     validate_tvs_load_dump_margin_trace()

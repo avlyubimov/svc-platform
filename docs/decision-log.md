@@ -2064,3 +2064,20 @@ factory assembly class, exact orderable suffixes, authorized distributor
 continuity, alternates, DNP/open production notes, and BOM evidence must close
 before MPN lock, footprint lock, pick-place output, PCBA order package, or
 `PB-100.kicad_pcb` work can be released.
+
+## 2026-07-17 — PB-100 garage install freeze checklist
+
+Decision: PB-100 garage assembly review now has
+`hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`.
+The checklist ties user-installed connector/fuse ownership, the 50 A
+battery/MAXI path, DTP/DT/DTM connector classes, MINI/ATO per-channel fuse
+access, purchase-ready connector kit evidence, wire gauges, enclosure service
+access, BOM evidence synchronization, and the no-layout boundary into one
+machine-checked artifact.
+
+Reason: PBREL-012 cannot close from connector family classes alone. Exact
+housings, contacts, seals, wedgelocks, boots, backshells, crimp tooling,
+wire-gauge derating, enclosure entry, service access, and spare handling must
+close before garage purchase lock, installation signoff, connector footprints,
+fuse-holder footprints, enclosure release, manufacturing output, or
+`PB-100.kicad_pcb` work can be released.
