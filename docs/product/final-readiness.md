@@ -179,8 +179,12 @@ Current coverage:
 - Factory-vs-garage assembly ownership now has a dedicated trace for critical
   PB-100 symbol keys plus
   `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`;
-  schematic freeze must still recheck JLCPCB/PCBWay assembly class, distributor
-  continuity, garage connector derating, crimp tooling, and service access.
+  `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`
+  now ties factory-owned critical keys, BOM/evidence alignment, assembly-platform
+  recheck, alternates, package handling, sourcing evidence, and no-layout
+  boundary. Schematic freeze must still recheck JLCPCB/PCBWay assembly class,
+  distributor continuity, garage connector derating, crimp tooling, and service
+  access.
 - Garage install closure now has
   `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`,
   tying the 50 A battery/MAXI path, DTP/DT/DTM connector classes, MINI/ATO fuse

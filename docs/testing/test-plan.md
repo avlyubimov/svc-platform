@@ -155,6 +155,7 @@ ordered rule execution, and stale-telemetry denial in one processing step.
 - Vibration, connector, fuse, and harness ownership tests trace to
   `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv` and
   `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`,
+  `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`,
   plus
   `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`.
 

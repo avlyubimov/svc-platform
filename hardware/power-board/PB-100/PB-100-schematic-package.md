@@ -20,6 +20,7 @@ It is not a PCB layout package.
 - `production/bom/pb100_symbol_bom_map.csv`
 - `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`
 - `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`
@@ -204,6 +205,12 @@ It is not a PCB layout package.
   package handling, TVS source hygiene, B2B/CAN1 production notes, BOM evidence
   synchronization, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`.
+- Factory assembly sourcing precheck: factory-owned critical keys, BOM/evidence
+  register alignment, JLCPCB/PCBWay assembly-platform recheck, alternate
+  coverage, package handling, TVS source hygiene, logic/current/thermal sourcing,
+  B2B/CAN1 production handling, date-stamped sourcing evidence, and no-layout
+  boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`.
 - Garage install freeze checklist: user-installed connector/fuse scope, 50 A
   battery/MAXI path, DTP/DT/DTM connector classes, MINI/ATO fuse access,
   purchase-ready connector kit evidence, wire gauges, enclosure service access,
@@ -356,6 +363,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-symbol-pin-evidence.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-open-items.md`
 - `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv`
 - `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`
@@ -434,6 +442,8 @@ Preliminary validation tables:
   absolute maximum ratings.
 - Confirm connector current ratings and derating.
 - Confirm JLCPCB/PCBWay assembly class for selected MPNs.
+- Review `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`
+  against current factory assembly and distributor evidence.
 - Review `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`
   against current factory assembly and distributor evidence.
 - Review `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`

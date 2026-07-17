@@ -2162,6 +2162,21 @@ continuity, alternates, DNP/open production notes, and BOM evidence must close
 before MPN lock, footprint lock, pick-place output, PCBA order package, or
 `PB-100.kicad_pcb` work can be released.
 
+## 2026-07-17 — PB-100 factory assembly sourcing precheck
+
+Decision: PB-100 factory-assembly review now has
+`hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`.
+The precheck ties factory-owned critical keys, BOM/evidence register alignment,
+JLCPCB/PCBWay assembly-platform recheck, critical alternates, package handling,
+TVS source hygiene, logic/current/thermal sourcing, B2B/CAN1 production
+handling, date-stamped sourcing evidence, and no-layout boundary to PBREL-011.
+
+Reason: PBREL-011 needs a closeable sourcing bridge between the factory freeze
+checklist, symbol readiness, BOM map, sourcing recheck register, evidence
+snapshot, and board-print no-go boundary. It prevents stale assembly-platform
+or distributor evidence from being treated as sufficient for MPN, footprint,
+pick-place, PCBA order, or layout release.
+
 ## 2026-07-17 — PB-100 garage install freeze checklist
 
 Decision: PB-100 garage assembly review now has
