@@ -2146,6 +2146,22 @@ Reason: PBREL-008 needs a formula-backed bridge between the value checklist,
 LM5164 candidate calculation, LB-100 load-budget contract, TVS/load-dump stress,
 and factory sourcing before logic-power values or footprints can close.
 
+## 2026-07-17 — PB-100 logic-power closeout precheck
+
+Decision: PB-100 logic-power review now has
+`hardware/power-board/PB-100/PB-100-logic-power-closeout-precheck.csv`. The
+precheck bridges the regulator family source boundary, `PB_5V_OUT` budget,
+protected input/transient stress, UVLO/default-off behavior, RON/feedback/
+bootstrap values, inductor/COUT stability, PGOOD interface, switch-node EMI,
+factory sourcing, and no-layout manufacturing boundary to PBREL-008.
+
+Reason: The logic-power value checklist and derivation precheck define the
+candidate calculations, but print-readiness also needs a machine-checked
+closeout bridge that prevents U3/L1/CIN/COUT placement, switch-node copper,
+thermal-pad vias, `PB-100.kicad_pcb`, Gerbers, drills, pick-place, or
+manufacturing ZIP work until load-budget, TVS stress, EMI/stability, PGOOD, and
+sourcing evidence close.
+
 ## 2026-07-17 — PB-100 current telemetry value freeze checklist
 
 Decision: PB-100 current-telemetry review now has

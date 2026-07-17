@@ -518,6 +518,14 @@ LOGIC_POWER_VALUE_FREEZE_CHECKLIST_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+LOGIC_POWER_CLOSEOUT_PRECHECK_COLUMNS = (
+    "Precheck ID",
+    "Scope",
+    "Required evidence bridge",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
 LOGIC_POWER_VALUE_DERIVATION_PRECHECK_COLUMNS = (
     "Derivation ID",
     "Scope",
@@ -716,6 +724,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-logic-power-freeze-review.csv",
         "PB-100-logic-power-value-freeze-checklist.csv",
         "PB-100-logic-power-value-derivation-precheck.csv",
+        "PB-100-logic-power-closeout-precheck.csv",
     ),
     "CAP-OUT-TEMPLATE": (
         "PB-100-high-medium-output-baseline-trace.csv",
@@ -1012,6 +1021,18 @@ REQUIRED_LOGIC_POWER_VALUE_DERIVATION_CHECKS = {
     "LOGIC-DER-008",
     "LOGIC-DER-009",
     "LOGIC-DER-010",
+}
+REQUIRED_LOGIC_POWER_CLOSEOUT_PRECHECKS = {
+    "LOGIC-CLS-001",
+    "LOGIC-CLS-002",
+    "LOGIC-CLS-003",
+    "LOGIC-CLS-004",
+    "LOGIC-CLS-005",
+    "LOGIC-CLS-006",
+    "LOGIC-CLS-007",
+    "LOGIC-CLS-008",
+    "LOGIC-CLS-009",
+    "LOGIC-CLS-010",
 }
 REQUIRED_CAN1_SAFETY_REQUIREMENTS = {
     "Vehicle CAN read-only default",
@@ -1354,6 +1375,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md",
     "hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv",
+    "hardware/power-board/PB-100/PB-100-logic-power-closeout-precheck.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv",
@@ -2466,6 +2488,7 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-logic-power-freeze-review.csv",
             "PB-100-logic-power-value-freeze-checklist.csv",
             "PB-100-logic-power-value-derivation-precheck.csv",
+            "PB-100-logic-power-closeout-precheck.csv",
         ),
         "Input protection contract": (
             "PB-100-input-reverse-package-trace.csv",
@@ -2483,6 +2506,7 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-logic-power-freeze-review.csv",
             "PB-100-logic-power-value-freeze-checklist.csv",
             "PB-100-logic-power-value-derivation-precheck.csv",
+            "PB-100-logic-power-closeout-precheck.csv",
         ),
         "B2B LB-100 pin precheck": (
             "PB-100-b2b-lb100-pin-binding-precheck.md",
@@ -2665,6 +2689,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-logic-power-freeze-review.csv",
             "PB-100-logic-power-value-freeze-checklist.csv",
             "PB-100-logic-power-value-derivation-precheck.csv",
+            "PB-100-logic-power-closeout-precheck.csv",
             "PB-100-logic-power-budget.csv",
         ),
         "Current telemetry": (
@@ -2779,6 +2804,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-tvs-load-dump-freeze-review.csv",
         "PB-100-tvs-overshoot-escape-checklist.csv",
         "PB-100-tvs-overshoot-validation-precheck.csv",
+        "PB-100-tvs-overshoot-closeout-precheck.csv",
         "60 V",
         "DO-218AC",
         "overshoot",
@@ -2815,6 +2841,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-logic-power-freeze-review.csv",
         "PB-100-logic-power-value-freeze-checklist.csv",
         "PB-100-logic-power-value-derivation-precheck.csv",
+        "PB-100-logic-power-closeout-precheck.csv",
         "1 A",
         "power-good",
         "UVLO",
@@ -5223,6 +5250,133 @@ def validate_logic_power_value_derivation_precheck() -> None:
     for token in ("LOGIC-FRZ-004", "LOGIC-FRZ-005", "LOGIC-FRZ-006", "LOGIC-FRZ-007"):
         if token not in checklist_text:
             fail(f"logic-power value freeze checklist must support derivation token {token}")
+
+
+def validate_logic_power_closeout_precheck() -> None:
+    path = PB100_DIR / "PB-100-logic-power-closeout-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty logic-power closeout precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in LOGIC_POWER_CLOSEOUT_PRECHECK_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        precheck_id = row["Precheck ID"].strip()
+        if precheck_id not in REQUIRED_LOGIC_POWER_CLOSEOUT_PRECHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown logic-power closeout precheck {precheck_id}")
+        if precheck_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate logic-power closeout precheck {precheck_id}")
+        rows_by_id[precheck_id] = row
+        for column in LOGIC_POWER_CLOSEOUT_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+        if precheck_id == "LOGIC-CLS-002" and ("pb_5v_out" not in row_text or "accessory loads" not in row_text):
+            fail("logic-power closeout load budget row must keep PB_5V_OUT accessory-load boundary")
+        if precheck_id == "LOGIC-CLS-010" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
+            fail("logic-power closeout no-layout row must block PCB layout explicitly")
+
+    missing_items = sorted(REQUIRED_LOGIC_POWER_CLOSEOUT_PRECHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing logic-power closeout prechecks: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "LM5164-Q1-class",
+        "100 V 1 A",
+        "LM5013-Q1-class",
+        "100 V 3.5 A",
+        "TPS54360B-Q1-class",
+        "TVS margin",
+        "PBREL-007",
+        "PB_5V_OUT",
+        "1000 mA",
+        "500 mA LB-100",
+        "500 mA PB-side",
+        "accessory loads",
+        "hardware/logic-board/LB-100/LB-100-power-budget-precheck.md",
+        "VBAT_PROT",
+        "U3 VIN",
+        "VBAT_RAW",
+        "2.2µF 100V X7R",
+        "0.1µF",
+        "10µF 100V",
+        "PB-100-tvs-overshoot-closeout-precheck.csv",
+        "BUCK_EN_UVLO",
+        "332kΩ",
+        "100kΩ",
+        "6.48 V rising UVLO",
+        "4.75 V shutdown",
+        "OUT1..OUT10",
+        "LB_3V3_IO",
+        "PB_PWR_GOOD",
+        "BUCK_RON_SET",
+        "41.2kΩ",
+        "300kHz",
+        "BUCK_FB",
+        "158kΩ",
+        "49.9kΩ",
+        "5.0V",
+        "1.2V reference",
+        "BUCK_BST",
+        "2.2nF 50V X7R",
+        "L1",
+        "47µH",
+        "AEC-Q200",
+        "Isat at least 2.2A",
+        "Irms at least 1.2A",
+        "COUT",
+        "2x22µF 10V X7R",
+        "DC-bias",
+        "47kΩ",
+        "10nF DNP",
+        "BUCK_SW",
+        "DNP RC snubber",
+        "switch-node ringing",
+        "LOGIC_BUCK",
+        "LOGIC_BUCK_INDUCTOR",
+        "JLCPCB PCBWay",
+        "LM5164QDDATQ1",
+        "LM5164QDDARQ1",
+        "LM5013-Q1",
+        "TPS54360B-Q1",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "U3 placement",
+        "L1 placement",
+        "switch-node copper",
+        "thermal-pad vias",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "manufacturing ZIP",
+    ):
+        if token not in precheck_text:
+            fail(f"logic-power closeout precheck must include {token}")
+
+    for supporting_artifact, tokens in {
+        "PB-100-logic-power-value-freeze-checklist.csv": ("LOGIC-FRZ-002", "LOGIC-FRZ-010"),
+        "PB-100-logic-power-value-derivation-precheck.csv": ("LOGIC-DER-004", "LOGIC-DER-010"),
+        "PB-100-logic-power-design-values.csv": ("BUCK_EN_UVLO", "TBD not final", "PB_PWR_GOOD"),
+    }.items():
+        supporting_text = read_text(PB100_DIR / supporting_artifact)
+        for token in tokens:
+            if token not in supporting_text:
+                fail(f"logic-power closeout precheck requires {supporting_artifact} token {token}")
 
 
 def validate_can1_tx_disable_trace() -> None:
@@ -9225,6 +9379,8 @@ def validate_validation_traceability() -> None:
                 fail("Logic power validation trace must include value freeze checklist")
             if "pb-100-logic-power-value-derivation-precheck.csv" not in row_text:
                 fail("Logic power validation trace must include value derivation precheck")
+            if "pb-100-logic-power-closeout-precheck.csv" not in row_text:
+                fail("Logic power validation trace must include closeout precheck")
             if "pb_5v_out" not in row_text or "uvlo" not in row_text:
                 fail("Logic power validation trace must keep PB_5V_OUT and UVLO explicit")
         if freeze_gate == "Factory assembly readiness":
@@ -9743,6 +9899,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-logic-power-freeze-review.csv",
         "PB-100-logic-power-value-freeze-checklist.csv",
         "PB-100-logic-power-value-derivation-precheck.csv",
+        "PB-100-logic-power-closeout-precheck.csv",
         "PB-100-current-telemetry-trace.csv",
         "PB-100-current-telemetry-freeze-review.csv",
         "PB-100-current-telemetry-value-freeze-checklist.csv",
@@ -9863,6 +10020,7 @@ def main() -> int:
     validate_logic_power_freeze_review()
     validate_logic_power_value_freeze_checklist()
     validate_logic_power_value_derivation_precheck()
+    validate_logic_power_closeout_precheck()
     validate_can1_tx_disable_trace()
     validate_can1_safety_verification()
     validate_can1_production_dnp_review()

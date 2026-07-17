@@ -186,6 +186,11 @@ Current coverage:
   and PGOOD interface, magnetics/capacitor review, sourcing, and no-layout
   boundary into
   `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`.
+- Logic power closeout precheck now ties regulator family source boundary,
+  `PB_5V_OUT` budget, protected input/transient stress, UVLO/default-off,
+  RON/feedback/bootstrap, inductor/COUT stability, PGOOD interface,
+  switch-node EMI, sourcing, and no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-logic-power-closeout-precheck.csv`.
 - Factory-vs-garage assembly ownership now has a dedicated trace for critical
   PB-100 symbol keys plus
   `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`;

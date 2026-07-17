@@ -94,6 +94,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-logic-buck-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`
@@ -150,7 +151,7 @@ The schematic review packet consists of:
 | OUT2 SOA | Data-sheet SOA extraction against `PB-100-out2-soa-envelope.csv` |
 | Input reverse protection | Input reverse package trace, input reverse freeze review, Q1 freeze checklist, Q1 derivation precheck, Q1 closeout precheck, input power values, Q1 pin evidence, and 40 A copper/thermal review |
 | TVS/load dump | Clamp and overshoot margin trace plus TVS freeze review overshoot escape checklist validation precheck and closeout precheck against every selected downstream voltage class |
-| Logic power | Logic power rail trace, logic power freeze review, value freeze checklist, value derivation precheck, LM5164 pin template, logic power design values, final buck current budget, EMI parts, UVLO, feedback, and power-good implementation |
+| Logic power | Logic power rail trace, logic power freeze review, value freeze checklist, value derivation precheck, closeout precheck, LM5164 pin template, logic power design values, final buck current budget, EMI parts, UVLO, feedback, and power-good implementation |
 | Current telemetry | Current telemetry trace, current telemetry freeze review, value freeze checklist, value derivation precheck, current telemetry design calculation, INA228 pin template, board-current budget trace, 40 A freeze review, board-current design calculation, board-current value checklist, board-current derivation precheck, ADC scaling, filtering, calibration plan, and total-current monitor choice |
 | Thermal telemetry | Thermal telemetry trace, thermal telemetry freeze review, value freeze checklist, value derivation precheck, final sensor values, divider values, placement notes, calibration, and derating thresholds |
 | Test points | Bring-up, telemetry, output, fused-output, and CAN1 safety test points are defined without footprint or placement lock |
