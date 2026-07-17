@@ -153,6 +153,11 @@ Current coverage:
   tying sensor class, placement zones, divider/ADC scaling, self-heating,
   ADC settling, configuration calibration, firmware fail-safe, bench validation,
   sourcing, and no-layout boundary.
+- Thermal telemetry value derivation precheck now ties the NTC source boundary,
+  beta/divider formulas, self-heating estimate, ADC settling, placement zones,
+  configuration calibration, firmware fail-safe, sourcing, and no-layout
+  boundary into
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`.
 - Logic power now has a trace tying the LM5164-Q1-class 100 V 1 A default,
   LM5013-Q1-class 100 V fallback, protected `PB_5V_OUT`, `PB_PWR_GOOD`, and
   rail-invalid default-off behavior together.
@@ -283,7 +288,9 @@ Current coverage:
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`,
   but placement, ADC settling, calibration, and assembly review remain open and
   tracked in
-  `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`.
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`
+  plus
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`.
 - Thermal telemetry divider calibration now has a firmware configuration
   contract in `firmware/configs/config-example.json`,
   `firmware/configs/svc-config.schema.json`, and `firmware/core/svc_config.h`;

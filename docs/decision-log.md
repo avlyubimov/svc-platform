@@ -2131,6 +2131,20 @@ threshold ownership, NTC sourcing, and stale-telemetry fail-safe evidence must
 close before sensor placement, thermal copper, footprints, or
 `PB-100.kicad_pcb` work can be locked.
 
+## 2026-07-17 — PB-100 thermal telemetry value derivation precheck
+
+Decision: PB-100 thermal-telemetry review now has
+`hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`.
+The precheck ties NTC source boundaries, the beta equation, divider ADC
+equation, self-heating estimate, ADC settling, placement zones,
+configuration-owned calibration, firmware fail-safe behavior, sourcing, and
+no-layout boundary to PBREL-010.
+
+Reason: PBREL-010 needs a formula-backed bridge between the value checklist,
+thermal telemetry calculation, configuration contract, bench validation, and
+factory sourcing before thermal values, sensor placement, or footprints can
+close.
+
 ## 2026-07-17 — PB-100 factory assembly freeze checklist
 
 Decision: PB-100 factory assembly review now has
