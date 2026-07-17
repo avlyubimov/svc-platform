@@ -1941,3 +1941,17 @@ layout geometry. The calculation keeps the accepted current-budget architecture
 explicit while preserving the no-`PB-100.kicad_pcb` boundary until connector
 derating, shunt package heating, Q1 thermal path, protected distribution, and
 bench telemetry calibration close.
+
+## 2026-07-17 — PB-100 B2B LB-100 pin audit checklist
+
+Decision: PB-100 board-to-board review now has
+`hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`. The
+checklist covers the exact STM32H563 LQFP-100 pinout audit, ADC capacity,
+output PWM default-low behavior, fault/wake routing, CAN1 read-only crossing,
+PB-side bus and expansion conflicts, FX18 footprint drawing, stack height,
+vibration retention, assembly handling, and no-layout boundary.
+
+Reason: PBREL-003 cannot close from a resource-class precheck alone. The release
+packet needs a machine-checked audit list that preserves the current JPB1 map
+while making the remaining LB-100 pinout and FX18 mechanical evidence explicit
+before any connector placement or `PB-100.kicad_pcb` work.

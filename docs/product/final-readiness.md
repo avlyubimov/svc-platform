@@ -148,6 +148,12 @@ Current coverage:
   LQFP-100 schematic review, covering 10 PWM-capable controls, 16 ADC-class
   measurements, fault/wake inputs, `PB_I2C`, CAN1 safety, and reserved
   expansion without assigning exact STM32 pins.
+- B2B/LB-100 pin binding now has an audit checklist covering the exact
+  STM32H563 LQFP-100 pinout audit, 16 ADC-capable measurement inputs or reviewed
+  mux strategy, output default-low PWM routing, CAN1 DNP/open crossing, FX18
+  footprint drawing, stack height, vibration retention, assembly handling, and
+  no-layout boundary in
+  `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`.
 - Q1 input reverse MOSFET pin evidence is captured from the Infineon
   `IAUTN06S5N008` data sheet; schematic freeze must still close TOLL footprint,
   40 A copper/thermal review, assembly handling, and gate clamp behavior.

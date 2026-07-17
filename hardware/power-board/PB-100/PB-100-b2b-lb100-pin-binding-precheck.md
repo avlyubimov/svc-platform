@@ -7,6 +7,12 @@ LB-100 MCU resource budget that must be proven on the STM32H563 LQFP-100 target.
 It does not assign exact STM32H5 package pins, alternate functions, or PCB
 placement. Exact pin binding remains an LB-100 schematic-freeze item.
 
+The execution checklist for this precheck is
+`hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`. That
+checklist keeps the STM32H563 LQFP-100 exact pinout audit, FX18 footprint
+drawing, stack height, vibration retention, assembly handling, CAN1 read-only
+crossing, and no-layout boundary explicit.
+
 ## Non-goals
 
 - No STM32 pin numbers are assigned here.

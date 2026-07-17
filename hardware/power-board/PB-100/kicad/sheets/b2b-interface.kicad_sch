@@ -10,7 +10,7 @@
     (company "SVC Platform")
     (comment 9 "Work queue: CAP-B2B. Preliminary schematic capture follows PB-100-schematic-capture-work-queue.csv.")
     (comment 1 "Preliminary capture for JPB1 100-pin FX18 candidate interface.")
-    (comment 2 "Sources: PB-100-b2b-interface-trace.csv, PB-100-b2b-lb100-resource-binding.csv, and PB-100-b2b-pin-map.csv.")
+    (comment 2 "Sources: PB-100-b2b-interface-trace.csv, PB-100-b2b-lb100-resource-binding.csv, PB-100-b2b-lb100-pin-audit-checklist.csv, and PB-100-b2b-pin-map.csv.")
   )
   (lib_symbols
   (symbol "PB100:PB100_ERC_PASSIVE_ANCHOR_PRELIM"
@@ -157,7 +157,7 @@
     (pin passive line (at 25.4 -60.96 180) (length 5.08) (name "SPARE_16" (effects (font (size 1.27 1.27)))) (number "100" (effects (font (size 1.27 1.27)))))
   )
   )
-  (text "B2B interface capture notes:\n- Source traces: PB-100-b2b-interface-trace.csv, PB-100-b2b-lb100-resource-binding.csv, PB-100-b2b-pin-map.csv, PB-100-b2b-pin-budget.csv\n- JPB1 candidates FX18-100P-0.8SV10 and FX18-100S-0.8SV20 carry power, output controls, faults, current telemetry, board telemetry, CAN1 safety, and reserves\n- Exact LB-100 MCU pin binding remains schematic-freeze work\n\nNo PCB layout from this preliminary capture."
+  (text "B2B interface capture notes:\n- Source traces: PB-100-b2b-interface-trace.csv, PB-100-b2b-lb100-resource-binding.csv, PB-100-b2b-lb100-pin-audit-checklist.csv, PB-100-b2b-pin-map.csv, PB-100-b2b-pin-budget.csv\n- JPB1 candidates FX18-100P-0.8SV10 and FX18-100S-0.8SV20 carry power, output controls, faults, current telemetry, board telemetry, CAN1 safety, and reserves\n- Exact LB-100 MCU pin binding and FX18 footprint drawing audit remain schematic-freeze work\n\nNo PCB layout from this preliminary capture."
     (at 20 20 0)
     (effects (font (size 2.0 2.0)) (justify left top))
     (uuid "ad54db94-c379-59b6-99fd-002d8da3e86d")
