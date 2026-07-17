@@ -258,6 +258,11 @@ Current coverage:
   wire derating, Q1/shunt operating points, copper pre-layout loss boundary,
   firmware enforcement, telemetry enforcement, bench path, and no-layout
   boundary into one machine-checked artifact.
+- Board-current value derivation now has
+  `hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv`,
+  tying shunt/Q1 formulas, connector/wire derating, firmware enforcement,
+  telemetry enforcement, sourcing ownership, and no-layout boundary into one
+  machine-checked artifact.
 - Close PB-100 CAN1 TX-disable schematic evidence using the `JP_CAN1`
   DNP/open link plus `U_CAN1` default-disabled/readback contract.
 - CAN1 TX-disable now has a trace tying `JP_CAN1`, `U_CAN1`,

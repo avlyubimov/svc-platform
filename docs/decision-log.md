@@ -2259,3 +2259,18 @@ protected distribution, firmware-visible budget enforcement, bench calibration,
 and no-layout boundary must close before high-current copper, shunt copper,
 connector footprint lock, manufacturing output, or `PB-100.kicad_pcb` work can
 be released.
+
+## 2026-07-17 — PB-100 board-current budget value derivation precheck
+
+Decision: PB-100 board-current review now has
+`hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv`.
+The precheck ties ADR-0008 targets, protected high-current path sequence,
+0.5 mΩ shunt formulas, Q1 thermal operating points, copper pre-layout loss,
+garage fuse/connector/wire derating, firmware budget enforcement, telemetry
+enforcement, sourcing/BOM ownership, and no-layout boundary to PBREL-002.
+
+Reason: PBREL-002 needs a formula-backed bridge between the trace, design
+calculation, value checklist, input reverse review, current telemetry review,
+garage sourcing, firmware tests, and board-print no-go boundary before any
+high-current copper, shunt copper, connector footprint, or manufacturing output
+can be released.

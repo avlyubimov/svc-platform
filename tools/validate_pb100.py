@@ -324,6 +324,14 @@ BOARD_CURRENT_BUDGET_VALUE_FREEZE_CHECKLIST_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+BOARD_CURRENT_BUDGET_VALUE_DERIVATION_PRECHECK_COLUMNS = (
+    "Derivation ID",
+    "Scope",
+    "Formula or source basis",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
 CURRENT_TELEMETRY_TRACE_COLUMNS = (
     "Measurement group",
     "Signals",
@@ -663,6 +671,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-board-current-budget-design-calculation.md",
         "PB-100-board-current-budget-value-freeze-checklist.csv",
+        "PB-100-board-current-budget-value-derivation-precheck.csv",
         "PB-100-tvs-load-dump-margin-trace.csv",
         "PB-100-tvs-load-dump-freeze-review.csv",
         "PB-100-tvs-overshoot-escape-checklist.csv",
@@ -1062,6 +1071,18 @@ REQUIRED_BOARD_CURRENT_BUDGET_VALUE_FREEZE_CHECKS = {
     "BUDGET-FRZ-009",
     "BUDGET-FRZ-010",
 }
+REQUIRED_BOARD_CURRENT_BUDGET_VALUE_DERIVATION_CHECKS = {
+    "BUDGET-DER-001",
+    "BUDGET-DER-002",
+    "BUDGET-DER-003",
+    "BUDGET-DER-004",
+    "BUDGET-DER-005",
+    "BUDGET-DER-006",
+    "BUDGET-DER-007",
+    "BUDGET-DER-008",
+    "BUDGET-DER-009",
+    "BUDGET-DER-010",
+}
 REQUIRED_CURRENT_TELEMETRY_FREEZE_REVIEW_ITEMS = {
     "Total shunt range",
     "Monitor range",
@@ -1225,6 +1246,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md",
     "hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv",
+    "hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv",
     "hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv",
@@ -2339,6 +2361,7 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-board-current-budget-freeze-review.csv",
             "PB-100-board-current-budget-design-calculation.md",
             "PB-100-board-current-budget-value-freeze-checklist.csv",
+            "PB-100-board-current-budget-value-derivation-precheck.csv",
             "PB-100-input-reverse-package-trace.csv",
             "PB-100-input-reverse-q1-derivation-precheck.csv",
             "PB-100-tvs-load-dump-margin-trace.csv",
@@ -2501,6 +2524,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-board-current-budget-freeze-review.csv",
             "PB-100-board-current-budget-design-calculation.md",
             "PB-100-board-current-budget-value-freeze-checklist.csv",
+            "PB-100-board-current-budget-value-derivation-precheck.csv",
             "PB-100-input-power-design-values.csv",
         ),
         "Board-to-board interface": (
@@ -2641,6 +2665,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-board-current-budget-design-calculation.md",
         "PB-100-board-current-budget-value-freeze-checklist.csv",
+        "PB-100-board-current-budget-value-derivation-precheck.csv",
         "40 A",
         "firmware config",
         "shunt",
@@ -5741,6 +5766,124 @@ def validate_board_current_budget_value_freeze_checklist() -> None:
             fail(f"firmware/config budget evidence must support board-current checklist token {token}")
 
 
+def validate_board_current_budget_value_derivation_precheck() -> None:
+    path = PB100_DIR / "PB-100-board-current-budget-value-derivation-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty board-current budget value derivation precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [
+        column for column in BOARD_CURRENT_BUDGET_VALUE_DERIVATION_PRECHECK_COLUMNS if column not in fieldnames
+    ]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        derivation_id = row["Derivation ID"].strip()
+        if derivation_id not in REQUIRED_BOARD_CURRENT_BUDGET_VALUE_DERIVATION_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown board-current derivation item {derivation_id}")
+        if derivation_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate board-current derivation item {derivation_id}")
+        rows_by_id[derivation_id] = row
+        for column in BOARD_CURRENT_BUDGET_VALUE_DERIVATION_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+
+    missing_items = sorted(REQUIRED_BOARD_CURRENT_BUDGET_VALUE_DERIVATION_CHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing board-current derivation items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "ADR-0008",
+        "50A main harness fuse",
+        "50 A main fuse",
+        "40 A board continuous-current target",
+        "40 A default total_current_limit_a",
+        "82 A summed output limits",
+        "configuration separate from firmware",
+        "VBAT_RAW",
+        "INPUT_REVERSE_FET",
+        "VBAT_REV_PROT",
+        "TOTAL_CURRENT_SHUNT",
+        "0.5mΩ",
+        "VBAT_PROT",
+        "Vshunt = I * Rshunt",
+        "Pshunt = I^2 * Rshunt",
+        "20mV and 0.8W at 40A",
+        "25mV and 1.25W at 50A",
+        "30mV and 1.8W at 60A",
+        "IAUTN06S5N008ATMA1",
+        "TOLL",
+        "0.76mΩ",
+        "2.43 W at 40 A",
+        "BUK7S1R2-80M",
+        "LFPAK88",
+        "3.84 W at 40 A",
+        "dual SIDR626LDP",
+        "3.36 W total at 40 A",
+        "Every 1 mΩ",
+        "1.6 W at 40 A",
+        "2.5 W at 50 A",
+        "6mm2 / 10AWG",
+        "MAXI",
+        "total_current_limit_a",
+        "power_budget",
+        "PB-BENCH-010",
+        "PB-BENCH-006",
+        "stale telemetry denial",
+        "IIN_SENSE",
+        "IIN_SHUNT_HI",
+        "IIN_SHUNT_LO",
+        "0-60 A",
+        "Kelvin",
+        "ADC or I2C",
+        "INPUT_CONNECTOR",
+        "MAIN_FUSE_HOLDER",
+        "factory_bom_draft.csv",
+        "garage_bom_draft.csv",
+        "pb100_assembly_sourcing_recheck.csv",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "high-current copper",
+        "shunt copper",
+        "Q1 copper",
+    ):
+        if token not in precheck_text:
+            fail(f"board-current budget value derivation precheck must include {token}")
+
+    design_text = read_text(PB100_DIR / "PB-100-board-current-budget-design-calculation.md")
+    for token in ("20 mV at 40 A", "0.8 W at 40 A", "1.6 W at 40 A", "3.6 W at 60 A"):
+        if token not in design_text:
+            fail(f"board-current design calculation must support derivation token {token}")
+
+    firmware_text = "\n".join(
+        (
+            read_text(REPO_ROOT / "firmware" / "configs" / "config-example.json"),
+            read_text(REPO_ROOT / "firmware" / "tests" / "test_power_budget.c"),
+            read_text(REPO_ROOT / "firmware" / "tests" / "test_rule_runtime.c"),
+        )
+    )
+    for token in ("total_current_limit_a", "40", "test_denies_output_over_budget", "stale"):
+        if token not in firmware_text:
+            fail(f"firmware/config budget evidence must support board-current derivation token {token}")
+
+
 def validate_current_telemetry_trace() -> None:
     path = PB100_DIR / "PB-100-current-telemetry-trace.csv"
     validate_csv(path)
@@ -8403,6 +8546,8 @@ def validate_validation_traceability() -> None:
                 fail("Board current validation trace must include design calculation")
             if "pb-100-board-current-budget-value-freeze-checklist.csv" not in row_text:
                 fail("Board current validation trace must include value freeze checklist")
+            if "pb-100-board-current-budget-value-derivation-precheck.csv" not in row_text:
+                fail("Board current validation trace must include value derivation precheck")
         if freeze_gate == "Current telemetry":
             if "pb-100-current-telemetry-freeze-review.csv" not in row_text:
                 fail("Current telemetry validation trace must include freeze review")
@@ -8976,6 +9121,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-board-current-budget-design-calculation.md",
         "PB-100-board-current-budget-value-freeze-checklist.csv",
+        "PB-100-board-current-budget-value-derivation-precheck.csv",
         "PB-100-thermal-telemetry-trace.csv",
         "PB-100-thermal-telemetry-freeze-review.csv",
         "PB-100-thermal-telemetry-value-freeze-checklist.csv",
@@ -9070,6 +9216,7 @@ def main() -> int:
     validate_board_current_budget_freeze_review()
     validate_board_current_budget_design_calculation()
     validate_board_current_budget_value_freeze_checklist()
+    validate_board_current_budget_value_derivation_precheck()
     validate_current_telemetry_trace()
     validate_current_telemetry_freeze_review()
     validate_current_telemetry_value_freeze_checklist()

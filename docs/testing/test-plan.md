@@ -140,6 +140,7 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`,
   `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`,
   `hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv`,
+  `hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv`,
   and
   `docs/adr/ADR-0008-pb-100-current-budget.md`.
 - Thermal derating tests trace to
