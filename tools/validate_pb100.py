@@ -180,6 +180,15 @@ BOARD_RELEASE_BLOCKER_REGISTER_COLUMNS = (
     "Next engineering action",
     "Layout impact",
 )
+BOARD_PRINT_CLOSURE_MATRIX_COLUMNS = (
+    "Gate",
+    "Blocker ID",
+    "Closeout artifact",
+    "Current proof state",
+    "Remaining evidence to close",
+    "Required current-state evidence",
+    "Board-print blocked action",
+)
 OUTPUT_CHANNEL_PIN_CONTRACT_COLUMNS = (
     "Output",
     "Controller ref",
@@ -1468,6 +1477,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md",
     "hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv",
     "hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv",
+    "hardware/power-board/PB-100/PB-100-board-print-closure-matrix.csv",
     "hardware/power-board/PB-100/PB-100-validation-traceability.csv",
     "hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv",
     "hardware/power-board/PB-100/PB-100-review-release-manifest.csv",
@@ -3034,6 +3044,23 @@ def validate_schematic_freeze_gap_register() -> None:
         fail("Garage assembly readiness gap must keep garage/user scope explicit")
 
 
+def required_closeout_artifact_by_gate() -> dict[str, str]:
+    return {
+        "CAN1 safety policy": "pb-100-can1-default-disable-closeout-precheck.csv",
+        "Board current budget": "pb-100-board-current-budget-closeout-precheck.csv",
+        "Board-to-board interface": "pb-100-b2b-interface-closeout-precheck.csv",
+        "High/medium output stage": "pb-100-output-stage-closeout-precheck.csv",
+        "Low-current output stage": "pb-100-output-stage-closeout-precheck.csv",
+        "Input reverse protection": "pb-100-input-reverse-q1-closeout-precheck.csv",
+        "TVS/load-dump protection": "pb-100-tvs-overshoot-closeout-precheck.csv",
+        "Logic power rails": "pb-100-logic-power-closeout-precheck.csv",
+        "Current telemetry": "pb-100-current-telemetry-closeout-precheck.csv",
+        "Thermal telemetry": "pb-100-thermal-telemetry-closeout-precheck.csv",
+        "Factory assembly readiness": "pb-100-factory-assembly-closeout-precheck.csv",
+        "Garage assembly readiness": "pb-100-garage-install-closeout-precheck.csv",
+    }
+
+
 def validate_board_release_blocker_register() -> None:
     path = PB100_DIR / "PB-100-board-release-blocker-register.csv"
     validate_csv(path)
@@ -3051,20 +3078,7 @@ def validate_board_release_blocker_register() -> None:
 
     gates_by_status = freeze_checklist_gates_by_status()
     conditional_gates = {gate for gate, status in gates_by_status.items() if status == "Conditional"}
-    required_closeout_by_gate = {
-        "CAN1 safety policy": "pb-100-can1-default-disable-closeout-precheck.csv",
-        "Board current budget": "pb-100-board-current-budget-closeout-precheck.csv",
-        "Board-to-board interface": "pb-100-b2b-interface-closeout-precheck.csv",
-        "High/medium output stage": "pb-100-output-stage-closeout-precheck.csv",
-        "Low-current output stage": "pb-100-output-stage-closeout-precheck.csv",
-        "Input reverse protection": "pb-100-input-reverse-q1-closeout-precheck.csv",
-        "TVS/load-dump protection": "pb-100-tvs-overshoot-closeout-precheck.csv",
-        "Logic power rails": "pb-100-logic-power-closeout-precheck.csv",
-        "Current telemetry": "pb-100-current-telemetry-closeout-precheck.csv",
-        "Thermal telemetry": "pb-100-thermal-telemetry-closeout-precheck.csv",
-        "Factory assembly readiness": "pb-100-factory-assembly-closeout-precheck.csv",
-        "Garage assembly readiness": "pb-100-garage-install-closeout-precheck.csv",
-    }
+    required_closeout_by_gate = required_closeout_artifact_by_gate()
     seen_gates = set()
     seen_blockers = set()
     for row_number, row in enumerate(rows, 2):
@@ -3117,6 +3131,100 @@ def validate_board_release_blocker_register() -> None:
             f"{path.relative_to(REPO_ROOT)} has blockers for non-conditional gates: "
             f"{', '.join(extra_gates)}"
         )
+
+
+def validate_board_print_closure_matrix() -> None:
+    path = PB100_DIR / "PB-100-board-print-closure-matrix.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty board-print closure matrix: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in BOARD_PRINT_CLOSURE_MATRIX_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    blocker_rows = list(
+        csv.DictReader((PB100_DIR / "PB-100-board-release-blocker-register.csv").open(newline="", encoding="utf-8"))
+    )
+    active_blockers_by_gate = {
+        row["Gate"].strip(): row
+        for row in blocker_rows
+        if row["Status"].strip() != "Closed"
+    }
+    required_closeout_by_gate = required_closeout_artifact_by_gate()
+
+    rows_by_gate: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        gate = row["Gate"].strip()
+        if gate in rows_by_gate:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Gate {gate}")
+        rows_by_gate[gate] = row
+        if gate not in active_blockers_by_gate:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: gate {gate} has no active release blocker")
+        for column in BOARD_PRINT_CLOSURE_MATRIX_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if row["Current proof state"].strip() != "Conditional":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Current proof state must remain Conditional")
+        blocker_row = active_blockers_by_gate[gate]
+        blocker_id = blocker_row["Blocker ID"].strip()
+        if row["Blocker ID"].strip() != blocker_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocker ID must match {blocker_id}")
+        required_closeout = required_closeout_by_gate[gate]
+        if row["Closeout artifact"].strip().lower() != required_closeout:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Closeout artifact must be {required_closeout}")
+        row_text = " ".join(row.values()).lower()
+        if "dated" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: close evidence must require dated evidence")
+        if "do not" not in row["Board-print blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Board-print blocked action must be explicit")
+        for token in ("pb-100.kicad_pcb", "gerbers", "drills", "pick-place", "manufacturing zip"):
+            if token not in row["Board-print blocked action"].lower():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Board-print blocked action must block {token}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+
+    missing_gates = sorted(active_blockers_by_gate.keys() - rows_by_gate.keys())
+    extra_gates = sorted(rows_by_gate.keys() - active_blockers_by_gate.keys())
+    if missing_gates:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing active release blockers: "
+            f"{', '.join(missing_gates)}"
+        )
+    if extra_gates:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} has non-active blockers: "
+            f"{', '.join(extra_gates)}"
+        )
+
+    matrix_text = read_text(path)
+    for token in (
+        "PBREL-001",
+        "PBREL-002",
+        "PBREL-003",
+        "PBREL-004",
+        "PBREL-005",
+        "PBREL-006",
+        "PBREL-007",
+        "PBREL-008",
+        "PBREL-009",
+        "PBREL-010",
+        "PBREL-011",
+        "PBREL-012",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "manufacturing ZIP",
+        "fabrication package",
+        "PCBA order package",
+    ):
+        if token not in matrix_text:
+            fail(f"board-print closure matrix must include {token}")
 
 
 def validate_output_channel_pin_contract() -> None:
@@ -10954,6 +11062,7 @@ def main() -> int:
     validate_schematic_readiness_dashboard()
     validate_schematic_freeze_gap_register()
     validate_board_release_blocker_register()
+    validate_board_print_closure_matrix()
     validate_schematic_capture_work_queue()
     validate_schematic_capture_plan()
     validate_review_release_manifest()

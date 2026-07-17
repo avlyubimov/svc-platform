@@ -133,6 +133,7 @@ The schematic review packet consists of:
 - `production/bom/pb100_symbol_bom_map.csv`
 - `production/bom/pb100_assembly_sourcing_recheck.csv`
 - `production/bom/pb100_sourcing_evidence_snapshot.csv`
+- `hardware/power-board/PB-100/PB-100-board-print-closure-matrix.csv`
 - `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`
 - `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`

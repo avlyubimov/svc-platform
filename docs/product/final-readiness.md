@@ -390,6 +390,8 @@ Current coverage:
 
 ## No-go conditions
 
+- Any active row in
+  `hardware/power-board/PB-100/PB-100-board-print-closure-matrix.csv`.
 - Any `PB-100.kicad_pcb` or manufacturing output before schematic freeze.
 - Any vehicle CAN1 TX enable path without a new ADR and explicit hardware action.
 - Any hard-coded accessory role to physical output mapping in hardware or
