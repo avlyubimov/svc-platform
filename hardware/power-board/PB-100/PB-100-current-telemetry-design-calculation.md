@@ -30,6 +30,11 @@ footprint lock, or manufacturing output.
 
 ## Shunt operating points
 
+Formula basis:
+
+- `Vshunt = I * Rshunt`
+- `Pshunt = I^2 * Rshunt`
+
 | Current | Shunt voltage | Shunt dissipation | Range use with ±40.96 mV |
 |---:|---:|---:|---:|
 | 40 A budget | 20 mV | 0.8 W | 49 % |

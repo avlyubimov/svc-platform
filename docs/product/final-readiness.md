@@ -80,6 +80,15 @@ Current coverage:
   100 V pass-with-margin paths, 60 V overshoot dependencies, 40 V smart-switch
   ADR boundary, sourcing gate, and no-layout boundary into
   `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`.
+- TVS/load-dump overshoot closure now has
+  `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`,
+  which keeps the active HM3 MPN evidence, 60 V overshoot acceptance criteria,
+  80 V MOSFET escape path, 100 V downstream default, and no-layout boundary in
+  one machine-checked artifact.
+- TVS overshoot validation precheck now ties the active HM3 clamp source,
+  60 V overshoot acceptance method, 80 V escape, measurement/simulation setup,
+  factory alternates, and no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`.
 - MOSFET voltage-margin review now makes the 80 V review escape path explicit
   for 60 V output and input-reverse MOSFET paths unless overshoot evidence
   accepts the active TVS clamp margin.
@@ -103,6 +112,10 @@ Current coverage:
   threshold/timer networks, gate default-off behavior, sense/ADC scaling,
   inductive clamp, MOSFET voltage margin, and no-layout boundary into
   `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`.
+- Output-stage value derivation precheck now ties TI TPS4811-Q1 datasheet
+  equations and TPS48110Q1EVM reference positions to PB-100 high, medium, and
+  low current value derivation in
+  `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`.
 - Current telemetry now has a trace tying per-output IMON ranges, total
   `IIN_SENSE`, 0.5 mΩ shunt measurement, 40 A budget enforcement, and
   stale-telemetry safe-off behavior together.
@@ -114,6 +127,16 @@ Current coverage:
   points, INA228-class ±40.96 mV range, candidate `0x40` address straps,
   LB-owned pull-up boundary, input/VBUS filters, and calibration boundary in
   `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`.
+- Current telemetry value closure now has
+  `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`,
+  tying shunt range, monitor family, Kelvin/filter network, I2C ownership,
+  alert behavior, VBUS stress, per-output IMON scaling, configuration
+  calibration, stale safe-fault tests, sourcing, and no-layout boundary.
+- Current telemetry value derivation precheck now ties shunt voltage/power
+  formulas, INA228/INA229 monitor ranges, Kelvin/filter network, I2C ownership,
+  VBUS stress, per-output IMON scaling, configuration calibration, bench
+  safe-fault path, sourcing, and no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`.
 - Total-current and per-output IMON calibration now have a firmware
   configuration contract in `firmware/configs/config-example.json`,
   `firmware/configs/svc-config.schema.json`, and `firmware/core/svc_config.h`;
@@ -125,6 +148,16 @@ Current coverage:
   scaling, placement zones, threshold ownership, stale-telemetry cutoff,
   assembly alternates, and bench validation into
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`.
+- Thermal telemetry value closure now has
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`,
+  tying sensor class, placement zones, divider/ADC scaling, self-heating,
+  ADC settling, configuration calibration, firmware fail-safe, bench validation,
+  sourcing, and no-layout boundary.
+- Thermal telemetry value derivation precheck now ties the NTC source boundary,
+  beta/divider formulas, self-heating estimate, ADC settling, placement zones,
+  configuration calibration, firmware fail-safe, sourcing, and no-layout
+  boundary into
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`.
 - Logic power now has a trace tying the LM5164-Q1-class 100 V 1 A default,
   LM5013-Q1-class 100 V fallback, protected `PB_5V_OUT`, `PB_PWR_GOOD`, and
   rail-invalid default-off behavior together.
@@ -133,10 +166,33 @@ Current coverage:
   UVLO safe-off behavior, PGOOD, inductor/capacitor classes, sourcing, and
   no-layout boundary into
   `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`.
+- Logic power value closure now has
+  `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`,
+  tying LM5164/LM5013 family selection, `PB_5V_OUT` budget, UVLO, RON,
+  feedback, bootstrap, L1/COUT, `PB_PWR_GOOD`, switch-node EMI, sourcing, and
+  no-layout boundaries into one machine-checked artifact.
+- Logic power value derivation precheck now ties official TI buck-family source
+  boundaries, `PB_5V_OUT` load budget, UVLO/RON/feedback formulas, bootstrap
+  and PGOOD interface, magnetics/capacitor review, sourcing, and no-layout
+  boundary into
+  `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`.
 - Factory-vs-garage assembly ownership now has a dedicated trace for critical
-  PB-100 symbol keys; schematic freeze must still recheck JLCPCB/PCBWay
-  assembly class, distributor continuity, garage connector derating, crimp
-  tooling, and service access.
+  PB-100 symbol keys plus
+  `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`;
+  `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`
+  now ties factory-owned critical keys, BOM/evidence alignment, assembly-platform
+  recheck, alternates, package handling, sourcing evidence, and no-layout
+  boundary. Schematic freeze must still recheck JLCPCB/PCBWay assembly class,
+  distributor continuity, garage connector derating, crimp tooling, and service
+  access.
+- Garage install closure now has
+  `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`,
+  tying the 50 A battery/MAXI path, DTP/DT/DTM connector classes, MINI/ATO fuse
+  access, wire gauges, crimp tooling, seals, enclosure service access, BOM
+  synchronization, and no-layout boundaries into one machine-checked artifact.
+  `hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv`
+  now adds the closeable sourcing/install bridge for garage-owned keys, wire and
+  harness derating, purchase kits, service access, and no-PCB-migration rules.
 - Thermal telemetry now has a TDK `NTCGS103JF103FT8`-class 10 kΩ 150 °C
   AEC-Q200 NTC candidate for all three thermal points; schematic freeze must
   still close divider values, ADC scaling, placement, assembly class, and
@@ -159,6 +215,11 @@ Current coverage:
   footprint drawing, stack height, vibration retention, assembly handling, and
   no-layout boundary in
   `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`.
+- B2B/LB-100 review now has a freeze checklist tying the FX18 connector pair,
+  power/status pins, role-free OUTn signals, board telemetry, `PB_I2C`, CAN1
+  read-only crossing, STM32H563 LQFP-100 audit, cross-artifact synchronization,
+  and no-layout boundary to
+  `hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`.
 - Q1 input reverse MOSFET pin evidence is captured from the Infineon
   `IAUTN06S5N008` data sheet; schematic freeze must still close TOLL footprint,
   40 A copper/thermal review, assembly handling, and gate clamp behavior.
@@ -169,6 +230,15 @@ Current coverage:
   TOLL/LFPAK/PowerPAK alternates, protected measurement sequence, HM3 TVS
   dependency, sourcing gate, and no-layout boundary into
   `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`.
+- Q1 input reverse freeze checklist now ties gate clamp/discharge timing,
+  TOLL/LFPAK/PowerPAK package paths, protected measurement sequence, 40 A
+  thermal/copper/SOA audit, assembly sourcing, and no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`.
+- Q1 input reverse derivation precheck now ties LM74700-Q1 VCAP/gate-driver
+  behavior, ideal-diode thresholds, MOSFET RDS(on) window, TVS stress,
+  protected measurement sequence, assembly alternates, and no-layout boundary
+  to
+  `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`.
 - The PB-100 board-current budget now has a cross-artifact trace tying the
   50 A main fuse target, 40 A board/configuration limit, 0-60 A total-current
   telemetry range, and 0.5 mΩ shunt operating point together; schematic freeze
@@ -182,6 +252,12 @@ Current coverage:
   points, Q1 candidate dissipation, and copper loss boundary for the 50 A fuse,
   40 A continuous budget, and 0-60 A telemetry range in
   `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`.
+- Board-current value closure now has
+  `hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv`,
+  tying the current-budget contract, high-current path sequence, connector and
+  wire derating, Q1/shunt operating points, copper pre-layout loss boundary,
+  firmware enforcement, telemetry enforcement, bench path, and no-layout
+  boundary into one machine-checked artifact.
 - Close PB-100 CAN1 TX-disable schematic evidence using the `JP_CAN1`
   DNP/open link plus `U_CAN1` default-disabled/readback contract.
 - CAN1 TX-disable now has a trace tying `JP_CAN1`, `U_CAN1`,
@@ -196,6 +272,11 @@ Current coverage:
   LB-100 unpowered, production DNP/open inspection, physical disabled-status
   readback, RX listen-only independence, and future-ADR hardware-action checks
   in `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`.
+- CAN1 default-disable closure now has
+  `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`,
+  tying the DNP/open missing link, default-disabled gate values, TXD recessive
+  bias, physical status readback, firmware/capability boundary, bench path, and
+  no-layout boundary into one machine-checked artifact.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.
 - Synchronize factory and garage BOM drafts with final selections.
@@ -204,12 +285,19 @@ Current coverage:
 - Logic power now has candidate LM5164 values in
   `hardware/power-board/PB-100/PB-100-logic-power-design-calculation.md`, but
   those values remain not final until load budget, sourcing, EMI, and stability
-  review close.
+  review close; the close-work list is tracked in
+  `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`
+  plus
+  `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`.
 - LB-100 now has a `PB_5V_OUT` load-budget precheck with a 500 mA sustained
   allocation; exceeding it keeps the PB-100 LM5013-Q1-class fallback active.
 - Thermal telemetry now has candidate NTC divider values in
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`,
-  but placement, ADC settling, calibration, and assembly review remain open.
+  but placement, ADC settling, calibration, and assembly review remain open and
+  tracked in
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`
+  plus
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`.
 - Thermal telemetry divider calibration now has a firmware configuration
   contract in `firmware/configs/config-example.json`,
   `firmware/configs/svc-config.schema.json`, and `firmware/core/svc_config.h`;

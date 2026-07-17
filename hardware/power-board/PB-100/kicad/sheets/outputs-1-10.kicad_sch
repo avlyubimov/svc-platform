@@ -10,7 +10,7 @@
     (company "SVC Platform")
     (comment 9 "Work queue: CAP-OUT-INST. Preliminary schematic capture follows PB-100-schematic-capture-work-queue.csv.")
     (comment 1 "Preliminary capture for ten generic output channel instances.")
-    (comment 2 "Sources: PB-100-schematic-instance-symbol-map.csv, PB-100-output-net-expansion.csv, PB-100-output-channel-pin-contract.csv.")
+    (comment 2 "Sources: PB-100-schematic-instance-symbol-map.csv, PB-100-output-net-expansion.csv, PB-100-output-channel-pin-contract.csv, PB-100-output-stage-value-derivation-precheck.csv.")
   )
   (lib_symbols
   (symbol "PB100:PB100_ERC_PASSIVE_ANCHOR_PRELIM"
@@ -118,7 +118,7 @@
     (pin passive line (at 22.86 12.7 180) (length 5.08) (name "VS" (effects (font (size 1.27 1.27)))) (number "20" (effects (font (size 1.27 1.27)))))
   )
   )
-  (text "Outputs capture notes:\n- Source traces: PB-100-high-medium-output-baseline-trace.csv, PB-100-high-medium-output-freeze-review.csv, PB-100-low-current-output-baseline-trace.csv, PB-100-low-current-output-freeze-review.csv, PB-100-output-stage-value-freeze-checklist.csv\n- OUT1 through OUT10 remain generic hardware channels\n- OUT2 SOA and per-class values remain schematic-freeze blockers\n\nNo PCB layout from this preliminary capture."
+  (text "Outputs capture notes:\n- Source traces: PB-100-high-medium-output-baseline-trace.csv, PB-100-high-medium-output-freeze-review.csv, PB-100-low-current-output-baseline-trace.csv, PB-100-low-current-output-freeze-review.csv, PB-100-output-stage-value-freeze-checklist.csv, PB-100-output-stage-value-derivation-precheck.csv\n- OUT1 through OUT10 remain generic hardware channels\n- OUT2 SOA and per-class values remain schematic-freeze blockers\n\nNo PCB layout from this preliminary capture."
     (at 20 20 0)
     (effects (font (size 2.0 2.0)) (justify left top))
     (uuid "630f5d39-24e4-5953-baaa-1aac5307b229")

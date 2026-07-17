@@ -19,35 +19,48 @@ It is not a PCB layout package.
 - `firmware/configs/hardware/pb-100-capabilities.json`
 - `production/bom/pb100_symbol_bom_map.csv`
 - `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`
+- `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`
 - `production/bom/pb100_assembly_sourcing_recheck.csv`
 - `production/bom/pb100_sourcing_evidence_snapshot.csv`
+- `hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv`
 - `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`
 - `hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv`
 - `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`
+- `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`
+- `hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`
+- `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
+- `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-input-protection-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-kicad-prep.md`
 - `hardware/power-board/PB-100/kicad/PB-100.kicad_sch`
@@ -58,6 +71,8 @@ It is not a PCB layout package.
 - `hardware/logic-board/LB-100/LB-100-power-budget-precheck.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
@@ -67,6 +82,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
 - `hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-output-net-expansion.csv`
 - `hardware/power-board/PB-100/PB-100-output-stage-design-values.csv`
@@ -88,6 +104,8 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`
 
 ## Electrical baseline
 
@@ -99,6 +117,11 @@ It is not a PCB layout package.
   protected copper distribution, firmware config, telemetry enforcement, and
   no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`.
+- 40 A board-current value checklist: current-budget contract, path sequence,
+  connector and wire derating, Q1 thermal path, shunt/Kelvin path, copper
+  pre-layout boundary, firmware enforcement, telemetry enforcement, bench
+  validation, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv`.
 - Current telemetry freeze review: 0.5 mΩ shunt range, INA228-class monitor
   headroom, Kelvin sense, ADC/I2C ownership, per-output IMON scaling,
   calibration configuration, and stale-telemetry safe faults are tracked in
@@ -108,14 +131,42 @@ It is not a PCB layout package.
   pull-up boundary, input filter, VBUS filter, and calibration boundary are
   tracked in
   `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`.
+- Current telemetry value checklist: shunt range, monitor family, Kelvin and
+  input filter, I2C ownership, alert behavior, VBUS stress, per-output IMON
+  scaling, configuration calibration, stale safe-fault tests, sourcing, and
+  no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`.
+- Current telemetry value derivation precheck: shunt voltage and power formulas,
+  INA228/INA229 range, Kelvin/filter network, I2C ownership, alert boundary,
+  VBUS stress, per-output IMON scaling, configuration calibration, bench
+  safe-fault path, sourcing, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`.
 - Input reverse freeze review: LM74700 gate/default-off behavior, TOLL/LFPAK88
   and PowerPAK alternates, protected measurement sequence, HM3 TVS dependency,
   sourcing gate, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`.
+- Input reverse Q1 freeze checklist: gate clamp/discharge timing, package
+  alternates, protected measurement sequence, 40 A thermal/copper/SOA audit,
+  assembly sourcing, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`.
+- Input reverse Q1 derivation precheck: LM74700-Q1 VCAP/gate-driver behavior,
+  ideal-diode thresholds, MOSFET RDS(on) window, TVS stress, protected
+  measurement sequence, assembly alternates, and no-layout boundary are tracked
+  in
+  `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`.
 - TVS/load-dump freeze review: active SM8S33AHM3/I HM3 branch, 100 V device
   margin, 60 V MOSFET overshoot dependency, 80 V Q1 alternate, 40 V
   smart-switch ADR boundary, sourcing gate, and no-layout boundary are tracked
   in `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`.
+- TVS overshoot escape checklist: active HM3 source snapshot, 60 V headroom,
+  80 V MOSFET escape decision, 100 V downstream boundary, 40 V ADR boundary,
+  schematic-value dependencies, sourcing, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`.
+- TVS overshoot validation precheck: waveform/source impedance,
+  `Vstress = Vclamp + Lloop * di/dt`, bench probe and simulation parasitic
+  setup, 60 V acceptance versus 80 V escape, factory alternates, and no-layout
+  boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`.
 - MOSFET voltage-margin review: 60 V MOSFET paths behind the active HM3 TVS
   branch need explicit overshoot evidence or migration to the 80 V review
   escape path before schematic freeze. See
@@ -125,6 +176,14 @@ It is not a PCB layout package.
   PGOOD, inductor/capacitor classes, sourcing, and no-layout boundary are
   tracked in
   `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`.
+- Logic power value checklist: LM5164/LM5013 selection, load budget, UVLO,
+  RON, feedback, bootstrap, L1/COUT, `PB_PWR_GOOD`, switch-node EMI, sourcing,
+  and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`.
+- Logic power value derivation precheck: LM5164/LM5013/TPS54360 source
+  boundaries, `PB_5V_OUT` budget, UVLO, RON, feedback, bootstrap, PGOOD,
+  inductor/capacitor, EMI, sourcing, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`.
 - LB-100 power budget precheck: LB-100 has a 500 mA sustained allocation from
   `PB_5V_OUT`; exceeding it keeps the LM5013-Q1-class fallback active before
   PB-100 schematic freeze.
@@ -132,6 +191,37 @@ It is not a PCB layout package.
   placement zones, 85/105/75 °C thresholds, firmware fail-safe behavior,
   calibration, assembly alternates, and bench validation are tracked in
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`.
+- Thermal telemetry value checklist: sensor class, placement zones,
+  divider/ADC scaling, self-heating, ADC settling, configuration calibration,
+  firmware fail-safe, bench validation, sourcing, and no-layout boundary are
+  tracked in
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`.
+- Thermal telemetry value derivation precheck: NTC source boundary, beta and
+  divider equations, self-heating estimate, ADC settling, placement zones,
+  configuration calibration, firmware fail-safe, sourcing, and no-layout
+  boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`.
+- Factory assembly freeze checklist: factory-owned critical keys, alternate
+  coverage, JLCPCB/PCBWay assembly class, date-stamped distributor continuity,
+  package handling, TVS source hygiene, B2B/CAN1 production notes, BOM evidence
+  synchronization, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`.
+- Factory assembly sourcing precheck: factory-owned critical keys, BOM/evidence
+  register alignment, JLCPCB/PCBWay assembly-platform recheck, alternate
+  coverage, package handling, TVS source hygiene, logic/current/thermal sourcing,
+  B2B/CAN1 production handling, date-stamped sourcing evidence, and no-layout
+  boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`.
+- Garage install freeze checklist: user-installed connector/fuse scope, 50 A
+  battery/MAXI path, DTP/DT/DTM connector classes, MINI/ATO fuse access,
+  purchase-ready connector kit evidence, wire gauges, enclosure service access,
+  BOM synchronization, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`.
+- Garage install sourcing precheck: garage-owned symbol keys, 50 A battery/MAXI
+  path, DTP/DT/DTM connector class boundaries, user-serviceable fuses,
+  purchase-ready kit evidence, wire/harness derating, enclosure/service review,
+  BOM/source synchronization, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv`.
 - Output freeze reviews: high/medium and low-current stages keep TPS48110 plus
   external MOSFET boundaries, OUT2 SOA, gate-drive defaults, sense/telemetry,
   fault thresholds, clamp strategy, low-current ADR-0011 no-smart-switch
@@ -141,6 +231,10 @@ It is not a PCB layout package.
   gate default-off behavior, sense/ADC scaling, inductive clamp, MOSFET voltage
   margin, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`.
+- Output value derivation precheck: TI TPS4811-Q1 equations and TPS48110Q1EVM
+  reference positions are mapped to PB-100 high, medium, and low current
+  value derivation in
+  `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`.
 - Outputs: 10 generic high-side protected channels.
 - CAN1: read-only by default; TX physically disabled.
 
@@ -179,6 +273,11 @@ It is not a PCB layout package.
   production DNP/open inspection, physical disabled-status readback, RX
   listen-only independence, and future-ADR hardware-action checks are tracked in
   `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`.
+- CAN1 default-disable freeze checklist: policy boundary, `JP_CAN1` DNP/open
+  missing link, `U_CAN1` disabled default, TXD recessive bias, physical
+  disabled-status readback, DNP-link detect boundary, RX independence, firmware
+  and capability boundary, bench path, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`.
 
 ## Board-to-board signal budget
 
@@ -196,6 +295,9 @@ LB-100 resource-class binding CSV:
 
 LB-100 pin audit and FX18 checklist:
 `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`.
+
+B2B interface freeze checklist:
+`hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`.
 
 LB-100 pin-binding precheck:
 `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`.
@@ -226,6 +328,10 @@ The pin audit checklist keeps the exact STM32H563 LQFP-100 pinout audit, ADC
 capacity, output PWM default-low behavior, fault/wake routing, CAN1 read-only
 crossing, FX18 footprint drawing, stack height, vibration retention, assembly
 handling, and no-layout boundary visible before connector placement.
+The B2B interface freeze checklist ties that audit to power/status pins,
+role-free output signals, board telemetry, `PB_I2C`, CAN1 read-only crossing,
+resource-class reservations, cross-artifact synchronization, and the no-layout
+boundary for PBREL-003.
 
 ## Output channel matrix
 
@@ -262,9 +368,15 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-symbol-capture-worklist.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-pin-evidence.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-open-items.md`
+- `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv`
+- `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`
 - `hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-input-protection-pin-contract.csv`
@@ -273,6 +385,8 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-budget.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`
@@ -280,6 +394,8 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-map.csv`
+- `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv`
@@ -289,11 +405,15 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-output-stage-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa-envelope.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-map.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-estimates.csv`
 - `hardware/power-board/PB-100/PB-100-protection-validation.csv`
@@ -329,6 +449,16 @@ Preliminary validation tables:
   absolute maximum ratings.
 - Confirm connector current ratings and derating.
 - Confirm JLCPCB/PCBWay assembly class for selected MPNs.
+- Review `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`
+  against current factory assembly and distributor evidence.
+- Review `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`
+  against current factory assembly and distributor evidence.
+- Review `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`
+  against purchase-ready connector, fuse, wire, crimp-tooling, seal, and
+  service-access evidence.
+- Review `hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv`
+  against purchase-ready connector, fuse, wire, crimp-tooling, seal, enclosure,
+  and service-access evidence.
 - Close `production/bom/pb100_assembly_sourcing_recheck.csv` and
   `production/bom/pb100_sourcing_evidence_snapshot.csv` rows before schematic
   freeze.
