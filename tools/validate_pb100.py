@@ -308,6 +308,14 @@ BOARD_CURRENT_BUDGET_FREEZE_REVIEW_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+BOARD_CURRENT_BUDGET_VALUE_FREEZE_CHECKLIST_COLUMNS = (
+    "Check ID",
+    "Review item",
+    "Required close evidence",
+    "Primary artifacts",
+    "Pass condition",
+    "Blocked action",
+)
 CURRENT_TELEMETRY_TRACE_COLUMNS = (
     "Measurement group",
     "Signals",
@@ -573,6 +581,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-board-current-budget-trace.csv",
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-board-current-budget-design-calculation.md",
+        "PB-100-board-current-budget-value-freeze-checklist.csv",
         "PB-100-tvs-load-dump-margin-trace.csv",
         "PB-100-tvs-load-dump-freeze-review.csv",
         "PB-100-tvs-overshoot-escape-checklist.csv",
@@ -880,6 +889,18 @@ REQUIRED_BOARD_CURRENT_BUDGET_FREEZE_REVIEW_ITEMS = {
     "Output oversubscription boundary",
     "Layout authorization boundary",
 }
+REQUIRED_BOARD_CURRENT_BUDGET_VALUE_FREEZE_CHECKS = {
+    "BUDGET-FRZ-001",
+    "BUDGET-FRZ-002",
+    "BUDGET-FRZ-003",
+    "BUDGET-FRZ-004",
+    "BUDGET-FRZ-005",
+    "BUDGET-FRZ-006",
+    "BUDGET-FRZ-007",
+    "BUDGET-FRZ-008",
+    "BUDGET-FRZ-009",
+    "BUDGET-FRZ-010",
+}
 REQUIRED_CURRENT_TELEMETRY_FREEZE_REVIEW_ITEMS = {
     "Total shunt range",
     "Monitor range",
@@ -994,6 +1015,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv",
     "hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md",
+    "hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv",
@@ -2092,6 +2114,7 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-board-current-budget-trace.csv",
             "PB-100-board-current-budget-freeze-review.csv",
             "PB-100-board-current-budget-design-calculation.md",
+            "PB-100-board-current-budget-value-freeze-checklist.csv",
             "PB-100-input-reverse-package-trace.csv",
             "PB-100-tvs-load-dump-margin-trace.csv",
             "PB-100-tvs-load-dump-freeze-review.csv",
@@ -2239,6 +2262,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-board-current-budget-trace.csv",
             "PB-100-board-current-budget-freeze-review.csv",
             "PB-100-board-current-budget-design-calculation.md",
+            "PB-100-board-current-budget-value-freeze-checklist.csv",
             "PB-100-input-power-design-values.csv",
         ),
         "Board-to-board interface": (
@@ -2364,6 +2388,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-board-current-budget-trace.csv",
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-board-current-budget-design-calculation.md",
+        "PB-100-board-current-budget-value-freeze-checklist.csv",
         "40 A",
         "firmware config",
         "shunt",
@@ -4967,6 +4992,119 @@ def validate_board_current_budget_design_calculation() -> None:
             fail(f"board-current design calculation must include {token}")
 
 
+def validate_board_current_budget_value_freeze_checklist() -> None:
+    path = PB100_DIR / "PB-100-board-current-budget-value-freeze-checklist.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty board-current budget value freeze checklist: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [
+        column for column in BOARD_CURRENT_BUDGET_VALUE_FREEZE_CHECKLIST_COLUMNS if column not in fieldnames
+    ]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_check: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        check_id = row["Check ID"].strip()
+        if check_id not in REQUIRED_BOARD_CURRENT_BUDGET_VALUE_FREEZE_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown board-current check {check_id}")
+        if check_id in rows_by_check:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate board-current check {check_id}")
+        rows_by_check[check_id] = row
+        for column in BOARD_CURRENT_BUDGET_VALUE_FREEZE_CHECKLIST_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+
+    missing_checks = sorted(REQUIRED_BOARD_CURRENT_BUDGET_VALUE_FREEZE_CHECKS - rows_by_check.keys())
+    if missing_checks:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing board-current checks: "
+            f"{', '.join(missing_checks)}"
+        )
+
+    checklist_text = read_text(path)
+    for token in (
+        "ADR-0008",
+        "50A main harness fuse",
+        "40 A board continuous-current target",
+        "40 A default total_current_limit_a",
+        "0-60 A telemetry range",
+        "82 A summed output limits",
+        "VBAT_RAW",
+        "INPUT_REVERSE_FET",
+        "VBAT_REV_PROT",
+        "0.5mΩ",
+        "VBAT_PROT",
+        "MAXI",
+        "6mm2 / 10AWG",
+        "IAUTN06S5N008ATMA1",
+        "TOLL",
+        "2.43 W at 40 A",
+        "BUK7S1R2-80M",
+        "LFPAK88",
+        "3.84 W at 40 A",
+        "dual SIDR626LDP",
+        "3.36 W total at 40 A",
+        "TOTAL_CURRENT_SHUNT",
+        "20mV and 0.8W at 40A",
+        "25mV and 1.25W at 50A",
+        "30mV and 1.8W at 60A",
+        "Kelvin",
+        "1.6W at 40A",
+        "2.5W at 50A",
+        "3.6W at 60A",
+        "power_budget",
+        "stale telemetry denial",
+        "configuration separate from firmware",
+        "TOTAL_CURRENT_MONITOR",
+        "IIN_SENSE",
+        "PB-BENCH-006",
+        "PB-BENCH-010",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "high-current copper",
+        "shunt copper",
+        "Q1 copper",
+    ):
+        if token not in checklist_text:
+            fail(f"board-current budget value freeze checklist must include {token}")
+
+    design_text = read_text(PB100_DIR / "PB-100-board-current-budget-design-calculation.md")
+    for token in ("20 mV at 40 A", "0.8 W at 40 A", "1.6 W at 40 A", "3.6 W at 60 A"):
+        if token not in design_text:
+            fail(f"board-current design calculation must support value checklist token {token}")
+
+    firmware_text = "\n".join(
+        (
+            read_text(REPO_ROOT / "firmware" / "configs" / "config-example.json"),
+            read_text(REPO_ROOT / "firmware" / "tests" / "test_power_budget.c"),
+            read_text(REPO_ROOT / "firmware" / "tests" / "test_rule_runtime.c"),
+        )
+    )
+    for token in (
+        "total_current_limit_a",
+        "40",
+        "shed_priority_order",
+        "test_denies_output_over_budget",
+        "test_shed_order_uses_configured_priority_order",
+        "stale",
+    ):
+        if token not in firmware_text:
+            fail(f"firmware/config budget evidence must support board-current checklist token {token}")
+
+
 def validate_current_telemetry_trace() -> None:
     path = PB100_DIR / "PB-100-current-telemetry-trace.csv"
     validate_csv(path)
@@ -7015,6 +7153,8 @@ def validate_validation_traceability() -> None:
                 fail("Board current validation trace must include 40 A freeze review")
             if "pb-100-board-current-budget-design-calculation.md" not in row_text:
                 fail("Board current validation trace must include design calculation")
+            if "pb-100-board-current-budget-value-freeze-checklist.csv" not in row_text:
+                fail("Board current validation trace must include value freeze checklist")
         if freeze_gate == "Current telemetry":
             if "pb-100-current-telemetry-freeze-review.csv" not in row_text:
                 fail("Current telemetry validation trace must include freeze review")
@@ -7558,6 +7698,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-board-current-budget-trace.csv",
         "PB-100-board-current-budget-freeze-review.csv",
         "PB-100-board-current-budget-design-calculation.md",
+        "PB-100-board-current-budget-value-freeze-checklist.csv",
         "PB-100-thermal-telemetry-trace.csv",
         "PB-100-thermal-telemetry-freeze-review.csv",
         "PB-100-thermal-telemetry-value-freeze-checklist.csv",
@@ -7645,6 +7786,7 @@ def main() -> int:
     validate_board_current_budget_trace()
     validate_board_current_budget_freeze_review()
     validate_board_current_budget_design_calculation()
+    validate_board_current_budget_value_freeze_checklist()
     validate_current_telemetry_trace()
     validate_current_telemetry_freeze_review()
     validate_current_telemetry_value_freeze_checklist()

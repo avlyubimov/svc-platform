@@ -212,6 +212,12 @@ Current coverage:
   points, Q1 candidate dissipation, and copper loss boundary for the 50 A fuse,
   40 A continuous budget, and 0-60 A telemetry range in
   `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`.
+- Board-current value closure now has
+  `hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv`,
+  tying the current-budget contract, high-current path sequence, connector and
+  wire derating, Q1/shunt operating points, copper pre-layout loss boundary,
+  firmware enforcement, telemetry enforcement, bench path, and no-layout
+  boundary into one machine-checked artifact.
 - Close PB-100 CAN1 TX-disable schematic evidence using the `JP_CAN1`
   DNP/open link plus `U_CAN1` default-disabled/readback contract.
 - CAN1 TX-disable now has a trace tying `JP_CAN1`, `U_CAN1`,

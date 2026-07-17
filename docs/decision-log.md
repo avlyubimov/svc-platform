@@ -2098,3 +2098,21 @@ physical missing link, reset/unpowered default-disable behavior, production DNP
 handling, physical status readback, firmware listen-only behavior, and bench
 evidence must close before CAN1 footprints, routing, manufacturing output, or
 `PB-100.kicad_pcb` work can be released.
+
+## 2026-07-17 — PB-100 board-current budget value freeze checklist
+
+Decision: PB-100 board-current review now has
+`hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv`.
+The checklist ties ADR-0008 current-budget targets, the 50 A main fuse and 40 A
+board/configuration budget, high-current path sequence, connector/wire derating,
+Q1 thermal-path candidates, 0.5 mΩ four-terminal shunt operating points, copper
+pre-layout loss boundary, firmware enforcement, total-current telemetry
+enforcement, bench validation, and the no-layout boundary into one
+machine-checked artifact.
+
+Reason: PBREL-002 cannot close from a numeric design calculation alone. The
+connector derating, Q1 package thermal path, shunt package/Kelvin evidence,
+protected distribution, firmware-visible budget enforcement, bench calibration,
+and no-layout boundary must close before high-current copper, shunt copper,
+connector footprint lock, manufacturing output, or `PB-100.kicad_pcb` work can
+be released.
