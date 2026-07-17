@@ -222,6 +222,10 @@ Current coverage:
   `hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv`
   now adds the closeable sourcing/install bridge for garage-owned keys, wire and
   harness derating, purchase kits, service access, and no-PCB-migration rules.
+  `hardware/power-board/PB-100/PB-100-garage-install-closeout-precheck.csv`
+  adds the closeout bridge for user-installed ownership, 50 A input path,
+  connector/fuse kits, wire/harness derating, enclosure service/vibration, BOM
+  synchronization, and no-layout manufacturing boundary.
 - Thermal telemetry now has a TDK `NTCGS103JF103FT8`-class 10 kΩ 150 °C
   AEC-Q200 NTC candidate for all three thermal points; schematic freeze must
   still close divider values, ADC scaling, placement, assembly class, and

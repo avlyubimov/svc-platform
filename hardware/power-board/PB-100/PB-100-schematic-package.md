@@ -31,6 +31,7 @@ It is not a PCB layout package.
 - `production/bom/pb100_assembly_sourcing_recheck.csv`
 - `production/bom/pb100_sourcing_evidence_snapshot.csv`
 - `hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-garage-install-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv`
 - `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`
@@ -63,6 +64,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
 - `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-garage-install-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-input-protection-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv`
@@ -278,6 +280,11 @@ It is not a PCB layout package.
   purchase-ready kit evidence, wire/harness derating, enclosure/service review,
   BOM/source synchronization, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv`.
+- Garage install closeout precheck: user-installed critical key ownership,
+  battery/MAXI path, output/signal connector classes, user-serviceable fuses,
+  purchase-ready kits, wire/harness derating, enclosure/service/vibration
+  evidence, BOM/source synchronization, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-garage-install-closeout-precheck.csv`.
 - Output freeze reviews: high/medium and low-current stages keep TPS48110 plus
   external MOSFET boundaries, OUT2 SOA, gate-drive defaults, sense/telemetry,
   fault thresholds, clamp strategy, low-current ADR-0011 no-smart-switch
@@ -455,6 +462,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv`
 - `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-garage-install-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`
@@ -547,6 +555,9 @@ Preliminary validation tables:
 - Review `hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv`
   against purchase-ready connector, fuse, wire, crimp-tooling, seal, enclosure,
   and service-access evidence.
+- Review `hardware/power-board/PB-100/PB-100-garage-install-closeout-precheck.csv`
+  against purchase-ready connector, fuse, wire, crimp-tooling, seal, enclosure,
+  vibration, and service-access evidence.
 - Close `production/bom/pb100_assembly_sourcing_recheck.csv` and
   `production/bom/pb100_sourcing_evidence_snapshot.csv` rows before schematic
   freeze.
