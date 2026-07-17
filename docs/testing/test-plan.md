@@ -153,7 +153,8 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`,
   `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`,
   `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`,
-  `hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`, and
+  `hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`,
+  `hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv`, and
   `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`.
 - Vibration, connector, fuse, and harness ownership tests trace to
   `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv` and

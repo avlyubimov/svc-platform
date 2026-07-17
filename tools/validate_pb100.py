@@ -454,6 +454,14 @@ B2B_INTERFACE_FREEZE_CHECKLIST_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+B2B_INTERFACE_CLOSEOUT_PRECHECK_COLUMNS = (
+    "Precheck ID",
+    "Scope",
+    "Required evidence bridge",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
 TVS_LOAD_DUMP_MARGIN_TRACE_COLUMNS = (
     "Protected item",
     "Voltage class",
@@ -714,6 +722,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-b2b-lb100-resource-binding.csv",
         "PB-100-b2b-lb100-pin-audit-checklist.csv",
         "PB-100-b2b-interface-freeze-checklist.csv",
+        "PB-100-b2b-interface-closeout-precheck.csv",
     ),
     "CAP-CAN1": (
         "PB-100-can1-tx-disable-trace.csv",
@@ -1026,6 +1035,18 @@ REQUIRED_B2B_INTERFACE_FREEZE_CHECKS = {
     "B2B-FRZ-009",
     "B2B-FRZ-010",
 }
+REQUIRED_B2B_INTERFACE_CLOSEOUT_PRECHECKS = {
+    "B2B-CLS-001",
+    "B2B-CLS-002",
+    "B2B-CLS-003",
+    "B2B-CLS-004",
+    "B2B-CLS-005",
+    "B2B-CLS-006",
+    "B2B-CLS-007",
+    "B2B-CLS-008",
+    "B2B-CLS-009",
+    "B2B-CLS-010",
+}
 REQUIRED_OUTPUT_STAGE_VALUE_FREEZE_CHECKS = {
     "OUTVAL-001",
     "OUTVAL-002",
@@ -1276,6 +1297,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv",
     "hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv",
     "hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv",
+    "hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv",
     "hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md",
     "hardware/power-board/PB-100/PB-100-output-net-expansion.csv",
     "hardware/power-board/PB-100/PB-100-test-point-plan.csv",
@@ -2395,6 +2417,7 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-b2b-lb100-pin-binding-precheck.md",
             "PB-100-b2b-lb100-pin-audit-checklist.csv",
             "PB-100-b2b-interface-freeze-checklist.csv",
+            "PB-100-b2b-interface-closeout-precheck.csv",
         ),
         "BOM synchronization": (
             "PB-100-assembly-readiness-trace.csv",
@@ -2532,6 +2555,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-b2b-lb100-resource-binding.csv",
             "PB-100-b2b-lb100-pin-audit-checklist.csv",
             "PB-100-b2b-interface-freeze-checklist.csv",
+            "PB-100-b2b-interface-closeout-precheck.csv",
             "PB-100-b2b-pin-map.csv",
         ),
         "High/medium output stage": (
@@ -2726,6 +2750,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-b2b-lb100-resource-binding.csv",
         "PB-100-b2b-lb100-pin-audit-checklist.csv",
         "PB-100-b2b-interface-freeze-checklist.csv",
+        "PB-100-b2b-interface-closeout-precheck.csv",
         "FX18-100P-0.8SV10",
         "FX18-100S-0.8SV20",
         "exact LB-100 MCU pin binding",
@@ -8388,6 +8413,124 @@ def validate_b2b_interface_freeze_checklist() -> None:
             fail(f"B2B interface freeze checklist must include {token}")
 
 
+def validate_b2b_interface_closeout_precheck() -> None:
+    path = PB100_DIR / "PB-100-b2b-interface-closeout-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty B2B interface closeout precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in B2B_INTERFACE_CLOSEOUT_PRECHECK_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        precheck_id = row["Precheck ID"].strip()
+        if precheck_id not in REQUIRED_B2B_INTERFACE_CLOSEOUT_PRECHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown B2B closeout precheck {precheck_id}")
+        if precheck_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate B2B closeout precheck {precheck_id}")
+        rows_by_id[precheck_id] = row
+        for column in B2B_INTERFACE_CLOSEOUT_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+        if "can1_tx_route" in row_text and "dnp/open" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1_TX_ROUTE rows must keep DNP/open explicit")
+        if precheck_id == "B2B-CLS-010" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
+            fail("B2B closeout no-layout row must block PCB layout explicitly")
+
+    missing_items = sorted(REQUIRED_B2B_INTERFACE_CLOSEOUT_PRECHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing B2B closeout prechecks: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "JPB1",
+        "100-position",
+        "0.8 mm",
+        "PB-100-b2b-pin-map.csv",
+        "100 JPB1 pins",
+        "PB-100-b2b-lb100-resource-binding.csv",
+        "PB-100-b2b-lb100-pin-binding-precheck.md",
+        "PB-100-b2b-lb100-pin-audit-checklist.csv",
+        "PB-100-b2b-interface-freeze-checklist.csv",
+        "FX18-100P-0.8SV10",
+        "FX18-100S-0.8SV20",
+        "20 mm",
+        "footprint drawing",
+        "courtyard",
+        "pin-1",
+        "stack height",
+        "vibration retention",
+        "assembly handling",
+        "tray",
+        "JLCPCB PCBWay",
+        "STM32H563",
+        "LQFP-100",
+        "Exact LB-100 pinout",
+        "16 ADC",
+        "external ADC/mux",
+        "10 GPIO/PWM",
+        "default-low",
+        "PB_PWR_GOOD",
+        "PB_WAKE_REQ",
+        "OUT1_CTL",
+        "OUT10_IMON",
+        "IIN_SENSE",
+        "TEMP_PWR_A",
+        "PB_I2C_SCL",
+        "PB_I2C_SDA",
+        "PB_I2C_INT",
+        "CAN1_TX_DISABLE_CMD",
+        "CAN1_TX_DISABLED_STATUS",
+        "CAN1_RX_ROUTE",
+        "CAN1_TX_ROUTE",
+        "DNP/open",
+        "future ADR",
+        "CAN2",
+        "LIN",
+        "RS485",
+        "UART",
+        "EXT_ADC",
+        "architecture review",
+        "PB_5V_OUT",
+        "LB_3V3_IO",
+        "PB_PWR_GOOD",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "connector placement",
+        "board outline",
+        "stack-height lock",
+        "manufacturing ZIP",
+    ):
+        if token not in precheck_text:
+            fail(f"B2B interface closeout precheck must include {token}")
+
+    pin_rows = list(csv.DictReader((PB100_DIR / "PB-100-b2b-pin-map.csv").open(newline="", encoding="utf-8")))
+    if len(pin_rows) != 100:
+        fail("B2B closeout precheck requires PB-100-b2b-pin-map.csv to contain 100 JPB1 pins")
+
+    audit_text = read_text(PB100_DIR / "PB-100-b2b-lb100-pin-audit-checklist.csv")
+    for token in ("STM32H563", "LQFP-100", "16 ADC", "FX18-100P-0.8SV10", "FX18-100S-0.8SV20"):
+        if token not in audit_text:
+            fail(f"B2B pin audit checklist must support closeout precheck token {token}")
+
+
 def parse_pin_span_set(value: str) -> set[str]:
     pins: set[str] = set()
     for part in value.split(";"):
@@ -8652,6 +8795,11 @@ def validate_validation_traceability() -> None:
         for row in gates_with_tests["Board-to-board interface"]
     ):
         fail("validation traceability for Board-to-board interface must include PB-100-b2b-interface-freeze-checklist.csv")
+    if not any(
+        "PB-100-b2b-interface-closeout-precheck.csv" in row["Primary artifact"]
+        for row in gates_with_tests["Board-to-board interface"]
+    ):
+        fail("validation traceability for Board-to-board interface must include PB-100-b2b-interface-closeout-precheck.csv")
 
     missing_gates = sorted(gate for gate, gate_rows in gates_with_tests.items() if not gate_rows)
     if missing_gates:
@@ -9130,6 +9278,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-b2b-lb100-resource-binding.csv",
         "PB-100-b2b-lb100-pin-audit-checklist.csv",
         "PB-100-b2b-interface-freeze-checklist.csv",
+        "PB-100-b2b-interface-closeout-precheck.csv",
         "PB-100-assembly-readiness-trace.csv",
         "PB-100-factory-assembly-freeze-checklist.csv",
         "PB-100-factory-assembly-sourcing-precheck.csv",
@@ -9255,6 +9404,7 @@ def main() -> int:
     validate_b2b_connector_candidate()
     validate_b2b_lb100_pin_audit_checklist()
     validate_b2b_interface_freeze_checklist()
+    validate_b2b_interface_closeout_precheck()
     validate_b2b_resource_binding()
     validate_validation_traceability()
     validate_test_point_plan()

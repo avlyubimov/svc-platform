@@ -25,6 +25,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`
 - `production/bom/pb100_assembly_sourcing_recheck.csv`
 - `production/bom/pb100_sourcing_evidence_snapshot.csv`
@@ -312,6 +313,9 @@ LB-100 pin audit and FX18 checklist:
 B2B interface freeze checklist:
 `hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`.
 
+B2B interface closeout precheck:
+`hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv`.
+
 LB-100 pin-binding precheck:
 `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`.
 
@@ -345,6 +349,10 @@ The B2B interface freeze checklist ties that audit to power/status pins,
 role-free output signals, board telemetry, `PB_I2C`, CAN1 read-only crossing,
 resource-class reservations, cross-artifact synchronization, and the no-layout
 boundary for PBREL-003.
+The B2B interface closeout precheck bridges that freeze checklist to the JPB1
+100-pin map, FX18 footprint/stack/vibration evidence, exact STM32H563 LQFP-100
+pinout audit, ADC/PWM/resource limits, CAN1 DNP/open crossing, and the explicit
+no-layout/manufacturing-output boundary.
 
 ## Output channel matrix
 

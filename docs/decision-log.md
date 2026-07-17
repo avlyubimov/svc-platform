@@ -1970,6 +1970,20 @@ freeze packet also needs a reviewer-facing gate that links B2B electrical,
 mechanical, LB-100 resource, CAN1 safety, and no-layout conditions before any
 mezzanine placement or manufacturing-output work.
 
+## 2026-07-17 — PB-100 B2B interface closeout precheck
+
+Decision: PB-100 board-to-board release review now has
+`hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv`. The
+precheck bridges the JPB1 100-position pin map, FX18 footprint drawing,
+20 mm stack-height evidence, vibration and assembly handling, exact STM32H563
+LQFP-100 pinout audit, ADC/PWM/resource limits, CAN1 DNP/open crossing, and
+no-layout manufacturing boundary to PBREL-003.
+
+Reason: The B2B freeze checklist names the gate, but print-readiness review
+also needs a machine-checked closeout bridge that prevents connector placement,
+stack-height lock, `PB-100.kicad_pcb`, Gerbers, drills, pick-place, or
+manufacturing ZIP work until LB-100 pinout and FX18 mechanical evidence close.
+
 ## 2026-07-17 — PB-100 output-stage value freeze checklist
 
 Decision: PB-100 output-stage review now has

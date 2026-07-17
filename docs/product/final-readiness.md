@@ -220,6 +220,11 @@ Current coverage:
   read-only crossing, STM32H563 LQFP-100 audit, cross-artifact synchronization,
   and no-layout boundary to
   `hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`.
+- B2B/LB-100 review now has a closeout precheck bridging the JPB1 100-pin map,
+  FX18 footprint/stack/vibration evidence, exact STM32H563 LQFP-100 pinout
+  audit, ADC/PWM/resource limits, CAN1 DNP/open crossing, and no-layout
+  manufacturing boundary to
+  `hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv`.
 - Q1 input reverse MOSFET pin evidence is captured from the Infineon
   `IAUTN06S5N008` data sheet; schematic freeze must still close TOLL footprint,
   40 A copper/thermal review, assembly handling, and gate clamp behavior.
