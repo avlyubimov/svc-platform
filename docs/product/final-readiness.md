@@ -277,6 +277,11 @@ Current coverage:
   tying the DNP/open missing link, default-disabled gate values, TXD recessive
   bias, physical status readback, firmware/capability boundary, bench path, and
   no-layout boundary into one machine-checked artifact.
+- CAN1 default-disable derivation now has
+  `hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv`,
+  tying policy/configuration, physical missing-link, gate polarity, status
+  readback, firmware/capability/bench evidence, factory DNP sourcing, and
+  no-layout boundary into one machine-checked artifact.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.
 - Synchronize factory and garage BOM drafts with final selections.

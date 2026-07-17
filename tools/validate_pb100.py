@@ -510,6 +510,14 @@ OUTPUT_STAGE_VALUE_DERIVATION_PRECHECK_COLUMNS = (
     "Required PB-100 close evidence",
     "Blocked action",
 )
+CAN1_DEFAULT_DISABLE_DERIVATION_PRECHECK_COLUMNS = (
+    "Derivation ID",
+    "Scope",
+    "Formula or source basis",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
 CAN1_SAFETY_VERIFICATION_COLUMNS = (
     "Requirement",
     "Signal or artifact",
@@ -702,6 +710,7 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-can1-tx-disable-trace.csv",
         "PB-100-can1-production-dnp-review.csv",
         "PB-100-can1-default-disable-freeze-checklist.csv",
+        "PB-100-can1-default-disable-derivation-precheck.csv",
     ),
 }
 REVIEW_RELEASE_MANIFEST_COLUMNS = (
@@ -973,6 +982,18 @@ REQUIRED_CAN1_DEFAULT_DISABLE_FREEZE_CHECKS = {
     "CAN1-FRZ-009",
     "CAN1-FRZ-010",
 }
+REQUIRED_CAN1_DEFAULT_DISABLE_DERIVATION_CHECKS = {
+    "CAN1-DER-001",
+    "CAN1-DER-002",
+    "CAN1-DER-003",
+    "CAN1-DER-004",
+    "CAN1-DER-005",
+    "CAN1-DER-006",
+    "CAN1-DER-007",
+    "CAN1-DER-008",
+    "CAN1-DER-009",
+    "CAN1-DER-010",
+}
 REQUIRED_B2B_LB100_PIN_AUDIT_ITEMS = {
     "B2B-AUD-001",
     "B2B-AUD-002",
@@ -1243,6 +1264,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv",
     "hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md",
     "hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv",
+    "hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv",
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv",
@@ -2367,11 +2389,13 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-can1-tx-disable-trace.csv",
             "PB-100-can1-production-dnp-review.csv",
             "PB-100-can1-default-disable-freeze-checklist.csv",
+            "PB-100-can1-default-disable-derivation-precheck.csv",
         ),
         "CAN1 safety verification": (
             "PB-100-can1-tx-disable-trace.csv",
             "PB-100-can1-reset-bench-checklist.csv",
             "PB-100-can1-default-disable-freeze-checklist.csv",
+            "PB-100-can1-default-disable-derivation-precheck.csv",
         ),
     }
     for area, tokens in required_dashboard_evidence.items():
@@ -2470,6 +2494,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-can1-safety-verification.csv",
             "PB-100-can1-production-dnp-review.csv",
             "PB-100-can1-default-disable-freeze-checklist.csv",
+            "PB-100-can1-default-disable-derivation-precheck.csv",
         ),
         "Board current budget": (
             "PB-100-board-current-budget-trace.csv",
@@ -2562,6 +2587,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-can1-production-dnp-review.csv",
         "PB-100-can1-reset-bench-checklist.csv",
         "PB-100-can1-default-disable-freeze-checklist.csv",
+        "PB-100-can1-default-disable-derivation-precheck.csv",
         "JP_CAN1",
         "U_CAN1",
         "future ADR",
@@ -5194,6 +5220,128 @@ def validate_can1_default_disable_freeze_checklist() -> None:
     for token in ("PB-BENCH-012", "no vehicle-CAN transmit frame", "not from firmware-only"):
         if token not in reset_text:
             fail(f"CAN1 reset bench checklist must support freeze checklist token {token}")
+
+
+def validate_can1_default_disable_derivation_precheck() -> None:
+    path = PB100_DIR / "PB-100-can1-default-disable-derivation-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty CAN1 default-disable derivation precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [
+        column for column in CAN1_DEFAULT_DISABLE_DERIVATION_PRECHECK_COLUMNS if column not in fieldnames
+    ]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        derivation_id = row["Derivation ID"].strip()
+        if derivation_id not in REQUIRED_CAN1_DEFAULT_DISABLE_DERIVATION_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown CAN1 derivation item {derivation_id}")
+        if derivation_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate CAN1 derivation item {derivation_id}")
+        rows_by_id[derivation_id] = row
+        for column in CAN1_DEFAULT_DISABLE_DERIVATION_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        row_text = " ".join(row.values()).lower()
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+        if "can1_tx_route" in row_text and "dnp/open" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1_TX_ROUTE derivation rows must keep DNP/open explicit")
+        if "configuration" in row_text and "cannot enable tx" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1 configuration rows must state configuration cannot enable TX")
+
+    missing_items = sorted(REQUIRED_CAN1_DEFAULT_DISABLE_DERIVATION_CHECKS - rows_by_id.keys())
+    if missing_items:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing CAN1 derivation items: "
+            f"{', '.join(missing_items)}"
+        )
+
+    precheck_text = read_text(path)
+    for token in (
+        "ADR-0002",
+        "read-only by default",
+        "configuration cannot enable TX",
+        "future ADR",
+        "explicit hardware action",
+        "CAN1_TX_ROUTE",
+        "JP_CAN1",
+        "0Ω 0603",
+        "0 Ω 0603",
+        "DNP/open",
+        "no default-populated vehicle-CAN TX path",
+        "normally-open solder bridge",
+        "U_CAN1",
+        "SN74LVC1G125-Q1",
+        "OE high disabled",
+        "47 kΩ",
+        "47k",
+        "CAN1_TX_DISABLE_CMD",
+        "LB_3V3_IO",
+        "TXD recessive",
+        "transceiver VIO",
+        "CAN1_TX_DISABLED_STATUS",
+        "1 kΩ",
+        "1k",
+        "100 kΩ",
+        "100k",
+        "1 nF DNP",
+        "1nF DNP",
+        "not firmware-only",
+        "physical disabled state",
+        "DNP link detect",
+        "CAN1_RX_ROUTE",
+        "listen-only RX",
+        "can_safety",
+        "CAN2 expansion TX remains separate",
+        "vehicle_can_read_only_default",
+        "tx_route_population DNP/open",
+        "tx_requires_future_adr",
+        "hardware_action_required_for_tx",
+        "PB-BENCH-012",
+        "CAN1-RST-001",
+        "CAN1-RST-006",
+        "no vehicle-CAN transmit frame",
+        "factory_bom_draft.csv",
+        "pb100_symbol_bom_map.csv",
+        "pb100_assembly_sourcing_recheck.csv",
+        "JLCPCB/PCBWay",
+        "DNP 0R",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "CAN1 TX route layout",
+        "jumper footprint",
+        "fabrication package",
+    ):
+        if token not in precheck_text:
+            fail(f"CAN1 default-disable derivation precheck must include {token}")
+
+    design_text = read_text(PB100_DIR / "PB-100-can1-tx-disable-design-calculation.md")
+    for token in ("0 Ω 0603", "SN74LVC1G125-Q1", "47 kΩ", "1 kΩ", "100 kΩ", "1 nF DNP"):
+        if token not in design_text:
+            fail(f"CAN1 design calculation must support derivation token {token}")
+
+    reset_text = read_text(PB100_DIR / "PB-100-can1-reset-bench-checklist.csv")
+    for token in ("PB-BENCH-012", "no vehicle-CAN transmit frame", "future ADR", "explicit hardware action"):
+        if token not in reset_text:
+            fail(f"CAN1 reset bench checklist must support derivation token {token}")
+
+    sourcing_text = read_text(REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv")
+    for token in ("CAN1_TX_DISABLE", "DNP/open", "no default-populated TX", "future ADR"):
+        if token not in sourcing_text:
+            fail(f"assembly sourcing recheck must support CAN1 derivation token {token}")
 
 
 def validate_can1_reset_bench_checklist() -> None:
@@ -8246,6 +8394,8 @@ def validate_validation_traceability() -> None:
                 fail("CAN1 validation trace must include production DNP review")
             if "pb-100-can1-default-disable-freeze-checklist.csv" not in row_text:
                 fail("CAN1 validation trace must include default-disable freeze checklist")
+            if "pb-100-can1-default-disable-derivation-precheck.csv" not in row_text:
+                fail("CAN1 validation trace must include default-disable derivation precheck")
         if freeze_gate == "Board current budget":
             if "pb-100-board-current-budget-freeze-review.csv" not in row_text:
                 fail("Board current validation trace must include 40 A freeze review")
@@ -8804,6 +8954,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-can1-tx-disable-trace.csv",
         "PB-100-can1-production-dnp-review.csv",
         "PB-100-can1-default-disable-freeze-checklist.csv",
+        "PB-100-can1-default-disable-derivation-precheck.csv",
         "PB-100-can1-reset-bench-checklist.csv",
         "PB-100-input-reverse-package-trace.csv",
         "PB-100-input-reverse-freeze-review.csv",
@@ -8936,6 +9087,7 @@ def main() -> int:
     validate_can1_safety_verification()
     validate_can1_production_dnp_review()
     validate_can1_default_disable_freeze_checklist()
+    validate_can1_default_disable_derivation_precheck()
     validate_can1_reset_bench_checklist()
     validate_can1_capture_contract()
     validate_assembly_sourcing_recheck()
