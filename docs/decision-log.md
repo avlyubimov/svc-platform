@@ -2402,3 +2402,20 @@ calculation, value checklist, input reverse review, current telemetry review,
 garage sourcing, firmware tests, and board-print no-go boundary before any
 high-current copper, shunt copper, connector footprint, or manufacturing output
 can be released.
+
+## 2026-07-17 — PB-100 board-current budget closeout precheck
+
+Decision: PB-100 board-current review now has
+`hardware/power-board/PB-100/PB-100-board-current-budget-closeout-precheck.csv`.
+The precheck bridges ADR-0008 targets, the protected high-current path, main
+fuse/wire derating, Q1 thermal candidates, total-current shunt/Kelvin telemetry,
+copper pre-layout constraints, firmware budget enforcement, bench telemetry
+evidence, factory/garage BOM owner split, and no-layout manufacturing boundary
+to PBREL-002.
+
+Reason: The value checklist and derivation precheck define the budget math, but
+print-readiness also needs a machine-checked closeout bridge that prevents
+high-current copper, shunt copper, Q1 copper, connector placement,
+`PB-100.kicad_pcb`, Gerbers, drills, pick-place, or manufacturing ZIP work until
+connector derating, shunt package/Kelvin evidence, Q1 thermal path, protected
+distribution, telemetry calibration, sourcing, and bench evidence close.

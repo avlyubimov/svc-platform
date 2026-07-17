@@ -40,6 +40,7 @@ hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv,Teleme
 hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md,Telemetry,40 A board-current path design calculation,Required,validate_board_current_budget_design_calculation,Conditional
 hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv,Telemetry,40 A board-current value freeze checklist,Required,validate_board_current_budget_value_freeze_checklist,Conditional
 hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv,Telemetry,40 A board-current value derivation precheck,Required,validate_board_current_budget_value_derivation_precheck,Conditional
+hardware/power-board/PB-100/PB-100-board-current-budget-closeout-precheck.csv,Telemetry,40 A board-current closeout precheck,Required,validate_board_current_budget_closeout_precheck,Conditional
 hardware/power-board/PB-100/PB-100-input-power-design-values.csv,Input protection,Input power design values,Required,validate_input_power_design_values,Conditional
 hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv,Input protection,Q1 reverse-protection package and thermal trace,Required,validate_input_reverse_package_trace,Conditional
 hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv,Input protection,Q1 reverse-protection freeze review,Required,validate_input_reverse_freeze_review,Conditional

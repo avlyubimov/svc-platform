@@ -51,6 +51,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-board-current-budget-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`
@@ -137,6 +138,12 @@ It is not a PCB layout package.
   fuse/wire derating, firmware and telemetry enforcement, BOM sourcing, and
   no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv`.
+- 40 A board-current closeout precheck: requirement/configuration boundary,
+  protected high-current path, main fuse and wire derating, Q1 thermal path,
+  shunt/Kelvin telemetry, copper pre-layout boundary, firmware enforcement,
+  bench telemetry evidence, BOM owner split, and no-layout manufacturing
+  boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-board-current-budget-closeout-precheck.csv`.
 - Current telemetry freeze review: 0.5 mΩ shunt range, INA228-class monitor
   headroom, Kelvin sense, ADC/I2C ownership, per-output IMON scaling,
   calibration configuration, and stale-telemetry safe faults are tracked in

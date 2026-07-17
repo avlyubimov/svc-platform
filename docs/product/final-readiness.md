@@ -300,6 +300,12 @@ Current coverage:
   tying shunt/Q1 formulas, connector/wire derating, firmware enforcement,
   telemetry enforcement, sourcing ownership, and no-layout boundary into one
   machine-checked artifact.
+- Board-current closeout precheck now has
+  `hardware/power-board/PB-100/PB-100-board-current-budget-closeout-precheck.csv`,
+  bridging the 50 A fuse path, 40 A budget, protected high-current path,
+  Q1 thermal candidates, shunt/Kelvin telemetry, copper pre-layout boundary,
+  firmware enforcement, bench telemetry evidence, BOM owner split, and
+  no-layout boundary to PBREL-002.
 - Close PB-100 CAN1 TX-disable schematic evidence using the `JP_CAN1`
   DNP/open link plus `U_CAN1` default-disabled/readback contract.
 - CAN1 TX-disable now has a trace tying `JP_CAN1`, `U_CAN1`,
