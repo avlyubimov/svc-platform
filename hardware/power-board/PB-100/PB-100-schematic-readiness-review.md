@@ -40,6 +40,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-output-net-expansion.csv`
 - `hardware/power-board/PB-100/PB-100-output-stage-design-values.csv`
+- `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv`
 - `hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
@@ -128,7 +129,7 @@ The schematic review packet consists of:
 | Output pin contract | OUT1..OUT10 control, fault, telemetry, load, fuse, and connector nets captured without role-specific names |
 | Output controller template | TPS48110 threshold, timing, bootstrap, gate-drive, and current-sense values reviewed per channel class |
 | Output net expansion | Every `OUTn_*` template net expanded to `OUT1_*` through `OUT10_*`, with JPB1-facing control/fault/current nets checked |
-| Output stage design values | High, medium, and low class threshold, timing, gate-drive, sense, clamp, and output value checklist items selected without role-specific names |
+| Output stage design values | High, medium, and low class threshold, timing, gate-drive, sense, clamp, TI equation derivation precheck, and output value checklist items selected without role-specific names |
 | High/medium baseline trace | OUT2 and medium-current groups are machine-checked against matrix, config, telemetry, contracts, SOA, per-class design values, and high/medium output freeze review |
 | Low-current baseline trace | OUT5/OUT8/OUT9 are machine-checked against ADR-0011, capabilities, matrix, config, output contracts, and low-current output freeze review |
 | Capture work queue | Every KiCad sheet has source artifacts, refs, blockers, freeze evidence, and explicit no-layout boundary |

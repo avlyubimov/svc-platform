@@ -76,6 +76,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
 - `hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-output-controller-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-output-net-expansion.csv`
 - `hardware/power-board/PB-100/PB-100-output-stage-design-values.csv`
@@ -188,6 +189,10 @@ It is not a PCB layout package.
   gate default-off behavior, sense/ADC scaling, inductive clamp, MOSFET voltage
   margin, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`.
+- Output value derivation precheck: TI TPS4811-Q1 equations and TPS48110Q1EVM
+  reference positions are mapped to PB-100 high, medium, and low current
+  value derivation in
+  `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`.
 - Outputs: 10 generic high-side protected channels.
 - CAN1: read-only by default; TX physically disabled.
 

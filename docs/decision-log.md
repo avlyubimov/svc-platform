@@ -1984,6 +1984,21 @@ component values can be locked. The checklist keeps output channels generic,
 keeps role mapping in configuration, and blocks MOSFET/fuse/connector placement
 or `PB-100.kicad_pcb` work until schematic freeze evidence closes.
 
+## 2026-07-17 — PB-100 output-stage value derivation precheck
+
+Decision: PB-100 output-stage review now has
+`hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`.
+The precheck ties TI TPS4811-Q1 datasheet equations and TPS48110Q1EVM reference
+positions to `OUTn_IWRN_SET`, `OUTn_ISCP_SET`, `OUTn_TMR`, `OUTn_BST`,
+gate-drive, current-sense, and `OUTn_IMON` derivation for high, medium, and
+low-current output classes.
+
+Reason: PBREL-004/PBREL-005 cannot close from placeholder rows alone. The
+schematic freeze packet needs a formula-backed bridge between controller
+datasheet equations, OUT2 SOA/current limits, the low-current ADR-0011
+boundary, telemetry ranges, and still-open final value-bearing schematic
+instances.
+
 ## 2026-07-17 — PB-100 input reverse Q1 freeze checklist
 
 Decision: PB-100 input reverse-protection review now has

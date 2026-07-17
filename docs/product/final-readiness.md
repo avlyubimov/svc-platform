@@ -108,6 +108,10 @@ Current coverage:
   threshold/timer networks, gate default-off behavior, sense/ADC scaling,
   inductive clamp, MOSFET voltage margin, and no-layout boundary into
   `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`.
+- Output-stage value derivation precheck now ties TI TPS4811-Q1 datasheet
+  equations and TPS48110Q1EVM reference positions to PB-100 high, medium, and
+  low current value derivation in
+  `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`.
 - Current telemetry now has a trace tying per-output IMON ranges, total
   `IIN_SENSE`, 0.5 mΩ shunt measurement, 40 A budget enforcement, and
   stale-telemetry safe-off behavior together.
