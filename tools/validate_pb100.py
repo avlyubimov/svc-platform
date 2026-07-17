@@ -445,6 +445,14 @@ FACTORY_ASSEMBLY_SOURCING_PRECHECK_COLUMNS = (
     "Required PB-100 close evidence",
     "Blocked action",
 )
+FACTORY_ASSEMBLY_CLOSEOUT_PRECHECK_COLUMNS = (
+    "Precheck ID",
+    "Scope",
+    "Required evidence bridge",
+    "Project input",
+    "Required PB-100 close evidence",
+    "Blocked action",
+)
 LOGIC_POWER_RAIL_TRACE_COLUMNS = (
     "Trace item",
     "Net or ref",
@@ -1364,6 +1372,18 @@ REQUIRED_FACTORY_ASSEMBLY_SOURCING_PRECHECKS = {
     "FACT-SRC-009",
     "FACT-SRC-010",
 }
+REQUIRED_FACTORY_ASSEMBLY_CLOSEOUT_PRECHECKS = {
+    "FACT-CLS-001",
+    "FACT-CLS-002",
+    "FACT-CLS-003",
+    "FACT-CLS-004",
+    "FACT-CLS-005",
+    "FACT-CLS-006",
+    "FACT-CLS-007",
+    "FACT-CLS-008",
+    "FACT-CLS-009",
+    "FACT-CLS-010",
+}
 REQUIRED_GARAGE_INSTALL_FREEZE_CHECKS = {
     "GAR-FRZ-001",
     "GAR-FRZ-002",
@@ -1492,6 +1512,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv",
     "hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv",
+    "hardware/power-board/PB-100/PB-100-factory-assembly-closeout-precheck.csv",
     "hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md",
     "hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv",
     "hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv",
@@ -2611,12 +2632,14 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-assembly-readiness-trace.csv",
             "PB-100-factory-assembly-freeze-checklist.csv",
             "PB-100-factory-assembly-sourcing-precheck.csv",
+            "PB-100-factory-assembly-closeout-precheck.csv",
             "PB-100-garage-install-freeze-checklist.csv",
         ),
         "Assembly sourcing recheck": (
             "PB-100-assembly-readiness-trace.csv",
             "PB-100-factory-assembly-freeze-checklist.csv",
             "PB-100-factory-assembly-sourcing-precheck.csv",
+            "PB-100-factory-assembly-closeout-precheck.csv",
             "PB-100-garage-install-freeze-checklist.csv",
         ),
         "CAN1 safety": (
@@ -2809,6 +2832,7 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-assembly-readiness-trace.csv",
             "PB-100-factory-assembly-freeze-checklist.csv",
             "PB-100-factory-assembly-sourcing-precheck.csv",
+            "PB-100-factory-assembly-closeout-precheck.csv",
             "pb100_sourcing_evidence_snapshot.csv",
         ),
         "Garage assembly readiness": (
@@ -2969,6 +2993,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "pb-100-assembly-readiness-trace.csv" not in factory_text
         or "pb-100-factory-assembly-freeze-checklist.csv" not in factory_text
         or "pb-100-factory-assembly-sourcing-precheck.csv" not in factory_text
+        or "pb-100-factory-assembly-closeout-precheck.csv" not in factory_text
         or "assembly" not in factory_text
         or "alternat" not in factory_text
     ):
@@ -8372,6 +8397,155 @@ def validate_factory_assembly_sourcing_precheck() -> None:
             fail(f"sourcing evidence snapshot must support factory sourcing precheck token {token}")
 
 
+def validate_factory_assembly_closeout_precheck() -> None:
+    path = PB100_DIR / "PB-100-factory-assembly-closeout-precheck.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty factory assembly closeout precheck: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [
+        column for column in FACTORY_ASSEMBLY_CLOSEOUT_PRECHECK_COLUMNS if column not in fieldnames
+    ]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_id: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        precheck_id = row["Precheck ID"].strip()
+        if precheck_id not in REQUIRED_FACTORY_ASSEMBLY_CLOSEOUT_PRECHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown factory closeout precheck {precheck_id}")
+        if precheck_id in rows_by_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate factory closeout precheck {precheck_id}")
+        rows_by_id[precheck_id] = row
+        for column in FACTORY_ASSEMBLY_CLOSEOUT_PRECHECK_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+        row_text = " ".join(row.values()).lower()
+        if precheck_id == "FACT-CLS-010" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
+            fail("factory assembly closeout no-layout row must block PCB layout explicitly")
+
+    missing_checks = sorted(REQUIRED_FACTORY_ASSEMBLY_CLOSEOUT_PRECHECKS - rows_by_id.keys())
+    if missing_checks:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing factory assembly closeout prechecks: "
+            f"{', '.join(missing_checks)}"
+        )
+
+    closeout_text = read_text(path)
+    for token in (
+        "HS_CTRL",
+        "OUT_FET",
+        "OUT2_ESCAPE_FET",
+        "INPUT_IDEAL_DIODE",
+        "INPUT_REVERSE_FET",
+        "INPUT_TVS",
+        "LOGIC_BUCK",
+        "LOGIC_BUCK_INDUCTOR",
+        "TOTAL_CURRENT_MONITOR",
+        "TOTAL_CURRENT_SHUNT",
+        "THERMAL_NTC",
+        "B2B_CONNECTOR",
+        "CAN1_TX_DISABLE",
+        "PB-100-assembly-readiness-trace.csv",
+        "PB-100-factory-assembly-freeze-checklist.csv",
+        "PB-100-factory-assembly-sourcing-precheck.csv",
+        "PB-100-symbol-mpn-readiness.csv",
+        "production/bom/factory_bom_draft.csv",
+        "production/bom/pb100_symbol_bom_map.csv",
+        "production/bom/pb100_assembly_sourcing_recheck.csv",
+        "production/bom/pb100_sourcing_evidence_snapshot.csv",
+        "PB-100-board-release-blocker-register.csv",
+        "JLCPCB PCBWay",
+        "JLCPCB/PCBWay",
+        "assembly class",
+        "reel",
+        "tray",
+        "cut tape",
+        "extended part",
+        "orderable suffix",
+        "Alternate 1",
+        "Alternate 2",
+        "TPS48110AQDGXRQ1",
+        "SIDR626LDP-T1-RE3",
+        "IAUTN06S5N008ATMA1",
+        "BUK7S1R2-80M",
+        "LM74700QDBVRQ1",
+        "19-VSSOP",
+        "PowerPAK",
+        "TOLL",
+        "LFPAK88",
+        "SOT-23-6",
+        "SM8S33AHM3/I",
+        "SLD8S33A",
+        "DM8W33AQ-13",
+        "SM8S33A-Q",
+        "MCC SM8S33A EOL",
+        "Vishay HE3 NFD",
+        "DO-218AC",
+        "LM5164QDDATQ1",
+        "LM5013-Q1",
+        "TPS54360B-Q1",
+        "INA228-Q1",
+        "INA229-Q1",
+        "INA226",
+        "CSS4J-4026R-L500F",
+        "1.0mΩ",
+        "NTCGS103JF103FT8",
+        "Vishay NTCS0402E3",
+        "Murata NCU18",
+        "FX18-100P-0.8SV10",
+        "FX18-100S-0.8SV20",
+        "20 mm",
+        "DNP/open",
+        "no default-populated TX",
+        "future ADR",
+        "2026-07-16",
+        "2026-07-17",
+        "authorized distributor",
+        "manufacturer evidence",
+        "Open:",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "centroid",
+        "fabrication package",
+        "manufacturing ZIP",
+        "assembly output",
+        "PCBA order package",
+    ):
+        if token not in closeout_text:
+            fail(f"factory assembly closeout precheck must include {token}")
+
+    for supporting_artifact, tokens in {
+        "PB-100-factory-assembly-freeze-checklist.csv": ("FACT-FRZ-001", "FACT-FRZ-010"),
+        "PB-100-factory-assembly-sourcing-precheck.csv": ("FACT-SRC-001", "FACT-SRC-010"),
+        "PB-100-assembly-readiness-trace.csv": ("Factory", "CAN1_TX_DISABLE"),
+    }.items():
+        supporting_text = read_text(PB100_DIR / supporting_artifact)
+        for token in tokens:
+            if token not in supporting_text:
+                fail(f"factory assembly closeout precheck requires {supporting_artifact} token {token}")
+
+    sourcing_text = read_text(REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv")
+    evidence_text = read_text(REPO_ROOT / "production" / "bom" / "pb100_sourcing_evidence_snapshot.csv")
+    for token in ("JLCPCB/PCBWay", "authorized distributor", "schematic freeze"):
+        if token not in sourcing_text:
+            fail(f"assembly sourcing recheck must support factory closeout precheck token {token}")
+    for token in ("2026-07-16", "Open:", "DNP/open"):
+        if token not in evidence_text:
+            fail(f"sourcing evidence snapshot must support factory closeout precheck token {token}")
+
+
 def validate_garage_connector_fuse_plan() -> None:
     csv_path = PB100_DIR / "PB-100-garage-connector-fuse-plan.csv"
     validate_csv(csv_path)
@@ -10002,6 +10176,8 @@ def validate_validation_traceability() -> None:
                 fail("Factory assembly validation trace must include factory assembly freeze checklist")
             if "pb-100-factory-assembly-sourcing-precheck.csv" not in row_text:
                 fail("Factory assembly validation trace must include factory assembly sourcing precheck")
+            if "pb-100-factory-assembly-closeout-precheck.csv" not in row_text:
+                fail("Factory assembly validation trace must include factory assembly closeout precheck")
         if freeze_gate == "Garage assembly readiness":
             if "garage" not in row_text:
                 fail("Garage assembly validation trace must keep garage scope explicit")
@@ -10535,6 +10711,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-assembly-readiness-trace.csv",
         "PB-100-factory-assembly-freeze-checklist.csv",
         "PB-100-factory-assembly-sourcing-precheck.csv",
+        "PB-100-factory-assembly-closeout-precheck.csv",
         "PB-100-garage-install-freeze-checklist.csv",
         "PB-100-garage-install-sourcing-precheck.csv",
     )
@@ -10650,6 +10827,7 @@ def main() -> int:
     validate_assembly_readiness_trace()
     validate_factory_assembly_freeze_checklist()
     validate_factory_assembly_sourcing_precheck()
+    validate_factory_assembly_closeout_precheck()
     validate_garage_connector_fuse_plan()
     validate_garage_install_freeze_checklist()
     validate_garage_install_sourcing_precheck()

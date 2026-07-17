@@ -113,5 +113,6 @@ production/bom/pb100_symbol_bom_map.csv,Production,Symbol-to-BOM map,Required,va
 hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv,Production,Factory and garage assembly ownership trace,Required,validate_assembly_readiness_trace,Conditional
 hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv,Production,Factory assembly freeze checklist,Required,validate_factory_assembly_freeze_checklist,Conditional
 hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv,Production,Factory assembly sourcing precheck,Required,validate_factory_assembly_sourcing_precheck,Conditional
+hardware/power-board/PB-100/PB-100-factory-assembly-closeout-precheck.csv,Production,Factory assembly closeout precheck,Required,validate_factory_assembly_closeout_precheck,Conditional
 production/bom/pb100_assembly_sourcing_recheck.csv,Production,Assembly sourcing recheck,Required,validate_assembly_sourcing_recheck,Conditional
 production/bom/pb100_sourcing_evidence_snapshot.csv,Production,Sourcing evidence snapshot,Required,validate_sourcing_evidence_snapshot,Conditional
