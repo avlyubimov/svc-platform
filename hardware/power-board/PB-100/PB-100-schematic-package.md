@@ -38,6 +38,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-can1-default-disable-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-input-power-design-values.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`
 - `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`
@@ -50,12 +51,14 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-board-current-budget-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
 - `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`
@@ -78,6 +81,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-rails.md`
 - `hardware/power-board/PB-100/PB-100-out2-soa.md`
@@ -112,6 +116,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`
 
 ## Electrical baseline
 
@@ -133,6 +138,12 @@ It is not a PCB layout package.
   fuse/wire derating, firmware and telemetry enforcement, BOM sourcing, and
   no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv`.
+- 40 A board-current closeout precheck: requirement/configuration boundary,
+  protected high-current path, main fuse and wire derating, Q1 thermal path,
+  shunt/Kelvin telemetry, copper pre-layout boundary, firmware enforcement,
+  bench telemetry evidence, BOM owner split, and no-layout manufacturing
+  boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-board-current-budget-closeout-precheck.csv`.
 - Current telemetry freeze review: 0.5 mΩ shunt range, INA228-class monitor
   headroom, Kelvin sense, ADC/I2C ownership, per-output IMON scaling,
   calibration configuration, and stale-telemetry safe faults are tracked in
@@ -152,6 +163,12 @@ It is not a PCB layout package.
   VBUS stress, per-output IMON scaling, configuration calibration, bench
   safe-fault path, sourcing, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`.
+- Current telemetry closeout precheck: shunt formulas, monitor family, Kelvin
+  and filter network, I2C/interrupt ownership, protected VBUS stress,
+  per-output IMON scaling, configuration-owned calibration, bench safe-fault
+  evidence, sourcing/symbol synchronization, and no-layout manufacturing
+  boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`.
 - Input reverse freeze review: LM74700 gate/default-off behavior, TOLL/LFPAK88
   and PowerPAK alternates, protected measurement sequence, HM3 TVS dependency,
   sourcing gate, and no-layout boundary are tracked in
@@ -206,6 +223,11 @@ It is not a PCB layout package.
   boundaries, `PB_5V_OUT` budget, UVLO, RON, feedback, bootstrap, PGOOD,
   inductor/capacitor, EMI, sourcing, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`.
+- Logic power closeout precheck: regulator family source boundary,
+  `PB_5V_OUT` budget, protected input/transient stress, UVLO/default-off,
+  RON/feedback/bootstrap, inductor/COUT stability, PGOOD interface,
+  switch-node EMI, sourcing, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-logic-power-closeout-precheck.csv`.
 - LB-100 power budget precheck: LB-100 has a 500 mA sustained allocation from
   `PB_5V_OUT`; exceeding it keeps the LM5013-Q1-class fallback active before
   PB-100 schematic freeze.
@@ -223,6 +245,11 @@ It is not a PCB layout package.
   configuration calibration, firmware fail-safe, sourcing, and no-layout
   boundary are tracked in
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`.
+- Thermal telemetry closeout precheck: NTC source class, divider equations and
+  values, placement zones, self-heating, ADC settling, configuration-owned
+  calibration, firmware fail-safe, bench validation, sourcing/symbol
+  synchronization, and no-layout manufacturing boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`.
 - Factory assembly freeze checklist: factory-owned critical keys, alternate
   coverage, JLCPCB/PCBWay assembly class, date-stamped distributor continuity,
   package handling, TVS source hygiene, B2B/CAN1 production notes, BOM evidence
@@ -311,6 +338,12 @@ It is not a PCB layout package.
   listen-only RX independence, firmware/capability/bench evidence, factory DNP
   sourcing bridge, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv`.
+- CAN1 default-disable closeout precheck: policy/hardware boundary, DNP/open
+  missing link, default-disabled gate, TXD recessive bias, physical
+  disabled-status readback, DNP link-detect boundary, listen-only RX
+  independence, firmware/capability/bench evidence, factory DNP sourcing, and
+  no-layout manufacturing boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-can1-default-disable-closeout-precheck.csv`.
 
 ## Board-to-board signal budget
 
@@ -428,6 +461,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-logic-power-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-budget.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-placeholders.csv`
 - `hardware/power-board/PB-100/PB-100-logic-power-design-values.csv`
@@ -437,6 +471,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-current-telemetry-map.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-output-channel-pin-contract.csv`
 - `hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv`
@@ -456,6 +491,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-map.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-estimates.csv`
 - `hardware/power-board/PB-100/PB-100-protection-validation.csv`

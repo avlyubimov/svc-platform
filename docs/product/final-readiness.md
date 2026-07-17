@@ -147,6 +147,12 @@ Current coverage:
   VBUS stress, per-output IMON scaling, configuration calibration, bench
   safe-fault path, sourcing, and no-layout boundary into
   `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`.
+- Current telemetry closeout precheck now bridges the shunt formulas, monitor
+  family, Kelvin/filter network, I2C/interrupt ownership, protected VBUS
+  stress, per-output IMON ADC scaling, configuration-owned calibration, bench
+  safe-fault evidence, sourcing/symbol synchronization, and no-layout boundary
+  into
+  `hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`.
 - Total-current and per-output IMON calibration now have a firmware
   configuration contract in `firmware/configs/config-example.json`,
   `firmware/configs/svc-config.schema.json`, and `firmware/core/svc_config.h`;
@@ -168,6 +174,11 @@ Current coverage:
   configuration calibration, firmware fail-safe, sourcing, and no-layout
   boundary into
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`.
+- Thermal telemetry closeout precheck now bridges the NTC source class, divider
+  equations and values, placement zones, self-heating, ADC settling,
+  configuration-owned calibration, firmware fail-safe behavior, bench
+  validation, sourcing/symbol synchronization, and no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`.
 - Logic power now has a trace tying the LM5164-Q1-class 100 V 1 A default,
   LM5013-Q1-class 100 V fallback, protected `PB_5V_OUT`, `PB_PWR_GOOD`, and
   rail-invalid default-off behavior together.
@@ -186,6 +197,11 @@ Current coverage:
   and PGOOD interface, magnetics/capacitor review, sourcing, and no-layout
   boundary into
   `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`.
+- Logic power closeout precheck now ties regulator family source boundary,
+  `PB_5V_OUT` budget, protected input/transient stress, UVLO/default-off,
+  RON/feedback/bootstrap, inductor/COUT stability, PGOOD interface,
+  switch-node EMI, sourcing, and no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-logic-power-closeout-precheck.csv`.
 - Factory-vs-garage assembly ownership now has a dedicated trace for critical
   PB-100 symbol keys plus
   `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`;
@@ -284,6 +300,12 @@ Current coverage:
   tying shunt/Q1 formulas, connector/wire derating, firmware enforcement,
   telemetry enforcement, sourcing ownership, and no-layout boundary into one
   machine-checked artifact.
+- Board-current closeout precheck now has
+  `hardware/power-board/PB-100/PB-100-board-current-budget-closeout-precheck.csv`,
+  bridging the 50 A fuse path, 40 A budget, protected high-current path,
+  Q1 thermal candidates, shunt/Kelvin telemetry, copper pre-layout boundary,
+  firmware enforcement, bench telemetry evidence, BOM owner split, and
+  no-layout boundary to PBREL-002.
 - Close PB-100 CAN1 TX-disable schematic evidence using the `JP_CAN1`
   DNP/open link plus `U_CAN1` default-disabled/readback contract.
 - CAN1 TX-disable now has a trace tying `JP_CAN1`, `U_CAN1`,
@@ -308,6 +330,11 @@ Current coverage:
   tying policy/configuration, physical missing-link, gate polarity, status
   readback, firmware/capability/bench evidence, factory DNP sourcing, and
   no-layout boundary into one machine-checked artifact.
+- CAN1 default-disable closeout precheck now has
+  `hardware/power-board/PB-100/PB-100-can1-default-disable-closeout-precheck.csv`,
+  bridging policy, DNP/open missing-link evidence, default-disabled gate,
+  physical status readback, RX independence, firmware/capability/bench evidence,
+  factory DNP sourcing, and no-layout boundary to PBREL-001.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.
 - Synchronize factory and garage BOM drafts with final selections.
@@ -329,6 +356,8 @@ Current coverage:
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`
   plus
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`.
+- Thermal telemetry closeout precheck now adds a machine-checked bridge in
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`.
 - Thermal telemetry divider calibration now has a firmware configuration
   contract in `firmware/configs/config-example.json`,
   `firmware/configs/svc-config.schema.json`, and `firmware/core/svc_config.h`;

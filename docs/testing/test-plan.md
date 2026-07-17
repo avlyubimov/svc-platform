@@ -96,7 +96,8 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`, and
   `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`
   plus
-  `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`.
+  `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`
+  and `hardware/power-board/PB-100/PB-100-logic-power-closeout-precheck.csv`.
 - OUT2 pulse tests trace to
   `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`
   `hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv`
@@ -121,7 +122,8 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`, and
   `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`
   plus
-  `hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv`.
+  `hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv`,
+  and `hardware/power-board/PB-100/PB-100-can1-default-disable-closeout-precheck.csv`.
 - Input reverse-protection tests trace to
   `hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv`,
   `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`,
@@ -140,11 +142,13 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`,
   `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`,
   `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`,
+  `hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`,
   `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`,
   `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`,
   `hardware/power-board/PB-100/PB-100-board-current-budget-design-calculation.md`,
   `hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv`,
   `hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv`,
+  `hardware/power-board/PB-100/PB-100-board-current-budget-closeout-precheck.csv`,
   and
   `docs/adr/ADR-0008-pb-100-current-budget.md`.
 - Thermal derating tests trace to
@@ -152,7 +156,8 @@ ordered rule execution, and stale-telemetry denial in one processing step.
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`, and
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`
   plus
-  `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`.
+  `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`,
+  and `hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`.
 - B2B interface tests trace to
   `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`,
   `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`,

@@ -10,7 +10,7 @@
     (company "SVC Platform")
     (comment 9 "Work queue: CAP-CAN1. Preliminary schematic capture follows PB-100-schematic-capture-work-queue.csv.")
     (comment 1 "Preliminary capture for CAN1 TX-disable readback and DNP/open TX path.")
-    (comment 2 "Sources: PB-100-can1-tx-disable-trace.csv, PB-100-can1-tx-disable.md, PB-100-can1-safety-verification.csv, PB-100-can1-production-dnp-review.csv, PB-100-can1-default-disable-freeze-checklist.csv, PB-100-can1-default-disable-derivation-precheck.csv.")
+    (comment 2 "Sources: PB-100-can1-tx-disable-trace.csv, PB-100-can1-tx-disable.md, PB-100-can1-safety-verification.csv, PB-100-can1-production-dnp-review.csv, PB-100-can1-default-disable-freeze-checklist.csv, PB-100-can1-default-disable-derivation-precheck.csv, PB-100-can1-default-disable-closeout-precheck.csv.")
   )
   (lib_symbols
   (symbol "PB100:PB100_CAN1_TX_DISABLE_PRELIM"
@@ -51,7 +51,7 @@
     (pin passive line (at 0 0 0) (length 0) (name "SIG" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27)))))
   )
   )
-  (text "CAN1 safety capture notes:\n- Source traces: PB-100-can1-tx-disable-trace.csv, PB-100-can1-tx-disable.md, PB-100-can1-safety-verification.csv, PB-100-can1-production-dnp-review.csv, PB-100-can1-default-disable-freeze-checklist.csv, PB-100-can1-default-disable-derivation-precheck.csv, PB-100-can1-reset-bench-checklist.csv, PB-100-schematic-net-domain-plan.csv\n- CAN1_TX_ROUTE remains DNP/open by default with no default-populated TX\n- CAN1_TX_DISABLED_STATUS remains visible to LB-100 as physical disabled state readback\n- PB-BENCH-012 covers reset, unpowered, DNP/open, and disabled-status checks\n- Future vehicle-CAN TX requires a new ADR and explicit hardware action\n\nNo PCB layout from this preliminary capture."
+  (text "CAN1 safety capture notes:\n- Source traces: PB-100-can1-tx-disable-trace.csv, PB-100-can1-tx-disable.md, PB-100-can1-safety-verification.csv, PB-100-can1-production-dnp-review.csv, PB-100-can1-default-disable-freeze-checklist.csv, PB-100-can1-default-disable-derivation-precheck.csv, PB-100-can1-default-disable-closeout-precheck.csv, PB-100-can1-reset-bench-checklist.csv, PB-100-schematic-net-domain-plan.csv\n- CAN1_TX_ROUTE remains DNP/open by default with no default-populated TX\n- CAN1_TX_DISABLED_STATUS remains visible to LB-100 as physical disabled state readback\n- PB-BENCH-012 covers reset, unpowered, DNP/open, and disabled-status checks\n- Future vehicle-CAN TX requires a new ADR and explicit hardware action\n\nNo PCB layout from this preliminary capture."
     (at 20 20 0)
     (effects (font (size 2.0 2.0)) (justify left top))
     (uuid "d2f47475-4e8a-561f-8bc1-16ba218267c0")

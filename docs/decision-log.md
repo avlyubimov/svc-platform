@@ -2146,6 +2146,22 @@ Reason: PBREL-008 needs a formula-backed bridge between the value checklist,
 LM5164 candidate calculation, LB-100 load-budget contract, TVS/load-dump stress,
 and factory sourcing before logic-power values or footprints can close.
 
+## 2026-07-17 — PB-100 logic-power closeout precheck
+
+Decision: PB-100 logic-power review now has
+`hardware/power-board/PB-100/PB-100-logic-power-closeout-precheck.csv`. The
+precheck bridges the regulator family source boundary, `PB_5V_OUT` budget,
+protected input/transient stress, UVLO/default-off behavior, RON/feedback/
+bootstrap values, inductor/COUT stability, PGOOD interface, switch-node EMI,
+factory sourcing, and no-layout manufacturing boundary to PBREL-008.
+
+Reason: The logic-power value checklist and derivation precheck define the
+candidate calculations, but print-readiness also needs a machine-checked
+closeout bridge that prevents U3/L1/CIN/COUT placement, switch-node copper,
+thermal-pad vias, `PB-100.kicad_pcb`, Gerbers, drills, pick-place, or
+manufacturing ZIP work until load-budget, TVS stress, EMI/stability, PGOOD, and
+sourcing evidence close.
+
 ## 2026-07-17 — PB-100 current telemetry value freeze checklist
 
 Decision: PB-100 current-telemetry review now has
@@ -2177,6 +2193,23 @@ current telemetry calculation, board-current budget, firmware configuration
 contract, and factory sourcing before shunt, monitor, routing, or calibration
 values can close.
 
+## 2026-07-17 — PB-100 current telemetry closeout precheck
+
+Decision: PB-100 current-telemetry review now has
+`hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`.
+The precheck bridges the shunt formulas, INA228/INA229/INA226 monitor family,
+Kelvin and input-filter network, I2C address/pull-up/interrupt ownership,
+protected VBUS stress, per-output IMON ADC scaling, configuration-owned
+calibration, bench safe-fault evidence, sourcing/symbol synchronization, and
+no-layout manufacturing boundary to PBREL-009.
+
+Reason: The current telemetry value checklist and derivation precheck define the
+candidate values, but print-readiness also needs a machine-checked closeout
+bridge that prevents shunt placement, Kelvin routing, monitor footprints,
+`PB-100.kicad_pcb`, Gerbers, drills, pick-place, or manufacturing ZIP work until
+shunt package heating, monitor sourcing, LB-100 ADC/I2C ownership, calibration,
+and bench evidence close.
+
 ## 2026-07-17 — PB-100 thermal telemetry value freeze checklist
 
 Decision: PB-100 thermal-telemetry review now has
@@ -2206,6 +2239,22 @@ Reason: PBREL-010 needs a formula-backed bridge between the value checklist,
 thermal telemetry calculation, configuration contract, bench validation, and
 factory sourcing before thermal values, sensor placement, or footprints can
 close.
+
+## 2026-07-17 — PB-100 thermal telemetry closeout precheck
+
+Decision: PB-100 thermal-telemetry review now has
+`hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`.
+The precheck bridges the NTC source class, divider equations and values,
+placement zones, self-heating, ADC settling, configuration-owned calibration,
+firmware fail-safe behavior, bench validation, sourcing/symbol synchronization,
+and no-layout manufacturing boundary to PBREL-010.
+
+Reason: The thermal telemetry value checklist and derivation precheck define the
+candidate values, but print-readiness also needs a machine-checked closeout
+bridge that prevents sensor placement, thermal copper, board-zone keepouts,
+`PB-100.kicad_pcb`, Gerbers, drills, pick-place, or manufacturing ZIP work until
+sensor package, ADC settling, placement, self-heating, calibration, sourcing,
+and bench evidence close.
 
 ## 2026-07-17 — PB-100 factory assembly freeze checklist
 
@@ -2304,6 +2353,23 @@ ownership, and board-print no-go boundary. It prevents configuration,
 firmware-only status, or BOM-only claims from being treated as CAN1 TX safety
 closure.
 
+## 2026-07-17 — PB-100 CAN1 default-disable closeout precheck
+
+Decision: PB-100 CAN1 safety review now has
+`hardware/power-board/PB-100/PB-100-can1-default-disable-closeout-precheck.csv`.
+The precheck bridges ADR-0002 policy, `JP_CAN1` DNP/open missing-link evidence,
+`U_CAN1` default-disabled gate behavior, TXD recessive bias, physical
+disabled-status readback, DNP link-detect boundary, RX listen-only independence,
+firmware/capability/bench evidence, factory DNP sourcing, and no-layout
+manufacturing boundary to PBREL-001.
+
+Reason: The freeze checklist and derivation precheck define the CAN1 safety
+inputs, but print-readiness also needs a machine-checked closeout bridge that
+prevents CAN1 TX route layout, jumper footprint lock, `PB-100.kicad_pcb`,
+Gerbers, drills, pick-place, or manufacturing ZIP work until the physical
+missing link, gate polarity, disabled-status readback, DNP handling, bench
+evidence, and sourcing close.
+
 ## 2026-07-17 — PB-100 board-current budget value freeze checklist
 
 Decision: PB-100 board-current review now has
@@ -2336,3 +2402,20 @@ calculation, value checklist, input reverse review, current telemetry review,
 garage sourcing, firmware tests, and board-print no-go boundary before any
 high-current copper, shunt copper, connector footprint, or manufacturing output
 can be released.
+
+## 2026-07-17 — PB-100 board-current budget closeout precheck
+
+Decision: PB-100 board-current review now has
+`hardware/power-board/PB-100/PB-100-board-current-budget-closeout-precheck.csv`.
+The precheck bridges ADR-0008 targets, the protected high-current path, main
+fuse/wire derating, Q1 thermal candidates, total-current shunt/Kelvin telemetry,
+copper pre-layout constraints, firmware budget enforcement, bench telemetry
+evidence, factory/garage BOM owner split, and no-layout manufacturing boundary
+to PBREL-002.
+
+Reason: The value checklist and derivation precheck define the budget math, but
+print-readiness also needs a machine-checked closeout bridge that prevents
+high-current copper, shunt copper, Q1 copper, connector placement,
+`PB-100.kicad_pcb`, Gerbers, drills, pick-place, or manufacturing ZIP work until
+connector derating, shunt package/Kelvin evidence, Q1 thermal path, protected
+distribution, telemetry calibration, sourcing, and bench evidence close.
