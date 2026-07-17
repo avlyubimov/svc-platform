@@ -169,6 +169,10 @@ Current coverage:
   TOLL/LFPAK/PowerPAK alternates, protected measurement sequence, HM3 TVS
   dependency, sourcing gate, and no-layout boundary into
   `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`.
+- Q1 input reverse freeze checklist now ties gate clamp/discharge timing,
+  TOLL/LFPAK/PowerPAK package paths, protected measurement sequence, 40 A
+  thermal/copper/SOA audit, assembly sourcing, and no-layout boundary into
+  `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`.
 - The PB-100 board-current budget now has a cross-artifact trace tying the
   50 A main fuse target, 40 A board/configuration limit, 0-60 A total-current
   telemetry range, and 0.5 mΩ shunt operating point together; schematic freeze

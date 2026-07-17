@@ -1969,3 +1969,19 @@ Reason: PBREL-004 and PBREL-005 need a shared close-work list before final
 component values can be locked. The checklist keeps output channels generic,
 keeps role mapping in configuration, and blocks MOSFET/fuse/connector placement
 or `PB-100.kicad_pcb` work until schematic freeze evidence closes.
+
+## 2026-07-17 — PB-100 input reverse Q1 freeze checklist
+
+Decision: PB-100 input reverse-protection review now has
+`hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`.
+The checklist covers LM74700/LM74502 gate-default behavior, `INPUT_FET_GATE`
+clamp/discharge timing, `IAUTN06S5N008ATMA1` TOLL preferred path,
+`BUK7S1R2-80M` 80 V LFPAK88 alternate, dual `SIDR626LDP` fallback, protected
+measurement sequence, 40 A thermal/copper/SOA audit, assembly sourcing, and
+the no-layout boundary.
+
+Reason: PBREL-006 needs an explicit close-work list before Q1 package and gate
+network values can be locked. The checklist keeps the 60 V preferred path
+conditional on overshoot and sourcing evidence, retains 80 V and dual-device
+alternates, and blocks Q1 placement, copper geometry, and `PB-100.kicad_pcb`
+until schematic freeze closes.
