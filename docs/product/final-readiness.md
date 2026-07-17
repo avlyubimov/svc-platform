@@ -154,9 +154,10 @@ Current coverage:
   feedback, bootstrap, L1/COUT, `PB_PWR_GOOD`, switch-node EMI, sourcing, and
   no-layout boundaries into one machine-checked artifact.
 - Factory-vs-garage assembly ownership now has a dedicated trace for critical
-  PB-100 symbol keys; schematic freeze must still recheck JLCPCB/PCBWay
-  assembly class, distributor continuity, garage connector derating, crimp
-  tooling, and service access.
+  PB-100 symbol keys plus
+  `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`;
+  schematic freeze must still recheck JLCPCB/PCBWay assembly class, distributor
+  continuity, garage connector derating, crimp tooling, and service access.
 - Thermal telemetry now has a TDK `NTCGS103JF103FT8`-class 10 kΩ 150 °C
   AEC-Q200 NTC candidate for all three thermal points; schematic freeze must
   still close divider values, ADC scaling, placement, assembly class, and

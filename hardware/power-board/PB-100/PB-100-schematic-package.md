@@ -19,6 +19,7 @@ It is not a PCB layout package.
 - `firmware/configs/hardware/pb-100-capabilities.json`
 - `production/bom/pb100_symbol_bom_map.csv`
 - `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`
+- `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-audit-checklist.csv`
@@ -159,6 +160,11 @@ It is not a PCB layout package.
   firmware fail-safe, bench validation, sourcing, and no-layout boundary are
   tracked in
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`.
+- Factory assembly freeze checklist: factory-owned critical keys, alternate
+  coverage, JLCPCB/PCBWay assembly class, date-stamped distributor continuity,
+  package handling, TVS source hygiene, B2B/CAN1 production notes, BOM evidence
+  synchronization, and no-layout boundary are tracked in
+  `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`.
 - Output freeze reviews: high/medium and low-current stages keep TPS48110 plus
   external MOSFET boundaries, OUT2 SOA, gate-drive defaults, sense/telemetry,
   fault thresholds, clamp strategy, low-current ADR-0011 no-smart-switch
@@ -289,6 +295,7 @@ Preliminary validation tables:
 - `hardware/power-board/PB-100/PB-100-symbol-capture-worklist.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-pin-evidence.csv`
 - `hardware/power-board/PB-100/PB-100-symbol-open-items.md`
+- `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md`
 - `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv`
 - `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`
@@ -361,6 +368,8 @@ Preliminary validation tables:
   absolute maximum ratings.
 - Confirm connector current ratings and derating.
 - Confirm JLCPCB/PCBWay assembly class for selected MPNs.
+- Review `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`
+  against current factory assembly and distributor evidence.
 - Close `production/bom/pb100_assembly_sourcing_recheck.csv` and
   `production/bom/pb100_sourcing_evidence_snapshot.csv` rows before schematic
   freeze.

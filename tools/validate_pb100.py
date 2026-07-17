@@ -357,6 +357,14 @@ THERMAL_TELEMETRY_VALUE_FREEZE_CHECKLIST_COLUMNS = (
     "Pass condition",
     "Blocked action",
 )
+FACTORY_ASSEMBLY_FREEZE_CHECKLIST_COLUMNS = (
+    "Check ID",
+    "Review item",
+    "Required close evidence",
+    "Primary artifacts",
+    "Pass condition",
+    "Blocked action",
+)
 LOGIC_POWER_RAIL_TRACE_COLUMNS = (
     "Trace item",
     "Net or ref",
@@ -884,6 +892,18 @@ REQUIRED_THERMAL_TELEMETRY_VALUE_FREEZE_CHECKS = {
     "THERM-FRZ-009",
     "THERM-FRZ-010",
 }
+REQUIRED_FACTORY_ASSEMBLY_FREEZE_CHECKS = {
+    "FACT-FRZ-001",
+    "FACT-FRZ-002",
+    "FACT-FRZ-003",
+    "FACT-FRZ-004",
+    "FACT-FRZ-005",
+    "FACT-FRZ-006",
+    "FACT-FRZ-007",
+    "FACT-FRZ-008",
+    "FACT-FRZ-009",
+    "FACT-FRZ-010",
+}
 REQUIRED_FAULT_IDS = {
     "PBFLT-INPUT-REV",
     "PBFLT-LOAD-DUMP",
@@ -966,6 +986,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv",
     "hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv",
+    "hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md",
     "hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv",
     "hardware/power-board/PB-100/kicad/PB-100.kicad_sch",
@@ -2050,8 +2071,8 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-b2b-lb100-pin-binding-precheck.md",
             "PB-100-b2b-lb100-pin-audit-checklist.csv",
         ),
-        "BOM synchronization": ("PB-100-assembly-readiness-trace.csv",),
-        "Assembly sourcing recheck": ("PB-100-assembly-readiness-trace.csv",),
+        "BOM synchronization": ("PB-100-assembly-readiness-trace.csv", "PB-100-factory-assembly-freeze-checklist.csv"),
+        "Assembly sourcing recheck": ("PB-100-assembly-readiness-trace.csv", "PB-100-factory-assembly-freeze-checklist.csv"),
         "CAN1 safety": ("PB-100-can1-tx-disable-trace.csv", "PB-100-can1-production-dnp-review.csv"),
         "CAN1 safety verification": ("PB-100-can1-tx-disable-trace.csv", "PB-100-can1-reset-bench-checklist.csv"),
     }
@@ -2205,7 +2226,11 @@ def validate_schematic_freeze_gap_register() -> None:
             "PB-100-thermal-telemetry-value-freeze-checklist.csv",
             "PB-100-thermal-telemetry-map.csv",
         ),
-        "Factory assembly readiness": ("PB-100-assembly-readiness-trace.csv", "pb100_sourcing_evidence_snapshot.csv"),
+        "Factory assembly readiness": (
+            "PB-100-assembly-readiness-trace.csv",
+            "PB-100-factory-assembly-freeze-checklist.csv",
+            "pb100_sourcing_evidence_snapshot.csv",
+        ),
         "Garage assembly readiness": ("PB-100-assembly-readiness-trace.csv", "PB-100-garage-connector-fuse-plan.md"),
     }
     for gate, tokens in required_checklist_evidence.items():
@@ -2333,7 +2358,12 @@ def validate_schematic_freeze_gap_register() -> None:
         if token not in b2b_text:
             fail(f"Board-to-board interface gap must keep {token} explicit")
     factory_text = " ".join(rows_by_gate["Factory assembly readiness"].values()).lower()
-    if "pb-100-assembly-readiness-trace.csv" not in factory_text or "assembly" not in factory_text or "alternat" not in factory_text:
+    if (
+        "pb-100-assembly-readiness-trace.csv" not in factory_text
+        or "pb-100-factory-assembly-freeze-checklist.csv" not in factory_text
+        or "assembly" not in factory_text
+        or "alternat" not in factory_text
+    ):
         fail("Factory assembly readiness gap must keep assembly and alternatives explicit")
     garage_text = " ".join(rows_by_gate["Garage assembly readiness"].values()).lower()
     if "pb-100-assembly-readiness-trace.csv" not in garage_text or "garage" not in garage_text or "user" not in garage_text:
@@ -5643,6 +5673,127 @@ def validate_assembly_readiness_trace() -> None:
             fail(f"safety DNP assembly trace must preserve {token}")
 
 
+def validate_factory_assembly_freeze_checklist() -> None:
+    path = PB100_DIR / "PB-100-factory-assembly-freeze-checklist.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty factory assembly freeze checklist: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [
+        column for column in FACTORY_ASSEMBLY_FREEZE_CHECKLIST_COLUMNS if column not in fieldnames
+    ]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    rows_by_check: dict[str, dict[str, str]] = {}
+    for row_number, row in enumerate(rows, 2):
+        check_id = row["Check ID"].strip()
+        if check_id not in REQUIRED_FACTORY_ASSEMBLY_FREEZE_CHECKS:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown factory assembly check {check_id}")
+        if check_id in rows_by_check:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate factory assembly check {check_id}")
+        rows_by_check[check_id] = row
+        for column in FACTORY_ASSEMBLY_FREEZE_CHECKLIST_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        validate_no_role_tokens_in_row(path, row_number, row)
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
+
+    missing_checks = sorted(REQUIRED_FACTORY_ASSEMBLY_FREEZE_CHECKS - rows_by_check.keys())
+    if missing_checks:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing factory assembly checks: "
+            f"{', '.join(missing_checks)}"
+        )
+
+    checklist_text = read_text(path)
+    for token in (
+        "HS_CTRL",
+        "OUT_FET",
+        "OUT2_ESCAPE_FET",
+        "INPUT_IDEAL_DIODE",
+        "INPUT_REVERSE_FET",
+        "INPUT_TVS",
+        "LOGIC_BUCK",
+        "LOGIC_BUCK_INDUCTOR",
+        "TOTAL_CURRENT_MONITOR",
+        "TOTAL_CURRENT_SHUNT",
+        "THERMAL_NTC",
+        "B2B_CONNECTOR",
+        "CAN1_TX_DISABLE",
+        "Alternate 1",
+        "Alternate 2",
+        "JLCPCB PCBWay",
+        "assembly class",
+        "reel",
+        "tray",
+        "cut tape",
+        "authorized distributor",
+        "2026-07-16",
+        "date-stamped",
+        "TPS48110AQDGXRQ1",
+        "SIDR626LDP-T1-RE3",
+        "IAUTN06S5N008ATMA1",
+        "BUK7S1R2-80M",
+        "PowerPAK",
+        "TOLL",
+        "LFPAK88",
+        "19-VSSOP",
+        "SM8S33AHM3/I",
+        "SLD8S33A",
+        "DM8W33AQ-13",
+        "SM8S33A-Q",
+        "MCC SM8S33A EOL",
+        "Vishay HE3 NFD",
+        "DO-218AC",
+        "LM5164QDDATQ1",
+        "LM5013-Q1",
+        "TPS54360B-Q1",
+        "INA228-Q1",
+        "INA229-Q1",
+        "INA226",
+        "CSS4J-4026R-L500F",
+        "1.0mΩ",
+        "NTCGS103JF103FT8",
+        "Vishay NTCS0402E3",
+        "Murata NCU18",
+        "FX18-100P-0.8SV10",
+        "FX18-100S-0.8SV20",
+        "20 mm",
+        "DNP/open",
+        "no default-populated TX",
+        "future ADR",
+        "factory_bom_draft.csv",
+        "pb100_symbol_bom_map.csv",
+        "pb100_assembly_sourcing_recheck.csv",
+        "pb100_sourcing_evidence_snapshot.csv",
+        "PB-100-review-release-manifest.csv",
+        "PB-100-schematic-freeze-checklist.md",
+        "No PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+    ):
+        if token not in checklist_text:
+            fail(f"factory assembly freeze checklist must include {token}")
+
+    sourcing_text = read_text(REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv")
+    evidence_text = read_text(REPO_ROOT / "production" / "bom" / "pb100_sourcing_evidence_snapshot.csv")
+    for token in ("JLCPCB/PCBWay", "Alternates", "Verify", "schematic freeze"):
+        if token not in sourcing_text:
+            fail(f"assembly sourcing recheck must support factory checklist token {token}")
+    for token in ("2026-07-16", "Open:", "DNP/open"):
+        if token not in evidence_text:
+            fail(f"sourcing evidence snapshot must support factory checklist token {token}")
+
+
 def validate_garage_connector_fuse_plan() -> None:
     csv_path = PB100_DIR / "PB-100-garage-connector-fuse-plan.csv"
     validate_csv(csv_path)
@@ -6621,8 +6772,11 @@ def validate_validation_traceability() -> None:
                 fail("Logic power validation trace must include value freeze checklist")
             if "pb_5v_out" not in row_text or "uvlo" not in row_text:
                 fail("Logic power validation trace must keep PB_5V_OUT and UVLO explicit")
-        if freeze_gate == "Factory assembly readiness" and "sourcing recheck" not in row_text:
-            fail("Factory assembly validation trace must require sourcing recheck")
+        if freeze_gate == "Factory assembly readiness":
+            if "sourcing recheck" not in row_text:
+                fail("Factory assembly validation trace must require sourcing recheck")
+            if "pb-100-factory-assembly-freeze-checklist.csv" not in row_text:
+                fail("Factory assembly validation trace must include factory assembly freeze checklist")
         if freeze_gate == "Garage assembly readiness" and "garage" not in row_text:
             fail("Garage assembly validation trace must keep garage scope explicit")
         gates_with_tests[freeze_gate].append(row)
@@ -7122,6 +7276,7 @@ def validate_test_plan_traceability() -> None:
         "PB-100-b2b-lb100-resource-binding.csv",
         "PB-100-b2b-lb100-pin-audit-checklist.csv",
         "PB-100-assembly-readiness-trace.csv",
+        "PB-100-factory-assembly-freeze-checklist.csv",
     )
     for token in required_trace_artifacts:
         if token not in text:
@@ -7217,6 +7372,7 @@ def main() -> int:
     validate_can1_capture_contract()
     validate_assembly_sourcing_recheck()
     validate_assembly_readiness_trace()
+    validate_factory_assembly_freeze_checklist()
     validate_garage_connector_fuse_plan()
     validate_sourcing_evidence_snapshot()
     validate_tvs_candidate_consistency()

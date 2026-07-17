@@ -2047,3 +2047,20 @@ ADC settling, physical placement, self-heating, bench calibration, firmware
 threshold ownership, NTC sourcing, and stale-telemetry fail-safe evidence must
 close before sensor placement, thermal copper, footprints, or
 `PB-100.kicad_pcb` work can be locked.
+
+## 2026-07-17 — PB-100 factory assembly freeze checklist
+
+Decision: PB-100 factory assembly review now has
+`hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`.
+The checklist ties factory-owned critical symbol keys, critical alternates,
+JLCPCB/PCBWay assembly class, reel/tray/cut-tape handling, date-stamped sourcing
+evidence, power-package handling, TVS source hygiene, logic/current/thermal
+sourcing, B2B connector production handling, CAN1 DNP/open handling, BOM
+evidence synchronization, and the no-layout boundary into one machine-checked
+artifact.
+
+Reason: PBREL-011 cannot close from preliminary MPN candidates alone. Current
+factory assembly class, exact orderable suffixes, authorized distributor
+continuity, alternates, DNP/open production notes, and BOM evidence must close
+before MPN lock, footprint lock, pick-place output, PCBA order package, or
+`PB-100.kicad_pcb` work can be released.
