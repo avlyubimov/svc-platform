@@ -1832,3 +1832,15 @@ Reason: The project needs a direct machine-readable answer for whether PB-100
 can be sent for board printing. The gate reports the schematic-freeze status,
 active board-release blockers, KiCad PCB presence, and manufacturing output
 presence instead of relying on a manual reading of the release packet.
+
+## 2026-07-17 — PB-100 garage connector class narrowing
+
+Decision: PB-100 garage assembly planning now narrows output connectors to DTP
+for OUT1 and OUT2, DT for OUT3 through OUT10, DTM for CAN/service/signal wiring,
+and a MAXI near-battery main fuse holder class. The battery input path remains
+conditional and explicitly excludes DT or DTP as the 50 A input connector class.
+
+Reason: Board release needs the user-installed connector and fuse scope to be
+concrete enough for harness planning while still blocking PCB layout until exact
+housings, contacts, seals, crimp tooling, fuse holder, enclosure service access,
+and derating evidence close.

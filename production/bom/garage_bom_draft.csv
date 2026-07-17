@@ -1,17 +1,17 @@
 Category,Item,Suggested spec,Qty,Buy/Install,Priority,Notes
-Protection,Littelfuse MAXI fuse holder,MAXI 152 or MAH sealed inline 50A class,1,Garage,Core,Install near battery per ADR-0008
+Protection,Littelfuse MAXI fuse holder,MAXI 152 or MAH sealed inline 50A class,1,Garage,Core,Install near battery per ADR-0008; select holder variant with 50A continuous margin and matching cable seals
 Protection,MAXI fuses,50A,2,Garage,Core,One spare
-Connectors,Battery input connector,High-current sealed connector or ring-lug harness entry TBD,1,Garage,Core,Must be derated before schematic freeze
-Connectors,Deutsch DTP 2-pin sets,OUT1/OUT2 high-current outputs,2,Garage,Core,DTP class for 15A/20A fuse outputs
-Connectors,Deutsch DT 2-pin sets,OUT3-OUT10 outputs,8,Garage,Core,DT class for 5A/10A fuse outputs
+Connectors,Battery input connector,Ring-lug battery lead plus MAXI holder then high-current sealed harness entry or serviceable gland TBD,1,Garage,Core,Do not use DT or DTP for 50A input path; candidate wire 6mm2 / 10AWG or larger until derating review closes
+Connectors,Deutsch DTP 2-pin sets,OUT1/OUT2 high-current outputs with size 12 25A contact class,2,Garage,Core,DTP class for 15A/20A fuse outputs; final contacts seals boots backshells and crimp tool pending
+Connectors,Deutsch DT 2-pin sets,OUT3-OUT10 outputs with size 16 13A contact class,8,Garage,Core,DT class for 5A/10A fuse outputs only; move any future higher-fuse output to DTP by review
 Connectors,Deutsch output connector sets,DTP class for OUT1/OUT2 and DT class for OUT3-OUT10,10,Garage,Core,Aggregate PB-100 output connector BOM mapping row
 Connectors,Deutsch DTM 4-pin sets,CAN/service,2,Garage,Core,CAN/inputs
 Connectors,Deutsch DTM 8-pin set,External inputs,1,Garage,Should,Buttons/ADC/pulse
 Fuses,Mini/ATO blade fuses,5/10/15/20A kit,1,Garage,Core,Per channel
 Fuses,Per-output fuse holders,MINI/ATO blade holder or enclosure fuse block class,10,Garage,Core,Final holder style depends on enclosure
-Wire,Automotive wire red/black,4 mm² or larger after derating,2,Garage,Core,Battery input
-Wire,Automotive wire,2.5 mm² or larger after derating,5,Garage,Core,High-load outputs
-Wire,Automotive wire,0.5–1.0 mm²,5,Garage,Core,Signals/CAN
+Wire,Automotive wire red/black,6 mm2 / 10 AWG or larger after derating,2,Garage,Core,Battery input and main fuse path
+Wire,Automotive wire,2.5-4 mm2 / 14-12 AWG after derating,5,Garage,Core,High-load DTP outputs and medium DT outputs as contact range allows
+Wire,Automotive wire,0.5-1.0 mm2 / 20-18 AWG,5,Garage,Core,Signals/CAN only
 Harness,Tesa cloth tape,Automotive harness tape,1,Garage,Core,User already has analog
 Harness,Adhesive heat shrink,Assorted,1,Garage,Core,Harness sealing
 Mechanical,Enclosure,ASA/PETG printed or machined,1,Garage,Core,Final CAD pending

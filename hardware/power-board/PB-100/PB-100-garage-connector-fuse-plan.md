@@ -6,6 +6,8 @@ This document selects garage-installed connector and fuse families for PB-100
 schematic planning. It does not freeze exact connector MPNs or enclosure
 placement.
 
+Last source recheck: 2026-07-17.
+
 ## Decision
 
 Use DEUTSCH connector families by current class:
@@ -20,6 +22,28 @@ fuse near the battery.
 Use MINI/ATO blade fuse families for per-channel user-serviceable fuses, with
 final holder style decided during enclosure and schematic review.
 
+## Rev.1 garage boundary
+
+- Battery input stays off-board and conditional: use a battery ring-lug lead to
+  a near-battery MAXI fuse holder, then a high-current sealed harness entry or
+  serviceable cable gland class into the enclosure. Do not use DT or DTP as the
+  50 A battery input connector class.
+- Use 6 mm2 / 10 AWG or larger candidate battery-input wire until harness
+  length, temperature, bundling, and fuse-holder terminals are reviewed.
+- Use DTP 2-pin housings with size 12 contacts for OUT1 and OUT2. The current
+  class covers the 15 A and 20 A fuse classes, but final contacts, seals,
+  boots, backshells, and crimp tooling still need a purchase-ready review.
+- Use DT 2-pin housings with size 16 contacts for OUT3 through OUT10. Keep DT
+  only for 10 A fuse classes or lower; move any future higher-fuse output to
+  DTP by ADR or release review.
+- Use DTM only for CAN, service, and signal wiring. Do not use DTM for PB-100
+  output power.
+- Keep per-channel blade fuses user-serviceable from outside the sealed
+  electronics volume or from a removable service cover.
+- Keep crimping garage-realistic: each selected contact family must have an
+  available crimp tool, insertion/removal tool, wedgelock, seal, and spare
+  contact set before schematic freeze.
+
 ## Current rationale
 
 - DEUTSCH DTM uses size 20 contacts around the 7.5 A class and is therefore
@@ -28,6 +52,8 @@ final holder style decided during enclosure and schematic review.
   4-8 A output classes with margin, but not the 15 A/20 A fuse classes.
 - DEUTSCH DTP uses size 12 contacts around the 25 A class and is the preferred
   family for OUT1 and OUT2.
+- Battery input remains a separate 50 A path and must not borrow the DTP output
+  connector decision.
 
 ## Detailed output map
 
