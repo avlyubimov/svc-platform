@@ -20,3 +20,9 @@
   keeping them not final before freeze.
 - Added candidate PB-100 NTC divider values for schematic review while keeping
   thermal placement and calibration open.
+- Added candidate PB-100 total-current telemetry values for schematic review
+  while keeping shunt copper, bus ownership, and calibration open.
+- Added candidate PB-100 CAN1 TX-disable hardware values while keeping vehicle
+  CAN TX DNP/open and future-ADR gated.
+- Added a PB-100/LB-100 B2B resource precheck for STM32H563 pin-binding review
+  without freezing exact MCU pins.

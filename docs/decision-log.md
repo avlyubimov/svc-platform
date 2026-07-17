@@ -1769,3 +1769,56 @@ Reason: The default 85 °C warn, 105 °C cutoff, and 75 °C recovery thresholds
 need concrete ADC voltage coverage before schematic review. The values remain
 not final until LB-100 ADC settling, NTC self-heating, sensor placement,
 calibration, and assembly sourcing are reviewed.
+
+## 2026-07-16 — PB-100 current telemetry candidate values
+
+Decision: PB-100 total-current telemetry planning now has a value-bearing but
+not-final monitor and shunt candidate in
+`hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`.
+The current candidate keeps the 0.5 mΩ four-terminal shunt, uses the
+INA228-Q1-class ±40.96 mV range, records 20 mV at 40 A and 30 mV at 60 A,
+uses `A1 = GND` and `A0 = GND` as a candidate `0x40` I2C address, keeps
+`PB_I2C` pull-ups LB-owned by default, and adds candidate shunt-input and
+VBUS filter values for schematic review.
+
+Reason: The current telemetry blocker needed concrete schematic-review values
+instead of open address, pull-up, filter, and calibration placeholders. These
+values remain not final until the LB-100 I2C plan, shunt footprint, Kelvin
+routing, copper heating, VBUS surge stress, exact monitor suffix, and bench
+calibration process are reviewed.
+
+## 2026-07-16 — PB-100 CAN1 TX-disable candidate values
+
+Decision: PB-100 CAN1 safety planning now has a value-bearing but not-final
+default-disabled hardware candidate in
+`hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`.
+The current candidate keeps `JP_CAN1` DNP/open as a 0 Ω 0603 link or
+normally-open solder bridge, uses an `SN74LVC1G125-Q1`-class 3-state gate for
+`U_CAN1`, pulls the physical `OE` disable node high with 47 kΩ, biases
+downstream TXD recessive with 47 kΩ, and reads the physical disable node back
+to `CAN1_TX_DISABLED_STATUS` through a 1 kΩ series path plus 100 kΩ pull-up.
+
+Reason: CAN1 read-only behavior is a constitutional hardware safety rule. The
+release blocker needed concrete schematic-review values for the default-open
+link, default-disabled gate, and physical status readback without creating any
+default-populated vehicle-CAN TX path. These values remain not final until
+factory DNP handling, exact gate package, reset/unpowered bench behavior,
+direct DNP-link detection need, and independent CAN safety review close.
+
+## 2026-07-16 — PB-100/LB-100 pin-binding precheck
+
+Decision: PB-100 board-to-board planning now has an LB-100 resource-budget
+precheck in
+`hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`. The
+precheck requires the STM32H563 LQFP-100 schematic review to account for 10
+PWM-capable output controls, 10 output fault inputs, 10 per-output ADC current
+inputs, 6 board analog/ID measurements plus reference strategy, `PB_I2C`, CAN1
+read-only safety pins, and future expansion reserves before exact pin binding
+can close.
+
+Reason: The B2B blocker cannot be closed by the PB-100 pin map alone. Exact
+STM32H5 package pins must be assigned in the LB-100 schematic with USB, SWD,
+clock, storage, BLE, sensors, sleep/wake, ADC, timer, FDCAN, UART, and SPI
+conflicts visible. This precheck is deliberately not an exact pinout and keeps
+connector placement and layout blocked until the real LB-100 pinout audit
+passes.

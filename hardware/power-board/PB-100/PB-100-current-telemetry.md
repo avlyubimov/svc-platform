@@ -27,6 +27,13 @@ Initial total-current shunt direction:
 
 This is a schematic-planning value, not a footprint or sourcing lock.
 
+Candidate total-current monitor values are tracked in
+`hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`.
+The current candidate keeps `INA228-Q1` on the ±40.96 mV shunt range, uses
+`A1 = GND` and `A0 = GND` as a candidate `0x40` I2C address, keeps `PB_I2C`
+pull-ups owned by LB-100 unless reviewed otherwise, and reserves optional
+PB-side DNP pull-ups/filter parts for schematic review.
+
 ## Measurement map
 
 Detailed map CSV:
@@ -58,6 +65,8 @@ total input current measurement, not the sum of output estimates alone.
   fallback.
 - Reserve `PB_I2C_SCL`, `PB_I2C_SDA`, and `PB_I2C_INT` for a digital input
   current monitor or future PB-side monitor.
+- Keep `PB_I2C_INT` diagnostic-only: alert can deny or derate outputs but must
+  not enable outputs from safe-off.
 - Provide calibration constants through configuration, not firmware constants.
 - Treat missing, saturated, or implausible telemetry as a safe fault.
 

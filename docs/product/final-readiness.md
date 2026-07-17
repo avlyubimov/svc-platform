@@ -87,6 +87,10 @@ Current coverage:
   INA228-class monitor headroom, Kelvin sense, ADC/I2C ownership, calibration
   configuration, stale-telemetry safe faults, and bench validation IDs into
   `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`.
+- Current telemetry candidate values now document the 0.5 mΩ shunt operating
+  points, INA228-class ±40.96 mV range, candidate `0x40` address straps,
+  LB-owned pull-up boundary, input/VBUS filters, and calibration boundary in
+  `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`.
 - Thermal telemetry now has a trace tying `TEMP_PCB`, `TEMP_PWR_A`, and
   `TEMP_PWR_B` to the TDK NTC candidate, default 85/105/75 °C thresholds,
   configuration-owned calibration, and firmware thermal fail-safe behavior.
@@ -118,6 +122,10 @@ Current coverage:
   the FX18 candidate pair, 100-pin map, output controls/fault/current telemetry,
   board telemetry, CAN1 safety crossing, and exact MCU pin-binding blockers
   together.
+- B2B/LB-100 pin binding now has a resource-budget precheck for STM32H563
+  LQFP-100 schematic review, covering 10 PWM-capable controls, 16 ADC-class
+  measurements, fault/wake inputs, `PB_I2C`, CAN1 safety, and reserved
+  expansion without assigning exact STM32 pins.
 - Q1 input reverse MOSFET pin evidence is captured from the Infineon
   `IAUTN06S5N008` data sheet; schematic freeze must still close TOLL footprint,
   40 A copper/thermal review, assembly handling, and gate clamp behavior.
@@ -143,6 +151,10 @@ Current coverage:
   `CAN1_TX_ROUTE`, `CAN1_TX_DISABLED_STATUS`, firmware listen-only behavior,
   DNP BOM ownership, the production DNP review, and the future-ADR
   hardware-action boundary together.
+- CAN1 TX-disable candidate values now document the 0 Ω DNP/open link,
+  `SN74LVC1G125-Q1`-class default-disabled gate, 47 kΩ pulls, physical
+  `OE`-node status readback, and reset/unpowered bench checks in
+  `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.
 - Synchronize factory and garage BOM drafts with final selections.

@@ -47,6 +47,16 @@ The preferred Rev.1 schematic input is both a DNP/open TX route and a default
 asserted disable gate. This gives a physical missing-link barrier plus an
 electrical disable state.
 
+Candidate value-bearing network details are tracked in
+`hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`.
+The current candidate keeps `JP_CAN1` as a 0 Ω 0603 DNP/open link or
+normally-open solder bridge in `CAN1_TX_ROUTE`, uses an
+`SN74LVC1G125-Q1`-class 3-state gate for `U_CAN1`, pulls the gate `OE` disable
+node high with 47 kΩ, biases downstream TXD recessive with 47 kΩ, and reports
+the physical gate-control node to `CAN1_TX_DISABLED_STATUS` through a 1 kΩ
+series path plus 100 kΩ default pull-up. These are schematic-review candidates,
+not final MPN or footprint locks.
+
 ## Rev.1 capture contract
 
 The schematic capture packet must show these two refs if CAN1 safety crosses

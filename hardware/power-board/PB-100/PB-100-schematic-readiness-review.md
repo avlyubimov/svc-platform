@@ -57,15 +57,18 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-b2b-pin-map.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-interface-trace.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-resource-binding.csv`
+- `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv`
 - `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`
 - `hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv`
+- `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-current-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv`
 - `hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`
 - `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`
+- `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`
 - `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`
@@ -119,13 +122,13 @@ The schematic review packet consists of:
 | Input reverse protection | Input reverse package trace, input reverse freeze review, input power values, Q1 pin evidence, and 40 A copper/thermal review |
 | TVS/load dump | Clamp and overshoot margin trace plus TVS freeze review against every selected downstream voltage class |
 | Logic power | Logic power rail trace, logic power freeze review, LM5164 pin template, logic power design values, final buck current budget, EMI parts, UVLO, feedback, and power-good implementation |
-| Current telemetry | Current telemetry trace, current telemetry freeze review, INA228 pin template, board-current budget trace, 40 A freeze review, ADC scaling, filtering, calibration plan, and total-current monitor choice |
+| Current telemetry | Current telemetry trace, current telemetry freeze review, current telemetry design calculation, INA228 pin template, board-current budget trace, 40 A freeze review, ADC scaling, filtering, calibration plan, and total-current monitor choice |
 | Thermal telemetry | Thermal telemetry trace, thermal telemetry freeze review, final sensor values, divider values, placement notes, calibration, and derating thresholds |
 | Test points | Bring-up, telemetry, output, fused-output, and CAN1 safety test points are defined without footprint or placement lock |
 | Fault response | Input, logic, B2B, output, thermal, current-budget, CAN1, and identity faults have safe hardware defaults and firmware responses |
 | Hardware capabilities | Role-free PB-100 capabilities align with output matrix, telemetry maps, config defaults, and CAN1 read-only policy |
-| B2B interface | JPB1 connector trace, pin assignment review, CAN1 safety crossing, LB-100 resource-class binding, and exact LB-100 MCU pin binding |
-| CAN1 safety | CAN1 TX-disable trace, production DNP review, DNP/open TX path, default disable state, status readback, DNP BOM ownership, firmware listen-only behavior, and future ADR hardware-action process |
+| B2B interface | JPB1 connector trace, pin assignment review, CAN1 safety crossing, LB-100 resource-class binding, LB-100 pin-binding precheck, and exact LB-100 MCU pin binding |
+| CAN1 safety | CAN1 TX-disable trace, production DNP review, CAN1 TX-disable design calculation, DNP/open TX path, default disable state, status readback, DNP BOM ownership, firmware listen-only behavior, and future ADR hardware-action process |
 | Factory assembly | JLCPCB/PCBWay assembly class, distributor continuity, and alternates for critical MPNs; ownership is traced in `PB-100-assembly-readiness-trace.csv`, `PB-100-symbol-mpn-readiness.csv`, `pb100_assembly_sourcing_recheck.csv`, and `pb100_sourcing_evidence_snapshot.csv` |
 | Garage assembly | Connector, fuse, enclosure, harness items, current derating, wire gauge, crimp tooling, and service access remain user-installable per `PB-100-assembly-readiness-trace.csv` |
 
