@@ -1,5 +1,14 @@
 # Test Plan
 
+## Phase boundary
+
+PB-100 bench tests that require an assembled PB-100 board are post-prototype
+validation gates. Per
+`docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md`,
+schematic freeze and first prototype board-print authorization require the test
+plan, test hooks, calculations, simulations, and source evidence; they do not
+require physical bench records from a board that has not been built yet.
+
 ## Bench test before motorcycle
 
 Required equipment:
@@ -14,6 +23,11 @@ Required equipment:
 
 Do not run first-power, short-circuit, inrush, thermal, or CAN safety tests on
 the motorcycle.
+
+Do not run motorcycle first-power, field use, or production release before the
+post-prototype validation gate in
+`hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv` is
+complete.
 
 ## PB-100 bench validation matrix
 

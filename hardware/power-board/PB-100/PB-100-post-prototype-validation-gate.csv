@@ -1,0 +1,16 @@
+Bench ID,Area,Requires assembled board,Pre-layout artifact,Post-prototype evidence,Blocks until complete,Status
+PB-BENCH-001,Bring-up,Yes,docs/testing/test-plan.md,Current-limited 6V 12V 18V bring-up record with outputs disabled,First motorcycle power and production release,Deferred post-prototype
+PB-BENCH-002,Safe default,Yes,docs/testing/test-plan.md,LB reset or disconnected output-off observation record,First motorcycle power and production release,Deferred post-prototype
+PB-BENCH-003,Reverse protection,Yes,PB-100-input-reverse-q1-closeout-precheck.csv,Reverse-polarity current-limited fixture record,First motorcycle power and production release,Deferred post-prototype
+PB-BENCH-004,TVS/load dump,Board optional,PB-100-tvs-overshoot-validation-precheck.csv,Simulation or surge fixture clamp-margin record,First motorcycle power and production release,Deferred post-prototype
+PB-BENCH-005,Per-output current telemetry,Yes,PB-100-current-telemetry-closeout-precheck.csv,Per-output calibration sweep record,First motorcycle power and production release,Deferred post-prototype
+PB-BENCH-006,Total input current telemetry,Yes,PB-100-current-telemetry-closeout-precheck.csv,Independent input current calibration record,First motorcycle power and production release,Deferred post-prototype
+PB-BENCH-007,Output inrush envelope,Yes,PB-100-output-stage-closeout-precheck.csv,Fused fixture inrush/SOA record,First motorcycle power and production release,Deferred post-prototype
+PB-BENCH-008,Overcurrent and short fault,Yes,PB-100-output-stage-closeout-precheck.csv,Controlled overcurrent and short-circuit fault record,First motorcycle power and production release,Deferred post-prototype
+PB-BENCH-009,Thermal derating,Yes,PB-100-thermal-telemetry-closeout-precheck.csv,Enclosure thermal calibration and derating record,First motorcycle power and production release,Deferred post-prototype
+PB-BENCH-010,Board current budget,Yes,PB-100-board-current-budget-closeout-precheck.csv,40A budget startup refusal or shedding record,First motorcycle power and production release,Deferred post-prototype
+PB-BENCH-011,Fuse behavior,Yes,PB-100-garage-install-closeout-precheck.csv,Fuse open/overload visibility and isolation record,First motorcycle power and production release,Deferred post-prototype
+PB-BENCH-012,CAN1 listen-only,Yes,PB-100-can1-reset-bench-checklist.csv,CAN analyzer no vehicle-CAN transmit frame and disabled-status record,First motorcycle power and production release,Deferred post-prototype
+PB-BENCH-013,CAN2 expansion,Yes,docs/testing/test-plan.md,CAN2 bench-only transmit record with CAN1 unaffected,First motorcycle power and production release,Deferred post-prototype
+PB-BENCH-014,B2B interface,Yes,PB-100-b2b-interface-closeout-precheck.csv,JPB1 pin behavior record against PB-100 pin map,First motorcycle power and production release,Deferred post-prototype
+PB-BENCH-015,Vibration inspection,Yes,PB-100-garage-install-closeout-precheck.csv,Fuse connector harness strain-relief vibration inspection record,First motorcycle power and production release,Deferred post-prototype

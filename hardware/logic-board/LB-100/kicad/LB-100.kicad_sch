@@ -1,0 +1,37 @@
+(kicad_sch
+  (version 20230121)
+  (generator "codex")
+  (uuid "7d94186d-e642-4e5b-83a0-78d04f2d0614")
+  (paper "A3")
+  (title_block
+    (title "LB-100 Logic Board")
+    (date "2026-07-20")
+    (rev "schematic-scaffold")
+    (company "SVC Platform")
+    (comment 1 "Schematic scaffold only. PCB layout is blocked until LB-100 schematic freeze.")
+    (comment 2 "Requirements: ../LB-100-requirements.md and ADR-0014.")
+    (comment 3 "CAN1 vehicle interface remains read-only by default.")
+    (comment 4 "PB_5V_OUT allocation is 500 mA sustained unless reviewed.")
+  )
+  (lib_symbols)
+  (text "LB-100 schematic scaffold only.\n\nDo not create PCB layout from this project until LB-100 schematic freeze is closed.\n\nPrimary inputs:\n- ../LB-100-requirements.md\n- ../LB-100-power-budget-precheck.md\n- ../LB-100-schematic-freeze-checklist.md\n- ../LB-100-board-release-blocker-register.csv\n- ../../../power-board/PB-100/PB-100-b2b-pin-map.csv"
+    (at 30 35 0)
+    (effects
+      (font
+        (size 2.54 2.54)
+      )
+      (justify left top)
+    )
+    (uuid "8630e559-6236-4a15-9ab8-a8b2f59d0de4")
+  )
+  (text "Blocked in this scaffold:\n- PCB layout\n- Gerber generation\n- drill files\n- pick-place files\n- BOM/CPL order package\n- vehicle-CAN TX enable path"
+    (at 30 105 0)
+    (effects
+      (font
+        (size 2.0 2.0)
+      )
+      (justify left top)
+    )
+    (uuid "46926aa4-0e19-486c-8908-8744b2e64b75")
+  )
+)

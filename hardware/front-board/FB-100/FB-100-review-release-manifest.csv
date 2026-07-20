@@ -1,0 +1,19 @@
+Artifact,Category,Freeze role,Required for freeze,Validation hook,Status
+docs/adr/ADR-0014-lb-fb-baseline-requirements.md,Architecture,LB/FB baseline requirements freeze,Required,Document reviewed,Frozen
+hardware/front-board/FB-100/FB-100-requirements.md,Requirements,FB-100 baseline requirements,Required,Document reviewed,Frozen
+hardware/front-board/FB-100/FB-100-interface-signal-plan.csv,Interface,FB-100 to LB-100 signal plan,Required,validate_board_order,Ready
+hardware/front-board/FB-100/FB-100-ui-mechanical-precheck.csv,Mechanical,FB-100 UI and mechanical precheck,Required,validate_board_order,Ready
+hardware/front-board/FB-100/FB-100-component-sourcing-precheck.csv,Production,FB-100 component sourcing precheck,Required,validate_board_order,Ready
+hardware/front-board/FB-100/FB-100-schematic-freeze-checklist.md,Review gate,FB-100 schematic freeze checklist,Required,validate_board_order,Open
+hardware/front-board/FB-100/FB-100-board-release-blocker-register.csv,Review gate,FB-100 board-release blocker register,Required,validate_board_order,Open
+hardware/front-board/FB-100/kicad/FB-100.kicad_pro,KiCad scaffold,KiCad project metadata,Required,validate_board_order,Ready
+hardware/front-board/FB-100/kicad/FB-100.kicad_sch,KiCad scaffold,Top schematic scaffold,Required,validate_board_order,Ready
+hardware/front-board/FB-100/kicad/sym-lib-table,KiCad scaffold,Symbol library table,Required,validate_board_order,Ready
+hardware/front-board/FB-100/kicad/fp-lib-table,KiCad scaffold,Footprint library table,Required,validate_board_order,Ready
+hardware/front-board/FB-100/kicad/lib/FB100.kicad_sym,KiCad scaffold,Project symbol library,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/LB-100-requirements.md,Interface,LB-100 host interface baseline,Required,Document reviewed,Conditional
+docs/production/component-family-shortlist.md,Production,Initial component families,Required,Document reviewed,Ready
+hardware/front-board/FB-100/FB-100-interface-pinout-closeout.csv,Interface,JFB1 24-pin FFC pinout closeout,Required,validate_board_order,Ready
+hardware/front-board/FB-100/FB-100-usb-service-closeout-precheck.csv,USB,USB service no-back-power closeout,Required,validate_board_order,Ready
+hardware/front-board/FB-100/FB-100-ui-control-closeout-precheck.csv,UI,Role-free UI controls closeout,Required,validate_board_order,Ready
+hardware/front-board/FB-100/FB-100-mechanical-envelope-precheck.csv,Mechanical,Mechanical envelope closeout,Required,validate_board_order,Ready

@@ -13,6 +13,7 @@ PB100_DIR = REPO_ROOT / "hardware" / "power-board" / "PB-100"
 CHECKLIST = PB100_DIR / "PB-100-schematic-freeze-checklist.md"
 BLOCKERS = PB100_DIR / "PB-100-board-release-blocker-register.csv"
 CLOSURE_MATRIX = PB100_DIR / "PB-100-board-print-closure-matrix.csv"
+POST_PROTOTYPE_GATE = PB100_DIR / "PB-100-post-prototype-validation-gate.csv"
 KICAD_DIR = PB100_DIR / "kicad"
 
 MANUFACTURING_SUFFIXES = {
@@ -94,6 +95,13 @@ def board_print_closure_rows() -> list[dict[str, str]]:
         return list(csv.DictReader(handle))
 
 
+def post_prototype_gate_rows() -> list[dict[str, str]]:
+    if not POST_PROTOTYPE_GATE.exists():
+        return []
+    with POST_PROTOTYPE_GATE.open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
 def layout_files() -> list[Path]:
     return sorted(KICAD_DIR.rglob("*.kicad_pcb"))
 
@@ -125,9 +133,13 @@ def main() -> int:
     gates = checklist_gates()
     blockers = release_blockers()
     closure_rows = board_print_closure_rows()
+    post_prototype_rows = post_prototype_gate_rows()
     active_gates = [row for row in gates if row["Status"] != "Closed"]
     active_blockers = [row for row in blockers if row["Status"] != "Closed"]
     active_closure_rows = [row for row in closure_rows if row["Current proof state"] != "Closed"]
+    deferred_post_prototype = [
+        row for row in post_prototype_rows if row.get("Status", "").strip() != "Closed"
+    ]
     pcbs = layout_files()
     manufacturing = manufacturing_files()
 
@@ -147,6 +159,7 @@ def main() -> int:
     print(f"  Active freeze gates: {len(active_gates)}")
     print(f"  Active release blockers: {len(active_blockers)}")
     print(f"  Board-print closure rows: {len(active_closure_rows)}")
+    print(f"  Deferred post-prototype validation gates: {len(deferred_post_prototype)}")
     print(f"  KiCad PCB files: {len(pcbs)}")
     print(f"  Manufacturing output files: {len(manufacturing)}")
 

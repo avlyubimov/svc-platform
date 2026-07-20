@@ -12,6 +12,14 @@ Any change to PB-100 output count, protection model, role-mapping model,
 board-level current budget, or CAN1 safety behavior requires a new ADR before
 this checklist can close.
 
+ADR-0013 splits pre-layout closure from post-prototype validation. Schematic
+freeze and first prototype board-print authorization require calculations,
+simulations where applicable, source evidence, schematic hooks, package/footprint
+review inputs, and bench procedures. Physical PB-BENCH execution that requires
+an assembled PB-100 board is deferred to the post-prototype validation gate and
+blocks first motorcycle power, field use, and production release, not the first
+prototype PCB fabrication package.
+
 ## Status values
 
 - `Closed`: Evidence exists and no schematic blocker remains.
@@ -39,7 +47,7 @@ this checklist can close.
 | Thermal telemetry | Conditional | `docs/requirements/pb-100-requirements.md`, `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-map.csv` | PCB and power-zone temperature sensing strategy plus closeout precheck are selected and mapped to LB-100 |
 | Factory assembly readiness | Conditional | `docs/production/component-family-shortlist.md`, `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`, `hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv`, `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`, `hardware/power-board/PB-100/PB-100-factory-assembly-closeout-precheck.csv`, `hardware/power-board/PB-100/PB-100-symbol-mpn-readiness.csv`, `production/bom/factory_bom_draft.csv`, `production/bom/pb100_assembly_sourcing_recheck.csv`, `production/bom/pb100_sourcing_evidence_snapshot.csv` | Critical components have at least two alternatives and assembly-source closeout status is checked |
 | Garage assembly readiness | Conditional | `hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv`, `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`, `hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv`, `hardware/power-board/PB-100/PB-100-garage-install-closeout-precheck.csv`, `production/bom/garage_bom_draft.csv`, `production/bom/pb100_symbol_bom_map.csv`, `production/bom/pb100_assembly_sourcing_recheck.csv`, `hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.md` | User-installed items are limited to connectors, fuses, enclosure hardware, and wiring with closeout evidence |
-| Bench validation plan | Closed | `docs/testing/test-plan.md` | PB-100 bring-up, protection, thermal, current-budget, and CAN1 listen-only tests are explicitly listed |
+| Bench validation plan | Closed | `docs/testing/test-plan.md`, `docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md`, `hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv` | PB-100 bring-up, protection, thermal, current-budget, and CAN1 listen-only tests are explicitly listed as post-prototype validation gates |
 
 ## Active blockers
 
@@ -100,8 +108,8 @@ Before marking this checklist `Closed`, the review packet must include:
 - Factory and garage BOM drafts synchronized with selected MPNs.
 - Assembly sourcing recheck register and sourcing evidence snapshot synchronized
   with critical symbol keys.
-- Bench validation plan for protection, telemetry, current budget, and CAN1
-  listen-only behavior.
+- Bench validation plan and post-prototype validation gate for protection,
+  telemetry, current budget, and CAN1 listen-only behavior.
 - Validation traceability register covering every conditional freeze gate.
 - Test-point plan covering rails, telemetry, outputs, and CAN1 safety.
 - Fault-response matrix covering safe defaults and firmware actions.

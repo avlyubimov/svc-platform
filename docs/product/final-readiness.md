@@ -4,7 +4,7 @@ Status: In progress
 Last updated: 2026-07-20
 
 This document defines what “ready” means for the current repository state. It
-does not authorize PB-100 PCB layout.
+does not authorize PB-100, LB-100, or FB-100 PCB layout.
 
 ## Automated gate
 
@@ -17,10 +17,22 @@ make check
 For board-order status, run:
 
 ```bash
+make board-order-status
+```
+
+For PB-100-only detail, run:
+
+```bash
 make pb100-release-status
 ```
 
-For a release job that must fail while PB-100 is not printable, run:
+For a release job that must fail while any board is not printable, run:
+
+```bash
+make board-order-gate
+```
+
+For a PB-100-only release job that must fail while PB-100 is not printable, run:
 
 ```bash
 make pb100-release-gate
@@ -35,6 +47,9 @@ Current coverage:
   20 components and 20 electrical nets.
 - PB-100 KiCad role-token guard for generic `OUT1`..`OUT10` naming.
 - PB-100 layout/manufacturing artifact blocker.
+- Three-board board-order gate for PB-100, LB-100, and FB-100.
+- LB-100 and FB-100 baseline freeze manifests, closed pre-layout blocker
+  registers, and no-layout blockers.
 - Firmware config JSON/schema validation.
 - Firmware host-test suite.
 - Firmware hardware-capability, config-store, config-update, and runtime-boot
@@ -51,9 +66,15 @@ Current coverage:
 | PB-100 requirements | Ready for schematic planning | Baseline is frozen; schematic freeze remains open |
 | PB-100 KiCad scaffold | Preliminary capture | Child sheets now contain ERC-clean preliminary capture content and exported netlist coverage; schematic freeze remains open |
 | PB-100 PCB/layout | Blocked | Layout, Gerber, drill, placement, and manufacturing zips are blocked by the board-release blocker register; 2026-07-20 local ERC/netlist/host-test evidence is separated in `hardware/power-board/PB-100/PB-100-board-release-local-evidence-closeout.csv` |
+| LB-100 requirements | Ready for schematic planning | Baseline is frozen by ADR-0014; schematic freeze remains open |
+| LB-100 KiCad scaffold | Preliminary scaffold | Top-level non-layout schematic scaffold exists; pin binding, rail budget, communication, service/storage/sensor, and sourcing pre-layout blockers are closed; reviewed value-bearing schematic sheets remain open |
+| LB-100 PCB/layout | Blocked | Layout and manufacturing outputs are blocked by `hardware/logic-board/LB-100/LB-100-schematic-freeze-checklist.md`; `hardware/logic-board/LB-100/LB-100-board-release-blocker-register.csv` has 0 active blockers |
+| FB-100 requirements | Ready for schematic planning | Baseline is frozen by ADR-0014; schematic freeze remains open |
+| FB-100 KiCad scaffold | Preliminary scaffold | Top-level non-layout schematic scaffold exists; interface pinout, USB service, UI/control, mechanical envelope, and sourcing pre-layout blockers are closed; reviewed value-bearing schematic sheets remain open |
+| FB-100 PCB/layout | Blocked | Layout and manufacturing outputs are blocked by `hardware/front-board/FB-100/FB-100-schematic-freeze-checklist.md`; `hardware/front-board/FB-100/FB-100-board-release-blocker-register.csv` has 0 active blockers |
 | Firmware safety core | Host-test ready | Output, overflow-safe delayed battery cutoff, runtime load shedding, stale-current safe-off, thermal derate/cutoff, CAN dropped-edge retry, telemetry, events, saturating diagnostic counters, logging, config, runtime boot, CAN-to-rule bridge, ambient-light rule conditions, ordered rule sets, multi-action rule compilation, rule runtime, and rule paths covered |
 | Configuration format | Host-test ready | JSON schema, canonical rule grammar, rule-action mapping, buffer-atomic rule compilation, PB-100 capability manifest, compiled capability baseline, config store reserved/sequence-wrap handling, config update, and examples are validated |
-| Production package | Draft | BOM sourcing snapshot was refreshed for selected manufacturer, distributor, JLCPCB componentSearch, PCBWay generic process, and garage kit-candidate evidence on 2026-07-20; zero/low-stock risks, exact suffix lock, final garage purchase lock, and schematic closeout evidence remain open |
+| Production package | Draft | `production/board-order/three_board_jlcpcb_order_readiness.csv` tracks all three boards as NO-GO until schematic freeze, layout, fabrication outputs, and assembly outputs close |
 
 ## Required before schematic freeze
 
@@ -135,7 +156,7 @@ Current coverage:
   stale-telemetry safe-off behavior together.
 - Current telemetry freeze review now ties the 0.5 mΩ shunt range,
   INA228-class monitor headroom, Kelvin sense, ADC/I2C ownership, calibration
-  configuration, stale-telemetry safe faults, and bench validation IDs into
+  configuration, stale-telemetry safe faults, and post-prototype bench IDs into
   `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`.
 - Current telemetry candidate values now document the 0.5 mΩ shunt operating
   points, INA228-class ±40.96 mV range, candidate `0x40` address straps,
@@ -149,30 +170,32 @@ Current coverage:
 - Current telemetry value derivation precheck now ties shunt voltage/power
   formulas, INA228/INA229 monitor ranges, Kelvin/filter network, I2C ownership,
   VBUS stress, per-output IMON scaling, configuration calibration, bench
-  safe-fault path, sourcing, and no-layout boundary into
+  safe-fault procedure, post-prototype validation, sourcing, and no-layout
+  boundary into
   `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`.
 - Current telemetry closeout precheck now bridges the shunt formulas, monitor
   family, Kelvin/filter network, I2C/interrupt ownership, protected VBUS
   stress, per-output IMON ADC scaling, configuration-owned calibration, bench
-  safe-fault evidence, sourcing/symbol synchronization, and no-layout boundary
-  into
+  safe-fault hooks, post-prototype evidence gate, sourcing/symbol
+  synchronization, and no-layout boundary into
   `hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`.
 - Total-current and per-output IMON calibration now have a firmware
   configuration contract in `firmware/configs/config-example.json`,
   `firmware/configs/svc-config.schema.json`, and `firmware/core/svc_config.h`;
-  ADC scaling and bench calibration evidence remain schematic-freeze blockers.
+  ADC scaling and calibration hooks remain schematic-freeze blockers, while
+  physical bench calibration is a post-prototype validation gate.
 - Thermal telemetry now has a trace tying `TEMP_PCB`, `TEMP_PWR_A`, and
   `TEMP_PWR_B` to the TDK NTC candidate, default 85/105/75 °C thresholds,
   configuration-owned calibration, and firmware thermal fail-safe behavior.
 - Thermal telemetry freeze review now ties NTC sensor class, divider/ADC
   scaling, placement zones, threshold ownership, stale-telemetry cutoff,
-  assembly alternates, and bench validation into
+  assembly alternates, and post-prototype bench validation into
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`.
 - Thermal telemetry value closure now has
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`,
   tying sensor class, placement zones, divider/ADC scaling, self-heating,
-  ADC settling, configuration calibration, firmware fail-safe, bench validation,
-  sourcing, and no-layout boundary.
+  ADC settling, configuration calibration, firmware fail-safe, bench procedure,
+  post-prototype validation, sourcing, and no-layout boundary.
 - Thermal telemetry value derivation precheck now ties the NTC source boundary,
   beta/divider formulas, self-heating estimate, ADC settling, placement zones,
   configuration calibration, firmware fail-safe, sourcing, and no-layout
@@ -337,10 +360,11 @@ Current coverage:
   `SN74LVC1G125-Q1`-class default-disabled gate, 47 kΩ pulls, physical
   `OE`-node status readback, and reset/unpowered bench checks in
   `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`.
-- CAN1 reset and DNP bench evidence now has a checklist covering LB-100 reset,
+- CAN1 reset and DNP bench procedure now has a checklist covering LB-100 reset,
   LB-100 unpowered, production DNP/open inspection, physical disabled-status
-  readback, RX listen-only independence, and future-ADR hardware-action checks
-  in `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`.
+  readback, RX listen-only independence, and future-ADR hardware-action checks;
+  physical observations remain post-prototype in
+  `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`.
 - CAN1 default-disable closure now has
   `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`,
   tying the DNP/open missing link, default-disabled gate values, TXD recessive
@@ -349,13 +373,13 @@ Current coverage:
 - CAN1 default-disable derivation now has
   `hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv`,
   tying policy/configuration, physical missing-link, gate polarity, status
-  readback, firmware/capability/bench evidence, factory DNP sourcing, and
-  no-layout boundary into one machine-checked artifact.
+  readback, firmware/capability evidence, bench procedure, factory DNP
+  sourcing, and no-layout boundary into one machine-checked artifact.
 - CAN1 default-disable closeout precheck now has
   `hardware/power-board/PB-100/PB-100-can1-default-disable-closeout-precheck.csv`,
   bridging policy, DNP/open missing-link evidence, default-disabled gate,
-  physical status readback, RX independence, firmware/capability/bench evidence,
-  factory DNP sourcing, and no-layout boundary to PBREL-001.
+  physical status readback, RX independence, firmware/capability evidence,
+  bench procedure, factory DNP sourcing, and no-layout boundary to PBREL-001.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
 - Close OUT2 SOA extraction and input reverse-protection thermal review.
 - Synchronize factory and garage BOM drafts with final selections.
@@ -382,16 +406,20 @@ Current coverage:
 - Thermal telemetry divider calibration now has a firmware configuration
   contract in `firmware/configs/config-example.json`,
   `firmware/configs/svc-config.schema.json`, and `firmware/core/svc_config.h`;
-  ADC settling, placement, self-heating, sourcing, and bench calibration remain
-  schematic-freeze blockers.
+  ADC settling, placement, self-heating, sourcing, and calibration hooks remain
+  schematic-freeze blockers, while physical bench calibration is a
+  post-prototype validation gate.
 
 ## Required before PCB layout
 
-- `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md` status
+- `hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md`,
+  `hardware/logic-board/LB-100/LB-100-schematic-freeze-checklist.md`, and
+  `hardware/front-board/FB-100/FB-100-schematic-freeze-checklist.md` statuses
   changed to closed with evidence for every conditional gate.
 - No open ADR requirement change touching PB-100 output count, protection model,
   role mapping, current budget, or CAN1 safety behavior.
-- Final schematic review packet archived in the repository.
+- Final PB-100, LB-100, and FB-100 schematic review packets archived in the
+  repository.
 
 ## Required before prototype bring-up
 

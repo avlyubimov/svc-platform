@@ -1,0 +1,10 @@
+(fp_lib_table
+  (version 7)
+  (lib
+    (name "LB100")
+    (type "KiCad")
+    (uri "${KIPRJMOD}/lib/LB100.pretty")
+    (options "")
+    (descr "LB-100 preliminary project-local footprints")
+  )
+)

@@ -1,0 +1,37 @@
+(kicad_sch
+  (version 20230121)
+  (generator "codex")
+  (uuid "31a9ee96-ed23-4f25-980a-cb2470bd0d5c")
+  (paper "A4")
+  (title_block
+    (title "FB-100 Front Panel Board")
+    (date "2026-07-20")
+    (rev "schematic-scaffold")
+    (company "SVC Platform")
+    (comment 1 "Schematic scaffold only. PCB layout is blocked until FB-100 schematic freeze.")
+    (comment 2 "Requirements: ../FB-100-requirements.md and ADR-0014.")
+    (comment 3 "UI signals remain role-free status/channel signals.")
+    (comment 4 "USB service path must not back-power LB-100 or PB-100 unless reviewed.")
+  )
+  (lib_symbols)
+  (text "FB-100 schematic scaffold only.\n\nDo not create PCB layout from this project until FB-100 schematic freeze is closed.\n\nPrimary inputs:\n- ../FB-100-requirements.md\n- ../FB-100-schematic-freeze-checklist.md\n- ../FB-100-board-release-blocker-register.csv\n- ../../../logic-board/LB-100/LB-100-requirements.md"
+    (at 25 30 0)
+    (effects
+      (font
+        (size 2.54 2.54)
+      )
+      (justify left top)
+    )
+    (uuid "b2ec4b0b-f117-4a83-b8f7-dbe78b359f9e")
+  )
+  (text "Blocked in this scaffold:\n- PCB layout\n- Gerber generation\n- drill files\n- pick-place files\n- BOM/CPL order package\n- accessory role names in UI hardware"
+    (at 25 95 0)
+    (effects
+      (font
+        (size 2.0 2.0)
+      )
+      (justify left top)
+    )
+    (uuid "ee99957b-f111-4857-b45e-d407279bfe61")
+  )
+)

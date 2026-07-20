@@ -5,6 +5,12 @@ Status: Schematic planning package ready for review; not frozen
 This package converts frozen PB-100 requirements into schematic-planning inputs.
 It is not a PCB layout package.
 
+Per ADR-0013, pre-layout closure requires calculations, source evidence,
+package/footprint review inputs, schematic test hooks, and bench procedures.
+Physical PB-BENCH execution that needs an assembled board is deferred to the
+post-prototype validation gate and blocks first motorcycle power and production
+release, not first prototype PCB fabrication.
+
 ## Governing documents
 
 - `docs/architecture/Architecture-Review-v1.0.md`
@@ -14,6 +20,7 @@ It is not a PCB layout package.
 - `docs/adr/ADR-0008-pb-100-current-budget.md`
 - `docs/adr/ADR-0010-pb-100-power-path-candidate-strategy.md`
 - `docs/adr/ADR-0011-pb-100-low-current-output-stage.md`
+- `docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md`
 - `docs/can/can-safety.md`
 - `docs/production/component-family-shortlist.md`
 - `firmware/configs/hardware/pb-100-capabilities.json`
@@ -37,6 +44,7 @@ It is not a PCB layout package.
 - `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`
 - `hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv`
 - `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`
+- `hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv`
@@ -134,7 +142,7 @@ It is not a PCB layout package.
 - 40 A board-current value checklist: current-budget contract, path sequence,
   connector and wire derating, Q1 thermal path, shunt/Kelvin path, copper
   pre-layout boundary, firmware enforcement, telemetry enforcement, bench
-  validation, and no-layout boundary are tracked in
+  procedure, post-prototype validation, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv`.
 - 40 A board-current value derivation precheck: current-budget contract,
   protected current path, shunt and Q1 formulas, copper pre-layout loss, garage
@@ -144,8 +152,8 @@ It is not a PCB layout package.
 - 40 A board-current closeout precheck: requirement/configuration boundary,
   protected high-current path, main fuse and wire derating, Q1 thermal path,
   shunt/Kelvin telemetry, copper pre-layout boundary, firmware enforcement,
-  bench telemetry evidence, BOM owner split, and no-layout manufacturing
-  boundary are tracked in
+  bench telemetry hooks, post-prototype evidence gate, BOM owner split, and
+  no-layout manufacturing boundary are tracked in
   `hardware/power-board/PB-100/PB-100-board-current-budget-closeout-precheck.csv`.
 - Current telemetry freeze review: 0.5 mΩ shunt range, INA228-class monitor
   headroom, Kelvin sense, ADC/I2C ownership, per-output IMON scaling,
@@ -164,13 +172,14 @@ It is not a PCB layout package.
 - Current telemetry value derivation precheck: shunt voltage and power formulas,
   INA228/INA229 range, Kelvin/filter network, I2C ownership, alert boundary,
   VBUS stress, per-output IMON scaling, configuration calibration, bench
-  safe-fault path, sourcing, and no-layout boundary are tracked in
+  safe-fault procedure, post-prototype validation, sourcing, and no-layout
+  boundary are tracked in
   `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`.
 - Current telemetry closeout precheck: shunt formulas, monitor family, Kelvin
   and filter network, I2C/interrupt ownership, protected VBUS stress,
   per-output IMON scaling, configuration-owned calibration, bench safe-fault
-  evidence, sourcing/symbol synchronization, and no-layout manufacturing
-  boundary are tracked in
+  hooks, post-prototype evidence gate, sourcing/symbol synchronization, and
+  no-layout manufacturing boundary are tracked in
   `hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`.
 - Input reverse freeze review: LM74700 gate/default-off behavior, TOLL/LFPAK88
   and PowerPAK alternates, protected measurement sequence, HM3 TVS dependency,
@@ -236,12 +245,13 @@ It is not a PCB layout package.
   PB-100 schematic freeze.
 - Thermal telemetry freeze review: NTC sensor class, divider/ADC scaling,
   placement zones, 85/105/75 °C thresholds, firmware fail-safe behavior,
-  calibration, assembly alternates, and bench validation are tracked in
+  calibration hooks, assembly alternates, and post-prototype bench validation
+  are tracked in
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`.
 - Thermal telemetry value checklist: sensor class, placement zones,
   divider/ADC scaling, self-heating, ADC settling, configuration calibration,
-  firmware fail-safe, bench validation, sourcing, and no-layout boundary are
-  tracked in
+  firmware fail-safe, bench procedure, post-prototype validation, sourcing, and
+  no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`.
 - Thermal telemetry value derivation precheck: NTC source boundary, beta and
   divider equations, self-heating estimate, ADC settling, placement zones,
@@ -250,8 +260,9 @@ It is not a PCB layout package.
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`.
 - Thermal telemetry closeout precheck: NTC source class, divider equations and
   values, placement zones, self-heating, ADC settling, configuration-owned
-  calibration, firmware fail-safe, bench validation, sourcing/symbol
-  synchronization, and no-layout manufacturing boundary are tracked in
+  calibration, firmware fail-safe, bench hooks, post-prototype validation,
+  sourcing/symbol synchronization, and no-layout manufacturing boundary are
+  tracked in
   `hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`.
 - Factory assembly freeze checklist: factory-owned critical keys, alternate
   coverage, JLCPCB/PCBWay assembly class, date-stamped distributor continuity,
@@ -339,8 +350,12 @@ It is not a PCB layout package.
   `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`.
 - CAN1 reset and DNP bench checklist: LB-100 reset, LB-100 unpowered,
   production DNP/open inspection, physical disabled-status readback, RX
-  listen-only independence, and future-ADR hardware-action checks are tracked in
+  listen-only independence, and future-ADR hardware-action procedures are tracked in
   `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`.
+- Post-prototype validation gate: PB-BENCH-001 through PB-BENCH-015 remain
+  deferred until assembled hardware exists; they block first motorcycle power
+  and production release in
+  `hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv`.
 - CAN1 default-disable freeze checklist: policy boundary, `JP_CAN1` DNP/open
   missing link, `U_CAN1` disabled default, TXD recessive bias, physical
   disabled-status readback, DNP-link detect boundary, RX independence, firmware
@@ -349,14 +364,14 @@ It is not a PCB layout package.
 - CAN1 default-disable derivation precheck: policy/configuration boundary,
   physical missing-link barrier, default-disabled gate polarity, TXD recessive
   bias, physical disabled-status readback, optional DNP link detect,
-  listen-only RX independence, firmware/capability/bench evidence, factory DNP
-  sourcing bridge, and no-layout boundary are tracked in
+  listen-only RX independence, firmware/capability/bench procedure evidence,
+  factory DNP sourcing bridge, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv`.
 - CAN1 default-disable closeout precheck: policy/hardware boundary, DNP/open
   missing link, default-disabled gate, TXD recessive bias, physical
   disabled-status readback, DNP link-detect boundary, listen-only RX
-  independence, firmware/capability/bench evidence, factory DNP sourcing, and
-  no-layout manufacturing boundary are tracked in
+  independence, firmware/capability/bench procedure evidence, factory DNP
+  sourcing, and no-layout manufacturing boundary are tracked in
   `hardware/power-board/PB-100/PB-100-can1-default-disable-closeout-precheck.csv`.
 
 ## Board-to-board signal budget

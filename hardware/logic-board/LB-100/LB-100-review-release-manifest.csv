@@ -1,0 +1,24 @@
+Artifact,Category,Freeze role,Required for freeze,Validation hook,Status
+docs/adr/ADR-0014-lb-fb-baseline-requirements.md,Architecture,LB/FB baseline requirements freeze,Required,Document reviewed,Frozen
+hardware/logic-board/LB-100/LB-100-requirements.md,Requirements,LB-100 baseline requirements,Required,Document reviewed,Frozen
+hardware/logic-board/LB-100/LB-100-power-budget-precheck.md,Power,PB_5V_OUT load budget precheck,Required,Document reviewed,Ready
+hardware/logic-board/LB-100/LB-100-rail-tree-precheck.csv,Power,LB-100 rail-tree precheck,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/LB-100-jpb1-resource-budget.csv,Interface,LB-100 JPB1 resource budget,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/LB-100-stm32h563-pin-binding-precheck.csv,Interface,STM32H563 LQFP100 exact pin binding,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/LB-100-mcu-sourcing-precheck.csv,Production,LB-100 MCU sourcing precheck,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/LB-100-schematic-freeze-checklist.md,Review gate,LB-100 schematic freeze checklist,Required,validate_board_order,Open
+hardware/logic-board/LB-100/LB-100-board-release-blocker-register.csv,Review gate,LB-100 board-release blocker register,Required,validate_board_order,Open
+hardware/logic-board/LB-100/kicad/LB-100.kicad_pro,KiCad scaffold,KiCad project metadata,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/kicad/LB-100.kicad_sch,KiCad scaffold,Top schematic scaffold,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/kicad/sym-lib-table,KiCad scaffold,Symbol library table,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/kicad/fp-lib-table,KiCad scaffold,Footprint library table,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/kicad/lib/LB100.kicad_sym,KiCad scaffold,Project symbol library,Required,validate_board_order,Ready
+docs/adr/ADR-0005-stm32h5-product-target.md,Architecture,MCU target baseline,Required,Document reviewed,Frozen
+docs/adr/ADR-0012-system-sleep-wake-and-parking-current.md,Power,Sleep wake and parking current baseline,Required,Document reviewed,Ready
+docs/adr/ADR-0002-can-read-only-default.md,Safety,CAN1 read-only default,Required,Document reviewed,Frozen
+docs/can/can-safety.md,Safety,CAN safety policy,Required,Document reviewed,Ready
+docs/production/component-family-shortlist.md,Production,Initial component families,Required,Document reviewed,Ready
+hardware/logic-board/LB-100/LB-100-rail-budget-closeout-precheck.csv,Power,LB-100 calculated rail budget closeout,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/LB-100-component-sourcing-precheck.csv,Production,LB-100 component sourcing precheck,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/LB-100-communication-safety-precheck.csv,Safety,CAN and expansion safety closeout,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/LB-100-service-storage-sensor-precheck.csv,Service,Service storage sensor closeout,Required,validate_board_order,Ready

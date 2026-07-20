@@ -2651,3 +2651,92 @@ PowerPAK/TOLL/LFPAK88/DO-218AC/CSS4J/FX18 handling, DNP/open inspection, or
 first-article rework limits. Keeping that evidence separate prevents a generic
 assembly capability page from being treated as BOM lock, pick-place release,
 manufacturing ZIP, fabrication package, or PCBA order approval.
+
+## 2026-07-20 — PB-100 bench validation moved after prototype assembly
+
+Decision: PB-100 pre-layout closure now follows ADR-0013 and separates
+schematic/source/package evidence from physical bench execution. The new
+`hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv` tracks
+PB-BENCH-001 through PB-BENCH-015 as deferred post-prototype gates that block
+first motorcycle power, field use, and production release, but not the first
+prototype PCB fabrication package after schematic freeze.
+
+Reason: Several checks require an assembled PB-100 board or PB-100/LB-100
+stack. Requiring those measurements before the first board exists creates a
+process deadlock. Pre-layout release blockers may still require calculations,
+simulations, source evidence, package/footprint review inputs, test hooks, and
+bench procedures; physical records close only after prototype assembly.
+
+## 2026-07-20 — Three-board order gate added before JLCPCB package work
+
+Decision: LB-100 and FB-100 baseline requirements are frozen for schematic
+planning by ADR-0014, and both boards now have schematic-freeze checklists,
+board-release blocker registers, and review manifests. The project-level order
+readiness register
+`production/board-order/three_board_jlcpcb_order_readiness.csv` tracks PB-100,
+LB-100, and FB-100 together, with `make board-order-status` reporting the
+overall NO-GO/READY state.
+
+Reason: The product cannot be treated as ready to order while only PB-100 has
+release gates. A three-board gate makes the missing LB-100 and FB-100 KiCad
+scaffolds, schematic freezes, layout files, fabrication outputs, and assembly
+outputs explicit without starting PCB layout before the required schematic
+freeze evidence exists.
+
+## 2026-07-20 — LB-100 and FB-100 KiCad scaffolds started without layout
+
+Decision: LB-100 and FB-100 now each have a project-local KiCad schematic
+scaffold under `hardware/logic-board/LB-100/kicad/` and
+`hardware/front-board/FB-100/kicad/`. The scaffolds are top-level note sheets
+with local symbol and footprint library tables, and intentionally do not include
+`.kicad_pcb`, Gerber, drill, pick-place, BOM/CPL, or manufacturing packages.
+
+Reason: ADR-0014 freezes LB-100 and FB-100 baseline requirements enough to open
+schematic planning workbenches. Creating note-sheet scaffolds removes the
+"missing KiCad project" blocker while preserving the no-layout boundary until
+each board's schematic freeze checklist and blocker register close.
+
+## 2026-07-20 — LB-100 and FB-100 pre-layout contracts started
+
+Decision: LB-100 now has `LB-100-jpb1-resource-budget.csv` and
+`LB-100-rail-tree-precheck.csv` to start exact MCU resource and power-tree
+closeout. FB-100 now has `FB-100-interface-signal-plan.csv` and
+`FB-100-ui-mechanical-precheck.csv` to start the front-panel signal, USB,
+indicator, button, OLED, and enclosure closeout.
+
+Reason: These contracts reduce the unknowns blocking LB-100 and FB-100
+schematic freeze without creating layout, board outlines, component placement,
+Gerbers, drills, pick-place files, BOM/CPL packages, or JLCPCB/PCBWay order
+artifacts.
+
+## 2026-07-20 — LB-100 MCU and FB-100 service/UI sourcing started
+
+Decision: LB-100 MCU sourcing evidence now has
+`hardware/logic-board/LB-100/LB-100-mcu-sourcing-precheck.csv` covering the
+STM32H563VIT6 preferred path, STM32H573VIT6 security alternate, and a downsized
+STM32H563RGT6 fallback that would require a resource reduction before use.
+FB-100 component sourcing evidence now has
+`hardware/front-board/FB-100/FB-100-component-sourcing-precheck.csv` covering
+USB-C service connector candidates, USB ESD protection candidates, RGB status
+LED class, and channel indicator LED class.
+
+Reason: Current JLCPCB/LCSC/DigiKey/ST/TI source evidence closes part of the
+factory-sourcing gap for LB-100 and FB-100 while leaving exact pin audit,
+footprint orientation, USB no-back-power, LED drive values, final quantities,
+BOM/CPL, PCB layout, and manufacturing outputs blocked.
+
+## 2026-07-20 — LB-100 and FB-100 pre-layout release blockers closed
+
+Decision: LB-100 release blockers LBREL-001 through LBREL-007 and FB-100
+release blockers FBREL-001 through FBREL-006 are now closed with machine-checked
+pre-layout evidence. LB-100 has exact STM32H563VITx LQFP100/JPB1 pin binding,
+rail budget, communication-safety, service/storage/sensor, and sourcing
+closeout records. FB-100 has JFB1 pinout, USB service/no-back-power, UI/control,
+mechanical-envelope, and sourcing closeout records.
+
+Reason: These records remove the LB-100 and FB-100 release-blocker deadlock
+without creating PCB layouts, Gerbers, drills, pick-place files, BOM/CPL order
+packages, manufacturing ZIPs, or JLCPCB/PCBWay order artifacts. Both boards
+remain NO-GO for ordering until their schematic-freeze checklists close with
+reviewed value-bearing schematic sheets; PB-100 remains blocked by its active
+PBREL register.
