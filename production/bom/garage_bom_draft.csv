@@ -15,7 +15,9 @@ Wire,Automotive wire,2.5-4 mm2 / 14-12 AWG after derating,5,Garage,Core,High-loa
 Wire,Automotive wire,0.5-1.0 mm2 / 20-18 AWG,5,Garage,Core,Signals/CAN only
 Harness,Tesa cloth tape,Automotive harness tape,1,Garage,Core,User already has analog
 Harness,Adhesive heat shrink,Assorted,1,Garage,Core,Harness sealing
+Harness,FB-100 front-panel FFC cable,24-pin FFC cable matching selected 0.5 mm JFB1 connector,1,Garage,Should,Garage-installed service/display cable; exact length and orientation close with enclosure
 Mechanical,Enclosure,ASA/PETG printed or machined,1,Garage,Core,Final CAD pending
+Mechanical,FB-100 front-panel mounting,80 mm x 35 mm prototype faceplate standoffs light-pipe/window and button actuator hardware,1,Garage,Should,Mechanical envelope captured in FB-100-mechanical-envelope-precheck.csv; final CAD pending
 Mechanical,Silicone gasket,2 mm sheet,1,Garage,Core,Lid seal
 Mechanical,Stainless screws,M3 assorted,1,Garage,Core,PCB/lid
 Mechanical,Mounting hardware,Rubber isolators/clips,1,Garage,Should,Motorcycle mounting

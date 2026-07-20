@@ -11,6 +11,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 ORDER_READINESS = REPO_ROOT / "production" / "board-order" / "three_board_jlcpcb_order_readiness.csv"
 PB100_FREEZE = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-schematic-freeze-checklist.md"
 PB100_BLOCKERS = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-board-release-blocker-register.csv"
+BOARD_BLOCKERS = {
+    "PB-100": PB100_BLOCKERS,
+    "LB-100": REPO_ROOT / "hardware" / "logic-board" / "LB-100" / "LB-100-board-release-blocker-register.csv",
+    "FB-100": REPO_ROOT / "hardware" / "front-board" / "FB-100" / "FB-100-board-release-blocker-register.csv",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -33,9 +38,13 @@ def checklist_status(path: Path) -> str:
 
 
 def active_pb100_blockers() -> int:
-    if not PB100_BLOCKERS.exists():
+    return active_blockers(PB100_BLOCKERS)
+
+
+def active_blockers(path: Path) -> int:
+    if not path.exists():
         return 0
-    with PB100_BLOCKERS.open(newline="", encoding="utf-8") as handle:
+    with path.open(newline="", encoding="utf-8") as handle:
         return sum(1 for row in csv.DictReader(handle) if row["Status"].strip() != "Closed")
 
 
@@ -58,9 +67,13 @@ def main() -> int:
     print("")
     print("Board states:")
     for row in rows:
+        board = row["Board"]
+        blocker_path = BOARD_BLOCKERS.get(board)
+        active_count = active_blockers(blocker_path) if blocker_path is not None else 0
         print(
-            f"  - {row['Board']}: {row['Order state']} | "
+            f"  - {board}: {row['Order state']} | "
             f"freeze={row['Schematic freeze state']} | "
+            f"active_blockers={active_count} | "
             f"kicad={row['KiCad schematic state']} | "
             f"next={row['Next action']}"
         )

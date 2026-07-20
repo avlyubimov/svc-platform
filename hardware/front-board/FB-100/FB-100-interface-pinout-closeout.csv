@@ -1,0 +1,25 @@
+Connector,Pin,Signal,Direction,Owner,Default state,Close evidence,Status,Blocked action
+JFB1,1,GND,Shared,LB-100/FB-100,N/A,Return paired with USB shield and LED/button current,Closed,Do not route high-current or accessory power through JFB1
+JFB1,2,FB_3V3_OR_IO,LB-100 to FB-100,LB-100,Off until LB rail valid,Front-board logic indicator and pull-up reference only,Closed,Do not power FB-100 from USB VBUS or signal clamp paths
+JFB1,3,GND,Shared,LB-100/FB-100,N/A,Second return for USB/LED/button current and FFC reference,Closed,Do not use shield as signal return substitute
+JFB1,4,USB_D_P,FB-100 to LB-100,LB-100,High-Z until attach,Routes to STM32H563 PA12 USB_DP through USBLC6-class ESD,Closed,Do not route USB before impedance and ESD placement review
+JFB1,5,USB_D_N,FB-100 to LB-100,LB-100,High-Z until attach,Routes to STM32H563 PA11 USB_DM through USBLC6-class ESD,Closed,Do not swap D+/D- or bypass ESD
+JFB1,6,USB_CC1,FB-100/LB-100,LB-100,5.1k Rd device role,USB-C service is device-only and detect-only,Closed,Do not advertise source or dual-role power without ADR
+JFB1,7,USB_CC2,FB-100/LB-100,LB-100,5.1k Rd device role,USB-C service is device-only and detect-only,Closed,Do not advertise source or dual-role power without ADR
+JFB1,8,USB_VBUS_SENSE,FB-100 to LB-100,LB-100,Divider/sense only,VBUS presence cannot back-power LB_3V3_IO PB_5V_OUT or PB-100,Closed,Do not connect VBUS to system rails
+JFB1,9,STATUS_RGB_DATA,LB-100 to FB-100,LB-100,Low/off until firmware drives,Role-free status RGB data or discrete RGB driver input,Closed,Do not encode vehicle accessory roles in LED hardware
+JFB1,10,CH_LED_1,LB-100 to FB-100,LB-100,Off until firmware drives,Role-free OUT1 indicator,Closed,Do not label by accessory role
+JFB1,11,CH_LED_2,LB-100 to FB-100,LB-100,Off until firmware drives,Role-free OUT2 indicator,Closed,Do not label by accessory role
+JFB1,12,CH_LED_3,LB-100 to FB-100,LB-100,Off until firmware drives,Role-free OUT3 indicator,Closed,Do not label by accessory role
+JFB1,13,CH_LED_4,LB-100 to FB-100,LB-100,Off until firmware drives,Role-free OUT4 indicator,Closed,Do not label by accessory role
+JFB1,14,CH_LED_5,LB-100 to FB-100,LB-100,Off until firmware drives,Role-free OUT5 indicator,Closed,Do not label by accessory role
+JFB1,15,CH_LED_6,LB-100 to FB-100,LB-100,Off until firmware drives,Role-free OUT6 indicator,Closed,Do not label by accessory role
+JFB1,16,CH_LED_7,LB-100 to FB-100,LB-100,Off until firmware drives,Role-free OUT7 indicator,Closed,Do not label by accessory role
+JFB1,17,CH_LED_8,LB-100 to FB-100,LB-100,Off until firmware drives,Role-free OUT8 indicator,Closed,Do not label by accessory role
+JFB1,18,CH_LED_9,LB-100 to FB-100,LB-100,Off until firmware drives,Role-free OUT9 indicator,Closed,Do not label by accessory role
+JFB1,19,CH_LED_10,LB-100 to FB-100,LB-100,Off until firmware drives,Role-free OUT10 indicator,Closed,Do not label by accessory role
+JFB1,20,SERVICE_BTN,FB-100 to LB-100,LB-100,Inactive active-low with pull,Service input only; debounce in firmware or RC,Closed,Do not share service button with unsafe reset/output enable path
+JFB1,21,RESET_BTN,FB-100 to LB-100,LB-100,Inactive active-low with pull,Reset or boot request through LB supervisor only,Closed,Do not let reset button directly enable PB outputs
+JFB1,22,OLED_SCL,LB-100 to FB-100,LB-100,Pull-up on controlled 3V3,Optional OLED I2C SCL DNP if display not populated,Closed,Do not consume OLED bus when OLED is DNP without pull-up review
+JFB1,23,OLED_SDA,LB-100/FB-100,LB-100,Pull-up on controlled 3V3,Optional OLED I2C SDA DNP if display not populated,Closed,Do not consume OLED bus when OLED is DNP without pull-up review
+JFB1,24,OLED_RST_OR_INT_DNP,LB-100/FB-100,LB-100,DNP or pulled inactive,Optional display reset/interrupt spare,Closed,Do not make OLED mandatory for service UI

@@ -53,9 +53,24 @@ LB100_CONTRACTS = (
     LB100_DIR / "LB-100-jpb1-resource-budget.csv",
     LB100_DIR / "LB-100-rail-tree-precheck.csv",
 )
+LB100_PIN_BINDING = LB100_DIR / "LB-100-stm32h563-pin-binding-precheck.csv"
+LB100_SOURCING = LB100_DIR / "LB-100-mcu-sourcing-precheck.csv"
+LB100_COMPONENT_SOURCING = LB100_DIR / "LB-100-component-sourcing-precheck.csv"
+LB100_CLOSEOUTS = (
+    LB100_DIR / "LB-100-communication-safety-precheck.csv",
+    LB100_DIR / "LB-100-service-storage-sensor-precheck.csv",
+)
+LB100_RAIL_BUDGET_CLOSEOUT = LB100_DIR / "LB-100-rail-budget-closeout-precheck.csv"
 FB100_CONTRACTS = (
     FB100_DIR / "FB-100-interface-signal-plan.csv",
     FB100_DIR / "FB-100-ui-mechanical-precheck.csv",
+)
+FB100_SOURCING = FB100_DIR / "FB-100-component-sourcing-precheck.csv"
+FB100_INTERFACE_PINOUT = FB100_DIR / "FB-100-interface-pinout-closeout.csv"
+FB100_CLOSEOUTS = (
+    FB100_DIR / "FB-100-usb-service-closeout-precheck.csv",
+    FB100_DIR / "FB-100-ui-control-closeout-precheck.csv",
+    FB100_DIR / "FB-100-mechanical-envelope-precheck.csv",
 )
 REQUIRED_BLOCKER_PREFIX = {
     "LB-100": "LBREL-",
@@ -128,6 +143,61 @@ FB100_MECHANICAL_COLUMNS = (
     "Required evidence",
     "Current state",
     "Pass condition",
+    "Blocked action",
+)
+SOURCING_COLUMNS = (
+    "Symbol key",
+    "Assembly owner",
+    "Preferred MPN or class",
+    "JLCPCB part",
+    "Primary source",
+    "Secondary source",
+    "Evidence date",
+    "Evidence result",
+    "Open blocker",
+    "Status",
+)
+LB100_PIN_BINDING_COLUMNS = (
+    "Scope",
+    "JPB1 pin",
+    "Net",
+    "STM32H563VITx LQFP100 pin",
+    "Package position",
+    "Peripheral or pin evidence",
+    "Default or population rule",
+    "Review status",
+    "Open blocker",
+    "Blocked action",
+)
+GENERIC_CLOSEOUT_COLUMNS = (
+    "Check ID",
+    "Scope",
+    "Evidence",
+    "Close result",
+    "Status",
+    "Blocked action",
+)
+FB100_INTERFACE_PINOUT_COLUMNS = (
+    "Connector",
+    "Pin",
+    "Signal",
+    "Direction",
+    "Owner",
+    "Default state",
+    "Close evidence",
+    "Status",
+    "Blocked action",
+)
+LB100_RAIL_BUDGET_CLOSEOUT_COLUMNS = (
+    "Budget item",
+    "Rail",
+    "Population",
+    "Active budget mA",
+    "Service or peak budget mA",
+    "Sleep boundary",
+    "Source evidence",
+    "Close result",
+    "Status",
     "Blocked action",
 )
 
@@ -300,14 +370,19 @@ def validate_blocker_register(board: str, path: Path) -> None:
         seen_ids.add(blocker_id)
         if not blocker_id.startswith(prefix):
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocker ID must start with {prefix}")
-        if row["Status"].strip() not in {"Open", "Conditional"}:
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blockers must remain Open or Conditional")
+        if row["Status"].strip() not in {"Open", "Conditional", "Closed"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blockers must be Open Conditional or Closed")
         for column in BLOCKER_COLUMNS:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        row_text = " ".join(row.values()).lower()
+        if row["Status"].strip() == "Closed" and "closed" not in row_text:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: closed blocker must explain closed evidence")
         impact = row["Layout impact"].lower()
-        if "block" not in impact or "layout" not in impact:
+        if "layout" not in impact:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Layout impact must block layout")
+        if row["Status"].strip() != "Closed" and "block" not in impact:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: active Layout impact must block layout")
 
 
 def validate_manifest(path: Path) -> None:
@@ -352,6 +427,209 @@ def validate_contract_csv(path: Path, required_columns: tuple[str, ...], require
         blocked = row["Blocked action"].lower()
         if "do not" not in blocked:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocked action must be explicit")
+
+
+def validate_sourcing_precheck(path: Path, required_tokens: tuple[str, ...]) -> None:
+    rows = validate_csv(path)
+    if not rows:
+        fail(f"empty sourcing precheck: {path.relative_to(REPO_ROOT)}")
+    missing_columns = [column for column in SOURCING_COLUMNS if column not in rows[0]]
+    if missing_columns:
+        fail(f"{path.relative_to(REPO_ROOT)} is missing columns: {', '.join(missing_columns)}")
+    text = read_text(path)
+    for token in required_tokens:
+        if token not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} must include {token}")
+    for row_number, row in enumerate(rows, 2):
+        for column in SOURCING_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if row["Assembly owner"].strip() not in {"Factory", "Garage", "Factory or DNP"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid assembly owner")
+        if row["Status"].strip() not in {"Conditional", "Ready", "Frozen"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid sourcing status")
+        if row["Evidence date"].strip() != "2026-07-20":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: evidence date must match current recheck date")
+        for column in ("Primary source", "Secondary source"):
+            if not row[column].strip().startswith(("https://", "http://")):
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: {column} must be a URL")
+        if "open" not in row["Open blocker"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Open blocker must explicitly remain open")
+
+
+def validate_generic_closeout_csv(path: Path, required_tokens: tuple[str, ...]) -> None:
+    rows = validate_csv(path)
+    if not rows:
+        fail(f"empty closeout CSV: {path.relative_to(REPO_ROOT)}")
+    missing_columns = [column for column in GENERIC_CLOSEOUT_COLUMNS if column not in rows[0]]
+    if missing_columns:
+        fail(f"{path.relative_to(REPO_ROOT)} is missing columns: {', '.join(missing_columns)}")
+    text = read_text(path)
+    for token in required_tokens:
+        if token not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} must include {token}")
+    for row_number, row in enumerate(rows, 2):
+        for column in GENERIC_CLOSEOUT_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if row["Status"].strip() != "Closed":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: closeout rows must be Closed")
+        if "closed" not in row["Close result"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Close result must explain closure")
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocked action must be explicit")
+    if "No-layout boundary" not in text and "Manufacturing boundary" not in text:
+        fail(f"{path.relative_to(REPO_ROOT)} must include a no-layout or manufacturing boundary row")
+
+
+def validate_lb100_pin_binding() -> None:
+    path = LB100_PIN_BINDING
+    rows = validate_csv(path)
+    if not rows:
+        fail(f"empty LB-100 pin binding: {path.relative_to(REPO_ROOT)}")
+    missing_columns = [column for column in LB100_PIN_BINDING_COLUMNS if column not in rows[0]]
+    if missing_columns:
+        fail(f"{path.relative_to(REPO_ROOT)} is missing columns: {', '.join(missing_columns)}")
+    text = read_text(path)
+    for token in (
+        "STM32H563VITx.xml",
+        "DBVersion V3.0",
+        "Package LQFP100",
+        "IONb 80",
+        "OUT1_CTL",
+        "OUT10_IMON",
+        "PB_I2C_SCL",
+        "CAN1_TX_ROUTE",
+        "DNP/open",
+        "USB_DM",
+        "SWDIO",
+        "BOOT0",
+    ):
+        if token not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} must include {token}")
+
+    jpb1_pins = {str(pin) for pin in range(1, 101)}
+    seen_jpb1 = set()
+    seen_package_positions = set()
+    seen_mcu_pins = set()
+    for row_number, row in enumerate(rows, 2):
+        for column in LB100_PIN_BINDING_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        status = row["Review status"].strip()
+        if status not in {"Closed", "Conditional", "Reserved"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Review status")
+        blocked = row["Blocked action"].lower()
+        if "do not" not in blocked:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocked action must be explicit")
+        jpb1_pin = row["JPB1 pin"].strip()
+        if jpb1_pin != "N/A":
+            if jpb1_pin not in jpb1_pins:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid JPB1 pin {jpb1_pin}")
+            if jpb1_pin in seen_jpb1:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate JPB1 pin {jpb1_pin}")
+            seen_jpb1.add(jpb1_pin)
+        mcu_pin = row["STM32H563VITx LQFP100 pin"].strip()
+        package_position = row["Package position"].strip()
+        if mcu_pin != "No MCU pin":
+            if package_position in {"N/A", ""}:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: exact MCU pin requires package position")
+            if package_position in seen_package_positions:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate package position {package_position}")
+            if mcu_pin in seen_mcu_pins:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate MCU pin {mcu_pin}")
+            seen_package_positions.add(package_position)
+            seen_mcu_pins.add(mcu_pin)
+    missing_jpb1 = sorted(jpb1_pins - seen_jpb1, key=int)
+    if missing_jpb1:
+        fail(f"{path.relative_to(REPO_ROOT)} is missing JPB1 pins: {', '.join(missing_jpb1)}")
+
+
+def validate_fb100_interface_pinout() -> None:
+    path = FB100_INTERFACE_PINOUT
+    rows = validate_csv(path)
+    if not rows:
+        fail(f"empty FB-100 interface pinout: {path.relative_to(REPO_ROOT)}")
+    missing_columns = [column for column in FB100_INTERFACE_PINOUT_COLUMNS if column not in rows[0]]
+    if missing_columns:
+        fail(f"{path.relative_to(REPO_ROOT)} is missing columns: {', '.join(missing_columns)}")
+    text = read_text(path)
+    for token in (
+        "JFB1",
+        "USB_D_P",
+        "USB_D_N",
+        "USB_CC1",
+        "USB_CC2",
+        "USB_VBUS_SENSE",
+        "CH_LED_1",
+        "CH_LED_10",
+        "SERVICE_BTN",
+        "RESET_BTN",
+        "OLED_SCL",
+        "OLED_SDA",
+        "Do not connect VBUS to system rails",
+    ):
+        if token not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} must include {token}")
+    seen_pins = set()
+    for row_number, row in enumerate(rows, 2):
+        for column in FB100_INTERFACE_PINOUT_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if row["Connector"].strip() != "JFB1":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: connector must be JFB1")
+        pin = row["Pin"].strip()
+        if pin in seen_pins:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate JFB1 pin {pin}")
+        seen_pins.add(pin)
+        if row["Status"].strip() != "Closed":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: pinout rows must be Closed")
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocked action must be explicit")
+    expected = {str(pin) for pin in range(1, 25)}
+    missing = sorted(expected - seen_pins, key=int)
+    if missing:
+        fail(f"{path.relative_to(REPO_ROOT)} is missing JFB1 pins: {', '.join(missing)}")
+
+
+def validate_lb100_rail_budget_closeout() -> None:
+    path = LB100_RAIL_BUDGET_CLOSEOUT
+    rows = validate_csv(path)
+    if not rows:
+        fail(f"empty LB-100 rail budget closeout: {path.relative_to(REPO_ROOT)}")
+    missing_columns = [column for column in LB100_RAIL_BUDGET_CLOSEOUT_COLUMNS if column not in rows[0]]
+    if missing_columns:
+        fail(f"{path.relative_to(REPO_ROOT)} is missing columns: {', '.join(missing_columns)}")
+    text = read_text(path)
+    for token in (
+        "PB_5V_OUT",
+        "219.2",
+        "415.2",
+        "500 mA",
+        "no-back-power",
+        "CAN1 TX",
+        "No-layout boundary",
+    ):
+        if token not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} must include {token}")
+    seen_items = set()
+    for row_number, row in enumerate(rows, 2):
+        item = row["Budget item"].strip()
+        if item in seen_items:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Budget item {item}")
+        seen_items.add(item)
+        for column in LB100_RAIL_BUDGET_CLOSEOUT_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if row["Status"].strip() != "Closed":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: rail budget rows must be Closed")
+        if "closed" not in row["Close result"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Close result must explain closure")
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocked action must be explicit")
+    for item in ("Base sustained total", "Service peak total", "No-layout boundary"):
+        if item not in seen_items:
+            fail(f"{path.relative_to(REPO_ROOT)} must include {item}")
 
 
 def validate_order_readiness() -> None:
@@ -433,6 +711,56 @@ def main() -> int:
         FB100_CONTRACTS[1],
         FB100_MECHANICAL_COLUMNS,
         ("FB-MECH-001", "USB-C", "No FB-100 PCB layout", "JLCPCB/PCBWay"),
+    )
+    validate_lb100_pin_binding()
+    validate_sourcing_precheck(
+        LB100_COMPONENT_SOURCING,
+        (
+            "LB_3V3_MAIN_REG",
+            "LB_CAN1_TRANSCEIVER",
+            "LB_CAN2_TRANSCEIVER",
+            "LB_LIN_TRANSCEIVER_DNP",
+            "LB_RS485_TRANSCEIVER_DNP",
+            "LB_BLE_MODULE",
+            "LB_FRAM",
+            "LB_RTC",
+            "LB_IMU",
+            "LB_LUX",
+            "LB_MICROSD_SOCKET",
+            "LB_SERVICE_USB_BOUNDARY",
+        ),
+    )
+    validate_lb100_rail_budget_closeout()
+    for closeout_path in LB100_CLOSEOUTS:
+        validate_generic_closeout_csv(closeout_path, ("Closed", "Do not"))
+    validate_sourcing_precheck(
+        LB100_SOURCING,
+        ("STM32H563VIT6", "C6937834", "STM32H573VIT6", "C7545121", "STM32H563RGT6", "C22470894"),
+    )
+    validate_fb100_interface_pinout()
+    for closeout_path in FB100_CLOSEOUTS:
+        validate_generic_closeout_csv(closeout_path, ("Closed", "Do not"))
+    validate_sourcing_precheck(
+        FB100_SOURCING,
+        (
+            "USB4105-GF-A",
+            "C3020560",
+            "TYPE-C-31-M-12",
+            "C165948",
+            "USBLC6-2SC6",
+            "C7519",
+            "TPD2EUSB30ADRTR",
+            "C94934",
+            "FB_STATUS_RGB",
+            "FB_CHANNEL_LED",
+            "FB_FPC_CONNECTOR",
+            "FB_FFC_CABLE",
+            "FB_SERVICE_BUTTON",
+            "FB_RESET_BUTTON",
+            "FB_OLED_DNP",
+            "FB_BUTTON_LED_PASSIVES",
+            "FB_OLED_ALT_091_DNP",
+        ),
     )
     validate_order_readiness()
     validate_no_layout_before_freeze("PB-100", PB100_DIR, "Open")

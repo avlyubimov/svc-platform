@@ -2708,3 +2708,35 @@ Reason: These contracts reduce the unknowns blocking LB-100 and FB-100
 schematic freeze without creating layout, board outlines, component placement,
 Gerbers, drills, pick-place files, BOM/CPL packages, or JLCPCB/PCBWay order
 artifacts.
+
+## 2026-07-20 — LB-100 MCU and FB-100 service/UI sourcing started
+
+Decision: LB-100 MCU sourcing evidence now has
+`hardware/logic-board/LB-100/LB-100-mcu-sourcing-precheck.csv` covering the
+STM32H563VIT6 preferred path, STM32H573VIT6 security alternate, and a downsized
+STM32H563RGT6 fallback that would require a resource reduction before use.
+FB-100 component sourcing evidence now has
+`hardware/front-board/FB-100/FB-100-component-sourcing-precheck.csv` covering
+USB-C service connector candidates, USB ESD protection candidates, RGB status
+LED class, and channel indicator LED class.
+
+Reason: Current JLCPCB/LCSC/DigiKey/ST/TI source evidence closes part of the
+factory-sourcing gap for LB-100 and FB-100 while leaving exact pin audit,
+footprint orientation, USB no-back-power, LED drive values, final quantities,
+BOM/CPL, PCB layout, and manufacturing outputs blocked.
+
+## 2026-07-20 — LB-100 and FB-100 pre-layout release blockers closed
+
+Decision: LB-100 release blockers LBREL-001 through LBREL-007 and FB-100
+release blockers FBREL-001 through FBREL-006 are now closed with machine-checked
+pre-layout evidence. LB-100 has exact STM32H563VITx LQFP100/JPB1 pin binding,
+rail budget, communication-safety, service/storage/sensor, and sourcing
+closeout records. FB-100 has JFB1 pinout, USB service/no-back-power, UI/control,
+mechanical-envelope, and sourcing closeout records.
+
+Reason: These records remove the LB-100 and FB-100 release-blocker deadlock
+without creating PCB layouts, Gerbers, drills, pick-place files, BOM/CPL order
+packages, manufacturing ZIPs, or JLCPCB/PCBWay order artifacts. Both boards
+remain NO-GO for ordering until their schematic-freeze checklists close with
+reviewed value-bearing schematic sheets; PB-100 remains blocked by its active
+PBREL register.
