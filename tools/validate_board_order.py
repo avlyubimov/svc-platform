@@ -11,6 +11,7 @@ PB100_DIR = REPO_ROOT / "hardware" / "power-board" / "PB-100"
 LB100_DIR = REPO_ROOT / "hardware" / "logic-board" / "LB-100"
 FB100_DIR = REPO_ROOT / "hardware" / "front-board" / "FB-100"
 ORDER_READINESS = REPO_ROOT / "production" / "board-order" / "three_board_jlcpcb_order_readiness.csv"
+PB100_FREEZE = PB100_DIR / "PB-100-schematic-freeze-checklist.md"
 ADR_0014 = REPO_ROOT / "docs" / "adr" / "ADR-0014-lb-fb-baseline-requirements.md"
 
 MANUFACTURING_SUFFIXES = {
@@ -793,7 +794,7 @@ def main() -> int:
         ),
     )
     validate_order_readiness()
-    validate_no_layout_before_freeze("PB-100", PB100_DIR, "Open")
+    validate_no_layout_before_freeze("PB-100", PB100_DIR, checklist_status(PB100_FREEZE))
     print("Three-board order validation passed")
     return 0
 

@@ -192,6 +192,9 @@ BOARD_PRINT_CLOSURE_MATRIX_COLUMNS = (
 ENGINEERING_BLOCKER_CLOSEOUT = (
     "hardware/power-board/PB-100/PB-100-engineering-blocker-closeout.md"
 )
+SCHEMATIC_REVIEW_CLOSEOUT = (
+    "hardware/power-board/PB-100/PB-100-schematic-review-closeout.md"
+)
 OUTPUT_CHANNEL_PIN_CONTRACT_COLUMNS = (
     "Output",
     "Controller ref",
@@ -897,7 +900,7 @@ REQUIRED_READINESS_AREAS = {
     "CAN1 safety verification",
     "Layout authorization",
 }
-ALLOWED_DASHBOARD_STATUSES = {"Closed", "Conditional", "Open", "Blocked"}
+ALLOWED_DASHBOARD_STATUSES = {"Closed", "Conditional", "Open", "Blocked", "Ready"}
 REQUIRED_LOGIC_POWER_ITEMS = {
     "Buck regulator",
     "Buck input rail",
@@ -1486,6 +1489,7 @@ ALLOWED_CAPTURE_STATUSES = {
 REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md",
     ENGINEERING_BLOCKER_CLOSEOUT,
+    SCHEMATIC_REVIEW_CLOSEOUT,
     "hardware/power-board/PB-100/PB-100-schematic-package.md",
     "hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv",
     "hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md",
@@ -2591,14 +2595,17 @@ def validate_schematic_readiness_dashboard() -> None:
         fail("Architecture baseline must remain Closed in schematic readiness dashboard")
     if rows_by_area["PB-100 requirements"]["Status"].strip() != "Closed":
         fail("PB-100 requirements must remain Closed in schematic readiness dashboard")
-    if rows_by_area["Layout authorization"]["Status"].strip() != "Blocked":
-        fail("Layout authorization must remain Blocked before schematic freeze")
+    freeze_closed = freeze_checklist_status() == "Closed"
+    expected_layout_status = "Ready" if freeze_closed else "Blocked"
+    if rows_by_area["Layout authorization"]["Status"].strip() != expected_layout_status:
+        fail(f"Layout authorization must be {expected_layout_status} for current schematic freeze state")
     if "schematic freeze" not in rows_by_area["Layout authorization"]["Remaining close work"].lower():
         fail("Layout authorization close work must reference schematic freeze")
 
     symbol_row = rows_by_area["Symbol readiness"]
-    if symbol_row["Status"].strip() != "Conditional":
-        fail("Symbol readiness must remain Conditional while Q1 package and assembly review remain open")
+    expected_symbol_status = "Closed" if freeze_closed else "Conditional"
+    if symbol_row["Status"].strip() != expected_symbol_status:
+        fail(f"Symbol readiness must be {expected_symbol_status} for current schematic freeze state")
     symbol_close_work = symbol_row["Remaining close work"].lower()
     if "q1" not in symbol_close_work or "40 a" not in symbol_close_work:
         fail("Symbol readiness must mention Q1 and 40 A close work")
@@ -2731,6 +2738,14 @@ def freeze_checklist_rows_by_gate() -> dict[str, dict[str, str]]:
     return rows_by_gate
 
 
+def freeze_checklist_status() -> str:
+    text = read_text(PB100_DIR / "PB-100-schematic-freeze-checklist.md")
+    match = re.search(r"^Status:\s*(.+?)\s*$", text, flags=re.MULTILINE)
+    if match is None:
+        fail("PB-100 schematic freeze checklist must include top-level Status")
+    return match.group(1).strip()
+
+
 def freeze_checklist_gates_by_status() -> dict[str, str]:
     rows_by_gate = freeze_checklist_rows_by_gate()
     gates_by_status = {gate: row["Status"] for gate, row in rows_by_gate.items()}
@@ -2754,7 +2769,7 @@ def validate_schematic_freeze_gap_register() -> None:
 
     checklist_rows_by_gate = freeze_checklist_rows_by_gate()
     gates_by_status = {gate: row["Status"] for gate, row in checklist_rows_by_gate.items()}
-    conditional_gates = {gate for gate, status in gates_by_status.items() if status == "Conditional"}
+    tracked_gates = set(pbrel_id_by_gate())
     seen_gates = set()
     rows_by_gate: dict[str, dict[str, str]] = {}
     for row_number, row in enumerate(rows, 2):
@@ -2766,13 +2781,12 @@ def validate_schematic_freeze_gap_register() -> None:
         rows_by_gate[gate] = row
         if gate not in gates_by_status:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown freeze checklist gate {gate}")
-        if status != "Conditional":
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: gap register rows must remain Conditional")
-        if gates_by_status[gate] != "Conditional":
-            fail(
-                f"{path.relative_to(REPO_ROOT)}:{row_number}: gate {gate} is "
-                f"{gates_by_status[gate]} in freeze checklist but present in gap register"
-            )
+        if gate not in tracked_gates:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: gate {gate} is not a tracked PB freeze gate")
+        if status not in {"Closed", "Conditional", "Open", "Blocked"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid gap status {status}")
+        if status != gates_by_status[gate]:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: gap status must match checklist status {gates_by_status[gate]}")
         for column in (
             "Close evidence required",
             "Primary gap artifact",
@@ -2782,16 +2796,16 @@ def validate_schematic_freeze_gap_register() -> None:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
 
-    missing_gates = sorted(conditional_gates - seen_gates)
-    extra_gates = sorted(seen_gates - conditional_gates)
+    missing_gates = sorted(tracked_gates - seen_gates)
+    extra_gates = sorted(seen_gates - tracked_gates)
     if missing_gates:
         fail(
-            f"{path.relative_to(REPO_ROOT)} is missing conditional gates: "
+            f"{path.relative_to(REPO_ROOT)} is missing tracked PB freeze gates: "
             f"{', '.join(missing_gates)}"
         )
     if extra_gates:
         fail(
-            f"{path.relative_to(REPO_ROOT)} has non-conditional gates: "
+            f"{path.relative_to(REPO_ROOT)} has non-tracked PB freeze gates: "
             f"{', '.join(extra_gates)}"
         )
 
@@ -3255,6 +3269,47 @@ def validate_engineering_blocker_closeout() -> None:
         for token in common_section_tokens + specific_tokens_by_id[blocker_id]:
             if token not in section and token not in normalized_section:
                 fail(f"{path.relative_to(REPO_ROOT)} {blocker_id} section must include {token}")
+
+
+def validate_schematic_review_closeout() -> None:
+    path = REPO_ROOT / SCHEMATIC_REVIEW_CLOSEOUT
+    text = read_text(path)
+    normalized_text = " ".join(text.split())
+    for token in (
+        "Status: Closed",
+        "Review date: 2026-07-20",
+        "does not create KiCad PCB layout",
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "BOM/CPL",
+        "manufacturing ZIP",
+        "PCBA orders",
+        "PBREL-001 through PBREL-012 are closed",
+        "post-prototype",
+        "board-print remains NO-GO",
+        "CAN1_TX_ROUTE",
+        "DNP/open",
+        "40 A default total current budget",
+        "JPB1",
+        "TPS48110AQDGXRQ1",
+        "ADR-0011",
+        "SM8S33AHM3/I",
+        "80 V MOSFET",
+        "LM74700QDBVRQ1",
+        "LM5164QDDATQ1",
+        "INA228-Q1",
+        "TEMP_PCB",
+        "TEMP_PWR_A",
+        "TEMP_PWR_B",
+        "JLCPCB/PCBWay",
+        "garage",
+        "PB-100-engineering-blocker-closeout.md",
+        "PB-100-post-prototype-validation-gate.csv",
+    ):
+        if token not in text and token not in normalized_text:
+            fail(f"{path.relative_to(REPO_ROOT)} must include {token}")
 
 
 def validate_board_release_blocker_register() -> None:
@@ -10557,11 +10612,9 @@ def validate_validation_traceability() -> None:
             f"{', '.join(missing_columns)}"
         )
 
-    conditional_gates = {
-        gate for gate, status in freeze_checklist_gates_by_status().items() if status == "Conditional"
-    }
+    tracked_gates = set(pbrel_id_by_gate())
     seen_test_ids = set()
-    gates_with_tests: dict[str, list[dict[str, str]]] = {gate: [] for gate in conditional_gates}
+    gates_with_tests: dict[str, list[dict[str, str]]] = {gate: [] for gate in tracked_gates}
     allowed_phases = {"Schematic review", "Schematic plus bench", "Production review"}
     for row_number, row in enumerate(rows, 2):
         test_id = row["Test ID"].strip()
@@ -10571,8 +10624,8 @@ def validate_validation_traceability() -> None:
         seen_test_ids.add(test_id)
         if not test_id.startswith("PBVAL-"):
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Test ID must start with PBVAL-")
-        if freeze_gate not in conditional_gates:
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown or non-conditional freeze gate {freeze_gate}")
+        if freeze_gate not in tracked_gates:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown freeze gate {freeze_gate}")
         if row["Validation phase"].strip() not in allowed_phases:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Validation phase {row['Validation phase'].strip()}")
         for column in VALIDATION_TRACEABILITY_COLUMNS:
@@ -11329,6 +11382,7 @@ def main() -> int:
     validate_schematic_readiness_dashboard()
     validate_schematic_freeze_gap_register()
     validate_engineering_blocker_closeout()
+    validate_schematic_review_closeout()
     validate_board_release_blocker_register()
     validate_board_print_closure_matrix()
     validate_schematic_capture_work_queue()

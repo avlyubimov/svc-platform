@@ -4,17 +4,18 @@ docs/requirements/pb-100-requirements.md,Requirements,PB-100 baseline,Required,D
 docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md,Architecture,Pre-layout versus post-prototype validation split,Required,Document reviewed,Frozen
 docs/testing/test-plan.md,Validation,Bench validation baseline,Required,Document reviewed,Ready
 hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv,Validation,Post-prototype bench validation gate,Required,validate_post_prototype_validation_gate,Conditional
-hardware/power-board/PB-100/PB-100-schematic-package.md,Review package,Schematic package index,Required,Manifest and docs validation,Ready
-hardware/power-board/PB-100/PB-100-schematic-readiness-review.md,Review package,Readiness snapshot,Required,Manifest and docs validation,Ready
+hardware/power-board/PB-100/PB-100-schematic-package.md,Review package,Schematic package index,Required,Manifest and docs validation,Closed
+hardware/power-board/PB-100/PB-100-schematic-readiness-review.md,Review package,Readiness snapshot,Required,Manifest and docs validation,Closed
 hardware/power-board/PB-100/PB-100-review-release-manifest.csv,Review package,Freeze release manifest,Required,validate_review_release_manifest,Conditional
-hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv,Review package,Cross-artifact readiness dashboard,Required,validate_schematic_readiness_dashboard,Conditional
-hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md,Review package,Freeze gate checklist,Required,validate_schematic_freeze_gap_register,Open
-hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv,Review package,Conditional gate gap register,Required,validate_schematic_freeze_gap_register,Conditional
-hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv,Review package,Board-release blocker register,Required,validate_board_release_blocker_register,Conditional
+hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv,Review package,Cross-artifact readiness dashboard,Required,validate_schematic_readiness_dashboard,Closed
+hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md,Review package,Freeze gate checklist,Required,validate_schematic_freeze_gap_register,Closed
+hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv,Review package,Conditional gate gap register,Required,validate_schematic_freeze_gap_register,Closed
+hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv,Review package,Board-release blocker register,Required,validate_board_release_blocker_register,Closed
 hardware/power-board/PB-100/PB-100-engineering-blocker-closeout.md,Review package,PBREL engineering blocker closeout,Required,validate_engineering_blocker_closeout,Closed
-hardware/power-board/PB-100/PB-100-board-print-closure-matrix.csv,Review package,Board-print closure matrix,Required,validate_board_print_closure_matrix,Conditional
+hardware/power-board/PB-100/PB-100-schematic-review-closeout.md,Review package,PB-100 schematic review closeout,Required,validate_schematic_review_closeout,Closed
+hardware/power-board/PB-100/PB-100-board-print-closure-matrix.csv,Review package,Board-print closure matrix,Required,validate_board_print_closure_matrix,Closed
 hardware/power-board/PB-100/PB-100-board-release-local-evidence-closeout.csv,Review package,Local PBREL evidence closeout ledger,Required,Document reviewed,Conditional
-hardware/power-board/PB-100/PB-100-validation-traceability.csv,Validation,Freeze-gate validation trace,Required,validate_validation_traceability,Conditional
+hardware/power-board/PB-100/PB-100-validation-traceability.csv,Validation,Freeze-gate validation trace,Required,validate_validation_traceability,Closed
 hardware/power-board/PB-100/PB-100-schematic-capture-plan.md,Schematic capture,Capture process,Required,Document reviewed,Ready
 hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv,Schematic capture,Sheet-level capture work queue,Required,validate_schematic_capture_work_queue,Conditional
 hardware/power-board/PB-100/PB-100-kicad-sheet-manifest.csv,KiCad scaffold,Sheet manifest,Required,validate_kicad_sheet_manifest,Ready
