@@ -2947,3 +2947,24 @@ placement/routing constraints. This closes the USB/no-back-power layout-model
 gate without creating `FB-100.kicad_pcb`, Gerbers, drill files, pick-place
 files, BOM/CPL order packages, manufacturing ZIPs, fabrication packages, or
 PCBA orders. FB-100 board import remains blocked by footprint binding.
+
+## 2026-07-20 — FB-100 local footprint binding closed
+
+Decision: FB-100 now has project-local KiCad footprint bindings for every
+on-board footprint item in `hardware/front-board/FB-100/kicad/lib/FB100.pretty`.
+The bindings cover USB-C preferred and alternate connectors, USB ESD preferred
+and alternate packages, RGB/status LED, channel LED preferred and alternate
+packages, JFB1 FPC connector, SERVICE/RESET switch options, optional OLED DNP
+preferred and alternate footprints, and local 0603/0805 passive footprints.
+Evidence is in `hardware/front-board/FB-100/FB-100-footprint-binding-closeout.csv`
+and `hardware/front-board/FB-100/FB-100-footprint-binding-closeout.md`.
+
+Reason: FB-100 package sources were identified, but board-import preparation
+still lacked local KiCad footprint evidence. JLCPCB/LCSC/EasyEDA footprint
+sources were converted and normalized to KiCad 10 format, with temporary 3D
+model paths removed. This closes FB-100 footprint binding without creating
+`FB-100.kicad_pcb`, Gerbers, drill files, pick-place files, BOM/CPL order
+packages, manufacturing ZIPs, fabrication packages, or PCBA orders. FB-100 board
+import remains blocked by schematic symbol promotion because the KiCad
+schematic is still a value-bearing scaffold rather than footprint-bound symbol
+instances.

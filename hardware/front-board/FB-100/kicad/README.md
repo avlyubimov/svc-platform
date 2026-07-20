@@ -6,11 +6,12 @@ This directory contains a non-layout KiCad project for FB-100 schematic
 planning.
 
 There is intentionally no `FB-100.kicad_pcb` file. Schematic freeze,
-mechanical-envelope layout inputs, and USB/no-back-power layout inputs are
-closed, but KiCad board import remains blocked until
-`../FB-100-pcb-layout-start-checklist.csv` closes footprint binding. Gerbers,
-drills, pick-place files, BOM/CPL order packages, and zipped manufacturing
-outputs remain blocked until layout review and order evidence close.
+mechanical-envelope layout inputs, USB/no-back-power layout inputs, and
+project-local footprint binding are closed, but KiCad board import remains
+blocked until `../FB-100-pcb-layout-start-checklist.csv` closes schematic symbol
+promotion. Gerbers, drills, pick-place files, BOM/CPL order packages, and
+zipped manufacturing outputs remain blocked until layout review and order
+evidence close.
 
 ## Source Documents
 
@@ -18,6 +19,8 @@ outputs remain blocked until layout review and order evidence close.
 - `../FB-100-schematic-freeze-checklist.md`
 - `../FB-100-pcb-layout-start-checklist.csv`
 - `../FB-100-footprint-binding-inventory.csv`
+- `../FB-100-footprint-binding-closeout.csv`
+- `../FB-100-footprint-binding-closeout.md`
 - `../FB-100-mechanical-envelope-inventory.csv`
 - `../FB-100-mechanical-layout-inputs.csv`
 - `../FB-100-usb-no-back-power-layout-rules.csv`

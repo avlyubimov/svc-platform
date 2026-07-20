@@ -1,0 +1,159 @@
+(footprint "R_C_0603_1608Metric"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "Generic 0603 1608 metric resistor/capacitor footprint for FB-100 passives")
+	(property "Reference" "REF**"
+		(at 0 -1.45 0)
+		(layer "F.SilkS")
+		(uuid "f08c0c80-a7ce-4b01-a298-63bd57810a32")
+		(effects
+			(font
+				(size 0.7 0.7)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Value" "R_C_0603_1608Metric"
+		(at 0 1.45 0)
+		(layer "F.Fab")
+		(uuid "441af150-9225-4914-a77e-bbe5b3c7ea49")
+		(effects
+			(font
+				(size 0.7 0.7)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "2b0f8bbe-67b8-4029-930e-9d1beae460a9")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "0af646ca-9f47-4775-acf6-a55edfd38b78")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr smd)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_line
+		(start -1.45 -0.75)
+		(end 1.45 -0.75)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "897a8314-ba88-4e11-b362-79b726d8f15b")
+	)
+	(fp_line
+		(start -1.45 0.75)
+		(end -1.45 -0.75)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "3d1e49a1-c19b-4465-8496-b16e554fe995")
+	)
+	(fp_line
+		(start 1.45 -0.75)
+		(end 1.45 0.75)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "7bb53536-2a21-4834-a4d5-0a431936e4c7")
+	)
+	(fp_line
+		(start 1.45 0.75)
+		(end -1.45 0.75)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "d8a1bacc-9a2d-45a2-a207-c852c1a34d29")
+	)
+	(fp_line
+		(start -0.8 -0.4)
+		(end 0.8 -0.4)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "8b1ceb85-f829-4717-8b65-778433e021d0")
+	)
+	(fp_line
+		(start -0.8 0.4)
+		(end -0.8 -0.4)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "bf41c372-6d7c-4c6d-b84f-7adf8955502a")
+	)
+	(fp_line
+		(start 0.8 -0.4)
+		(end 0.8 0.4)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "fa9736d6-2605-4130-bda6-f68693869ac8")
+	)
+	(fp_line
+		(start 0.8 0.4)
+		(end -0.8 0.4)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "38a9115d-2a66-46e1-8713-f80f6caa0369")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(uuid "0ff90737-c0bb-4814-9355-c785964ea123")
+		(effects
+			(font
+				(size 0.45 0.45)
+				(thickness 0.08)
+			)
+		)
+	)
+	(pad "1" smd roundrect
+		(at -0.8 0)
+		(size 0.85 0.9)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.2)
+		(uuid "7c96b19b-a351-46de-a250-fda3573d7dfe")
+	)
+	(pad "2" smd roundrect
+		(at 0.8 0)
+		(size 0.85 0.9)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.2)
+		(uuid "b4e13221-d2a8-4809-a97d-a86bfb6ec262")
+	)
+	(embedded_fonts no)
+)
