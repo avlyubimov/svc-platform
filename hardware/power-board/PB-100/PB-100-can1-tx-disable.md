@@ -60,8 +60,8 @@ not final MPN or footprint locks.
 Reset, unpowered, DNP/open inspection, disabled-status readback, RX
 listen-only independence, and future-ADR hardware-action checks are tracked in
 `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`. The
-checklist is a schematic-freeze bench evidence plan; it does not authorize
-CAN1 TX support.
+checklist is a schematic-freeze procedure and post-prototype evidence plan; it
+does not authorize CAN1 TX support.
 
 ## Rev.1 capture contract
 

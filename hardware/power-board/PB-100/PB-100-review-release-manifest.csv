@@ -1,7 +1,9 @@
 Artifact,Category,Freeze role,Required for freeze,Validation hook,Status
 docs/architecture/Architecture-Review-v1.0.md,Architecture,Frozen baseline,Required,Document reviewed,Frozen
 docs/requirements/pb-100-requirements.md,Requirements,PB-100 baseline,Required,Document reviewed,Frozen
+docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md,Architecture,Pre-layout versus post-prototype validation split,Required,Document reviewed,Frozen
 docs/testing/test-plan.md,Validation,Bench validation baseline,Required,Document reviewed,Ready
+hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv,Validation,Post-prototype bench validation gate,Required,validate_post_prototype_validation_gate,Conditional
 hardware/power-board/PB-100/PB-100-schematic-package.md,Review package,Schematic package index,Required,Manifest and docs validation,Ready
 hardware/power-board/PB-100/PB-100-schematic-readiness-review.md,Review package,Readiness snapshot,Required,Manifest and docs validation,Ready
 hardware/power-board/PB-100/PB-100-review-release-manifest.csv,Review package,Freeze release manifest,Required,validate_review_release_manifest,Conditional

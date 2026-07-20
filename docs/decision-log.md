@@ -2651,3 +2651,18 @@ PowerPAK/TOLL/LFPAK88/DO-218AC/CSS4J/FX18 handling, DNP/open inspection, or
 first-article rework limits. Keeping that evidence separate prevents a generic
 assembly capability page from being treated as BOM lock, pick-place release,
 manufacturing ZIP, fabrication package, or PCBA order approval.
+
+## 2026-07-20 — PB-100 bench validation moved after prototype assembly
+
+Decision: PB-100 pre-layout closure now follows ADR-0013 and separates
+schematic/source/package evidence from physical bench execution. The new
+`hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv` tracks
+PB-BENCH-001 through PB-BENCH-015 as deferred post-prototype gates that block
+first motorcycle power, field use, and production release, but not the first
+prototype PCB fabrication package after schematic freeze.
+
+Reason: Several checks require an assembled PB-100 board or PB-100/LB-100
+stack. Requiring those measurements before the first board exists creates a
+process deadlock. Pre-layout release blockers may still require calculations,
+simulations, source evidence, package/footprint review inputs, test hooks, and
+bench procedures; physical records close only after prototype assembly.

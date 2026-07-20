@@ -725,6 +725,15 @@ VALIDATION_TRACEABILITY_COLUMNS = (
     "Pass condition",
     "Safety constraint",
 )
+POST_PROTOTYPE_VALIDATION_GATE_COLUMNS = (
+    "Bench ID",
+    "Area",
+    "Requires assembled board",
+    "Pre-layout artifact",
+    "Post-prototype evidence",
+    "Blocks until complete",
+    "Status",
+)
 TEST_POINT_PLAN_COLUMNS = (
     "Test point ref",
     "Net",
@@ -1472,6 +1481,7 @@ ALLOWED_CAPTURE_STATUSES = {
     "Review-defined",
 }
 REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
+    "docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md",
     "hardware/power-board/PB-100/PB-100-schematic-package.md",
     "hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv",
     "hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md",
@@ -1487,6 +1497,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-board-current-budget-value-freeze-checklist.csv",
     "hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv",
     "hardware/power-board/PB-100/PB-100-board-current-budget-closeout-precheck.csv",
+    "hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv",
     "hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv",
@@ -10954,6 +10965,8 @@ def validate_test_plan_traceability() -> None:
     path = REPO_ROOT / "docs" / "testing" / "test-plan.md"
     text = read_text(path)
     required_trace_artifacts = (
+        "ADR-0013-pb-100-prelayout-vs-postprototype-validation.md",
+        "PB-100-post-prototype-validation-gate.csv",
         "PB-100-logic-power-rail-trace.csv",
         "PB-100-logic-power-freeze-review.csv",
         "PB-100-high-medium-output-baseline-trace.csv",
@@ -11023,6 +11036,60 @@ def validate_test_plan_traceability() -> None:
         fail(f"{path.relative_to(REPO_ROOT)} must keep CAN1 listen-only bench test")
 
 
+def validate_post_prototype_validation_gate() -> None:
+    path = PB100_DIR / "PB-100-post-prototype-validation-gate.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty post-prototype validation gate: {path.relative_to(REPO_ROOT)}")
+
+    fieldnames = rows[0].keys()
+    missing_columns = [column for column in POST_PROTOTYPE_VALIDATION_GATE_COLUMNS if column not in fieldnames]
+    if missing_columns:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing required columns: "
+            f"{', '.join(missing_columns)}"
+        )
+
+    expected_bench_ids = {f"PB-BENCH-{index:03d}" for index in range(1, 16)}
+    seen_bench_ids = set()
+    for row_number, row in enumerate(rows, 2):
+        bench_id = row["Bench ID"].strip()
+        if bench_id in seen_bench_ids:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Bench ID {bench_id}")
+        seen_bench_ids.add(bench_id)
+        if bench_id not in expected_bench_ids:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown Bench ID {bench_id}")
+        for column in POST_PROTOTYPE_VALIDATION_GATE_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        requires_board = row["Requires assembled board"].strip()
+        if requires_board not in {"Yes", "Board optional"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid assembled-board requirement")
+        if row["Status"].strip() != "Deferred post-prototype":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: post-prototype status must remain deferred")
+        blocks = row["Blocks until complete"].lower()
+        if "first motorcycle power" not in blocks or "production release" not in blocks:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: post-prototype gate must block motorcycle power and production release")
+        pre_layout_artifact = row["Pre-layout artifact"].strip()
+        if pre_layout_artifact.startswith("docs/"):
+            artifact_path = REPO_ROOT / pre_layout_artifact
+        else:
+            artifact_path = PB100_DIR / pre_layout_artifact
+        if not artifact_path.exists():
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: missing pre-layout artifact "
+                f"{pre_layout_artifact}"
+            )
+
+    missing_bench_ids = sorted(expected_bench_ids - seen_bench_ids)
+    if missing_bench_ids:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} is missing post-prototype bench IDs: "
+            f"{', '.join(missing_bench_ids)}"
+        )
+
+
 def validate_net_naming_contract() -> None:
     path = PB100_DIR / "PB-100-net-naming.md"
     text = read_text(path)
@@ -11069,6 +11136,7 @@ def main() -> int:
     validate_schematic_readiness_review()
     validate_schematic_package()
     validate_test_plan_traceability()
+    validate_post_prototype_validation_gate()
     validate_output_channel_pin_contract()
     validate_output_controller_pin_template()
     validate_output_net_expansion()
