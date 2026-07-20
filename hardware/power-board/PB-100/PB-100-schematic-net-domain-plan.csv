@@ -49,6 +49,7 @@ CAN1_TX_DISABLED_STATUS,CAN safety,can1-safety.kicad_sch,PB-100 to LB-100,Assert
 CAN1_RX_ROUTE,CAN receive,can1-safety.kicad_sch,PB-100 to LB-100,DNP unless CAN1 crosses PB-100,May be populated independently for listen-only reception
 CAN1_TX_ROUTE,CAN transmit DNP,can1-safety.kicad_sch,LB-100 to PB-100,DNP/open by default,Must remain DNP/open unless a future ADR changes policy
 CAN1_TX_GATE_OUT,CAN safety local,can1-safety.kicad_sch,Local gate output before DNP/open link,High-Z or recessive while disabled,Must not bypass JP_CAN1 DNP/open or create a default-populated vehicle-CAN TX path
+CAN1_TXD_SAFE,CAN safety local,can1-safety.kicad_sch,Downstream side of DNP/open link toward transceiver TXD,Isolated and biased recessive while JP_CAN1 is DNP/open,Must remain electrically distinct from CAN1_TX_ROUTE and CAN1_TX_GATE_OUT
 CAN2_RX_ROUTE,Expansion CAN,can1-safety.kicad_sch,PB-100 to LB-100,DNP by default,Expansion only not vehicle CAN
 CAN2_TX_ROUTE,Expansion CAN,can1-safety.kicad_sch,LB-100 to PB-100,DNP by default,Expansion only not vehicle CAN
 SPARE_*,Reserve,b2b-interface.kicad_sch,Mixed,NC,Must not carry hidden role-specific behavior before schematic review

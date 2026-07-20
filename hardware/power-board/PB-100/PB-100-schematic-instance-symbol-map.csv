@@ -54,4 +54,8 @@ RT3,telemetry,THERMAL_NTC,PB100_THERMAL_NTC_PRELIM,Created,TEMP_PWR_B thermal se
 RID1,telemetry,BOARD_ID_RESISTOR,PB100_BOARD_ID_RESISTOR_CLASS_PRELIM,Created,Board identity resistor network class
 JP_CAN1,can1-safety,CAN1_TX_DISABLE,PB100_CAN1_TX_DNP_LINK_PRELIM,Created,DNP/open CAN1 TX link concrete symbol under CAN1_TX_DISABLE policy umbrella
 U_CAN1,can1-safety,CAN1_TX_DISABLE,PB100_SN74LVC1G125_Q1_DBV_PRELIM,Created,Conditional SN74LVC1G125-Q1 DBV gate concrete symbol under CAN1_TX_DISABLE policy umbrella
+R_CAN1_OE,can1-safety,CAN1_TX_DISABLE,PB100_CAN1_SAFETY_RESISTOR_PRELIM,Created,47k physical OE default-disable pull-up
+R_CAN1_TX_BIAS,can1-safety,CAN1_TX_DISABLE,PB100_CAN1_SAFETY_RESISTOR_PRELIM,Created,47k downstream CAN1_TXD_SAFE recessive-bias pull-up
+R_CAN1_STATUS_SER,can1-safety,CAN1_TX_DISABLE,PB100_CAN1_SAFETY_RESISTOR_PRELIM,Created,1k physical OE-to-status series readback
+R_CAN1_STATUS_PULL,can1-safety,CAN1_TX_DISABLE,PB100_CAN1_SAFETY_RESISTOR_PRELIM,Created,100k disabled-status default pull-up
 TP1..TPn,test,TEST_POINT,PB100_TEST_POINT_CLASS_PRELIM,Created,Pattern row for schematic-review-defined test points

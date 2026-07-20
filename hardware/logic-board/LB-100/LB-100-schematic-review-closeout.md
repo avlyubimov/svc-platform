@@ -1,9 +1,12 @@
 # LB-100 Schematic Review Closeout
 
-Status: Closed
+Status: Retracted; schematic freeze is Open
 Review date: 2026-07-20
 
-This closeout freezes the LB-100 Rev.1 schematic inputs for PCB-layout start. It
+This former closeout no longer freezes the LB-100 Rev.1 schematic inputs. The
+current KiCad sheet has no component symbols, the JPB1 FX18 footprint lacks
+approved MF circuits/TH features, and proposed ADR-0015 leaves the CAN1
+physical-layer board owner unresolved. It
 does not create or approve KiCad PCB layout, Gerbers, drills, pick-place files,
 BOM/CPL order packages, manufacturing ZIP files, fabrication packages, or PCBA
 orders.
@@ -16,8 +19,9 @@ orders.
   `LB-100-stm32h563-pin-binding-precheck.csv`.
 - Power: `PB_5V_OUT` 500 mA sustained allocation, calculated LB-100 sustained
   load 219.2 mA, service peak 415.2 mA, and no-back-power USB boundary.
-- CAN safety: CAN1 remains read-only by default with DNP/open TX route and no
-  firmware-only enable path; CAN2 remains the transmit-capable expansion bus.
+- CAN safety: CAN1 policy remains read-only by default, but transceiver/gate
+  board ownership is not closed and no physical CAN1 chain may be promoted;
+  CAN2 remains the transmit-capable expansion bus.
 - Services: USB service, BLE, microSD, RTC, FRAM, IMU, lux, LIN/RS485/UART DNP
   reserve, SWD, BOOT0, reset, and service-button resources are captured.
 - Assembly: factory-owned MCU, regulators, transceivers, BLE, storage, sensors,

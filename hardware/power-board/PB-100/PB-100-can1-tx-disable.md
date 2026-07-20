@@ -57,6 +57,19 @@ the physical gate-control node to `CAN1_TX_DISABLED_STATUS` through a 1 kΩ
 series path plus 100 kΩ default pull-up. These are schematic-review candidates,
 not final MPN or footprint locks.
 
+The captured electrical order is explicit and the nets must remain distinct:
+`CAN1_TX_ROUTE` -> `U_CAN1.A` -> `CAN1_TX_GATE_OUT` -> `JP_CAN1` ->
+`CAN1_TXD_SAFE` -> final CAN1 transceiver TXD. `JP_CAN1` pin 2 must never share
+`CAN1_TX_ROUTE` with `U_CAN1.A`; the exported-netlist validator enforces this
+topology and the four physical resistor connections. `CAN1_TXD_SAFE` is local
+to PB-100 and is not carried by the current JPB1 map, so it cannot connect
+directly to a transceiver on LB-100. End-to-end capture is blocked by proposed
+`ADR-0015-can1-physical-layer-board-ownership.md`. If ADR-0015 candidate A is
+accepted, the PB-local transceiver TXD must connect only to `CAN1_TXD_SAFE` and
+its RXD must return through `CAN1_RX_ROUTE`. If another candidate is accepted,
+the gate, jumper, transceiver, connector, and readback chain must be colocated
+or an explicitly reviewed return path must be added; no bypass is permitted.
+
 Reset, unpowered, DNP/open inspection, disabled-status readback, RX
 listen-only independence, and future-ADR hardware-action checks are tracked in
 `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`. The

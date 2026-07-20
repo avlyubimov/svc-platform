@@ -3,7 +3,7 @@
 	(generator "codex")
 	(generator_version "2026-07-20")
 	(layer "F.Cu")
-	(descr "Hirose FX18-100S-0.8SV20_Hirose; source-derived signal land pattern from official Hirose FX18 catalog and 2D drawing. MF/TH mechanical details remain controlled by mechanical-envelope gate before board import.")
+	(descr "Hirose FX18-100S-0.8SV20_Hirose; 100 signal lands use the official 0.8 mm pitch, 4.9 mm row-center spacing, and 0.5 x 2.1 mm size. Six TH lands for four MF electrical positions remain blocked pending circuit ownership and paired-footprint review.")
 	(tags "Hirose FX18 100 0.8mm mezzanine PB LB JPB1 source-derived")
 	(property "Reference" "REF**"
 		(at 0.000 -7.300 0)
@@ -39,7 +39,7 @@
 			)
 		)
 	)
-	(property "Description" "Hirose FX18-100S-0.8SV20_Hirose 100-position 0.8 mm FX18 mezzanine connector; signal pads from catalog land pattern; mechanical gate required before layout."
+	(property "Description" "Hirose FX18-100S-0.8SV20_Hirose 100-position 0.8 mm FX18 mezzanine connector; official signal land geometry captured; six TH lands for four MF electrical positions remain gated before layout."
 		(at 0.000 0.000 0)
 		(layer "F.Fab")
 		(hide yes)
@@ -209,7 +209,7 @@
 		(uuid "b7f78d34-e3e0-4506-8ca3-61362f00fca8")
 	)
 	(fp_text user "PIN 1"
-		(at -23.500 5.600 0)
+		(at 23.500 5.600 0)
 		(layer "F.SilkS")
 		(uuid "2d3c0dab-9efb-4b3f-a99d-63ba7e77fd0a")
 		(effects
@@ -219,7 +219,7 @@
 			)
 		)
 	)
-	(fp_text user "MF/TH details: mechanical gate"
+	(fp_text user "MF A/B: 6 TH / 4 circuits OPEN"
 		(at 0.000 -5.700 0)
 		(layer "F.Fab")
 		(uuid "0dbb8c2c-245d-4a91-bb7c-421b5924c39b")
@@ -229,72 +229,6 @@
 				(thickness 0.100)
 			)
 		)
-	)
-	(fp_circle
-		(center -25.025 -2.450)
-		(end -24.575 -2.450)
-		(stroke
-			(width 0.080)
-			(type solid)
-		)
-		(fill no)
-		(layer "F.Fab")
-		(uuid "3d9d916c-96f2-4342-99a3-b36222ac65f1")
-	)
-	(fp_circle
-		(center -25.025 2.450)
-		(end -24.575 2.450)
-		(stroke
-			(width 0.080)
-			(type solid)
-		)
-		(fill no)
-		(layer "F.Fab")
-		(uuid "3f032474-7129-48de-868a-06833e6a4dbb")
-	)
-	(fp_circle
-		(center -25.025 0.000)
-		(end -24.275 0.000)
-		(stroke
-			(width 0.080)
-			(type solid)
-		)
-		(fill no)
-		(layer "F.Fab")
-		(uuid "2ef76af0-7816-454a-bcaa-b497789f4a6b")
-	)
-	(fp_circle
-		(center 25.025 -2.450)
-		(end 25.475 -2.450)
-		(stroke
-			(width 0.080)
-			(type solid)
-		)
-		(fill no)
-		(layer "F.Fab")
-		(uuid "eb16e6db-6c55-4131-b53f-fc6be8fdef9b")
-	)
-	(fp_circle
-		(center 25.025 2.450)
-		(end 25.475 2.450)
-		(stroke
-			(width 0.080)
-			(type solid)
-		)
-		(fill no)
-		(layer "F.Fab")
-		(uuid "aaf85695-5988-41d2-a22c-e4f7d716e5b9")
-	)
-	(fp_circle
-		(center 25.025 0.000)
-		(end 25.775 0.000)
-		(stroke
-			(width 0.080)
-			(type solid)
-		)
-		(fill no)
-		(layer "F.Fab")
-		(uuid "9b729ec2-f128-4080-a7c1-6f88b9d80f33")
 	)
 	(pad "100" smd roundrect
 		(at -19.600 -2.450)

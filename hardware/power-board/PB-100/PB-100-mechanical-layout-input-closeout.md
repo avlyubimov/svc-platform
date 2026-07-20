@@ -1,6 +1,10 @@
 # PB-100 Mechanical Layout Input Closeout
 
-Status: Closed for PB-100 mechanical board-import inputs
+Status: Conditional; JPB1 FX18 MF/TH footprint mechanics remain open
+
+The outline and placement datum remain useful inputs, but this closeout does not
+cover the missing MF contact solder lands and through-hole mechanical features
+in the PB/LB FX18 footprint pair. Board import remains blocked.
 Review date: 2026-07-20
 
 This closeout converts the PB-100 pre-layout mechanical envelope into reviewed

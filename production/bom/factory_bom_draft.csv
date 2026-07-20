@@ -1,7 +1,7 @@
 Subsystem,Item,Suggested part/class,Package/assembly,Qty,Assembly,Priority,Notes
 Logic,MCU,STM32H563VIT6 preferred; STM32H573VIT6 security alternate; STM32H563RGT6 downscope fallback requiring review,LQFP-100 preferred,1,Factory,Core,Product target accepted in ADR-0005; sourced in LB-100-mcu-sourcing-precheck.csv
 Logic,3V3 regulator,XC6220B331MR-G preferred; AMS1117-3.3 fallback only if thermal/dropout review accepts,SOT-25/SOT-223 class,1,Factory,Core,LB_3V3_MAIN_REG source evidence in LB-100-component-sourcing-precheck.csv
-Logic,CAN1 transceiver,NXP TJA1051T/1J preferred; TJA1051T/CM or TJA1051TK/3 alternate,SOIC-8/HVSON class,1,Factory,Core,BMW CAN read-only with TX physically disabled; source evidence in LB-100-component-sourcing-precheck.csv
+Logic,CAN1 transceiver,NXP TJA1051T/1J preferred; TJA1051T/CM or TJA1051TK/3 alternate,SOIC-8/HVSON class,1,Factory,Core,BMW CAN read-only with TX physically disabled; board ownership is blocked by proposed ADR-0015 and source evidence remains in LB-100-component-sourcing-precheck.csv
 Logic,CAN2 transceiver,NXP TJA1051T/1J preferred; TJA1051T/CM or TJA1051TK/3 alternate,SOIC-8/HVSON class,1,Factory,Should,Expansion CAN may transmit; source evidence in LB-100-component-sourcing-precheck.csv
 Logic,BLE module,E73-2G4M08S1C preferred; MS88SF3 nRF52840 alternate,Module,1,Factory,Should,UART/SPI control remains configuration-owned
 Logic,microSD socket,SOFNG TF-015 preferred; LCK_TF_113H1509WLG alternate,SMD,1,Factory,Core,Logs/config; source evidence in LB-100-component-sourcing-precheck.csv
@@ -23,6 +23,7 @@ Power,PB-100/LB-100 board-to-board connector,Hirose FX18-100P-0.8SV10 plus FX18-
 Power,Board identity resistor network,Precision resistor divider class,0603/0805,1,Factory,Should,PB_ID_ADC fallback board revision identity
 Power,Test points,Generic bring-up and telemetry test points,PCB pads or SMT test points,TBD,Factory,Should,Exact count from schematic review before layout
 Power,CAN1 TX disable DNP link,DNP 0R link plus SN74LVC1G125-Q1-class default-disabled gate candidate,0603 DNP link plus automotive 3-state gate TBD,1,Factory,Core,CAN1_TX_DISABLE Default DNP/open no default-populated vehicle-CAN TX path per ADR-0002
+Power,CAN1 safety resistor network,AEC-Q200 1% resistor class,0402,4,Factory,Core,R_CAN1_OE 47k R_CAN1_TX_BIAS 47k R_CAN1_STATUS_SER 1k and R_CAN1_STATUS_PULL 100k are physical schematic components
 Comms,LIN transceiver,TJA1021T/20/CM preferred DNP reserve; automotive LIN alternate by review,SOIC-8 class,1,Factory,Future,Footprint can be DNP; source evidence in LB-100-component-sourcing-precheck.csv
 Comms,RS485 transceiver,SP3485EN-L/TR preferred DNP reserve; MAX3485ESA alternate,SOIC-8 class,1,Factory,Future,Footprint can be DNP; source evidence in LB-100-component-sourcing-precheck.csv
 Front,USB-C service connector,USB4105-GF-A preferred; TYPE-C-31-M-12 alternate,USB-C receptacle SMD,1,Factory,Core,FB-100 device-only service connector; no system-rail back-power

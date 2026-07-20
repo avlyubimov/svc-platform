@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import csv
 import json
+import re
+from collections import Counter
 from pathlib import Path
 
 
@@ -22,6 +24,7 @@ MECHANICAL_ENVELOPE_STATUS = (
     REPO_ROOT / "production" / "board-order" / "three_board_mechanical_envelope_status.csv"
 )
 PB100_FREEZE = PB100_DIR / "PB-100-schematic-freeze-checklist.md"
+FX18_MF_OWNERSHIP = PB100_DIR / "PB-100-fx18-mf-contact-ownership-precheck.csv"
 ADR_0014 = REPO_ROOT / "docs" / "adr" / "ADR-0014-lb-fb-baseline-requirements.md"
 
 MANUFACTURING_SUFFIXES = {
@@ -86,10 +89,8 @@ LB100_CONTRACTS = (
 LB100_PIN_BINDING = LB100_DIR / "LB-100-stm32h563-pin-binding-precheck.csv"
 LB100_SOURCING = LB100_DIR / "LB-100-mcu-sourcing-precheck.csv"
 LB100_COMPONENT_SOURCING = LB100_DIR / "LB-100-component-sourcing-precheck.csv"
-LB100_CLOSEOUTS = (
-    LB100_DIR / "LB-100-communication-safety-precheck.csv",
-    LB100_DIR / "LB-100-service-storage-sensor-precheck.csv",
-)
+LB100_COMMUNICATION_SAFETY = LB100_DIR / "LB-100-communication-safety-precheck.csv"
+LB100_CLOSEOUTS = (LB100_DIR / "LB-100-service-storage-sensor-precheck.csv",)
 LB100_RAIL_BUDGET_CLOSEOUT = LB100_DIR / "LB-100-rail-budget-closeout-precheck.csv"
 FB100_CONTRACTS = (
     FB100_DIR / "FB-100-interface-signal-plan.csv",
@@ -289,6 +290,17 @@ LB100_RAIL_BUDGET_CLOSEOUT_COLUMNS = (
     "Status",
     "Blocked action",
 )
+FX18_MF_OWNERSHIP_COLUMNS = (
+    "MF contact key",
+    "Physical end",
+    "TH solder lands per footprint",
+    "Hirose electrical role",
+    "PB-100 net ownership",
+    "LB-100 net ownership",
+    "Review status",
+    "Required close evidence",
+    "Blocked action",
+)
 
 
 def fail(message: str) -> None:
@@ -433,8 +445,8 @@ def validate_adr_0014() -> None:
 
 def validate_checklist(board: str, path: Path) -> None:
     text = read_text(path)
-    lower_text = text.lower()
     normalized_text = " ".join(text.split())
+    lower_text = normalized_text.lower()
     status = checklist_status(path)
     if status == "Open" and ("does not" not in lower_text or "pcb layout" not in lower_text):
         fail(f"{path.relative_to(REPO_ROOT)} must block PCB layout while open")
@@ -592,6 +604,40 @@ def validate_generic_closeout_csv(path: Path, required_tokens: tuple[str, ...]) 
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocked action must be explicit")
     if "No-layout boundary" not in text and "Manufacturing boundary" not in text:
         fail(f"{path.relative_to(REPO_ROOT)} must include a no-layout or manufacturing boundary row")
+
+
+def validate_lb100_communication_safety() -> None:
+    path = LB100_COMMUNICATION_SAFETY
+    rows = validate_csv(path)
+    if not rows:
+        fail(f"empty communication safety precheck: {path.relative_to(REPO_ROOT)}")
+    missing_columns = [column for column in GENERIC_CLOSEOUT_COLUMNS if column not in rows[0]]
+    if missing_columns:
+        fail(f"{path.relative_to(REPO_ROOT)} is missing columns: {', '.join(missing_columns)}")
+    rows_by_id = {row["Check ID"].strip(): row for row in rows}
+    required_ids = {f"LB-COMM-{number:03d}" for number in range(1, 8)}
+    if set(rows_by_id) != required_ids:
+        fail(f"{path.relative_to(REPO_ROOT)} must contain LB-COMM-001 through LB-COMM-007")
+    text = read_text(path)
+    for token in ("ADR-0015", "CAN1_TXD_SAFE", "Conditional", "No-layout boundary"):
+        if token not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} must include {token}")
+    for row_number, row in enumerate(rows, 2):
+        for column in GENERIC_CLOSEOUT_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        check_id = row["Check ID"].strip()
+        status = row["Status"].strip()
+        if check_id in {"LB-COMM-001", "LB-COMM-002"}:
+            if "Proposed" in read_text(REPO_ROOT / "docs/adr/ADR-0015-can1-physical-layer-board-ownership.md"):
+                if status != "Conditional":
+                    fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1 must remain Conditional while ADR-0015 is Proposed")
+            elif status not in {"Conditional", "Closed"}:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid CAN1 status")
+        elif status != "Closed":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: non-CAN1 communication rows must be Closed")
+        if "do not" not in row["Blocked action"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocked action must be explicit")
 
 
 def validate_lb100_pin_binding() -> None:
@@ -758,6 +804,12 @@ def validate_order_readiness() -> None:
         board_path = REPO_ROOT / row["Board path"].strip()
         if not board_path.exists():
             fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: missing board path")
+        freeze_state = checklist_status(board_freeze_path(board))
+        if row["Schematic freeze state"].strip() != freeze_state:
+            fail(
+                f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"schematic freeze state must match {freeze_state}"
+            )
         if row["Order state"].strip() != "NO-GO":
             fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: order must remain NO-GO until every board closes")
         for token in ("No PCB layout", "No fabrication outputs", "No assembly outputs"):
@@ -822,6 +874,154 @@ def board_dir(board: str) -> Path:
     fail(f"unknown board {board}")
 
 
+def board_freeze_path(board: str) -> Path:
+    if board == "PB-100":
+        return PB100_FREEZE
+    return FREEZE_CHECKLISTS[board]
+
+
+def validate_fx18_mf_ownership() -> bool:
+    rows = validate_csv(FX18_MF_OWNERSHIP)
+    if not rows:
+        fail(f"empty FX18 MF ownership precheck: {FX18_MF_OWNERSHIP.relative_to(REPO_ROOT)}")
+    missing_columns = [column for column in FX18_MF_OWNERSHIP_COLUMNS if column not in rows[0]]
+    if missing_columns:
+        fail(
+            f"{FX18_MF_OWNERSHIP.relative_to(REPO_ROOT)} is missing columns: "
+            f"{', '.join(missing_columns)}"
+        )
+    expected_land_counts = {
+        "MF_A_PIN1_51_END": 2,
+        "MF_B_PIN1_51_END": 1,
+        "MF_A_PIN50_100_END": 2,
+        "MF_B_PIN50_100_END": 1,
+    }
+    if {row["MF contact key"].strip() for row in rows} != set(expected_land_counts):
+        fail(
+            f"{FX18_MF_OWNERSHIP.relative_to(REPO_ROOT)} must contain the four FX18 MF "
+            "electrical positions at both connector ends"
+        )
+    total_lands = 0
+    ownership_closed = True
+    for row_number, row in enumerate(rows, 2):
+        for column in FX18_MF_OWNERSHIP_COLUMNS:
+            if not row[column].strip():
+                fail(f"{FX18_MF_OWNERSHIP.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        key = row["MF contact key"].strip()
+        try:
+            land_count = int(row["TH solder lands per footprint"].strip())
+        except ValueError:
+            fail(
+                f"{FX18_MF_OWNERSHIP.relative_to(REPO_ROOT)}:{row_number}: "
+                "TH solder lands per footprint must be an integer"
+            )
+        if land_count != expected_land_counts[key]:
+            fail(
+                f"{FX18_MF_OWNERSHIP.relative_to(REPO_ROOT)}:{row_number}: {key} must use "
+                f"{expected_land_counts[key]} physical TH solder land(s)"
+            )
+        total_lands += land_count
+        role = row["Hirose electrical role"].lower()
+        if "3 a" not in role:
+            fail(f"{FX18_MF_OWNERSHIP.relative_to(REPO_ROOT)}:{row_number}: missing 3 A MF rating")
+        if "_A_" in key and not all(token in role for token in ("split", "same circuit")):
+            fail(
+                f"{FX18_MF_OWNERSHIP.relative_to(REPO_ROOT)}:{row_number}: "
+                "MF A must preserve the split-pole same-circuit rule"
+            )
+        pb_owner = row["PB-100 net ownership"].strip()
+        lb_owner = row["LB-100 net ownership"].strip()
+        review_status = row["Review status"].strip()
+        is_unassigned = pb_owner == "Unassigned" or lb_owner == "Unassigned"
+        if is_unassigned:
+            ownership_closed = False
+            if pb_owner != "Unassigned" or lb_owner != "Unassigned" or review_status != "Conditional":
+                fail(
+                    f"{FX18_MF_OWNERSHIP.relative_to(REPO_ROOT)}:{row_number}: partial MF "
+                    "ownership is forbidden; both sides must stay Unassigned/Conditional"
+                )
+        elif review_status != "Closed" or "Product Owner-approved" not in row["Required close evidence"]:
+            fail(
+                f"{FX18_MF_OWNERSHIP.relative_to(REPO_ROOT)}:{row_number}: assigned MF "
+                "ownership requires Closed status and Product Owner-approved evidence"
+            )
+        if "Do not" not in row["Blocked action"]:
+            fail(f"{FX18_MF_OWNERSHIP.relative_to(REPO_ROOT)}:{row_number}: missing blocked action")
+    if total_lands != 6:
+        fail(f"{FX18_MF_OWNERSHIP.relative_to(REPO_ROOT)} must require exactly six TH lands")
+    return ownership_closed
+
+
+def fx18_footprint_is_mechanically_complete(board: str) -> bool:
+    paths = {
+        "PB-100": PB100_DIR / "kicad/lib/PB100.pretty/FX18-100P-0.8SV10_Hirose.kicad_mod",
+        "LB-100": LB100_DIR / "kicad/lib/LB100.pretty/FX18-100S-0.8SV20_Hirose.kicad_mod",
+    }
+    path = paths.get(board)
+    if path is None:
+        return True
+    text = read_text(path)
+    pad_blocks = [
+        (match.group(1), match.group(2), match.group(3), match.group(0))
+        for match in re.finditer(
+            r'(?ms)^\t\(pad "([^"]*)" ([^ \n]+) ([^\n]+)\n(.*?)^\t\)\s*$',
+            text,
+        )
+    ]
+    signal_pads = [
+        pad for pad in pad_blocks
+        if pad[0].isdigit() and 1 <= int(pad[0]) <= 100
+    ]
+    if len(signal_pads) != 100 or {int(pad[0]) for pad in signal_pads} != set(range(1, 101)):
+        fail(
+            f"{path.relative_to(REPO_ROOT)} must contain exactly one numbered signal pad for "
+            "each FX18 position 1..100"
+        )
+
+    for pad_number_text, pad_type, pad_shape, block in signal_pads:
+        pad_number = int(pad_number_text)
+        at_match = re.search(r"\(at (-?[0-9.]+) (-?[0-9.]+)(?: [^)]+)?\)", block)
+        size_match = re.search(r"\(size ([0-9.]+) ([0-9.]+)\)", block)
+        if at_match is None or size_match is None:
+            fail(f"{path.relative_to(REPO_ROOT)} pad {pad_number} is missing at/size geometry")
+        actual_x, actual_y = (float(value) for value in at_match.groups())
+        actual_width, actual_height = (float(value) for value in size_match.groups())
+        if board == "PB-100":
+            row_index = pad_number - 1 if pad_number <= 50 else pad_number - 51
+            expected_x = -19.6 + (0.8 * row_index)
+        else:
+            row_index = pad_number - 1 if pad_number <= 50 else pad_number - 51
+            expected_x = 19.6 - (0.8 * row_index)
+        expected_y = 2.45 if pad_number <= 50 else -2.45
+        if (
+            pad_type != "smd"
+            or pad_shape != "roundrect"
+            or abs(actual_x - expected_x) > 0.001
+            or abs(actual_y - expected_y) > 0.001
+            or abs(actual_width - 0.5) > 0.001
+            or abs(actual_height - 2.1) > 0.001
+            or '(layers "F.Cu" "F.Paste" "F.Mask")' not in block
+        ):
+            fail(
+                f"{path.relative_to(REPO_ROOT)} pad {pad_number} does not match the official "
+                "FX18 signal land pattern (0.8 mm pitch, 4.9 mm row spacing, 0.5 x 2.1 mm)"
+            )
+
+    mf_pads = [pad for pad in pad_blocks if pad[1] == "thru_hole"]
+    mf_identifiers = [pad[0] for pad in mf_pads]
+    signal_identifiers = {str(number) for number in range(1, 101)}
+    identifiers_are_valid = (
+        len(mf_pads) == 6
+        and all(identifier and identifier not in signal_identifiers for identifier in mf_identifiers)
+        and sorted(Counter(mf_identifiers).values()) == [1, 1, 2, 2]
+    )
+    return (
+        identifiers_are_valid
+        and "MF A/B: 6 TH / 4 circuits OPEN" not in text
+        and validate_fx18_mf_ownership()
+    )
+
+
 def validate_layout_start_readiness() -> None:
     rows = validate_csv(LAYOUT_START_READINESS)
     missing_columns = [column for column in LAYOUT_START_READINESS_COLUMNS if column not in rows[0]]
@@ -833,10 +1033,18 @@ def validate_layout_start_readiness() -> None:
         seen_boards.add(board)
         if board not in REQUIRED_ORDER_BOARDS:
             fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: unknown board {board}")
-        if row["Freeze state"].strip() != "Closed":
-            fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: freeze must be Closed")
-        if row["Layout planning state"].strip() != "READY":
-            fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: layout planning must be READY")
+        freeze_state = checklist_status(board_freeze_path(board))
+        if row["Freeze state"].strip() != freeze_state:
+            fail(
+                f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"freeze state must match {freeze_state}"
+            )
+        expected_planning_state = "READY" if freeze_state == "Closed" else "BLOCKED"
+        if row["Layout planning state"].strip() != expected_planning_state:
+            fail(
+                f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"layout planning must be {expected_planning_state}"
+            )
         if row["KiCad board import state"].strip() != "BLOCKED":
             fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: KiCad board import must remain BLOCKED")
         if not row["Footprint binding state"].startswith(("OPEN", "CLOSED")):
@@ -900,9 +1108,10 @@ def validate_layout_start_checklist(board: str, path: Path) -> None:
     missing_gates = sorted(required_gates - set(rows_by_gate))
     if missing_gates:
         fail(f"{path.relative_to(REPO_ROOT)} is missing gates: {', '.join(missing_gates)}")
+    freeze_closed = checklist_status(board_freeze_path(board)) == "Closed"
     expected_status = {
-        "Schematic freeze": "Closed",
-        "KiCad schematic value review": "Closed",
+        "Schematic freeze": "Closed" if freeze_closed else "Open",
+        "KiCad schematic value review": "Closed" if freeze_closed else "Open",
         "Footprint binding": {"Open", "Closed"},
         "Mechanical envelope": {"Open", "Closed"},
         "DFM/DRC baseline": "Ready",
@@ -982,6 +1191,15 @@ def validate_footprint_binding_inventory(board: str, path: Path) -> tuple[int, i
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Assembly owner")
         binding_state = row["KiCad footprint binding state"].strip()
         drawing_state = row["Drawing review state"].strip()
+        is_fx18 = "FX18" in row["Preferred MPN or class"]
+        if is_fx18 and not fx18_footprint_is_mechanically_complete(board):
+            if binding_state != "Open" or drawing_state != "Source identified":
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{row_number}: incomplete FX18 footprint "
+                    "must remain Open with Source identified until 100 signal SMD pads and "
+                    "six plated TH lands for four distinct MF circuits are captured; each "
+                    "split-pole MF A pair must share one circuit identifier"
+                )
         if binding_state not in {"Open", "Bound", "Not required"}:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid KiCad footprint binding state")
         if drawing_state not in {"Open", "Source identified", "Reviewed", "Not required"}:
@@ -1096,6 +1314,17 @@ def validate_mechanical_envelope_inventory(board: str, path: Path) -> int:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
         review_state = row["Review state"].strip()
+        if (
+            board in {"PB-100", "LB-100"}
+            and "JPB1" in " ".join(row.values())
+            and not fx18_footprint_is_mechanically_complete(board)
+            and review_state != "Open"
+        ):
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: JPB1 mechanical item must remain "
+                "Open until the FX18 footprint contains six plated TH lands for four MF "
+                "circuits with each split-pole MF A pair electrically joined"
+            )
         if review_state not in {"Open", "Closed"}:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Review state must be Open or Closed")
         if review_state == "Open":
@@ -1262,6 +1491,7 @@ def main() -> int:
         ),
     )
     validate_lb100_rail_budget_closeout()
+    validate_lb100_communication_safety()
     for closeout_path in LB100_CLOSEOUTS:
         validate_generic_closeout_csv(closeout_path, ("Closed", "Do not"))
     validate_sourcing_precheck(
@@ -1294,6 +1524,7 @@ def main() -> int:
         ),
     )
     validate_layout_rules()
+    validate_fx18_mf_ownership()
     validate_footprint_binding_status()
     validate_mechanical_envelope_status()
     validate_layout_start_readiness()
