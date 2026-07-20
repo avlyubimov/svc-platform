@@ -2770,3 +2770,18 @@ thermal impact, production impact, field reliability, datasheet/source evidence,
 and post-prototype validation boundaries. This removes the PBREL evidence
 deadlock without creating PCB layout, Gerbers, drills, pick-place files,
 BOM/CPL order packages, manufacturing ZIPs, or JLCPCB/PCBWay order artifacts.
+
+## 2026-07-20 — LB-100 and FB-100 schematic freeze closed
+
+Decision: LB-100 and FB-100 schematic-freeze checklists are closed for PCB-layout
+start. Each board now has a reviewed value-bearing KiCad schematic sheet and a
+schematic-review closeout document:
+`hardware/logic-board/LB-100/LB-100-schematic-review-closeout.md` and
+`hardware/front-board/FB-100/FB-100-schematic-review-closeout.md`.
+
+Reason: LB-100 and FB-100 release blockers were already closed with exact
+interface, power, safety, mechanical, and sourcing evidence. The added schematic
+review closeouts and KiCad sheet evidence close the remaining note-only
+schematic gap without creating PCB layout, Gerbers, drills, pick-place files,
+BOM/CPL order packages, manufacturing ZIPs, fabrication packages, or PCBA order
+artifacts.

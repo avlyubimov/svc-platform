@@ -34,4 +34,24 @@
     )
     (uuid "46926aa4-0e19-486c-8908-8744b2e64b75")
   )
+  (text "Reviewed LB-100 value-bearing schematic inputs:\n- MCU baseline STM32H563VITx LQFP100; STM32H573VITx security alternate; STM32H563RGT6 fallback only after resource reduction.\n- PB_5V_OUT budget: 500 mA sustained allocation; 219.2 mA sustained LB load; 415.2 mA service peak; USB no-back-power boundary.\n- JPB1: exact OUT1_CTL..OUT10_CTL, OUT1_FLT..OUT10_FLT, OUT1_IMON..OUT10_IMON, PB_I2C, CAN1, CAN2, LIN/RS485/UART, and spare binding per LB-100-stm32h563-pin-binding-precheck.csv.\n- CAN1: DNP/open TX route; read-only default; no firmware-only vehicle-CAN TX enable.\n- Services: USB service, BLE, microSD, RTC, FRAM, IMU, lux, SWD, BOOT0, reset, service button."
+    (at 155 35 0)
+    (effects
+      (font
+        (size 1.6 1.6)
+      )
+      (justify left top)
+    )
+    (uuid "b4a6cc8e-99e4-4a1e-9d1b-6dc9c6fd2291")
+  )
+  (text "Schematic freeze evidence:\n- ../LB-100-schematic-review-closeout.md\n- ../LB-100-stm32h563-pin-binding-precheck.csv\n- ../LB-100-rail-budget-closeout-precheck.csv\n- ../LB-100-communication-safety-precheck.csv\n- ../LB-100-service-storage-sensor-precheck.csv\n- ../LB-100-mcu-sourcing-precheck.csv\n- ../LB-100-component-sourcing-precheck.csv\n\nPCB layout and manufacturing outputs remain separate post-freeze work."
+    (at 155 130 0)
+    (effects
+      (font
+        (size 1.6 1.6)
+      )
+      (justify left top)
+    )
+    (uuid "c6f1d4f0-5f3d-443a-a850-9b9c2d34db96")
+  )
 )

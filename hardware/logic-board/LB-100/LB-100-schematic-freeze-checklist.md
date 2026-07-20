@@ -1,10 +1,10 @@
 # LB-100 Schematic Freeze Checklist
 
-Status: Open
+Status: Closed
 
-This checklist gates LB-100 schematic planning before PCB layout. It does not
-authorize KiCad PCB layout, Gerbers, drills, pick-place, BOM/CPL order packages,
-or PCBA orders.
+This checklist closes LB-100 schematic planning for PCB-layout start. It does
+not authorize Gerbers, drills, pick-place, BOM/CPL order packages, manufacturing
+ZIP files, fabrication packages, or PCBA orders.
 
 ## Completion Rule
 
@@ -25,11 +25,12 @@ before this checklist can close.
 | CAN and expansion safety | Closed | `docs/adr/ADR-0002-can-read-only-default.md`, `docs/can/can-safety.md`, `hardware/logic-board/LB-100/LB-100-communication-safety-precheck.csv`, `hardware/logic-board/LB-100/LB-100-component-sourcing-precheck.csv` | CAN1 read-only hardware policy, CAN2 expansion TX separation, LIN/RS485/UART footprints, and transceiver defaults are reviewed |
 | Service, storage, and sensors | Closed | `hardware/logic-board/LB-100/LB-100-requirements.md`, `hardware/logic-board/LB-100/LB-100-service-storage-sensor-precheck.csv`, `hardware/logic-board/LB-100/LB-100-component-sourcing-precheck.csv` | USB-C service path, BLE, microSD, RTC, FRAM, IMU, lux sensor, ESD, and power isolation are selected |
 | Factory assembly readiness | Closed | `docs/production/component-family-shortlist.md`, `hardware/logic-board/LB-100/LB-100-mcu-sourcing-precheck.csv`, `hardware/logic-board/LB-100/LB-100-component-sourcing-precheck.csv` | Critical LB-100 components have preferred parts, alternatives where critical, and current JLCPCB/PCBWay sourcing review |
-| KiCad schematic review | Conditional | `hardware/logic-board/LB-100/kicad/LB-100.kicad_sch`, `hardware/logic-board/LB-100/kicad/LB-100.kicad_pro` | Non-layout KiCad schematic scaffold exists; freeze still requires reviewed value-bearing schematic sheets and no PCB layout or manufacturing artifacts |
+| KiCad schematic review | Closed | `hardware/logic-board/LB-100/kicad/LB-100.kicad_sch`, `hardware/logic-board/LB-100/kicad/LB-100.kicad_pro`, `hardware/logic-board/LB-100/LB-100-schematic-review-closeout.md` | Reviewed value-bearing schematic sheet evidence exists and no PCB layout or manufacturing artifacts were created |
 
 ## Active Blockers
 
-Active LB-100 release blockers are tracked in
+LB-100 release blockers are closed and retained in
 `hardware/logic-board/LB-100/LB-100-board-release-blocker-register.csv`.
-PCB layout and manufacturing output remain blocked until this checklist is
-`Closed` and the blocker register is empty.
+PCB layout is now a separate post-freeze task. Manufacturing output remains
+blocked until reviewed layout, fabrication outputs, assembly outputs, and order
+evidence exist.

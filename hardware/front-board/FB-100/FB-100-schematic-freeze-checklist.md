@@ -1,10 +1,10 @@
 # FB-100 Schematic Freeze Checklist
 
-Status: Open
+Status: Closed
 
-This checklist gates FB-100 schematic planning before PCB layout. It does not
-authorize KiCad PCB layout, Gerbers, drills, pick-place, BOM/CPL order packages,
-or PCBA orders.
+This checklist closes FB-100 schematic planning for PCB-layout start. It does
+not authorize Gerbers, drills, pick-place, BOM/CPL order packages, manufacturing
+ZIP files, fabrication packages, or PCBA orders.
 
 ## Completion Rule
 
@@ -23,11 +23,12 @@ interface require an ADR before this checklist can close.
 | Indicators and controls | Closed | `hardware/front-board/FB-100/FB-100-requirements.md`, `hardware/front-board/FB-100/FB-100-interface-signal-plan.csv`, `hardware/front-board/FB-100/FB-100-component-sourcing-precheck.csv`, `hardware/front-board/FB-100/FB-100-ui-control-closeout-precheck.csv` | RGB LED, channel LEDs, SERVICE/RESET button, and optional OLED footprint are selected without accessory role hard-coding |
 | Mechanical and enclosure interface | Closed | `hardware/front-board/FB-100/FB-100-requirements.md`, `hardware/front-board/FB-100/FB-100-ui-mechanical-precheck.csv`, `hardware/front-board/FB-100/FB-100-mechanical-envelope-precheck.csv` | Board envelope, mounting strategy, button/LED alignment, display keep-out, connector access, and service sealing are reviewed |
 | Factory assembly readiness | Closed | `docs/production/component-family-shortlist.md`, `hardware/front-board/FB-100/FB-100-component-sourcing-precheck.csv` | Critical FB-100 components have preferred parts, alternatives where critical, and current JLCPCB/PCBWay sourcing review |
-| KiCad schematic review | Conditional | `hardware/front-board/FB-100/kicad/FB-100.kicad_sch`, `hardware/front-board/FB-100/kicad/FB-100.kicad_pro` | Non-layout KiCad schematic scaffold exists; freeze still requires reviewed value-bearing schematic sheets and no PCB layout or manufacturing artifacts |
+| KiCad schematic review | Closed | `hardware/front-board/FB-100/kicad/FB-100.kicad_sch`, `hardware/front-board/FB-100/kicad/FB-100.kicad_pro`, `hardware/front-board/FB-100/FB-100-schematic-review-closeout.md` | Reviewed value-bearing schematic sheet evidence exists and no PCB layout or manufacturing artifacts were created |
 
 ## Active Blockers
 
-Active FB-100 release blockers are tracked in
+FB-100 release blockers are closed and retained in
 `hardware/front-board/FB-100/FB-100-board-release-blocker-register.csv`.
-PCB layout and manufacturing output remain blocked until this checklist is
-`Closed` and the blocker register is empty.
+PCB layout is now a separate post-freeze task. Manufacturing output remains
+blocked until reviewed layout, fabrication outputs, assembly outputs, and order
+evidence exist.
