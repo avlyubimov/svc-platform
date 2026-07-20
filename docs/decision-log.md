@@ -2968,3 +2968,24 @@ packages, manufacturing ZIPs, fabrication packages, or PCBA orders. FB-100 board
 import remains blocked by schematic symbol promotion because the KiCad
 schematic is still a value-bearing scaffold rather than footprint-bound symbol
 instances.
+
+## 2026-07-20 — PB/LB footprint binding progress imported
+
+Decision: Import and normalize project-local KiCad footprints for the PB-100 and
+LB-100 package classes that already have successful JLCPCB/LCSC/EasyEDA footprint
+evidence. This is a footprint-binding progress increment, not a layout start.
+
+Rationale: PB-100 and LB-100 were both blocked by open footprint inventories even
+after package-source evidence existed. EasyEDA conversion succeeded for the
+TPS48110 VSSOP, SIDR626 PowerPAK, LM74700 SOT-23-6, LM5164 SO PowerPAD,
+INA228 VSSOP, NTC 0402, STM32H563 LQFP100, LB regulators/transceivers,
+BLE module, IMU, lux sensor, and microSD socket. These are now committed as
+project-local `.kicad_mod` evidence under `PB100.pretty` and `LB100.pretty`.
+
+Impact: PB-100 footprint inventory drops from 15 open items to 9 open items.
+LB-100 footprint inventory drops from 13 open items to 1 open item. KiCad board
+import remains blocked because PB still needs TOLL/LFPAK/DO-218AC/CSS4J/FX18
+and related optional/safety footprint decisions, while LB still needs the FX18
+JPB1 footprint and mechanical layout gates. No `*.kicad_pcb`, Gerbers, drills,
+pick-place, BOM/CPL, manufacturing ZIP, fabrication package, panel output, or
+PCBA order artifact is authorized or created by this increment.
