@@ -76,6 +76,7 @@ Current host tests cover:
   values, with canonical `0` or `1..100` PWM literals.
 - Runtime Boot path from direct configuration or persistent store that keeps
   outputs off unless configuration and hardware capability checks pass.
+- Runtime Boot invalid-argument handling that leaves runtime state safe/off.
 - Telemetry Snapshot validity/staleness for battery, total current, and
   per-output current samples.
 - Telemetry-backed System Safety and Rule Engine wrappers for stale-data fail

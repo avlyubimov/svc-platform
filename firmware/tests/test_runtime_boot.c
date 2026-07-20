@@ -159,6 +159,29 @@ static void test_boot_from_store_fails_when_no_config_can_load(void)
     assert(!runtime.initialized);
 }
 
+static void test_boot_from_store_rejects_null_loaded_config(void)
+{
+    svc_runtime_t runtime = {0};
+    runtime.initialized = true;
+
+    const svc_runtime_store_boot_result_t result = svc_runtime_boot_from_store(
+        &runtime,
+        NULL,
+        NULL,
+        &svc_default_config,
+        &svc_pb100_hardware_capability,
+        NULL);
+
+    assert(result.status == SVC_RUNTIME_STORE_BOOT_INVALID_ARGUMENT);
+    assert(result.boot.status == SVC_RUNTIME_BOOT_INVALID_ARGUMENT);
+    assert(result.boot.event_bus_initialized);
+    assert(!result.boot.output_manager_initialized);
+    assert(!result.boot.system_safety_initialized);
+    assert(result.boot.active_output_mask == 0U);
+    assert(!runtime.initialized);
+    assert(svc_event_bus_is_empty(&runtime.event_bus));
+}
+
 int main(void)
 {
     test_boot_accepts_pb100_default_config_with_outputs_off();
@@ -169,5 +192,6 @@ int main(void)
     test_boot_from_store_uses_default_when_no_records_exist();
     test_boot_from_store_fails_when_loaded_config_exceeds_hardware();
     test_boot_from_store_fails_when_no_config_can_load();
+    test_boot_from_store_rejects_null_loaded_config();
     return 0;
 }

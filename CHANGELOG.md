@@ -33,3 +33,5 @@
   before compiled rule entries are written.
 - Hardened System Safety runtime current-budget enforcement so stale or invalid
   total-current telemetry disables active outputs.
+- Hardened Runtime Boot store-loading invalid-argument handling so missing
+  loaded-configuration storage leaves runtime safe/off.
