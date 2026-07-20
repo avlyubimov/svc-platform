@@ -841,8 +841,11 @@ def validate_layout_start_readiness() -> None:
             fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: KiCad board import must remain BLOCKED")
         if not row["Footprint binding state"].startswith("OPEN"):
             fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: footprint binding must be OPEN")
-        if not row["Mechanical envelope state"].startswith("OPEN"):
-            fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: mechanical envelope must be OPEN")
+        if not row["Mechanical envelope state"].startswith(("OPEN", "CLOSED")):
+            fail(
+                f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
+                "mechanical envelope must be OPEN or CLOSED"
+            )
         if not row["Assembly/DFM baseline"].startswith("READY"):
             fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: assembly DFM baseline must be READY")
         if row["Order state"].strip() != "NO-GO":
@@ -898,13 +901,20 @@ def validate_layout_start_checklist(board: str, path: Path) -> None:
         "Schematic freeze": "Closed",
         "KiCad schematic value review": "Closed",
         "Footprint binding": "Open",
-        "Mechanical envelope": "Open",
+        "Mechanical envelope": {"Open", "Closed"},
         "DFM/DRC baseline": "Ready",
         "Manufacturing output boundary": "Closed",
     }
-    for gate, status in expected_status.items():
-        if rows_by_gate[gate]["Status"].strip() != status:
-            fail(f"{path.relative_to(REPO_ROOT)}:{gate}: expected {status}")
+    for gate, expected in expected_status.items():
+        actual_status = rows_by_gate[gate]["Status"].strip()
+        if isinstance(expected, set):
+            if actual_status not in expected:
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{gate}: "
+                    f"expected one of {', '.join(sorted(expected))}"
+                )
+        elif actual_status != expected:
+            fail(f"{path.relative_to(REPO_ROOT)}:{gate}: expected {expected}")
     text = read_text(path)
     for row_number, row in enumerate(rows, 2):
         for column in LAYOUT_START_CHECKLIST_COLUMNS:
@@ -1064,14 +1074,21 @@ def validate_mechanical_envelope_inventory(board: str, path: Path) -> int:
         for column in MECHANICAL_ENVELOPE_INVENTORY_COLUMNS:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
-        if row["Review state"].strip() != "Open":
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Review state must be Open")
-        if "BOARD_IMPORT_BLOCKED" not in row["Board-import impact"]:
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: board import must remain blocked")
+        review_state = row["Review state"].strip()
+        if review_state not in {"Open", "Closed"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Review state must be Open or Closed")
+        if review_state == "Open":
+            if "BOARD_IMPORT_BLOCKED" not in row["Board-import impact"]:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: board import must remain blocked")
+        elif row["Board-import impact"].strip() != "MECHANICAL_INPUT_CLOSED":
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: "
+                "closed mechanical rows must use MECHANICAL_INPUT_CLOSED"
+            )
         next_action = row["Next action"].lower()
         if not any(verb in next_action for verb in ("create", "select", "review", "define", "close", "apply")):
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Next action must be actionable")
-    return len(rows)
+    return sum(1 for row in rows if row["Review state"].strip() == "Open")
 
 
 def validate_mechanical_envelope_status() -> None:

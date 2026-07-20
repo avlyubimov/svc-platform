@@ -2912,3 +2912,21 @@ Exact LED package source paths remove the last FB-100 package-source gap while
 leaving drive polarity, current-limit values, brightness, light-pipe alignment,
 optical orientation, and actual footprint binding blocked until reviewed layout
 inputs close.
+
+## 2026-07-20 — FB-100 mechanical layout inputs closed
+
+Decision: FB-100 mechanical envelope is closed as a board-import input with an
+80.0 mm x 35.0 mm prototype outline, four M2.5 NPTH mounting holes, USB-C
+service edge datum, rear/internal JFB1 FFC cable exit, role-free STATUS and
+CH1..CH10 optical grid, separated SERVICE/RESET actuator targets, optional
+OLED DNP keepout, and tab-route-first panelization assumptions. Evidence is in
+`hardware/front-board/FB-100/FB-100-mechanical-layout-inputs.csv` and
+`hardware/front-board/FB-100/FB-100-mechanical-layout-input-closeout.md`.
+
+Reason: FB-100 schematic freeze had enough mechanical policy for planning but
+not enough exact layout-input dimensions for responsible board import. Closing
+the FB-100 mechanical rows removes 7 mechanical blockers without creating
+`FB-100.kicad_pcb`, Gerbers, drill files, pick-place files, BOM/CPL order
+packages, manufacturing ZIPs, fabrication packages, panel CAD, enclosure CAD,
+or PCBA orders. FB-100 board import remains blocked by footprint binding and
+USB/no-back-power layout-model review.
