@@ -2801,3 +2801,22 @@ telemetry, factory assembly, and garage assembly. This does not create
 manufacturing ZIPs, fabrication packages, or PCBA order artifacts; JLCPCB/PCBWay
 ordering remains NO-GO until reviewed PCB layout and manufacturing outputs
 exist.
+
+## 2026-07-20 — Three-board layout-start gate created
+
+Decision: PB-100, LB-100, and FB-100 now have a controlled layout-start gate
+that separates layout planning from KiCad board import and manufacturing-output
+generation. The consolidated readiness artifact is
+`production/board-order/three_board_layout_start_readiness.csv`; board-specific
+checklists are `PB-100-pcb-layout-start-checklist.csv`,
+`LB-100-pcb-layout-start-checklist.csv`, and
+`FB-100-pcb-layout-start-checklist.csv`.
+
+Reason: Schematic freeze is closed on all three boards, but every KiCad
+schematic still has empty footprint properties and the mechanical envelopes are
+not reviewed enough for responsible board import. The new gate records
+layout-planning `READY`, KiCad board import `BLOCKED`, and JLCPCB/PCBWay order
+`NO-GO`. It also locks a conservative JLCPCB/PCBWay DRC/DFM baseline in
+`production/board-order/three_board_layout_rules.md` while continuing to block
+Gerbers, drills, pick-place files, BOM/CPL order packages, manufacturing ZIPs,
+fabrication packages, and PCBA orders.

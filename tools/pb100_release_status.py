@@ -14,6 +14,7 @@ CHECKLIST = PB100_DIR / "PB-100-schematic-freeze-checklist.md"
 BLOCKERS = PB100_DIR / "PB-100-board-release-blocker-register.csv"
 CLOSURE_MATRIX = PB100_DIR / "PB-100-board-print-closure-matrix.csv"
 POST_PROTOTYPE_GATE = PB100_DIR / "PB-100-post-prototype-validation-gate.csv"
+LAYOUT_START_CHECKLIST = PB100_DIR / "PB-100-pcb-layout-start-checklist.csv"
 KICAD_DIR = PB100_DIR / "kicad"
 
 MANUFACTURING_SUFFIXES = {
@@ -102,6 +103,13 @@ def post_prototype_gate_rows() -> list[dict[str, str]]:
         return list(csv.DictReader(handle))
 
 
+def layout_start_rows() -> list[dict[str, str]]:
+    if not LAYOUT_START_CHECKLIST.exists():
+        return []
+    with LAYOUT_START_CHECKLIST.open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
 def layout_files() -> list[Path]:
     return sorted(KICAD_DIR.rglob("*.kicad_pcb"))
 
@@ -134,6 +142,7 @@ def main() -> int:
     blockers = release_blockers()
     closure_rows = board_print_closure_rows()
     post_prototype_rows = post_prototype_gate_rows()
+    layout_rows = layout_start_rows()
     active_gates = [row for row in gates if row["Status"] != "Closed"]
     active_blockers = [row for row in blockers if row["Status"] != "Closed"]
     active_closure_rows = [row for row in closure_rows if row["Current proof state"] != "Closed"]
@@ -142,6 +151,10 @@ def main() -> int:
     ]
     pcbs = layout_files()
     manufacturing = manufacturing_files()
+    open_layout_start_rows = [row for row in layout_rows if row.get("Status", "").strip() == "Open"]
+    board_import_blockers = [
+        row for row in open_layout_start_rows if row.get("Gate", "").strip() in {"Footprint binding", "Mechanical envelope"}
+    ]
 
     board_print_ready = (
         status == "Closed"
@@ -151,13 +164,16 @@ def main() -> int:
         and bool(manufacturing)
     )
     layout_ready = status == "Closed" and not active_gates and not active_blockers
+    board_import_ready = layout_ready and not board_import_blockers
 
     print("PB-100 release status")
     print(f"  Schematic freeze checklist: {status}")
-    print(f"  Layout authorization: {'READY' if layout_ready else 'BLOCKED'}")
+    print(f"  Layout planning authorization: {'READY' if layout_ready else 'BLOCKED'}")
+    print(f"  KiCad board import: {'READY' if board_import_ready else 'BLOCKED'}")
     print(f"  Board-print package: {'READY' if board_print_ready else 'NO-GO'}")
     print(f"  Active freeze gates: {len(active_gates)}")
     print(f"  Active release blockers: {len(active_blockers)}")
+    print(f"  Open layout-start gates: {len(open_layout_start_rows)}")
     print(f"  Board-print closure rows: {len(active_closure_rows)}")
     print(f"  Deferred post-prototype validation gates: {len(deferred_post_prototype)}")
     print(f"  KiCad PCB files: {len(pcbs)}")
@@ -171,6 +187,12 @@ def main() -> int:
             blocker_id = row["Blocker ID"]
             action = row["Next engineering action"]
             print(f"  - {blocker_id}: {gate} - {action}")
+
+    if board_import_blockers:
+        print("")
+        print("KiCad board-import blockers:")
+        for row in board_import_blockers:
+            print(f"  - {row['Gate']}: {row['Blocked action']}")
 
     if pcbs:
         print("")

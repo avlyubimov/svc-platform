@@ -1,6 +1,6 @@
 # PB-100 KiCad Project
 
-Status: Preliminary schematic capture; no PCB layout
+Status: Schematic freeze closed; layout-start preparation open; no PCB layout
 
 This directory contains the preliminary KiCad project for PB-100.
 
@@ -18,9 +18,11 @@ This directory contains the preliminary KiCad project for PB-100.
   or garage-installed schematic elements.
 - `lib/PB100.pretty/`: empty preliminary local footprint library.
 
-There is intentionally no `PB-100.kicad_pcb` file. PCB layout remains blocked
-until schematic freeze. Gerber, drill, pick-and-place, placement, and zipped
-manufacturing outputs are also blocked by repository validation.
+There is intentionally no `PB-100.kicad_pcb` file. Schematic freeze is closed,
+but KiCad board import remains blocked until
+`../PB-100-pcb-layout-start-checklist.csv` closes footprint binding and
+mechanical envelope gates. Gerber, drill, pick-and-place, placement, BOM/CPL,
+and zipped manufacturing outputs remain blocked by repository validation.
 
 ## Source documents
 
@@ -52,6 +54,7 @@ manufacturing outputs are also blocked by repository validation.
 - `../PB-100-symbol-pin-evidence.csv`
 - `../PB-100-symbol-open-items.md`
 - `../PB-100-schematic-freeze-checklist.md`
+- `../PB-100-pcb-layout-start-checklist.csv`
 - `../PB-100-schematic-freeze-gap-register.csv`
 - `../PB-100-validation-traceability.csv`
 - `../PB-100-test-point-plan.csv`
@@ -63,17 +66,22 @@ manufacturing outputs are also blocked by repository validation.
 
 ## Next KiCad work
 
-1. Open `PB-100.kicad_pro` in KiCad.
-2. Let KiCad normalize project settings if needed.
-3. Review linked child schematic sheets listed in
+1. Review `../PB-100-pcb-layout-start-checklist.csv` and close footprint
+   binding plus mechanical envelope gates.
+2. Open `PB-100.kicad_pro` in KiCad.
+3. Let KiCad normalize project settings if needed.
+4. Review linked child schematic sheets listed in
    `PB-100-schematic-capture-plan.md` against the trace and freeze-review
    artifacts.
-4. Review preliminary concrete MPN symbols against the official data sheets
+5. Review preliminary concrete MPN symbols against the official data sheets
    listed in `PB-100-symbol-capture-worklist.csv`.
-5. Replace abstract class instances with final electrical symbols, values, and
+6. Replace abstract class instances with final electrical symbols, values, and
    footprints only after package drawings, pinouts, SOA, and sourcing gates are
    checked.
-6. Do not create a PCB layout until the freeze checklist is closed.
+7. Create `PB-100.kicad_pcb` only after footprint binding and mechanical
+   envelope gates close.
+8. Do not create Gerbers, drills, pick-place, BOM/CPL, manufacturing ZIP files,
+   fabrication packages, or PCBA orders until layout review closes.
 
 ## Validation
 
@@ -83,8 +91,8 @@ Run from repository root:
 python3 tools/validate_pb100.py
 ```
 
-The validator intentionally fails if layout/manufacturing artifacts appear before
-the PB-100 schematic freeze checklist is closed.
+The validator intentionally fails if manufacturing artifacts appear before
+layout review and order evidence close.
 
 The validator requires `kicad-cli` version `10.0.4`. It fails if KiCad is
 missing or a different version is installed.
@@ -120,5 +128,5 @@ the KiCad symbol library.
 numbers directly against that map.
 
 The readiness dashboard and pin/value contract CSVs are checked against the
-instance map, JPB1 pin map, net-domain plan, and freeze policy. They are
-schematic-capture contracts only and do not authorize layout or final values.
+instance map, JPB1 pin map, net-domain plan, and freeze policy. Layout-start
+work is now controlled by `../PB-100-pcb-layout-start-checklist.csv`.
