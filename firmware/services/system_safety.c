@@ -62,6 +62,19 @@ static bool thermal_action_event_type(
     return false;
 }
 
+static bool publish_power_budget_shed_event(
+    svc_event_bus_t *event_bus,
+    uint32_t measured_total_current_ma)
+{
+    return svc_event_bus_publish(
+        event_bus,
+        (svc_event_t){
+            .type = SVC_EVENT_POWER_BUDGET_SHED,
+            .output_id = SVC_OUTPUT_OUT1,
+            .value = measured_total_current_ma
+        });
+}
+
 static uint16_t disable_active_outputs(svc_output_manager_t *output_manager)
 {
     const uint16_t active_mask = svc_output_manager_active_mask(output_manager);
@@ -111,7 +124,9 @@ bool svc_system_safety_init(
     safety->last_battery_action = SVC_BATTERY_ACTION_ALLOW;
     safety->last_thermal_action = SVC_THERMAL_ACTION_ALLOW;
     safety->last_battery_update_ms = 0U;
+    safety->pending_power_budget_shed_value = 0U;
     safety->battery_update_time_valid = false;
+    safety->power_budget_shed_event_pending = false;
     safety->initialized = true;
     return true;
 }
@@ -326,14 +341,18 @@ svc_system_power_budget_safety_result_t svc_system_safety_update_power_budget(
     }
 
     if (result.disabled_output_mask != 0U) {
+        safety->pending_power_budget_shed_value = measured_total_current_ma;
+        safety->power_budget_shed_event_pending = true;
+    }
+
+    if (safety->power_budget_shed_event_pending) {
         result.event_publish_attempted = true;
-        result.event_published = svc_event_bus_publish(
+        result.event_published = publish_power_budget_shed_event(
             event_bus,
-            (svc_event_t){
-                .type = SVC_EVENT_POWER_BUDGET_SHED,
-                .output_id = SVC_OUTPUT_OUT1,
-                .value = measured_total_current_ma
-            });
+            safety->pending_power_budget_shed_value);
+        if (result.event_published) {
+            safety->power_budget_shed_event_pending = false;
+        }
     }
 
     result.active_output_mask = svc_output_manager_active_mask(output_manager);

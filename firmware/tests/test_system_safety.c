@@ -398,6 +398,50 @@ static void test_stale_power_budget_telemetry_disables_active_outputs(void)
     assert(event.type == SVC_EVENT_POWER_BUDGET_SHED);
 }
 
+static void test_power_budget_shed_event_retries_after_bus_full(void)
+{
+    svc_output_manager_t manager = initialized_output_manager();
+    svc_system_safety_t safety = initialized_safety();
+    svc_event_bus_t bus = {0};
+    svc_event_bus_init(&bus);
+
+    for (size_t event_index = 0U; event_index < SVC_EVENT_BUS_CAPACITY; ++event_index) {
+        assert(svc_event_bus_publish(&bus, (svc_event_t){SVC_EVENT_OUTPUT_STATE_CHANGED, SVC_OUTPUT_OUT1, (uint32_t)event_index}));
+    }
+    assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT9, 1000U, true).status == SVC_OUTPUT_MANAGER_OK);
+
+    const svc_system_power_budget_safety_result_t dropped_result = svc_system_safety_update_power_budget(
+        &safety,
+        &manager,
+        &bus,
+        12000U,
+        false);
+
+    assert(dropped_result.disabled_output_mask == mask_for(SVC_OUTPUT_OUT9));
+    assert(dropped_result.event_publish_attempted);
+    assert(!dropped_result.event_published);
+    assert(dropped_result.active_output_mask == 0U);
+
+    svc_event_t event = {0};
+    while (svc_event_bus_pop(&bus, &event)) {
+    }
+
+    const svc_system_power_budget_safety_result_t retry_result = svc_system_safety_update_power_budget(
+        &safety,
+        &manager,
+        &bus,
+        0U,
+        false);
+
+    assert(retry_result.disabled_output_mask == 0U);
+    assert(retry_result.event_publish_attempted);
+    assert(retry_result.event_published);
+    assert(svc_event_bus_count(&bus) == 1U);
+    assert(svc_event_bus_pop(&bus, &event));
+    assert(event.type == SVC_EVENT_POWER_BUDGET_SHED);
+    assert(event.value == 12000U);
+}
+
 static void test_thermal_cutoff_disables_active_outputs(void)
 {
     svc_output_manager_t manager = initialized_output_manager();
@@ -467,5 +511,6 @@ int main(void)
     test_stale_thermal_telemetry_disables_active_outputs();
     test_runtime_power_budget_sheds_active_loads();
     test_stale_power_budget_telemetry_disables_active_outputs();
+    test_power_budget_shed_event_retries_after_bus_full();
     return 0;
 }

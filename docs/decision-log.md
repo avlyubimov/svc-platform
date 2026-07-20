@@ -2566,3 +2566,15 @@ Reason: The battery cutoff delay is a safety boundary. Overflow in
 `elapsed_ms + 999` could turn a long interval into a one-second increment and
 delay low-voltage cutoff. The new conversion preserves ceiling behavior for
 normal intervals and fails toward cutoff for long-running or delayed updates.
+
+## 2026-07-20 — Power-budget shed event retry
+
+Decision: System Safety now retains a pending runtime power-budget shed event
+when the Event Bus is full and retries publication on later power-budget safety
+updates until the event is accepted.
+
+Reason: Runtime budget enforcement can disable outputs because measured current
+is over limit or total-current telemetry is stale/invalid. That shutdown remains
+the priority, but diagnostic evidence must not be lost permanently because the
+Event Bus was full at the shutdown instant. Retrying keeps the safety action
+unchanged while preserving the event path once queue capacity is available.

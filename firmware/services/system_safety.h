@@ -44,7 +44,9 @@ typedef struct {
     svc_battery_action_t last_battery_action;
     svc_thermal_action_t last_thermal_action;
     uint32_t last_battery_update_ms;
+    uint32_t pending_power_budget_shed_value;
     bool battery_update_time_valid;
+    bool power_budget_shed_event_pending;
     bool initialized;
 } svc_system_safety_t;
 

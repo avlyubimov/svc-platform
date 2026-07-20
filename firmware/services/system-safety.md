@@ -17,6 +17,7 @@ letting feature code bypass the Output Manager.
 - Treat invalid or stale total-current telemetry as a safe fault that disables
   active outputs through the Output Manager.
 - Publish power-budget shedding events when runtime enforcement disables loads.
+- Retry a dropped power-budget shedding event until the Event Bus accepts it.
 - Apply thermal derating through the Output Manager at thermal warning.
 - Disable all active outputs through the Output Manager on thermal cutoff.
 - Treat invalid battery telemetry as cutoff.
