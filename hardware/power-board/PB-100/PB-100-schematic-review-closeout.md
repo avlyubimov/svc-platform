@@ -1,19 +1,26 @@
 # PB-100 Schematic Review Closeout
 
-Status: Closed
+Status: Retracted; schematic freeze is Open
 Review date: 2026-07-20
 
-This closeout freezes PB-100 Rev.1 schematic inputs for PCB-layout start. It
+This former closeout no longer freezes PB-100 Rev.1 schematic inputs. It
 does not create KiCad PCB layout, `PB-100.kicad_pcb`, Gerbers, drills,
 pick-place files, BOM/CPL order packages, manufacturing ZIP files, fabrication
 packages, or PCBA orders.
 
 ## Freeze Boundary
 
+The 2026-07-20 closure was retracted after a netlist and footprint audit found
+unclosed implementation evidence: conditional 60 V stress margins, incomplete
+FX18 MF/TH mechanics, and preliminary symbols with empty footprint bindings.
+The corrected CAN1 topology is necessary evidence but does not close those
+remaining gates.
+
 - PB-100 architecture is unchanged: 10 generic outputs, high-side switching,
   board-level current budget, read-only CAN1 default, and factory/garage split.
-- PBREL-001 through PBREL-012 are closed by
-  `PB-100-engineering-blocker-closeout.md`.
+- The former PBREL closeout evidence remains historical in
+  `PB-100-engineering-blocker-closeout.md`; active implementation blockers are
+  restored in `PB-100-board-release-blocker-register.csv`.
 - Physical PB-BENCH execution remains deferred to
   `PB-100-post-prototype-validation-gate.csv` and blocks first motorcycle power,
   field use, and production release.

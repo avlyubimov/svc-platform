@@ -54,4 +54,8 @@ RT3,telemetry,Power-zone B temperature sensor,TDK NTCGS103JF103FT8-class 10k NTC
 RID1,telemetry,Board identity resistor network,Precision resistor divider,SMD,1,Value TBD,PB_ID_ADC fallback identity
 JP_CAN1,can1-safety,CAN1 TX DNP/open link,Solder jumper or DNP 0R,TBD,1,Default open,No CAN1 TX without future ADR
 U_CAN1,can1-safety,CAN1 TX disable gate,Logic gate or transceiver silent control,TBD,1,Conditional,Only if CAN1 safety gate crosses PB-100
+R_CAN1_OE,can1-safety,CAN1 gate disable pull-up,47k 1% resistor,0402,1,Candidate value,Physical OE node defaults disabled high
+R_CAN1_TX_BIAS,can1-safety,CAN1 downstream TXD recessive bias,47k 1% resistor,0402,1,Candidate value,Downstream CAN1_TXD_SAFE defaults recessive high
+R_CAN1_STATUS_SER,can1-safety,CAN1 physical-status series isolation,1k 1% resistor,0402,1,Candidate value,Readback is driven by the physical OE node
+R_CAN1_STATUS_PULL,can1-safety,CAN1 disabled-status default pull-up,100k 1% resistor,0402,1,Candidate value,Status defaults to disabled high
 TP1..TPn,test,Bring-up and telemetry test points,Test point,TBD,TBD,Review item,Exact count from schematic ERC/bench plan

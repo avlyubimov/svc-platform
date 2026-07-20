@@ -54,4 +54,8 @@ telemetry.kicad_sch,RT3,THERMAL_NTC,Planned,TEMP_PWR_B sensor
 telemetry.kicad_sch,RID1,BOARD_ID_RESISTOR,Planned,Board identity resistor network
 can1-safety.kicad_sch,JP_CAN1,CAN1_TX_DISABLE,Planned,DNP/open CAN1 TX link
 can1-safety.kicad_sch,U_CAN1,CAN1_TX_DISABLE,Planned,Conditional CAN1 TX disable gate
+can1-safety.kicad_sch,R_CAN1_OE,CAN1_TX_DISABLE,Planned,47k physical OE default-disable pull-up captured in the preliminary sheet
+can1-safety.kicad_sch,R_CAN1_TX_BIAS,CAN1_TX_DISABLE,Planned,47k downstream CAN1_TXD_SAFE recessive-bias pull-up captured in the preliminary sheet
+can1-safety.kicad_sch,R_CAN1_STATUS_SER,CAN1_TX_DISABLE,Planned,1k physical OE-to-status series readback captured in the preliminary sheet
+can1-safety.kicad_sch,R_CAN1_STATUS_PULL,CAN1_TX_DISABLE,Planned,100k disabled-status default pull-up captured in the preliminary sheet
 cross-sheet-review,TP1..TPn,TEST_POINT,Review-defined,Exact test point locations are defined during schematic review

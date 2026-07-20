@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
@@ -1759,7 +1760,104 @@ def validate_kicad_cli_netlist_export(kicad_cli: str, temp_dir: Path) -> None:
             f"KiCad netlist has {net_count} electrical nets; "
             f"expected at least {MIN_KICAD_NETS}"
         )
+    validate_can1_netlist_topology(kicad_cli, temp_dir)
     print("PB-100 KiCad netlist export passed")
+
+
+def validate_can1_netlist_topology(kicad_cli: str, temp_dir: Path) -> None:
+    """Validate the captured CAN1 safety circuit from connectivity, not labels in prose."""
+    netlist_path = temp_dir / "PB-100.xml"
+    command = [
+        kicad_cli,
+        "sch",
+        "export",
+        "netlist",
+        "--format",
+        "kicadxml",
+        "--output",
+        str(netlist_path),
+        str(KICAD_DIR / "PB-100.kicad_sch"),
+    ]
+    result = subprocess.run(command, check=False, text=True, capture_output=True)
+    if result.returncode != 0:
+        details = "\n".join(part for part in (result.stdout.strip(), result.stderr.strip()) if part)
+        fail(f"KiCad XML netlist export failed for CAN1 topology validation: {details}")
+
+    try:
+        root = ET.parse(netlist_path).getroot()
+    except (ET.ParseError, OSError) as error:
+        fail(f"invalid KiCad XML netlist for CAN1 topology validation: {error}")
+
+    components = {
+        component.get("ref", ""): component
+        for component in root.findall("./components/comp")
+    }
+    expected_components = {
+        "JP_CAN1": ("CAN1_TX_DNP_LINK_PRELIM", "PB100:R0603_DNP_LINK_1608Metric"),
+        "U_CAN1": ("SN74LVC1G125_Q1_DBV_PRELIM", "PB100:SOT-23-5_DBV_TI"),
+        "R_CAN1_OE": ("47k 1%", "PB100:R0402"),
+        "R_CAN1_TX_BIAS": ("47k 1%", "PB100:R0402"),
+        "R_CAN1_STATUS_SER": ("1k 1%", "PB100:R0402"),
+        "R_CAN1_STATUS_PULL": ("100k 1%", "PB100:R0402"),
+    }
+    for reference, (expected_value, expected_footprint) in expected_components.items():
+        component = components.get(reference)
+        if component is None:
+            fail(f"CAN1 topology is missing physical component {reference}")
+        value = component.findtext("value", default="").strip()
+        footprint = component.findtext("footprint", default="").strip()
+        if value != expected_value:
+            fail(f"CAN1 component {reference} value is {value!r}; expected {expected_value!r}")
+        if footprint != expected_footprint:
+            fail(
+                f"CAN1 component {reference} footprint is {footprint!r}; "
+                f"expected {expected_footprint!r}"
+            )
+
+    if components["JP_CAN1"].find("./property[@name='dnp']") is None:
+        fail("JP_CAN1 must be physically marked DNP in the exported KiCad netlist")
+
+    nets = {}
+    for net in root.findall("./nets/net"):
+        name = net.get("name", "")
+        nets[name] = {(node.get("ref", ""), node.get("pin", "")) for node in net.findall("node")}
+
+    exact_nets = {
+        "CAN1_TX_ROUTE": {("JPB1", "70"), ("U_CAN1", "2")},
+        "CAN1_TX_GATE_OUT": {("U_CAN1", "4"), ("JP_CAN1", "1")},
+        "CAN1_TXD_SAFE": {("JP_CAN1", "2"), ("R_CAN1_TX_BIAS", "2")},
+        "CAN1_TX_DISABLED_STATUS": {
+            ("JPB1", "68"),
+            ("R_CAN1_STATUS_SER", "2"),
+            ("R_CAN1_STATUS_PULL", "2"),
+        },
+        "CAN1_TX_DISABLE_CMD": {
+            ("JPB1", "67"),
+            ("U_CAN1", "1"),
+            ("R_CAN1_OE", "2"),
+            ("R_CAN1_STATUS_SER", "1"),
+        },
+    }
+    for net_name, expected_nodes in exact_nets.items():
+        actual_nodes = nets.get(net_name)
+        if actual_nodes != expected_nodes:
+            fail(
+                f"CAN1 net {net_name} has nodes {sorted(actual_nodes or set())}; "
+                f"expected {sorted(expected_nodes)}"
+            )
+
+    rail_nodes = nets.get("LB_3V3_IO", set())
+    required_rail_nodes = {
+        ("U_CAN1", "5"),
+        ("R_CAN1_OE", "1"),
+        ("R_CAN1_TX_BIAS", "1"),
+        ("R_CAN1_STATUS_PULL", "1"),
+    }
+    missing_rail_nodes = required_rail_nodes - rail_nodes
+    if missing_rail_nodes:
+        fail(f"CAN1 safety pull-ups are not tied to LB_3V3_IO: {sorted(missing_rail_nodes)}")
+
+    print("PB-100 CAN1 physical net topology passed")
 
 
 def validate_no_layout_artifacts() -> None:
@@ -2369,6 +2467,7 @@ def validate_instance_symbol_map() -> None:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: symbol key {symbol_key} is missing worklist row")
         can1_concrete_symbols = {
             "PB100_CAN1_TX_DISABLE_PRELIM",
+            "PB100_CAN1_SAFETY_RESISTOR_PRELIM",
             "PB100_CAN1_TX_DNP_LINK_PRELIM",
             "PB100_SN74LVC1G125_Q1_DBV_PRELIM",
         }
@@ -3392,7 +3491,7 @@ def validate_schematic_review_closeout() -> None:
     text = read_text(path)
     normalized_text = " ".join(text.split())
     for token in (
-        "Status: Closed",
+        "Status: Retracted; schematic freeze is Open",
         "Review date: 2026-07-20",
         "does not create KiCad PCB layout",
         "PB-100.kicad_pcb",
@@ -3402,7 +3501,9 @@ def validate_schematic_review_closeout() -> None:
         "BOM/CPL",
         "manufacturing ZIP",
         "PCBA orders",
-        "PBREL-001 through PBREL-012 are closed",
+        "closure was retracted",
+        "conditional 60 V stress margins",
+        "FX18 MF/TH mechanics",
         "post-prototype",
         "board-print remains NO-GO",
         "CAN1_TX_ROUTE",

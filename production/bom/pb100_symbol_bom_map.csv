@@ -18,4 +18,4 @@ B2B_CONNECTOR,factory_bom_draft.csv,PB-100/LB-100 board-to-board connector,1,Pop
 OUTPUT_CONNECTOR,garage_bom_draft.csv,Deutsch output connector sets,10,Garage installed,Garage,Candidate,DTP class for OUT1/OUT2 and DT class for OUT3-OUT10
 OUTPUT_FUSE_HOLDER,garage_bom_draft.csv,Per-output fuse holders,10,Garage installed,Garage,Candidate,Final holder style depends on enclosure
 MAIN_FUSE_HOLDER,garage_bom_draft.csv,Littelfuse MAXI fuse holder,1,Garage installed,Garage,Candidate,Install near battery per ADR-0008
-CAN1_TX_DISABLE,factory_bom_draft.csv,CAN1 TX disable DNP link,1,Default DNP/open,Factory,Core safety,No default-populated vehicle-CAN TX path without future ADR and explicit hardware action
+CAN1_TX_DISABLE,factory_bom_draft.csv,CAN1 TX disable DNP link,1 set,Default DNP/open link with populated gate and four safety resistors,Factory,Core safety,Factory BOM also includes CAN1 safety resistor network: JP_CAN1 DNP; U_CAN1 plus 47k OE pull 47k downstream bias 1k status series and 100k status pull are populated; no default-populated vehicle-CAN TX path without future ADR and explicit hardware action

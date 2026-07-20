@@ -3106,3 +3106,73 @@ Footprint property promotion remain blocked before board import. No
 `PB-100.kicad_pcb`, Gerbers, drills, pick-place files, BOM/CPL order packages,
 manufacturing ZIPs, fabrication packages, panel outputs, or PCBA orders are
 created or authorized.
+
+## 2026-07-20 — Electrical/topology audit remediation and freeze retraction
+
+Decision: retract the premature PB-100, LB-100, and FB-100 schematic-freeze
+closeouts without changing the frozen three-board architecture. PB-100 CAN1 now
+uses the explicit sequence `CAN1_TX_ROUTE` -> `U_CAN1` ->
+`CAN1_TX_GATE_OUT` -> DNP `JP_CAN1` -> `CAN1_TXD_SAFE`, with physical 47 kΩ
+OE pull-up, 47 kΩ downstream TXD bias, 1 kΩ status series resistor, and
+100 kΩ status pull-up. `tools/validate_pb100.py` exports the KiCad XML
+netlist and checks exact component-pin-net membership, values, footprints, and
+the DNP property instead of accepting text markers.
+
+Decision: reopen PB/LB FX18 footprint, electrical-interface, and mechanical
+gates. Official Hirose drawings `0000951879` and `0000951892` specify 0.8 mm
+signal pitch, 4.9 mm signal-row center spacing, and 0.5 mm by 2.1 mm signal
+lands. A high-resolution drawing review confirmed that the existing 4.9 mm
+signal-row spacing was correct; the 8.4 mm callout is not the signal-row
+spacing and must not be substituted for it. The socket pin-1 marker was
+mirrored to its actual signal end, and misleading F.Fab circles that did not
+represent physical holes were removed.
+
+The same Hirose drawings, product data, and official Allegro footprint packages
+`0001474376`/`0001474378` identify four additional MF electrical positions per
+connector. MF Contact A has two soldering poles that must be connected to the
+same circuit, while MF Contact B has one; the paired ends therefore require six
+physical plated TH lands representing four circuits. The 100-position JPB1
+signal map does not assign those four MF circuits. They remain unassigned in
+`PB-100-fx18-mf-contact-ownership-precheck.csv`, and no speculative TH pads or
+net assignments were added.
+
+`tools/validate_board_order.py` now validates every signal-pad coordinate,
+size, layer set, pitch, row spacing, and plug/socket mirroring. It cannot treat
+an FX18 footprint as complete until it also has exactly six plated TH lands,
+four non-signal circuit identifiers, and the two duplicated identifiers needed
+to join both split-pole MF A pairs. The earlier FX18/mechanical closeout entries
+are superseded by this audit result; PCB import remains blocked pending Product
+Owner approval of MF net ownership and independent paired-footprint review.
+
+Decision: keep the PB-100 60/80 V choice Conditional. A 53.3 V datasheet clamp
+point alone does not accept a 60 V MOSFET. Closure requires reproducible
+`Vstress = Vclamp + Lloop * di/dt` simulation or measurement with waveform,
+parasitics, temperature, source impedance, fixture/probe uncertainty and SOA;
+otherwise an 80 V migration requires Product Owner approval plus thermal,
+sourcing, footprint, and assembly review. LB-100 and FB-100 remain Open because
+their KiCad schematics contain no component instances. No `.kicad_pcb`, Gerber,
+drill, pick-place, BOM/CPL order, manufacturing ZIP, fabrication, or PCBA order
+artifact is authorized or created.
+
+## 2026-07-20 — CAN1 physical-layer ownership contradiction exposed
+
+Decision: do not create an LB-100 CAN1 transceiver schematic from the current
+documents. The post-jumper `CAN1_TXD_SAFE` net exists only on PB-100, while the
+current LB sourcing and footprint inventories assign the transceiver to LB-100.
+JPB1 has no post-jumper return signal, so the earlier instruction to connect an
+LB transceiver TXD directly to `CAN1_TXD_SAFE` cannot be implemented
+electrically. PBREL-001, LBREL-004, and the related CAN freeze rows are
+Conditional rather than Closed.
+
+Proposed ADR-0015 compares three topologies. Candidate A is recommended: LB-100
+keeps STM32 FDCAN, protocol, and firmware ownership, while PB-100 owns the CAN1
+transceiver, protection, termination options, and vehicle-harness physical
+layer. This keeps `CAN1_TXD_SAFE` local, preserves all four existing JPB1 logic
+signals, and avoids carrying CANH/CANL or a post-jumper return through the
+mezzanine connector. Candidate B colocates the entire CAN1 chain on LB-100;
+candidate C adds a return path across JPB1 and is not recommended.
+
+ADR-0015 remains `Proposed`. No transceiver was moved or instantiated, no
+accepted architecture was changed, and no DNP capability was removed. Product
+Owner approval is required before BOM ownership, rail budgets, protection,
+termination, footprint binding, or value-bearing CAN1 capture is changed.

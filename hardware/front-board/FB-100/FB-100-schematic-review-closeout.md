@@ -1,9 +1,10 @@
 # FB-100 Schematic Review Closeout
 
-Status: Closed
+Status: Retracted; schematic freeze is Open
 Review date: 2026-07-20
 
-This closeout freezes the FB-100 Rev.1 schematic inputs for PCB-layout start. It
+This former closeout no longer freezes the FB-100 Rev.1 schematic inputs. The
+current KiCad sheet is a text scaffold without component symbols. It
 does not create or approve KiCad PCB layout, Gerbers, drills, pick-place files,
 BOM/CPL order packages, manufacturing ZIP files, fabrication packages, or PCBA
 orders.
