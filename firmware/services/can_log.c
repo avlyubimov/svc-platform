@@ -1,11 +1,19 @@
 #include "can_log.h"
 
 #include <stddef.h>
+#include <stdint.h>
 
 static bool port_is_valid(svc_can_port_t port)
 {
     return port == SVC_CAN_PORT_CAN1_VEHICLE ||
            port == SVC_CAN_PORT_CAN2_EXPANSION;
+}
+
+static void increment_counter(uint32_t *counter)
+{
+    if (*counter < UINT32_MAX) {
+        ++(*counter);
+    }
 }
 
 void svc_can_log_init(svc_can_log_t *log)
@@ -39,16 +47,16 @@ svc_can_log_status_t svc_can_log_append_rx(
     if (log->count == SVC_CAN_LOG_CAPACITY) {
         write_index = log->start;
         log->start = (log->start + 1U) % SVC_CAN_LOG_CAPACITY;
-        ++log->dropped_count;
+        increment_counter(&log->dropped_count);
     } else {
         ++log->count;
     }
 
     log->frames[write_index] = *frame;
     if (frame->port == SVC_CAN_PORT_CAN1_VEHICLE) {
-        ++log->can1_rx_count;
+        increment_counter(&log->can1_rx_count);
     } else {
-        ++log->can2_rx_count;
+        increment_counter(&log->can2_rx_count);
     }
 
     return SVC_CAN_LOG_OK;

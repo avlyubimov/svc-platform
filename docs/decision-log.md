@@ -2532,3 +2532,14 @@ Reason: The diagnostic log is intentionally bounded, but long-running overflow
 conditions must not make drop accounting appear fresh or low after counter wrap.
 Saturating preserves the latest event entries and keeps diagnostic evidence
 conservative without changing the fixed-size storage model.
+
+## 2026-07-20 — CAN RX Log diagnostic counter saturation
+
+Decision: CAN RX Log dropped-frame and per-port receive counters now saturate at
+`UINT32_MAX` instead of wrapping.
+
+Reason: CAN capture is receive-only diagnostic evidence for vehicle and
+expansion traffic. Long-running capture sessions must not make frame activity or
+drop pressure appear low because an unsigned counter wrapped; saturating keeps
+the diagnostic state conservative while preserving the fixed-size ring buffer
+and CAN1 no-transmit boundary.

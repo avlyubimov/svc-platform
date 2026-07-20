@@ -51,7 +51,8 @@ Current host tests cover:
 - Event Log fixed-size diagnostic ring buffer with overwrite/drop accounting
   that saturates instead of wrapping the diagnostic drop counter.
 - CAN1 listen-only TX denial and CAN2 expansion TX allowance.
-- CAN RX Log fixed-size receive-only frame capture for CAN1/CAN2.
+- CAN RX Log fixed-size receive-only frame capture for CAN1/CAN2 with
+  saturating diagnostic counters.
 - CAN Event Decode from received frames to internal Event Bus state-change
   events without output control.
 - CAN Event Decode dropped-edge retry behavior when the Event Bus is full.
