@@ -11,6 +11,10 @@ PB100_DIR = REPO_ROOT / "hardware" / "power-board" / "PB-100"
 LB100_DIR = REPO_ROOT / "hardware" / "logic-board" / "LB-100"
 FB100_DIR = REPO_ROOT / "hardware" / "front-board" / "FB-100"
 ORDER_READINESS = REPO_ROOT / "production" / "board-order" / "three_board_jlcpcb_order_readiness.csv"
+LAYOUT_RULES = REPO_ROOT / "production" / "board-order" / "three_board_layout_rules.md"
+LAYOUT_START_READINESS = (
+    REPO_ROOT / "production" / "board-order" / "three_board_layout_start_readiness.csv"
+)
 PB100_FREEZE = PB100_DIR / "PB-100-schematic-freeze-checklist.md"
 ADR_0014 = REPO_ROOT / "docs" / "adr" / "ADR-0014-lb-fb-baseline-requirements.md"
 
@@ -49,6 +53,11 @@ BLOCKER_REGISTERS = {
 MANIFESTS = {
     "LB-100": LB100_DIR / "LB-100-review-release-manifest.csv",
     "FB-100": FB100_DIR / "FB-100-review-release-manifest.csv",
+}
+LAYOUT_START_CHECKLISTS = {
+    "PB-100": PB100_DIR / "PB-100-pcb-layout-start-checklist.csv",
+    "LB-100": LB100_DIR / "LB-100-pcb-layout-start-checklist.csv",
+    "FB-100": FB100_DIR / "FB-100-pcb-layout-start-checklist.csv",
 }
 SCHEMATIC_REVIEW_CLOSEOUTS = {
     "LB-100": LB100_DIR / "LB-100-schematic-review-closeout.md",
@@ -94,6 +103,26 @@ ORDER_COLUMNS = (
     "Order state",
     "Blocking evidence",
     "Next action",
+)
+LAYOUT_START_READINESS_COLUMNS = (
+    "Board",
+    "Freeze state",
+    "Layout planning state",
+    "KiCad board import state",
+    "Footprint binding state",
+    "Mechanical envelope state",
+    "Assembly/DFM baseline",
+    "Fabrication/assembly output state",
+    "Order state",
+    "Blocking evidence",
+    "Next action",
+)
+LAYOUT_START_CHECKLIST_COLUMNS = (
+    "Gate",
+    "Status",
+    "Evidence",
+    "Decision",
+    "Blocked action",
 )
 BLOCKER_COLUMNS = (
     "Gate",
@@ -307,13 +336,26 @@ def manufacturing_files(board_dir: Path) -> list[Path]:
     return sorted(files)
 
 
+def layout_files(board_dir: Path) -> list[Path]:
+    return sorted(board_dir.rglob("*.kicad_pcb"))
+
+
 def validate_no_layout_before_freeze(board: str, board_dir: Path, status: str) -> None:
-    pcbs = sorted(board_dir.rglob("*.kicad_pcb"))
+    pcbs = layout_files(board_dir)
     manufacturing = manufacturing_files(board_dir)
     if status != "Closed" and pcbs:
         fail(f"{board} has PCB layout before schematic freeze: {pcbs[0].relative_to(REPO_ROOT)}")
     if status != "Closed" and manufacturing:
         fail(f"{board} has manufacturing output before schematic freeze: {manufacturing[0].relative_to(REPO_ROOT)}")
+
+
+def validate_no_manufacturing_outputs_before_order(board: str, board_dir: Path) -> None:
+    manufacturing = manufacturing_files(board_dir)
+    if manufacturing:
+        fail(
+            f"{board} has manufacturing output before order review: "
+            f"{manufacturing[0].relative_to(REPO_ROOT)}"
+        )
 
 
 def validate_adr_0014() -> None:
@@ -666,9 +708,173 @@ def validate_order_readiness() -> None:
         for token in ("No PCB layout", "No fabrication outputs", "No assembly outputs"):
             if token not in " ".join(row.values()):
                 fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: must keep {token}")
+        for token in (
+            f"{board}-pcb-layout-start-checklist.csv",
+            "footprint binding",
+            "mechanical envelope",
+            "do not generate JLCPCB/PCBWay outputs",
+        ):
+            if token not in " ".join(row.values()):
+                fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: must include {token}")
     missing_boards = sorted(REQUIRED_ORDER_BOARDS - seen_boards)
     if missing_boards:
         fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)} is missing boards: {', '.join(missing_boards)}")
+
+
+def validate_layout_rules() -> None:
+    text = read_text(LAYOUT_RULES)
+    for token in (
+        "Status: Active",
+        "Evidence date: 2026-07-20",
+        "https://jlcpcb.com/capabilities/pcb-capabilities",
+        "https://jlcpcb.com/capabilities/pcb-assembly-capabilities",
+        "https://www.pcbway.com/pcb_prototype/PCB_Manufacturing_tolerances.html",
+        "https://www.pcbway.com/pcb_prototype/Panel_Requirements_for_Assembly.html",
+        "0.15 mm / 0.15 mm",
+        "0.30 mm",
+        "0.60 mm",
+        "0402",
+        "0603",
+        "fiducials",
+        "PB-100 high-current paths",
+        "CAN1_TX_ROUTE",
+        "DNP/open",
+        "USB-C",
+        "Manufacturing outputs remain blocked",
+    ):
+        if token not in text:
+            fail(f"{LAYOUT_RULES.relative_to(REPO_ROOT)} must include {token}")
+    for token in (
+        "does not create KiCad PCB layout files",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "BOM/CPL",
+        "manufacturing ZIP",
+        "PCBA orders",
+    ):
+        if token not in text:
+            fail(f"{LAYOUT_RULES.relative_to(REPO_ROOT)} must keep output boundary token {token}")
+
+
+def board_dir(board: str) -> Path:
+    if board == "PB-100":
+        return PB100_DIR
+    if board == "LB-100":
+        return LB100_DIR
+    if board == "FB-100":
+        return FB100_DIR
+    fail(f"unknown board {board}")
+
+
+def validate_layout_start_readiness() -> None:
+    rows = validate_csv(LAYOUT_START_READINESS)
+    missing_columns = [column for column in LAYOUT_START_READINESS_COLUMNS if column not in rows[0]]
+    if missing_columns:
+        fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)} is missing columns: {', '.join(missing_columns)}")
+    seen_boards = set()
+    for row_number, row in enumerate(rows, 2):
+        board = row["Board"].strip()
+        seen_boards.add(board)
+        if board not in REQUIRED_ORDER_BOARDS:
+            fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: unknown board {board}")
+        if row["Freeze state"].strip() != "Closed":
+            fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: freeze must be Closed")
+        if row["Layout planning state"].strip() != "READY":
+            fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: layout planning must be READY")
+        if row["KiCad board import state"].strip() != "BLOCKED":
+            fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: KiCad board import must remain BLOCKED")
+        if not row["Footprint binding state"].startswith("OPEN"):
+            fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: footprint binding must be OPEN")
+        if not row["Mechanical envelope state"].startswith("OPEN"):
+            fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: mechanical envelope must be OPEN")
+        if not row["Assembly/DFM baseline"].startswith("READY"):
+            fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: assembly DFM baseline must be READY")
+        if row["Order state"].strip() != "NO-GO":
+            fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: order must remain NO-GO")
+        row_text = " ".join(row.values())
+        for token in (
+            f"No {board}.kicad_pcb",
+            "no Gerbers",
+            "drills",
+            "pick-place",
+            "BOM/CPL",
+            "manufacturing ZIP",
+            f"{board}-pcb-layout-start-checklist.csv",
+            "footprint binding",
+            "mechanical envelope",
+        ):
+            if token not in row_text:
+                fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: must include {token}")
+        current_layout_files = layout_files(board_dir(board))
+        if current_layout_files:
+            fail(
+                f"{board} has KiCad board import while layout-start checklist is blocked: "
+                f"{current_layout_files[0].relative_to(REPO_ROOT)}"
+            )
+        validate_no_manufacturing_outputs_before_order(board, board_dir(board))
+    missing_boards = sorted(REQUIRED_ORDER_BOARDS - seen_boards)
+    if missing_boards:
+        fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)} is missing boards: {', '.join(missing_boards)}")
+
+
+def validate_layout_start_checklist(board: str, path: Path) -> None:
+    rows = validate_csv(path)
+    missing_columns = [column for column in LAYOUT_START_CHECKLIST_COLUMNS if column not in rows[0]]
+    if missing_columns:
+        fail(f"{path.relative_to(REPO_ROOT)} is missing columns: {', '.join(missing_columns)}")
+    rows_by_gate = {row["Gate"].strip(): row for row in rows}
+    required_gates = {
+        "Schematic freeze",
+        "KiCad schematic value review",
+        "Footprint binding",
+        "Mechanical envelope",
+        "DFM/DRC baseline",
+        "Manufacturing output boundary",
+    }
+    missing_gates = sorted(required_gates - set(rows_by_gate))
+    if missing_gates:
+        fail(f"{path.relative_to(REPO_ROOT)} is missing gates: {', '.join(missing_gates)}")
+    expected_status = {
+        "Schematic freeze": "Closed",
+        "KiCad schematic value review": "Closed",
+        "Footprint binding": "Open",
+        "Mechanical envelope": "Open",
+        "DFM/DRC baseline": "Ready",
+        "Manufacturing output boundary": "Closed",
+    }
+    for gate, status in expected_status.items():
+        if rows_by_gate[gate]["Status"].strip() != status:
+            fail(f"{path.relative_to(REPO_ROOT)}:{gate}: expected {status}")
+    text = read_text(path)
+    for row_number, row in enumerate(rows, 2):
+        for column in LAYOUT_START_CHECKLIST_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if row["Status"].strip() not in {"Closed", "Open", "Ready"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Status")
+        if "Do not" not in row["Blocked action"]:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocked action must be explicit")
+    for token in (
+        "empty Footprint properties",
+        "production/board-order/three_board_layout_rules.md",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "BOM/CPL",
+        "manufacturing ZIP",
+        "PCBA order",
+    ):
+        if token not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} must include {token}")
+    board_tokens = {
+        "PB-100": ("high-current", "JPB1", "power copper", "fuse"),
+        "LB-100": ("STM32H563", "JPB1", "CAN1_TX_ROUTE", "DNP/open"),
+        "FB-100": ("USB-C", "no-back-power", "JFB1", "VBUS"),
+    }
+    for token in board_tokens[board]:
+        if token not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} must include board-specific token {token}")
 
 
 def validate_kicad_scaffold(board: str, board_dir: Path, status: str) -> None:
@@ -793,6 +999,10 @@ def main() -> int:
             "FB_OLED_ALT_091_DNP",
         ),
     )
+    validate_layout_rules()
+    validate_layout_start_readiness()
+    for board, path in LAYOUT_START_CHECKLISTS.items():
+        validate_layout_start_checklist(board, path)
     validate_order_readiness()
     validate_no_layout_before_freeze("PB-100", PB100_DIR, checklist_status(PB100_FREEZE))
     print("Three-board order validation passed")

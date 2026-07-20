@@ -9,6 +9,9 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ORDER_READINESS = REPO_ROOT / "production" / "board-order" / "three_board_jlcpcb_order_readiness.csv"
+LAYOUT_START_READINESS = (
+    REPO_ROOT / "production" / "board-order" / "three_board_layout_start_readiness.csv"
+)
 PB100_FREEZE = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-schematic-freeze-checklist.md"
 PB100_BLOCKERS = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-board-release-blocker-register.csv"
 BOARD_BLOCKERS = {
@@ -53,10 +56,24 @@ def load_order_rows() -> list[dict[str, str]]:
         return list(csv.DictReader(handle))
 
 
+def load_layout_rows() -> dict[str, dict[str, str]]:
+    if not LAYOUT_START_READINESS.exists():
+        return {}
+    with LAYOUT_START_READINESS.open(newline="", encoding="utf-8") as handle:
+        return {row["Board"]: row for row in csv.DictReader(handle)}
+
+
 def main() -> int:
     args = parse_args()
     rows = load_order_rows()
+    layout_rows = load_layout_rows()
     blocked_rows = [row for row in rows if row["Order state"].strip() != "READY"]
+    layout_ready_rows = [
+        row for row in layout_rows.values() if row["Layout planning state"].strip() == "READY"
+    ]
+    layout_import_blocked_rows = [
+        row for row in layout_rows.values() if row["KiCad board import state"].strip() == "BLOCKED"
+    ]
 
     print("SVC three-board order status")
     print(f"  Overall JLCPCB/PCBWay order: {'READY' if not blocked_rows else 'NO-GO'}")
@@ -64,16 +81,23 @@ def main() -> int:
     print(f"  PB-100 active release blockers: {active_pb100_blockers()}")
     print(f"  Boards tracked: {len(rows)}")
     print(f"  Boards not order-ready: {len(blocked_rows)}")
+    print(f"  Boards layout-planning ready: {len(layout_ready_rows)}")
+    print(f"  Boards KiCad board-import blocked: {len(layout_import_blocked_rows)}")
     print("")
     print("Board states:")
     for row in rows:
         board = row["Board"]
         blocker_path = BOARD_BLOCKERS.get(board)
         active_count = active_blockers(blocker_path) if blocker_path is not None else 0
+        layout_row = layout_rows.get(board, {})
+        layout_state = layout_row.get("Layout planning state", "Missing")
+        import_state = layout_row.get("KiCad board import state", "Missing")
         print(
             f"  - {board}: {row['Order state']} | "
             f"freeze={row['Schematic freeze state']} | "
             f"active_blockers={active_count} | "
+            f"layout_planning={layout_state} | "
+            f"board_import={import_state} | "
             f"kicad={row['KiCad schematic state']} | "
             f"next={row['Next action']}"
         )
