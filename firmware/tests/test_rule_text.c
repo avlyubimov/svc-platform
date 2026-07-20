@@ -274,6 +274,10 @@ static void test_compile_rule_set_rejects_invalid_action(void)
     };
     svc_rule_condition_t condition_buffer[1] = {0};
     svc_rule_t rules[2] = {0};
+    rules[0].condition_count = 99U;
+    rules[0].action.role = OUT_ROLE_CHIGEE;
+    rules[1].condition_count = 88U;
+    rules[1].action.role = OUT_ROLE_DVR;
     size_t compiled_rule_count = 99U;
 
     const svc_rule_text_status_t compile_status = svc_rule_text_compile_rule_set(
@@ -289,6 +293,10 @@ static void test_compile_rule_set_rejects_invalid_action(void)
 
     assert(compile_status == SVC_RULE_TEXT_INVALID_ACTION_VALUE);
     assert(compiled_rule_count == 0U);
+    assert(rules[0].condition_count == 99U);
+    assert(rules[0].action.role == OUT_ROLE_CHIGEE);
+    assert(rules[1].condition_count == 88U);
+    assert(rules[1].action.role == OUT_ROLE_DVR);
 }
 
 int main(void)

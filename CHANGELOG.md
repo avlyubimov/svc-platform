@@ -29,3 +29,5 @@
 - Aligned firmware rule action grammar across the JSON Schema, repository
   validator, and host-tested parser for supported roles and canonical 0..100
   PWM values.
+- Hardened multi-action rule-set compilation so invalid action text is rejected
+  before compiled rule entries are written.

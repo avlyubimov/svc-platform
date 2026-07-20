@@ -243,6 +243,16 @@ svc_rule_text_status_t svc_rule_text_compile_rule_set(
         if (status != SVC_RULE_TEXT_OK) {
             return status;
         }
+    }
+
+    for (size_t action_index = 0U; action_index < action_count; ++action_index) {
+        svc_rule_action_t action = {0};
+        const svc_rule_text_status_t status = svc_rule_text_parse_action(
+            action_texts[action_index],
+            &action);
+        if (status != SVC_RULE_TEXT_OK) {
+            return status;
+        }
 
         rule_buffer[action_index].conditions = condition_count == 0U ? NULL : condition_buffer;
         rule_buffer[action_index].condition_count = condition_count;
