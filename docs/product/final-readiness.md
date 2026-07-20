@@ -4,7 +4,7 @@ Status: In progress
 Last updated: 2026-07-20
 
 This document defines what “ready” means for the current repository state. It
-does not authorize PB-100 PCB layout.
+does not authorize PB-100, LB-100, or FB-100 PCB layout.
 
 ## Automated gate
 
@@ -17,10 +17,22 @@ make check
 For board-order status, run:
 
 ```bash
+make board-order-status
+```
+
+For PB-100-only detail, run:
+
+```bash
 make pb100-release-status
 ```
 
-For a release job that must fail while PB-100 is not printable, run:
+For a release job that must fail while any board is not printable, run:
+
+```bash
+make board-order-gate
+```
+
+For a PB-100-only release job that must fail while PB-100 is not printable, run:
 
 ```bash
 make pb100-release-gate
@@ -35,6 +47,8 @@ Current coverage:
   20 components and 20 electrical nets.
 - PB-100 KiCad role-token guard for generic `OUT1`..`OUT10` naming.
 - PB-100 layout/manufacturing artifact blocker.
+- Three-board board-order gate for PB-100, LB-100, and FB-100.
+- LB-100 and FB-100 baseline freeze manifests and no-layout blockers.
 - Firmware config JSON/schema validation.
 - Firmware host-test suite.
 - Firmware hardware-capability, config-store, config-update, and runtime-boot
@@ -51,9 +65,15 @@ Current coverage:
 | PB-100 requirements | Ready for schematic planning | Baseline is frozen; schematic freeze remains open |
 | PB-100 KiCad scaffold | Preliminary capture | Child sheets now contain ERC-clean preliminary capture content and exported netlist coverage; schematic freeze remains open |
 | PB-100 PCB/layout | Blocked | Layout, Gerber, drill, placement, and manufacturing zips are blocked by the board-release blocker register; 2026-07-20 local ERC/netlist/host-test evidence is separated in `hardware/power-board/PB-100/PB-100-board-release-local-evidence-closeout.csv` |
+| LB-100 requirements | Ready for schematic planning | Baseline is frozen by ADR-0014; schematic freeze remains open |
+| LB-100 KiCad scaffold | Preliminary scaffold | Top-level non-layout schematic scaffold exists; `LB-100-jpb1-resource-budget.csv` and `LB-100-rail-tree-precheck.csv` start the pin/rail closeout, while exact MCU pins, values, reviewed sheets, and source evidence remain open |
+| LB-100 PCB/layout | Blocked | Layout and manufacturing outputs are blocked by `hardware/logic-board/LB-100/LB-100-schematic-freeze-checklist.md` and `hardware/logic-board/LB-100/LB-100-board-release-blocker-register.csv` |
+| FB-100 requirements | Ready for schematic planning | Baseline is frozen by ADR-0014; schematic freeze remains open |
+| FB-100 KiCad scaffold | Preliminary scaffold | Top-level non-layout schematic scaffold exists; `FB-100-interface-signal-plan.csv` and `FB-100-ui-mechanical-precheck.csv` start the interface/mechanical closeout, while UI values, reviewed sheets, and source evidence remain open |
+| FB-100 PCB/layout | Blocked | Layout and manufacturing outputs are blocked by `hardware/front-board/FB-100/FB-100-schematic-freeze-checklist.md` and `hardware/front-board/FB-100/FB-100-board-release-blocker-register.csv` |
 | Firmware safety core | Host-test ready | Output, overflow-safe delayed battery cutoff, runtime load shedding, stale-current safe-off, thermal derate/cutoff, CAN dropped-edge retry, telemetry, events, saturating diagnostic counters, logging, config, runtime boot, CAN-to-rule bridge, ambient-light rule conditions, ordered rule sets, multi-action rule compilation, rule runtime, and rule paths covered |
 | Configuration format | Host-test ready | JSON schema, canonical rule grammar, rule-action mapping, buffer-atomic rule compilation, PB-100 capability manifest, compiled capability baseline, config store reserved/sequence-wrap handling, config update, and examples are validated |
-| Production package | Draft | BOM sourcing snapshot was refreshed for selected manufacturer, distributor, JLCPCB componentSearch, PCBWay generic process, and garage kit-candidate evidence on 2026-07-20; zero/low-stock risks, exact suffix lock, final garage purchase lock, and schematic closeout evidence remain open |
+| Production package | Draft | `production/board-order/three_board_jlcpcb_order_readiness.csv` tracks all three boards as NO-GO until schematic freeze, layout, fabrication outputs, and assembly outputs close |
 
 ## Required before schematic freeze
 

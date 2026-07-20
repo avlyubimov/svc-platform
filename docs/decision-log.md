@@ -2666,3 +2666,45 @@ stack. Requiring those measurements before the first board exists creates a
 process deadlock. Pre-layout release blockers may still require calculations,
 simulations, source evidence, package/footprint review inputs, test hooks, and
 bench procedures; physical records close only after prototype assembly.
+
+## 2026-07-20 — Three-board order gate added before JLCPCB package work
+
+Decision: LB-100 and FB-100 baseline requirements are frozen for schematic
+planning by ADR-0014, and both boards now have schematic-freeze checklists,
+board-release blocker registers, and review manifests. The project-level order
+readiness register
+`production/board-order/three_board_jlcpcb_order_readiness.csv` tracks PB-100,
+LB-100, and FB-100 together, with `make board-order-status` reporting the
+overall NO-GO/READY state.
+
+Reason: The product cannot be treated as ready to order while only PB-100 has
+release gates. A three-board gate makes the missing LB-100 and FB-100 KiCad
+scaffolds, schematic freezes, layout files, fabrication outputs, and assembly
+outputs explicit without starting PCB layout before the required schematic
+freeze evidence exists.
+
+## 2026-07-20 — LB-100 and FB-100 KiCad scaffolds started without layout
+
+Decision: LB-100 and FB-100 now each have a project-local KiCad schematic
+scaffold under `hardware/logic-board/LB-100/kicad/` and
+`hardware/front-board/FB-100/kicad/`. The scaffolds are top-level note sheets
+with local symbol and footprint library tables, and intentionally do not include
+`.kicad_pcb`, Gerber, drill, pick-place, BOM/CPL, or manufacturing packages.
+
+Reason: ADR-0014 freezes LB-100 and FB-100 baseline requirements enough to open
+schematic planning workbenches. Creating note-sheet scaffolds removes the
+"missing KiCad project" blocker while preserving the no-layout boundary until
+each board's schematic freeze checklist and blocker register close.
+
+## 2026-07-20 — LB-100 and FB-100 pre-layout contracts started
+
+Decision: LB-100 now has `LB-100-jpb1-resource-budget.csv` and
+`LB-100-rail-tree-precheck.csv` to start exact MCU resource and power-tree
+closeout. FB-100 now has `FB-100-interface-signal-plan.csv` and
+`FB-100-ui-mechanical-precheck.csv` to start the front-panel signal, USB,
+indicator, button, OLED, and enclosure closeout.
+
+Reason: These contracts reduce the unknowns blocking LB-100 and FB-100
+schematic freeze without creating layout, board outlines, component placement,
+Gerbers, drills, pick-place files, BOM/CPL packages, or JLCPCB/PCBWay order
+artifacts.

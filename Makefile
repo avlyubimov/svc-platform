@@ -1,9 +1,12 @@
-.PHONY: check validate-pb100 validate-config firmware-test pb100-release-status pb100-release-gate clean
+.PHONY: check validate-pb100 validate-board-order validate-config firmware-test pb100-release-status pb100-release-gate board-order-status board-order-gate clean
 
-check: validate-pb100 validate-config firmware-test
+check: validate-pb100 validate-board-order validate-config firmware-test
 
 validate-pb100:
 	python3 tools/validate_pb100.py
+
+validate-board-order:
+	python3 tools/validate_board_order.py
 
 validate-config:
 	python3 tools/validate_config.py
@@ -16,6 +19,12 @@ pb100-release-status:
 
 pb100-release-gate:
 	python3 tools/pb100_release_status.py --fail-on-blocked
+
+board-order-status:
+	python3 tools/board_order_status.py
+
+board-order-gate:
+	python3 tools/board_order_status.py --fail-on-blocked
 
 clean:
 	$(MAKE) -C firmware clean
