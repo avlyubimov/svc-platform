@@ -57,6 +57,8 @@ Current host tests cover:
 - System Safety Coordinator integration between battery cutoff, power-budget
   shedding, thermal derating/cutoff, Event Bus, and Output Manager output
   shutdown.
+- System Safety runtime fail-safe shutdown when total-current telemetry is stale
+  or invalid.
 - Role Resolver and Rule Engine role-action runner through Output Manager.
 - Rule condition state tracking for engine, high-beam, left-indicator, and
   ambient-light day/dusk/night events.

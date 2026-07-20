@@ -31,3 +31,5 @@
   PWM values.
 - Hardened multi-action rule-set compilation so invalid action text is rejected
   before compiled rule entries are written.
+- Hardened System Safety runtime current-budget enforcement so stale or invalid
+  total-current telemetry disables active outputs.

@@ -330,6 +330,39 @@ static void test_runtime_power_budget_sheds_active_loads(void)
     assert(event.value == 45000U);
 }
 
+static void test_stale_power_budget_telemetry_disables_active_outputs(void)
+{
+    svc_output_manager_t manager = initialized_output_manager();
+    svc_system_safety_t safety = initialized_safety();
+    svc_event_bus_t bus = {0};
+    svc_event_bus_init(&bus);
+    svc_telemetry_snapshot_t telemetry = {0};
+    svc_telemetry_snapshot_init(&telemetry);
+    svc_telemetry_update_total_current(&telemetry, 12000U, true, 100U);
+
+    assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT9, 1000U, true).status == SVC_OUTPUT_MANAGER_OK);
+
+    const svc_system_power_budget_safety_result_t result =
+        svc_system_safety_update_power_budget_from_telemetry(
+            &safety,
+            &manager,
+            &bus,
+            &telemetry,
+            1200U,
+            SVC_TELEMETRY_DEFAULT_STALE_MS);
+
+    assert(result.budget.status == SVC_OUTPUT_MANAGER_DENY_BUDGET);
+    assert(result.budget.budget_decision == SVC_POWER_BUDGET_DENY_TELEMETRY_INVALID);
+    assert(result.disabled_output_mask == mask_for(SVC_OUTPUT_OUT9));
+    assert(result.active_output_mask == 0U);
+    assert(result.event_publish_attempted);
+    assert(result.event_published);
+
+    svc_event_t event = {0};
+    assert(svc_event_bus_pop(&bus, &event));
+    assert(event.type == SVC_EVENT_POWER_BUDGET_SHED);
+}
+
 static void test_thermal_cutoff_disables_active_outputs(void)
 {
     svc_output_manager_t manager = initialized_output_manager();
@@ -397,5 +430,6 @@ int main(void)
     test_thermal_cutoff_disables_active_outputs();
     test_stale_thermal_telemetry_disables_active_outputs();
     test_runtime_power_budget_sheds_active_loads();
+    test_stale_power_budget_telemetry_disables_active_outputs();
     return 0;
 }

@@ -317,6 +317,10 @@ svc_system_power_budget_safety_result_t svc_system_safety_update_power_budget(
         measured_total_current_ma,
         telemetry_valid);
     result.disabled_output_mask = result.budget.shed_output_mask;
+    if (result.budget.status == SVC_OUTPUT_MANAGER_DENY_BUDGET &&
+        result.budget.budget_decision == SVC_POWER_BUDGET_DENY_TELEMETRY_INVALID) {
+        result.disabled_output_mask |= disable_active_outputs(output_manager);
+    }
 
     if (result.disabled_output_mask != 0U) {
         result.event_publish_attempted = true;

@@ -2485,3 +2485,16 @@ parser must reject the same rule-action language before persisted user
 configuration can safely drive role-mapped output actions. Keeping the validator
 derived from parser role/condition tables reduces drift while preserving the
 configuration/firmware separation and Output Manager enforcement path.
+
+## 2026-07-20 — Runtime current-telemetry fail-safe shutdown
+
+Decision: System Safety now treats stale or invalid total-current telemetry in
+the runtime power-budget path as a safe fault. Active outputs are disabled
+through the Output Manager, and a power-budget shed event is published when the
+coordinator disables loads.
+
+Reason: PB-100 board-current enforcement depends on independent total-current
+telemetry. Missing, stale, saturated, or implausible total-current data must not
+leave already-active loads running under an unenforceable board budget. The
+change keeps startup refusal, load shedding, and stale-telemetry shutdown in the
+same host-tested safety path without changing PB-100 hardware requirements.

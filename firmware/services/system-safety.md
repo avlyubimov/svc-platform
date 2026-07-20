@@ -12,6 +12,8 @@ letting feature code bypass the Output Manager.
   telemetry remains continuously below the cutoff threshold.
 - Run total-current budget enforcement from telemetry and shed active loads
   through the Output Manager when measured current exceeds the configured limit.
+- Treat invalid or stale total-current telemetry as a safe fault that disables
+  active outputs through the Output Manager.
 - Publish power-budget shedding events when runtime enforcement disables loads.
 - Apply thermal derating through the Output Manager at thermal warning.
 - Disable all active outputs through the Output Manager on thermal cutoff.

@@ -33,8 +33,9 @@ Initial host-testable implementation:
 ## Safety behavior
 
 If telemetry is missing or invalid, the service must choose the safer state:
-deny new high-current loads and keep affected outputs off until diagnostics are
-valid again.
+deny new high-current loads. In the System Safety runtime enforcement path,
+invalid or stale total-current telemetry disables active outputs until
+diagnostics are valid again.
 
 When telemetry is valid and measured total current exceeds the configured board
 limit, active outputs are shed in `shed_order` priority order until the
