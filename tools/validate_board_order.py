@@ -146,6 +146,7 @@ FOOTPRINT_BINDING_STATUS_COLUMNS = (
     "Evidence source",
     "KiCad symbol state",
     "Open footprint items",
+    "Package sources identified",
     "Board import state",
     "Blocked action",
 )
@@ -838,10 +839,16 @@ def validate_layout_start_readiness() -> None:
             fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: layout planning must be READY")
         if row["KiCad board import state"].strip() != "BLOCKED":
             fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: KiCad board import must remain BLOCKED")
-        if not row["Footprint binding state"].startswith("OPEN"):
-            fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: footprint binding must be OPEN")
-        if not row["Mechanical envelope state"].startswith("OPEN"):
-            fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: mechanical envelope must be OPEN")
+        if not row["Footprint binding state"].startswith(("OPEN", "CLOSED")):
+            fail(
+                f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
+                "footprint binding must be OPEN or CLOSED"
+            )
+        if not row["Mechanical envelope state"].startswith(("OPEN", "CLOSED")):
+            fail(
+                f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
+                "mechanical envelope must be OPEN or CLOSED"
+            )
         if not row["Assembly/DFM baseline"].startswith("READY"):
             fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: assembly DFM baseline must be READY")
         if row["Order state"].strip() != "NO-GO":
@@ -896,14 +903,21 @@ def validate_layout_start_checklist(board: str, path: Path) -> None:
     expected_status = {
         "Schematic freeze": "Closed",
         "KiCad schematic value review": "Closed",
-        "Footprint binding": "Open",
-        "Mechanical envelope": "Open",
+        "Footprint binding": {"Open", "Closed"},
+        "Mechanical envelope": {"Open", "Closed"},
         "DFM/DRC baseline": "Ready",
         "Manufacturing output boundary": "Closed",
     }
-    for gate, status in expected_status.items():
-        if rows_by_gate[gate]["Status"].strip() != status:
-            fail(f"{path.relative_to(REPO_ROOT)}:{gate}: expected {status}")
+    for gate, expected in expected_status.items():
+        actual_status = rows_by_gate[gate]["Status"].strip()
+        if isinstance(expected, set):
+            if actual_status not in expected:
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{gate}: "
+                    f"expected one of {', '.join(sorted(expected))}"
+                )
+        elif actual_status != expected:
+            fail(f"{path.relative_to(REPO_ROOT)}:{gate}: expected {expected}")
     text = read_text(path)
     for row_number, row in enumerate(rows, 2):
         for column in LAYOUT_START_CHECKLIST_COLUMNS:
@@ -937,7 +951,7 @@ def validate_layout_start_checklist(board: str, path: Path) -> None:
             fail(f"{path.relative_to(REPO_ROOT)} must include board-specific token {token}")
 
 
-def validate_footprint_binding_inventory(board: str, path: Path) -> int:
+def validate_footprint_binding_inventory(board: str, path: Path) -> tuple[int, int]:
     rows = validate_csv(path)
     if not rows:
         fail(f"empty footprint inventory: {path.relative_to(REPO_ROOT)}")
@@ -955,6 +969,7 @@ def validate_footprint_binding_inventory(board: str, path: Path) -> int:
             fail(f"{path.relative_to(REPO_ROOT)} must include board-specific footprint token {token}")
     seen_items = set()
     open_items = 0
+    source_identified_items = 0
     for row_number, row in enumerate(rows, 2):
         item = row["Footprint item"].strip()
         if item in seen_items:
@@ -967,17 +982,37 @@ def validate_footprint_binding_inventory(board: str, path: Path) -> int:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Assembly owner")
         binding_state = row["KiCad footprint binding state"].strip()
         drawing_state = row["Drawing review state"].strip()
-        if binding_state not in {"Open", "Not required"}:
+        if binding_state not in {"Open", "Bound", "Not required"}:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid KiCad footprint binding state")
-        if drawing_state not in {"Open", "Not required"}:
+        if drawing_state not in {"Open", "Source identified", "Reviewed", "Not required"}:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Drawing review state")
         impact = row["Board-import impact"].strip()
         if binding_state == "Open":
             open_items += 1
-            if drawing_state != "Open":
-                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: open binding requires open drawing review")
+            if drawing_state == "Source identified":
+                source_identified_items += 1
+            elif drawing_state != "Open":
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: open binding requires open or source-identified drawing review")
             if "BOARD_IMPORT_BLOCKED" not in impact:
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: board import must remain blocked")
+        elif binding_state == "Bound":
+            source_identified_items += 1
+            if drawing_state != "Reviewed":
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Bound binding needs Reviewed drawing state")
+            if impact != "FOOTPRINT_BOUND":
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Bound item must use FOOTPRINT_BOUND impact")
+            footprint_paths = [
+                token.strip("`;,")
+                for token in row["Footprint source"].replace(";", " ").split()
+                if token.strip("`;,").endswith(".kicad_mod")
+            ]
+            if not footprint_paths:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Bound item must list a .kicad_mod path")
+            if not any((REPO_ROOT / footprint_path).exists() for footprint_path in footprint_paths):
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{row_number}: "
+                    "Bound item must reference an existing .kicad_mod footprint"
+                )
         else:
             if drawing_state != "Not required":
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Not required binding needs Not required drawing review")
@@ -986,7 +1021,7 @@ def validate_footprint_binding_inventory(board: str, path: Path) -> int:
         next_action = row["Next action"].lower()
         if not any(verb in next_action for verb in ("review", "verify", "select", "keep", "close", "bind")):
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Next action must be actionable")
-    return open_items
+    return open_items, source_identified_items
 
 
 def validate_footprint_binding_status() -> None:
@@ -1011,10 +1046,18 @@ def validate_footprint_binding_status() -> None:
             open_items = int(row["Open footprint items"].strip())
         except ValueError:
             fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: Open footprint items must be an integer")
-        if open_items != inventory_counts[board]:
+        source_identified_items = int(row["Package sources identified"].strip())
+        expected_open_items, expected_source_identified_items = inventory_counts[board]
+        if open_items != expected_open_items:
             fail(
                 f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: "
-                f"open item count {open_items} does not match inventory count {inventory_counts[board]}"
+                f"open item count {open_items} does not match inventory count {expected_open_items}"
+            )
+        if source_identified_items != expected_source_identified_items:
+            fail(
+                f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"source-identified count {source_identified_items} does not match inventory count "
+                f"{expected_source_identified_items}"
             )
         if row["Board import state"].strip() != "BLOCKED":
             fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: board import must be BLOCKED")
@@ -1052,14 +1095,21 @@ def validate_mechanical_envelope_inventory(board: str, path: Path) -> int:
         for column in MECHANICAL_ENVELOPE_INVENTORY_COLUMNS:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
-        if row["Review state"].strip() != "Open":
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Review state must be Open")
-        if "BOARD_IMPORT_BLOCKED" not in row["Board-import impact"]:
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: board import must remain blocked")
+        review_state = row["Review state"].strip()
+        if review_state not in {"Open", "Closed"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Review state must be Open or Closed")
+        if review_state == "Open":
+            if "BOARD_IMPORT_BLOCKED" not in row["Board-import impact"]:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: board import must remain blocked")
+        elif row["Board-import impact"].strip() != "MECHANICAL_INPUT_CLOSED":
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: "
+                "closed mechanical rows must use MECHANICAL_INPUT_CLOSED"
+            )
         next_action = row["Next action"].lower()
         if not any(verb in next_action for verb in ("create", "select", "review", "define", "close", "apply")):
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Next action must be actionable")
-    return len(rows)
+    return sum(1 for row in rows if row["Review state"].strip() == "Open")
 
 
 def validate_mechanical_envelope_status() -> None:
@@ -1104,6 +1154,7 @@ def validate_kicad_scaffold(board: str, board_dir: Path, status: str) -> None:
     kicad_dir = board_dir / "kicad"
     project_path = kicad_dir / f"{board}.kicad_pro"
     schematic_path = kicad_dir / f"{board}.kicad_sch"
+    footprint_dir = kicad_dir / "lib" / f"{board.replace('-', '')}.pretty"
     try:
         project = json.loads(project_path.read_text(encoding="utf-8"))
     except FileNotFoundError:
@@ -1119,6 +1170,16 @@ def validate_kicad_scaffold(board: str, board_dir: Path, status: str) -> None:
         kicad_dir / "lib" / f"{board.replace('-', '')}.kicad_sym",
     ):
         validate_s_expression_balance(path)
+    if footprint_dir.exists():
+        for footprint_path in sorted(footprint_dir.glob("*.kicad_mod")):
+            validate_s_expression_balance(footprint_path)
+            footprint_text = read_text(footprint_path)
+            for forbidden_token in ("/tmp/", "tmp."):
+                if forbidden_token in footprint_text:
+                    fail(
+                        f"{footprint_path.relative_to(REPO_ROOT)} must not reference "
+                        f"temporary path token {forbidden_token}"
+                    )
     readme = read_text(kicad_dir / "README.md")
     if f"no `{board}.kicad_pcb`" not in readme:
         fail(f"{(kicad_dir / 'README.md').relative_to(REPO_ROOT)} must explicitly block {board}.kicad_pcb")

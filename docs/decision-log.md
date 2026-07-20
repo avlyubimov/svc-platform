@@ -2869,3 +2869,102 @@ garage-kit, and sourcing review, but they should not block KiCad footprint
 binding as if they were on-board SMT/THT land patterns. This reduces false
 board-import blockers while preserving the manufacturing boundary and without
 removing any DNP footprint or board capability.
+
+## 2026-07-20 — Footprint package sources identified
+
+Decision: The footprint-binding inventories now distinguish package-source
+identification from completed footprint binding. PB-100 has 14 of 15 open
+on-board footprint items with package sources identified, LB-100 has 9 of 13,
+and FB-100 has 8 of 12.
+
+Reason: Official package/source evidence is required before creating project
+local footprints, but identifying a package source does not prove pad geometry,
+pin-1/orientation, courtyard, stencil, solder-mask, or assembly handling. Board
+import therefore remains `BLOCKED` until each source-identified item is
+converted into reviewed KiCad footprint evidence and every remaining open source
+gap is resolved.
+
+## 2026-07-20 — Remaining PB/LB footprint package sources identified
+
+Decision: PB-100 and LB-100 now have package sources identified for every open
+on-board footprint item. PB-100 is 15 of 15 and LB-100 is 13 of 13. FB-100 is
+10 of 12; its remaining package-source gaps are exact status RGB LED and channel
+LED MPN/package selection.
+
+Reason: CAN1 TX disable package evidence, BLE module footprint source, BMI270
+LGA package evidence, VEML7700 optical package evidence, TF-015 microSD source,
+and optional OLED module sources have been traced without creating KiCad
+footprints or a PCB. The open FB LED items remain intentionally open because
+generic LED categories are not enough evidence for package binding; exact MPN,
+polarity, optical/mechanical fit, current-limit values, and JLCPCB/PCBWay
+assembly evidence must close first.
+
+## 2026-07-20 — FB-100 LED package sources identified
+
+Decision: FB-100 now has package sources identified for every open on-board
+footprint item. Status RGB uses Everlight 19-237/R6GHBHC-A01/2T class with
+LCSC C60105 and JLCPCB RGB LED evidence. Channel indicators use KT-0805Y
+preferred or KT-0603R alternate class with JLCPCB LED indication evidence.
+FB-100 package-source coverage is now 12 of 12.
+
+Reason: Generic LED categories were insufficient for footprint-source evidence.
+Exact LED package source paths remove the last FB-100 package-source gap while
+leaving drive polarity, current-limit values, brightness, light-pipe alignment,
+optical orientation, and actual footprint binding blocked until reviewed layout
+inputs close.
+
+## 2026-07-20 — FB-100 mechanical layout inputs closed
+
+Decision: FB-100 mechanical envelope is closed as a board-import input with an
+80.0 mm x 35.0 mm prototype outline, four M2.5 NPTH mounting holes, USB-C
+service edge datum, rear/internal JFB1 FFC cable exit, role-free STATUS and
+CH1..CH10 optical grid, separated SERVICE/RESET actuator targets, optional
+OLED DNP keepout, and tab-route-first panelization assumptions. Evidence is in
+`hardware/front-board/FB-100/FB-100-mechanical-layout-inputs.csv` and
+`hardware/front-board/FB-100/FB-100-mechanical-layout-input-closeout.md`.
+
+Reason: FB-100 schematic freeze had enough mechanical policy for planning but
+not enough exact layout-input dimensions for responsible board import. Closing
+the FB-100 mechanical rows removes 7 mechanical blockers without creating
+`FB-100.kicad_pcb`, Gerbers, drill files, pick-place files, BOM/CPL order
+packages, manufacturing ZIPs, fabrication packages, panel CAD, enclosure CAD,
+or PCBA orders. FB-100 board import remains blocked by footprint binding and
+USB/no-back-power layout-model review.
+
+## 2026-07-20 — FB-100 USB no-back-power layout model closed
+
+Decision: FB-100 USB/no-back-power layout model is closed as a board-import
+input. USB ESD must sit between the USB-C receptacle and JFB1, `USB_D_P` and
+`USB_D_N` must route as a short coupled pair, `USB_VBUS_SENSE` remains
+sense-only with no connection to `FB_3V3_OR_IO`, `PB_5V_OUT`, `LB_3V3_IO`,
+PB-100, or any output rail, CC pins remain device-role only, shield/ESD return
+cannot be a high-current return, and JFB1 USB pins remain fixed. Evidence is in
+`hardware/front-board/FB-100/FB-100-usb-no-back-power-layout-rules.csv` and
+`hardware/front-board/FB-100/FB-100-usb-no-back-power-layout-closeout.md`.
+
+Reason: FB-100 schematic freeze closed USB policy but not USB layout-specific
+placement/routing constraints. This closes the USB/no-back-power layout-model
+gate without creating `FB-100.kicad_pcb`, Gerbers, drill files, pick-place
+files, BOM/CPL order packages, manufacturing ZIPs, fabrication packages, or
+PCBA orders. FB-100 board import remains blocked by footprint binding.
+
+## 2026-07-20 — FB-100 local footprint binding closed
+
+Decision: FB-100 now has project-local KiCad footprint bindings for every
+on-board footprint item in `hardware/front-board/FB-100/kicad/lib/FB100.pretty`.
+The bindings cover USB-C preferred and alternate connectors, USB ESD preferred
+and alternate packages, RGB/status LED, channel LED preferred and alternate
+packages, JFB1 FPC connector, SERVICE/RESET switch options, optional OLED DNP
+preferred and alternate footprints, and local 0603/0805 passive footprints.
+Evidence is in `hardware/front-board/FB-100/FB-100-footprint-binding-closeout.csv`
+and `hardware/front-board/FB-100/FB-100-footprint-binding-closeout.md`.
+
+Reason: FB-100 package sources were identified, but board-import preparation
+still lacked local KiCad footprint evidence. JLCPCB/LCSC/EasyEDA footprint
+sources were converted and normalized to KiCad 10 format, with temporary 3D
+model paths removed. This closes FB-100 footprint binding without creating
+`FB-100.kicad_pcb`, Gerbers, drill files, pick-place files, BOM/CPL order
+packages, manufacturing ZIPs, fabrication packages, or PCBA orders. FB-100 board
+import remains blocked by schematic symbol promotion because the KiCad
+schematic is still a value-bearing scaffold rather than footprint-bound symbol
+instances.

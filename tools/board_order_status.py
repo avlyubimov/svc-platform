@@ -117,6 +117,7 @@ def main() -> int:
         layout_state = layout_row.get("Layout planning state", "Missing")
         import_state = layout_row.get("KiCad board import state", "Missing")
         open_footprints = footprint_row.get("Open footprint items", "Missing")
+        source_footprints = footprint_row.get("Package sources identified", "Missing")
         open_mechanical = mechanical_row.get("Open mechanical items", "Missing")
         print(
             f"  - {board}: {row['Order state']} | "
@@ -125,6 +126,7 @@ def main() -> int:
             f"layout_planning={layout_state} | "
             f"board_import={import_state} | "
             f"open_footprints={open_footprints} | "
+            f"package_sources={source_footprints} | "
             f"open_mechanical={open_mechanical} | "
             f"kicad={row['KiCad schematic state']} | "
             f"next={row['Next action']}"

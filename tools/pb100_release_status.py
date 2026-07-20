@@ -126,6 +126,16 @@ def open_footprint_items() -> str:
     return "Missing"
 
 
+def package_sources_identified() -> str:
+    if not FOOTPRINT_BINDING_STATUS.exists():
+        return "Missing"
+    with FOOTPRINT_BINDING_STATUS.open(newline="", encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            if row["Board"] == "PB-100":
+                return row.get("Package sources identified", "Missing")
+    return "Missing"
+
+
 def open_mechanical_items() -> str:
     if not MECHANICAL_ENVELOPE_STATUS.exists():
         return "Missing"
@@ -201,6 +211,7 @@ def main() -> int:
     print(f"  Active release blockers: {len(active_blockers)}")
     print(f"  Open layout-start gates: {len(open_layout_start_rows)}")
     print(f"  Open footprint items: {open_footprint_items()}")
+    print(f"  Package sources identified: {package_sources_identified()}")
     print(f"  Open mechanical items: {open_mechanical_items()}")
     print(f"  Board-print closure rows: {len(active_closure_rows)}")
     print(f"  Deferred post-prototype validation gates: {len(deferred_post_prototype)}")
