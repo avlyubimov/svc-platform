@@ -102,6 +102,7 @@ Do not use names such as `FOG_LEFT`, `SEAT`, `USB`, `CHIGEE`, `DVR`, or
 | `CAN1_TX_DISABLED_STATUS` | Asserted when physical TX path is disabled |
 | `CAN1_RX_ROUTE` | DNP unless CAN1 routes through PB-100 |
 | `CAN1_TX_ROUTE` | DNP/open and hardware-gated unless future ADR allows TX |
+| `CAN1_TX_GATE_OUT` | Local output of the optional default-disabled gate before the DNP/open `JP_CAN1` missing-link barrier |
 
 Any CAN1 TX enable path requires a new ADR and an explicit hardware action.
 

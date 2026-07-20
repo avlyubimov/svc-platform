@@ -26,6 +26,10 @@ orders.
   where OUT2 SOA does not require the larger package.
 - Recommended solution: bind both TOLL and LFPAK88 footprints locally while
   keeping final OUT2 package selection in the SOA/thermal review gate.
+- Symbol/footprint compatibility: `PB-100-symbol-footprint-pad-map.csv`
+  verifies that the TOLL drain pad is named `Tab` to match
+  `PB100_INPUT_NMOS_TOLL_PRELIM` and the LFPAK88 mounting-base drain pad is
+  named `mb` to match `PB100_POWER_NMOS_ESCAPE_PRELIM`.
 - Datasheet evidence: Infineon IAUTN06S5N008 is an automotive AEC-Q101 MOSFET
   in PG-HSOF-8-1 with pin 1 gate, pins 2-8 source, and tab drain. Nexperia
   BUK7S1R2-80M is an automotive AEC-Q101 MOSFET in LFPAK88 SOT1235 with pin 1
@@ -50,22 +54,26 @@ orders.
   MOSFET evidence paths.
 - LCSC availability: TOLL has an existing candidate row; LFPAK88 must be
   rechecked before population.
-- PCBWay/JLC compatibility: both are factory SMT power packages but need paste
-  aperture, AOI, wettable-flank, thermal-via, and first-article inspection notes.
+- PCBWay/JLC compatibility: both are factory SMT power packages. Initial
+  segmented paste apertures are present in the local footprints; AOI,
+  wettable-flank, thermal-via, solder-void, and first-article inspection notes
+  remain layout/DFM review items.
 - Cost impact: no BOM change until a package is selected for a populated symbol.
 - Thermal impact: footprints expose large copper pads but do not close copper
   spreading, via field, or enclosure heat path.
-- Production impact: paste segmentation and solder-voiding controls remain DFM
-  gates before any pick-place or PCBA order output.
+- Production impact: solid drain-pad paste has been removed from the TOLL and
+  LFPAK88 drain copper pads and replaced with segmented paste-only apertures;
+  solder-voiding controls and vendor DFM still remain before any pick-place or
+  PCBA order output.
 - Field reliability: keeping both local footprints avoids a late footprint
   scramble while preserving the default/escape decision boundary.
-- Known risks: TOLL footprint symmetry, pin-1 orientation, LFPAK88 mounting-base
-  drain paste pattern, OUT2 SOA, input reverse FET heating, and sourcing stock
-  risk remain layout/BOM gates.
+- Known risks: TOLL footprint symmetry, pin-1 orientation, thermal-via fields,
+  solder voiding, OUT2 SOA, input reverse FET heating, and sourcing stock risk
+  remain layout/BOM gates.
 
 ## Remaining PB Footprint Blockers
 
 No PB-100 footprint-binding inventory rows remain open. KiCad board import is
-still blocked by mechanical envelope, thermal/current layout model, and
-controlled schematic symbol promotion gates. This closeout does not authorize
-PCB layout or manufacturing output.
+still blocked by thermal/current layout model and controlled schematic symbol
+promotion gates. This closeout does not authorize PCB layout or manufacturing
+output.

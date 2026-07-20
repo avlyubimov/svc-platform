@@ -92,3 +92,10 @@ PB100_CAN1_TX_DISABLE_PRELIM,2,CAN1_TX_DISABLED_STATUS,hardware/power-board/PB-1
 PB100_CAN1_TX_DISABLE_PRELIM,3,CAN1_TX_ROUTE,hardware/power-board/PB-100/PB-100-can1-tx-disable.md,Internal Rev.1 schematic class,DNP/default-disabled CAN1 safety gate,DNP/open TX route
 PB100_CAN1_TX_DISABLE_PRELIM,4,CAN1_RX_ROUTE,hardware/power-board/PB-100/PB-100-can1-tx-disable.md,Internal Rev.1 schematic class,DNP/default-disabled CAN1 safety gate,RX route independent of TX
 PB100_CAN1_TX_DISABLE_PRELIM,5,GND,hardware/power-board/PB-100/PB-100-can1-tx-disable.md,Internal Rev.1 schematic class,DNP/default-disabled CAN1 safety gate,Ground reference
+PB100_CAN1_TX_DNP_LINK_PRELIM,1,CAN1_TX_GATE_OUT,hardware/power-board/PB-100/PB-100-can1-tx-disable.md,Internal Rev.1 concrete DNP/open link,0603 DNP/open link,Gate output side of physical missing-link barrier
+PB100_CAN1_TX_DNP_LINK_PRELIM,2,CAN1_TX_ROUTE,hardware/power-board/PB-100/PB-100-can1-tx-disable.md,Internal Rev.1 concrete DNP/open link,0603 DNP/open link,Vehicle CAN1 TX route side remains DNP/open by default
+PB100_SN74LVC1G125_Q1_DBV_PRELIM,1,OE_DISABLE,https://www.ti.com/lit/ds/symlink/sn74lvc1g125-q1.pdf,TI SN74LVC1G125-Q1 Rev. E,DBV0005A SOT-23-5,Active-low output-enable pin held disabled high by default
+PB100_SN74LVC1G125_Q1_DBV_PRELIM,2,A_CAN1_TX,https://www.ti.com/lit/ds/symlink/sn74lvc1g125-q1.pdf,TI SN74LVC1G125-Q1 Rev. E,DBV0005A SOT-23-5,Gate input from CAN1_TX_ROUTE
+PB100_SN74LVC1G125_Q1_DBV_PRELIM,3,GND,https://www.ti.com/lit/ds/symlink/sn74lvc1g125-q1.pdf,TI SN74LVC1G125-Q1 Rev. E,DBV0005A SOT-23-5,Ground pin
+PB100_SN74LVC1G125_Q1_DBV_PRELIM,4,Y_CAN1_TX,https://www.ti.com/lit/ds/symlink/sn74lvc1g125-q1.pdf,TI SN74LVC1G125-Q1 Rev. E,DBV0005A SOT-23-5,Three-state gate output to CAN1_TX_GATE_OUT before DNP/open link
+PB100_SN74LVC1G125_Q1_DBV_PRELIM,5,VCC,https://www.ti.com/lit/ds/symlink/sn74lvc1g125-q1.pdf,TI SN74LVC1G125-Q1 Rev. E,DBV0005A SOT-23-5,LB_3V3_IO logic supply reference
