@@ -45,8 +45,8 @@ Current host tests cover:
   denial, priority shedding, PWM increase revalidation, thermal derating, and
   fault lockout behavior.
 - Overflow-safe projected-current denial for output starts and PWM increases.
-- Battery protection warning, delayed cutoff latch using `shutdown_delay_s`,
-  recovery, and invalid telemetry behavior.
+- Battery protection warning, overflow-safe delayed cutoff latch using
+  `shutdown_delay_s`, recovery, and invalid telemetry behavior.
 - Event Bus FIFO order, overflow rejection, and empty-pop behavior.
 - Event Dispatcher output overcurrent/fault handling through Output Manager.
 - Event Log fixed-size diagnostic ring buffer with overwrite/drop accounting

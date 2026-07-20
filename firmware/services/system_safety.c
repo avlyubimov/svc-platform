@@ -87,7 +87,10 @@ static uint16_t disable_active_outputs(svc_output_manager_t *output_manager)
 
 static uint16_t elapsed_ms_to_s(uint32_t elapsed_ms)
 {
-    uint32_t elapsed_s = (elapsed_ms + 999U) / 1000U;
+    uint32_t elapsed_s = elapsed_ms / 1000U;
+    if ((elapsed_ms % 1000U) != 0U) {
+        ++elapsed_s;
+    }
     if (elapsed_s == 0U) {
         elapsed_s = 1U;
     }

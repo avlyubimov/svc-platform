@@ -2554,3 +2554,15 @@ Reason: Persisted user configuration must remain preferred across firmware
 updates and long service life. A raw numeric `>=` comparison can resurrect an
 older pre-wrap record after the sequence rolls over, while wrap-aware selection
 keeps the newest valid record active without changing the storage format.
+
+## 2026-07-20 — Overflow-safe battery elapsed-time conversion
+
+Decision: System Safety now converts telemetry update elapsed milliseconds to
+seconds using division and remainder arithmetic instead of adding 999 ms before
+division. Very large intervals saturate the battery undervoltage duration at
+`UINT16_MAX`.
+
+Reason: The battery cutoff delay is a safety boundary. Overflow in
+`elapsed_ms + 999` could turn a long interval into a one-second increment and
+delay low-voltage cutoff. The new conversion preserves ceiling behavior for
+normal intervals and fails toward cutoff for long-running or delayed updates.
