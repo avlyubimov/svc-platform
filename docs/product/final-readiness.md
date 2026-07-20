@@ -1,7 +1,7 @@
 # Final Readiness
 
 Status: In progress  
-Last updated: 2026-07-16
+Last updated: 2026-07-20
 
 This document defines what “ready” means for the current repository state. It
 does not authorize PB-100 PCB layout.
@@ -51,8 +51,8 @@ Current coverage:
 | PB-100 requirements | Ready for schematic planning | Baseline is frozen; schematic freeze remains open |
 | PB-100 KiCad scaffold | Preliminary capture | Child sheets now contain ERC-clean preliminary capture content and exported netlist coverage; schematic freeze remains open |
 | PB-100 PCB/layout | Blocked | Layout, Gerber, drill, placement, and manufacturing zips are blocked by the board-release blocker register |
-| Firmware safety core | Host-test ready | Output, delayed battery cutoff, runtime load shedding, thermal derate/cutoff, CAN, telemetry, events, logging, config, runtime boot, CAN-to-rule bridge, ambient-light rule conditions, ordered rule sets, multi-action rule compilation, rule runtime, and rule paths covered |
-| Configuration format | Host-test ready | JSON schema, rule grammar, rule-action mapping, PB-100 capability manifest, compiled capability baseline, config store, config update, and examples are validated |
+| Firmware safety core | Host-test ready | Output, overflow-safe delayed battery cutoff, runtime load shedding, stale-current safe-off, thermal derate/cutoff, CAN dropped-edge retry, telemetry, events, saturating diagnostic counters, logging, config, runtime boot, CAN-to-rule bridge, ambient-light rule conditions, ordered rule sets, multi-action rule compilation, rule runtime, and rule paths covered |
+| Configuration format | Host-test ready | JSON schema, canonical rule grammar, rule-action mapping, buffer-atomic rule compilation, PB-100 capability manifest, compiled capability baseline, config store reserved/sequence-wrap handling, config update, and examples are validated |
 | Production package | Draft | BOMs and component families need final sourcing and schematic evidence |
 
 ## Required before schematic freeze
