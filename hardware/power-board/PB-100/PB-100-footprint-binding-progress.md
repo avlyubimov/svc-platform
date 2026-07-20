@@ -1,6 +1,6 @@
 # PB-100 Footprint Binding Progress
 
-Status: Partial
+Status: Complete For Footprint Binding
 Review date: 2026-07-20
 
 This progress note binds the PB-100 footprints that have project-local KiCad
@@ -22,6 +22,8 @@ fabrication packages, panel outputs, or PCBA orders.
 - Vishay SM8S input TVS: `PB100:DO-218AC_Vishay_SM8S`.
 - Bourns CSS4J-4026 total input current shunt: `PB100:CSS4J-4026_Bourns`.
 - TMP112-Q1 optional DNP digital temperature sensor: `PB100:SOT-563-6_DRL_TI`.
+- Infineon PG-HSOF-8-1 TOLL input reverse MOSFET: `PB100:PG-HSOF-8-1_TOLL_Infineon`.
+- Nexperia LFPAK88 SOT1235 alternate and OUT2 escape MOSFET: `PB100:LFPAK88_SOT1235_Nexperia`.
 
 ## FX18 Evidence Boundary
 
@@ -32,17 +34,20 @@ binding only. The MF/TH mechanical pads, paired datum, 20 mm stack spacing,
 pin-1 orientation across boards, vibration retention, and assembly handling
 remain in the mechanical envelope gate before board import.
 
-## Still Open
+## Footprint Inventory Result
 
-The PB-100 footprint gate remains Open. These package classes still need local
-footprint evidence before board import:
+The PB-100 footprint-binding inventory has no remaining Open rows. These
+non-footprint gates still block KiCad board import:
 
-- TOLL / PG-HSOF-8-1 input-reverse and OUT2 escape MOSFET path.
-- LFPAK88 80 V alternate MOSFET path.
+- Controlled schematic symbol promotion from preliminary symbols to bound
+  footprint properties.
+- Mechanical envelope review.
+- Thermal/current layout model and high-current copper review.
+- Package-specific paste aperture via field solder voiding and assembly notes.
 
 ## Boundary
 
-PB-100 now has 12 bound on-board footprint items, 3 open on-board footprint
+PB-100 now has 15 bound on-board footprint items, 0 open on-board footprint
 items, and 2 garage/not-required footprint items. KiCad board import remains
-blocked by the open PB footprint rows plus mechanical and thermal/current layout
-gates.
+blocked by mechanical, thermal/current layout, and controlled schematic symbol
+promotion gates.

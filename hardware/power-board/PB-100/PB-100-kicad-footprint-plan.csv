@@ -1,10 +1,10 @@
 Function,Preferred component,Package,Footprint source,Status,Notes
 High-side controller,TPS48110AQDGXRQ1,19-VSSOP,Custom from TI package drawing,Custom required,Non-standard 19-pin VSSOP with high-voltage clearance
 Output MOSFET,SIDR626LDP-T1-RE3,PowerPAK-SO-8DC,Custom from Vishay package drawing,Custom required,Top-side cooling and power copper need schematic-review notes
-OUT2 escape MOSFET,IAUTN06S5N008ATMA1 or BUK7S1R2-80M,TOLL or LFPAK88,Custom from vendor package drawing,Conditional,Only if OUT2 SOA requires larger or alternate MOSFET
+OUT2 escape MOSFET,IAUTN06S5N008ATMA1 or BUK7S1R2-80M,TOLL or LFPAK88,hardware/power-board/PB-100/kicad/lib/PB100.pretty/PG-HSOF-8-1_TOLL_Infineon.kicad_mod; hardware/power-board/PB-100/kicad/lib/PB100.pretty/LFPAK88_SOT1235_Nexperia.kicad_mod,Bound conditional,Only if OUT2 SOA requires larger or alternate MOSFET; final package selection remains SOA thermal review
 Reverse protection controller,LM74700QDBVRQ1,SOT-23-6,KiCad stock candidate,Verify,DBV package drawing required before lock
-Input reverse MOSFET,IAUTN06S5N008ATMA1,TOLL,Custom from Infineon package drawing,Custom required,Preferred input thermal strategy
-Input reverse MOSFET alternate,BUK7S1R2-80M,LFPAK88,Custom from Nexperia package drawing,Conditional,Higher-voltage alternate
+Input reverse MOSFET,IAUTN06S5N008ATMA1,TOLL,hardware/power-board/PB-100/kicad/lib/PB100.pretty/PG-HSOF-8-1_TOLL_Infineon.kicad_mod,Bound,Preferred input thermal strategy; paste segmentation via field and 40A thermal path remain layout gates
+Input reverse MOSFET alternate,BUK7S1R2-80M,LFPAK88,hardware/power-board/PB-100/kicad/lib/PB100.pretty/LFPAK88_SOT1235_Nexperia.kicad_mod,Bound,Higher-voltage alternate; select only after voltage overshoot SOA and sourcing review
 Input TVS,Vishay SM8S33AHM3/I,DO-218AC,hardware/power-board/PB-100/kicad/lib/PB100.pretty/DO-218AC_Vishay_SM8S.kicad_mod,Bound,High-current TVS footprint matches Vishay DO-218AC mounting pad layout; polarity creepage and surge thermal layout remain open
 Logic buck,LM5164QDDATQ1,SO PowerPAD-8,KiCad stock candidate,Verify,TI DDA package drawing required before lock
 Logic buck alternate,LM5013-Q1,SO PowerPAD-8,hardware/power-board/PB-100/kicad/lib/PB100.pretty/SOIC-8_L4.9-W3.9-P1.27-LS6.0-BL-EP2.9.kicad_mod,Bound,Higher-current 100V fallback footprint only; LM5164 remains default unless logic-power review selects alternate

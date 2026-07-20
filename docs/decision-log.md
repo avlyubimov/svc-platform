@@ -3043,3 +3043,21 @@ voiding, optional I2C ownership, and production inspection remain layout/BOM
 gates. No `PB-100.kicad_pcb`, Gerbers, drills, pick-place files, BOM/CPL order
 packages, manufacturing ZIPs, fabrication packages, panel outputs, or PCBA
 orders are created or authorized.
+
+## 2026-07-20 — PB-100 MOSFET footprint inventory closed
+
+Decision: Add local PB-100 source-derived MOSFET package footprints for
+Infineon PG-HSOF-8-1 TOLL (`PB100:PG-HSOF-8-1_TOLL_Infineon`) and Nexperia
+LFPAK88 SOT1235 (`PB100:LFPAK88_SOT1235_Nexperia`). The PB-100 footprint
+inventory now has zero Open rows.
+
+Reason: Infineon package evidence gives the TOLL footprint and IAUTN06S5N008
+pinout with pin 1 gate, pins 2-8 source, and tab drain. Nexperia package
+evidence gives LFPAK88 SOT1235 footprint and BUK7S1R2-80M pinout with pin 1
+gate, pins 2-4 source, and mounting base drain. This closes footprint-binding
+evidence only; OUT2 escape package selection, input reverse FET thermal path,
+paste aperture segmentation, via field, solder voiding, sourcing stock, and
+controlled schematic symbol promotion remain before board import. No
+`PB-100.kicad_pcb`, Gerbers, drills, pick-place files, BOM/CPL order packages,
+manufacturing ZIPs, fabrication packages, panel outputs, or PCBA orders are
+created or authorized.
