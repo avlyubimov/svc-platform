@@ -6,10 +6,11 @@ hardware/logic-board/LB-100/LB-100-rail-tree-precheck.csv,Power,LB-100 rail-tree
 hardware/logic-board/LB-100/LB-100-jpb1-resource-budget.csv,Interface,LB-100 JPB1 resource budget,Required,validate_board_order,Ready
 hardware/logic-board/LB-100/LB-100-stm32h563-pin-binding-precheck.csv,Interface,STM32H563 LQFP100 exact pin binding,Required,validate_board_order,Ready
 hardware/logic-board/LB-100/LB-100-mcu-sourcing-precheck.csv,Production,LB-100 MCU sourcing precheck,Required,validate_board_order,Ready
-hardware/logic-board/LB-100/LB-100-schematic-freeze-checklist.md,Review gate,LB-100 schematic freeze checklist,Required,validate_board_order,Open
-hardware/logic-board/LB-100/LB-100-board-release-blocker-register.csv,Review gate,LB-100 board-release blocker register,Required,validate_board_order,Open
+hardware/logic-board/LB-100/LB-100-schematic-freeze-checklist.md,Review gate,LB-100 schematic freeze checklist,Required,validate_board_order,Closed
+hardware/logic-board/LB-100/LB-100-schematic-review-closeout.md,Review gate,LB-100 reviewed value-bearing schematic closeout,Required,validate_board_order,Closed
+hardware/logic-board/LB-100/LB-100-board-release-blocker-register.csv,Review gate,LB-100 board-release blocker register,Required,validate_board_order,Closed
 hardware/logic-board/LB-100/kicad/LB-100.kicad_pro,KiCad scaffold,KiCad project metadata,Required,validate_board_order,Ready
-hardware/logic-board/LB-100/kicad/LB-100.kicad_sch,KiCad scaffold,Top schematic scaffold,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/kicad/LB-100.kicad_sch,KiCad schematic,Reviewed value-bearing top schematic sheet,Required,validate_board_order,Closed
 hardware/logic-board/LB-100/kicad/sym-lib-table,KiCad scaffold,Symbol library table,Required,validate_board_order,Ready
 hardware/logic-board/LB-100/kicad/fp-lib-table,KiCad scaffold,Footprint library table,Required,validate_board_order,Ready
 hardware/logic-board/LB-100/kicad/lib/LB100.kicad_sym,KiCad scaffold,Project symbol library,Required,validate_board_order,Ready

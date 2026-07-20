@@ -49,6 +49,10 @@ MANIFESTS = {
     "LB-100": LB100_DIR / "LB-100-review-release-manifest.csv",
     "FB-100": FB100_DIR / "FB-100-review-release-manifest.csv",
 }
+SCHEMATIC_REVIEW_CLOSEOUTS = {
+    "LB-100": LB100_DIR / "LB-100-schematic-review-closeout.md",
+    "FB-100": FB100_DIR / "FB-100-schematic-review-closeout.md",
+}
 LB100_CONTRACTS = (
     LB100_DIR / "LB-100-jpb1-resource-budget.csv",
     LB100_DIR / "LB-100-rail-tree-precheck.csv",
@@ -332,18 +336,28 @@ def validate_adr_0014() -> None:
 def validate_checklist(board: str, path: Path) -> None:
     text = read_text(path)
     lower_text = text.lower()
-    if "does not" not in lower_text or "pcb layout" not in lower_text:
-        fail(f"{path.relative_to(REPO_ROOT)} must block PCB layout")
+    normalized_text = " ".join(text.split())
+    status = checklist_status(path)
+    if status == "Open" and ("does not" not in lower_text or "pcb layout" not in lower_text):
+        fail(f"{path.relative_to(REPO_ROOT)} must block PCB layout while open")
+    if status == "Closed":
+        for token in ("does not authorize", "Gerbers", "drills", "pick-place", "BOM/CPL", "PCBA orders"):
+            if token not in text and token not in normalized_text:
+                fail(f"{path.relative_to(REPO_ROOT)} must keep manufacturing-output boundary token {token}")
     if "board-release-blocker-register.csv" not in text:
         fail(f"{path.relative_to(REPO_ROOT)} must reference blocker register")
-    status = checklist_status(path)
-    if status != "Open":
-        fail(f"{path.relative_to(REPO_ROOT)} must remain Open until all gates close")
     gates = checklist_gates(path)
     if not any(row["Status"] == "Closed" for row in gates):
         fail(f"{path.relative_to(REPO_ROOT)} must have closed baseline gates")
-    if not any(row["Status"] == "Conditional" for row in gates):
+    if status == "Open" and not any(row["Status"] == "Conditional" for row in gates):
         fail(f"{path.relative_to(REPO_ROOT)} must have conditional close gates")
+    if status == "Closed":
+        open_gates = [row["Gate"] for row in gates if row["Status"] != "Closed"]
+        if open_gates:
+            fail(f"{path.relative_to(REPO_ROOT)} has non-closed gates: {', '.join(open_gates)}")
+        closeout_path = SCHEMATIC_REVIEW_CLOSEOUTS[board]
+        if str(closeout_path.relative_to(REPO_ROOT)) not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} must reference {closeout_path.relative_to(REPO_ROOT)}")
     if board == "LB-100":
         required_gates = {"MCU and pin binding", "Power tree and sleep budget", "PB-100 interface", "CAN and expansion safety"}
     else:
@@ -656,7 +670,7 @@ def validate_order_readiness() -> None:
         fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)} is missing boards: {', '.join(missing_boards)}")
 
 
-def validate_kicad_scaffold(board: str, board_dir: Path) -> None:
+def validate_kicad_scaffold(board: str, board_dir: Path, status: str) -> None:
     kicad_dir = board_dir / "kicad"
     project_path = kicad_dir / f"{board}.kicad_pro"
     schematic_path = kicad_dir / f"{board}.kicad_sch"
@@ -678,7 +692,22 @@ def validate_kicad_scaffold(board: str, board_dir: Path) -> None:
     readme = read_text(kicad_dir / "README.md")
     if f"no `{board}.kicad_pcb`" not in readme:
         fail(f"{(kicad_dir / 'README.md').relative_to(REPO_ROOT)} must explicitly block {board}.kicad_pcb")
-    validate_no_layout_before_freeze(board, board_dir, "Open")
+    schematic_text = read_text(schematic_path)
+    if status == "Closed":
+        closeout_path = SCHEMATIC_REVIEW_CLOSEOUTS[board]
+        read_text(closeout_path)
+        for token in ("Reviewed", "value-bearing", "schematic", "PCB layout and manufacturing outputs remain separate"):
+            if token not in schematic_text and token not in read_text(closeout_path):
+                fail(f"{schematic_path.relative_to(REPO_ROOT)} or closeout must include {token}")
+        if board == "LB-100":
+            for token in ("STM32H563VITx", "PB_5V_OUT", "219.2 mA", "415.2 mA", "CAN1", "DNP/open"):
+                if token not in schematic_text:
+                    fail(f"{schematic_path.relative_to(REPO_ROOT)} must include reviewed LB-100 token {token}")
+        else:
+            for token in ("JFB1", "USB_D_P", "USB_D_N", "CH_LED_1..CH_LED_10", "no back-power", "role-free"):
+                if token not in schematic_text:
+                    fail(f"{schematic_path.relative_to(REPO_ROOT)} must include reviewed FB-100 token {token}")
+    validate_no_layout_before_freeze(board, board_dir, status)
 
 
 def main() -> int:
@@ -686,8 +715,9 @@ def main() -> int:
     for board, path in FREEZE_CHECKLISTS.items():
         validate_checklist(board, path)
         board_dir = LB100_DIR if board == "LB-100" else FB100_DIR
-        validate_no_layout_before_freeze(board, board_dir, checklist_status(path))
-        validate_kicad_scaffold(board, board_dir)
+        status = checklist_status(path)
+        validate_no_layout_before_freeze(board, board_dir, status)
+        validate_kicad_scaffold(board, board_dir, status)
     for board, path in BLOCKER_REGISTERS.items():
         validate_blocker_register(board, path)
     for path in MANIFESTS.values():

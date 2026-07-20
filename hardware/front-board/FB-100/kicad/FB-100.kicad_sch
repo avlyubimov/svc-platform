@@ -34,4 +34,24 @@
     )
     (uuid "ee99957b-f111-4857-b45e-d407279bfe61")
   )
+  (text "Reviewed FB-100 value-bearing schematic inputs:\n- JFB1 24-pin interface with USB_D_P, USB_D_N, USB_CC1, USB_CC2, USB_VBUS_SENSE, FB_3V3_IO, GND, status RGB, CH_LED_1..CH_LED_10, SERVICE_BTN, RESET_BTN, OLED_SCL, OLED_SDA.\n- USB-C service is device-only; CC Rd behavior; ESD protection; VBUS sense-only; no back-power into LB-100 or PB-100.\n- UI hardware stays role-free: channel/status indicators only, no accessory names.\n- Optional OLED remains DNP until mechanical and power review.\n- Mechanical envelope, USB access, LED/button alignment, service sealing, and enclosure boundary are reviewed."
+    (at 130 30 0)
+    (effects
+      (font
+        (size 1.45 1.45)
+      )
+      (justify left top)
+    )
+    (uuid "873c3dff-b990-43a6-bb55-d2b7517735d4")
+  )
+  (text "Schematic freeze evidence:\n- ../FB-100-schematic-review-closeout.md\n- ../FB-100-interface-signal-plan.csv\n- ../FB-100-interface-pinout-closeout.csv\n- ../FB-100-usb-service-closeout-precheck.csv\n- ../FB-100-ui-control-closeout-precheck.csv\n- ../FB-100-ui-mechanical-precheck.csv\n- ../FB-100-mechanical-envelope-precheck.csv\n- ../FB-100-component-sourcing-precheck.csv\n\nPCB layout and manufacturing outputs remain separate post-freeze work."
+    (at 130 120 0)
+    (effects
+      (font
+        (size 1.45 1.45)
+      )
+      (justify left top)
+    )
+    (uuid "62567595-2fc4-4384-9841-cd55cf3245c5")
+  )
 )
