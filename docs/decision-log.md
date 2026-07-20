@@ -2471,3 +2471,17 @@ keeps those gaps explicit and machine-checked so `PB-100.kicad_pcb`, Gerbers,
 drills, pick-place, fabrication package, manufacturing ZIP, or PCBA order
 package work cannot be treated as authorized while any closure row remains
 Conditional.
+
+## 2026-07-20 — Firmware rule action grammar canonicalization
+
+Decision: Firmware rule actions now use a canonical PWM literal grammar shared
+by `firmware/services/rule_text.c`, `firmware/configs/svc-config.schema.json`,
+and `tools/validate_config.py`. Supported rule actions are role names accepted
+by the firmware rule-text parser with `.pwm = 0` or `.pwm = 1..100`; signed
+values and leading-zero PWM values are rejected.
+
+Reason: The configuration schema, repository validator, and host-tested firmware
+parser must reject the same rule-action language before persisted user
+configuration can safely drive role-mapped output actions. Keeping the validator
+derived from parser role/condition tables reduces drift while preserving the
+configuration/firmware separation and Output Manager enforcement path.

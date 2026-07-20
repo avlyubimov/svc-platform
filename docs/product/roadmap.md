@@ -69,7 +69,7 @@ Current host-tested services:
 - Rule Event Bridge
 - System Safety Coordinator
 - Role Resolver
-- Rule Engine skeleton
+- Rule Engine role-action runner
 - Rule condition evaluator
 - Ambient day/dusk/night rule conditions
 - In-memory rule runner
