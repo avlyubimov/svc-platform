@@ -13,22 +13,22 @@ worst-case sizing load.
 
 - OUT2 target fuse: 20 A.
 - OUT2 default current limit: 18 A.
-- SIDR626LDP-class MOSFET is the current output MOSFET candidate.
-- The conservative thermal estimate uses 2.1 mOhm at VGS = 4.5 V and a 2.0
-  temperature multiplier.
-- Vishay SIDR626LDP data sheet lists 60 V VDS, RDS(on) values down to the
-  1.5 mOhm max class at VGS = 10 V, thermal resistance data, and single-pulse
-  SOA curves.
+- BUK7S1R2-80M 80 V LFPAK88 is the selected output MOSFET.
+- The conservative hot thermal estimate uses 2.4 mOhm and gives about 0.78 W
+  at the 18 A continuous OUT2 limit before switching and copper losses.
+- The Nexperia data sheet provides the selected package, thermal and SOA
+  evidence; application-specific motor inrush and fault timing still require
+  reproducible analysis or bench evidence.
 
 ## Schematic decision
 
-Use SIDR626LDP-class MOSFETs for OUT2 schematic planning only if the detailed
-SOA review confirms the startup envelope and short-circuit fault timing.
+Use the selected BUK7S1R2-80M for OUT2 only after the detailed SOA review
+confirms the startup envelope and short-circuit fault timing.
 
 The schematic must preserve an escape path for OUT2:
 
-- larger low-Rds TOLL/LFPAK MOSFET footprint variant; or
-- parallel MOSFET option; or
+- IAUTN08S5N012L 80 V TOLL or BUK7J2R4-80M 80 V LFPAK56E through a controlled
+  non-drop-in substitution review; or
 - lower OUT2 current/inrush limit through a future ADR if hardware margin is not
   proven.
 
@@ -65,6 +65,7 @@ These are schematic-review targets, not user-configurable output limits.
 
 ## Evidence links
 
-- Vishay SIDR626LDP data sheet: https://www.vishay.com/docs/77277/sidr626ldp.pdf
-- LCSC SIDR626LDP candidate page: https://www.lcsc.com/product-detail/C3279576.html
-- DigiKey SIDR626LDP availability snapshot: https://www.digikey.com/en/products/detail/vishay-siliconix/SIDR626LDP-T1-RE3/13175742
+- Nexperia BUK7S1R2-80M data sheet:
+  https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf
+- Historical SIDR626LDP evidence is retained only to explain rejection of the
+  former 60 V path: https://www.vishay.com/docs/77277/sidr626ldp.pdf

@@ -961,9 +961,9 @@ REQUIRED_INPUT_POWER_ITEMS = {
 }
 REQUIRED_INPUT_REVERSE_FREEZE_REVIEW_ITEMS = {
     "Controller gate default",
-    "Preferred TOLL path",
-    "80V LFPAK88 alternate",
-    "Dual PowerPAK fallback",
+    "Rejected 60V history",
+    "Selected 80V LFPAK88 path",
+    "80V non-drop-in alternatives",
     "Protected measurement sequence",
     "TVS overshoot dependency",
     "Assembly and sourcing gate",
@@ -1007,8 +1007,8 @@ REQUIRED_INPUT_REVERSE_Q1_CLOSEOUT_PRECHECKS = {
 REQUIRED_TVS_LOAD_DUMP_FREEZE_REVIEW_ITEMS = {
     "Active HM3 branch",
     "100V device margin",
-    "60V MOSFET conditional margin",
-    "80V input alternate",
+    "60V MOSFET historical rejection",
+    "80V MOSFET selected baseline",
     "60V buck alternate boundary",
     "40V smart-switch ADR boundary",
     "OV and input-filter dependencies",
@@ -1799,6 +1799,13 @@ def validate_can1_netlist_topology(kicad_cli: str, temp_dir: Path) -> None:
         "R_CAN1_TX_BIAS": ("47k 1%", "PB100:R0402"),
         "R_CAN1_STATUS_SER": ("1k 1%", "PB100:R0402"),
         "R_CAN1_STATUS_PULL": ("100k 1%", "PB100:R0402"),
+        "U_CAN1_PHY": ("TJA1051TK/3/1J", "PB100:HVSON-8_L3.0-W3.0-P0.65-BL-EP"),
+        "R_CAN1_SILENT": ("47k 1%", "PB100:R0402"),
+        "JP_CAN1_NORMAL": ("CAN1_NORMAL_MODE_DNP", "PB100:R0603_DNP_LINK_1608Metric"),
+        "D_CAN1": ("ESD2CANFD24QDBZRQ1", "PB100:SOT-23-3_DBZ_TI"),
+        "R_CAN1_TERM": ("120R 1% DNP", "PB100:R0603_DNP_LINK_1608Metric"),
+        "C_CAN1_VCC": ("100nF 50V X7R", "PB100:C0402"),
+        "C_CAN1_VIO": ("100nF 50V X7R", "PB100:C0402"),
     }
     for reference, (expected_value, expected_footprint) in expected_components.items():
         component = components.get(reference)
@@ -1816,6 +1823,9 @@ def validate_can1_netlist_topology(kicad_cli: str, temp_dir: Path) -> None:
 
     if components["JP_CAN1"].find("./property[@name='dnp']") is None:
         fail("JP_CAN1 must be physically marked DNP in the exported KiCad netlist")
+    for reference in ("JP_CAN1_NORMAL", "R_CAN1_TERM"):
+        if components[reference].find("./property[@name='dnp']") is None:
+            fail(f"{reference} must be physically marked DNP in the exported KiCad netlist")
 
     nets = {}
     for net in root.findall("./nets/net"):
@@ -1825,7 +1835,27 @@ def validate_can1_netlist_topology(kicad_cli: str, temp_dir: Path) -> None:
     exact_nets = {
         "CAN1_TX_ROUTE": {("JPB1", "70"), ("U_CAN1", "2")},
         "CAN1_TX_GATE_OUT": {("U_CAN1", "4"), ("JP_CAN1", "1")},
-        "CAN1_TXD_SAFE": {("JP_CAN1", "2"), ("R_CAN1_TX_BIAS", "2")},
+        "CAN1_TXD_SAFE": {
+            ("JP_CAN1", "2"),
+            ("R_CAN1_TX_BIAS", "2"),
+            ("U_CAN1_PHY", "1"),
+        },
+        "CAN1_RX_ROUTE": {("JPB1", "69"), ("U_CAN1_PHY", "4")},
+        "CAN1_PHY_SILENT": {
+            ("JP_CAN1_NORMAL", "1"),
+            ("R_CAN1_SILENT", "2"),
+            ("U_CAN1_PHY", "8"),
+        },
+        "CAN1_HARNESS_H": {
+            ("D_CAN1", "1"),
+            ("R_CAN1_TERM", "1"),
+            ("U_CAN1_PHY", "7"),
+        },
+        "CAN1_HARNESS_L": {
+            ("D_CAN1", "2"),
+            ("R_CAN1_TERM", "2"),
+            ("U_CAN1_PHY", "6"),
+        },
         "CAN1_TX_DISABLED_STATUS": {
             ("JPB1", "68"),
             ("R_CAN1_STATUS_SER", "2"),
@@ -1852,12 +1882,54 @@ def validate_can1_netlist_topology(kicad_cli: str, temp_dir: Path) -> None:
         ("R_CAN1_OE", "1"),
         ("R_CAN1_TX_BIAS", "1"),
         ("R_CAN1_STATUS_PULL", "1"),
+        ("U_CAN1_PHY", "5"),
+        ("R_CAN1_SILENT", "1"),
+        ("C_CAN1_VIO", "1"),
     }
     missing_rail_nodes = required_rail_nodes - rail_nodes
     if missing_rail_nodes:
         fail(f"CAN1 safety pull-ups are not tied to LB_3V3_IO: {sorted(missing_rail_nodes)}")
 
-    print("PB-100 CAN1 physical net topology passed")
+    required_pb5v_nodes = {("U_CAN1_PHY", "3"), ("C_CAN1_VCC", "1")}
+    missing_pb5v_nodes = required_pb5v_nodes - nets.get("PB_5V_OUT", set())
+    if missing_pb5v_nodes:
+        fail(f"CAN1 transceiver VCC is not tied to PB_5V_OUT: {sorted(missing_pb5v_nodes)}")
+    required_ground_nodes = {
+        ("U_CAN1_PHY", "2"),
+        ("U_CAN1_PHY", "9"),
+        ("D_CAN1", "3"),
+        ("JP_CAN1_NORMAL", "2"),
+        ("C_CAN1_VCC", "2"),
+        ("C_CAN1_VIO", "2"),
+    }
+    missing_ground_nodes = required_ground_nodes - nets.get("GND", set())
+    if missing_ground_nodes:
+        fail(f"CAN1 physical-layer ground is incomplete: {sorted(missing_ground_nodes)}")
+
+    jpb1 = components.get("JPB1")
+    if jpb1 is None:
+        fail("PB-100 topology is missing JPB1")
+    if jpb1.findtext("footprint", default="").strip() != "PB100:FX18-100P-0.8SV10_Hirose":
+        fail("JPB1 must bind the reviewed Hirose FX18-100P footprint")
+    mf_nodes = {
+        ("JPB1", "MF_A_PIN1_51_END"),
+        ("JPB1", "MF_B_PIN1_51_END"),
+        ("JPB1", "MF_A_PIN50_100_END"),
+        ("JPB1", "MF_B_PIN50_100_END"),
+    }
+    missing_mf_nodes = mf_nodes - nets.get("GND", set())
+    if missing_mf_nodes:
+        fail(f"JPB1 MF contacts are not tied only to GND: {sorted(missing_mf_nodes)}")
+    forbidden_mf_nets = {
+        net_name: sorted(mf_nodes & nodes)
+        for net_name, nodes in nets.items()
+        if net_name in {"AGND", "PB_5V_OUT", "LB_3V3_IO", "VBAT", "VBAT_RAW", "VBAT_PROT"}
+        and mf_nodes & nodes
+    }
+    if forbidden_mf_nets:
+        fail(f"JPB1 MF contacts are tied to forbidden nets: {forbidden_mf_nets}")
+
+    print("PB-100 CAN1 and JPB1 MF physical net topology passed")
 
 
 def validate_no_layout_artifacts() -> None:
@@ -2148,11 +2220,28 @@ def validate_symbol_capture_progress() -> None:
         if next_symbol < 0:
             next_symbol = symbol_text.rfind("\n)")
         symbol_block = symbol_text[start:next_symbol]
+        selected_physical_symbols = {
+            "PB100_TJA1051TK3_CAN_PHY_PRELIM": "PB100:HVSON-8_L3.0-W3.0-P0.65-BL-EP",
+            "PB100_ESD2CANFD24_Q1_PRELIM": "PB100:SOT-23-3_DBZ_TI",
+        }
+        if symbol_name in selected_physical_symbols:
+            if "(in_bom yes)" not in symbol_block or "(on_board yes)" not in symbol_block:
+                fail(f"selected physical symbol {symbol_name} must be included in BOM and board")
+            expected_footprint = selected_physical_symbols[symbol_name]
+            if f'(property "Footprint" "{expected_footprint}"' not in symbol_block:
+                fail(f"selected physical symbol {symbol_name} must bind {expected_footprint}")
+            continue
         if "(in_bom no)" not in symbol_block:
             fail(f"preliminary symbol {symbol_name} must be excluded from BOM")
         if "(on_board no)" not in symbol_block:
             fail(f"preliminary symbol {symbol_name} must be excluded from board")
-        if '(property "Footprint" ""' not in symbol_block:
+        if symbol_name == "PB100_JPB1_100PIN_PRELIM":
+            if '(property "Footprint" "PB100:FX18-100P-0.8SV10_Hirose"' not in symbol_block:
+                fail("JPB1 preliminary symbol must bind the Product Owner-approved FX18 footprint")
+        elif symbol_name == "PB100_POWER_NMOS_ESCAPE_PRELIM":
+            if '(property "Footprint" "PB100:LFPAK88_SOT1235_Nexperia"' not in symbol_block:
+                fail("selected 80 V power MOSFET symbol must bind the reviewed LFPAK88 footprint")
+        elif '(property "Footprint" ""' not in symbol_block:
             fail(f"preliminary symbol {symbol_name} must not lock a footprint")
 
 
@@ -2345,7 +2434,7 @@ def validate_symbol_footprint_pad_map() -> None:
 
 
 def validate_input_reverse_fet_symbol_evidence() -> None:
-    symbol_name = "PB100_INPUT_NMOS_TOLL_PRELIM"
+    symbol_name = "PB100_POWER_NMOS_ESCAPE_PRELIM"
     symbol_text = read_text(KICAD_DIR / "lib" / "PB100.kicad_sym")
     block = symbol_block(symbol_text, symbol_name)
     if not block:
@@ -2356,11 +2445,7 @@ def validate_input_reverse_fet_symbol_evidence() -> None:
         ("2", "S"),
         ("3", "S"),
         ("4", "S"),
-        ("5", "S"),
-        ("6", "S"),
-        ("7", "S"),
-        ("8", "S"),
-        ("Tab", "D"),
+        ("mb", "D"),
     ):
         expected_name = f'(name "{pin_name}"'
         expected_number = f'(number "{pin_number}"'
@@ -2371,13 +2456,15 @@ def validate_input_reverse_fet_symbol_evidence() -> None:
         fail(f"{symbol_name} must remain excluded from BOM")
     if "(on_board no)" not in block:
         fail(f"{symbol_name} must remain excluded from board")
-    if '(property "Footprint" ""' not in block:
-        fail(f"{symbol_name} must not lock a TOLL footprint")
+    if '(property "Value" "BUK7S1R2-80M"' not in block:
+        fail(f"{symbol_name} must lock the Product Owner-approved BUK7S1R2-80M value")
+    if '(property "Footprint" "PB100:LFPAK88_SOT1235_Nexperia"' not in block:
+        fail(f"{symbol_name} must bind the reviewed LFPAK88 footprint")
 
     open_items_text = read_text(PB100_DIR / "PB-100-symbol-open-items.md")
     if "Evidence captured" not in open_items_text:
         fail("Q1 symbol-open-items row must mark evidence captured")
-    if "40 A copper/thermal review remain open" not in open_items_text:
+    if "40 A copper/thermal review remains open" not in open_items_text:
         fail("Q1 symbol-open-items row must keep 40 A copper/thermal review open")
 
 
@@ -2411,6 +2498,17 @@ def validate_jpb1_symbol_from_pin_map() -> None:
         expected_number = f'(number "{pin_number}"'
         if not any(expected_name in line and expected_number in line for line in block.splitlines()):
             fail(f"{symbol_name} is missing JPB1 pin {pin_number} {pin_name}")
+
+    for mf_identifier in (
+        "MF_A_PIN1_51_END",
+        "MF_B_PIN1_51_END",
+        "MF_A_PIN50_100_END",
+        "MF_B_PIN50_100_END",
+    ):
+        if f'(number "{mf_identifier}"' not in block:
+            fail(f"{symbol_name} is missing approved GND MF pin {mf_identifier}")
+    if '(property "Footprint" "PB100:FX18-100P-0.8SV10_Hirose"' not in block:
+        fail(f"{symbol_name} must bind the reviewed Hirose FX18-100P footprint")
 
 
 def validate_instance_symbol_map() -> None:
@@ -2485,8 +2583,10 @@ def validate_instance_symbol_map() -> None:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: created symbol is missing: {symbol_name}")
         if symbol_state == "Pending" and symbol_present:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: pending symbol is already present: {symbol_name}")
-        if ref == "Q102" and "OUT2_ESCAPE_FET" not in row["Notes"]:
-            fail("Q102 instance-symbol map must preserve the OUT2 escape-FET note")
+        if ref == "Q102" and not all(
+            token in row["Notes"] for token in ("BUK7S1R2-80M", "SOA", "thermal")
+        ):
+            fail("Q102 instance-symbol map must preserve selected 80 V SOA/thermal evidence")
 
 
 def validate_sheet_reference_map() -> None:
@@ -3153,9 +3253,10 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-input-reverse-q1-closeout-precheck.csv",
         "Q1",
         "40 A",
-        "IAUTN06S5N008",
         "BUK7S1R2-80M",
-        "dual SIDR626LDP",
+        "80 V",
+        "LFPAK88",
+        "SOA",
     ):
         if token not in input_text:
             fail(f"Input reverse protection gap must keep {token} explicit")
@@ -3208,9 +3309,10 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-tvs-overshoot-escape-checklist.csv",
         "PB-100-tvs-overshoot-validation-precheck.csv",
         "PB-100-tvs-overshoot-closeout-precheck.csv",
-        "60 V",
+        "80 V",
         "DO-218AC",
         "overshoot",
+        "peak stress",
     ):
         if token not in tvs_text:
             fail(f"TVS/load-dump gap must keep {token} explicit")
@@ -3361,7 +3463,7 @@ def validate_engineering_blocker_closeout() -> None:
             fail(f"{path.relative_to(REPO_ROOT)} must keep no-layout token {token}")
 
     common_section_tokens = (
-        "Closeout status: Closed",
+        "Closeout status:",
         "Why blocker existed",
         "Candidate comparison",
         "Recommended solution",
@@ -3411,7 +3513,7 @@ def validate_engineering_blocker_closeout() -> None:
         ),
         "PBREL-004": (
             "TPS48110AQDGXRQ1",
-            "BUK7Y3R1-80M",
+            "BUK7S1R2-80M",
             "OUT2",
             "SOA",
         ),
@@ -3473,6 +3575,16 @@ def validate_engineering_blocker_closeout() -> None:
             "garage-installed",
         ),
     }
+    blocker_rows = list(
+        csv.DictReader(
+            (PB100_DIR / "PB-100-board-release-blocker-register.csv").open(
+                newline="", encoding="utf-8"
+            )
+        )
+    )
+    expected_status_by_id = {
+        row["Blocker ID"].strip(): row["Status"].strip() for row in blocker_rows
+    }
     for gate, blocker_id in pbrel_id_by_gate().items():
         marker = f"## {blocker_id} — {gate}"
         marker_index = text.find(marker)
@@ -3481,6 +3593,16 @@ def validate_engineering_blocker_closeout() -> None:
         next_marker_index = text.find("\n## PBREL-", marker_index + len(marker))
         section = text[marker_index:] if next_marker_index < 0 else text[marker_index:next_marker_index]
         normalized_section = re.sub(r"\s+", " ", section)
+        status_match = re.search(r"Closeout status:\s*([A-Za-z -]+)\.", section)
+        if status_match is None:
+            fail(f"{path.relative_to(REPO_ROOT)} {blocker_id} section must include a closeout status")
+        actual_status = status_match.group(1).strip()
+        expected_status = expected_status_by_id.get(blocker_id)
+        if actual_status != expected_status:
+            fail(
+                f"{path.relative_to(REPO_ROOT)} {blocker_id} status {actual_status} "
+                f"does not match blocker register status {expected_status}"
+            )
         for token in common_section_tokens + specific_tokens_by_id[blocker_id]:
             if token not in section and token not in normalized_section:
                 fail(f"{path.relative_to(REPO_ROOT)} {blocker_id} section must include {token}")
@@ -3502,7 +3624,8 @@ def validate_schematic_review_closeout() -> None:
         "manufacturing ZIP",
         "PCBA orders",
         "closure was retracted",
-        "conditional 60 V stress margins",
+        "80 V MOSFET baseline",
+        "actual overshoot",
         "FX18 MF/TH mechanics",
         "post-prototype",
         "board-print remains NO-GO",
@@ -4124,10 +4247,13 @@ def validate_input_protection_pin_contract() -> None:
     q1_state = instance_by_ref["Q1"]["Symbol state"].strip()
     if q1_state != "Created":
         fail("Q1 must be Created after INPUT_REVERSE_FET symbol evidence closes")
-    for row in q1_rows:
-        close_text = " ".join(row[column] for column in ("Default state", "Freeze dependency"))
-        if "TOLL" not in close_text or "40 A" not in close_text:
-            fail("Q1 input protection rows must keep TOLL and 40 A review explicit")
+    q1_close_text = " ".join(
+        row[column]
+        for row in q1_rows
+        for column in ("Interface point", "Default state", "Freeze dependency")
+    )
+    if not all(token in q1_close_text for token in ("BUK7S1R2-80M", "LFPAK88", "40 A")):
+        fail("Q1 input protection rows must keep selected 80 V LFPAK88 and 40 A review explicit")
 
 
 def validate_logic_power_design_placeholders() -> None:
@@ -4410,7 +4536,8 @@ def validate_output_stage_value_freeze_checklist() -> None:
         "0-30A",
         "0-20A",
         "0-8A",
-        "60V/80V",
+        "BUK7S1R2-80M",
+        "80V",
         "No PCB layout",
         "PB-100.kicad_pcb",
     ):
@@ -4605,12 +4732,13 @@ def validate_output_stage_closeout_precheck() -> None:
         "fuse energy",
         "40A 1s",
         "80A 100ms",
-        "60V/80V",
+        "BUK7S1R2-80M",
+        "80V",
         "PB-100-tvs-load-dump-margin-trace.csv",
         "PB-100-mosfet-voltage-margin-review.md",
         "ADR-0011",
         "external-controller",
-        "60V N-MOSFET",
+        "BUK7S1R2-80M 80V N-MOSFET",
         "no direct 40 V smart-switch rail",
         "no direct 40V smart-switch rail",
         "output-channel-template.kicad_sch",
@@ -4691,7 +4819,7 @@ def validate_low_current_output_baseline_trace() -> None:
             "Low current",
             "5",
             "4",
-            "TPS48110AQDGXRQ1 plus external 60V N-MOSFET",
+            "TPS48110AQDGXRQ1 plus selected BUK7S1R2-80M 80V LFPAK88 N-MOSFET",
             "configuration only",
             "no direct 40 V smart-switch rail",
             "future ADR",
@@ -4808,7 +4936,7 @@ def validate_high_medium_output_baseline_trace() -> None:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
         row_text = " ".join(row.values())
-        for token in ("TPS48110AQDGXRQ1 plus external 60V N-MOSFET", "schematic freeze"):
+        for token in ("TPS48110AQDGXRQ1 plus selected BUK7S1R2-80M 80V LFPAK88 MOSFET", "layout"):
             if token not in row_text:
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: high/medium row must include {token}")
 
@@ -4847,7 +4975,7 @@ def validate_high_medium_output_baseline_trace() -> None:
                 fail(f"{output} must exist in matrix, capability manifest, and config example")
             if matrix_row["Class"].strip() != expected["class"]:
                 fail(f"{output} must remain {expected['class']} in output channel matrix")
-            if matrix_row["Initial switch direction"].strip() != "TPS48110AQDGXRQ1 plus external 60V N-MOSFET":
+            if matrix_row["Initial switch direction"].strip() != "TPS48110AQDGXRQ1 plus selected BUK7S1R2-80M 80V LFPAK88 N-MOSFET":
                 fail(f"{output} must keep TPS48110 external MOSFET switch direction")
             if int(matrix_row["Target fuse A"]) != int(expected["fuses"]):
                 fail(f"{output} fuse target must match high/medium trace")
@@ -4960,7 +5088,7 @@ def validate_high_medium_output_freeze_review() -> None:
             fail(f"high/medium output freeze review must cite {token}")
 
     high_medium_text = read_text(PB100_DIR / "PB-100-high-medium-output-baseline-trace.csv")
-    for token in ("OUT2", "OUT1", "OUT3 OUT4 OUT6 OUT7 OUT10", "TPS48110AQDGXRQ1 plus external 60V N-MOSFET"):
+    for token in ("OUT2", "OUT1", "OUT3 OUT4 OUT6 OUT7 OUT10", "TPS48110AQDGXRQ1 plus selected BUK7S1R2-80M 80V LFPAK88 MOSFET"):
         if token not in high_medium_text:
             fail(f"high/medium baseline trace must support freeze review token {token}")
 
@@ -5019,7 +5147,7 @@ def validate_low_current_output_freeze_review() -> None:
         "5A fuse",
         "4A configured current limit",
         "TPS48110AQDGXRQ1",
-        "external 60V N-MOSFET",
+        "BUK7S1R2-80M 80V external N-MOSFET",
         "no direct 40V smart-switch rail",
         "future ADR",
         "OUTn_CTL",
@@ -5109,8 +5237,8 @@ def validate_input_power_design_values() -> None:
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown input-power net {net_name}")
         if design_item == "Q1 package and copper path":
             row_text = " ".join(row.values())
-            if "TOLL" not in row_text or "40 A" not in row_text:
-                fail("Q1 package and copper path must keep TOLL and 40 A review explicit")
+            if not all(token in row_text for token in ("BUK7S1R2-80M", "LFPAK88", "80 V", "40 A")):
+                fail("Q1 package and copper path must keep selected 80 V LFPAK88 and 40 A review explicit")
         if design_item == "Shunt value and power rating":
             row_text = " ".join(row.values()).lower()
             for token in ("four-terminal", "0.5m", "60a", "30mv", "1.8w", "40a", "0.8w"):
@@ -5142,9 +5270,9 @@ def validate_input_reverse_package_trace() -> None:
 
     required_items = {
         "Controller gate path",
-        "Preferred TOLL path",
-        "80 V LFPAK88 alternate",
-        "Dual PowerPAK fallback",
+        "Rejected 60 V TOLL history",
+        "Selected 80 V LFPAK88 path",
+        "80 V alternatives",
         "Current measurement boundary",
         "Assembly sourcing gate",
     }
@@ -5183,9 +5311,9 @@ def validate_input_reverse_package_trace() -> None:
         "LFPAK88",
         "1.2 mOhm",
         "3.84 W",
-        "Dual SIDR626LDP",
-        "1.68 W per FET",
-        "Single 2.1 mOhm PowerPAK device is rejected",
+        "IAUTN08S5N012L",
+        "BUK7J2R4-80M",
+        "not approved substitutes",
         "0.5mΩ",
         "VBAT_REV_PROT",
         "IIN_SHUNT_HI/IIN_SHUNT_LO",
@@ -5199,22 +5327,23 @@ def validate_input_reverse_package_trace() -> None:
         if token not in controller_text:
             fail(f"input reverse controller trace must include {token}")
 
-    preferred_text = " ".join(rows_by_item["Preferred TOLL path"].values())
-    for token in ("HM3 TVS overshoot", "Do not lock TOLL footprint", "40 A copper"):
-        if token not in preferred_text:
-            fail(f"preferred TOLL trace must include {token}")
+    selected_text = " ".join(rows_by_item["Selected 80 V LFPAK88 path"].values())
+    for token in ("BUK7S1R2-80M", "26.7 V", "40 A", "production-source"):
+        if token not in selected_text:
+            fail(f"selected 80 V Q1 trace must include {token}")
 
-    fallback_text = " ".join(rows_by_item["Dual PowerPAK fallback"].values())
-    for token in ("20 A per FET", "current sharing", "Single 2.1 mOhm"):
-        if token not in fallback_text:
-            fail(f"dual PowerPAK fallback trace must include {token}")
+    alternatives_text = " ".join(rows_by_item["80 V alternatives"].values())
+    for token in ("IAUTN08S5N012L", "BUK7J2R4-80M", "non-drop-in", "rejected"):
+        if token not in alternatives_text:
+            fail(f"80 V Q1 alternatives trace must include {token}")
 
     input_doc = read_text(PB100_DIR / "PB-100-input-reverse-protection.md")
     for token in (
-        "IAUTN06S5N008ATMA1-class 60 V TOLL MOSFET",
-        "BUK7S1R2-80M-class 80 V LFPAK88 MOSFET",
-        "Dual SIDR626LDP-class PowerPAK MOSFETs",
-        "single 2.1 mOhm PowerPAK-class MOSFET",
+        "BUK7S1R2-80M",
+        "80 V LFPAK88",
+        "IAUTN08S5N012L",
+        "BUK7J2R4-80M",
+        "not approved Rev.1 assembly substitutions",
     ):
         if token not in input_doc:
             fail(f"input reverse strategy document must include {token}")
@@ -5222,9 +5351,9 @@ def validate_input_reverse_package_trace() -> None:
     thermal_rows = list(csv.DictReader((PB100_DIR / "PB-100-thermal-estimates.csv").open(newline="", encoding="utf-8")))
     thermal_by_path = {row["Path"].strip(): row for row in thermal_rows}
     expected_thermal = {
-        "IAUTN06S5N008 input reverse MOSFET": ("40", "0.00076", "2.43"),
-        "BUK7S1R2-80M input reverse MOSFET": ("40", "0.0012", "3.84"),
-        "Dual SIDR626LDP input reverse MOSFETs": ("20 per FET", "0.0021", "1.68 per FET"),
+        "BUK7S1R2-80M 80 V input reverse MOSFET": ("40", "0.0012", "3.84"),
+        "IAUTN08S5N012L 80 V input reverse alternate": ("40", "0.0012", "3.84"),
+        "BUK7J2R4-80M 80 V input reverse alternate": ("40", "0.0024", "7.68"),
     }
     for thermal_path, (current, rds, dissipation) in expected_thermal.items():
         row = thermal_by_path.get(thermal_path)
@@ -5243,16 +5372,15 @@ def validate_input_reverse_package_trace() -> None:
         fail("Q1 input pin contract must map VBAT_RAW VBAT_REV_PROT and INPUT_FET_GATE")
 
     input_power_text = read_text(PB100_DIR / "PB-100-input-power-design-values.csv")
-    for token in ("Review TOLL candidate against LFPAK88 or dual fallback", "40 A thermal review", "0.5mΩ"):
+    for token in ("BUK7S1R2-80M LFPAK88 selected", "40 A SOA copper thermal", "0.5mΩ"):
         if token not in input_power_text:
             fail(f"input power values must preserve input reverse token {token}")
 
     protection_text = read_text(PB100_DIR / "PB-100-protection-validation.csv")
     for token in (
-        "IAUTN06S5N008 input reverse MOSFET,60V VDS",
-        "Conditional limited margin",
         "BUK7S1R2-80M input reverse MOSFET,80V VDS",
-        "Pass with margin",
+        "Selected with 26.7V nominal margin",
+        "Rejected Rev.1 baseline",
     ):
         if token not in protection_text:
             fail(f"protection validation must preserve input reverse token {token}")
@@ -5267,7 +5395,7 @@ def validate_input_reverse_package_trace() -> None:
     )
     for checked_path in checked_paths:
         checked_text = read_text(checked_path)
-        for token in ("IAUTN06S5N008", "BUK7S1R2-80M", "SIDR626LDP"):
+        for token in ("BUK7S1R2-80M", "IAUTN08S5N012", "BUK7J2R4-80M"):
             if token not in checked_text:
                 fail(f"{checked_path.relative_to(REPO_ROOT)} must retain input reverse alternate {token}")
 
@@ -5314,15 +5442,13 @@ def validate_input_reverse_freeze_review() -> None:
         "controller-unpowered off state",
         "LM74502-Q1",
         "IAUTN06S5N008ATMA1",
-        "60V TOLL",
-        "0.76mΩ",
-        "2.43W at 40A",
+        "Rejected 60V",
         "BUK7S1R2-80M",
         "80V LFPAK88",
         "3.84W at 40A",
-        "Dual SIDR626LDP",
-        "20A per FET",
-        "single 2.1mΩ PowerPAK",
+        "IAUTN08S5N012L",
+        "BUK7J2R4-80M",
+        "non-drop-in alternatives",
         "VBAT_REV_PROT",
         "VBAT_PROT",
         "IIN_SHUNT_HI",
@@ -5337,7 +5463,7 @@ def validate_input_reverse_freeze_review() -> None:
             fail(f"input reverse freeze review must include {token}")
 
     trace_text = read_text(PB100_DIR / "PB-100-input-reverse-package-trace.csv")
-    for token in ("IAUTN06S5N008ATMA1", "BUK7S1R2-80M", "Dual SIDR626LDP", "40 A", "JLCPCB PCBWay"):
+    for token in ("IAUTN06S5N008ATMA1", "BUK7S1R2-80M", "IAUTN08S5N012L", "BUK7J2R4-80M", "40 A", "JLCPCB PCBWay"):
         if token not in trace_text:
             fail(f"input reverse package trace must support freeze review token {token}")
 
@@ -5352,7 +5478,7 @@ def validate_input_reverse_freeze_review() -> None:
             fail(f"TVS margin trace must support input reverse freeze review token {token}")
 
     sourcing_text = read_text(REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv")
-    for token in ("INPUT_REVERSE_FET", "TOLL", "BUK7S1R2-80M", "SIDR626LDP"):
+    for token in ("INPUT_REVERSE_FET", "LFPAK88", "BUK7S1R2-80M", "IAUTN08S5N012L", "BUK7J2R4-80M"):
         if token not in sourcing_text:
             fail(f"assembly sourcing recheck must support input reverse freeze review token {token}")
 
@@ -5386,12 +5512,18 @@ def validate_input_reverse_q1_freeze_checklist() -> None:
         row_text = " ".join(row.values()).lower()
         if check_id == "Q1-FRZ-002" and ("input_fet_gate" not in row_text or "turn-off timing" not in row_text):
             fail("Q1 gate checklist row must keep INPUT_FET_GATE and turn-off timing explicit")
-        if check_id == "Q1-FRZ-003" and ("iautn06s5n008atma1" not in row_text or "2.43w at 40a" not in row_text):
-            fail("Q1 preferred TOLL checklist row must keep IAUTN06S5N008ATMA1 and 40 A dissipation explicit")
-        if check_id == "Q1-FRZ-004" and ("buk7s1r2-80m" not in row_text or "80 v" not in row_text):
-            fail("Q1 alternate checklist row must keep BUK7S1R2-80M 80 V explicit")
-        if check_id == "Q1-FRZ-005" and ("dual sidr626ldp" not in row_text or "single" not in row_text):
-            fail("Q1 fallback checklist row must preserve dual SIDR626LDP and single-device rejection")
+        if check_id == "Q1-FRZ-003" and not all(
+            token in row_text for token in ("iautn06s5n008atma1", "dual sidr626ldp", "not approved")
+        ):
+            fail("Q1 rejected-60V checklist row must keep historical paths and exclusion explicit")
+        if check_id == "Q1-FRZ-004" and not all(
+            token in row_text for token in ("buk7s1r2-80m", "80 v", "lfpak88", "3.84w at 40a")
+        ):
+            fail("Q1 selected checklist row must keep BUK7S1R2-80M 80 V LFPAK88 explicit")
+        if check_id == "Q1-FRZ-005" and not all(
+            token in row_text for token in ("iautn08s5n012l", "buk7j2r4-80m", "non-drop-in")
+        ):
+            fail("Q1 alternatives checklist row must preserve two 80 V non-drop-in alternatives")
         if check_id == "Q1-FRZ-006" and ("vbat_rev_prot" not in row_text or "iin_shunt_hi" not in row_text or "vbat_prot" not in row_text):
             fail("Q1 measurement sequence checklist row must keep protected telemetry sequence explicit")
         if check_id == "Q1-FRZ-009" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
@@ -5410,13 +5542,13 @@ def validate_input_reverse_q1_freeze_checklist() -> None:
         "LM74502-Q1",
         "INPUT_FET_GATE",
         "IAUTN06S5N008ATMA1",
-        "60 V TOLL",
-        "2.43W at 40A",
+        "not approved Rev.1 assembly substitutions",
         "BUK7S1R2-80M",
         "80 V LFPAK88",
         "3.84W at 40A",
-        "Dual SIDR626LDP",
-        "1.68W per FET",
+        "IAUTN08S5N012L",
+        "BUK7J2R4-80M",
+        "non-drop-in alternatives",
         "VBAT_REV_PROT",
         "IIN_SHUNT_HI",
         "IIN_SHUNT_LO",
@@ -5488,9 +5620,11 @@ def validate_input_reverse_q1_derivation_precheck() -> None:
         "-11mV",
         "0.5mΩ",
         "1.25mΩ",
-        "IAUTN06S5N008ATMA1",
         "BUK7S1R2-80M",
-        "dual SIDR626LDP",
+        "80V LFPAK88",
+        "IAUTN08S5N012L",
+        "BUK7J2R4-80M",
+        "60V paths are rejected",
         "SM8S33AHM3/I",
         "VBAT_REV_PROT",
         "IIN_SHUNT_HI",
@@ -5533,12 +5667,11 @@ def validate_input_reverse_q1_closeout_precheck() -> None:
         row_text = " ".join(row.values()).lower()
         if "do not" not in row["Blocked action"].lower():
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
-        if precheck_id == "Q1-CLS-005" and (
-            "iautn06s5n008atma1" not in row_text
-            or "buk7s1r2-80m" not in row_text
-            or "dual sidr626ldp" not in row_text
+        if precheck_id == "Q1-CLS-005" and not all(
+            token in row_text
+            for token in ("buk7s1r2-80m", "iautn08s5n012l", "buk7j2r4-80m", "60 v paths are rejected")
         ):
-            fail("Q1 closeout package row must keep preferred and alternate paths explicit")
+            fail("Q1 closeout package row must keep selected and two 80 V alternate paths explicit")
         if precheck_id == "Q1-CLS-010" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
             fail("Q1 closeout no-layout row must block PCB layout explicitly")
 
@@ -5575,25 +5708,19 @@ def validate_input_reverse_q1_closeout_precheck() -> None:
         "0.5mΩ to 1.25mΩ",
         "RDS(on)",
         "40A",
-        "IAUTN06S5N008ATMA1",
-        "60 V TOLL",
-        "PG-HSOF-8-1",
-        "0.76mΩ",
-        "2.43W at 40A",
         "BUK7S1R2-80M",
         "80 V",
         "LFPAK88",
         "1.2mΩ",
         "3.84W at 40A",
-        "dual SIDR626LDP",
-        "PowerPAK",
-        "20A per FET",
-        "1.68W per FET",
-        "single SIDR626LDP is rejected",
+        "IAUTN08S5N012L",
+        "BUK7J2R4-80M",
+        "non-drop-in 80 V alternatives",
+        "60 V paths are rejected",
         "SM8S33AHM3/I",
         "TVS",
-        "60 V overshoot",
-        "80V-class escape",
+        "peak stress margin",
+        "80V limit",
         "IIN_SHUNT_HI",
         "IIN_SHUNT_LO",
         "0.5mΩ shunt",
@@ -5621,7 +5748,7 @@ def validate_input_reverse_q1_closeout_precheck() -> None:
     for supporting_artifact, tokens in {
         "PB-100-input-reverse-q1-freeze-checklist.csv": ("Q1-FRZ-003", "Q1-FRZ-009"),
         "PB-100-input-reverse-q1-derivation-precheck.csv": ("Q1-DER-002", "Q1-DER-010"),
-        "PB-100-input-reverse-package-trace.csv": ("IAUTN06S5N008ATMA1", "BUK7S1R2-80M", "Dual SIDR626LDP"),
+        "PB-100-input-reverse-package-trace.csv": ("BUK7S1R2-80M", "IAUTN08S5N012L", "BUK7J2R4-80M"),
     }.items():
         supporting_text = read_text(PB100_DIR / supporting_artifact)
         for token in tokens:
@@ -7053,15 +7180,13 @@ def validate_board_current_budget_design_calculation() -> None:
         "30 mV at 60 A",
         "1.8 W at 60 A",
         "Pfet = I^2 * Rds(on) * 2.0",
-        "IAUTN06S5N008ATMA1",
-        "TOLL",
-        "2.43 W",
         "BUK7S1R2-80M",
+        "selected 80 V LFPAK88",
         "LFPAK88",
         "3.84 W",
-        "dual `SIDR626LDP`",
-        "dual PowerPAK",
-        "1.68 W per FET",
+        "IAUTN08S5N012L",
+        "BUK7J2R4-80M",
+        "retained in historical decision artifacts only",
         "Every 1 mΩ",
         "1.6 W at 40 A",
         "2.5 W at 50 A",
@@ -7125,14 +7250,13 @@ def validate_board_current_budget_value_freeze_checklist() -> None:
         "VBAT_PROT",
         "MAXI",
         "6mm2 / 10AWG",
-        "IAUTN06S5N008ATMA1",
-        "TOLL",
-        "2.43 W at 40 A",
         "BUK7S1R2-80M",
+        "selected BUK7S1R2-80M 80 V LFPAK88",
         "LFPAK88",
         "3.84 W at 40 A",
-        "dual SIDR626LDP",
-        "3.36 W total at 40 A",
+        "IAUTN08S5N012L 80 V TOLL",
+        "BUK7J2R4-80M 80 V LFPAK56E",
+        "former IAUTN06S5N008 and SIDR626LDP 60 V paths are rejected",
         "TOTAL_CURRENT_SHUNT",
         "20mV and 0.8W at 40A",
         "25mV and 1.25W at 50A",
@@ -7243,15 +7367,14 @@ def validate_board_current_budget_value_derivation_precheck() -> None:
         "20mV and 0.8W at 40A",
         "25mV and 1.25W at 50A",
         "30mV and 1.8W at 60A",
-        "IAUTN06S5N008ATMA1",
-        "TOLL",
-        "0.76mΩ",
-        "2.43 W at 40 A",
         "BUK7S1R2-80M",
+        "selected BUK7S1R2-80M 80 V LFPAK88",
         "LFPAK88",
+        "2.4mΩ",
         "3.84 W at 40 A",
-        "dual SIDR626LDP",
-        "3.36 W total at 40 A",
+        "IAUTN08S5N012L 80 V TOLL",
+        "BUK7J2R4-80M 80 V LFPAK56E",
+        "former 60 V paths are rejected",
         "Every 1 mΩ",
         "1.6 W at 40 A",
         "2.5 W at 50 A",
@@ -7361,14 +7484,13 @@ def validate_board_current_budget_closeout_precheck() -> None:
         "0.5mΩ",
         "VBAT_PROT",
         "6mm2 / 10AWG",
-        "IAUTN06S5N008ATMA1",
-        "TOLL",
-        "PG-HSOF-8-1",
-        "2.43 W at 40 A",
         "BUK7S1R2-80M",
+        "selected BUK7S1R2-80M 80 V LFPAK88",
         "LFPAK88",
-        "dual SIDR626LDP",
-        "PowerPAK",
+        "3.84 W at 40 A",
+        "IAUTN08S5N012L 80 V TOLL",
+        "BUK7J2R4-80M 80 V LFPAK56E",
+        "former IAUTN06S5N008 and SIDR626LDP 60 V paths are rejected",
         "Vshunt = I * Rshunt",
         "Pshunt = I^2 * Rshunt",
         "20mV and 0.8W at 40A",
@@ -8699,8 +8821,8 @@ def validate_assembly_sourcing_recheck() -> None:
         if "alternat" not in row["Alternate coverage"].lower() and symbol_key != "CAN1_TX_DISABLE":
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: alternate coverage must remain explicit")
         if symbol_key == "INPUT_REVERSE_FET":
-            if "toll" not in row_text or "40 a" not in row_text:
-                fail("INPUT_REVERSE_FET sourcing row must keep TOLL and 40 A review explicit")
+            if not all(token in row_text for token in ("80 v", "lfpak88", "40 a")):
+                fail("INPUT_REVERSE_FET sourcing row must keep selected 80 V LFPAK88 and 40 A review explicit")
 
     missing_keys = sorted(critical_readiness.keys() - seen_keys)
     extra_keys = sorted(seen_keys - critical_readiness.keys())
@@ -9777,8 +9899,8 @@ def validate_tvs_load_dump_margin_trace() -> None:
 
     required_items = {
         "TPS48110 high-side controller",
-        "SIDR626LDP output MOSFET",
-        "IAUTN06S5N008 input reverse MOSFET",
+        "BUK7S1R2-80M output MOSFET",
+        "SIDR626LDP and IAUTN06S5N008 historical paths",
         "BUK7S1R2-80M input reverse MOSFET",
         "LM5164QDDATQ1 buck",
         "LM5013-Q1 buck alternate",
@@ -9808,10 +9930,21 @@ def validate_tvs_load_dump_margin_trace() -> None:
             f"{', '.join(missing_items)}"
         )
 
-    for protected_item in ("SIDR626LDP output MOSFET", "IAUTN06S5N008 input reverse MOSFET"):
-        row_text = " ".join(rows_by_item[protected_item].values()).lower()
-        if "60 v" not in row_text or "conditional limited margin" not in row_text or "overshoot" not in row_text:
-            fail(f"{protected_item} must keep 60 V conditional overshoot margin explicit")
+    historical_text = " ".join(
+        rows_by_item["SIDR626LDP and IAUTN06S5N008 historical paths"].values()
+    ).lower()
+    for token in ("60 v", "rejected", "history", "overshoot"):
+        if token not in historical_text:
+            fail(f"historical 60 V paths must preserve {token}")
+
+    for protected_item in (
+        "BUK7S1R2-80M output MOSFET",
+        "BUK7S1R2-80M input reverse MOSFET",
+    ):
+        selected_text = " ".join(rows_by_item[protected_item].values()).lower()
+        for token in ("80 v", "selected", "26.7 v", "overshoot"):
+            if token not in selected_text:
+                fail(f"{protected_item} must preserve selected 80 V margin evidence: {token}")
 
     smart_switch_text = " ".join(rows_by_item["TPS2HB35 direct smart switch"].values()).lower()
     for token in ("40 v", "deferred by adr-0011", "future adr", "lower-clamp"):
@@ -9820,7 +9953,6 @@ def validate_tvs_load_dump_margin_trace() -> None:
 
     for protected_item in (
         "TPS48110 high-side controller",
-        "BUK7S1R2-80M input reverse MOSFET",
         "LM5164QDDATQ1 buck",
         "LM5013-Q1 buck alternate",
     ):
@@ -9828,7 +9960,13 @@ def validate_tvs_load_dump_margin_trace() -> None:
             fail(f"{protected_item} must remain pass-with-margin against active HM3 TVS")
 
     protection_text = read_text(PB100_DIR / "PB-100-protection-validation.csv")
-    for token in ("Active SM8S33AHM3-class TVS", "53.3V clamp", "Conditional limited margin"):
+    for token in (
+        "Active SM8S33AHM3-class TVS",
+        "53.3V clamp",
+        "BUK7S1R2-80M output MOSFET",
+        "Selected with 26.7V nominal margin",
+        "Rejected Rev.1 baseline",
+    ):
         if token not in protection_text:
             fail(f"protection validation must preserve {token}")
 
@@ -9882,10 +10020,12 @@ def validate_tvs_load_dump_freeze_review() -> None:
         "SIDR626LDP",
         "IAUTN06S5N008",
         "60 V",
-        "Conditional limited margin",
+        "rejected Rev.1 assembly paths",
         "overshoot",
         "BUK7S1R2-80M",
         "80 V",
+        "selected for Q1 and Q101 through Q110",
+        "26.7 V nominal headroom",
         "TPS54360B-Q1",
         "TPS2HB35",
         "ADR-0011",
@@ -9905,8 +10045,9 @@ def validate_tvs_load_dump_freeze_review() -> None:
         "SM8S33AHM3/I",
         "HM3 DO-218AC",
         "53.3 V clamp at 124 A",
-        "Conditional limited margin",
+        "Rejected Rev.1 baseline",
         "BUK7S1R2-80M",
+        "Selected with 26.7 V nominal margin",
         "TPS54360B-Q1",
         "TPS2HB35",
         "Deferred by ADR-0011",
@@ -9918,7 +10059,8 @@ def validate_tvs_load_dump_freeze_review() -> None:
     for token in (
         "Active SM8S33AHM3-class TVS",
         "53.3V clamp",
-        "Conditional limited margin",
+        "Rejected Rev.1 baseline",
+        "Selected with 26.7V nominal margin",
         "Optional future alternate",
         "TPS54360B-Q1",
     ):
@@ -9996,11 +10138,13 @@ def validate_tvs_overshoot_escape_checklist() -> None:
         "46.7 V headroom",
         "SIDR626LDP",
         "IAUTN06S5N008",
-        "Conditional limited margin",
+        "historical evidence",
+        "not permitted Rev.1 assembly substitutions",
         "overshoot",
         "BUK7S1R2-80M",
         "LFPAK88",
         "1.2 mOhm",
+        "selected for Q1 and Q101 through Q110",
         "TPS48110",
         "LM5164QDDATQ1",
         "LM5013-Q1",
@@ -10026,7 +10170,13 @@ def validate_tvs_overshoot_escape_checklist() -> None:
             fail(f"TVS overshoot escape checklist must include {token}")
 
     margin_text = read_text(PB100_DIR / "PB-100-tvs-load-dump-margin-trace.csv")
-    for token in ("SM8S33AHM3/I", "53.3 V clamp at 124 A", "Conditional limited margin", "BUK7S1R2-80M"):
+    for token in (
+        "SM8S33AHM3/I",
+        "53.3 V clamp at 124 A",
+        "Rejected Rev.1 baseline",
+        "BUK7S1R2-80M",
+        "Selected with 26.7 V nominal margin",
+    ):
         if token not in margin_text:
             fail(f"TVS margin trace must support overshoot checklist token {token}")
 
@@ -10161,7 +10311,8 @@ def validate_tvs_overshoot_closeout_precheck() -> None:
         "53.3 V clamp at 124 A",
         "MCC SM8S33A EOL",
         "Vishay HE3 NFD",
-        "60 V acceptance",
+        "60 V MOSFET exclusion bridge",
+        "rejected historical evidence",
         "Vstress = Vclamp + Lloop * di/dt",
         "probe fixture parasitics",
         "source impedance",
@@ -10169,7 +10320,7 @@ def validate_tvs_overshoot_closeout_precheck() -> None:
         "IAUTN06S5N008",
         "BUK7S1R2-80M",
         "LFPAK88",
-        "80 V output MOSFET",
+        "80 V is selected for Q1 and Q101 through Q110",
         "TPS48110",
         "LM5164QDDATQ1",
         "LM5013-Q1",
@@ -10210,7 +10361,7 @@ def validate_tvs_overshoot_closeout_precheck() -> None:
     for supporting_artifact, tokens in {
         "PB-100-tvs-overshoot-escape-checklist.csv": ("TVS-FRZ-002", "TVS-FRZ-009"),
         "PB-100-tvs-overshoot-validation-precheck.csv": ("TVS-VAL-002", "TVS-VAL-010"),
-        "PB-100-tvs-load-dump-freeze-review.csv": ("60V MOSFET conditional margin", "Layout authorization boundary"),
+        "PB-100-tvs-load-dump-freeze-review.csv": ("60V MOSFET historical rejection", "Layout authorization boundary"),
     }.items():
         supporting_text = read_text(PB100_DIR / supporting_artifact)
         for token in tokens:
@@ -11296,8 +11447,8 @@ def validate_schematic_capture_work_queue() -> None:
         refs_covered_by_sheet.setdefault(sheet_file, set()).update(row_refs)
         if "Q1" in row_refs:
             row_text = " ".join(row.values())
-            if "INPUT_REVERSE_FET" not in row_text or "TOLL" not in row_text or "40 A" not in row_text:
-                fail("Q1 capture work must keep INPUT_REVERSE_FET, TOLL, and 40 A review explicit")
+            if not all(token in row_text for token in ("INPUT_REVERSE_FET", "BUK7S1R2-80M", "LFPAK88", "40 A")):
+                fail("Q1 capture work must keep selected 80 V LFPAK88 and 40 A review explicit")
         if work_item == "CAP-CAN1":
             row_text = " ".join(row.values()).lower()
             if "dnp/open" not in row_text or "future adr" not in row_text:

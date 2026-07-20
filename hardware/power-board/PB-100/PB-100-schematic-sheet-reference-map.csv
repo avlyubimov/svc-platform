@@ -58,4 +58,6 @@ can1-safety.kicad_sch,R_CAN1_OE,CAN1_TX_DISABLE,Planned,47k physical OE default-
 can1-safety.kicad_sch,R_CAN1_TX_BIAS,CAN1_TX_DISABLE,Planned,47k downstream CAN1_TXD_SAFE recessive-bias pull-up captured in the preliminary sheet
 can1-safety.kicad_sch,R_CAN1_STATUS_SER,CAN1_TX_DISABLE,Planned,1k physical OE-to-status series readback captured in the preliminary sheet
 can1-safety.kicad_sch,R_CAN1_STATUS_PULL,CAN1_TX_DISABLE,Planned,100k disabled-status default pull-up captured in the preliminary sheet
+can1-safety.kicad_sch,U_CAN1_PHY,CAN1_PHY,Planned,TJA1051TK/3/1J PB-owned transceiver captured with TXD only downstream of JP_CAN1 and independent RX
+can1-safety.kicad_sch,D_CAN1,CAN1_ESD,Planned,ESD2CANFD24QDBZRQ1 PB-owned CANH CANL harness protection captured
 cross-sheet-review,TP1..TPn,TEST_POINT,Review-defined,Exact test point locations are defined during schematic review

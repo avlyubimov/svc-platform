@@ -1,62 +1,110 @@
-# PB-100 MOSFET Voltage-Margin Review
+# PB-100 80 V MOSFET Voltage-Class Decision
 
-Status: Schematic-review input; not final
+Status: Accepted by Product Owner on 2026-07-20; voltage class frozen, PCB layout not authorized
 
-This note defines how PB-100 Rev.1 should close the remaining 60 V MOSFET
-margin risk behind the active `SM8S33AHM3/I` load-dump TVS branch. It does not
-freeze a MOSFET MPN, footprint, copper geometry, or PCB layout.
+## Decision
 
-## Inputs
+PB-100 Rev.1 uses `BUK7S1R2-80M` in LFPAK88 SOT1235 for input reverse
+MOSFET Q1 and output MOSFETs Q101 through Q110. All eleven schematic instances
+bind `PB100:LFPAK88_SOT1235_Nexperia` and use the data-sheet pin contract:
+pin 1 gate, pins 2 through 4 source, and mounting base `mb` drain.
 
-- Active input TVS branch: Vishay `SM8S33AHM3/I` HM3 DO-218AC.
-- Active clamp point used in PB-100 planning: 53.3 V at 124 A.
-- Existing 100 V paths pass this clamp with margin.
-- Existing 60 V MOSFET paths remain conditional because board parasitics can add
-  overshoot above the TVS data-sheet clamp point.
-- Direct 40 V smart-switch rails remain deferred by ADR-0011.
+The former 60 V `SIDR626LDP` and `IAUTN06S5N008` paths are rejected for the
+Rev.1 assembly baseline. Their footprint and calculation records remain as
+engineering history and are not approved substitutes. Returning to a 60 V
+path requires explicit Product Owner review plus reproducible overshoot proof.
 
-## Margin math
+## Why this component
 
-| Voltage class | Margin above 53.3 V clamp | Planning result |
+- 80 V VDS gives 26.7 V nominal headroom above the current 53.3 V TVS clamp
+  planning point, versus only 6.7 V for a 60 V MOSFET.
+- The manufacturer preliminary data sheet specifies 1.2 mOhm maximum RDS(on)
+  at 25 C, 2.4 mOhm at 125 C, a 175 C maximum junction temperature, and
+  AEC-Q101 qualification intent.
+- The existing reviewed LFPAK88 footprint has pin/pad identity evidence and
+  twelve segmented paste apertures over the mounting-base drain pad.
+- One voltage and package baseline across Q1 and Q101 through Q110 reduces
+  substitution and assembly ambiguity while preserving generic output roles.
+
+## Alternatives
+
+### Alternative A — `IAUTN08S5N012L`, 80 V TOLL
+
+Retained as an automotive 80 V production alternative. It is not drop-in:
+TOLL uses a different footprint, paste field, copper geometry, and thermal
+model. A controlled substitution must repeat pin-map, SOA, thermal, assembly,
+and sourcing review. It was not selected because one LFPAK88 baseline is
+already captured and reduces Rev.1 package variation.
+
+### Alternative B — `BUK7J2R4-80M`, 80 V LFPAK56E
+
+Retained as an 80 V automotive Nexperia-family alternative. It is not drop-in
+because LFPAK56E has a different package and higher conduction loss at the
+40 A board input. It was not selected because the smaller package gives less
+thermal margin for Q1 and OUT2.
+
+### Rejected 60 V paths
+
+`SIDR626LDP` and `IAUTN06S5N008` could be reconsidered only if clamp-loop
+overshoot were proven below their reviewed limit and the Product Owner approved
+a future baseline change. They are not Rev.1 alternatives. Product Owner chose
+80 V so Rev.1 does not depend on that narrow 6.7 V nominal headroom.
+
+## Operating and thermal margin
+
+At the current 53.3 V clamp planning point:
+
+| Voltage class | Nominal headroom | Result |
 |---|---:|---|
-| 60 V | 6.7 V | Conditional; requires measured or simulated overshoot evidence |
-| 80 V | 26.7 V | Preferred schematic-review escape path if SOA and assembly pass |
-| 100 V | 46.7 V | Pass-with-margin class for controller and buck paths |
+| 60 V | 6.7 V | Rejected for Rev.1 MOSFET assembly baseline |
+| 80 V | 26.7 V | Selected; actual clamp-loop stress still requires validation |
+| 100 V | 46.7 V | Retained for controller and buck paths |
 
-The 60 V class has only about 11 percent headroom before parasitic overshoot.
-The 80 V class has about 33 percent headroom before parasitic overshoot. Rev.1
-should not close schematic freeze on a 60 V MOSFET path unless the transient
-overshoot review explicitly accepts that margin.
+Using 2.4 mOhm at 125 C as a conservative conduction value gives 3.84 W at
+40 A for Q1, 0.78 W at 18 A for OUT2, 0.35 W at 12 A, 0.15 W at 8 A, and
+0.04 W at 4 A. These values exclude switching, inrush, avalanche, copper and
+connector loss. They close only the voltage-class choice, not the SOA or
+thermal-layout gates.
 
-## Rev.1 Close Direction
+The design target is operation below the 175 C absolute maximum with junction
+margin demonstrated from the final copper, ambient, airflow, pulse duty cycle,
+and assembly voiding evidence. No lifetime claim is accepted yet; automotive
+service-life suitability remains conditional on that thermal mission-profile
+review and qualified production sourcing.
 
-- Treat `BUK7S1R2-80M` or equivalent 80 V LFPAK88-class MOSFET as the preferred
-  voltage-margin review path for the input reverse MOSFET if the TOLL 60 V path
-  cannot prove overshoot margin.
-- Treat an 80 V output MOSFET class as the preferred review escape for OUT2 and
-  other output MOSFETs if `SIDR626LDP` 60 V SOA plus overshoot evidence does not
-  close.
-- Keep `SIDR626LDP` available for output schematic planning only when SOA,
-  thermal, factory assembly, and overshoot evidence all close together.
-- Keep `IAUTN06S5N008ATMA1` available for input reverse protection only when
-  its TOLL package assembly and 60 V overshoot evidence both close.
-- Do not introduce a lower-clamp TVS branch or direct 40 V smart-switch rail
-  without a future ADR or explicit release review.
+## Availability and production
 
-## Freeze Impact
+- Automotive qualification: the selected data sheet identifies AEC-Q101;
+  exact production qualification status must be reconfirmed because the
+  reviewed February 2024 data sheet is preliminary.
+- LCSC/JLCPCB: no locked live stock code is claimed. Exact reel availability
+  and extended/consigned assembly handling remain open.
+- PCBWay/JLCPCB compatibility: LFPAK88 paste segmentation is captured, but
+  factory confirmation of bottom-termination handling, solder void criteria,
+  AOI/X-ray plan, and thermal-pad process is required before order.
+- Expected lifetime: automotive project lifetime target; not yet substantiated
+  until production-status, mission-profile, junction-temperature, and source
+  continuity evidence close.
 
-- `PBREL-004` and `PBREL-005` cannot close until the selected output MOSFET
-  voltage class, SOA, thermal path, and assembly evidence are tied to final
-  schematic values.
-- `PBREL-006` cannot close until the input reverse MOSFET voltage class,
-  package, gate network, and 40 A thermal path close.
-- `PBREL-007` cannot close until either 60 V overshoot evidence is accepted or
-  the affected MOSFET paths move to an 80 V or higher voltage class.
+## Known risks and remaining gates
+
+- The preferred data sheet is preliminary; production status or orderability
+  may force a controlled migration to one of the 80 V alternatives.
+- Q1 40 A copper and thermal design, OUT2 startup SOA, per-channel inductive
+  energy, and actual TVS-plus-loop overshoot remain open.
+- `Vstress = Vclamp + Lloop * di/dt` must be validated with reproducible model
+  or bench evidence. The 80 V selection increases margin but does not replace
+  transient verification.
+- No PCB placement, high-current copper, Gerber, drill, or pick-place output is
+  authorized by this decision alone.
 
 ## Evidence
 
+- Nexperia BUK7S1R2-80M data sheet:
+  <https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf>
+- Infineon IAUTN08S5N012L product page:
+  <https://www.infineon.com/part/IAUTN08S5N012L>
 - TVS margin trace: `PB-100-tvs-load-dump-margin-trace.csv`.
-- TVS freeze review: `PB-100-tvs-load-dump-freeze-review.csv`.
-- Input reverse package trace: `PB-100-input-reverse-package-trace.csv`.
-- OUT2 SOA envelope: `PB-100-out2-soa.md`.
-- Factory sourcing recheck: `production/bom/pb100_assembly_sourcing_recheck.csv`.
+- Thermal estimates: `PB-100-thermal-estimates.csv`.
+- Factory sourcing recheck:
+  `production/bom/pb100_assembly_sourcing_recheck.csv`.

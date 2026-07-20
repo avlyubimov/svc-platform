@@ -11,8 +11,11 @@ packages, or PCBA orders.
 ## Freeze Boundary
 
 The 2026-07-20 closure was retracted after a netlist and footprint audit found
-unclosed implementation evidence: conditional 60 V stress margins, incomplete
-FX18 MF/TH mechanics, and preliminary symbols with empty footprint bindings.
+unclosed implementation evidence. The Product Owner has since selected the
+80 V MOSFET baseline and the FX18 footprints now include the assigned GND
+MF/TH lands. FX18 MF/TH mechanics at the footprint level are captured, but
+actual overshoot, SOA, thermal, sourcing, paired-stack
+mechanics, and preliminary symbols with empty footprint bindings remain open.
 The corrected CAN1 topology is necessary evidence but does not close those
 remaining gates.
 
@@ -34,16 +37,17 @@ remaining gates.
   readback remains physical, and future TX requires ADR plus hardware action.
 - Board budget: 50 A near-battery main fuse, 40 A default total current budget,
   0.5mΩ total-current shunt, and firmware load shedding remain accepted.
-- Interface: `JPB1` 100-pin PB/LB contract remains closed and synchronized with
-  LB-100 STM32H563VITx LQFP100 binding evidence.
+- Interface: `JPB1` 100-pin PB/LB contract and four GND MF circuits are
+  synchronized with LB-100 STM32H563VITx LQFP100 binding evidence; paired
+  20 mm stack fit, retention and vibration evidence remain Conditional.
 - Output stage: TPS48110AQDGXRQ1-class external high-side controller remains the
   baseline for all OUT1..OUT10 channels; low-current channels keep ADR-0011 no
   direct 40 V smart-switch rail.
 - Voltage margin: SM8S33AHM3/I HM3 DO-218AC TVS remains active, obsolete/NFD
-  TVS sources remain excluded, and 80 V MOSFET escape paths remain retained for
-  affected MOSFET voltage margin.
+  TVS sources remain excluded, and BUK7S1R2-80M 80 V LFPAK88 is selected for
+  Q1 and Q101-Q110. Actual clamp-loop overshoot remains Conditional.
 - Input reverse protection: LM74700QDBVRQ1-class ideal-diode controller with
-  selected Q1 package strategy and BUK7S1R2-80M 80 V alternate retained.
+  selected Q1 BUK7S1R2-80M 80 V LFPAK88 package strategy.
 - Logic power: LM5164QDDATQ1-class 100 V 1 A buck remains baseline with
   LM5013-Q1-class 100 V fallback; `PB_5V_OUT` remains limited to LB-100 and
   PB-side low-power circuitry, not accessory loads.

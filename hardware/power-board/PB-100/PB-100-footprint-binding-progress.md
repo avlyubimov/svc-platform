@@ -11,7 +11,11 @@ fabrication packages, panel outputs, or PCBA orders.
 ## Closed In This Increment
 
 - TPS48110 high-side controller: `PB100:VSSOP-20_19P-L5.0-W3.0-P0.50-LS5.0-BL_PE16`.
-- SIDR626LDP default output MOSFET: `PB100:POWERPAK-SO-8_L6.1-W5.1-P1.27-BL-EP`.
+- BUK7S1R2-80M selected 80 V output and input-reverse MOSFET:
+  `PB100:LFPAK88_SOT1235_Nexperia`.
+- SIDR626LDP historical 60 V package evidence:
+  `PB100:POWERPAK-SO-8_L6.1-W5.1-P1.27-BL-EP`; it is not a Rev.1 assembly
+  substitute.
 - LM74700 reverse-protection controller: `PB100:SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL`.
 - LM5164 logic buck: `PB100:SOIC-8_L4.9-W3.9-P1.27-LS6.0-BL-EP2.9`.
 - INA228-class input-current monitor: `PB100:VSSOP-10_L3.0-W3.0-P0.50-LS4.9-BL`.
@@ -22,8 +26,8 @@ fabrication packages, panel outputs, or PCBA orders.
 - Vishay SM8S input TVS: `PB100:DO-218AC_Vishay_SM8S`.
 - Bourns CSS4J-4026 total input current shunt: `PB100:CSS4J-4026_Bourns`.
 - TMP112-Q1 optional DNP digital temperature sensor: `PB100:SOT-563-6_DRL_TI`.
-- Infineon PG-HSOF-8-1 TOLL input reverse MOSFET: `PB100:PG-HSOF-8-1_TOLL_Infineon`.
-- Nexperia LFPAK88 SOT1235 alternate and OUT2 escape MOSFET: `PB100:LFPAK88_SOT1235_Nexperia`.
+- Infineon PG-HSOF-8-1 TOLL historical 60 V footprint:
+  `PB100:PG-HSOF-8-1_TOLL_Infineon`; retained as evidence only.
 
 ## FX18 Evidence Boundary
 

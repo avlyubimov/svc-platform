@@ -1,62 +1,70 @@
 # PB-100 Input Reverse-Protection MOSFET Strategy
 
-Status: Schematic-planning input
-
-This document resolves the PB-FRZ-003 planning blocker by selecting a thermal
-strategy for the LM74700-class input ideal-diode MOSFET. It does not freeze the
-final MPN.
+Status: 80 V voltage class accepted by Product Owner; SOA, thermal, sourcing,
+and PCB layout remain open
 
 ## Problem
 
-The initial thermal table used the same 2.1 mOhm MOSFET class as the output
-channels for the 40 A board input path. At 40 A with a conservative 2.0
-temperature multiplier, that produces about 6.72 W in a single package:
-
-```text
-P = I^2 * Rds * multiplier
-P = 40^2 * 0.0021 * 2.0 = 6.72 W
-```
-
-That is too high for the default input reverse-protection assumption.
+The input ideal-diode path must carry the 40 A board budget while surviving the
+active load-dump clamp plus loop overshoot. A single 2.1 mOhm PowerPAK device
+would dissipate about 6.72 W at 40 A with a 2.0 hot-resistance multiplier and
+is rejected. The former 60 V TOLL candidate has only 6.7 V nominal headroom
+above the 53.3 V TVS planning clamp.
 
 ## Decision
 
-Use a dedicated low-Rds input MOSFET strategy for Rev.1 schematic planning:
+Use one `BUK7S1R2-80M` 80 V LFPAK88 MOSFET for Q1. The KiCad symbol and
+footprint use pin 1 gate, pins 2 through 4 source, and mounting base `mb` drain.
 
-| Strategy | Rds assumption | 40 A estimate | Status |
+| Strategy | Hot RDS(on) assumption | 40 A estimate | Status |
 |---|---:|---:|---|
-| IAUTN06S5N008ATMA1-class 60 V TOLL MOSFET | 0.76 mOhm | 2.43 W | Preferred pending assembly-source check |
-| BUK7S1R2-80M-class 80 V LFPAK88 MOSFET | 1.2 mOhm | 3.84 W | Higher-voltage alternate |
-| Dual SIDR626LDP-class PowerPAK MOSFETs in parallel | 2.1 mOhm each | 1.68 W per FET | Factory-assembly fallback if TOLL/LFPAK88 sourcing is weak |
+| `BUK7S1R2-80M` 80 V LFPAK88 | 2.4 mOhm at 125 C | 3.84 W | Selected |
+| `IAUTN08S5N012L` 80 V TOLL | Candidate-specific review | TBD | Non-drop-in alternative A |
+| `BUK7J2R4-80M` 80 V LFPAK56E | Higher resistance than selected part | 7.68 W planning estimate | Non-drop-in alternative B |
 
-The Rev.1 schematic must not use a single 2.1 mOhm PowerPAK-class MOSFET for the
-40 A input reverse-protection path unless the board current target is lowered by
-ADR or a later thermal model proves acceptable margin.
+`IAUTN06S5N008` 60 V TOLL and dual `SIDR626LDP` 60 V PowerPAK calculations
+remain historical evidence. They are not approved Rev.1 assembly substitutions.
 
-## Source snapshot
+## Operating and lifetime evidence
 
-- Infineon IAUTN06S5N008: 60 V automotive MOSFET, TOLL package, 0.76 mOhm max
-  Rds(on), active/preferred status.
-- Nexperia BUK7S1R2-80M: 80 V automotive LFPAK88 MOSFET, 1.2 mOhm class,
-  AEC-Q101-qualified data sheet.
-- SIDR626LDP-T1-RE3 remains useful as an output MOSFET and as a parallel input
-  fallback because it already has an LCSC candidate entry.
+- The selected 80 V class has 26.7 V nominal headroom above the 53.3 V clamp
+  planning point. Actual `Vclamp + Lloop * di/dt` stress still requires
+  reproducible model or bench validation.
+- The selected data sheet gives 175 C maximum junction temperature. Final
+  allowable junction rise must be derived from ambient, copper, transient duty,
+  SOA, solder voiding, and enclosure conditions.
+- Expected lifetime remains the automotive project target, but is not claimed
+  closed until the mission profile, junction margin, qualification status, and
+  production-source continuity are recorded.
 
-## Schematic requirements
+## Production evidence and risks
 
-- Use an input MOSFET footprint strategy that can support either the preferred
-  low-Rds device or a documented alternate.
-- Keep source/drain copper sized for at least the 40 A board-level current
-  budget before thermal derating.
-- Place input current measurement so it measures the board input current used by
-  firmware current-budget enforcement.
-- Validate transient voltage margin against the selected TVS clamp.
-- Recheck JLCPCB/PCBWay assembly support for TOLL, LFPAK88, or fallback
-  PowerPAK before schematic freeze.
+- The reviewed BUK7S1R2-80M data sheet is preliminary. Exact AEC-Q101
+  production qualification and orderability must be reconfirmed.
+- No locked LCSC code or JLCPCB stock quantity is claimed.
+- JLCPCB/PCBWay must confirm LFPAK88 bottom-termination assembly, segmented
+  paste, solder-void acceptance, and inspection process.
+- Both alternatives use different footprints and require controlled pin-map,
+  SOA, thermal, source, and factory review before substitution.
+
+## Schematic and release requirements
+
+- Q1 remains `BUK7S1R2-80M` with
+  `PB100:LFPAK88_SOT1235_Nexperia` in the Rev.1 schematic and BOM.
+- Source/drain copper must later be sized and validated for at least the 40 A
+  board budget after thermal derating.
+- Input current measurement remains in the protected path used by firmware
+  current-budget enforcement.
+- Close gate-clamp behavior, 40 A SOA, fuse energy, thermal margin, actual TVS
+  overshoot, production status, and factory handling before layout.
+- Do not create placement, high-current copper, Gerber, drill, or pick-place
+  output from this voltage-class decision alone.
 
 ## Evidence links
 
-- Infineon IAUTN06S5N008 product page: https://www.infineon.com/part/IAUTN06S5N008
-- Infineon IAUTN06S5N008 data sheet: https://www.infineon.com/dgdl/Infineon-IAUTN06S5N008_Datasheet-DataSheet-v02_00-EN.pdf?fileId=8ac78c8c85ecb3470186314156af0dfa
-- Nexperia BUK7S1R2-80M data sheet: https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf
-- Nexperia power-switch application note: https://www.nexperia.com/applications/interactive-app-notes/IAN50020_Power_Switch_MOSFETs
+- Nexperia BUK7S1R2-80M data sheet:
+  <https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf>
+- Infineon IAUTN08S5N012L product page:
+  <https://www.infineon.com/part/IAUTN08S5N012L>
+- Voltage-class decision: `PB-100-mosfet-voltage-margin-review.md`.
+- Thermal calculation: `PB-100-thermal-estimates.csv`.

@@ -3176,3 +3176,45 @@ ADR-0015 remains `Proposed`. No transceiver was moved or instantiated, no
 accepted architecture was changed, and no DNP capability was removed. Product
 Owner approval is required before BOM ownership, rail budgets, protection,
 termination, footprint binding, or value-bearing CAN1 capture is changed.
+
+## 2026-07-20 — ADR-0015 accepted and FX18 MF circuits assigned
+
+Decision: Product Owner accepted ADR-0015 candidate A. PB-100 owns the CAN1
+transceiver, ESD/TVS protection, optional common-mode choke and termination,
+CANH/CANL, and vehicle-harness physical boundary. LB-100 retains STM32 FDCAN,
+protocol, and read-only firmware policy. The PB schematic now implements
+`CAN1_TX_ROUTE -> U_CAN1 -> CAN1_TX_GATE_OUT -> JP_CAN1 (DNP/open) ->
+CAN1_TXD_SAFE -> U_CAN1_PHY TXD`; `U_CAN1_PHY RXD` connects only to
+`CAN1_RX_ROUTE`. A 47 kOhm silent-mode pull-up plus DNP `JP_CAN1_NORMAL` adds a
+second hardware transmit lock. The XML-netlist validator checks the transceiver,
+supplies, ESD, DNP termination, silent-mode lock, TX chain and RX route by
+component pin rather than text markers.
+
+Decision: Product Owner assigned all four FX18 MF circuits to `GND` on PB-100
+and LB-100. Each footprint now contains exactly six official 1.4 mm by 2.4 mm
+plated oval lands with 1.0 mm by 2.0 mm slots. Each MF A pair shares one logical
+pad identifier; both MF B contacts use separate identifiers. The four IDs are
+unique, plug/socket X geometry is mirrored, pin-1 ends are preserved, and no MF
+contact may connect to AGND, PB_5V_OUT, LB_3V3_IO or VBAT. JPB1 on PB-100 now
+binds the reviewed FX18 footprint and its four MF logical pins export on GND.
+
+These decisions close only the ownership and captured-topology contradictions.
+PCB layout remains blocked by the remaining connector/harness, mechanical,
+thermal, SOA, assembly-source and full schematic-freeze gates.
+
+## 2026-07-20 — Product Owner selected the 80 V MOSFET baseline
+
+Decision: select Nexperia `BUK7S1R2-80M` 80 V LFPAK88 for PB-100 Q1 and
+Q101-Q110. The selected KiCad symbols, footprints, schematic instances,
+factory BOM, sourcing trace, power budget and thermal planning now name the
+same part. `IAUTN08S5N012L` 80 V TOLL and `BUK7J2R4-80M` 80 V LFPAK56E are
+retained as controlled non-drop-in alternatives. `IAUTN06S5N008` and
+`SIDR626LDP` 60 V paths remain historical evidence and are not approved Rev.1
+assembly substitutions.
+
+This closes the contradictory 60/80 V selection only. It does not close the
+selected part's actual clamp-loop overshoot, SOA, fuse-energy, copper thermal,
+enclosure thermal, live sourcing or factory-assembly evidence. PBREL-004,
+PBREL-006, PBREL-007 and PBREL-011 therefore remain `Conditional`, and their
+engineering-closeout section statuses are synchronized to the release-blocker
+register. No PCB layout or manufacturing artifact is authorized.

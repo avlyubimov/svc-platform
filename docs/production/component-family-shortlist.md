@@ -26,13 +26,13 @@ order.
 | Expansion CAN transceiver | TI TCAN1042-Q1 | NXP TJA1051/TJA1057 | SOIC-8 or VSON/HVSON | CAN2 may transmit for bench or accessory use |
 | High-side output controller | TI TPS4811-Q1 | TI TPS1211-Q1; TI TPS4810-Q1 | VSSOP/HTSSOP class | Rev.1 baseline for all PB-100 outputs with external N-MOSFETs |
 | Smart high-side switch | TI TPS2HB16-Q1 | TI TPS2HB35-Q1; TI TPS1H100-Q1 | HTSSOP class | Deferred low-current alternate after ADR-0011; requires lower-clamp strategy |
-| Output MOSFET | Infineon OptiMOS automotive 40-60 V | Vishay SQJQ automotive; onsemi F085 automotive | TDSON/PowerPAK/TOLL/LFPAK | Must pass SOA and thermal review per channel; OUT2 keeps larger/parallel escape path |
+| Output MOSFET | Nexperia BUK7S1R2-80M 80 V LFPAK88 selected | Infineon IAUTN08S5N012L 80 V TOLL; Nexperia BUK7J2R4-80M 80 V LFPAK56E | LFPAK88 selected; alternatives are non-drop-in | Selected for Q101-Q110; per-channel SOA thermal inductive-clamp sourcing and assembly evidence remain gates |
 | Current monitor | TPS48110 IMON for outputs; TI INA228/INA229 or INA226 for input | External analog monitor; firmware-calibrated ADC path | VSSOP/SOIC class | Per-output telemetry uses controller IMON; total input current uses dedicated shunt monitor |
 | Total current shunt | Bourns CSS4J-4026R-L500F-class 0.5 mΩ four-terminal shunt | Bourns CSS4J-4026R-1L00F-class 1.0 mΩ; Isabellenhuette BVN/BAS or equivalent AEC-Q200 four-terminal family | CSS4J-4026 or reviewed power shunt | 0.5 mΩ gives 30 mV at 60 A and 1.8 W; compatible with INA228 ±40.96 mV range candidate |
 | Temperature sensor | TDK NTCGS103JF103FT8-class 10 kΩ AEC-Q200 NTC | Vishay NTCS0402E3 10 kΩ AEC-Q200 150 °C class; Murata NCU18XH103D6SRB-class 10 kΩ 0603 AEC-Q200 150 °C; TI TMP117/TMP112-class digital sensor optional | 0402 preferred for NTC; SOT/DFN only for optional digital sensor | PB-100 uses PCB reference plus two power-zone thermal points; divider values and calibration remain schematic-freeze items |
 | Logic buck regulator | TI LM5164-Q1 | TI LM5013-Q1; TI TPS54360B-Q1/TPS54360-Q1 | SOIC/HSOIC PowerPAD | LM5164-Q1 for 1 A 100 V rail; LM5013-Q1 preferred over 60 V family if more current is needed |
 | Input reverse protection | TI LM74700-Q1/LM74502-Q1 class | ADI/LTC ideal diode controller families | MSOP/SOIC class | Controller family only; MOSFET is tracked separately |
-| Input reverse MOSFET | Infineon OptiMOS 5 60 V TOLL low-Rds class | Nexperia LFPAK88 80 V; parallel Vishay SIDR626 PowerPAK | TOLL/LFPAK88/PowerPAK | Single 2.1 mOhm MOSFET is rejected for 40 A input thermal |
+| Input reverse MOSFET | Nexperia BUK7S1R2-80M 80 V LFPAK88 selected | Infineon IAUTN08S5N012L 80 V TOLL; Nexperia BUK7J2R4-80M 80 V LFPAK56E | LFPAK88 selected; alternatives are non-drop-in | 40 A SOA copper thermal production status and assembly handling remain gates |
 | Input TVS/load dump | Vishay SM8S33AHM3/I active HM3 TVS | Vishay SM8S33AHE3_A/I NFD stock-only; Littelfuse SLD8S33A; Diodes DM8W33AQ-13; Bourns SM8S33A-Q class | DO-218AC/SMC as needed | MCC SM8S33A source is EOL and HE3 is NFD evidence only; final clamp voltage depends on MOSFET and buck ratings |
 | PB-100/LB-100 board-to-board connector | Hirose FX18-100P-0.8SV10 plus FX18-100S-0.8SV20 candidate pair | Samtec Q Strip/high-density mezzanine class; Molex SlimStack 100-position class | 100-position 0.8 mm FX18 20 mm stack candidate | Candidate pair supports 100-position JPB1 planning; stack height vibration retention footprint and PCBA handling remain schematic-freeze items |
 | FRAM | Fujitsu/Infineon MB85 I2C/SPI FRAM | Cypress/Infineon Excelon FRAM | SOIC/TSSOP/DFN | Configuration and black-box storage |
@@ -47,12 +47,13 @@ Detailed candidate MPNs for PB-100 schematic planning are tracked in
 
 The current strategy is:
 
-- All Rev.1 outputs: TPS48110AQDGXRQ1-class high-side controller plus
-  external 60 V N-MOSFET.
+- All Rev.1 outputs: TPS48110AQDGXRQ1-class high-side controller plus selected
+  BUK7S1R2-80M-class 80 V LFPAK88 N-MOSFET.
 - Low-current integrated smart switches: deferred alternatives only.
 - Input reverse protection: LM74700QDBVRQ1-class ideal-diode controller.
-- Input reverse MOSFET: IAUTN06S5N008ATMA1-class low-Rds TOLL device, with
-  BUK7S1R2-80M-class LFPAK88 and dual SIDR626LDP fallback alternatives.
+- Input reverse and output MOSFET: BUK7S1R2-80M-class 80 V LFPAK88 selected,
+  with IAUTN08S5N012L 80 V TOLL and BUK7J2R4-80M 80 V LFPAK56E retained as
+  non-drop-in alternatives.
 - Input transient clamp: Vishay SM8S33AHM3/I active HM3 load-dump TVS or
   reviewed equivalent. MCC SM8S33A is treated as EOL evidence only, and Vishay
   HE3 is treated as NFD stock-only evidence; neither may be locked.
@@ -78,10 +79,13 @@ The current strategy is:
 - TI TPS4811-Q1 is active as an automotive high-side driver with protection and diagnostics: https://www.ti.com/product/TPS4811-Q1
 - TI TPS48110AQDGXRQ1 was listed at LCSC on the snapshot date: https://www.lcsc.com/product-image/C17556513.html
 - TI TPS2HB35BQPWPRQ1 was listed at LCSC on the snapshot date: https://www.lcsc.com/product-detail/power-distribution-switches_texas-instruments-tps2hb35bqpwprq1_C3230080.html
-- Vishay SIDR626LDP-T1-RE3 was listed at LCSC on the snapshot date: https://www.lcsc.com/product-detail/C3279576.html
-- Vishay SIDR626LDP data sheet was checked for OUT2 SOA planning: https://www.vishay.com/docs/77277/sidr626ldp.pdf
+- Vishay SIDR626LDP-T1-RE3 sourcing and data-sheet evidence is retained only as
+  rejected 60 V history, not as a Rev.1 assembly substitute:
+  https://www.lcsc.com/product-detail/C3279576.html and
+  https://www.vishay.com/docs/77277/sidr626ldp.pdf
 - TI LM74700QDBVRQ1 was listed at LCSC on the snapshot date: https://www.lcsc.com/product-detail/C2941042.html
-- Infineon IAUTN06S5N008 is active/preferred as a 60 V 0.76 mOhm automotive TOLL MOSFET: https://www.infineon.com/part/IAUTN06S5N008
+- Infineon IAUTN06S5N008 is retained only as rejected 60 V TOLL history:
+  https://www.infineon.com/part/IAUTN06S5N008
 - Nexperia BUK7S1R2-80M data sheet lists an 80 V 1.2 mOhm automotive LFPAK88 MOSFET: https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf
 - MCC SM8S33A reference now shows EOL/obsolete status and is retained only as a
   cautionary sourcing note: https://www.mccsemi.com/products/esd-protection-and-power-tvs/tvs/SM8S33A

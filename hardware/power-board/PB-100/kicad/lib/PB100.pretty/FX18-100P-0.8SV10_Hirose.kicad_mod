@@ -3,7 +3,7 @@
 	(generator "codex")
 	(generator_version "2026-07-20")
 	(layer "F.Cu")
-	(descr "Hirose FX18-100P-0.8SV10_Hirose; 100 signal lands use the official 0.8 mm pitch, 4.9 mm row-center spacing, and 0.5 x 2.1 mm size. Six TH lands for four MF electrical positions remain blocked pending circuit ownership and paired-footprint review.")
+	(descr "Hirose FX18-100P-0.8SV10_Hirose; official 100 signal lands plus six plated TH lands for four GND-connected MF circuits. MF A split poles share one pad identifier per end.")
 	(tags "Hirose FX18 100 0.8mm mezzanine PB LB JPB1 source-derived")
 	(property "Reference" "REF**"
 		(at 0.000 -7.300 0)
@@ -39,7 +39,7 @@
 			)
 		)
 	)
-	(property "Description" "Hirose FX18-100P-0.8SV10_Hirose 100-position 0.8 mm FX18 mezzanine connector; official signal land geometry captured; six TH lands for four MF electrical positions remain gated before layout."
+	(property "Description" "Hirose FX18-100P-0.8SV10_Hirose 100-position 0.8 mm FX18 mezzanine connector with official signal and MF plated-slot land geometry."
 		(at 0.000 0.000 0)
 		(layer "F.Fab")
 		(hide yes)
@@ -87,7 +87,7 @@
 			)
 		)
 	)
-	(attr smd)
+	(attr through_hole)
 	(fp_line
 		(start -25.950 -3.900)
 		(end 25.950 -3.900)
@@ -219,7 +219,7 @@
 			)
 		)
 	)
-	(fp_text user "MF A/B: 6 TH / 4 circuits OPEN"
+	(fp_text user "MF A/B: 6 TH / 4 GND circuits"
 		(at 0.000 -5.700 0)
 		(layer "F.Fab")
 		(uuid "9b451fae-1b17-4af3-8d30-6a604aea0c4d")
@@ -929,6 +929,54 @@
 		(layers "F.Cu" "F.Paste" "F.Mask")
 		(roundrect_rratio 0.200)
 		(uuid "00db0eeb-7e66-4507-9fd3-a06d29193a2f")
+	)
+	(pad "MF_A_PIN1_51_END" thru_hole oval
+		(at -24.325 -2.100)
+		(size 1.400 2.400)
+		(drill oval 1.000 2.000)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "6e5502e8-206a-4fea-b158-03f90a7b321d")
+	)
+	(pad "MF_A_PIN1_51_END" thru_hole oval
+		(at -24.325 2.100)
+		(size 1.400 2.400)
+		(drill oval 1.000 2.000)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "abf9ab8c-8d3e-4326-9d40-099f48d30a21")
+	)
+	(pad "MF_B_PIN1_51_END" thru_hole oval
+		(at -21.200 -2.100)
+		(size 1.400 2.400)
+		(drill oval 1.000 2.000)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "d2062908-2cea-4685-8989-481df5600867")
+	)
+	(pad "MF_A_PIN50_100_END" thru_hole oval
+		(at 24.325 -2.100)
+		(size 1.400 2.400)
+		(drill oval 1.000 2.000)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "cfd9c76d-44ca-4f6c-8fe2-e65ba236982d")
+	)
+	(pad "MF_A_PIN50_100_END" thru_hole oval
+		(at 24.325 2.100)
+		(size 1.400 2.400)
+		(drill oval 1.000 2.000)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "c64452a0-e094-421a-a3d3-802bba13755c")
+	)
+	(pad "MF_B_PIN50_100_END" thru_hole oval
+		(at 21.200 2.100)
+		(size 1.400 2.400)
+		(drill oval 1.000 2.000)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "b3cb01ad-f0dd-4731-a620-da362049474c")
 	)
 	(fp_circle
 		(center -19.600 4.000)
