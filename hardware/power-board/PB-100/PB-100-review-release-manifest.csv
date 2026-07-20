@@ -118,5 +118,6 @@ hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv,Production,Facto
 hardware/power-board/PB-100/PB-100-factory-assembly-freeze-checklist.csv,Production,Factory assembly freeze checklist,Required,validate_factory_assembly_freeze_checklist,Conditional
 hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv,Production,Factory assembly sourcing precheck,Required,validate_factory_assembly_sourcing_precheck,Conditional
 hardware/power-board/PB-100/PB-100-factory-assembly-closeout-precheck.csv,Production,Factory assembly closeout precheck,Required,validate_factory_assembly_closeout_precheck,Conditional
+hardware/power-board/PB-100/PB-100-factory-assembly-platform-evidence.csv,Production,Factory PCBWay assembly-platform evidence,Required,Document reviewed,Conditional
 production/bom/pb100_assembly_sourcing_recheck.csv,Production,Assembly sourcing recheck,Required,validate_assembly_sourcing_recheck,Conditional
 production/bom/pb100_sourcing_evidence_snapshot.csv,Production,Sourcing evidence snapshot,Required,validate_sourcing_evidence_snapshot,Conditional

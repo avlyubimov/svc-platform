@@ -2636,3 +2636,18 @@ fuse-holder footprints, enclosure CAD release, manufacturing ZIPs, fabrication
 packages, or PCBA order packages. Final lock still needs supplier stock, exact
 quantities, boots/backshells, insertion/removal tools, wire-gauge fit, enclosure
 entry, heat/service access, vibration inspection, and garage signoff.
+
+## 2026-07-20 — PB-100 PCBWay process evidence separated from MPN lock
+
+Decision: PB-100 factory assembly readiness now has
+`hardware/power-board/PB-100/PB-100-factory-assembly-platform-evidence.csv`.
+The evidence records PCBWay generic SMT assembly limits, package-input modes,
+component sourcing modes, and the distinction between generic process capability
+and PB-100 MPN/package-specific approval. PBREL-011 remains `Conditional`.
+
+Reason: PCBWay generic process evidence can close part of the assembly-platform
+source gap, but it does not prove exact PB-100 orderable suffix availability,
+PowerPAK/TOLL/LFPAK88/DO-218AC/CSS4J/FX18 handling, DNP/open inspection, or
+first-article rework limits. Keeping that evidence separate prevents a generic
+assembly capability page from being treated as BOM lock, pick-place release,
+manufacturing ZIP, fabrication package, or PCBA order approval.
