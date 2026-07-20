@@ -2898,3 +2898,17 @@ footprints or a PCB. The open FB LED items remain intentionally open because
 generic LED categories are not enough evidence for package binding; exact MPN,
 polarity, optical/mechanical fit, current-limit values, and JLCPCB/PCBWay
 assembly evidence must close first.
+
+## 2026-07-20 — FB-100 LED package sources identified
+
+Decision: FB-100 now has package sources identified for every open on-board
+footprint item. Status RGB uses Everlight 19-237/R6GHBHC-A01/2T class with
+LCSC C60105 and JLCPCB RGB LED evidence. Channel indicators use KT-0805Y
+preferred or KT-0603R alternate class with JLCPCB LED indication evidence.
+FB-100 package-source coverage is now 12 of 12.
+
+Reason: Generic LED categories were insufficient for footprint-source evidence.
+Exact LED package source paths remove the last FB-100 package-source gap while
+leaving drive polarity, current-limit values, brightness, light-pipe alignment,
+optical orientation, and actual footprint binding blocked until reviewed layout
+inputs close.
