@@ -25,10 +25,12 @@ packages, panel outputs, or PCBA orders.
 
 The JPB1 footprint is source-derived from the official Hirose FX18 catalog
 recommended land pattern and the official 2026 2D drawings for
-`FX18-100S-0.8SV20` and `FX18-100P-0.8SV10`. It closes LB-100 footprint
-binding only. The MF/TH mechanical pads, mating datum, 20 mm stack spacing,
-pin-1 orientation across PB/LB, vibration retention, and assembly handling
-remain in the mechanical envelope gate before board import.
+`FX18-100S-0.8SV20` and `FX18-100P-0.8SV10`. Both footprints capture six
+official plated lands with four GND MF circuits, unique logical identifiers,
+mirrored X geometry, and preserved pin-1 orientation. Footprint binding is
+closed; physical mating datum, 20 mm stack tolerance, vibration retention,
+assembly-fixture, and handling evidence remain in the mechanical envelope gate
+before board import.
 
 ## Still Open
 

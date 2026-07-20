@@ -9,6 +9,8 @@ Thumbs.db
 # Build
 build/
 dist/
+__pycache__/
+*.py[cod]
 *.elf
 *.bin
 *.hex

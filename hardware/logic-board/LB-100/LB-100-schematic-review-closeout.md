@@ -4,9 +4,10 @@ Status: Retracted; schematic freeze is Open
 Review date: 2026-07-20
 
 This former closeout no longer freezes the LB-100 Rev.1 schematic inputs. The
-current KiCad sheet has no component symbols, the JPB1 FX18 footprint lacks
-approved MF circuits/TH features, and proposed ADR-0015 leaves the CAN1
-physical-layer board owner unresolved. It
+current KiCad sheet has no component symbols. Both FX18 footprints contain
+six official plated lands with four GND MF circuits, but physical paired-stack
+validation remains open. ADR-0015 Accepted assigns the CAN1 physical layer to
+PB-100 while LB-100 retains STM32 FDCAN and read-only firmware policy. It
 does not create or approve KiCad PCB layout, Gerbers, drills, pick-place files,
 BOM/CPL order packages, manufacturing ZIP files, fabrication packages, or PCBA
 orders.
@@ -19,9 +20,10 @@ orders.
   `LB-100-stm32h563-pin-binding-precheck.csv`.
 - Power: `PB_5V_OUT` 500 mA sustained allocation, calculated LB-100 sustained
   load 219.2 mA, service peak 415.2 mA, and no-back-power USB boundary.
-- CAN safety: CAN1 policy remains read-only by default, but transceiver/gate
-  board ownership is not closed and no physical CAN1 chain may be promoted;
-  CAN2 remains the transmit-capable expansion bus.
+- CAN safety: ADR-0015 Accepted keeps the CAN1 transceiver, gate, protection,
+  termination, CANH/CANL, and vehicle harness on PB-100; LB-100 owns only
+  STM32 FDCAN, protocol, and read-only firmware policy. CAN2 remains the
+  transmit-capable expansion bus.
 - Services: USB service, BLE, microSD, RTC, FRAM, IMU, lux, LIN/RS485/UART DNP
   reserve, SWD, BOOT0, reset, and service-button resources are captured.
 - Assembly: factory-owned MCU, regulators, transceivers, BLE, storage, sensors,

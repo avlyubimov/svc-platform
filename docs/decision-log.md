@@ -3234,3 +3234,24 @@ functions are preserved. The release-manifest hook registry now discovers
 `globals()`. `make check` remains the compatibility contract. This is an
 implementation-maintainability change only; it does not change hardware
 architecture, freeze status, PCB authorization, or manufacturing readiness.
+
+## 2026-07-21 — Cross-document readiness consistency gate
+
+Decision: synchronize active readiness documents with ADR-0015 Accepted, the
+captured six-land FX18 footprints, the selected BUK7S1R2-80M 80 V baseline, and
+the three board-release blocker registers. The current active blocker set is
+PBREL-001/003/004/006/007/011, LBREL-003/007, and FBREL-006. Footprint capture
+is distinct from the still-open physical FX18 paired-stack, vibration, mating,
+and assembly-fixture evidence.
+
+Decision: add `tools/readiness_validation/consistency.py` as a separate
+single-responsibility validator. It derives blocker counts and exact IDs from
+the board registers, compares both three-board readiness CSV files and
+`docs/product/final-readiness.md`, requires the accepted CAN1/FX18/80 V facts,
+and rejects the known stale claims. `make check` now executes this gate.
+
+Reason: green electrical, footprint, or artifact checks did not prove that
+human-facing status documents agreed with their sources of truth. The separate
+gate prevents stale status text without coupling document policy back into the
+large electrical validators. It changes no architecture and authorizes no PCB
+layout or manufacturing output.

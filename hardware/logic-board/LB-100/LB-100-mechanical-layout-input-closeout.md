@@ -1,10 +1,12 @@
 # LB-100 Mechanical Layout Input Closeout
 
-Status: Conditional; JPB1 FX18 MF/TH footprint mechanics remain open
+Status: Conditional; JPB1 physical paired-stack mechanics remain open
 
 The outline and placement datum remain useful inputs, but this closeout does not
-cover the missing MF contact solder lands and through-hole mechanical features
-in the PB/LB FX18 footprint pair. Board import remains blocked.
+close the physical 20 mm stack tolerance, vibration retention, mating
+inspection, or assembly-fixture evidence. Both FX18 footprints already contain
+six official plated lands with four GND MF circuits. Board import remains
+blocked.
 Review date: 2026-07-20
 
 This closeout converts the LB-100 pre-layout mechanical envelope into reviewed

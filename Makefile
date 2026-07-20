@@ -1,12 +1,15 @@
-.PHONY: check validate-pb100 validate-board-order validate-config firmware-test pb100-release-status pb100-release-gate board-order-status board-order-gate clean
+.PHONY: check validate-pb100 validate-board-order validate-readiness-consistency validate-config firmware-test pb100-release-status pb100-release-gate board-order-status board-order-gate clean
 
-check: validate-pb100 validate-board-order validate-config firmware-test
+check: validate-pb100 validate-board-order validate-readiness-consistency validate-config firmware-test
 
 validate-pb100:
 	python3 tools/validate_pb100.py
 
 validate-board-order:
 	python3 tools/validate_board_order.py
+
+validate-readiness-consistency:
+	python3 tools/validate_readiness_consistency.py
 
 validate-config:
 	python3 tools/validate_config.py
