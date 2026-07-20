@@ -2498,3 +2498,16 @@ telemetry. Missing, stale, saturated, or implausible total-current data must not
 leave already-active loads running under an unenforceable board budget. The
 change keeps startup refusal, load shedding, and stale-telemetry shutdown in the
 same host-tested safety path without changing PB-100 hardware requirements.
+
+## 2026-07-20 — CAN decode dropped-edge retry
+
+Decision: CAN Event Decode now updates per-rule decoded state only after a
+state-change event is successfully published to the Event Bus. If the Event Bus
+is full and publication is dropped, the rule state remains unchanged so the next
+matching received frame retries publication.
+
+Reason: CAN-derived edges such as high-beam or indicator transitions must not be
+permanently hidden by transient Event Bus pressure. The decoder remains
+receive-only and still does not control outputs directly; it preserves the
+event-to-rule-to-Output-Manager safety path while making dropped internal events
+recoverable.

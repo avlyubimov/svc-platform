@@ -37,3 +37,5 @@
   loaded-configuration storage leaves runtime safe/off.
 - Hardened Configuration Store record validation to reject nonzero reserved
   fields before checksum/config acceptance.
+- Fixed CAN Event Decode so dropped state-change events do not advance rule
+  state and can be retried on the next matching frame.
