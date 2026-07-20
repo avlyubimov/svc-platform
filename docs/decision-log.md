@@ -2740,3 +2740,17 @@ packages, manufacturing ZIPs, or JLCPCB/PCBWay order artifacts. Both boards
 remain NO-GO for ordering until their schematic-freeze checklists close with
 reviewed value-bearing schematic sheets; PB-100 remains blocked by its active
 PBREL register.
+
+## 2026-07-20 — Engineering execution authority formalized
+
+Decision: Repository agent rules now include a `Decision Authority` boundary and
+`docs/ENGINEERING_PRINCIPLES.md` as a required engineering-execution reference.
+Codex acts as Lead Hardware/Firmware Engineer for implementation, while
+architecture decisions remain under ChatGPT plus Product Owner authority and
+final approval remains with the Product Owner.
+
+Reason: The project has moved from architecture definition into higher-risk
+engineering execution. Persistent rules are required so PB-100 blocker closeout,
+component selection, firmware changes, manufacturing planning, and commits stay
+evidence-driven, architecture-preserving, capability-compatible, and blocked
+from PCB layout or manufacturing output until the proper gates close.
