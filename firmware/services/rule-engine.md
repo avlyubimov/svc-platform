@@ -75,7 +75,9 @@ dynamic allocation.
 action strings into an ordered `svc_rule_t` array using caller-provided rule and
 condition buffers. This maps the JSON `then[]` shape to the rule-set runner
 without dynamic allocation. Invalid action text is rejected before compiled rule
-entries are written to the caller-provided rule buffer.
+entries are written to the caller-provided rule buffer. Invalid condition or
+action text is also rejected before caller-provided condition buffers are
+modified.
 
 `svc_rule_engine_evaluate_rule_with_telemetry()` reads total-current validity
 from Telemetry Snapshot before applying a matching rule, so stale current data

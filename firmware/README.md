@@ -78,7 +78,7 @@ Current host tests cover:
 - Rule text compile helpers from condition/action strings to in-memory
   `svc_rule_t` and ordered `svc_rule_t` arrays for multi-action rules.
 - Rule-set compilation rejects invalid multi-action rule text before writing
-  compiled rule entries.
+  compiled rule entries or caller-provided condition buffers.
 - Rule action grammar alignment between the JSON Schema, repository
   configuration validator, and firmware parser for supported roles and PWM
   values, with canonical `0` or `1..100` PWM literals.

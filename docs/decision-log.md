@@ -2578,3 +2578,13 @@ is over limit or total-current telemetry is stale/invalid. That shutdown remains
 the priority, but diagnostic evidence must not be lost permanently because the
 Event Bus was full at the shutdown instant. Retrying keeps the safety action
 unchanged while preserving the event path once queue capacity is available.
+
+## 2026-07-20 — Atomic rule text compile buffers
+
+Decision: Rule text compile helpers now validate condition and action strings
+before writing caller-provided condition buffers or compiled rule entries.
+
+Reason: Rule compilation uses caller-owned static storage to avoid dynamic
+allocation. A rejected rule must not leave partially updated condition storage
+that could be reused accidentally by a later rule evaluation. Validating first
+keeps failed compilation side-effect free for the caller-owned buffers.
