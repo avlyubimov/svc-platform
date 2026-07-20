@@ -128,18 +128,22 @@ orders.
 
 ## PBREL-003 — Board-to-board interface
 
-- Closeout status: Conditional.
+- Closeout status: Closed.
+- Closure boundary: pre-layout evidence under ADR-0013; PB-BENCH-014/015 still
+  gate motorcycle power, field use, and production release.
 - Why blocker existed: PB-100 and LB-100 need a stable 100-pin interface before
   schematic/layout work can preserve power, telemetry, safety, and expansion.
 - Candidate comparison: Hirose FX18 100-position mezzanine pair is preferred;
   Samtec Q Strip class remains an alternate with sourcing and footprint review;
   Molex SlimStack class remains an alternate but needs equivalent stack-height
   and retention proof.
-- Recommended solution: keep `JPB1` as the role-free PB/LB interface using
-  FX18-100P-0.8SV10 plus FX18-100S-0.8SV20 candidate pair and the closed
-  STM32H563VITx LQFP100 resource binding from LB-100.
-- Risks: exact footprint drawing, mating height, vibration retention, tray/reel
-  handling, and stack tolerance remain schematic/mechanical review items.
+- Recommended solution: keep `JPB1` as the role-free PB/LB interface using the
+  corrected FX18-100P-0.8SV10 plus FX18-100S-0.8SV10 pair, four shared M2.5
+  stack holes, four 20.3 +/-0.127 mm spacers, and the closed STM32H563VITx
+  LQFP100 resource binding from LB-100.
+- Risks: physical continuity, vibration, tray/reel handling, and service damage
+  remain post-prototype/production risks; PB-BENCH-014 and PB-BENCH-015 are
+  mandatory before motorcycle power, field use, or production release.
 - Alternatives: Samtec Q Strip/high-density mezzanine family and Molex SlimStack
   100-position family.
 - Cost impact: moderate, expected to be one of the more expensive board-level
@@ -167,12 +171,13 @@ orders.
 - Evidence and calculations:
   `PB-100-b2b-pin-map.csv`, `PB-100-b2b-lb100-resource-binding.csv`,
   `PB-100-b2b-lb100-pin-audit-checklist.csv`, and
-  `hardware/logic-board/LB-100/LB-100-stm32h563-pin-binding-precheck.csv`.
+  `hardware/logic-board/LB-100/LB-100-stm32h563-pin-binding-precheck.csv`, plus
+  `PB-100-fx18-paired-stack-closeout.md`.
 - Datasheet and sourcing evidence:
   https://www.hirose.com/en/product/series/FX18 and
   `production/bom/pb100_sourcing_evidence_snapshot.csv`.
-- Post-prototype validation: PB-BENCH-011 verifies board-stack interface and
-  vibration/continuity behavior after hardware exists.
+- Post-prototype validation: PB-BENCH-014 verifies assembled-stack continuity
+  and PB-BENCH-015 verifies vibration/retention after hardware exists.
 - No-layout boundary: Does not authorize PCB layout, `PB-100.kicad_pcb`,
   Gerbers, drills, pick-place, BOM/CPL, manufacturing ZIP, or PCBA order.
 

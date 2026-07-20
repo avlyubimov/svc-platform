@@ -1,7 +1,7 @@
 # LB-100 Footprint Binding Progress
 
 Status: Complete For Footprint Binding
-Review date: 2026-07-20
+Review date: 2026-07-21
 
 This progress note binds the LB-100 footprints that have project-local KiCad
 footprint evidence. It does not create `LB-100.kicad_pcb`, Gerbers, drill files,
@@ -19,27 +19,32 @@ packages, panel outputs, or PCBA orders.
 - BMI270 IMU: `LB100:LGA-14_L3.0-W2.5-P0.50-BR`.
 - VEML7700 ambient sensor: `LB100:SENSOR-SMD_EML7700-TT`.
 - TF-015 microSD socket: `LB100:TF-SMD_TF-015`.
-- JPB1 Hirose FX18 receptacle: `LB100:FX18-100S-0.8SV20_Hirose`, paired with `PB100:FX18-100P-0.8SV10_Hirose`.
+- JPB1 Hirose FX18 receptacle: `LB100:FX18-100S-0.8SV10_Hirose`, paired with `PB100:FX18-100P-0.8SV10_Hirose`.
+- TCA9539-Q1 UI expander, two TPS22918-Q1 load switches, JFB1 FPC,
+  HSE/LSE crystals, service headers, and all 0603/0805 passives used by the
+  reviewed value-bearing schematic.
 
 ## FX18 Evidence Boundary
 
 The JPB1 footprint is source-derived from the official Hirose FX18 catalog
 recommended land pattern and the official 2026 2D drawings for
-`FX18-100S-0.8SV20` and `FX18-100P-0.8SV10`. Both footprints capture six
+`FX18-100S-0.8SV10` and `FX18-100P-0.8SV10`. Both footprints capture six
 official plated lands with four GND MF circuits, unique logical identifiers,
 mirrored X geometry, and preserved pin-1 orientation. Footprint binding is
-closed; physical mating datum, 20 mm stack tolerance, vibration retention,
-assembly-fixture, and handling evidence remain in the mechanical envelope gate
-before board import.
+closed. The official P-SV10 plus S-SV10 pair, four shared M2.5 holes, four
+20.3 +/-0.127 mm spacers, fixture, and mating inspection plan are closed for
+pre-layout work by `PB-100-fx18-paired-stack-closeout.md`. Physical continuity
+and vibration execution remains mandatory as PB-BENCH-014/015 before motorcycle
+power or production.
 
 ## Still Open
 
-No LB-100 footprint inventory rows remain open. KiCad board import is still
-blocked by the open mechanical envelope gate, signal-integrity layout gate, and
-controlled schematic symbol promotion from empty Footprint properties.
+No LB-100 footprint inventory rows remain open. Schematic symbol promotion and
+the mechanical envelope gate are closed. KiCad board import is still blocked by
+the separate signal-integrity and safety layout model.
 
 ## Boundary
 
-LB-100 now has 13 bound on-board footprint items, 0 open on-board footprint
-items, and 1 not-required service-USB footprint item. KiCad board import remains
-blocked by mechanical and signal-integrity layout gates.
+LB-100 now has 18 source-identified/bound footprint classes, 0 open footprint
+items, and 2 no-footprint-required ownership boundaries. KiCad board import
+remains blocked only by the signal-integrity and safety layout gate.

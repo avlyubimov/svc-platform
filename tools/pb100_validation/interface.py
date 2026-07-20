@@ -70,7 +70,7 @@ def validate_b2b_interface_trace() -> None:
         )
 
     connector_text = " ".join(rows_by_item["Connector candidate"].values())
-    for token in ("FX18-100P-0.8SV10", "FX18-100S-0.8SV20", "No connector placement"):
+    for token in ("FX18-100P-0.8SV10", "FX18-100S-0.8SV10", "No connector placement"):
         if token not in connector_text:
             fail(f"B2B connector trace must include {token}")
 
@@ -187,7 +187,7 @@ def validate_b2b_interface_trace() -> None:
 def validate_b2b_connector_candidate() -> None:
     required_tokens = (
         "FX18-100P-0.8SV10",
-        "FX18-100S-0.8SV20",
+        "FX18-100S-0.8SV10",
         "100",
         "0.8",
     )
@@ -273,7 +273,7 @@ def validate_b2b_lb100_pin_audit_checklist() -> None:
         "LQFP-100",
         "Exact LB-100 pinout",
         "FX18-100P-0.8SV10",
-        "FX18-100S-0.8SV20",
+        "FX18-100S-0.8SV10",
         "vibration",
         "assembly handling",
         "CAN1_TX_ROUTE",
@@ -337,7 +337,7 @@ def validate_b2b_interface_freeze_checklist() -> None:
     checklist_text = read_text(path)
     for token in (
         "FX18-100P-0.8SV10",
-        "FX18-100S-0.8SV20",
+        "FX18-100S-0.8SV10",
         "PB_5V_OUT",
         "LB_3V3_IO",
         "OUT1_CTL",
@@ -415,7 +415,7 @@ def validate_b2b_interface_closeout_precheck() -> None:
         "PB-100-b2b-lb100-pin-audit-checklist.csv",
         "PB-100-b2b-interface-freeze-checklist.csv",
         "FX18-100P-0.8SV10",
-        "FX18-100S-0.8SV20",
+        "FX18-100S-0.8SV10",
         "20 mm",
         "footprint drawing",
         "courtyard",
@@ -474,7 +474,7 @@ def validate_b2b_interface_closeout_precheck() -> None:
         fail("B2B closeout precheck requires PB-100-b2b-pin-map.csv to contain 100 JPB1 pins")
 
     audit_text = read_text(PB100_DIR / "PB-100-b2b-lb100-pin-audit-checklist.csv")
-    for token in ("STM32H563", "LQFP-100", "16 ADC", "FX18-100P-0.8SV10", "FX18-100S-0.8SV20"):
+    for token in ("STM32H563", "LQFP-100", "16 ADC", "FX18-100P-0.8SV10", "FX18-100S-0.8SV10"):
         if token not in audit_text:
             fail(f"B2B pin audit checklist must support closeout precheck token {token}")
 

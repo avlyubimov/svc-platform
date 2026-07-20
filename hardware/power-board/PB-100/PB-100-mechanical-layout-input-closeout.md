@@ -1,12 +1,12 @@
 # PB-100 Mechanical Layout Input Closeout
 
-Status: Conditional; JPB1 physical paired-stack mechanics remain open
+Status: Closed for pre-layout mechanical input
 
-The outline and placement datum remain useful inputs, but this closeout does not
-close the physical 20 mm stack tolerance, vibration retention, mating
-inspection, or assembly-fixture evidence. Both FX18 footprints already contain
-six official plated lands with four GND MF circuits. Board import remains
-blocked.
+The JPB1 pair, 20 mm stack, four-spacer retention pattern, assembly fixture,
+mating inspection, and six official plated lands with four GND MF circuits are
+closed in `PB-100-fx18-paired-stack-closeout.md`. Actual stack and vibration
+records remain post-prototype PB-BENCH-014/015 evidence under ADR-0013. PB-100
+board import remains blocked by non-mechanical gates.
 Review date: 2026-07-20
 
 This closeout converts the PB-100 pre-layout mechanical envelope into reviewed
@@ -87,9 +87,10 @@ layout model and symbol-promotion gates close:
 - OUT1/OUT2 DTP and OUT3..OUT10 DT exact housings, seals, boots, backshells,
   cable bend radius, and harness labels remain garage BOM and enclosure review
   inputs.
-- JPB1 pin-1 mirroring, paired PB/LB datum tolerance, board spacing, and
-  vibration retention must still be verified during controlled symbol promotion
-  and board import.
+- JPB1 uses the corrected `FX18-100P-0.8SV10` plus
+  `FX18-100S-0.8SV10` 20 mm pair, four shared M2.5 stack holes, and
+  20.3 +/-0.127 mm spacers. Physical fit and vibration are deferred to
+  PB-BENCH-014/015 rather than treated as pre-layout evidence.
 - High-current zones do not prove thermal performance. MOSFET SOA, shunt
   heating, TVS surge energy, copper temperature rise, fuse coordination, and
   enclosure heat path remain open thermal/current layout evidence.

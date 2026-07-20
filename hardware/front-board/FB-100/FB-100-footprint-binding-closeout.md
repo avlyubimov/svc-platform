@@ -58,11 +58,12 @@ Use the footprints listed in `FB-100-footprint-binding-closeout.csv`:
   against package drawings before PCBA order release.
 - USB-C shell stake, shield, and panel-edge clearance must be reviewed in the
   actual board layout.
-- LED polarity/current values and optical alignment remain schematic/BOM lock
-  items.
+- LED polarity/current values are closed in the value-bearing schematic;
+  optical alignment remains a placement review item.
 - OLED remains DNP by default; population needs Product Owner approval.
-- FB-100 schematic is still a value-bearing scaffold, so no board layout or
-  manufacturing package is authorized by this closeout alone.
+- FB-100 now has a reviewed 44-component/46-net value-bearing schematic, so
+  controlled board import is ready; manufacturing packages remain unauthorized
+  until layout and fabrication review close.
 
 ## Tooling Evidence
 
@@ -74,7 +75,8 @@ Use the footprints listed in `FB-100-footprint-binding-closeout.csv`:
 
 ## Boundary
 
-FB-100 footprint binding is closed as local KiCad library evidence. KiCad board
-layout, Gerbers, drills, pick-place, BOM/CPL order package, manufacturing ZIP,
-fabrication package, and PCBA order generation remain blocked until the full
-layout review and project order gates allow them.
+FB-100 footprint binding and symbol promotion are closed as local KiCad
+evidence. Controlled board import is ready. Gerbers, drills, pick-place,
+BOM/CPL order packages, manufacturing ZIPs, fabrication packages, and PCBA
+orders remain blocked until the full layout review and project order gates
+allow them.

@@ -77,7 +77,8 @@ REQUIRED_FACTS = {
     PB100_DIR / "PB-100-mechanical-layout-input-closeout.md": (
         "six official plated lands",
         "four GND MF circuits",
-        "20 mm stack tolerance",
+        "20 mm stack",
+        "20.3 +/-0.127 mm",
     ),
     PB100_DIR / "PB-100-pcb-layout-start-checklist.csv": (
         "zero Open rows",
@@ -88,8 +89,9 @@ REQUIRED_FACTS = {
         "ADR-0015 Accepted",
         "six official plated",
         "four GND MF circuits",
-        "`LBREL-003`",
-        "`LBREL-007`",
+        "zero active LBREL blockers",
+        "63 components",
+        "186 electrical nets",
     ),
     LB100_DIR / "LB-100-schematic-review-closeout.md": (
         "ADR-0015 Accepted",
@@ -104,12 +106,14 @@ REQUIRED_FACTS = {
     LB100_DIR / "LB-100-mechanical-layout-input-closeout.md": (
         "six official plated lands",
         "four GND MF circuits",
-        "20 mm stack tolerance",
+        "20 mm stack",
+        "20.3 +/-0.127 mm",
     ),
     LB100_DIR / "LB-100-pcb-layout-start-checklist.csv": (
         "ADR-0015 Accepted",
         "six official plated lands",
         "four GND MF circuits",
+        "20.3 +/-0.127 mm",
     ),
 }
 

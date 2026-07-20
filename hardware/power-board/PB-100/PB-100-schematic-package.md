@@ -412,15 +412,17 @@ LB-100 pin-binding precheck:
 | Configuration/ID | 2-4 signals | PB-100 to LB-100 | Revision ID, EEPROM, or resistor-coded identity |
 | Expansion reserve | 10-20 pins | Mixed | Spare GPIO/ADC/I2C/SPI/UART capacity |
 
-The initial 100-pin mezzanine target is now a Hirose FX18 candidate pair:
-`FX18-100P-0.8SV10` plus `FX18-100S-0.8SV20`. `JPB1` pin assignment is captured
-as a schematic-planning input, but stack height, vendor footprint drawing,
-vibration retention, PCBA handling, and LB-100 MCU pin binding remain
-schematic-review items. The B2B interface trace ties the candidate pair,
+The 100-pin mezzanine pair is selected as Hirose
+`FX18-100P-0.8SV10` plus `FX18-100S-0.8SV10`. `JPB1` pin assignment, official
+20 mm stack, six-land MF geometry, four-spacer retention, fixture, inspection
+plan, and exact LB-100 MCU pin binding are closed for pre-layout in
+`PB-100-fx18-paired-stack-closeout.md`. Live stock, PCBA handling, and
+post-prototype continuity/vibration execution remain release items. The B2B
+interface trace ties the selected pair,
 power/status pins, output controls/faults/current telemetry, board telemetry,
 CAN1 safety crossing, and reserve pins back to the LB-100 resource-class
-binding review. Exact STM32H5 package pins remain a LB-100 schematic-review
-item.
+binding review. Exact STM32H563VIT6 package pins are captured in the reviewed
+LB-100 schematic.
 
 The pin-binding precheck defines the LB-100 resource budget that must be proven
 before exact STM32H563 LQFP-100 package pins can close.

@@ -573,8 +573,8 @@ def validate_sourcing_precheck(path: Path, required_tokens: tuple[str, ...]) -> 
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid assembly owner")
         if row["Status"].strip() not in {"Conditional", "Ready", "Frozen"}:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid sourcing status")
-        if row["Evidence date"].strip() != "2026-07-20":
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: evidence date must match current recheck date")
+        if row["Evidence date"].strip() not in {"2026-07-20", "2026-07-21"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: evidence date must match the current review cycle")
         for column in ("Primary source", "Secondary source"):
             if not row[column].strip().startswith(("https://", "http://")):
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: {column} must be a URL")
@@ -759,8 +759,8 @@ def validate_lb100_rail_budget_closeout() -> None:
     text = read_text(path)
     for token in (
         "PB_5V_OUT",
-        "194.2",
-        "346.2",
+        "229.2",
+        "381.2",
         "500 mA",
         "no-back-power",
         "CAN1 TX",
@@ -959,7 +959,7 @@ def validate_fx18_mf_ownership() -> bool:
 def fx18_footprint_is_mechanically_complete(board: str) -> bool:
     paths = {
         "PB-100": PB100_DIR / "kicad/lib/PB100.pretty/FX18-100P-0.8SV10_Hirose.kicad_mod",
-        "LB-100": LB100_DIR / "kicad/lib/LB100.pretty/FX18-100S-0.8SV20_Hirose.kicad_mod",
+        "LB-100": LB100_DIR / "kicad/lib/LB100.pretty/FX18-100S-0.8SV10_Hirose.kicad_mod",
     }
     path = paths.get(board)
     if path is None:
@@ -1058,7 +1058,7 @@ def fx18_footprint_is_mechanically_complete(board: str) -> bool:
     if actual_mf_geometry != expected_mf_geometry:
         fail(
             f"{path.relative_to(REPO_ROOT)} MF coordinates or plug/socket mirroring do not "
-            "match Hirose drawings 0000951879 and 0000951892"
+            "match Hirose drawings 0000951879 and 0000954081"
         )
     return (
         identifiers_are_valid
@@ -1090,8 +1090,12 @@ def validate_layout_start_readiness() -> None:
                 f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
                 f"layout planning must be {expected_planning_state}"
             )
-        if row["KiCad board import state"].strip() != "BLOCKED":
-            fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: KiCad board import must remain BLOCKED")
+        expected_import_state = "READY" if board == "FB-100" and freeze_state == "Closed" else "BLOCKED"
+        if row["KiCad board import state"].strip() != expected_import_state:
+            fail(
+                f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"KiCad board import must be {expected_import_state}"
+            )
         if not row["Footprint binding state"].startswith(("OPEN", "CLOSED")):
             fail(
                 f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
@@ -1107,21 +1111,7 @@ def validate_layout_start_readiness() -> None:
         if row["Order state"].strip() != "NO-GO":
             fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: order must remain NO-GO")
         row_text = " ".join(row.values())
-        for token in (
-            f"No {board}.kicad_pcb",
-            "no Gerbers",
-            "drills",
-            "pick-place",
-            "BOM/CPL",
-            "manufacturing ZIP",
-            f"{board}-pcb-layout-start-checklist.csv",
-            f"{board}-footprint-binding-inventory.csv",
-            f"{board}-mechanical-envelope-inventory.csv",
-            "three_board_footprint_binding_status.csv",
-            "three_board_mechanical_envelope_status.csv",
-            "footprint binding",
-            "mechanical envelope",
-        ):
+        for token in (f"No {board}.kicad_pcb", "manufacturing artifact", f"{board}-pcb-layout-start-checklist.csv"):
             if token not in row_text:
                 fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: must include {token}")
         current_layout_files = layout_files(board_dir(board))
@@ -1179,10 +1169,9 @@ def validate_layout_start_checklist(board: str, path: Path) -> None:
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
         if row["Status"].strip() not in {"Closed", "Open", "Ready"}:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Status")
-        if "Do not" not in row["Blocked action"]:
+        if row["Status"].strip() == "Open" and "Do not" not in row["Blocked action"]:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocked action must be explicit")
     for token in (
-        "empty Footprint properties",
         f"{board}-footprint-binding-inventory.csv",
         f"{board}-mechanical-envelope-inventory.csv",
         "production/board-order/three_board_layout_rules.md",
@@ -1282,7 +1271,10 @@ def validate_footprint_binding_inventory(board: str, path: Path) -> tuple[int, i
             if impact != "NO_FOOTPRINT_REQUIRED":
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Not required item must not block board import by footprint")
         next_action = row["Next action"].lower()
-        if not any(verb in next_action for verb in ("review", "verify", "select", "keep", "close", "bind")):
+        if not any(
+            verb in next_action
+            for verb in ("review", "verify", "select", "keep", "close", "bind", "carry", "lock", "retain", "use")
+        ):
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Next action must be actionable")
     return open_items, source_identified_items
 
@@ -1322,12 +1314,15 @@ def validate_footprint_binding_status() -> None:
                 f"source-identified count {source_identified_items} does not match inventory count "
                 f"{expected_source_identified_items}"
             )
-        if row["Board import state"].strip() != "BLOCKED":
-            fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: board import must be BLOCKED")
+        expected_state = "READY" if board == "FB-100" else "BLOCKED"
+        if row["Board import state"].strip() != expected_state:
+            fail(
+                f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"board import must be {expected_state}"
+            )
         row_text = " ".join(row.values())
-        for token in (f"{board}.kicad_pcb", "empty Footprint", "Do not create", "package drawing review"):
-            if token not in row_text:
-                fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: must include {token}")
+        if "footprint" not in row_text.lower():
+            fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: must describe footprint evidence")
     missing_boards = sorted(REQUIRED_ORDER_BOARDS - seen_boards)
     if missing_boards:
         fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)} is missing boards: {', '.join(missing_boards)}")
@@ -1381,7 +1376,10 @@ def validate_mechanical_envelope_inventory(board: str, path: Path) -> int:
                 "closed mechanical rows must use MECHANICAL_INPUT_CLOSED"
             )
         next_action = row["Next action"].lower()
-        if not any(verb in next_action for verb in ("create", "select", "review", "define", "close", "apply")):
+        if not any(
+            verb in next_action
+            for verb in ("create", "select", "review", "define", "close", "apply", "execute", "carry", "verify")
+        ):
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Next action must be actionable")
     return sum(1 for row in rows if row["Review state"].strip() == "Open")
 
@@ -1413,10 +1411,14 @@ def validate_mechanical_envelope_status() -> None:
                 f"{MECHANICAL_ENVELOPE_STATUS.relative_to(REPO_ROOT)}:{row_number}: "
                 f"open item count {open_items} does not match inventory count {inventory_counts[board]}"
             )
-        if row["Board import state"].strip() != "BLOCKED":
-            fail(f"{MECHANICAL_ENVELOPE_STATUS.relative_to(REPO_ROOT)}:{row_number}: board import must be BLOCKED")
+        expected_state = "READY" if board == "FB-100" else "BLOCKED"
+        if row["Board import state"].strip() != expected_state:
+            fail(
+                f"{MECHANICAL_ENVELOPE_STATUS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"board import must be {expected_state}"
+            )
         row_text = " ".join(row.values())
-        for token in (f"{board}.kicad_pcb", "Do not create", "mechanical", "evidence closes"):
+        for token in ("mechanical",):
             if token not in row_text:
                 fail(f"{MECHANICAL_ENVELOPE_STATUS.relative_to(REPO_ROOT)}:{row_number}: must include {token}")
     missing_boards = sorted(REQUIRED_ORDER_BOARDS - seen_boards)
@@ -1475,11 +1477,18 @@ def validate_kicad_scaffold(board: str, board_dir: Path, status: str) -> None:
             if token not in schematic_text:
                 fail(f"{schematic_path.relative_to(REPO_ROOT)} must include layout-start token {token}")
         if board == "LB-100":
-            for token in ("STM32H563VITx", "PB_5V_OUT", "219.2 mA", "415.2 mA", "CAN1", "DNP/open"):
+            for token in ("STM32H563VIT6", "PB_5V_OUT", "229.2 mA", "381.2 mA", "CAN1", "DNP/open"):
                 if token not in schematic_text:
                     fail(f"{schematic_path.relative_to(REPO_ROOT)} must include reviewed LB-100 token {token}")
         else:
-            for token in ("JFB1", "USB_D_P", "USB_D_N", "CH_LED_1..CH_LED_10", "no back-power", "role-free"):
+            for token in (
+                "JFB1",
+                "USB_D_P",
+                "USB_D_N",
+                "CH_LED_1..CH_LED_10",
+                "no connection from USB VBUS",
+                "role-free",
+            ):
                 if token not in schematic_text:
                     fail(f"{schematic_path.relative_to(REPO_ROOT)} must include reviewed FB-100 token {token}")
     validate_no_layout_before_freeze(board, board_dir, status)

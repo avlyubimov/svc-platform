@@ -1,10 +1,11 @@
 # Final Readiness
 
 Status: In progress  
-Last updated: 2026-07-20
+Last updated: 2026-07-21
 
 This document defines what “ready” means for the current repository state. It
-does not authorize PB-100, LB-100, or FB-100 PCB layout.
+authorizes only controlled FB-100 board import. It does not authorize PB-100 or
+LB-100 PCB import, or fabrication/assembly outputs for any board.
 
 ## Automated gate
 
@@ -44,7 +45,7 @@ Current coverage:
   symbols, release gates, power, CAN, telemetry, sourcing, protection,
   interface, and review-packet ownership; `tools/validate_pb100.py` remains the
   stable CLI entrypoint.
-- PB-100 CSV and KiCad scaffold validation.
+- PB-100 CSV and preliminary KiCad capture validation.
 - Required PB-100 KiCad schematic ERC and netlist export with `kicad-cli`
   10.0.4.
 - PB-100 sheet-placeholder blocker plus minimum exported netlist thresholds of
@@ -52,8 +53,10 @@ Current coverage:
 - PB-100 KiCad role-token guard for generic `OUT1`..`OUT10` naming.
 - PB-100 layout/manufacturing artifact blocker.
 - Three-board board-order gate for PB-100, LB-100, and FB-100.
-- LB-100 and FB-100 baseline freeze manifests, closed pre-layout blocker
-  registers, and no-layout blockers.
+- Deterministic LB-100 and FB-100 schematic generation plus focused exported-
+  netlist topology, symbol-to-footprint pad-contract, and ERC validation under
+  `tools/board_schematic_validation/`.
+- LB-100 and FB-100 baseline freeze manifests and release-blocker registers.
 - Firmware config JSON/schema validation.
 - Firmware host-test suite.
 - Firmware hardware-capability, config-store, config-update, and runtime-boot
@@ -69,16 +72,16 @@ Current coverage:
 | Architecture v1.0 | Ready | Frozen by ADR; PB-100 requirement changes still need ADR |
 | PB-100 requirements | Ready for schematic planning | Baseline is frozen; schematic freeze remains open |
 | PB-100 KiCad scaffold | Preliminary capture | Child sheets now contain ERC-clean preliminary capture content and exported netlist coverage; schematic freeze remains open |
-| PB-100 PCB/layout | Blocked | The release register has 6 active blockers: `PBREL-001`, `PBREL-003`, `PBREL-004`, `PBREL-006`, `PBREL-007`, `PBREL-011`. Layout, Gerber, drill, placement, and manufacturing zips remain blocked; local ERC/netlist/host-test evidence does not close sourcing, harness, bench, paired-stack, transient, SOA, thermal, or factory gates |
-| LB-100 requirements | Ready for schematic planning | Baseline is frozen by ADR-0014; schematic freeze remains open |
-| LB-100 KiCad scaffold | Preliminary scaffold | Top-level non-layout schematic scaffold exists; pin binding, rail budget, communication, service/storage/sensor, and sourcing pre-layout blockers are closed; reviewed value-bearing schematic sheets remain open |
-| LB-100 PCB/layout | Blocked | The release register has 2 active blockers: `LBREL-003`, `LBREL-007`. Physical FX18 paired-stack validation and reviewed value-bearing schematic capture block layout and manufacturing outputs |
-| FB-100 requirements | Ready for schematic planning | Baseline is frozen by ADR-0014; schematic freeze remains open |
-| FB-100 KiCad scaffold | Preliminary scaffold | Top-level non-layout schematic scaffold exists; interface pinout, USB service, UI/control, mechanical envelope, and sourcing pre-layout blockers are closed; reviewed value-bearing schematic sheets remain open |
-| FB-100 PCB/layout | Blocked | The release register has 1 active blocker: `FBREL-006`. Reviewed value-bearing schematic capture blocks layout and manufacturing outputs |
+| PB-100 PCB/layout | Blocked | The release register has 5 active blockers: `PBREL-001`, `PBREL-004`, `PBREL-006`, `PBREL-007`, `PBREL-011`. The corrected P-SV10 plus S-SV10 FX18 mechanical gate is closed for pre-layout work; transient, SOA, thermal, CAN1 integration, sourcing, factory, and symbol-promotion evidence still block PCB import and manufacturing outputs |
+| LB-100 requirements | Frozen | Baseline is frozen by ADR-0014 and the schematic freeze is Closed |
+| LB-100 KiCad schematic | Reviewed | Deterministic 63-component, 186-net, footprint-bound capture covers STM32H563, JPB1/JFB1, switched service rails, storage/sensors, UI I/O, and ADR-0015 logic-only CAN1; exported-netlist audit and ERC pass with only the two reviewed cross-board USB CC single-pin warnings |
+| LB-100 PCB/layout | Blocked | There are 0 active blockers (0 active LBREL blockers). Footprint, schematic, and corrected FX18 mechanical gates are closed; the separate signal-integrity and safety layout model remains Open, so no `LB-100.kicad_pcb` or manufacturing output is authorized |
+| FB-100 requirements | Frozen | Baseline is frozen by ADR-0014 and the schematic freeze is Closed |
+| FB-100 KiCad schematic | Reviewed | Deterministic 44-component, 46-net, footprint-bound capture covers USB-C/ESD/no-back-power, JFB1, ten role-free indicators, one-wire RGB, service/reset buttons, and DNP OLED; exported-netlist audit and ERC pass with zero findings |
+| FB-100 PCB/layout | Ready for controlled import | There are 0 active blockers (0 active FBREL blockers). Schematic, footprint, USB/no-back-power, and mechanical gates are closed; no `.kicad_pcb`, Gerber, drill, placement, BOM/CPL, manufacturing ZIP, or PCBA order exists yet |
 | Firmware safety core | Host-test ready | Output, overflow-safe delayed battery cutoff, runtime load shedding, stale-current safe-off, thermal derate/cutoff, CAN dropped-edge retry, telemetry, events, saturating diagnostic counters, logging, config, runtime boot, CAN-to-rule bridge, ambient-light rule conditions, ordered rule sets, multi-action rule compilation, rule runtime, and rule paths covered |
 | Configuration format | Host-test ready | JSON schema, canonical rule grammar, rule-action mapping, buffer-atomic rule compilation, PB-100 capability manifest, compiled capability baseline, config store reserved/sequence-wrap handling, config update, and examples are validated |
-| Production package | Draft | `production/board-order/three_board_jlcpcb_order_readiness.csv` tracks all three boards as NO-GO until schematic freeze, layout, fabrication outputs, and assembly outputs close |
+| Production package | Draft | `production/board-order/three_board_jlcpcb_order_readiness.csv` tracks all three boards as NO-GO until their layout, fabrication, review, and assembly-output gates close |
 
 ## Required before schematic freeze
 
@@ -273,7 +276,7 @@ Current coverage:
   still close divider values, ADC scaling, placement, assembly class, and
   calibration.
 - JPB1 uses the reviewed Hirose `FX18-100P-0.8SV10` plus
-  `FX18-100S-0.8SV20` pair. Both footprints contain exactly six plated TH
+  `FX18-100S-0.8SV10` pair. Both footprints contain exactly six plated TH
   lands for four logical MF circuits, all assigned to GND with mirrored
   plug/socket geometry. Schematic freeze must still close paired 20 mm stack
   fit, vibration retention, fixture/enclosure, and assembly handling.

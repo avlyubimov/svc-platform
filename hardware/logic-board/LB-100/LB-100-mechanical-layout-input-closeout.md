@@ -1,12 +1,12 @@
 # LB-100 Mechanical Layout Input Closeout
 
-Status: Conditional; JPB1 physical paired-stack mechanics remain open
+Status: Closed for pre-layout mechanical input
 
-The outline and placement datum remain useful inputs, but this closeout does not
-close the physical 20 mm stack tolerance, vibration retention, mating
-inspection, or assembly-fixture evidence. Both FX18 footprints already contain
-six official plated lands with four GND MF circuits. Board import remains
-blocked.
+The JPB1 pair, 20 mm stack, four-spacer retention pattern, assembly fixture,
+mating inspection, and six official plated lands with four GND MF circuits are
+closed in the PB/LB paired-stack closeout. Actual stack and vibration records
+remain post-prototype PB-BENCH-014/015 evidence under ADR-0013. LB-100 board
+import remains blocked by its signal-integrity layout-model gate.
 Review date: 2026-07-20
 
 This closeout converts the LB-100 pre-layout mechanical envelope into reviewed
@@ -86,9 +86,10 @@ and symbol-promotion gates close:
 
 - Final enclosure CAD or PB-100 standoff hardware can still move outline,
   mounting holes, service windows, and stack clearance.
-- JPB1 pin-1 mirroring, paired datum tolerance, stack compression, and vibration
-  retention must still close during controlled symbol promotion and board
-  import.
+- JPB1 uses the corrected `FX18-100P-0.8SV10` plus
+  `FX18-100S-0.8SV10` 20 mm pair, four shared M2.5 stack holes, and
+  20.3 +/-0.127 mm spacers. Physical fit and vibration are deferred to
+  PB-BENCH-014/015 rather than treated as pre-layout evidence.
 - CAN, USB, SD, clock, BLE antenna, and sensor placement/routing constraints
   remain open in the signal-integrity and safety layout model.
 - BLE module keepout and enclosure RF material must be verified against the
@@ -131,6 +132,5 @@ and symbol-promotion gates close:
 ## Boundary
 
 LB-100 mechanical envelope is closed as a layout input only. KiCad board import
-remains blocked by the open LB-100 signal-integrity and safety layout model plus
-controlled schematic symbol-promotion gate. JLCPCB/PCBWay order state remains
-`NO-GO`.
+remains blocked by the open LB-100 signal-integrity and safety layout model.
+JLCPCB/PCBWay order state remains `NO-GO`.
