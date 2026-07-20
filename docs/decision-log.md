@@ -2883,3 +2883,18 @@ pin-1/orientation, courtyard, stencil, solder-mask, or assembly handling. Board
 import therefore remains `BLOCKED` until each source-identified item is
 converted into reviewed KiCad footprint evidence and every remaining open source
 gap is resolved.
+
+## 2026-07-20 — Remaining PB/LB footprint package sources identified
+
+Decision: PB-100 and LB-100 now have package sources identified for every open
+on-board footprint item. PB-100 is 15 of 15 and LB-100 is 13 of 13. FB-100 is
+10 of 12; its remaining package-source gaps are exact status RGB LED and channel
+LED MPN/package selection.
+
+Reason: CAN1 TX disable package evidence, BLE module footprint source, BMI270
+LGA package evidence, VEML7700 optical package evidence, TF-015 microSD source,
+and optional OLED module sources have been traced without creating KiCad
+footprints or a PCB. The open FB LED items remain intentionally open because
+generic LED categories are not enough evidence for package binding; exact MPN,
+polarity, optical/mechanical fit, current-limit values, and JLCPCB/PCBWay
+assembly evidence must close first.
