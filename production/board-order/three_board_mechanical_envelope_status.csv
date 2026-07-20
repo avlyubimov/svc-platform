@@ -1,0 +1,4 @@
+Board,Inventory,Evidence source,Open mechanical items,Board import state,Blocked action
+PB-100,hardware/power-board/PB-100/PB-100-mechanical-envelope-inventory.csv,PB-100-garage-connector-fuse-plan.md and PB-100-b2b-interface-closeout-precheck.csv,9,BLOCKED,Do not create PB-100.kicad_pcb until board outline mounting connector fuse JPB1 enclosure and power-zone mechanical evidence closes
+LB-100,hardware/logic-board/LB-100/LB-100-mechanical-envelope-inventory.csv,LB-100-jpb1-resource-budget.csv and PB-100-b2b-interface-closeout-precheck.csv,8,BLOCKED,Do not create LB-100.kicad_pcb until board outline JPB1 stack MCU service storage BLE antenna and sensor keepout evidence closes
+FB-100,hardware/front-board/FB-100/FB-100-mechanical-envelope-inventory.csv,FB-100-mechanical-envelope-precheck.csv and FB-100-ui-mechanical-precheck.csv,7,BLOCKED,Do not create FB-100.kicad_pcb until USB-C edge panel mounting JFB1 LED button and OLED keepout evidence closes

@@ -8,13 +8,13 @@
     (date "2026-07-20")
     (rev "schematic-scaffold")
     (company "SVC Platform")
-    (comment 1 "Schematic scaffold only. PCB layout is blocked until FB-100 schematic freeze.")
+    (comment 1 "Schematic freeze closed. Board import is blocked by layout-start gates.")
     (comment 2 "Requirements: ../FB-100-requirements.md and ADR-0014.")
     (comment 3 "UI signals remain role-free status/channel signals.")
     (comment 4 "USB service path must not back-power LB-100 or PB-100 unless reviewed.")
   )
   (lib_symbols)
-  (text "FB-100 schematic scaffold only.\n\nDo not create PCB layout from this project until FB-100 schematic freeze is closed.\n\nPrimary inputs:\n- ../FB-100-requirements.md\n- ../FB-100-schematic-freeze-checklist.md\n- ../FB-100-board-release-blocker-register.csv\n- ../../../logic-board/LB-100/LB-100-requirements.md"
+  (text "FB-100 schematic scaffold only.\n\nDo not create FB-100.kicad_pcb from this project until ../FB-100-pcb-layout-start-checklist.csv closes footprint binding and mechanical envelope gates.\n\nPrimary inputs:\n- ../FB-100-requirements.md\n- ../FB-100-schematic-freeze-checklist.md\n- ../FB-100-pcb-layout-start-checklist.csv\n- ../FB-100-footprint-binding-inventory.csv\n- ../FB-100-mechanical-envelope-inventory.csv\n- ../FB-100-board-release-blocker-register.csv\n- ../../../logic-board/LB-100/LB-100-requirements.md"
     (at 25 30 0)
     (effects
       (font
@@ -24,7 +24,7 @@
     )
     (uuid "b2ec4b0b-f117-4a83-b8f7-dbe78b359f9e")
   )
-  (text "Blocked in this scaffold:\n- PCB layout\n- Gerber generation\n- drill files\n- pick-place files\n- BOM/CPL order package\n- accessory role names in UI hardware"
+  (text "Blocked in this scaffold:\n- KiCad board import while footprint binding is open\n- KiCad board import while mechanical envelope is open\n- Gerber generation\n- drill files\n- pick-place files\n- BOM/CPL order package\n- accessory role names in UI hardware"
     (at 25 95 0)
     (effects
       (font
@@ -44,7 +44,7 @@
     )
     (uuid "873c3dff-b990-43a6-bb55-d2b7517735d4")
   )
-  (text "Schematic freeze evidence:\n- ../FB-100-schematic-review-closeout.md\n- ../FB-100-interface-signal-plan.csv\n- ../FB-100-interface-pinout-closeout.csv\n- ../FB-100-usb-service-closeout-precheck.csv\n- ../FB-100-ui-control-closeout-precheck.csv\n- ../FB-100-ui-mechanical-precheck.csv\n- ../FB-100-mechanical-envelope-precheck.csv\n- ../FB-100-component-sourcing-precheck.csv\n\nPCB layout and manufacturing outputs remain separate post-freeze work."
+  (text "Schematic freeze evidence:\n- ../FB-100-schematic-review-closeout.md\n- ../FB-100-interface-signal-plan.csv\n- ../FB-100-interface-pinout-closeout.csv\n- ../FB-100-usb-service-closeout-precheck.csv\n- ../FB-100-ui-control-closeout-precheck.csv\n- ../FB-100-ui-mechanical-precheck.csv\n- ../FB-100-mechanical-envelope-precheck.csv\n- ../FB-100-component-sourcing-precheck.csv\n- ../FB-100-pcb-layout-start-checklist.csv\n- ../FB-100-footprint-binding-inventory.csv\n- ../FB-100-mechanical-envelope-inventory.csv\n\nPCB layout and manufacturing outputs remain separate post-freeze work."
     (at 130 120 0)
     (effects
       (font

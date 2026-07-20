@@ -49,12 +49,14 @@ and zipped manufacturing outputs remain blocked by repository validation.
 - `../PB-100-kicad-prep.md`
 - `../PB-100-kicad-sheet-manifest.csv`
 - `../PB-100-kicad-footprint-plan.csv`
+- `../PB-100-footprint-binding-inventory.csv`
 - `../PB-100-symbol-mpn-readiness.csv`
 - `../PB-100-symbol-capture-worklist.csv`
 - `../PB-100-symbol-pin-evidence.csv`
 - `../PB-100-symbol-open-items.md`
 - `../PB-100-schematic-freeze-checklist.md`
 - `../PB-100-pcb-layout-start-checklist.csv`
+- `../PB-100-mechanical-envelope-inventory.csv`
 - `../PB-100-schematic-freeze-gap-register.csv`
 - `../PB-100-validation-traceability.csv`
 - `../PB-100-test-point-plan.csv`
@@ -62,6 +64,8 @@ and zipped manufacturing outputs remain blocked by repository validation.
 - `../PB-100-can1-safety-verification.csv`
 - `../../../../production/bom/pb100_assembly_sourcing_recheck.csv`
 - `../../../../production/bom/pb100_sourcing_evidence_snapshot.csv`
+- `../../../../production/board-order/three_board_footprint_binding_status.csv`
+- `../../../../production/board-order/three_board_mechanical_envelope_status.csv`
 - `../../../../firmware/configs/hardware/pb-100-capabilities.json`
 
 ## Next KiCad work

@@ -18,6 +18,10 @@ and order evidence close.
 - `../LB-100-power-budget-precheck.md`
 - `../LB-100-schematic-freeze-checklist.md`
 - `../LB-100-pcb-layout-start-checklist.csv`
+- `../LB-100-footprint-binding-inventory.csv`
+- `../LB-100-mechanical-envelope-inventory.csv`
 - `../LB-100-board-release-blocker-register.csv`
+- `../../../../production/board-order/three_board_footprint_binding_status.csv`
+- `../../../../production/board-order/three_board_mechanical_envelope_status.csv`
 - `../../../power-board/PB-100/PB-100-b2b-pin-map.csv`
 - `../../../../docs/adr/ADR-0014-lb-fb-baseline-requirements.md`
