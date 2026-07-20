@@ -52,6 +52,6 @@ RT1,telemetry,THERMAL_NTC,PB100_THERMAL_NTC_PRELIM,Created,TEMP_PCB thermal sens
 RT2,telemetry,THERMAL_NTC,PB100_THERMAL_NTC_PRELIM,Created,TEMP_PWR_A thermal sensor class
 RT3,telemetry,THERMAL_NTC,PB100_THERMAL_NTC_PRELIM,Created,TEMP_PWR_B thermal sensor class
 RID1,telemetry,BOARD_ID_RESISTOR,PB100_BOARD_ID_RESISTOR_CLASS_PRELIM,Created,Board identity resistor network class
-JP_CAN1,can1-safety,CAN1_TX_DISABLE,PB100_CAN1_TX_DISABLE_PRELIM,Created,DNP/open CAN1 TX link or jumper class
-U_CAN1,can1-safety,CAN1_TX_DISABLE,PB100_CAN1_TX_DISABLE_PRELIM,Created,Conditional CAN1 TX disable gate class
+JP_CAN1,can1-safety,CAN1_TX_DISABLE,PB100_CAN1_TX_DNP_LINK_PRELIM,Created,DNP/open CAN1 TX link concrete symbol under CAN1_TX_DISABLE policy umbrella
+U_CAN1,can1-safety,CAN1_TX_DISABLE,PB100_SN74LVC1G125_Q1_DBV_PRELIM,Created,Conditional SN74LVC1G125-Q1 DBV gate concrete symbol under CAN1_TX_DISABLE policy umbrella
 TP1..TPn,test,TEST_POINT,PB100_TEST_POINT_CLASS_PRELIM,Created,Pattern row for schematic-review-defined test points

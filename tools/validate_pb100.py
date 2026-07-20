@@ -2137,6 +2137,115 @@ def validate_symbol_pin_evidence() -> None:
         )
 
 
+def parse_symbol_pin_numbers(symbol_name: str) -> set[str]:
+    block = symbol_block(read_text(KICAD_DIR / "lib" / "PB100.kicad_sym"), symbol_name)
+    if not block:
+        fail(f"symbol pad-map target is missing from PB100.kicad_sym: {symbol_name}")
+    return set(re.findall(r'\(number "([^"]+)"', block))
+
+
+def parse_footprint_pad_numbers(path: Path) -> set[str]:
+    if not path.exists():
+        fail(f"symbol-footprint pad-map references missing footprint: {path.relative_to(REPO_ROOT)}")
+    return set(re.findall(r'\(pad "([^"]+)"', read_text(path)))
+
+
+def footprint_pad_blocks(path: Path, pad_number: str) -> list[str]:
+    text = read_text(path)
+    pattern = re.compile(rf'\n\t\(pad "{re.escape(pad_number)}" .*?\n\t\)', re.DOTALL)
+    return pattern.findall(text)
+
+
+def validate_large_mosfet_paste_segmentation() -> None:
+    checks = (
+        (
+            PB100_DIR / "kicad" / "lib" / "PB100.pretty" / "PG-HSOF-8-1_TOLL_Infineon.kicad_mod",
+            "Tab",
+            42,
+        ),
+        (
+            PB100_DIR / "kicad" / "lib" / "PB100.pretty" / "LFPAK88_SOT1235_Nexperia.kicad_mod",
+            "mb",
+            12,
+        ),
+    )
+    for path, pad_number, minimum_paste_apertures in checks:
+        blocks = footprint_pad_blocks(path, pad_number)
+        if not blocks:
+            fail(f"{path.relative_to(REPO_ROOT)} is missing large MOSFET drain pad {pad_number}")
+        copper_blocks = [block for block in blocks if '"F.Cu"' in block]
+        paste_only_blocks = [
+            block
+            for block in blocks
+            if '"F.Paste"' in block and '"F.Cu"' not in block and '"F.Mask"' not in block
+        ]
+        if len(copper_blocks) != 1:
+            fail(
+                f"{path.relative_to(REPO_ROOT)} must have exactly one copper/mask drain pad "
+                f"{pad_number}, got {len(copper_blocks)}"
+            )
+        if '"F.Paste"' in copper_blocks[0]:
+            fail(f"{path.relative_to(REPO_ROOT)} drain copper pad {pad_number} must not use solid F.Paste")
+        if len(paste_only_blocks) < minimum_paste_apertures:
+            fail(
+                f"{path.relative_to(REPO_ROOT)} drain pad {pad_number} needs at least "
+                f"{minimum_paste_apertures} segmented paste apertures, got {len(paste_only_blocks)}"
+            )
+
+
+def validate_symbol_footprint_pad_map() -> None:
+    path = PB100_DIR / "PB-100-symbol-footprint-pad-map.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    if not rows:
+        fail(f"empty symbol-footprint pad-map: {path.relative_to(REPO_ROOT)}")
+    required_columns = {
+        "Map ID",
+        "Symbol name",
+        "Symbol pin numbers",
+        "Footprint path",
+        "Footprint pad numbers",
+        "Compatibility state",
+        "Evidence",
+        "Blocked action",
+    }
+    missing_columns = required_columns - set(rows[0])
+    if missing_columns:
+        fail(f"{path.relative_to(REPO_ROOT)} is missing columns: {', '.join(sorted(missing_columns))}")
+    seen_ids = set()
+    for row_number, row in enumerate(rows, 2):
+        map_id = row["Map ID"].strip()
+        if map_id in seen_ids:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Map ID {map_id}")
+        seen_ids.add(map_id)
+        if row["Compatibility state"].strip() != "Compatible":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Compatibility state must be Compatible")
+        if "Do not" not in row["Blocked action"]:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocked action must be explicit")
+        symbol_name = row["Symbol name"].strip()
+        symbol_expected = set(row["Symbol pin numbers"].split())
+        footprint_path = REPO_ROOT / row["Footprint path"].strip()
+        footprint_expected = set(row["Footprint pad numbers"].split())
+        symbol_actual = parse_symbol_pin_numbers(symbol_name)
+        footprint_actual = parse_footprint_pad_numbers(footprint_path)
+        missing_symbol_pins = sorted(symbol_expected - symbol_actual)
+        missing_footprint_pads = sorted(footprint_expected - footprint_actual)
+        if missing_symbol_pins:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: {symbol_name} missing symbol pins "
+                f"{', '.join(missing_symbol_pins)}"
+            )
+        if missing_footprint_pads:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: "
+                f"{row['Footprint path'].strip()} missing footprint pads {', '.join(missing_footprint_pads)}"
+            )
+        if symbol_expected != footprint_expected:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: symbol pin set and footprint pad set must match"
+            )
+
+
 def validate_input_reverse_fet_symbol_evidence() -> None:
     symbol_name = "PB100_INPUT_NMOS_TOLL_PRELIM"
     symbol_text = read_text(KICAD_DIR / "lib" / "PB100.kicad_sym")
@@ -2258,7 +2367,14 @@ def validate_instance_symbol_map() -> None:
         worklist_row = worklist_by_key.get(symbol_key)
         if worklist_row is None:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: symbol key {symbol_key} is missing worklist row")
-        if symbol_name != worklist_row["Concrete symbol name"].strip():
+        can1_concrete_symbols = {
+            "PB100_CAN1_TX_DISABLE_PRELIM",
+            "PB100_CAN1_TX_DNP_LINK_PRELIM",
+            "PB100_SN74LVC1G125_Q1_DBV_PRELIM",
+        }
+        if symbol_key == "CAN1_TX_DISABLE" and symbol_name in can1_concrete_symbols:
+            pass
+        elif symbol_name != worklist_row["Concrete symbol name"].strip():
             fail(
                 f"{path.relative_to(REPO_ROOT)}:{row_number}: {ref} maps to {symbol_name}, "
                 f"but worklist uses {worklist_row['Concrete symbol name'].strip()}"
@@ -8388,6 +8504,25 @@ def validate_can1_capture_contract() -> None:
         if token not in can1_sheet:
             fail(f"CAN1 safety KiCad sheet capture notes must include {token}")
 
+    if '(lib_id "pb100:pb100_can1_tx_disable_prelim")' in can1_sheet:
+        fail("JP_CAN1 and U_CAN1 must not use the generic CAN1_TX_DISABLE preliminary symbol")
+    for reference, concrete_symbol in (
+        ("JP_CAN1", "PB100:PB100_CAN1_TX_DNP_LINK_PRELIM"),
+        ("U_CAN1", "PB100:PB100_SN74LVC1G125_Q1_DBV_PRELIM"),
+    ):
+        reference_marker = f'(property "reference" "{reference.lower()}"'
+        symbol_marker = f'(lib_id "{concrete_symbol.lower()}")'
+        reference_index = can1_sheet.find(reference_marker)
+        if reference_index < 0:
+            fail(f"CAN1 safety sheet is missing reference {reference}")
+        symbol_index = can1_sheet.rfind("(lib_id", 0, reference_index)
+        if symbol_index < 0 or symbol_marker not in can1_sheet[symbol_index:reference_index]:
+            fail(f"{reference} must use concrete symbol {concrete_symbol}")
+    if '(property "reference" "jp_can1"' in can1_sheet and "(dnp yes)" not in can1_sheet:
+        fail("JP_CAN1 must remain DNP/open in the CAN1 safety sheet")
+    if "can1_tx_gate_out" not in can1_sheet:
+        fail("CAN1 safety sheet must expose CAN1_TX_GATE_OUT between U_CAN1 and JP_CAN1")
+
     bom_map = read_text(REPO_ROOT / "production" / "bom" / "pb100_symbol_bom_map.csv").lower()
     for token in ("can1_tx_disable", "default dnp/open", "no default-populated"):
         if token not in bom_map:
@@ -11372,6 +11507,8 @@ def main() -> int:
     validate_symbol_capture_worklist()
     validate_symbol_capture_progress()
     validate_symbol_pin_evidence()
+    validate_symbol_footprint_pad_map()
+    validate_large_mosfet_paste_segmentation()
     validate_input_reverse_fet_symbol_evidence()
     validate_jpb1_symbol_from_pin_map()
     validate_instance_symbol_map()

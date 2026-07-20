@@ -3083,3 +3083,26 @@ or PCBA orders are created or authorized. PB-100 board import remains blocked
 by thermal/current layout evidence and controlled schematic symbol promotion.
 LB-100 board import remains blocked by signal-integrity layout evidence and
 controlled schematic symbol promotion.
+
+## 2026-07-20 — PB-100 footprint binding review remediation
+
+Decision: tighten PB-100 footprint-binding evidence after review. The TOLL
+input MOSFET footprint drain pad now uses `Tab` to match
+`PB100_INPUT_NMOS_TOLL_PRELIM`; the LFPAK88 drain mounting-base pad now uses
+`mb` to match `PB100_POWER_NMOS_ESCAPE_PRELIM`. `JP_CAN1` and `U_CAN1` no
+longer share the generic five-pin CAN1 safety symbol in the CAN1 sheet:
+`JP_CAN1` uses a concrete two-pin DNP/open link symbol and `U_CAN1` uses a
+concrete SN74LVC1G125-Q1 DBV five-pin gate symbol. `PB-100-symbol-footprint-pad-map.csv`
+and `tools/validate_pb100.py` now check these symbol-pin to footprint-pad
+contracts automatically.
+
+Reason: a local `.kicad_mod` alone is not enough evidence for safe board import.
+Symbol pins and footprint pads must match before controlled symbol promotion,
+and large MOSFET drain pads must not carry a solid stencil aperture. The TOLL
+and LFPAK88 drain copper pads now exclude `F.Paste` and use segmented
+paste-only apertures checked by the validator. Solder-voiding, thermal-via
+fields, final MOSFET package selection, overshoot/SOA margin, and schematic
+Footprint property promotion remain blocked before board import. No
+`PB-100.kicad_pcb`, Gerbers, drills, pick-place files, BOM/CPL order packages,
+manufacturing ZIPs, fabrication packages, panel outputs, or PCBA orders are
+created or authorized.
