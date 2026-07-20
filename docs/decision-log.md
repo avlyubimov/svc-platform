@@ -2869,3 +2869,17 @@ garage-kit, and sourcing review, but they should not block KiCad footprint
 binding as if they were on-board SMT/THT land patterns. This reduces false
 board-import blockers while preserving the manufacturing boundary and without
 removing any DNP footprint or board capability.
+
+## 2026-07-20 — Footprint package sources identified
+
+Decision: The footprint-binding inventories now distinguish package-source
+identification from completed footprint binding. PB-100 has 14 of 15 open
+on-board footprint items with package sources identified, LB-100 has 9 of 13,
+and FB-100 has 8 of 12.
+
+Reason: Official package/source evidence is required before creating project
+local footprints, but identifying a package source does not prove pad geometry,
+pin-1/orientation, courtyard, stencil, solder-mask, or assembly handling. Board
+import therefore remains `BLOCKED` until each source-identified item is
+converted into reviewed KiCad footprint evidence and every remaining open source
+gap is resolved.

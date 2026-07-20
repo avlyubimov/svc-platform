@@ -146,6 +146,7 @@ FOOTPRINT_BINDING_STATUS_COLUMNS = (
     "Evidence source",
     "KiCad symbol state",
     "Open footprint items",
+    "Package sources identified",
     "Board import state",
     "Blocked action",
 )
@@ -937,7 +938,7 @@ def validate_layout_start_checklist(board: str, path: Path) -> None:
             fail(f"{path.relative_to(REPO_ROOT)} must include board-specific token {token}")
 
 
-def validate_footprint_binding_inventory(board: str, path: Path) -> int:
+def validate_footprint_binding_inventory(board: str, path: Path) -> tuple[int, int]:
     rows = validate_csv(path)
     if not rows:
         fail(f"empty footprint inventory: {path.relative_to(REPO_ROOT)}")
@@ -955,6 +956,7 @@ def validate_footprint_binding_inventory(board: str, path: Path) -> int:
             fail(f"{path.relative_to(REPO_ROOT)} must include board-specific footprint token {token}")
     seen_items = set()
     open_items = 0
+    source_identified_items = 0
     for row_number, row in enumerate(rows, 2):
         item = row["Footprint item"].strip()
         if item in seen_items:
@@ -969,13 +971,15 @@ def validate_footprint_binding_inventory(board: str, path: Path) -> int:
         drawing_state = row["Drawing review state"].strip()
         if binding_state not in {"Open", "Not required"}:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid KiCad footprint binding state")
-        if drawing_state not in {"Open", "Not required"}:
+        if drawing_state not in {"Open", "Source identified", "Not required"}:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Drawing review state")
         impact = row["Board-import impact"].strip()
         if binding_state == "Open":
             open_items += 1
-            if drawing_state != "Open":
-                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: open binding requires open drawing review")
+            if drawing_state == "Source identified":
+                source_identified_items += 1
+            elif drawing_state != "Open":
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: open binding requires open or source-identified drawing review")
             if "BOARD_IMPORT_BLOCKED" not in impact:
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: board import must remain blocked")
         else:
@@ -986,7 +990,7 @@ def validate_footprint_binding_inventory(board: str, path: Path) -> int:
         next_action = row["Next action"].lower()
         if not any(verb in next_action for verb in ("review", "verify", "select", "keep", "close", "bind")):
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Next action must be actionable")
-    return open_items
+    return open_items, source_identified_items
 
 
 def validate_footprint_binding_status() -> None:
@@ -1011,10 +1015,18 @@ def validate_footprint_binding_status() -> None:
             open_items = int(row["Open footprint items"].strip())
         except ValueError:
             fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: Open footprint items must be an integer")
-        if open_items != inventory_counts[board]:
+        source_identified_items = int(row["Package sources identified"].strip())
+        expected_open_items, expected_source_identified_items = inventory_counts[board]
+        if open_items != expected_open_items:
             fail(
                 f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: "
-                f"open item count {open_items} does not match inventory count {inventory_counts[board]}"
+                f"open item count {open_items} does not match inventory count {expected_open_items}"
+            )
+        if source_identified_items != expected_source_identified_items:
+            fail(
+                f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"source-identified count {source_identified_items} does not match inventory count "
+                f"{expected_source_identified_items}"
             )
         if row["Board import state"].strip() != "BLOCKED":
             fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: board import must be BLOCKED")
