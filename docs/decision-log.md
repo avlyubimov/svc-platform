@@ -2588,3 +2588,30 @@ Reason: Rule compilation uses caller-owned static storage to avoid dynamic
 allocation. A rejected rule must not leave partially updated condition storage
 that could be reused accidentally by a later rule evaluation. Validating first
 keeps failed compilation side-effect free for the caller-owned buffers.
+
+## 2026-07-20 — PBREL local evidence separated from external closeout
+
+Decision: PB-100 board-release evidence now has a dedicated local closeout
+ledger for `make check`-verified ERC, netlist, firmware host-test, capability,
+and configuration evidence. PBREL statuses remain `Conditional` until dated
+external bench, sourcing, schematic-value, and review records close.
+
+Reason: Local validation was complete for several firmware and schematic
+scaffold paths, but the board-release blockers also require physical bench
+records, current sourcing checks, and final value/footprint reviews. Separating
+local evidence prevents stale blocker wording without falsely authorizing PCB
+layout, Gerbers, drills, pick-place, manufacturing ZIPs, fabrication packages,
+or PCBA order packages.
+
+## 2026-07-20 — PB-100 sourcing snapshot refreshed without BOM lock
+
+Decision: PB-100 factory and garage sourcing records were refreshed against
+selected manufacturer and distributor pages for the current PBREL pass, and the
+refresh was synchronized between the sourcing evidence snapshot and assembly
+recheck register. The refresh does not lock the BOM or authorize layout.
+
+Reason: Distributor/manufacturer evidence can reduce stale sourcing risk, but
+PBREL-011 and PBREL-012 still require JLCPCB/PCBWay assembly-class evidence,
+exact orderable suffixes, inspection/rework handling, garage housings, contacts,
+seals, crimp tooling, fuse holders, enclosure access, and purchase-ready kit
+evidence before schematic freeze or board release.

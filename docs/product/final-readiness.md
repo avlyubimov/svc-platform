@@ -50,10 +50,10 @@ Current coverage:
 | Architecture v1.0 | Ready | Frozen by ADR; PB-100 requirement changes still need ADR |
 | PB-100 requirements | Ready for schematic planning | Baseline is frozen; schematic freeze remains open |
 | PB-100 KiCad scaffold | Preliminary capture | Child sheets now contain ERC-clean preliminary capture content and exported netlist coverage; schematic freeze remains open |
-| PB-100 PCB/layout | Blocked | Layout, Gerber, drill, placement, and manufacturing zips are blocked by the board-release blocker register |
+| PB-100 PCB/layout | Blocked | Layout, Gerber, drill, placement, and manufacturing zips are blocked by the board-release blocker register; 2026-07-20 local ERC/netlist/host-test evidence is separated in `hardware/power-board/PB-100/PB-100-board-release-local-evidence-closeout.csv` |
 | Firmware safety core | Host-test ready | Output, overflow-safe delayed battery cutoff, runtime load shedding, stale-current safe-off, thermal derate/cutoff, CAN dropped-edge retry, telemetry, events, saturating diagnostic counters, logging, config, runtime boot, CAN-to-rule bridge, ambient-light rule conditions, ordered rule sets, multi-action rule compilation, rule runtime, and rule paths covered |
 | Configuration format | Host-test ready | JSON schema, canonical rule grammar, rule-action mapping, buffer-atomic rule compilation, PB-100 capability manifest, compiled capability baseline, config store reserved/sequence-wrap handling, config update, and examples are validated |
-| Production package | Draft | BOMs and component families need final sourcing and schematic evidence |
+| Production package | Draft | BOM sourcing snapshot was refreshed for selected manufacturer/distributor evidence on 2026-07-20; JLCPCB/PCBWay assembly, purchase-ready garage kits, and schematic closeout evidence remain open |
 
 ## Required before schematic freeze
 
@@ -63,6 +63,10 @@ Current coverage:
 - Close every row in
   `hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`; any
   remaining row blocks PCB layout and board release.
+- Keep `hardware/power-board/PB-100/PB-100-board-release-local-evidence-closeout.csv`
+  synchronized with the latest `make check` result so locally verified
+  firmware/schematic evidence is not confused with external bench or sourcing
+  closeout.
 - Keep all child sheets free of `sheet-placeholder` markers, ERC-clean, and
   covered by exported KiCad netlist component/net thresholds.
 - Select final critical MPNs and at least two alternatives for each critical
