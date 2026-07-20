@@ -53,6 +53,7 @@ Current host-tested services:
 
 - Configuration Validator
 - Configuration Store
+- Configuration Store reserved-field and sequence-wrap handling
 - Configuration Update
 - Configuration Acceptance
 - Hardware Capability Guard
@@ -60,14 +61,18 @@ Current host-tested services:
 - Event Bus
 - Event Dispatcher
 - Event Log
+- Event/CAN diagnostic counter saturation
 - Power Budget
 - Output Manager
 - Battery Protection
+- Overflow-safe battery elapsed-time conversion
 - CAN Safety Guard
 - CAN RX Log
 - CAN Event Decode
+- CAN dropped-edge retry
 - Rule Event Bridge
 - System Safety Coordinator
+- System Safety stale-current safe-off and shed-event retry
 - Role Resolver
 - Rule Engine role-action runner
 - Rule condition evaluator
@@ -77,6 +82,7 @@ Current host-tested services:
 - Rule text parser
 - Rule text-to-runner compile helper
 - Multi-action rule text compiler
+- Canonical and buffer-atomic rule text compilation
 - Rule Runtime event-to-action step
 - Output Manager PWM duty-cycle state
 - Runtime Boot
