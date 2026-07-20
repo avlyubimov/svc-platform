@@ -11,6 +11,7 @@ hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv,Review pack
 hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md,Review package,Freeze gate checklist,Required,validate_schematic_freeze_gap_register,Open
 hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv,Review package,Conditional gate gap register,Required,validate_schematic_freeze_gap_register,Conditional
 hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv,Review package,Board-release blocker register,Required,validate_board_release_blocker_register,Conditional
+hardware/power-board/PB-100/PB-100-engineering-blocker-closeout.md,Review package,PBREL engineering blocker closeout,Required,validate_engineering_blocker_closeout,Closed
 hardware/power-board/PB-100/PB-100-board-print-closure-matrix.csv,Review package,Board-print closure matrix,Required,validate_board_print_closure_matrix,Conditional
 hardware/power-board/PB-100/PB-100-board-release-local-evidence-closeout.csv,Review package,Local PBREL evidence closeout ledger,Required,Document reviewed,Conditional
 hardware/power-board/PB-100/PB-100-validation-traceability.csv,Validation,Freeze-gate validation trace,Required,validate_validation_traceability,Conditional

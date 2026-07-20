@@ -112,6 +112,7 @@ release, not first prototype PCB fabrication.
 - `hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv`
 - `hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`
+- `hardware/power-board/PB-100/PB-100-engineering-blocker-closeout.md`
 - `hardware/power-board/PB-100/PB-100-validation-traceability.csv`
 - `hardware/power-board/PB-100/PB-100-test-point-plan.csv`
 - `hardware/power-board/PB-100/PB-100-fault-response-matrix.csv`
@@ -551,6 +552,8 @@ Preliminary validation tables:
   `hardware/power-board/PB-100/PB-100-review-release-manifest.csv`.
 - Track board-print blocker closure state in
   `hardware/power-board/PB-100/PB-100-board-print-closure-matrix.csv`.
+- Track PBREL engineering blocker closeout in
+  `hardware/power-board/PB-100/PB-100-engineering-blocker-closeout.md`.
 - Validate candidate MPNs in `PB-100-power-path-candidates.csv`.
 - Validate ADR-0011 low-current external-controller implementation.
 - Confirm high-side switch/controller thermal limits.
@@ -561,7 +564,8 @@ Preliminary validation tables:
 - Confirm connector current ratings and derating.
 - Confirm JLCPCB/PCBWay assembly class for selected MPNs.
 - Review `hardware/power-board/PB-100/PB-100-board-print-closure-matrix.csv`
-  against all active PBREL blockers before any board-print package work.
+  and `hardware/power-board/PB-100/PB-100-engineering-blocker-closeout.md`
+  against all PBREL blocker history before any board-print package work.
 - Review `hardware/power-board/PB-100/PB-100-factory-assembly-sourcing-precheck.csv`
   against current factory assembly and distributor evidence.
 - Review `hardware/power-board/PB-100/PB-100-factory-assembly-closeout-precheck.csv`
