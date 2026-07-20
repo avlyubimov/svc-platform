@@ -16,6 +16,16 @@ fabrication packages, panel outputs, or PCBA orders.
 - LM5164 logic buck: `PB100:SOIC-8_L4.9-W3.9-P1.27-LS6.0-BL-EP2.9`.
 - INA228-class input-current monitor: `PB100:VSSOP-10_L3.0-W3.0-P0.50-LS4.9-BL`.
 - TDK-class 0402 thermal NTCs: `PB100:R0402`.
+- JPB1 Hirose FX18 PB/LB pair: `PB100:FX18-100P-0.8SV10_Hirose` paired with `LB100:FX18-100S-0.8SV20_Hirose`.
+
+## FX18 Evidence Boundary
+
+The FX18 footprints are source-derived from the official Hirose FX18 catalog
+recommended land pattern and the official 2026 2D drawings for
+`FX18-100P-0.8SV10` and `FX18-100S-0.8SV20`. They close signal-pad footprint
+binding only. The MF/TH mechanical pads, paired datum, 20 mm stack spacing,
+pin-1 orientation across boards, vibration retention, and assembly handling
+remain in the mechanical envelope gate before board import.
 
 ## Still Open
 
@@ -27,12 +37,11 @@ footprint evidence before board import:
 - DO-218AC input TVS.
 - CSS4J-4026 four-terminal current shunt.
 - Optional digital temperature sensor if retained as DNP.
-- FX18 100-pin board-to-board connector pair.
 - CAN1 TX-disable final DNP/open link or logic-gate footprint decision.
 
 ## Boundary
 
-PB-100 now has 6 bound on-board footprint items, 9 open on-board footprint
+PB-100 now has 7 bound on-board footprint items, 8 open on-board footprint
 items, and 2 garage/not-required footprint items. KiCad board import remains
 blocked by the open PB footprint rows plus mechanical and thermal/current layout
 gates.

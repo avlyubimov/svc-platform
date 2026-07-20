@@ -2989,3 +2989,20 @@ and related optional/safety footprint decisions, while LB still needs the FX18
 JPB1 footprint and mechanical layout gates. No `*.kicad_pcb`, Gerbers, drills,
 pick-place, BOM/CPL, manufacturing ZIP, fabrication package, panel output, or
 PCBA order artifact is authorized or created by this increment.
+
+## 2026-07-20 — PB/LB FX18 local footprint binding
+
+Decision: PB-100 and LB-100 now include project-local source-derived Hirose
+FX18 footprints for the JPB1 mezzanine pair: `PB100:FX18-100P-0.8SV10_Hirose`
+and `LB100:FX18-100S-0.8SV20_Hirose`. The derivation uses the official Hirose
+FX18 catalog recommended land pattern plus official 2026 2D drawings for
+`CL0579-0034-1-00` and `CL0579-0038-2-00`; the footprint files intentionally
+keep MF/TH mechanical details as mechanical-envelope follow-up evidence rather
+than authorizing board import.
+
+Reason: JLCPCB/EasyEDA API did not expose the FX18 models, Hirose Allegro
+footprints require member access, and the project must keep footprint binding
+moving without starting layout or fabricating artifacts. Signal pad pitch, pad
+size, body outline, pin numbering, and source links are captured locally; paired
+stack datum, 20 mm spacing, pin-1 cross-board orientation, vibration retention,
+and assembly handling remain blocked in mechanical layout gates.
