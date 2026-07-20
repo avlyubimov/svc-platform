@@ -19,6 +19,9 @@ fabrication packages, panel outputs, or PCBA orders.
 - JPB1 Hirose FX18 PB/LB pair: `PB100:FX18-100P-0.8SV10_Hirose` paired with `LB100:FX18-100S-0.8SV20_Hirose`.
 - LM5013-Q1 logic buck alternate: package-compatible with the existing reviewed `PB100:SOIC-8_L4.9-W3.9-P1.27-LS6.0-BL-EP2.9` DDA SO PowerPAD-8 footprint.
 - CAN1 TX-disable hardware: `PB100:R0603_DNP_LINK_1608Metric` for default-open `JP_CAN1` and `PB100:SOT-23-5_DBV_TI` for the `SN74LVC1G125-Q1`-class default-disabled gate candidate.
+- Vishay SM8S input TVS: `PB100:DO-218AC_Vishay_SM8S`.
+- Bourns CSS4J-4026 total input current shunt: `PB100:CSS4J-4026_Bourns`.
+- TMP112-Q1 optional DNP digital temperature sensor: `PB100:SOT-563-6_DRL_TI`.
 
 ## FX18 Evidence Boundary
 
@@ -36,13 +39,10 @@ footprint evidence before board import:
 
 - TOLL / PG-HSOF-8-1 input-reverse and OUT2 escape MOSFET path.
 - LFPAK88 80 V alternate MOSFET path.
-- DO-218AC input TVS.
-- CSS4J-4026 four-terminal current shunt.
-- Optional digital temperature sensor if retained as DNP.
 
 ## Boundary
 
-PB-100 now has 9 bound on-board footprint items, 6 open on-board footprint
+PB-100 now has 12 bound on-board footprint items, 3 open on-board footprint
 items, and 2 garage/not-required footprint items. KiCad board import remains
 blocked by the open PB footprint rows plus mechanical and thermal/current layout
 gates.

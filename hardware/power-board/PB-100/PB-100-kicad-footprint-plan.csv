@@ -5,12 +5,13 @@ OUT2 escape MOSFET,IAUTN06S5N008ATMA1 or BUK7S1R2-80M,TOLL or LFPAK88,Custom fro
 Reverse protection controller,LM74700QDBVRQ1,SOT-23-6,KiCad stock candidate,Verify,DBV package drawing required before lock
 Input reverse MOSFET,IAUTN06S5N008ATMA1,TOLL,Custom from Infineon package drawing,Custom required,Preferred input thermal strategy
 Input reverse MOSFET alternate,BUK7S1R2-80M,LFPAK88,Custom from Nexperia package drawing,Conditional,Higher-voltage alternate
-Input TVS,Vishay SM8S33AHM3/I,DO-218AC,KiCad stock or custom,Verify,High-current TVS footprint must match final active MPN
+Input TVS,Vishay SM8S33AHM3/I,DO-218AC,hardware/power-board/PB-100/kicad/lib/PB100.pretty/DO-218AC_Vishay_SM8S.kicad_mod,Bound,High-current TVS footprint matches Vishay DO-218AC mounting pad layout; polarity creepage and surge thermal layout remain open
 Logic buck,LM5164QDDATQ1,SO PowerPAD-8,KiCad stock candidate,Verify,TI DDA package drawing required before lock
 Logic buck alternate,LM5013-Q1,SO PowerPAD-8,hardware/power-board/PB-100/kicad/lib/PB100.pretty/SOIC-8_L4.9-W3.9-P1.27-LS6.0-BL-EP2.9.kicad_mod,Bound,Higher-current 100V fallback footprint only; LM5164 remains default unless logic-power review selects alternate
-Total input current monitor,INA228 or INA226 class,VSSOP/SOIC,KiCad stock candidate,Verify,Final monitor MPN not locked
+Total input current monitor,INA228 or INA226 class,VSSOP/SOIC,hardware/power-board/PB-100/kicad/lib/PB100.pretty/VSSOP-10_L3.0-W3.0-P0.50-LS4.9-BL.kicad_mod,Bound,Final monitor MPN not locked
+Total input current shunt,Bourns CSS4J-4026R-L500F class,4-terminal shunt 4026,hardware/power-board/PB-100/kicad/lib/PB100.pretty/CSS4J-4026_Bourns.kicad_mod,Bound,Force/sense polarity pulse power solder voiding and copper heating remain layout gates
 Thermal sensors,TDK NTCGS103JF103FT8-class 10k NTC,0402,KiCad stock candidate,Verify,Use 150C AEC-Q200 part and close divider calibration before lock
-Optional digital temp,TMP117 or TMP112 class,DFN/SOT class,KiCad stock candidate,Optional,DNP if analog NTC strategy is sufficient
+Optional digital temp,TMP117 or TMP112 class,DFN/SOT class,hardware/power-board/PB-100/kicad/lib/PB100.pretty/SOT-563-6_DRL_TI.kicad_mod,Bound optional,DNP if analog NTC strategy is sufficient; TMP117 package would need a separate footprint if selected
 B2B connector,Hirose FX18-100P-0.8SV10 plus FX18-100S-0.8SV20 candidate pair,100-position 0.8 mm FX18 20 mm stack candidate,Vendor drawing required,Candidate pair,No placement until stack height vibration and assembly review close
 Output fuses,User-serviceable fuse holders,TBD,Vendor drawing required,Garage item,Footprint depends on fuse format and enclosure
 High-current connectors,Output and battery connectors,TBD,Vendor drawing required,Garage item,Connector current rating and derating still conditional
