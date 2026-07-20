@@ -14,7 +14,7 @@
     (comment 4 "PB_5V_OUT allocation is 500 mA sustained unless reviewed.")
   )
   (lib_symbols)
-  (text "LB-100 schematic scaffold only.\n\nDo not create LB-100.kicad_pcb from this project until ../LB-100-pcb-layout-start-checklist.csv closes footprint binding and mechanical envelope gates.\n\nPrimary inputs:\n- ../LB-100-requirements.md\n- ../LB-100-power-budget-precheck.md\n- ../LB-100-schematic-freeze-checklist.md\n- ../LB-100-pcb-layout-start-checklist.csv\n- ../LB-100-footprint-binding-inventory.csv\n- ../LB-100-board-release-blocker-register.csv\n- ../../../power-board/PB-100/PB-100-b2b-pin-map.csv"
+  (text "LB-100 schematic scaffold only.\n\nDo not create LB-100.kicad_pcb from this project until ../LB-100-pcb-layout-start-checklist.csv closes footprint binding and mechanical envelope gates.\n\nPrimary inputs:\n- ../LB-100-requirements.md\n- ../LB-100-power-budget-precheck.md\n- ../LB-100-schematic-freeze-checklist.md\n- ../LB-100-pcb-layout-start-checklist.csv\n- ../LB-100-footprint-binding-inventory.csv\n- ../LB-100-mechanical-envelope-inventory.csv\n- ../LB-100-board-release-blocker-register.csv\n- ../../../power-board/PB-100/PB-100-b2b-pin-map.csv"
     (at 30 35 0)
     (effects
       (font
@@ -44,7 +44,7 @@
     )
     (uuid "b4a6cc8e-99e4-4a1e-9d1b-6dc9c6fd2291")
   )
-  (text "Schematic freeze evidence:\n- ../LB-100-schematic-review-closeout.md\n- ../LB-100-stm32h563-pin-binding-precheck.csv\n- ../LB-100-rail-budget-closeout-precheck.csv\n- ../LB-100-communication-safety-precheck.csv\n- ../LB-100-service-storage-sensor-precheck.csv\n- ../LB-100-mcu-sourcing-precheck.csv\n- ../LB-100-component-sourcing-precheck.csv\n- ../LB-100-pcb-layout-start-checklist.csv\n- ../LB-100-footprint-binding-inventory.csv\n\nPCB layout and manufacturing outputs remain separate post-freeze work."
+  (text "Schematic freeze evidence:\n- ../LB-100-schematic-review-closeout.md\n- ../LB-100-stm32h563-pin-binding-precheck.csv\n- ../LB-100-rail-budget-closeout-precheck.csv\n- ../LB-100-communication-safety-precheck.csv\n- ../LB-100-service-storage-sensor-precheck.csv\n- ../LB-100-mcu-sourcing-precheck.csv\n- ../LB-100-component-sourcing-precheck.csv\n- ../LB-100-pcb-layout-start-checklist.csv\n- ../LB-100-footprint-binding-inventory.csv\n- ../LB-100-mechanical-envelope-inventory.csv\n\nPCB layout and manufacturing outputs remain separate post-freeze work."
     (at 155 130 0)
     (effects
       (font

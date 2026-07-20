@@ -18,6 +18,9 @@ LAYOUT_START_READINESS = (
 FOOTPRINT_BINDING_STATUS = (
     REPO_ROOT / "production" / "board-order" / "three_board_footprint_binding_status.csv"
 )
+MECHANICAL_ENVELOPE_STATUS = (
+    REPO_ROOT / "production" / "board-order" / "three_board_mechanical_envelope_status.csv"
+)
 PB100_FREEZE = PB100_DIR / "PB-100-schematic-freeze-checklist.md"
 ADR_0014 = REPO_ROOT / "docs" / "adr" / "ADR-0014-lb-fb-baseline-requirements.md"
 
@@ -66,6 +69,11 @@ FOOTPRINT_BINDING_INVENTORIES = {
     "PB-100": PB100_DIR / "PB-100-footprint-binding-inventory.csv",
     "LB-100": LB100_DIR / "LB-100-footprint-binding-inventory.csv",
     "FB-100": FB100_DIR / "FB-100-footprint-binding-inventory.csv",
+}
+MECHANICAL_ENVELOPE_INVENTORIES = {
+    "PB-100": PB100_DIR / "PB-100-mechanical-envelope-inventory.csv",
+    "LB-100": LB100_DIR / "LB-100-mechanical-envelope-inventory.csv",
+    "FB-100": FB100_DIR / "FB-100-mechanical-envelope-inventory.csv",
 }
 SCHEMATIC_REVIEW_CLOSEOUTS = {
     "LB-100": LB100_DIR / "LB-100-schematic-review-closeout.md",
@@ -150,6 +158,23 @@ FOOTPRINT_BINDING_INVENTORY_COLUMNS = (
     "KiCad footprint binding state",
     "Drawing review state",
     "Alternatives",
+    "Board-import impact",
+    "Next action",
+)
+MECHANICAL_ENVELOPE_STATUS_COLUMNS = (
+    "Board",
+    "Inventory",
+    "Evidence source",
+    "Open mechanical items",
+    "Board import state",
+    "Blocked action",
+)
+MECHANICAL_ENVELOPE_INVENTORY_COLUMNS = (
+    "Mechanical item",
+    "Scope",
+    "Evidence",
+    "Current state",
+    "Review state",
     "Board-import impact",
     "Next action",
 )
@@ -831,7 +856,9 @@ def validate_layout_start_readiness() -> None:
             "manufacturing ZIP",
             f"{board}-pcb-layout-start-checklist.csv",
             f"{board}-footprint-binding-inventory.csv",
+            f"{board}-mechanical-envelope-inventory.csv",
             "three_board_footprint_binding_status.csv",
+            "three_board_mechanical_envelope_status.csv",
             "footprint binding",
             "mechanical envelope",
         ):
@@ -889,6 +916,7 @@ def validate_layout_start_checklist(board: str, path: Path) -> None:
     for token in (
         "empty Footprint properties",
         f"{board}-footprint-binding-inventory.csv",
+        f"{board}-mechanical-envelope-inventory.csv",
         "production/board-order/three_board_layout_rules.md",
         "Gerbers",
         "drills",
@@ -986,6 +1014,79 @@ def validate_footprint_binding_status() -> None:
         fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)} is missing boards: {', '.join(missing_boards)}")
 
 
+def validate_mechanical_envelope_inventory(board: str, path: Path) -> int:
+    rows = validate_csv(path)
+    if not rows:
+        fail(f"empty mechanical envelope inventory: {path.relative_to(REPO_ROOT)}")
+    missing_columns = [column for column in MECHANICAL_ENVELOPE_INVENTORY_COLUMNS if column not in rows[0]]
+    if missing_columns:
+        fail(f"{path.relative_to(REPO_ROOT)} is missing columns: {', '.join(missing_columns)}")
+    text = read_text(path)
+    board_tokens = {
+        "PB-100": ("JPB1", "fuse", "high-current", "CAN1"),
+        "LB-100": ("JPB1", "STM32H563VITx", "BLE antenna", "CAN1_TX_ROUTE"),
+        "FB-100": ("USB-C", "JFB1", "CH_LED_1..CH_LED_10", "OLED"),
+    }
+    for token in board_tokens[board]:
+        if token not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} must include board-specific mechanical token {token}")
+    seen_items = set()
+    for row_number, row in enumerate(rows, 2):
+        item = row["Mechanical item"].strip()
+        if item in seen_items:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Mechanical item {item}")
+        seen_items.add(item)
+        for column in MECHANICAL_ENVELOPE_INVENTORY_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if row["Review state"].strip() != "Open":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Review state must be Open")
+        if "BOARD_IMPORT_BLOCKED" not in row["Board-import impact"]:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: board import must remain blocked")
+        next_action = row["Next action"].lower()
+        if not any(verb in next_action for verb in ("create", "select", "review", "define", "close", "apply")):
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Next action must be actionable")
+    return len(rows)
+
+
+def validate_mechanical_envelope_status() -> None:
+    rows = validate_csv(MECHANICAL_ENVELOPE_STATUS)
+    missing_columns = [column for column in MECHANICAL_ENVELOPE_STATUS_COLUMNS if column not in rows[0]]
+    if missing_columns:
+        fail(f"{MECHANICAL_ENVELOPE_STATUS.relative_to(REPO_ROOT)} is missing columns: {', '.join(missing_columns)}")
+    seen_boards = set()
+    inventory_counts = {
+        board: validate_mechanical_envelope_inventory(board, path)
+        for board, path in MECHANICAL_ENVELOPE_INVENTORIES.items()
+    }
+    for row_number, row in enumerate(rows, 2):
+        board = row["Board"].strip()
+        seen_boards.add(board)
+        if board not in REQUIRED_ORDER_BOARDS:
+            fail(f"{MECHANICAL_ENVELOPE_STATUS.relative_to(REPO_ROOT)}:{row_number}: unknown board {board}")
+        inventory = row["Inventory"].strip()
+        if inventory != str(MECHANICAL_ENVELOPE_INVENTORIES[board].relative_to(REPO_ROOT)):
+            fail(f"{MECHANICAL_ENVELOPE_STATUS.relative_to(REPO_ROOT)}:{row_number}: wrong inventory path")
+        try:
+            open_items = int(row["Open mechanical items"].strip())
+        except ValueError:
+            fail(f"{MECHANICAL_ENVELOPE_STATUS.relative_to(REPO_ROOT)}:{row_number}: Open mechanical items must be an integer")
+        if open_items != inventory_counts[board]:
+            fail(
+                f"{MECHANICAL_ENVELOPE_STATUS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"open item count {open_items} does not match inventory count {inventory_counts[board]}"
+            )
+        if row["Board import state"].strip() != "BLOCKED":
+            fail(f"{MECHANICAL_ENVELOPE_STATUS.relative_to(REPO_ROOT)}:{row_number}: board import must be BLOCKED")
+        row_text = " ".join(row.values())
+        for token in (f"{board}.kicad_pcb", "Do not create", "mechanical", "evidence closes"):
+            if token not in row_text:
+                fail(f"{MECHANICAL_ENVELOPE_STATUS.relative_to(REPO_ROOT)}:{row_number}: must include {token}")
+    missing_boards = sorted(REQUIRED_ORDER_BOARDS - seen_boards)
+    if missing_boards:
+        fail(f"{MECHANICAL_ENVELOPE_STATUS.relative_to(REPO_ROOT)} is missing boards: {', '.join(missing_boards)}")
+
+
 def validate_kicad_scaffold(board: str, board_dir: Path, status: str) -> None:
     kicad_dir = board_dir / "kicad"
     project_path = kicad_dir / f"{board}.kicad_pro"
@@ -1018,6 +1119,7 @@ def validate_kicad_scaffold(board: str, board_dir: Path, status: str) -> None:
         for token in (
             f"{board}-pcb-layout-start-checklist.csv",
             f"{board}-footprint-binding-inventory.csv",
+            f"{board}-mechanical-envelope-inventory.csv",
             f"{board}.kicad_pcb",
             "footprint binding",
             "mechanical envelope",
@@ -1119,6 +1221,7 @@ def main() -> int:
     )
     validate_layout_rules()
     validate_footprint_binding_status()
+    validate_mechanical_envelope_status()
     validate_layout_start_readiness()
     for board, path in LAYOUT_START_CHECKLISTS.items():
         validate_layout_start_checklist(board, path)

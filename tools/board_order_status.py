@@ -15,6 +15,9 @@ LAYOUT_START_READINESS = (
 FOOTPRINT_BINDING_STATUS = (
     REPO_ROOT / "production" / "board-order" / "three_board_footprint_binding_status.csv"
 )
+MECHANICAL_ENVELOPE_STATUS = (
+    REPO_ROOT / "production" / "board-order" / "three_board_mechanical_envelope_status.csv"
+)
 PB100_FREEZE = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-schematic-freeze-checklist.md"
 PB100_BLOCKERS = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-board-release-blocker-register.csv"
 BOARD_BLOCKERS = {
@@ -73,11 +76,19 @@ def load_footprint_rows() -> dict[str, dict[str, str]]:
         return {row["Board"]: row for row in csv.DictReader(handle)}
 
 
+def load_mechanical_rows() -> dict[str, dict[str, str]]:
+    if not MECHANICAL_ENVELOPE_STATUS.exists():
+        return {}
+    with MECHANICAL_ENVELOPE_STATUS.open(newline="", encoding="utf-8") as handle:
+        return {row["Board"]: row for row in csv.DictReader(handle)}
+
+
 def main() -> int:
     args = parse_args()
     rows = load_order_rows()
     layout_rows = load_layout_rows()
     footprint_rows = load_footprint_rows()
+    mechanical_rows = load_mechanical_rows()
     blocked_rows = [row for row in rows if row["Order state"].strip() != "READY"]
     layout_ready_rows = [
         row for row in layout_rows.values() if row["Layout planning state"].strip() == "READY"
@@ -102,9 +113,11 @@ def main() -> int:
         active_count = active_blockers(blocker_path) if blocker_path is not None else 0
         layout_row = layout_rows.get(board, {})
         footprint_row = footprint_rows.get(board, {})
+        mechanical_row = mechanical_rows.get(board, {})
         layout_state = layout_row.get("Layout planning state", "Missing")
         import_state = layout_row.get("KiCad board import state", "Missing")
         open_footprints = footprint_row.get("Open footprint items", "Missing")
+        open_mechanical = mechanical_row.get("Open mechanical items", "Missing")
         print(
             f"  - {board}: {row['Order state']} | "
             f"freeze={row['Schematic freeze state']} | "
@@ -112,6 +125,7 @@ def main() -> int:
             f"layout_planning={layout_state} | "
             f"board_import={import_state} | "
             f"open_footprints={open_footprints} | "
+            f"open_mechanical={open_mechanical} | "
             f"kicad={row['KiCad schematic state']} | "
             f"next={row['Next action']}"
         )

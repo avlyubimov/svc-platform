@@ -2837,3 +2837,21 @@ binding would produce false layout evidence. Board import therefore remains
 `BLOCKED` until package drawings, pad geometry, pin-1/orientation, DNP/open
 handling, assembly ownership, and mechanical keepout evidence close for every
 open footprint item.
+
+## 2026-07-20 — Mechanical envelope inventory blocks board import
+
+Decision: The second board-import blocker is decomposed into explicit
+mechanical-envelope inventories for PB-100, LB-100, and FB-100. The consolidated
+status file is
+`production/board-order/three_board_mechanical_envelope_status.csv`; per-board
+inventories are `PB-100-mechanical-envelope-inventory.csv`,
+`LB-100-mechanical-envelope-inventory.csv`, and
+`FB-100-mechanical-envelope-inventory.csv`.
+
+Reason: Layout planning is allowed, but KiCad board import still needs reviewed
+board outline, mounting, connector placement, service access, cable exits,
+mezzanine stack, antenna/optical/sensor keepouts, high-current zones, and
+panel/edge constraints. These are layout inputs, not architecture changes.
+Keeping board import `BLOCKED` prevents false `.kicad_pcb` evidence and keeps
+Gerbers, drills, pick-place files, BOM/CPL order packages, manufacturing ZIPs,
+fabrication packages, and PCBA orders blocked until layout review.

@@ -18,6 +18,9 @@ LAYOUT_START_CHECKLIST = PB100_DIR / "PB-100-pcb-layout-start-checklist.csv"
 FOOTPRINT_BINDING_STATUS = (
     REPO_ROOT / "production" / "board-order" / "three_board_footprint_binding_status.csv"
 )
+MECHANICAL_ENVELOPE_STATUS = (
+    REPO_ROOT / "production" / "board-order" / "three_board_mechanical_envelope_status.csv"
+)
 KICAD_DIR = PB100_DIR / "kicad"
 
 MANUFACTURING_SUFFIXES = {
@@ -123,6 +126,16 @@ def open_footprint_items() -> str:
     return "Missing"
 
 
+def open_mechanical_items() -> str:
+    if not MECHANICAL_ENVELOPE_STATUS.exists():
+        return "Missing"
+    with MECHANICAL_ENVELOPE_STATUS.open(newline="", encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            if row["Board"] == "PB-100":
+                return row["Open mechanical items"]
+    return "Missing"
+
+
 def layout_files() -> list[Path]:
     return sorted(KICAD_DIR.rglob("*.kicad_pcb"))
 
@@ -188,6 +201,7 @@ def main() -> int:
     print(f"  Active release blockers: {len(active_blockers)}")
     print(f"  Open layout-start gates: {len(open_layout_start_rows)}")
     print(f"  Open footprint items: {open_footprint_items()}")
+    print(f"  Open mechanical items: {open_mechanical_items()}")
     print(f"  Board-print closure rows: {len(active_closure_rows)}")
     print(f"  Deferred post-prototype validation gates: {len(deferred_post_prototype)}")
     print(f"  KiCad PCB files: {len(pcbs)}")
