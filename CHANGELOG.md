@@ -35,3 +35,5 @@
   total-current telemetry disables active outputs.
 - Hardened Runtime Boot store-loading invalid-argument handling so missing
   loaded-configuration storage leaves runtime safe/off.
+- Hardened Configuration Store record validation to reject nonzero reserved
+  fields before checksum/config acceptance.

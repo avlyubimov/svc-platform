@@ -124,6 +124,9 @@ svc_config_store_status_t svc_config_store_validate_record(
     if (record->format_version != SVC_CONFIG_STORE_FORMAT_VERSION) {
         return SVC_CONFIG_STORE_INVALID_VERSION;
     }
+    if (record->reserved != 0U) {
+        return SVC_CONFIG_STORE_INVALID_RESERVED;
+    }
     if (record->checksum != config_checksum(&record->config, record->sequence)) {
         return SVC_CONFIG_STORE_INVALID_CHECKSUM;
     }

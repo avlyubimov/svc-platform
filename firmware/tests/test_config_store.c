@@ -25,6 +25,16 @@ static void test_rejects_checksum_corruption(void)
     assert(svc_config_store_validate_record(&record) == SVC_CONFIG_STORE_INVALID_CHECKSUM);
 }
 
+static void test_rejects_reserved_field_corruption(void)
+{
+    svc_config_record_t record = {0};
+    assert(svc_config_store_build_record(&svc_default_config, 1U, &record) == SVC_CONFIG_STORE_OK);
+
+    record.reserved = 1U;
+
+    assert(svc_config_store_validate_record(&record) == SVC_CONFIG_STORE_INVALID_RESERVED);
+}
+
 static void test_rejects_telemetry_checksum_corruption(void)
 {
     svc_config_record_t record = {0};
@@ -121,6 +131,7 @@ int main(void)
 {
     test_builds_and_validates_config_record();
     test_rejects_checksum_corruption();
+    test_rejects_reserved_field_corruption();
     test_rejects_telemetry_checksum_corruption();
     test_selects_newest_valid_slot();
     test_fallback_default_when_slots_are_invalid();

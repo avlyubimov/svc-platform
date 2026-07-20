@@ -29,6 +29,8 @@ Current host tests cover:
   enum bounds without role-to-output assumptions.
 - Configuration Store record validation and two-slot selection so firmware
   defaults do not overwrite valid persisted user configuration.
+- Configuration Store reserved-field validation before accepting persisted
+  records.
 - Configuration Update preparation that refuses to persist a config until it is
   accepted against hardware capability.
 - Configuration acceptance for a discovered hardware capability contract before
