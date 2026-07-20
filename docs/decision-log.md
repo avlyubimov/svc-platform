@@ -2930,3 +2930,20 @@ the FB-100 mechanical rows removes 7 mechanical blockers without creating
 packages, manufacturing ZIPs, fabrication packages, panel CAD, enclosure CAD,
 or PCBA orders. FB-100 board import remains blocked by footprint binding and
 USB/no-back-power layout-model review.
+
+## 2026-07-20 — FB-100 USB no-back-power layout model closed
+
+Decision: FB-100 USB/no-back-power layout model is closed as a board-import
+input. USB ESD must sit between the USB-C receptacle and JFB1, `USB_D_P` and
+`USB_D_N` must route as a short coupled pair, `USB_VBUS_SENSE` remains
+sense-only with no connection to `FB_3V3_OR_IO`, `PB_5V_OUT`, `LB_3V3_IO`,
+PB-100, or any output rail, CC pins remain device-role only, shield/ESD return
+cannot be a high-current return, and JFB1 USB pins remain fixed. Evidence is in
+`hardware/front-board/FB-100/FB-100-usb-no-back-power-layout-rules.csv` and
+`hardware/front-board/FB-100/FB-100-usb-no-back-power-layout-closeout.md`.
+
+Reason: FB-100 schematic freeze closed USB policy but not USB layout-specific
+placement/routing constraints. This closes the USB/no-back-power layout-model
+gate without creating `FB-100.kicad_pcb`, Gerbers, drill files, pick-place
+files, BOM/CPL order packages, manufacturing ZIPs, fabrication packages, or
+PCBA orders. FB-100 board import remains blocked by footprint binding.
