@@ -1,9 +1,7 @@
 #include "rule_text.h"
 
-#include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdlib.h>
 #include <string.h>
 
 typedef struct {
@@ -66,6 +64,34 @@ static bool parse_role_name(const char *name, size_t name_length, output_role_t 
     return false;
 }
 
+static bool parse_pwm_percent(const char *text, uint8_t *pwm_duty_percent)
+{
+    if (text == NULL || text[0] == '\0') {
+        return false;
+    }
+    if (text[0] == '0') {
+        if (text[1] != '\0') {
+            return false;
+        }
+        *pwm_duty_percent = 0U;
+        return true;
+    }
+
+    unsigned int value = 0U;
+    for (size_t index = 0U; text[index] != '\0'; ++index) {
+        if (text[index] < '0' || text[index] > '9') {
+            return false;
+        }
+        value = value * 10U + (unsigned int)(text[index] - '0');
+        if (value > 100U) {
+            return false;
+        }
+    }
+
+    *pwm_duty_percent = (uint8_t)value;
+    return true;
+}
+
 svc_rule_text_status_t svc_rule_text_parse_condition(
     const char *text,
     svc_rule_condition_t *condition)
@@ -123,16 +149,62 @@ svc_rule_text_status_t svc_rule_text_parse_action(
     }
 
     const char *value_text = property_position + strlen(property);
-    char *end = NULL;
-    errno = 0;
-    const unsigned long pwm_value = strtoul(value_text, &end, 10);
-    if (errno != 0 || end == value_text || *end != '\0' || pwm_value > 100UL) {
+    uint8_t pwm_value = 0U;
+    if (!parse_pwm_percent(value_text, &pwm_value)) {
         return SVC_RULE_TEXT_INVALID_ACTION_VALUE;
     }
 
     action->role = role;
-    action->pwm_duty_percent = (uint8_t)pwm_value;
-    action->type = pwm_value == 0UL ? SVC_RULE_ACTION_DISABLE_ROLE : SVC_RULE_ACTION_ENABLE_ROLE;
+    action->pwm_duty_percent = pwm_value;
+    action->type = pwm_value == 0U ? SVC_RULE_ACTION_DISABLE_ROLE : SVC_RULE_ACTION_ENABLE_ROLE;
+    return SVC_RULE_TEXT_OK;
+}
+
+static svc_rule_text_status_t validate_condition_texts(
+    const char *const *condition_texts,
+    size_t condition_count)
+{
+    for (size_t condition_index = 0U; condition_index < condition_count; ++condition_index) {
+        svc_rule_condition_t condition = {0};
+        const svc_rule_text_status_t status = svc_rule_text_parse_condition(
+            condition_texts[condition_index],
+            &condition);
+        if (status != SVC_RULE_TEXT_OK) {
+            return status;
+        }
+    }
+    return SVC_RULE_TEXT_OK;
+}
+
+static svc_rule_text_status_t write_condition_texts(
+    const char *const *condition_texts,
+    size_t condition_count,
+    svc_rule_condition_t *condition_buffer)
+{
+    for (size_t condition_index = 0U; condition_index < condition_count; ++condition_index) {
+        const svc_rule_text_status_t status = svc_rule_text_parse_condition(
+            condition_texts[condition_index],
+            &condition_buffer[condition_index]);
+        if (status != SVC_RULE_TEXT_OK) {
+            return status;
+        }
+    }
+    return SVC_RULE_TEXT_OK;
+}
+
+static svc_rule_text_status_t validate_action_texts(
+    const char *const *action_texts,
+    size_t action_count)
+{
+    for (size_t action_index = 0U; action_index < action_count; ++action_index) {
+        svc_rule_action_t action = {0};
+        const svc_rule_text_status_t status = svc_rule_text_parse_action(
+            action_texts[action_index],
+            &action);
+        if (status != SVC_RULE_TEXT_OK) {
+            return status;
+        }
+    }
     return SVC_RULE_TEXT_OK;
 }
 
@@ -154,19 +226,25 @@ svc_rule_text_status_t svc_rule_text_compile_rule(
         return SVC_RULE_TEXT_INVALID_ARGUMENT;
     }
 
-    for (size_t condition_index = 0U; condition_index < condition_count; ++condition_index) {
-        const svc_rule_text_status_t status = svc_rule_text_parse_condition(
-            condition_texts[condition_index],
-            &condition_buffer[condition_index]);
-        if (status != SVC_RULE_TEXT_OK) {
-            return status;
-        }
+    svc_rule_text_status_t status = validate_condition_texts(
+        condition_texts,
+        condition_count);
+    if (status != SVC_RULE_TEXT_OK) {
+        return status;
     }
 
     svc_rule_action_t action = {0};
     const svc_rule_text_status_t action_status = svc_rule_text_parse_action(action_text, &action);
     if (action_status != SVC_RULE_TEXT_OK) {
         return action_status;
+    }
+
+    status = write_condition_texts(
+        condition_texts,
+        condition_count,
+        condition_buffer);
+    if (status != SVC_RULE_TEXT_OK) {
+        return status;
     }
 
     rule->conditions = condition_buffer;
@@ -202,13 +280,24 @@ svc_rule_text_status_t svc_rule_text_compile_rule_set(
         return SVC_RULE_TEXT_INVALID_ARGUMENT;
     }
 
-    for (size_t condition_index = 0U; condition_index < condition_count; ++condition_index) {
-        const svc_rule_text_status_t status = svc_rule_text_parse_condition(
-            condition_texts[condition_index],
-            &condition_buffer[condition_index]);
-        if (status != SVC_RULE_TEXT_OK) {
-            return status;
-        }
+    svc_rule_text_status_t status = validate_condition_texts(
+        condition_texts,
+        condition_count);
+    if (status != SVC_RULE_TEXT_OK) {
+        return status;
+    }
+
+    status = validate_action_texts(action_texts, action_count);
+    if (status != SVC_RULE_TEXT_OK) {
+        return status;
+    }
+
+    status = write_condition_texts(
+        condition_texts,
+        condition_count,
+        condition_buffer);
+    if (status != SVC_RULE_TEXT_OK) {
+        return status;
     }
 
     for (size_t action_index = 0U; action_index < action_count; ++action_index) {

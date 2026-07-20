@@ -4,7 +4,7 @@ The Rule Engine consumes role-based actions and applies them through the Output
 Manager. It does not write GPIO/PWM hardware and does not hard-code output
 numbers.
 
-## Initial skeleton
+## Host-tested rule path
 
 - Track event-derived condition state for engine running, high beam, and left
   indicator.
@@ -22,9 +22,9 @@ numbers.
 - Preserve Output Manager budget, telemetry, lockout, and invalid-config
   denials.
 
-The current implementation is an in-memory rule runner. Full JSON rule parsing
-will be added after the core safety path is stable. Configuration entries with
-multiple `then` actions can be represented by multiple `svc_rule_t` entries that
+The current implementation is an in-memory rule runner with text compile helpers
+for the supported rule condition/action grammar. Configuration entries with
+multiple `then` actions are represented by multiple `svc_rule_t` entries that
 share the same condition array and execute in order.
 
 ## Initial text grammar
@@ -41,6 +41,9 @@ Supported condition strings:
 Supported action strings:
 
 - `ROLE.pwm = 0..100`
+
+PWM values use canonical decimal text: `0` or `1..100`. Signed values and
+leading-zero values are rejected by the host-tested parser.
 
 `0` maps to a disable-role action. Any positive PWM value maps to an enable-role
 action with that duty-cycle request. Output Manager enforces whether the target
@@ -71,7 +74,10 @@ dynamic allocation.
 `svc_rule_text_compile_rule_set()` compiles one condition list plus multiple
 action strings into an ordered `svc_rule_t` array using caller-provided rule and
 condition buffers. This maps the JSON `then[]` shape to the rule-set runner
-without dynamic allocation.
+without dynamic allocation. Invalid action text is rejected before compiled rule
+entries are written to the caller-provided rule buffer. Invalid condition or
+action text is also rejected before caller-provided condition buffers are
+modified.
 
 `svc_rule_engine_evaluate_rule_with_telemetry()` reads total-current validity
 from Telemetry Snapshot before applying a matching rule, so stale current data

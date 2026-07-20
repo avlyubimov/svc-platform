@@ -89,6 +89,30 @@ static void test_ring_buffer_overwrites_oldest_frame(void)
     assert(first_retained.id == 3U);
 }
 
+static void test_diagnostic_counts_saturate_on_overflow(void)
+{
+    svc_can_log_t log = {0};
+    svc_can_log_init(&log);
+
+    for (size_t index = 0U; index < SVC_CAN_LOG_CAPACITY; ++index) {
+        const svc_can_frame_t frame = frame_for(SVC_CAN_PORT_CAN1_VEHICLE, (uint32_t)index, (uint8_t)index);
+        assert(svc_can_log_append_rx(&log, &frame) == SVC_CAN_LOG_OK);
+    }
+
+    log.dropped_count = UINT32_MAX;
+    log.can1_rx_count = UINT32_MAX;
+    log.can2_rx_count = UINT32_MAX;
+
+    const svc_can_frame_t can1_frame = frame_for(SVC_CAN_PORT_CAN1_VEHICLE, 100U, 1U);
+    const svc_can_frame_t can2_frame = frame_for(SVC_CAN_PORT_CAN2_EXPANSION, 101U, 2U);
+    assert(svc_can_log_append_rx(&log, &can1_frame) == SVC_CAN_LOG_OK);
+    assert(svc_can_log_append_rx(&log, &can2_frame) == SVC_CAN_LOG_OK);
+
+    assert(svc_can_log_dropped_count(&log) == UINT32_MAX);
+    assert(svc_can_log_port_count(&log, SVC_CAN_PORT_CAN1_VEHICLE) == UINT32_MAX);
+    assert(svc_can_log_port_count(&log, SVC_CAN_PORT_CAN2_EXPANSION) == UINT32_MAX);
+}
+
 static void test_null_inputs_fail_safe(void)
 {
     svc_can_log_t log = {0};
@@ -109,6 +133,7 @@ int main(void)
     test_rejects_invalid_dlc();
     test_rejects_invalid_port();
     test_ring_buffer_overwrites_oldest_frame();
+    test_diagnostic_counts_saturate_on_overflow();
     test_null_inputs_fail_safe();
     return 0;
 }

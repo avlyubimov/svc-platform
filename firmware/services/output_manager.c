@@ -24,6 +24,12 @@ static uint32_t saturated_subtract_u32(uint32_t value, uint32_t subtract)
     return subtract >= value ? 0U : value - subtract;
 }
 
+static uint32_t saturated_add_u32(uint32_t left, uint32_t right)
+{
+    const uint32_t sum = left + right;
+    return sum < left ? UINT32_MAX : sum;
+}
+
 static uint32_t output_current_limit_ma(
     const svc_device_config_t *config,
     svc_output_id_t output_id)
@@ -132,7 +138,9 @@ static svc_power_budget_result_t validate_pwm_increase_budget(
         output_current_limit_ma(manager->config, output_id),
         previous_duty_percent,
         duty_percent);
-    result.projected_total_current_ma = measured_total_current_ma + additional_current_ma;
+    result.projected_total_current_ma = saturated_add_u32(
+        measured_total_current_ma,
+        additional_current_ma);
     if (result.projected_total_current_ma > result.configured_limit_ma) {
         result.decision = SVC_POWER_BUDGET_DENY_TOTAL_LIMIT;
         return result;

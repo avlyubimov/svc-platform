@@ -458,7 +458,7 @@
           "items": {
             "type": "string",
             "minLength": 1,
-            "pattern": "^([A-Z0-9_]+)\\.pwm = ([0-9]+)$"
+            "pattern": "^(USB|CIGARETTE_SOCKET|FOG_LEFT|FOG_RIGHT|CHIGEE|HEATED_SEAT_RIDER|HEATED_SEAT_PASSENGER|DVR|AUX_BRAKE|SPARE)\\.pwm = (100|[1-9]?[0-9])$"
           }
         }
       }

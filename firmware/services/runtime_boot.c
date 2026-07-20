@@ -2,6 +2,16 @@
 
 #include <stddef.h>
 
+static svc_config_acceptance_result_t invalid_argument_acceptance(void)
+{
+    return (svc_config_acceptance_result_t){
+        .status = SVC_CONFIG_ACCEPTANCE_INVALID_DEVICE_CONFIG,
+        .config_status = SVC_CONFIG_INVALID_NULL,
+        .hardware_status = SVC_HARDWARE_CAPABILITY_OK,
+        .output_index = SVC_CONFIG_OUTPUT_INDEX_NONE
+    };
+}
+
 static svc_runtime_boot_result_t make_result(
     svc_runtime_boot_status_t status,
     svc_config_acceptance_result_t acceptance,
@@ -33,15 +43,8 @@ svc_runtime_boot_result_t svc_runtime_boot(
     const svc_device_config_t *config,
     const svc_hardware_capability_t *capability)
 {
-    const svc_config_acceptance_result_t empty_acceptance = {
-        .status = SVC_CONFIG_ACCEPTANCE_INVALID_DEVICE_CONFIG,
-        .config_status = SVC_CONFIG_INVALID_NULL,
-        .hardware_status = SVC_HARDWARE_CAPABILITY_OK,
-        .output_index = SVC_CONFIG_OUTPUT_INDEX_NONE
-    };
-
     if (runtime == NULL) {
-        return make_result(SVC_RUNTIME_BOOT_INVALID_ARGUMENT, empty_acceptance, NULL);
+        return make_result(SVC_RUNTIME_BOOT_INVALID_ARGUMENT, invalid_argument_acceptance(), NULL);
     }
 
     *runtime = (svc_runtime_t){0};
@@ -93,7 +96,14 @@ svc_runtime_store_boot_result_t svc_runtime_boot_from_store(
     };
 
     if (runtime == NULL || loaded_config == NULL) {
-        const svc_runtime_boot_result_t boot = svc_runtime_boot(runtime, NULL, capability);
+        if (runtime != NULL) {
+            *runtime = (svc_runtime_t){0};
+            svc_event_bus_init(&runtime->event_bus);
+        }
+        const svc_runtime_boot_result_t boot = make_result(
+            SVC_RUNTIME_BOOT_INVALID_ARGUMENT,
+            invalid_argument_acceptance(),
+            runtime);
         return make_store_boot_result(
             SVC_RUNTIME_STORE_BOOT_INVALID_ARGUMENT,
             empty_store,

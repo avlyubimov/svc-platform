@@ -8,10 +8,11 @@ selects the active configuration.
 ## Initial responsibilities
 
 - Build versioned configuration records with sequence numbers.
-- Validate magic, format version, checksum, and configuration contents.
+- Validate magic, format version, reserved field, checksum, and configuration
+  contents.
 - Prepare update records only after configuration acceptance against hardware
   capability succeeds.
-- Select the newest valid record from two slots.
+- Select the newest valid record from two slots, including sequence wraparound.
 - Fall back to compiled defaults only when no valid persisted record exists.
 - Keep persisted user configuration preferred across firmware default changes.
 

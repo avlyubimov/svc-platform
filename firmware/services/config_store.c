@@ -6,6 +6,7 @@
 
 #define SVC_CONFIG_STORE_FNV_OFFSET 2166136261U
 #define SVC_CONFIG_STORE_FNV_PRIME 16777619U
+#define SVC_CONFIG_STORE_SEQUENCE_HALF_RANGE 0x80000000U
 
 static uint32_t mix_byte(uint32_t checksum, uint8_t value)
 {
@@ -124,6 +125,9 @@ svc_config_store_status_t svc_config_store_validate_record(
     if (record->format_version != SVC_CONFIG_STORE_FORMAT_VERSION) {
         return SVC_CONFIG_STORE_INVALID_VERSION;
     }
+    if (record->reserved != 0U) {
+        return SVC_CONFIG_STORE_INVALID_RESERVED;
+    }
     if (record->checksum != config_checksum(&record->config, record->sequence)) {
         return SVC_CONFIG_STORE_INVALID_CHECKSUM;
     }
@@ -139,6 +143,14 @@ static bool record_is_valid(
 {
     *status = svc_config_store_validate_record(record);
     return *status == SVC_CONFIG_STORE_OK;
+}
+
+static bool sequence_is_newer_or_equal(uint32_t candidate, uint32_t reference)
+{
+    if (candidate == reference) {
+        return true;
+    }
+    return (uint32_t)(candidate - reference) < SVC_CONFIG_STORE_SEQUENCE_HALF_RANGE;
 }
 
 static svc_config_store_load_result_t make_load_result(
@@ -177,7 +189,7 @@ svc_config_store_load_result_t svc_config_store_load_latest(
     const bool slot_a_valid = record_is_valid(slot_a, &slot_a_status);
     const bool slot_b_valid = record_is_valid(slot_b, &slot_b_status);
 
-    if (slot_a_valid && (!slot_b_valid || slot_a->sequence >= slot_b->sequence)) {
+    if (slot_a_valid && (!slot_b_valid || sequence_is_newer_or_equal(slot_a->sequence, slot_b->sequence))) {
         *loaded_config = slot_a->config;
         return make_load_result(
             SVC_CONFIG_STORE_LOAD_OK,

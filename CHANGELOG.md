@@ -26,3 +26,18 @@
   CAN TX DNP/open and future-ADR gated.
 - Added a PB-100/LB-100 B2B resource precheck for STM32H563 pin-binding review
   without freezing exact MCU pins.
+- Aligned firmware rule action grammar across the JSON Schema, repository
+  validator, and host-tested parser for supported roles and canonical 0..100
+  PWM values.
+- Hardened multi-action rule-set compilation so invalid action text is rejected
+  before compiled rule entries are written.
+- Hardened System Safety runtime current-budget enforcement so stale or invalid
+  total-current telemetry disables active outputs.
+- Hardened Runtime Boot store-loading invalid-argument handling so missing
+  loaded-configuration storage leaves runtime safe/off.
+- Hardened Configuration Store record validation to reject nonzero reserved
+  fields before checksum/config acceptance.
+- Fixed CAN Event Decode so dropped state-change events do not advance rule
+  state and can be retried on the next matching frame.
+- Hardened projected-current calculations to saturate on unsigned overflow and
+  deny output starts or PWM increases.

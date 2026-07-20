@@ -42,6 +42,19 @@ static void test_denies_output_over_budget(void)
     assert(result.projected_total_current_ma == 48000U);
 }
 
+static void test_denies_projected_current_overflow(void)
+{
+    const svc_power_budget_result_t result = svc_power_budget_can_enable_output(
+        &svc_default_config,
+        0U,
+        SVC_OUTPUT_OUT9,
+        UINT32_MAX - 1000U,
+        true);
+
+    assert(result.decision == SVC_POWER_BUDGET_DENY_TOTAL_LIMIT);
+    assert(result.projected_total_current_ma == UINT32_MAX);
+}
+
 static void test_denies_invalid_telemetry(void)
 {
     const svc_power_budget_result_t result = svc_power_budget_can_enable_output(
@@ -93,6 +106,7 @@ int main(void)
     test_default_config_is_valid();
     test_allows_output_inside_budget();
     test_denies_output_over_budget();
+    test_denies_projected_current_overflow();
     test_denies_invalid_telemetry();
     test_denies_already_active_output();
     test_shed_order_uses_configured_priority_order();

@@ -89,8 +89,6 @@ svc_can_decode_result_t svc_can_decode_frame_to_event(
                 active);
         }
 
-        rule->initialized = true;
-        rule->last_active = active;
         const bool published = svc_event_bus_publish(
             event_bus,
             (svc_event_t){
@@ -98,6 +96,10 @@ svc_can_decode_result_t svc_can_decode_frame_to_event(
                 .output_id = SVC_OUTPUT_OUT1,
                 .value = frame->id
             });
+        if (published) {
+            rule->initialized = true;
+            rule->last_active = active;
+        }
         return make_result(
             published ? SVC_CAN_DECODE_EVENT_PUBLISHED : SVC_CAN_DECODE_EVENT_DROPPED,
             rule_index,

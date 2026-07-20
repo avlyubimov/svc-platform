@@ -10,6 +10,12 @@ static uint16_t output_mask_for_id(svc_output_id_t output_id)
     return (uint16_t)(1U << (uint8_t)output_id);
 }
 
+static uint32_t saturated_add_u32(uint32_t left, uint32_t right)
+{
+    const uint32_t sum = left + right;
+    return sum < left ? UINT32_MAX : sum;
+}
+
 static bool priority_seen(bool seen_priorities[3], svc_load_priority_t priority)
 {
     if (priority < SVC_PRIORITY_A || priority > SVC_PRIORITY_C) {
@@ -94,7 +100,9 @@ svc_power_budget_result_t svc_power_budget_can_enable_output(
     }
 
     const svc_output_config_t *output = &config->outputs[(uint8_t)requested_output];
-    result.projected_total_current_ma = measured_total_current_ma + output->current_limit_ma;
+    result.projected_total_current_ma = saturated_add_u32(
+        measured_total_current_ma,
+        output->current_limit_ma);
     if (result.projected_total_current_ma > config->power_budget.total_current_limit_ma) {
         result.decision = SVC_POWER_BUDGET_DENY_TOTAL_LIMIT;
         return result;

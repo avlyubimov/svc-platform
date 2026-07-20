@@ -2471,3 +2471,149 @@ keeps those gaps explicit and machine-checked so `PB-100.kicad_pcb`, Gerbers,
 drills, pick-place, fabrication package, manufacturing ZIP, or PCBA order
 package work cannot be treated as authorized while any closure row remains
 Conditional.
+
+## 2026-07-20 — Firmware rule action grammar canonicalization
+
+Decision: Firmware rule actions now use a canonical PWM literal grammar shared
+by `firmware/services/rule_text.c`, `firmware/configs/svc-config.schema.json`,
+and `tools/validate_config.py`. Supported rule actions are role names accepted
+by the firmware rule-text parser with `.pwm = 0` or `.pwm = 1..100`; signed
+values and leading-zero PWM values are rejected.
+
+Reason: The configuration schema, repository validator, and host-tested firmware
+parser must reject the same rule-action language before persisted user
+configuration can safely drive role-mapped output actions. Keeping the validator
+derived from parser role/condition tables reduces drift while preserving the
+configuration/firmware separation and Output Manager enforcement path.
+
+## 2026-07-20 — Runtime current-telemetry fail-safe shutdown
+
+Decision: System Safety now treats stale or invalid total-current telemetry in
+the runtime power-budget path as a safe fault. Active outputs are disabled
+through the Output Manager, and a power-budget shed event is published when the
+coordinator disables loads.
+
+Reason: PB-100 board-current enforcement depends on independent total-current
+telemetry. Missing, stale, saturated, or implausible total-current data must not
+leave already-active loads running under an unenforceable board budget. The
+change keeps startup refusal, load shedding, and stale-telemetry shutdown in the
+same host-tested safety path without changing PB-100 hardware requirements.
+
+## 2026-07-20 — CAN decode dropped-edge retry
+
+Decision: CAN Event Decode now updates per-rule decoded state only after a
+state-change event is successfully published to the Event Bus. If the Event Bus
+is full and publication is dropped, the rule state remains unchanged so the next
+matching received frame retries publication.
+
+Reason: CAN-derived edges such as high-beam or indicator transitions must not be
+permanently hidden by transient Event Bus pressure. The decoder remains
+receive-only and still does not control outputs directly; it preserves the
+event-to-rule-to-Output-Manager safety path while making dropped internal events
+recoverable.
+
+## 2026-07-20 — Overflow-safe current-budget projection
+
+Decision: Power Budget and Output Manager projected-current calculations now
+saturate unsigned additions at `UINT32_MAX`. Overflowed projections are treated
+as over-budget and deny output starts or PWM duty-cycle increases.
+
+Reason: Board-current enforcement must not allow a load because arithmetic
+wrapped a very large measured-current value into a small projected current. The
+change preserves the existing configuration-owned 40 A budget and shed ordering
+while making current projection fail closed.
+
+## 2026-07-20 — Event Log drop counter saturation
+
+Decision: Event Log overwrite accounting now saturates the diagnostic dropped
+entry counter at `UINT32_MAX` instead of allowing unsigned wraparound.
+
+Reason: The diagnostic log is intentionally bounded, but long-running overflow
+conditions must not make drop accounting appear fresh or low after counter wrap.
+Saturating preserves the latest event entries and keeps diagnostic evidence
+conservative without changing the fixed-size storage model.
+
+## 2026-07-20 — CAN RX Log diagnostic counter saturation
+
+Decision: CAN RX Log dropped-frame and per-port receive counters now saturate at
+`UINT32_MAX` instead of wrapping.
+
+Reason: CAN capture is receive-only diagnostic evidence for vehicle and
+expansion traffic. Long-running capture sessions must not make frame activity or
+drop pressure appear low because an unsigned counter wrapped; saturating keeps
+the diagnostic state conservative while preserving the fixed-size ring buffer
+and CAN1 no-transmit boundary.
+
+## 2026-07-20 — Configuration Store sequence wrap selection
+
+Decision: Configuration Store two-slot selection now compares record sequence
+numbers with wrap-aware unsigned serial arithmetic, so sequence `0` is treated
+as newer than `UINT32_MAX` after counter rollover.
+
+Reason: Persisted user configuration must remain preferred across firmware
+updates and long service life. A raw numeric `>=` comparison can resurrect an
+older pre-wrap record after the sequence rolls over, while wrap-aware selection
+keeps the newest valid record active without changing the storage format.
+
+## 2026-07-20 — Overflow-safe battery elapsed-time conversion
+
+Decision: System Safety now converts telemetry update elapsed milliseconds to
+seconds using division and remainder arithmetic instead of adding 999 ms before
+division. Very large intervals saturate the battery undervoltage duration at
+`UINT16_MAX`.
+
+Reason: The battery cutoff delay is a safety boundary. Overflow in
+`elapsed_ms + 999` could turn a long interval into a one-second increment and
+delay low-voltage cutoff. The new conversion preserves ceiling behavior for
+normal intervals and fails toward cutoff for long-running or delayed updates.
+
+## 2026-07-20 — Power-budget shed event retry
+
+Decision: System Safety now retains a pending runtime power-budget shed event
+when the Event Bus is full and retries publication on later power-budget safety
+updates until the event is accepted.
+
+Reason: Runtime budget enforcement can disable outputs because measured current
+is over limit or total-current telemetry is stale/invalid. That shutdown remains
+the priority, but diagnostic evidence must not be lost permanently because the
+Event Bus was full at the shutdown instant. Retrying keeps the safety action
+unchanged while preserving the event path once queue capacity is available.
+
+## 2026-07-20 — Atomic rule text compile buffers
+
+Decision: Rule text compile helpers now validate condition and action strings
+before writing caller-provided condition buffers or compiled rule entries.
+
+Reason: Rule compilation uses caller-owned static storage to avoid dynamic
+allocation. A rejected rule must not leave partially updated condition storage
+that could be reused accidentally by a later rule evaluation. Validating first
+keeps failed compilation side-effect free for the caller-owned buffers.
+
+## 2026-07-20 — PBREL local evidence separated from external closeout
+
+Decision: PB-100 board-release evidence now has a dedicated local closeout
+ledger for `make check`-verified ERC, netlist, firmware host-test, capability,
+and configuration evidence. PBREL statuses remain `Conditional` until dated
+external bench, sourcing, schematic-value, and review records close.
+
+Reason: Local validation was complete for several firmware and schematic
+scaffold paths, but the board-release blockers also require physical bench
+records, current sourcing checks, and final value/footprint reviews. Separating
+local evidence prevents stale blocker wording without falsely authorizing PCB
+layout, Gerbers, drills, pick-place, manufacturing ZIPs, fabrication packages,
+or PCBA order packages.
+
+## 2026-07-20 — PB-100 sourcing snapshot refreshed without BOM lock
+
+Decision: PB-100 factory and garage sourcing records were refreshed against
+selected manufacturer, distributor, and JLCPCB componentSearch pages for the
+current PBREL pass, and the refresh was synchronized between the sourcing
+evidence snapshot and assembly recheck register. The refresh does not lock the
+BOM or authorize layout.
+
+Reason: Distributor/manufacturer evidence can reduce stale sourcing risk, but
+PBREL-011 and PBREL-012 still require PCBWay assembly-class evidence, resolution
+of zero or low JLCPCB stock risks, exact orderable suffixes, inspection/rework
+handling, garage housings, contacts, seals, crimp tooling, fuse holders,
+enclosure access, and purchase-ready kit evidence before schematic freeze or
+board release.

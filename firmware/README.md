@@ -29,6 +29,9 @@ Current host tests cover:
   enum bounds without role-to-output assumptions.
 - Configuration Store record validation and two-slot selection so firmware
   defaults do not overwrite valid persisted user configuration.
+- Configuration Store wrap-aware sequence selection across two persisted slots.
+- Configuration Store reserved-field validation before accepting persisted
+  records.
 - Configuration Update preparation that refuses to persist a config until it is
   accepted against hardware capability.
 - Configuration acceptance for a discovered hardware capability contract before
@@ -41,15 +44,19 @@ Current host tests cover:
 - Output Manager safe default-off, enable/disable, budget denial, telemetry
   denial, priority shedding, PWM increase revalidation, thermal derating, and
   fault lockout behavior.
-- Battery protection warning, delayed cutoff latch using `shutdown_delay_s`,
-  recovery, and invalid telemetry behavior.
+- Overflow-safe projected-current denial for output starts and PWM increases.
+- Battery protection warning, overflow-safe delayed cutoff latch using
+  `shutdown_delay_s`, recovery, and invalid telemetry behavior.
 - Event Bus FIFO order, overflow rejection, and empty-pop behavior.
 - Event Dispatcher output overcurrent/fault handling through Output Manager.
-- Event Log fixed-size diagnostic ring buffer with overwrite/drop accounting.
+- Event Log fixed-size diagnostic ring buffer with overwrite/drop accounting
+  that saturates instead of wrapping the diagnostic drop counter.
 - CAN1 listen-only TX denial and CAN2 expansion TX allowance.
-- CAN RX Log fixed-size receive-only frame capture for CAN1/CAN2.
+- CAN RX Log fixed-size receive-only frame capture for CAN1/CAN2 with
+  saturating diagnostic counters.
 - CAN Event Decode from received frames to internal Event Bus state-change
   events without output control.
+- CAN Event Decode dropped-edge retry behavior when the Event Bus is full.
 - Rule Event Bridge that drains CAN-derived and other condition events into rule
   condition state while retaining non-rule events for safety dispatch.
 - Rule Runtime step that runs bridge, fault dispatch, and ordered rule
@@ -57,8 +64,10 @@ Current host tests cover:
 - System Safety Coordinator integration between battery cutoff, power-budget
   shedding, thermal derating/cutoff, Event Bus, and Output Manager output
   shutdown.
-- Role Resolver and Rule Engine skeleton for role-based actions through Output
-  Manager.
+- System Safety runtime fail-safe shutdown when total-current telemetry is stale
+  or invalid.
+- System Safety retry of dropped runtime power-budget shed events.
+- Role Resolver and Rule Engine role-action runner through Output Manager.
 - Rule condition state tracking for engine, high-beam, left-indicator, and
   ambient-light day/dusk/night events.
 - Rule runner evaluation for matched/unmatched conditions before role actions.
@@ -68,8 +77,14 @@ Current host tests cover:
 - Output Manager PWM duty-cycle ownership and `pwm_allowed` enforcement.
 - Rule text compile helpers from condition/action strings to in-memory
   `svc_rule_t` and ordered `svc_rule_t` arrays for multi-action rules.
+- Rule-set compilation rejects invalid multi-action rule text before writing
+  compiled rule entries or caller-provided condition buffers.
+- Rule action grammar alignment between the JSON Schema, repository
+  configuration validator, and firmware parser for supported roles and PWM
+  values, with canonical `0` or `1..100` PWM literals.
 - Runtime Boot path from direct configuration or persistent store that keeps
   outputs off unless configuration and hardware capability checks pass.
+- Runtime Boot invalid-argument handling that leaves runtime state safe/off.
 - Telemetry Snapshot validity/staleness for battery, total current, and
   per-output current samples.
 - Telemetry-backed System Safety and Rule Engine wrappers for stale-data fail

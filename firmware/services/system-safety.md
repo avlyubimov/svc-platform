@@ -10,9 +10,14 @@ letting feature code bypass the Output Manager.
 - Disable all active outputs through the Output Manager on battery cutoff.
 - Apply `battery.shutdown_delay_s` before low-voltage cutoff when battery
   telemetry remains continuously below the cutoff threshold.
+- Convert telemetry update elapsed time with overflow-safe ceiling arithmetic so
+  long intervals cannot shorten the low-voltage cutoff delay.
 - Run total-current budget enforcement from telemetry and shed active loads
   through the Output Manager when measured current exceeds the configured limit.
+- Treat invalid or stale total-current telemetry as a safe fault that disables
+  active outputs through the Output Manager.
 - Publish power-budget shedding events when runtime enforcement disables loads.
+- Retry a dropped power-budget shedding event until the Event Bus accepts it.
 - Apply thermal derating through the Output Manager at thermal warning.
 - Disable all active outputs through the Output Manager on thermal cutoff.
 - Treat invalid battery telemetry as cutoff.

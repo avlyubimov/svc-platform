@@ -125,6 +125,29 @@ static void test_event_bus_full_reports_dropped_event(void)
     assert(svc_event_bus_count(&bus) == SVC_EVENT_BUS_CAPACITY);
 }
 
+static void test_dropped_event_does_not_advance_rule_state(void)
+{
+    svc_can_event_rule_t rule = high_beam_rule();
+    svc_event_bus_t bus = {0};
+    svc_event_bus_init(&bus);
+    for (size_t index = 0U; index < SVC_EVENT_BUS_CAPACITY; ++index) {
+        assert(svc_event_bus_publish(&bus, (svc_event_t){SVC_EVENT_OUTPUT_STATE_CHANGED, SVC_OUTPUT_OUT1, (uint32_t)index}));
+    }
+    const svc_can_frame_t frame = frame_with_byte(0x01U);
+
+    assert(svc_can_decode_frame_to_event(&rule, 1U, &frame, &bus).status ==
+           SVC_CAN_DECODE_EVENT_DROPPED);
+    assert(!rule.initialized);
+    assert(!rule.last_active);
+
+    svc_event_t dropped_space = {0};
+    assert(svc_event_bus_pop(&bus, &dropped_space));
+    assert(svc_can_decode_frame_to_event(&rule, 1U, &frame, &bus).status ==
+           SVC_CAN_DECODE_EVENT_PUBLISHED);
+    assert(rule.initialized);
+    assert(rule.last_active);
+}
+
 int main(void)
 {
     test_publishes_event_on_rising_edge();
@@ -133,5 +156,6 @@ int main(void)
     test_ignores_mismatched_frame();
     test_invalid_frame_is_rejected();
     test_event_bus_full_reports_dropped_event();
+    test_dropped_event_does_not_advance_rule_state();
     return 0;
 }
