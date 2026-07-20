@@ -39,3 +39,5 @@
   fields before checksum/config acceptance.
 - Fixed CAN Event Decode so dropped state-change events do not advance rule
   state and can be retried on the next matching frame.
+- Hardened projected-current calculations to saturate on unsigned overflow and
+  deny output starts or PWM increases.

@@ -2511,3 +2511,14 @@ permanently hidden by transient Event Bus pressure. The decoder remains
 receive-only and still does not control outputs directly; it preserves the
 event-to-rule-to-Output-Manager safety path while making dropped internal events
 recoverable.
+
+## 2026-07-20 — Overflow-safe current-budget projection
+
+Decision: Power Budget and Output Manager projected-current calculations now
+saturate unsigned additions at `UINT32_MAX`. Overflowed projections are treated
+as over-budget and deny output starts or PWM duty-cycle increases.
+
+Reason: Board-current enforcement must not allow a load because arithmetic
+wrapped a very large measured-current value into a small projected current. The
+change preserves the existing configuration-owned 40 A budget and shed ordering
+while making current projection fail closed.

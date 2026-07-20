@@ -209,6 +209,23 @@ static void test_pwm_increase_rechecks_total_budget(void)
     assert(svc_output_manager_pwm_duty_percent(&manager, SVC_OUTPUT_OUT3) == 40U);
 }
 
+static void test_pwm_increase_denies_projected_current_overflow(void)
+{
+    svc_output_manager_t manager = initialized_manager();
+    assert(svc_output_manager_request_pwm(&manager, SVC_OUTPUT_OUT3, 40U, 1000U, true).status == SVC_OUTPUT_MANAGER_OK);
+
+    const svc_output_manager_result_t result = svc_output_manager_request_pwm(
+        &manager,
+        SVC_OUTPUT_OUT3,
+        100U,
+        UINT32_MAX - 1000U,
+        true);
+
+    assert(result.status == SVC_OUTPUT_MANAGER_DENY_BUDGET);
+    assert(result.budget_decision == SVC_POWER_BUDGET_DENY_TOTAL_LIMIT);
+    assert(svc_output_manager_pwm_duty_percent(&manager, SVC_OUTPUT_OUT3) == 40U);
+}
+
 static void test_pwm_decrease_is_allowed_without_fresh_telemetry(void)
 {
     svc_output_manager_t manager = initialized_manager();
@@ -276,6 +293,7 @@ int main(void)
     test_invalid_pwm_is_denied();
     test_pwm_increase_requires_valid_telemetry();
     test_pwm_increase_rechecks_total_budget();
+    test_pwm_increase_denies_projected_current_overflow();
     test_pwm_decrease_is_allowed_without_fresh_telemetry();
     test_runtime_budget_enforcement_sheds_configured_priority_order();
     test_thermal_derate_reduces_pwm_and_sheds_non_pwm_low_priority();

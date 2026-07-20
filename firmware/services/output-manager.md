@@ -38,6 +38,8 @@ state changes.
   when the output configuration has `pwm_allowed = false`.
 - Increasing PWM on an already-active output repeats total-budget and telemetry
   validation; lowering PWM remains allowed because it reduces load.
+- Projected-current calculations for output starts and PWM increases saturate on
+  unsigned overflow and deny the request.
 - Thermal derating reduces PWM-capable active outputs to the configured derate
   ceiling and disables non-PWM low-priority loads.
 

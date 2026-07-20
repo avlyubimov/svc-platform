@@ -40,6 +40,8 @@ diagnostics are valid again.
 When telemetry is valid and measured total current exceeds the configured board
 limit, active outputs are shed in `shed_order` priority order until the
 configured limit is reached or no active loads remain.
+Projected-current calculations saturate on unsigned overflow and deny the
+request instead of allowing wrapped values.
 
 Telemetry validity/staleness is provided by:
 

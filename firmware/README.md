@@ -43,6 +43,7 @@ Current host tests cover:
 - Output Manager safe default-off, enable/disable, budget denial, telemetry
   denial, priority shedding, PWM increase revalidation, thermal derating, and
   fault lockout behavior.
+- Overflow-safe projected-current denial for output starts and PWM increases.
 - Battery protection warning, delayed cutoff latch using `shutdown_delay_s`,
   recovery, and invalid telemetry behavior.
 - Event Bus FIFO order, overflow rejection, and empty-pop behavior.
