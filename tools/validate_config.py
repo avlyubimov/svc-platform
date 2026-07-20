@@ -76,7 +76,10 @@ REQUIRED_HARDWARE_CAPABILITY_TOKENS = (
     "configuration_required_for_roles",
 )
 RULE_CONDITION_PATTERN = r"^(engine_running|high_beam|left_indicator|ambient_day|ambient_dusk|ambient_night) == (true|false)$"
-RULE_ACTION_PATTERN = r"^([A-Z0-9_]+)\.pwm = ([0-9]+)$"
+RULE_ACTION_PATTERN = (
+    r"^(USB|CIGARETTE_SOCKET|FOG_LEFT|FOG_RIGHT|CHIGEE|HEATED_SEAT_RIDER|"
+    r"HEATED_SEAT_PASSENGER|DVR|AUX_BRAKE|SPARE)\.pwm = (100|[1-9]?[0-9])$"
+)
 
 
 def fail(message: str) -> None:

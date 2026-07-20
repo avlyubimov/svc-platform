@@ -57,8 +57,7 @@ Current host tests cover:
 - System Safety Coordinator integration between battery cutoff, power-budget
   shedding, thermal derating/cutoff, Event Bus, and Output Manager output
   shutdown.
-- Role Resolver and Rule Engine skeleton for role-based actions through Output
-  Manager.
+- Role Resolver and Rule Engine role-action runner through Output Manager.
 - Rule condition state tracking for engine, high-beam, left-indicator, and
   ambient-light day/dusk/night events.
 - Rule runner evaluation for matched/unmatched conditions before role actions.
@@ -68,6 +67,9 @@ Current host tests cover:
 - Output Manager PWM duty-cycle ownership and `pwm_allowed` enforcement.
 - Rule text compile helpers from condition/action strings to in-memory
   `svc_rule_t` and ordered `svc_rule_t` arrays for multi-action rules.
+- Rule action grammar alignment between the JSON Schema, repository
+  configuration validator, and firmware parser for supported roles and PWM
+  values.
 - Runtime Boot path from direct configuration or persistent store that keeps
   outputs off unless configuration and hardware capability checks pass.
 - Telemetry Snapshot validity/staleness for battery, total current, and
