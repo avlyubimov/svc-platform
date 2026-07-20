@@ -3061,3 +3061,25 @@ controlled schematic symbol promotion remain before board import. No
 `PB-100.kicad_pcb`, Gerbers, drills, pick-place files, BOM/CPL order packages,
 manufacturing ZIPs, fabrication packages, panel outputs, or PCBA orders are
 created or authorized.
+
+## 2026-07-20 — PB-100 and LB-100 mechanical layout inputs closed
+
+Decision: Close the PB-100 and LB-100 mechanical-envelope inventories as
+pre-layout board-import inputs only. PB-100 now has a reviewed `150.0 mm x
+90.0 mm` prototype outline, four M3 NPTH mounting holes, off-board battery
+entry, generic OUT1..OUT10 harness/service zones, centered JPB1 FX18 datum,
+high-current placement zones, and a separated CAN1 service exit. LB-100 now has
+a reviewed `100.0 mm x 70.0 mm` prototype outline, four M2.5 NPTH mounting
+holes, centered JPB1 FX18 datum, STM32H563VITx service zone, power-rail
+keepouts, microSD access, BLE antenna keepout, sensor orientation, and generic
+DNP/service connector zones with CAN1_TX_ROUTE DNP/open by default.
+
+Reason: footprint evidence is closed for all three boards, but board import was
+still blocked by missing PB/LB mechanical datums. The new closeouts define only
+prototype layout inputs and preserve the manufacturing boundary: no
+`PB-100.kicad_pcb`, `LB-100.kicad_pcb`, Gerbers, drills, pick-place files,
+BOM/CPL order packages, manufacturing ZIPs, fabrication packages, panel outputs,
+or PCBA orders are created or authorized. PB-100 board import remains blocked
+by thermal/current layout evidence and controlled schematic symbol promotion.
+LB-100 board import remains blocked by signal-integrity layout evidence and
+controlled schematic symbol promotion.
