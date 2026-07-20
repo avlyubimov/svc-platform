@@ -515,7 +515,7 @@ def validate_current_telemetry_closeout_precheck() -> None:
         "1kΩ",
         "1nF 100V",
         "85 V VBUS",
-        "60 V overshoot",
+        "selected 80 V clamp-loop overshoot",
         "OUT1_IMON",
         "OUT10_IMON",
         "OUT2 0-30A",

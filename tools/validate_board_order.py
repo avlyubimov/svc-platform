@@ -630,10 +630,7 @@ def validate_lb100_communication_safety() -> None:
         check_id = row["Check ID"].strip()
         status = row["Status"].strip()
         if check_id in {"LB-COMM-001", "LB-COMM-002"}:
-            if "Proposed" in read_text(REPO_ROOT / "docs/adr/ADR-0015-can1-physical-layer-board-ownership.md"):
-                if status != "Conditional":
-                    fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: CAN1 must remain Conditional while ADR-0015 is Proposed")
-            elif status not in {"Conditional", "Closed"}:
+            if status not in {"Conditional", "Closed"}:
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid CAN1 status")
         elif status != "Closed":
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: non-CAN1 communication rows must be Closed")

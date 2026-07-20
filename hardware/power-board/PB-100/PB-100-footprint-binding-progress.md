@@ -33,10 +33,12 @@ fabrication packages, panel outputs, or PCBA orders.
 
 The FX18 footprints are source-derived from the official Hirose FX18 catalog
 recommended land pattern and the official 2026 2D drawings for
-`FX18-100P-0.8SV10` and `FX18-100S-0.8SV20`. They close signal-pad footprint
-binding only. The MF/TH mechanical pads, paired datum, 20 mm stack spacing,
-pin-1 orientation across boards, vibration retention, and assembly handling
-remain in the mechanical envelope gate before board import.
+`FX18-100P-0.8SV10` and `FX18-100S-0.8SV20`. Both footprints capture six
+official plated lands with four GND MF circuits, unique logical identifiers,
+mirrored X geometry, and preserved pin-1 orientation. Footprint binding is
+closed; physical paired datum, 20 mm stack tolerance, vibration retention,
+assembly-fixture, and handling evidence remain in the mechanical envelope gate
+before board import.
 
 ## Footprint Inventory Result
 
