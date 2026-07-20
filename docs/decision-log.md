@@ -3025,3 +3025,21 @@ ADR-0002 and still requires a future ADR plus explicit hardware action before
 any TX population. This is footprint evidence only; no `PB-100.kicad_pcb`,
 Gerbers, drills, pick-place files, BOM/CPL order packages, manufacturing ZIPs,
 fabrication packages, panel outputs, or PCBA orders are created or authorized.
+
+## 2026-07-20 — PB-100 TVS shunt and optional temp footprints
+
+Decision: Add local source-derived PB-100 footprints for the Vishay SM8S
+DO-218AC input TVS, Bourns CSS4J-4026 four-terminal total-current shunt, and
+TMP112-Q1 optional DNP digital temperature sensor. The footprint inventory now
+records these rows as bound and reviewed while leaving TOLL/LFPAK MOSFET package
+selection open.
+
+Reason: Vishay document 98647 includes a DO-218AC mounting pad layout, Bourns
+CSS4J-4026 documentation includes a recommended Kelvin pad layout and AEC-Q200
+evidence, and TI TMP112-Q1 documentation provides the DRL SOT-563 package path
+for an optional DNP digital sensor. This is footprint-binding evidence only:
+TVS surge thermal behavior, shunt copper heating, Kelvin polarity, solder
+voiding, optional I2C ownership, and production inspection remain layout/BOM
+gates. No `PB-100.kicad_pcb`, Gerbers, drills, pick-place files, BOM/CPL order
+packages, manufacturing ZIPs, fabrication packages, panel outputs, or PCBA
+orders are created or authorized.
