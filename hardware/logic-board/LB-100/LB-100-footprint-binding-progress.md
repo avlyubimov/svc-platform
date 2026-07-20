@@ -1,6 +1,6 @@
 # LB-100 Footprint Binding Progress
 
-Status: Partial
+Status: Complete For Footprint Binding
 Review date: 2026-07-20
 
 This progress note binds the LB-100 footprints that have project-local KiCad
@@ -19,17 +19,25 @@ packages, panel outputs, or PCBA orders.
 - BMI270 IMU: `LB100:LGA-14_L3.0-W2.5-P0.50-BR`.
 - VEML7700 ambient sensor: `LB100:SENSOR-SMD_EML7700-TT`.
 - TF-015 microSD socket: `LB100:TF-SMD_TF-015`.
+- JPB1 Hirose FX18 receptacle: `LB100:FX18-100S-0.8SV20_Hirose`, paired with `PB100:FX18-100P-0.8SV10_Hirose`.
+
+## FX18 Evidence Boundary
+
+The JPB1 footprint is source-derived from the official Hirose FX18 catalog
+recommended land pattern and the official 2026 2D drawings for
+`FX18-100S-0.8SV20` and `FX18-100P-0.8SV10`. It closes LB-100 footprint
+binding only. The MF/TH mechanical pads, mating datum, 20 mm stack spacing,
+pin-1 orientation across PB/LB, vibration retention, and assembly handling
+remain in the mechanical envelope gate before board import.
 
 ## Still Open
 
-The LB-100 footprint gate remains Open only because JPB1 is not locally bound.
-The FX18 100-pin mezzanine pair needs project-local footprint evidence plus
-stack-height, pin-1, orientation, and vibration/assembly review before board
-import.
+No LB-100 footprint inventory rows remain open. KiCad board import is still
+blocked by the open mechanical envelope gate, signal-integrity layout gate, and
+controlled schematic symbol promotion from empty Footprint properties.
 
 ## Boundary
 
-LB-100 now has 12 bound on-board footprint items, 1 open on-board footprint
-item, and 1 not-required service-USB footprint item. KiCad board import remains
-blocked by the open JPB1 footprint row plus mechanical and signal-integrity
-layout gates.
+LB-100 now has 13 bound on-board footprint items, 0 open on-board footprint
+items, and 1 not-required service-USB footprint item. KiCad board import remains
+blocked by mechanical and signal-integrity layout gates.
