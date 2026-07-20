@@ -53,7 +53,7 @@ Current coverage:
 | PB-100 PCB/layout | Blocked | Layout, Gerber, drill, placement, and manufacturing zips are blocked by the board-release blocker register; 2026-07-20 local ERC/netlist/host-test evidence is separated in `hardware/power-board/PB-100/PB-100-board-release-local-evidence-closeout.csv` |
 | Firmware safety core | Host-test ready | Output, overflow-safe delayed battery cutoff, runtime load shedding, stale-current safe-off, thermal derate/cutoff, CAN dropped-edge retry, telemetry, events, saturating diagnostic counters, logging, config, runtime boot, CAN-to-rule bridge, ambient-light rule conditions, ordered rule sets, multi-action rule compilation, rule runtime, and rule paths covered |
 | Configuration format | Host-test ready | JSON schema, canonical rule grammar, rule-action mapping, buffer-atomic rule compilation, PB-100 capability manifest, compiled capability baseline, config store reserved/sequence-wrap handling, config update, and examples are validated |
-| Production package | Draft | BOM sourcing snapshot was refreshed for selected manufacturer, distributor, and JLCPCB componentSearch evidence on 2026-07-20; PCBWay assembly, zero/low-stock risks, purchase-ready garage kits, and schematic closeout evidence remain open |
+| Production package | Draft | BOM sourcing snapshot was refreshed for selected manufacturer, distributor, JLCPCB componentSearch, PCBWay generic process, and garage kit-candidate evidence on 2026-07-20; zero/low-stock risks, exact suffix lock, final garage purchase lock, and schematic closeout evidence remain open |
 
 ## Required before schematic freeze
 
@@ -216,8 +216,12 @@ Current coverage:
   adds the closeout bridge for critical-key ownership, alternates,
   assembly-platform handling, inspection/rework evidence, BOM synchronization,
   and no-layout manufacturing boundary. Schematic freeze must still recheck
-  JLCPCB/PCBWay assembly class, distributor continuity, garage connector
-  derating, crimp tooling, and service access.
+  JLCPCB/PCBWay exact suffixes, distributor continuity, garage connector
+  derating, crimp tooling, and service access. The 2026-07-20
+  `hardware/power-board/PB-100/PB-100-factory-assembly-platform-evidence.csv`
+  refresh records PCBWay generic SMT process and sourcing-mode evidence; it
+  does not lock package-specific handling, inspection/rework, or orderable
+  suffixes.
 - Garage install closure now has
   `hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv`,
   tying the 50 A battery/MAXI path, DTP/DT/DTM connector classes, MINI/ATO fuse
@@ -229,7 +233,13 @@ Current coverage:
   `hardware/power-board/PB-100/PB-100-garage-install-closeout-precheck.csv`
   adds the closeout bridge for user-installed ownership, 50 A input path,
   connector/fuse kits, wire/harness derating, enclosure service/vibration, BOM
-  synchronization, and no-layout manufacturing boundary.
+  synchronization, and no-layout manufacturing boundary. The 2026-07-20
+  `hardware/power-board/PB-100/PB-100-garage-purchase-kit-candidates.csv`
+  refresh now records candidate DTP06/DTP04, DT06/DT04, DTM06/DTM04 housings,
+  contacts, wedgelocks, Littelfuse fuse-holder classes, and HDT-48-00-class
+  tooling; final purchase lock still needs supplier stock, exact quantities,
+  boots/backshells, insertion/removal tools, enclosure entry, heat/service, and
+  vibration evidence.
 - Thermal telemetry now has a TDK `NTCGS103JF103FT8`-class 10 kΩ 150 °C
   AEC-Q200 NTC candidate for all three thermal points; schematic freeze must
   still close divider values, ADC scaling, placement, assembly class, and

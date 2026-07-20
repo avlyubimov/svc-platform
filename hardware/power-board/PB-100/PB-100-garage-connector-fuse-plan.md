@@ -6,7 +6,8 @@ This document selects garage-installed connector and fuse families for PB-100
 schematic planning. It does not freeze exact connector MPNs or enclosure
 placement.
 
-Last source recheck: 2026-07-17.
+Last source recheck: 2026-07-20 kit-candidate refresh; 2026-07-17 class
+baseline retained.
 
 ## Decision
 
@@ -44,6 +45,17 @@ final holder style decided during enclosure and schematic review.
   available crimp tool, insertion/removal tool, wedgelock, seal, and spare
   contact set before schematic freeze.
 
+## Purchase-kit candidate evidence
+
+Candidate garage kit MPNs are tracked in
+`hardware/power-board/PB-100/PB-100-garage-purchase-kit-candidates.csv`.
+That file narrows the current evidence to candidate DTP06/DTP04, DT06/DT04,
+DTM06/DTM04 housings, matching size 12/16/20 contacts, wedgelocks, Littelfuse
+MAXI and MINI/ATO fuse-holder classes, and HDT-48-00-class tooling. This still
+does not freeze exact connector MPNs: final lock requires supplier stock,
+boots/backshells, seals, insertion/removal tools, wire gauge, enclosure entry,
+heat/service access, and vibration inspection evidence.
+
 ## Current rationale
 
 - DEUTSCH DTM uses size 20 contacts around the 7.5 A class and is therefore
@@ -80,5 +92,12 @@ Detailed map CSV:
 - TE DEUTSCH DTM series: https://www.te.com/en/products/connectors/automotive-connectors/intersection/deutsch-dtm-connectors.html
 - TE DEUTSCH DTM housings: https://www.te.com/en/product-CAT-D485-CH8172.html
 - TE DEUTSCH family overview with DTP current class: https://www.te.com/en/videos/transportation/deutsch-dt-te-logos.html
+- TE DEUTSCH DTP06-2S housing: https://www.te.com/en/product-DTP06-2S.html
+- TE DEUTSCH DTP04-2P housing: https://www.te.com/en/product-DTP04-2P.html
+- TE DEUTSCH DT06-2S housing: https://www.te.com/en/product-DT06-2S.html
+- TE DEUTSCH DT04-2P housing: https://www.te.com/en/product-DT04-2P.html
+- TE DEUTSCH DTM06-4S housing: https://www.te.com/en/product-DTM06-4S.html
+- TE DEUTSCH DTM04-4P housing: https://www.te.com/en/product-DTM04-4P.html
+- TE DEUTSCH HDT-48-00 crimp tool: https://www.te.com/en/product-HDT-48-00.html
 - Littelfuse MAXI 152 inline fuse holder: https://www.littelfuse.com/products/fuses-overcurrent-protection/fuse-holders-fuse-blocks-accessories/fuse-holders/in-line-fuse-holders/maxi-152/01520003u
 - Littelfuse ATO/MINI sealed fuse holders: https://www.littelfuse.com/products/fuses-overcurrent-protection/fuse-holders-fuse-blocks-accessories/fuse-holders/in-line-fuse-holders/ato-mini-sealed-fuse-holders
