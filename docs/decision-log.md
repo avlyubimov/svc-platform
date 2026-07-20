@@ -2785,3 +2785,19 @@ review closeouts and KiCad sheet evidence close the remaining note-only
 schematic gap without creating PCB layout, Gerbers, drills, pick-place files,
 BOM/CPL order packages, manufacturing ZIPs, fabrication packages, or PCBA order
 artifacts.
+
+## 2026-07-20 — PB-100 schematic freeze closed
+
+Decision: PB-100 schematic freeze is closed for controlled PCB-layout start in
+`hardware/power-board/PB-100/PB-100-schematic-review-closeout.md`. The PBREL
+blocker register remains closed, the freeze gap register is retained as closed
+history, and the readiness dashboard now marks layout authorization as ready.
+
+Reason: PB-100 now has closed pre-layout engineering evidence for CAN1 safety,
+board current budget, board-to-board interface, output stages, input reverse
+protection, TVS/load-dump strategy, logic power, current telemetry, thermal
+telemetry, factory assembly, and garage assembly. This does not create
+`PB-100.kicad_pcb`, Gerbers, drills, pick-place files, BOM/CPL order packages,
+manufacturing ZIPs, fabrication packages, or PCBA order artifacts; JLCPCB/PCBWay
+ordering remains NO-GO until reviewed PCB layout and manufacturing outputs
+exist.

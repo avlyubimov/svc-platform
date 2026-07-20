@@ -1,11 +1,14 @@
 # PB-100 Schematic Readiness Review
 
-Status: Ready for schematic review; not frozen
+Status: Schematic freeze closed
 
-Review date: 2026-06-30
+Review date: 2026-07-20
 
 This snapshot summarizes the PB-100 schematic-planning package after resolving
-all active planning blockers. It does not authorize PCB layout.
+all active planning blockers and closing schematic freeze. PCB layout is now a
+separate post-freeze task; this document does not authorize PCB layout, Gerbers,
+drills, pick-place files, BOM/CPL order packages, manufacturing ZIP files,
+fabrication packages, or PCBA orders.
 
 ## Outcome
 
@@ -15,15 +18,16 @@ all active planning blockers. It does not authorize PCB layout.
 - Board-release blockers PBREL-001 through PBREL-012 are closed for pre-layout
   evidence and retained as history in
   `hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`.
-- The schematic-freeze checklist remains open because reviewed value-bearing
-  schematic sheets and Product Owner approval are separate freeze requirements.
+- PB-100 schematic freeze is closed by
+  `hardware/power-board/PB-100/PB-100-schematic-review-closeout.md`.
 - ADR-0013 separates pre-layout closure from physical bench execution:
   assembled-board PB-BENCH records block first motorcycle power and production
   release, not first prototype PCB fabrication.
-- All formerly open schematic-readiness gates now have evidence.
-- Remaining gates are conditional because they need schematic-level evidence,
-  final component sourcing checks, SOA extraction, connector derating, and
-  thermal/copper review.
+- All formerly open or conditional schematic-readiness gates now have reviewed
+  schematic-level evidence.
+- Physical layout, fabrication, assembly, bench, sourcing-lot, SOA extraction,
+  connector derating, and thermal/copper review remain controlled downstream
+  work before board-print or production release.
 
 ## Review packet
 
@@ -38,6 +42,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv`
 - `hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`
 - `hardware/power-board/PB-100/PB-100-engineering-blocker-closeout.md`
+- `hardware/power-board/PB-100/PB-100-schematic-review-closeout.md`
 - `hardware/power-board/PB-100/PB-100-validation-traceability.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv`
 - `hardware/power-board/PB-100/PB-100-test-point-plan.csv`
