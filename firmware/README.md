@@ -69,7 +69,7 @@ Current host tests cover:
   `svc_rule_t` and ordered `svc_rule_t` arrays for multi-action rules.
 - Rule action grammar alignment between the JSON Schema, repository
   configuration validator, and firmware parser for supported roles and PWM
-  values.
+  values, with canonical `0` or `1..100` PWM literals.
 - Runtime Boot path from direct configuration or persistent store that keeps
   outputs off unless configuration and hardware capability checks pass.
 - Telemetry Snapshot validity/staleness for battery, total current, and

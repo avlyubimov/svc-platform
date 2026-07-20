@@ -42,6 +42,9 @@ Supported action strings:
 
 - `ROLE.pwm = 0..100`
 
+PWM values use canonical decimal text: `0` or `1..100`. Signed values and
+leading-zero values are rejected by the host-tested parser.
+
 `0` maps to a disable-role action. Any positive PWM value maps to an enable-role
 action with that duty-cycle request. Output Manager enforces whether the target
 output allows partial PWM.

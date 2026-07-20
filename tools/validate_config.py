@@ -24,6 +24,7 @@ HARDWARE_CAPABILITY_HEADER_PATH = REPO_ROOT / "firmware" / "services" / "hardwar
 HARDWARE_CAPABILITY_IMPL_PATH = REPO_ROOT / "firmware" / "services" / "hardware_capability.c"
 PB100_CAPABILITY_HEADER_PATH = REPO_ROOT / "firmware" / "services" / "pb100_capability.h"
 PB100_CAPABILITY_IMPL_PATH = REPO_ROOT / "firmware" / "services" / "pb100_capability.c"
+RULE_TEXT_IMPL_PATH = REPO_ROOT / "firmware" / "services" / "rule_text.c"
 CONFIG_ACCEPTANCE_TEST_PATH = REPO_ROOT / "firmware" / "tests" / "test_config_acceptance.c"
 CONFIG_STORE_TEST_PATH = REPO_ROOT / "firmware" / "tests" / "test_config_store.c"
 CONFIG_UPDATE_TEST_PATH = REPO_ROOT / "firmware" / "tests" / "test_config_update.c"
@@ -75,11 +76,7 @@ REQUIRED_HARDWARE_CAPABILITY_TOKENS = (
     "can1_tx_route_dnp_open",
     "configuration_required_for_roles",
 )
-RULE_CONDITION_PATTERN = r"^(engine_running|high_beam|left_indicator|ambient_day|ambient_dusk|ambient_night) == (true|false)$"
-RULE_ACTION_PATTERN = (
-    r"^(USB|CIGARETTE_SOCKET|FOG_LEFT|FOG_RIGHT|CHIGEE|HEATED_SEAT_RIDER|"
-    r"HEATED_SEAT_PASSENGER|DVR|AUX_BRAKE|SPARE)\.pwm = (100|[1-9]?[0-9])$"
-)
+RULE_ACTION_VALUE_PATTERN = r"(100|[1-9]?[0-9])"
 
 
 def fail(message: str) -> None:
@@ -157,6 +154,39 @@ def parse_allowed_roles() -> set[str]:
     return roles
 
 
+def parse_rule_text_conditions() -> list[str]:
+    conditions = re.findall(
+        r'\{"([a-z_]+)",\s+SVC_RULE_CONDITION_[A-Z_]+\}',
+        read_text(RULE_TEXT_IMPL_PATH),
+    )
+    if not conditions:
+        fail("no rule text conditions found in firmware/services/rule_text.c")
+    return conditions
+
+
+def parse_rule_text_roles() -> list[str]:
+    entries = re.findall(
+        r'\{"([A-Z0-9_]+)",\s+OUT_ROLE_([A-Z0-9_]+)\}',
+        read_text(RULE_TEXT_IMPL_PATH),
+    )
+    if not entries:
+        fail("no rule text roles found in firmware/services/rule_text.c")
+    roles = []
+    for text_role, enum_role in entries:
+        if text_role != enum_role:
+            fail(f"rule text role {text_role} does not match OUT_ROLE_{enum_role}")
+        roles.append(text_role)
+    return roles
+
+
+def rule_condition_pattern(conditions: list[str]) -> str:
+    return rf"^({'|'.join(re.escape(condition) for condition in conditions)}) == (true|false)$"
+
+
+def rule_action_pattern(roles: list[str]) -> str:
+    return rf"^({'|'.join(re.escape(role) for role in roles)})\.pwm = {RULE_ACTION_VALUE_PATTERN}$"
+
+
 def parse_c_default_outputs() -> list[dict[str, Any]]:
     pattern = re.compile(
         r"\{SVC_OUTPUT_OUT(\d+),\s+OUT_ROLE_([A-Z0-9_]+),\s+"
@@ -204,6 +234,9 @@ def validate_schema(schema: dict[str, Any], allowed_roles: set[str]) -> None:
     schema_roles = require_schema_enum(schema, "outputRole")
     if set(schema_roles) != allowed_roles:
         fail("schema outputRole enum does not match firmware output_role_t")
+    rule_text_roles = parse_rule_text_roles()
+    if rule_text_roles != [role for role in schema_roles if role != "NONE"]:
+        fail("schema outputRole enum does not match firmware rule text action roles")
 
     schema_outputs = require_schema_enum(schema, "outputId")
     if schema_outputs != [f"OUT{output_number}" for output_number in range(1, 11)]:
@@ -223,13 +256,13 @@ def validate_schema(schema: dict[str, Any], allowed_roles: set[str]) -> None:
 
     rule_schema = schema.get("$defs", {}).get("rule", {})
     if_schema = rule_schema.get("properties", {}).get("if", {})
-    if if_schema.get("items", {}).get("pattern") != RULE_CONDITION_PATTERN:
+    if if_schema.get("items", {}).get("pattern") != rule_condition_pattern(parse_rule_text_conditions()):
         fail("schema rule.if item pattern must match supported firmware rule conditions")
 
     then_schema = rule_schema.get("properties", {}).get("then", {})
     if then_schema.get("minItems") != 1:
         fail("schema rule.then must require at least one action")
-    if then_schema.get("items", {}).get("pattern") != RULE_ACTION_PATTERN:
+    if then_schema.get("items", {}).get("pattern") != rule_action_pattern(rule_text_roles):
         fail("schema rule.then item pattern must match supported firmware rule actions")
 
     required = schema.get("required", [])
@@ -929,8 +962,8 @@ def validate_rules(config: dict[str, Any], allowed_roles: set[str]) -> None:
             continue
         role_outputs.setdefault(role, []).append(output)
 
-    condition_pattern = re.compile(RULE_CONDITION_PATTERN)
-    action_pattern = re.compile(RULE_ACTION_PATTERN)
+    condition_pattern = re.compile(rule_condition_pattern(parse_rule_text_conditions()))
+    action_pattern = re.compile(rule_action_pattern(parse_rule_text_roles()))
     for rule_index, rule in enumerate(rules):
         if not isinstance(rule, dict):
             fail(f"rules[{rule_index}] must be an object")

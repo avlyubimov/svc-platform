@@ -1,9 +1,7 @@
 #include "rule_text.h"
 
-#include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdlib.h>
 #include <string.h>
 
 typedef struct {
@@ -66,6 +64,34 @@ static bool parse_role_name(const char *name, size_t name_length, output_role_t 
     return false;
 }
 
+static bool parse_pwm_percent(const char *text, uint8_t *pwm_duty_percent)
+{
+    if (text == NULL || text[0] == '\0') {
+        return false;
+    }
+    if (text[0] == '0') {
+        if (text[1] != '\0') {
+            return false;
+        }
+        *pwm_duty_percent = 0U;
+        return true;
+    }
+
+    unsigned int value = 0U;
+    for (size_t index = 0U; text[index] != '\0'; ++index) {
+        if (text[index] < '0' || text[index] > '9') {
+            return false;
+        }
+        value = value * 10U + (unsigned int)(text[index] - '0');
+        if (value > 100U) {
+            return false;
+        }
+    }
+
+    *pwm_duty_percent = (uint8_t)value;
+    return true;
+}
+
 svc_rule_text_status_t svc_rule_text_parse_condition(
     const char *text,
     svc_rule_condition_t *condition)
@@ -123,16 +149,14 @@ svc_rule_text_status_t svc_rule_text_parse_action(
     }
 
     const char *value_text = property_position + strlen(property);
-    char *end = NULL;
-    errno = 0;
-    const unsigned long pwm_value = strtoul(value_text, &end, 10);
-    if (errno != 0 || end == value_text || *end != '\0' || pwm_value > 100UL) {
+    uint8_t pwm_value = 0U;
+    if (!parse_pwm_percent(value_text, &pwm_value)) {
         return SVC_RULE_TEXT_INVALID_ACTION_VALUE;
     }
 
     action->role = role;
-    action->pwm_duty_percent = (uint8_t)pwm_value;
-    action->type = pwm_value == 0UL ? SVC_RULE_ACTION_DISABLE_ROLE : SVC_RULE_ACTION_ENABLE_ROLE;
+    action->pwm_duty_percent = pwm_value;
+    action->type = pwm_value == 0U ? SVC_RULE_ACTION_DISABLE_ROLE : SVC_RULE_ACTION_ENABLE_ROLE;
     return SVC_RULE_TEXT_OK;
 }
 

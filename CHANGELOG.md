@@ -27,4 +27,5 @@
 - Added a PB-100/LB-100 B2B resource precheck for STM32H563 pin-binding review
   without freezing exact MCU pins.
 - Aligned firmware rule action grammar across the JSON Schema, repository
-  validator, and host-tested parser for supported roles and 0..100 PWM values.
+  validator, and host-tested parser for supported roles and canonical 0..100
+  PWM values.

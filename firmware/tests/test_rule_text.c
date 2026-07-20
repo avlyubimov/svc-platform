@@ -104,6 +104,18 @@ static void test_reject_invalid_pwm_value(void)
     assert(status == SVC_RULE_TEXT_INVALID_ACTION_VALUE);
 }
 
+static void test_reject_noncanonical_pwm_values(void)
+{
+    svc_rule_action_t action = {0};
+
+    assert(svc_rule_text_parse_action(
+        "FOG_LEFT.pwm = 001",
+        &action) == SVC_RULE_TEXT_INVALID_ACTION_VALUE);
+    assert(svc_rule_text_parse_action(
+        "FOG_LEFT.pwm = +1",
+        &action) == SVC_RULE_TEXT_INVALID_ACTION_VALUE);
+}
+
 static void test_compile_rule_from_text_and_execute(void)
 {
     const char *conditions[] = {
@@ -289,6 +301,7 @@ int main(void)
     test_parse_zero_pwm_as_disable_action();
     test_reject_unknown_action_role();
     test_reject_invalid_pwm_value();
+    test_reject_noncanonical_pwm_values();
     test_compile_rule_from_text_and_execute();
     test_compile_rule_rejects_condition_overflow();
     test_compile_rule_set_from_multiple_actions_and_execute();
