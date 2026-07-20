@@ -2754,3 +2754,19 @@ engineering execution. Persistent rules are required so PB-100 blocker closeout,
 component selection, firmware changes, manufacturing planning, and commits stay
 evidence-driven, architecture-preserving, capability-compatible, and blocked
 from PCB layout or manufacturing output until the proper gates close.
+
+## 2026-07-20 — PB-100 PBREL engineering blockers closed
+
+Decision: PB-100 release blockers PBREL-001 through PBREL-012 are closed for
+pre-layout engineering evidence in
+`hardware/power-board/PB-100/PB-100-engineering-blocker-closeout.md`. The blocker
+register and board-print closure matrix now treat those rows as closed history,
+while the PB-100 schematic-freeze checklist remains `Open` with conditional
+freeze gates.
+
+Reason: The evidence package now documents why each blocker existed, candidate
+comparisons, selected engineering direction, risks, alternatives, cost impact,
+thermal impact, production impact, field reliability, datasheet/source evidence,
+and post-prototype validation boundaries. This removes the PBREL evidence
+deadlock without creating PCB layout, Gerbers, drills, pick-place files,
+BOM/CPL order packages, manufacturing ZIPs, or JLCPCB/PCBWay order artifacts.

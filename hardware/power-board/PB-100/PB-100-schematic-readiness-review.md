@@ -12,9 +12,11 @@ all active planning blockers. It does not authorize PCB layout.
 - Architecture v1.0 and PB-100 baseline requirements are frozen by ADR.
 - No active PB-100 architecture-planning blockers remain in the freeze
   checklist.
-- Board-release blockers remain active for every conditional gate and are
-  tracked in
+- Board-release blockers PBREL-001 through PBREL-012 are closed for pre-layout
+  evidence and retained as history in
   `hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`.
+- The schematic-freeze checklist remains open because reviewed value-bearing
+  schematic sheets and Product Owner approval are separate freeze requirements.
 - ADR-0013 separates pre-layout closure from physical bench execution:
   assembled-board PB-BENCH records block first motorcycle power and production
   release, not first prototype PCB fabrication.
@@ -35,6 +37,7 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-freeze-gap-register.csv`
 - `hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`
+- `hardware/power-board/PB-100/PB-100-engineering-blocker-closeout.md`
 - `hardware/power-board/PB-100/PB-100-validation-traceability.csv`
 - `hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv`
 - `hardware/power-board/PB-100/PB-100-test-point-plan.csv`

@@ -189,6 +189,9 @@ BOARD_PRINT_CLOSURE_MATRIX_COLUMNS = (
     "Required current-state evidence",
     "Board-print blocked action",
 )
+ENGINEERING_BLOCKER_CLOSEOUT = (
+    "hardware/power-board/PB-100/PB-100-engineering-blocker-closeout.md"
+)
 OUTPUT_CHANNEL_PIN_CONTRACT_COLUMNS = (
     "Output",
     "Controller ref",
@@ -1482,6 +1485,7 @@ ALLOWED_CAPTURE_STATUSES = {
 }
 REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md",
+    ENGINEERING_BLOCKER_CLOSEOUT,
     "hardware/power-board/PB-100/PB-100-schematic-package.md",
     "hardware/power-board/PB-100/PB-100-schematic-readiness-dashboard.csv",
     "hardware/power-board/PB-100/PB-100-schematic-freeze-checklist.md",
@@ -3072,6 +3076,187 @@ def required_closeout_artifact_by_gate() -> dict[str, str]:
     }
 
 
+def pbrel_id_by_gate() -> dict[str, str]:
+    return {
+        "CAN1 safety policy": "PBREL-001",
+        "Board current budget": "PBREL-002",
+        "Board-to-board interface": "PBREL-003",
+        "High/medium output stage": "PBREL-004",
+        "Low-current output stage": "PBREL-005",
+        "Input reverse protection": "PBREL-006",
+        "TVS/load-dump protection": "PBREL-007",
+        "Logic power rails": "PBREL-008",
+        "Current telemetry": "PBREL-009",
+        "Thermal telemetry": "PBREL-010",
+        "Factory assembly readiness": "PBREL-011",
+        "Garage assembly readiness": "PBREL-012",
+    }
+
+
+def engineering_blocker_closeout_statuses() -> dict[str, str]:
+    path = REPO_ROOT / ENGINEERING_BLOCKER_CLOSEOUT
+    if not path.exists():
+        return {}
+    text = read_text(path)
+    statuses: dict[str, str] = {}
+    for blocker_id in pbrel_id_by_gate().values():
+        marker = f"## {blocker_id} "
+        marker_index = text.find(marker)
+        if marker_index < 0:
+            continue
+        next_marker_index = text.find("\n## PBREL-", marker_index + len(marker))
+        section = text[marker_index:] if next_marker_index < 0 else text[marker_index:next_marker_index]
+        status_match = re.search(r"Closeout status:\s*([A-Za-z -]+)\.", section)
+        if status_match:
+            statuses[blocker_id] = status_match.group(1).strip()
+    return statuses
+
+
+def validate_engineering_blocker_closeout() -> None:
+    path = REPO_ROOT / ENGINEERING_BLOCKER_CLOSEOUT
+    text = read_text(path)
+    normalized_text = re.sub(r"\s+", " ", text)
+    lower_text = text.lower()
+    if "does not authorize pcb layout" not in lower_text:
+        fail(f"{path.relative_to(REPO_ROOT)} must explicitly avoid PCB layout authorization")
+    for token in (
+        "PB-100.kicad_pcb",
+        "Gerbers",
+        "drills",
+        "pick-place",
+        "BOM/CPL",
+        "manufacturing ZIP",
+        "PCBA order",
+    ):
+        if token not in text and token not in normalized_text:
+            fail(f"{path.relative_to(REPO_ROOT)} must keep no-layout token {token}")
+
+    common_section_tokens = (
+        "Closeout status: Closed",
+        "Why blocker existed",
+        "Candidate comparison",
+        "Recommended solution",
+        "Risks",
+        "Alternatives",
+        "Cost impact",
+        "Thermal impact",
+        "Production impact",
+        "Field reliability impact",
+        "Why this component/solution",
+        "Why not alternative A",
+        "Why not alternative B",
+        "Expected lifetime",
+        "Operating margin",
+        "Maximum junction temperature",
+        "Availability",
+        "Automotive qualification",
+        "LCSC availability",
+        "PCBWay/JLCPCB compatibility",
+        "Known risks",
+        "Evidence and calculations",
+        "Datasheet and sourcing evidence",
+        "Post-prototype validation",
+        "No-layout boundary",
+    )
+    specific_tokens_by_id = {
+        "PBREL-001": (
+            "CAN1_TX_ROUTE",
+            "DNP/open",
+            "future ADR",
+            "SN74LVC1G125-Q1",
+            "PB-BENCH-012",
+        ),
+        "PBREL-002": (
+            "40 A",
+            "50 A",
+            "0.5mΩ",
+            "CSS4J-4026R-L500F",
+            "PB-BENCH-006",
+            "PB-BENCH-010",
+        ),
+        "PBREL-003": (
+            "FX18-100P-0.8SV10",
+            "FX18-100S-0.8SV20",
+            "STM32H563VITx",
+            "JPB1",
+        ),
+        "PBREL-004": (
+            "TPS48110AQDGXRQ1",
+            "BUK7Y3R1-80M",
+            "OUT2",
+            "SOA",
+        ),
+        "PBREL-005": (
+            "OUT5",
+            "OUT8",
+            "OUT9",
+            "ADR-0011",
+            "no direct 40 V",
+        ),
+        "PBREL-006": (
+            "LM74700QDBVRQ1",
+            "BUK7S1R2-80M",
+            "40 A",
+            "Q1",
+        ),
+        "PBREL-007": (
+            "SM8S33AHM3/I",
+            "53.3 V",
+            "80 V",
+            "overshoot",
+        ),
+        "PBREL-008": (
+            "LM5164QDDATQ1",
+            "PB_5V_OUT",
+            "100 V",
+            "1 A",
+            "LM5013-Q1",
+        ),
+        "PBREL-009": (
+            "INA228-Q1",
+            "0.5mΩ",
+            "±40.96 mV",
+            "PB-BENCH-005",
+        ),
+        "PBREL-010": (
+            "NTCGS103JF103FT8",
+            "TEMP_PCB",
+            "TEMP_PWR_A",
+            "TEMP_PWR_B",
+            "PB-BENCH-009",
+        ),
+        "PBREL-011": (
+            "JLCPCB",
+            "PCBWay",
+            "DNP/open",
+            "PowerPAK",
+            "TOLL",
+            "LFPAK88",
+            "DO-218AC",
+            "FX18",
+        ),
+        "PBREL-012": (
+            "TE DEUTSCH",
+            "DTP",
+            "DT",
+            "Littelfuse",
+            "MAXI",
+            "garage-installed",
+        ),
+    }
+    for gate, blocker_id in pbrel_id_by_gate().items():
+        marker = f"## {blocker_id} — {gate}"
+        marker_index = text.find(marker)
+        if marker_index < 0:
+            fail(f"{path.relative_to(REPO_ROOT)} is missing closeout section {marker}")
+        next_marker_index = text.find("\n## PBREL-", marker_index + len(marker))
+        section = text[marker_index:] if next_marker_index < 0 else text[marker_index:next_marker_index]
+        normalized_section = re.sub(r"\s+", " ", section)
+        for token in common_section_tokens + specific_tokens_by_id[blocker_id]:
+            if token not in section and token not in normalized_section:
+                fail(f"{path.relative_to(REPO_ROOT)} {blocker_id} section must include {token}")
+
+
 def validate_board_release_blocker_register() -> None:
     path = PB100_DIR / "PB-100-board-release-blocker-register.csv"
     validate_csv(path)
@@ -3088,8 +3273,10 @@ def validate_board_release_blocker_register() -> None:
         )
 
     gates_by_status = freeze_checklist_gates_by_status()
-    conditional_gates = {gate for gate, status in gates_by_status.items() if status == "Conditional"}
     required_closeout_by_gate = required_closeout_artifact_by_gate()
+    expected_blocker_id_by_gate = pbrel_id_by_gate()
+    closeout_statuses = engineering_blocker_closeout_statuses()
+    allowed_statuses = {"Closed", "Conditional", "Open", "Blocked"}
     seen_gates = set()
     seen_blockers = set()
     for row_number, row in enumerate(rows, 2):
@@ -3104,15 +3291,24 @@ def validate_board_release_blocker_register() -> None:
         seen_blockers.add(blocker_id)
         if gate not in gates_by_status:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown freeze checklist gate {gate}")
-        if gate not in conditional_gates:
+        if gate not in expected_blocker_id_by_gate:
             fail(
-                f"{path.relative_to(REPO_ROOT)}:{row_number}: gate {gate} is "
-                f"{gates_by_status[gate]} in freeze checklist and must not have a release blocker row"
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: gate {gate} is not a tracked PBREL gate"
             )
+        expected_blocker_id = expected_blocker_id_by_gate[gate]
+        if blocker_id != expected_blocker_id:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocker ID must be {expected_blocker_id}")
         if not blocker_id.startswith("PBREL-"):
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocker ID must start with PBREL-")
-        if status != "Conditional":
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: release blockers must remain Conditional")
+        if status not in allowed_statuses:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid release blocker status {status}")
+        if status == "Closed" and closeout_statuses.get(blocker_id) != "Closed":
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: Closed blocker {blocker_id} "
+                f"must have Closed closeout in {ENGINEERING_BLOCKER_CLOSEOUT}"
+            )
+        if gates_by_status[gate] == "Closed" and status != "Closed":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: closed freeze gate {gate} cannot keep an active blocker")
         for column in BOARD_RELEASE_BLOCKER_REGISTER_COLUMNS:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
@@ -3130,16 +3326,16 @@ def validate_board_release_blocker_register() -> None:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: release blocker must reference {required_closeout}")
         validate_no_role_tokens_in_row(path, row_number, row)
 
-    missing_gates = sorted(conditional_gates - seen_gates)
-    extra_gates = sorted(seen_gates - conditional_gates)
+    missing_gates = sorted(set(expected_blocker_id_by_gate) - seen_gates)
+    extra_gates = sorted(seen_gates - set(expected_blocker_id_by_gate))
     if missing_gates:
         fail(
-            f"{path.relative_to(REPO_ROOT)} is missing release blockers for gates: "
+            f"{path.relative_to(REPO_ROOT)} is missing PBREL blocker rows for gates: "
             f"{', '.join(missing_gates)}"
         )
     if extra_gates:
         fail(
-            f"{path.relative_to(REPO_ROOT)} has blockers for non-conditional gates: "
+            f"{path.relative_to(REPO_ROOT)} has blockers for non-PBREL gates: "
             f"{', '.join(extra_gates)}"
         )
 
@@ -3162,12 +3358,12 @@ def validate_board_print_closure_matrix() -> None:
     blocker_rows = list(
         csv.DictReader((PB100_DIR / "PB-100-board-release-blocker-register.csv").open(newline="", encoding="utf-8"))
     )
-    active_blockers_by_gate = {
+    blockers_by_gate = {
         row["Gate"].strip(): row
         for row in blocker_rows
-        if row["Status"].strip() != "Closed"
     }
     required_closeout_by_gate = required_closeout_artifact_by_gate()
+    allowed_states = {"Closed", "Conditional", "Open", "Blocked"}
 
     rows_by_gate: dict[str, dict[str, str]] = {}
     for row_number, row in enumerate(rows, 2):
@@ -3175,14 +3371,18 @@ def validate_board_print_closure_matrix() -> None:
         if gate in rows_by_gate:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Gate {gate}")
         rows_by_gate[gate] = row
-        if gate not in active_blockers_by_gate:
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: gate {gate} has no active release blocker")
+        if gate not in blockers_by_gate:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: gate {gate} has no release blocker row")
         for column in BOARD_PRINT_CLOSURE_MATRIX_COLUMNS:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
-        if row["Current proof state"].strip() != "Conditional":
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Current proof state must remain Conditional")
-        blocker_row = active_blockers_by_gate[gate]
+        proof_state = row["Current proof state"].strip()
+        if proof_state not in allowed_states:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Current proof state {proof_state}")
+        blocker_row = blockers_by_gate[gate]
+        blocker_status = blocker_row["Status"].strip()
+        if proof_state != blocker_status:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Current proof state must match blocker status {blocker_status}")
         blocker_id = blocker_row["Blocker ID"].strip()
         if row["Blocker ID"].strip() != blocker_id:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocker ID must match {blocker_id}")
@@ -3199,16 +3399,16 @@ def validate_board_print_closure_matrix() -> None:
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Board-print blocked action must block {token}")
         validate_no_role_tokens_in_row(path, row_number, row)
 
-    missing_gates = sorted(active_blockers_by_gate.keys() - rows_by_gate.keys())
-    extra_gates = sorted(rows_by_gate.keys() - active_blockers_by_gate.keys())
+    missing_gates = sorted(blockers_by_gate.keys() - rows_by_gate.keys())
+    extra_gates = sorted(rows_by_gate.keys() - blockers_by_gate.keys())
     if missing_gates:
         fail(
-            f"{path.relative_to(REPO_ROOT)} is missing active release blockers: "
+            f"{path.relative_to(REPO_ROOT)} is missing release blocker closure rows: "
             f"{', '.join(missing_gates)}"
         )
     if extra_gates:
         fail(
-            f"{path.relative_to(REPO_ROOT)} has non-active blockers: "
+            f"{path.relative_to(REPO_ROOT)} has closure rows without blocker rows: "
             f"{', '.join(extra_gates)}"
         )
 
@@ -10899,7 +11099,7 @@ def validate_review_release_manifest() -> None:
             f"{', '.join(missing_columns)}"
         )
 
-    allowed_statuses = {"Frozen", "Ready", "Conditional", "Open"}
+    allowed_statuses = {"Frozen", "Ready", "Closed", "Conditional", "Open"}
     seen_artifacts = set()
     for row_number, row in enumerate(rows, 2):
         artifact = row["Artifact"].strip()
@@ -11128,6 +11328,7 @@ def main() -> int:
     validate_bom_symbol_map()
     validate_schematic_readiness_dashboard()
     validate_schematic_freeze_gap_register()
+    validate_engineering_blocker_closeout()
     validate_board_release_blocker_register()
     validate_board_print_closure_matrix()
     validate_schematic_capture_work_queue()

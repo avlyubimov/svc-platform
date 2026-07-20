@@ -51,11 +51,12 @@ prototype PCB fabrication package.
 
 ## Active blockers
 
-No unresolved architecture-planning blockers remain. Board-release blockers are
-still active for every `Conditional` gate and are tracked in
-`hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`.
-PCB layout and manufacturing output remain blocked until that register is empty
-because every required gate has moved to `Closed`.
+No unresolved architecture-planning blockers remain. Board-release blockers
+PBREL-001 through PBREL-012 are closed for pre-layout evidence and retained as
+history in `hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`.
+The schematic-freeze gates remain `Conditional` until reviewed value-bearing
+schematic sheets and Product Owner approval close this checklist. PCB layout and
+manufacturing output remain blocked until this checklist top status is `Closed`.
 
 ## Resolved blockers
 
@@ -75,6 +76,7 @@ Before marking this checklist `Closed`, the review packet must include:
 - Updated review release manifest.
 - Updated schematic readiness dashboard.
 - Updated board-release blocker register with one row per conditional gate.
+- Updated PBREL engineering blocker closeout record.
 - Updated schematic capture work queue.
 - Updated schematic freeze gap register with one row per conditional gate.
 - Updated validation traceability register with one row per conditional gate.
