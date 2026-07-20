@@ -12,7 +12,7 @@ selects the active configuration.
   contents.
 - Prepare update records only after configuration acceptance against hardware
   capability succeeds.
-- Select the newest valid record from two slots.
+- Select the newest valid record from two slots, including sequence wraparound.
 - Fall back to compiled defaults only when no valid persisted record exists.
 - Keep persisted user configuration preferred across firmware default changes.
 

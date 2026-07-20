@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include "config_store.h"
 #include "svc_config.h"
@@ -68,6 +69,29 @@ static void test_selects_newest_valid_slot(void)
     assert(loaded_config.power_budget.total_current_limit_ma == 39000U);
 }
 
+static void test_selects_newest_slot_after_sequence_wrap(void)
+{
+    svc_config_record_t pre_wrap_record = {0};
+    svc_config_record_t post_wrap_record = {0};
+    svc_device_config_t post_wrap_config = svc_default_config;
+    post_wrap_config.power_budget.total_current_limit_ma = 38000U;
+
+    assert(svc_config_store_build_record(&svc_default_config, UINT32_MAX, &pre_wrap_record) == SVC_CONFIG_STORE_OK);
+    assert(svc_config_store_build_record(&post_wrap_config, 0U, &post_wrap_record) == SVC_CONFIG_STORE_OK);
+
+    svc_device_config_t loaded_config = {0};
+    const svc_config_store_load_result_t result = svc_config_store_load_latest(
+        &pre_wrap_record,
+        &post_wrap_record,
+        &svc_default_config,
+        &loaded_config);
+
+    assert(result.status == SVC_CONFIG_STORE_LOAD_OK);
+    assert(result.source == SVC_CONFIG_STORE_SOURCE_SLOT_B);
+    assert(result.sequence == 0U);
+    assert(loaded_config.power_budget.total_current_limit_ma == 38000U);
+}
+
 static void test_fallback_default_when_slots_are_invalid(void)
 {
     svc_config_record_t bad_record = {0};
@@ -134,6 +158,7 @@ int main(void)
     test_rejects_reserved_field_corruption();
     test_rejects_telemetry_checksum_corruption();
     test_selects_newest_valid_slot();
+    test_selects_newest_slot_after_sequence_wrap();
     test_fallback_default_when_slots_are_invalid();
     test_persisted_config_survives_default_change();
     test_no_valid_config_when_slots_and_fallback_invalid();

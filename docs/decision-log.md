@@ -2543,3 +2543,14 @@ expansion traffic. Long-running capture sessions must not make frame activity or
 drop pressure appear low because an unsigned counter wrapped; saturating keeps
 the diagnostic state conservative while preserving the fixed-size ring buffer
 and CAN1 no-transmit boundary.
+
+## 2026-07-20 — Configuration Store sequence wrap selection
+
+Decision: Configuration Store two-slot selection now compares record sequence
+numbers with wrap-aware unsigned serial arithmetic, so sequence `0` is treated
+as newer than `UINT32_MAX` after counter rollover.
+
+Reason: Persisted user configuration must remain preferred across firmware
+updates and long service life. A raw numeric `>=` comparison can resurrect an
+older pre-wrap record after the sequence rolls over, while wrap-aware selection
+keeps the newest valid record active without changing the storage format.
