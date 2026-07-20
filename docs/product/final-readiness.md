@@ -40,6 +40,10 @@ make pb100-release-gate
 
 Current coverage:
 
+- PB-100 validation is decomposed under `tools/pb100_validation/` by KiCad,
+  symbols, release gates, power, CAN, telemetry, sourcing, protection,
+  interface, and review-packet ownership; `tools/validate_pb100.py` remains the
+  stable CLI entrypoint.
 - PB-100 CSV and KiCad scaffold validation.
 - Required PB-100 KiCad schematic ERC and netlist export with `kicad-cli`
   10.0.4.
@@ -93,38 +97,39 @@ Current coverage:
 - Select final critical MPNs and at least two alternatives for each critical
   component family.
 - Recheck JLCPCB/PCBWay assembly availability and package suitability.
-- Resolve the TVS active-MPN blocker: MCC `SM8S33A` is EOL evidence only and
-  Vishay `SM8S33AHE3_A/I` is NFD evidence only, so schematic freeze must select
-  `SM8S33AHM3/I` or an equivalent active load-dump TVS and validate clamp
-  margin.
+- The planning baseline selects `SM8S33AHM3/I`; MCC `SM8S33A` remains EOL
+  evidence only and Vishay `SM8S33AHE3_A/I` remains NFD evidence only.
+  Schematic freeze still requires live source continuity, DO-218AC assembly,
+  pulse-energy, and actual clamp-loop validation.
 - TVS/load-dump margin now has a downstream voltage-class trace for the active
   `SM8S33AHM3/I` branch and its 53.3 V clamp point; schematic freeze must still
-  close 60 V overshoot margin, DO-218AC assembly handling, and any lower-clamp
-  future path through a review or ADR.
+  validate actual overshoot on the selected 80 V MOSFET paths, DO-218AC
+  assembly handling, and any lower-clamp future path through a review or ADR.
 - TVS/load-dump freeze review now ties the active SM8S33AHM3/I branch,
-  100 V pass-with-margin paths, 60 V overshoot dependencies, 40 V smart-switch
-  ADR boundary, sourcing gate, and no-layout boundary into
+  selected 80 V MOSFET baseline, rejected 60 V history, 100 V
+  pass-with-margin paths, 40 V smart-switch ADR boundary, sourcing gate, and
+  no-layout boundary into
   `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`.
 - TVS/load-dump overshoot closure now has
   `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`,
-  which keeps the active HM3 MPN evidence, 60 V overshoot acceptance criteria,
-  80 V MOSFET escape path, 100 V downstream default, and no-layout boundary in
+  which keeps the active HM3 MPN evidence, 60 V MOSFET exclusion, selected
+  80 V stress validation, 100 V downstream default, and no-layout boundary in
   one machine-checked artifact.
 - TVS overshoot validation precheck now ties the active HM3 clamp source,
-  60 V overshoot acceptance method, 80 V escape, measurement/simulation setup,
-  factory alternates, and no-layout boundary into
+  selected 80 V overshoot method, measurement/simulation setup, factory
+  alternatives, and no-layout boundary into
   `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`.
 - TVS overshoot closeout precheck now ties active source, overshoot method,
-  60 V acceptance, 80 V escape, 100 V downstream defaults, 40 V ADR boundary,
-  schematic-value dependencies, sourcing, validation sync, and no-layout
-  boundary to
+  rejected 60 V path exclusion, selected 80 V baseline, 100 V downstream
+  defaults, 40 V ADR boundary, schematic-value dependencies, sourcing,
+  validation sync, and no-layout boundary to
   `hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv`.
-- MOSFET voltage-margin review now makes the 80 V review escape path explicit
-  for 60 V output and input-reverse MOSFET paths unless overshoot evidence
-  accepts the active TVS clamp margin.
+- MOSFET voltage-margin review selects `BUK7S1R2-80M` 80 V LFPAK88 for Q1 and
+  Q101-Q110. `IAUTN08S5N012L` and `BUK7J2R4-80M` remain controlled non-drop-in
+  80 V alternatives; former 60 V paths are rejected for Rev.1 assembly.
 - OUT5, OUT8, and OUT9 now have a low-current baseline trace enforcing the
-  ADR-0011 external-controller plus external 60 V MOSFET architecture and
-  blocking any direct 40 V smart-switch rail without a future ADR.
+  ADR-0011 external-controller plus selected external 80 V MOSFET architecture
+  and blocking any direct 40 V smart-switch rail without a future ADR.
 - OUT2 and medium-current outputs now have a baseline trace tying their fuse
   classes, configured current limits, TPS48110 external-MOSFET architecture,
   telemetry nets, and SOA/fuse/inductive-clamp freeze blockers together.
@@ -267,18 +272,20 @@ Current coverage:
   AEC-Q200 NTC candidate for all three thermal points; schematic freeze must
   still close divider values, ADC scaling, placement, assembly class, and
   calibration.
-- JPB1 board-to-board planning now has a Hirose `FX18-100P-0.8SV10` plus
-  `FX18-100S-0.8SV20` candidate pair; schematic freeze must still close stack
-  height, footprint drawing, vibration retention, assembly handling, and exact
-  LB-100 MCU pin binding.
+- JPB1 uses the reviewed Hirose `FX18-100P-0.8SV10` plus
+  `FX18-100S-0.8SV20` pair. Both footprints contain exactly six plated TH
+  lands for four logical MF circuits, all assigned to GND with mirrored
+  plug/socket geometry. Schematic freeze must still close paired 20 mm stack
+  fit, vibration retention, fixture/enclosure, and assembly handling.
 - JPB1 now has a B2B interface trace and LB-100 resource-class binding tying
-  the FX18 candidate pair, 100-pin map, output controls/fault/current telemetry,
-  board telemetry, CAN1 safety crossing, and exact MCU pin-binding blockers
+  the selected FX18 pair, 100-pin map, output controls/fault/current telemetry,
+  board telemetry, CAN1 safety crossing, and exact MCU pin-binding evidence
   together.
 - B2B/LB-100 pin binding now has a resource-budget precheck for STM32H563
   LQFP-100 schematic review, covering 10 PWM-capable controls, 16 ADC-class
   measurements, fault/wake inputs, `PB_I2C`, CAN1 safety, and reserved
-  expansion without assigning exact STM32 pins.
+  expansion. The exact STM32 binding remains synchronized through the LB-100
+  pin-binding precheck rather than inferred from resource counts alone.
 - B2B/LB-100 pin binding now has an audit checklist covering the exact
   STM32H563 LQFP-100 pinout audit, 16 ADC-capable measurement inputs or reviewed
   mux strategy, output default-low PWM routing, CAN1 DNP/open crossing, FX18
@@ -295,19 +302,22 @@ Current coverage:
   audit, ADC/PWM/resource limits, CAN1 DNP/open crossing, and no-layout
   manufacturing boundary to
   `hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv`.
-- Q1 input reverse MOSFET pin evidence is captured from the Infineon
-  `IAUTN06S5N008` data sheet; schematic freeze must still close TOLL footprint,
-  40 A copper/thermal review, assembly handling, and gate clamp behavior.
+- Q1 input reverse MOSFET pin evidence and schematic capture use selected
+  `BUK7S1R2-80M` 80 V LFPAK88; schematic freeze must still close 40 A
+  copper/thermal/SOA review, assembly handling, and gate clamp behavior.
 - Q1 input reverse planning now has a package/thermal trace tying
-  `IAUTN06S5N008ATMA1`, `BUK7S1R2-80M`, dual `SIDR626LDP`, the 40 A board
-  budget, shunt measurement boundary, and assembly-source blockers together.
+  selected `BUK7S1R2-80M`, the two controlled non-drop-in 80 V alternatives,
+  the 40 A board budget, shunt measurement boundary, and assembly-source
+  blockers together. Former 60 V calculations are history only.
 - Q1 input reverse freeze review now ties LM74700 default-off behavior,
-  TOLL/LFPAK/PowerPAK alternates, protected measurement sequence, HM3 TVS
-  dependency, sourcing gate, and no-layout boundary into
+  selected LFPAK88 and controlled non-drop-in 80 V alternatives, protected
+  measurement sequence, HM3 TVS dependency, sourcing gate, and no-layout
+  boundary into
   `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`.
 - Q1 input reverse freeze checklist now ties gate clamp/discharge timing,
-  TOLL/LFPAK/PowerPAK package paths, protected measurement sequence, 40 A
-  thermal/copper/SOA audit, assembly sourcing, and no-layout boundary into
+  selected LFPAK88 and controlled 80 V package alternatives, protected
+  measurement sequence, 40 A thermal/copper/SOA audit, assembly sourcing, and
+  no-layout boundary into
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`.
 - Q1 input reverse derivation precheck now ties LM74700-Q1 VCAP/gate-driver
   behavior, ideal-diode thresholds, MOSFET RDS(on) window, TVS stress,
@@ -347,16 +357,21 @@ Current coverage:
 - Board-current closeout precheck now has
   `hardware/power-board/PB-100/PB-100-board-current-budget-closeout-precheck.csv`,
   bridging the 50 A fuse path, 40 A budget, protected high-current path,
-  Q1 thermal candidates, shunt/Kelvin telemetry, copper pre-layout boundary,
+  selected Q1 thermal path and controlled alternatives, shunt/Kelvin telemetry,
+  copper pre-layout boundary,
   firmware enforcement, bench telemetry evidence, BOM owner split, and
   no-layout boundary to PBREL-002.
-- Close PB-100 CAN1 TX-disable schematic evidence using the `JP_CAN1`
-  DNP/open link plus `U_CAN1` default-disabled/readback contract.
+- ADR-0015 candidate A is accepted: PB-100 owns the CAN1 transceiver, ESD/TVS,
+  optional termination/CMC, CANH/CANL, and harness physical layer; LB-100 owns
+  STM32 FDCAN, protocol, and read-only firmware policy.
+- Exported-netlist validation enforces `CAN1_TX_ROUTE -> U_CAN1 ->
+  CAN1_TX_GATE_OUT -> JP_CAN1 (DNP/open) -> CAN1_TXD_SAFE -> U_CAN1_PHY TXD`,
+  while `U_CAN1_PHY RXD` connects only to `CAN1_RX_ROUTE`.
 - CAN1 TX-disable now has a trace tying `JP_CAN1`, `U_CAN1`,
   `CAN1_TX_ROUTE`, `CAN1_TX_DISABLED_STATUS`, firmware listen-only behavior,
   DNP BOM ownership, the production DNP review, and the future-ADR
   hardware-action boundary together.
-- CAN1 TX-disable candidate values now document the 0 Ω DNP/open link,
+- CAN1 TX-disable design values document the 0 Ω DNP/open link,
   `SN74LVC1G125-Q1`-class default-disabled gate, 47 kΩ pulls, physical
   `OE`-node status readback, and reset/unpowered bench checks in
   `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`.
