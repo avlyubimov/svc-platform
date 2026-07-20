@@ -2,7 +2,8 @@ Rail,Load,Current mA,Source,Requirement,Notes
 PB_5V_OUT,LB-100 logic allocation,500,PB-100 buck,Core,Initial planning budget from LB-100-power-budget-precheck.md; use LM5013-Q1-class fallback if exceeded
 PB_5V_OUT,PB-100 controllers and sensors,150,PB-100 buck,Core,High-side controllers telemetry and sensors
 PB_5V_OUT,Telemetry pullups and status circuits,50,PB-100 buck,Core,I2C status and fault support
-PB_5V_OUT,Expansion reserve,200,PB-100 buck,Should,Reserved for future PB-side monitors
-PB_5V_OUT,Design margin,100,PB-100 buck,Should,Margin inside 1A LM5164-Q1-class limit
+PB_5V_OUT,CAN1 physical layer service maximum,70,PB-100 buck,Core,TJA1051 normal receive-only planning is 10mA; reserve 70mA dominant/service maximum even though both TX hardware links are DNP/open
+PB_5V_OUT,Expansion reserve,150,PB-100 buck,Should,Reserved for future PB-side monitors after ADR-0015 CAN1 ownership transfer
+PB_5V_OUT,Design margin,80,PB-100 buck,Should,Margin inside 1A LM5164-Q1-class limit after CAN1 allocation
 PB_5V_OUT,Initial total,1000,PB-100 buck,Core,Move to LM5013-Q1-class if exceeded
-LB_3V3_IO,PB-side logic-level reference,TBD,LB-100 regulator,Core,Not a PB-100 power source for loads
+LB_3V3_IO,PB-side logic-level reference and CAN1 VIO,1,LB-100 regulator,Core,Logic reference only; TJA1051 VIO and safety pull-ups stay below 1mA planning and are not powered from PB_5V_OUT

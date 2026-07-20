@@ -13,29 +13,31 @@ does not approve schematic freeze or PCB layout.
   systems.
 - LM74700-Q1: 3.2-65 V automotive ideal-diode controller with external
   N-MOSFET.
-- SIDR626LDP-T1-RE3: 60 V N-MOSFET, 2.1 mOhm max at VGS = 4.5 V, PowerPAK
-  SO-8DC.
-- IAUTN06S5N008: 60 V automotive N-MOSFET, 0.76 mOhm max at VGS = 10 V, TOLL.
-- BUK7S1R2-80M: 80 V automotive N-MOSFET, 1.2 mOhm class, LFPAK88.
+- BUK7S1R2-80M: selected 80 V automotive N-MOSFET, 1.2 mOhm class,
+  LFPAK88, for Q1 and Q101-Q110.
+- IAUTN08S5N012L 80 V TOLL and BUK7J2R4-80M 80 V LFPAK56E are
+  non-drop-in alternatives. SIDR626LDP and IAUTN06S5N008 60 V evidence is
+  historical and rejected for the Rev.1 assembly baseline.
 - Active AEC-Q101 SM8S33AHM3-class TVS: 33 V standoff, 53.3 V clamp at
   rated pulse current in the HM3 DO-218AC branch. MCC SM8S33A is EOL evidence
   only and Vishay HE3 is NFD stock-only evidence; neither may be locked.
 
 ## Preliminary findings
 
-- TPS48110AQDGXRQ1 plus external 60 V MOSFET remains the preferred path for
-  all Rev.1 output channels.
-- SIDR626LDP-class MOSFET conduction losses are acceptable as a starting point,
-  but SOA and thermal validation are still required for compressor inrush and
-  heated-seat steady state.
+- TPS48110AQDGXRQ1 plus selected external BUK7S1R2-80M 80 V MOSFET is the
+  Rev.1 path for all output channels.
+- Selected LFPAK88 conduction loss is acceptable as a planning input, but SOA
+  and thermal validation are still required for compressor inrush and
+  steady-state loads.
 - OUT2 compressor/inrush planning uses the envelope in
-  `hardware/power-board/PB-100/PB-100-out2-soa.md`; SIDR626LDP remains a
-  candidate only if detailed SOA review passes.
+  `hardware/power-board/PB-100/PB-100-out2-soa.md`; the selected BUK7S1R2-80M
+  still requires detailed SOA review.
 - LM74700QDBVRQ1-class reverse protection is compatible with the 12 V input
   target and cold-crank requirement when paired with a dedicated low-Rds input
   MOSFET strategy.
-- Active SM8S33AHM3-class input TVS is compatible with 60 V MOSFET planning but leaves
-  limited voltage margin against 60 V absolute maximum ratings.
+- Active SM8S33AHM3-class input TVS has 26.7 V nominal datasheet-clamp
+  headroom to the selected 80 V MOSFET rating; actual loop overshoot still
+  requires reproducible validation.
 - Active SM8S33AHM3-class input TVS is not automatically compatible with 40 V integrated
   smart switches. ADR-0011 resolves the Rev.1 conflict by moving OUT5, OUT8,
   and OUT9 to the external-controller output architecture.

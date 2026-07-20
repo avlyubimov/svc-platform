@@ -1,10 +1,10 @@
 Path,Output class,Current A,Rds or Ron ohm,Temperature multiplier,Estimated dissipation W,Status,Notes
-SIDR626LDP external MOSFET,High current OUT2,18,0.0021,2.0,1.36,Needs thermal validation,Conservative conduction estimate only; excludes switching and inrush
-SIDR626LDP external MOSFET,Medium current 12A channel,12,0.0021,2.0,0.60,Needs thermal validation,Applies to OUT1 class
-SIDR626LDP external MOSFET,Medium current 8A channel,8,0.0021,2.0,0.27,Needs thermal validation,Applies to OUT3 OUT4 OUT6 OUT7 OUT10 class
-SIDR626LDP external MOSFET,Low current 4A channel,4,0.0021,2.0,0.07,Rev.1 baseline estimate,Applies to OUT5 OUT8 OUT9; controller losses excluded
+BUK7S1R2-80M 80 V external MOSFET,High current OUT2,18,0.0012,2.0,0.78,Needs thermal validation,125 C maximum RDS(on) 2.4mOhm equivalent; excludes switching and inrush
+BUK7S1R2-80M 80 V external MOSFET,Medium current 12A channel,12,0.0012,2.0,0.35,Needs thermal validation,Applies to OUT1 class; excludes switching loss
+BUK7S1R2-80M 80 V external MOSFET,Medium current 8A channel,8,0.0012,2.0,0.15,Needs thermal validation,Applies to OUT3 OUT4 OUT6 OUT7 OUT10 class
+BUK7S1R2-80M 80 V external MOSFET,Low current 4A channel,4,0.0012,2.0,0.04,Rev.1 baseline estimate,Applies to OUT5 OUT8 OUT9; controller losses excluded
 TPS2HB35 integrated switch,Low current 4A channel,4,0.035,2.0,1.12,Deferred alternate,Not Rev.1 baseline after ADR-0011
 TPS2HB16 integrated switch,Low current 4A channel,4,0.016,2.0,0.51,Deferred alternate,Not Rev.1 baseline after ADR-0011
-IAUTN06S5N008 input reverse MOSFET,Board input 40A budget,40,0.00076,2.0,2.43,Preferred input strategy,TOLL package assembly and PCB thermal must be checked
-BUK7S1R2-80M input reverse MOSFET,Board input 40A budget,40,0.0012,2.0,3.84,Alternative,80V LFPAK88 package assembly and PCB thermal must be checked
-Dual SIDR626LDP input reverse MOSFETs,Board input 40A budget,20 per FET,0.0021,2.0,1.68 per FET,Fallback,Two parallel devices total about 3.36W
+BUK7S1R2-80M 80 V input reverse MOSFET,Board input 40A budget,40,0.0012,2.0,3.84,Selected input strategy,LFPAK88 package assembly SOA copper and PCB thermal must be checked
+IAUTN08S5N012L 80 V input reverse alternate,Board input 40A budget,40,0.0012,2.0,3.84,Documented alternate,TOLL package uses separate footprint and requires controlled substitution review
+BUK7J2R4-80M 80 V input reverse alternate,Board input 40A budget,40,0.0024,2.0,7.68,Documented alternate,LFPAK56E requires separate SOA thermal footprint and assembly review

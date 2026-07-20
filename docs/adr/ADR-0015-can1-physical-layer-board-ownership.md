@@ -1,7 +1,7 @@
 # ADR-0015: Assign CAN1 physical-layer ownership
 
 ## Status
-Proposed — Product Owner decision required
+Accepted — Product Owner approved candidate A on 2026-07-20
 
 ## Context
 ADR-0002 requires vehicle CAN1 transmit to be physically disabled by default.
@@ -82,16 +82,27 @@ still enters PB-100, CANH/CANL would also need a reviewed board crossing.
 - Main risks: connector intermittency, ground-domain sequencing, EMC, pin-map
   churn, and ambiguous safety ownership.
 
-## Recommendation
+## Decision
 
-Approve candidate A. It preserves the already verified PB safety chain, the
+Candidate A is approved. PB-100 owns the CAN1 transceiver, ESD/TVS protection,
+optional common-mode choke, optional termination, CANH/CANL, and the connection
+to the vehicle harness. LB-100 owns STM32 FDCAN, protocol handling, and the
+read-only firmware policy. This preserves the already verified PB safety chain, the
 current four-signal JPB1 contract, and the PB-side CAN harness corridor while
 keeping CAN protocol and firmware ownership on LB-100. It also places the
 transceiver and protection closest to the external bus entry.
 
-## Required implementation evidence after approval
+The mandatory transmit chain is:
 
-- Product Owner changes this ADR to `Accepted`.
+`CAN1_TX_ROUTE -> U_CAN1 -> CAN1_TX_GATE_OUT -> JP_CAN1 (DNP/open) ->
+CAN1_TXD_SAFE -> PB-100 CAN1 transceiver TXD`.
+
+The transceiver RXD connects only to `CAN1_RX_ROUTE`. `CANH` and `CANL` do not
+cross JPB1. Populating `JP_CAN1` remains a deliberate hardware action governed
+by a future ADR; firmware cannot bypass the open link.
+
+## Required implementation evidence
+
 - PB-100 transceiver family, VCC/VIO rails, silent-mode default, ESD,
   common-mode choke/termination population, connector, and CANH/CANL ownership
   are captured from manufacturer data sheets.
@@ -104,8 +115,12 @@ transceiver and protection closest to the external bus entry.
 - Critical components retain at least two alternatives and assembly evidence
   for JLCPCB/PCBWay.
 
-## Consequences while Proposed
+## Consequences
 
-PBREL-001 and LBREL-004 remain `Conditional`. Neither CAN1 transceiver may be
-placed in a board schematic, and PCB layout remains blocked. No existing DNP
-footprint is removed.
+The CAN1 physical-layer entries move from LB-100 to PB-100 in the BOM, sourcing
+registers, rail budgets, footprint inventories, and verification scripts.
+PBREL-001 remains `Conditional` until the complete value-bearing PB schematic,
+exported-netlist audit, sourcing/assembly evidence, and connector boundary are
+closed. LBREL-004 covers controller pin binding and firmware policy only. PCB
+layout remains blocked until the independent electrical, mechanical, thermal,
+and release gates close. No existing DNP footprint is removed.

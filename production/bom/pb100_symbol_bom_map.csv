@@ -1,10 +1,10 @@
 Symbol key,BOM file,BOM item,Qty basis,Population,Assembly owner,Status,Notes
 HS_CTRL,factory_bom_draft.csv,High-side switch/controller,10,Populated,Factory,Candidate,One controller per generic output channel
-OUT_FET,factory_bom_draft.csv,MOSFET,10,Populated,Factory,Candidate,Default external MOSFET per output channel
-OUT2_ESCAPE_FET,factory_bom_draft.csv,MOSFET,Conditional,Conditional alternate,Factory,Conditional,OUT2 escape path remains schematic-review conditional
+OUT_FET,factory_bom_draft.csv,MOSFET,10,Populated,Factory,Selected 80 V,BUK7S1R2-80M external MOSFET per output channel
+OUT2_ESCAPE_FET,factory_bom_draft.csv,MOSFET,1 within output quantity,Populated selected path,Factory,Selected 80 V,Q102 uses BUK7S1R2-80M while OUT2 SOA and thermal remain conditional
 INPUT_IDEAL_DIODE,factory_bom_draft.csv,Reverse protection,1,Populated,Factory,Candidate,LM74700-class controller plus external MOSFET strategy
 INPUT_CONNECTOR,garage_bom_draft.csv,Battery input connector,1,Garage installed,Garage,Conditional,High-current sealed connector or ring-lug harness entry TBD
-INPUT_REVERSE_FET,factory_bom_draft.csv,Input reverse MOSFET,1-2,Populated,Factory,Candidate,Preferred TOLL pending package and assembly evidence
+INPUT_REVERSE_FET,factory_bom_draft.csv,Input reverse MOSFET,1,Populated,Factory,Selected 80 V,BUK7S1R2-80M LFPAK88 selected pending 40 A SOA thermal and sourcing evidence
 INPUT_TVS,factory_bom_draft.csv,TVS protection,1,Populated,Factory,Conditional,Clamp voltage must match downstream device limits
 LOGIC_BUCK,factory_bom_draft.csv,DC/DC,1,Populated,Factory,Candidate,Protected PB_5V_OUT logic rail regulator
 LOGIC_BUCK_INDUCTOR,factory_bom_draft.csv,Buck inductor,1,Populated,Factory,Value TBD,Value and saturation current close with buck design
@@ -18,4 +18,6 @@ B2B_CONNECTOR,factory_bom_draft.csv,PB-100/LB-100 board-to-board connector,1,Pop
 OUTPUT_CONNECTOR,garage_bom_draft.csv,Deutsch output connector sets,10,Garage installed,Garage,Candidate,DTP class for OUT1/OUT2 and DT class for OUT3-OUT10
 OUTPUT_FUSE_HOLDER,garage_bom_draft.csv,Per-output fuse holders,10,Garage installed,Garage,Candidate,Final holder style depends on enclosure
 MAIN_FUSE_HOLDER,garage_bom_draft.csv,Littelfuse MAXI fuse holder,1,Garage installed,Garage,Candidate,Install near battery per ADR-0008
-CAN1_TX_DISABLE,factory_bom_draft.csv,CAN1 TX disable DNP link,1 set,Default DNP/open link with populated gate and four safety resistors,Factory,Core safety,Factory BOM also includes CAN1 safety resistor network: JP_CAN1 DNP; U_CAN1 plus 47k OE pull 47k downstream bias 1k status series and 100k status pull are populated; no default-populated vehicle-CAN TX path without future ADR and explicit hardware action
+CAN1_TX_DISABLE,factory_bom_draft.csv,CAN1 TX disable hardware,1 set,Two default DNP/open links with populated gate and five safety resistors,Factory,Core safety,Factory BOM also includes CAN1 safety resistor network: JP_CAN1 and JP_CAN1_NORMAL DNP; U_CAN1 plus 47k OE pull 47k downstream bias 1k status series 100k status pull and 47k silent pull-up are populated; no default-populated vehicle-CAN TX path without future ADR and two explicit hardware actions
+CAN1_PHY,factory_bom_draft.csv,CAN1 PB physical layer,1,Populated,Factory,Selected,NXP TJA1051TK/3/1J PB-owned physical layer under accepted ADR-0015
+CAN1_ESD,factory_bom_draft.csv,CAN1 bus protection and termination,1,Populated,Factory,Selected,TI ESD2CANFD24QDBZRQ1 protects PB-owned CANH CANL harness entry

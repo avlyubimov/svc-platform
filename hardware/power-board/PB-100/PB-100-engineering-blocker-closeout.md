@@ -20,7 +20,7 @@ orders.
 
 ## PBREL-001 — CAN1 safety policy
 
-- Closeout status: Closed.
+- Closeout status: Conditional.
 - Why blocker existed: vehicle CAN1 must remain read-only by hardware default,
   not only by firmware policy, and reset or unpowered states must not create a
   transmit path.
@@ -128,7 +128,7 @@ orders.
 
 ## PBREL-003 — Board-to-board interface
 
-- Closeout status: Closed.
+- Closeout status: Conditional.
 - Why blocker existed: PB-100 and LB-100 need a stable 100-pin interface before
   schematic/layout work can preserve power, telemetry, safety, and expansion.
 - Candidate comparison: Hirose FX18 100-position mezzanine pair is preferred;
@@ -178,23 +178,24 @@ orders.
 
 ## PBREL-004 — High/medium output stage
 
-- Closeout status: Closed.
+- Closeout status: Conditional.
 - Why blocker existed: OUT2 and medium-current outputs need high-side switching,
   current sense, fault handling, PWM, fuse coordination, and SOA margin before
   output-stage placement or copper can start.
 - Candidate comparison: TPS48110AQDGXRQ1 external-controller architecture is
   preferred; integrated smart switches are rejected for Rev.1 voltage-margin
-  risk; controller plus 60 V MOSFET remains conditional only where TVS overshoot
-  is proven, so the 80 V BUK7Y3R1-80M voltage-margin path is selected for
-  pre-layout closure.
+  risk; the Product Owner selected BUK7S1R2-80M 80 V LFPAK88 and rejected the
+  former 60 V assembly paths.
 - Recommended solution: keep TPS48110AQDGXRQ1 for all output channels and use
-  80 V LFPAK56 BUK7Y3R1-80M-class output MOSFET baseline for schematic review,
-  with larger LFPAK88/TOLL or parallel escape retained for OUT2 SOA.
+  BUK7S1R2-80M 80 V LFPAK88 for Q101-Q110, while keeping IAUTN08S5N012L
+  80 V TOLL and BUK7J2R4-80M 80 V LFPAK56E as controlled non-drop-in
+  alternatives.
 - Risks: OUT2 compressor inrush SOA, gate resistor tuning, inductive clamp
   energy, and thermal copper still require schematic/layout/post-prototype
   validation.
-- Alternatives: SIDR626LDP 60 V PowerPAK path if overshoot is proven, BUK7S1R2-
-  80M LFPAK88 for higher thermal margin, or IAUTN06S5N008 TOLL escape.
+- Alternatives: IAUTN08S5N012L 80 V TOLL or BUK7J2R4-80M 80 V LFPAK56E after
+  pin-map, SOA, thermal, footprint, sourcing and assembly review. SIDR626LDP
+  and IAUTN06S5N008 remain rejected 60 V history.
 - Cost impact: high relative to integrated switches because every channel keeps
   a controller and external MOSFET, but it preserves thermal/service margin.
 - Thermal impact: MOSFET conduction loss scales with output current squared;
@@ -286,21 +287,21 @@ orders.
 
 ## PBREL-006 — Input reverse protection
 
-- Closeout status: Closed.
+- Closeout status: Conditional.
 - Why blocker existed: the 40 A protected input path needs reverse-battery
   protection with low loss, load-dump voltage margin, gate control, and package
   thermal evidence.
 - Candidate comparison: LM74700QDBVRQ1 ideal-diode controller plus 80 V
-  BUK7S1R2-80M-class LFPAK88 MOSFET is selected for pre-layout closure; 60 V
-  IAUTN06S5N008 TOLL remains a thermal alternate but needs overshoot proof; dual
-  SIDR626LDP is rejected as more complex and less robust for input current.
+  BUK7S1R2-80M-class LFPAK88 MOSFET is selected; IAUTN08S5N012L 80 V TOLL
+  and BUK7J2R4-80M 80 V LFPAK56E are non-drop-in alternatives. The 60 V
+  IAUTN06S5N008 and SIDR626LDP paths are rejected for Rev.1 assembly.
 - Recommended solution: lock the schematic-review direction to LM74700-Q1 plus
   Q1 80 V LFPAK88 BUK7S1R2-80M-class path, with gate clamp/turn-off values
   derived in schematic review.
 - Risks: LFPAK88 assembly support, copper thermal model, gate clamp values, and
   negative transient behavior still need footprint and bench validation.
-- Alternatives: IAUTN06S5N008 TOLL 60 V low-Rds path after overshoot validation,
-  LM74502-Q1 controller family, or parallel PowerPAK fallback.
+- Alternatives: IAUTN08S5N012L 80 V TOLL, BUK7J2R4-80M 80 V LFPAK56E, or the
+  LM74502-Q1 controller family after controlled electrical and package review.
 - Cost impact: moderate; the 80 V LFPAK88 path may cost more than a 60 V TOLL
   path but buys voltage margin and package current density.
 - Thermal impact: 1.2mΩ nominal class gives 1.92 W at 40 A before temperature
@@ -341,16 +342,17 @@ orders.
 
 ## PBREL-007 — TVS/load-dump protection
 
-- Closeout status: Closed.
+- Closeout status: Conditional.
 - Why blocker existed: SM8S33-class TVS clamp can stress 60 V downstream parts
   after overshoot, so schematic freeze needed a voltage-margin escape path.
 - Candidate comparison: Vishay SM8S33AHM3/I HM3 DO-218AC TVS is preferred for
   active AEC-Q101 load-dump class; obsolete MCC/NFD HE3 paths are rejected for
   lock; 80 V downstream MOSFET and 100 V buck selections are preferred over
   accepting unproven 60 V overshoot margin.
-- Recommended solution: keep SM8S33AHM3/I TVS branch and close the blocker by
-  moving affected MOSFET paths to 80 V-class review while retaining 100 V
-  TPS4811 and LM5164/LM5013-class devices.
+- Recommended solution: keep the SM8S33AHM3/I TVS branch and the selected
+  80 V MOSFET baseline while retaining 100 V TPS4811 and LM5164/LM5013-class
+  devices. Voltage-class choice is closed; the blocker remains Conditional
+  until actual clamp-loop overshoot and TVS pulse-energy evidence closes.
 - Risks: board-level overshoot, TVS heating, trace inductance, and pulse energy
   still require simulation/bench validation after physical design.
 - Alternatives: Littelfuse SLD8S33A, Diodes DM8W33AQ-13, Bourns SM8S33A-Q
@@ -545,7 +547,7 @@ orders.
 
 ## PBREL-011 — Factory assembly readiness
 
-- Closeout status: Closed.
+- Closeout status: Conditional.
 - Why blocker existed: critical factory-populated PB-100 parts needed dated
   manufacturer/distributor/JLCPCB/PCBWay evidence, package handling notes, DNP
   inspection, and alternatives before blocker closure.

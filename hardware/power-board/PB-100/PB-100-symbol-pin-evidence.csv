@@ -101,3 +101,15 @@ PB100_SN74LVC1G125_Q1_DBV_PRELIM,2,A_CAN1_TX,https://www.ti.com/lit/ds/symlink/s
 PB100_SN74LVC1G125_Q1_DBV_PRELIM,3,GND,https://www.ti.com/lit/ds/symlink/sn74lvc1g125-q1.pdf,TI SN74LVC1G125-Q1 Rev. E,DBV0005A SOT-23-5,Ground pin
 PB100_SN74LVC1G125_Q1_DBV_PRELIM,4,Y_CAN1_TX,https://www.ti.com/lit/ds/symlink/sn74lvc1g125-q1.pdf,TI SN74LVC1G125-Q1 Rev. E,DBV0005A SOT-23-5,Three-state gate output to CAN1_TX_GATE_OUT before DNP/open link
 PB100_SN74LVC1G125_Q1_DBV_PRELIM,5,VCC,https://www.ti.com/lit/ds/symlink/sn74lvc1g125-q1.pdf,TI SN74LVC1G125-Q1 Rev. E,DBV0005A SOT-23-5,LB_3V3_IO logic supply reference
+PB100_TJA1051TK3_CAN_PHY_PRELIM,1,TXD,https://www.nxp.com/docs/en/data-sheet/TJA1051.pdf,NXP TJA1051 Rev. 10,HVSON-8-EP,Transmit input connected only to CAN1_TXD_SAFE
+PB100_TJA1051TK3_CAN_PHY_PRELIM,2,GND,https://www.nxp.com/docs/en/data-sheet/TJA1051.pdf,NXP TJA1051 Rev. 10,HVSON-8-EP,Ground
+PB100_TJA1051TK3_CAN_PHY_PRELIM,3,VCC,https://www.nxp.com/docs/en/data-sheet/TJA1051.pdf,NXP TJA1051 Rev. 10,HVSON-8-EP,PB_5V_OUT transceiver supply
+PB100_TJA1051TK3_CAN_PHY_PRELIM,4,RXD,https://www.nxp.com/docs/en/data-sheet/TJA1051.pdf,NXP TJA1051 Rev. 10,HVSON-8-EP,Receive output connected only to CAN1_RX_ROUTE
+PB100_TJA1051TK3_CAN_PHY_PRELIM,5,VIO,https://www.nxp.com/docs/en/data-sheet/TJA1051.pdf,NXP TJA1051 Rev. 10,HVSON-8-EP,LB_3V3_IO logic-level supply
+PB100_TJA1051TK3_CAN_PHY_PRELIM,6,CANL,https://www.nxp.com/docs/en/data-sheet/TJA1051.pdf,NXP TJA1051 Rev. 10,HVSON-8-EP,PB-owned CAN low harness line
+PB100_TJA1051TK3_CAN_PHY_PRELIM,7,CANH,https://www.nxp.com/docs/en/data-sheet/TJA1051.pdf,NXP TJA1051 Rev. 10,HVSON-8-EP,PB-owned CAN high harness line
+PB100_TJA1051TK3_CAN_PHY_PRELIM,8,S_SILENT,https://www.nxp.com/docs/en/data-sheet/TJA1051.pdf,NXP TJA1051 Rev. 10,HVSON-8-EP,Silent control pulled high unless second DNP link is deliberately populated
+PB100_TJA1051TK3_CAN_PHY_PRELIM,9,EP_GND,https://www.nxp.com/docs/en/data-sheet/TJA1051.pdf,NXP TJA1051 Rev. 10,HVSON-8-EP,Exposed pad connected to ground
+PB100_ESD2CANFD24_Q1_PRELIM,1,LINE1_CANH,https://www.ti.com/lit/ds/symlink/esd2can24-q1.pdf,TI ESD2CAN24-Q1 Rev. B,DBZ SOT-23-3,CAN1_HARNESS_H protection terminal
+PB100_ESD2CANFD24_Q1_PRELIM,2,LINE2_CANL,https://www.ti.com/lit/ds/symlink/esd2can24-q1.pdf,TI ESD2CAN24-Q1 Rev. B,DBZ SOT-23-3,CAN1_HARNESS_L protection terminal
+PB100_ESD2CANFD24_Q1_PRELIM,3,GND,https://www.ti.com/lit/ds/symlink/esd2can24-q1.pdf,TI ESD2CAN24-Q1 Rev. B,DBZ SOT-23-3,Short harness-entry ground return

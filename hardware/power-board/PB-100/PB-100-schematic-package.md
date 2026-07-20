@@ -203,26 +203,26 @@ release, not first prototype PCB fabrication.
   no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`.
 - TVS/load-dump freeze review: active SM8S33AHM3/I HM3 branch, 100 V device
-  margin, 60 V MOSFET overshoot dependency, 80 V Q1 alternate, 40 V
+  margin, rejected 60 V history, selected 80 V MOSFET baseline, 40 V
   smart-switch ADR boundary, sourcing gate, and no-layout boundary are tracked
   in `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`.
-- TVS overshoot escape checklist: active HM3 source snapshot, 60 V headroom,
-  80 V MOSFET escape decision, 100 V downstream boundary, 40 V ADR boundary,
+- TVS overshoot escape checklist: active HM3 source snapshot, rejected 60 V
+  history, selected 80 V MOSFET decision, 100 V downstream boundary, 40 V ADR boundary,
   schematic-value dependencies, sourcing, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`.
 - TVS overshoot validation precheck: waveform/source impedance,
   `Vstress = Vclamp + Lloop * di/dt`, bench probe and simulation parasitic
-  setup, 60 V acceptance versus 80 V escape, factory alternates, and no-layout
+  setup, selected 80 V stress validation, factory alternatives, and no-layout
   boundary are tracked in
   `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`.
 - TVS overshoot closeout precheck: active source, overshoot method, 60 V
-  acceptance, 80 V escape, 100 V downstream defaults, 40 V ADR boundary,
+  path exclusion, selected 80 V baseline, 100 V downstream defaults, 40 V ADR boundary,
   schematic-value dependencies, sourcing, validation sync, and no-layout
   boundary are tracked in
   `hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv`.
-- MOSFET voltage-margin review: 60 V MOSFET paths behind the active HM3 TVS
-  branch need explicit overshoot evidence or migration to the 80 V review
-  escape path before schematic freeze. See
+- MOSFET voltage-margin review: the Product Owner selected the 80 V
+  BUK7S1R2-80M baseline; former 60 V paths are rejected. Actual clamp-loop
+  overshoot, SOA and thermal evidence remain freeze gates. See
   `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`.
 - Logic power freeze review: LM5164/LM5013/TPS54360B regulator boundaries,
   protected `VBAT_PROT` sequencing, 1000 mA `PB_5V_OUT` budget, UVLO safe-off,
@@ -323,9 +323,9 @@ release, not first prototype PCB fabrication.
 
 | Class | Outputs | Target fuse | Target current limit | Initial implementation direction |
 |---|---|---:|---:|---|
-| High current | OUT2 | 20 A | 18 A | TPS48110AQDGXRQ1-class controller plus external 60 V N-MOSFET |
-| Medium current | OUT1, OUT3, OUT4, OUT6, OUT7, OUT10 | 10-15 A | 8-12 A | TPS48110AQDGXRQ1-class controller plus external 60 V N-MOSFET |
-| Low current | OUT5, OUT8, OUT9 | 5 A | 4 A | TPS48110AQDGXRQ1-class controller plus external 60 V N-MOSFET |
+| High current | OUT2 | 20 A | 18 A | TPS48110AQDGXRQ1-class controller plus selected BUK7S1R2-80M 80 V LFPAK88 N-MOSFET |
+| Medium current | OUT1, OUT3, OUT4, OUT6, OUT7, OUT10 | 10-15 A | 8-12 A | TPS48110AQDGXRQ1-class controller plus selected BUK7S1R2-80M 80 V LFPAK88 N-MOSFET |
+| Low current | OUT5, OUT8, OUT9 | 5 A | 4 A | TPS48110AQDGXRQ1-class controller plus selected BUK7S1R2-80M 80 V LFPAK88 N-MOSFET |
 
 ## Required schematic blocks
 

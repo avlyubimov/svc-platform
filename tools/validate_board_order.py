@@ -294,6 +294,7 @@ FX18_MF_OWNERSHIP_COLUMNS = (
     "MF contact key",
     "Physical end",
     "TH solder lands per footprint",
+    "KiCad pad identifier",
     "Hirose electrical role",
     "PB-100 net ownership",
     "LB-100 net ownership",
@@ -619,7 +620,7 @@ def validate_lb100_communication_safety() -> None:
     if set(rows_by_id) != required_ids:
         fail(f"{path.relative_to(REPO_ROOT)} must contain LB-COMM-001 through LB-COMM-007")
     text = read_text(path)
-    for token in ("ADR-0015", "CAN1_TXD_SAFE", "Conditional", "No-layout boundary"):
+    for token in ("ADR-0015 Accepted", "CAN1_TXD_SAFE", "Closed", "No-layout boundary"):
         if token not in text:
             fail(f"{path.relative_to(REPO_ROOT)} must include {token}")
     for row_number, row in enumerate(rows, 2):
@@ -761,8 +762,8 @@ def validate_lb100_rail_budget_closeout() -> None:
     text = read_text(path)
     for token in (
         "PB_5V_OUT",
-        "219.2",
-        "415.2",
+        "194.2",
+        "346.2",
         "500 mA",
         "no-back-power",
         "CAN1 TX",
@@ -931,6 +932,7 @@ def validate_fx18_mf_ownership() -> bool:
             )
         pb_owner = row["PB-100 net ownership"].strip()
         lb_owner = row["LB-100 net ownership"].strip()
+        pad_identifier = row["KiCad pad identifier"].strip()
         review_status = row["Review status"].strip()
         is_unassigned = pb_owner == "Unassigned" or lb_owner == "Unassigned"
         if is_unassigned:
@@ -944,6 +946,11 @@ def validate_fx18_mf_ownership() -> bool:
             fail(
                 f"{FX18_MF_OWNERSHIP.relative_to(REPO_ROOT)}:{row_number}: assigned MF "
                 "ownership requires Closed status and Product Owner-approved evidence"
+            )
+        elif pb_owner != "GND" or lb_owner != "GND" or pad_identifier != key:
+            fail(
+                f"{FX18_MF_OWNERSHIP.relative_to(REPO_ROOT)}:{row_number}: approved MF "
+                "ownership must use GND on both boards and a unique contact-key pad identifier"
             )
         if "Do not" not in row["Blocked action"]:
             fail(f"{FX18_MF_OWNERSHIP.relative_to(REPO_ROOT)}:{row_number}: missing blocked action")
@@ -1010,14 +1017,55 @@ def fx18_footprint_is_mechanically_complete(board: str) -> bool:
     mf_pads = [pad for pad in pad_blocks if pad[1] == "thru_hole"]
     mf_identifiers = [pad[0] for pad in mf_pads]
     signal_identifiers = {str(number) for number in range(1, 101)}
+    expected_mf_geometry = {
+        "PB-100": {
+            "MF_A_PIN1_51_END": {(-24.325, -2.1), (-24.325, 2.1)},
+            "MF_B_PIN1_51_END": {(-21.2, -2.1)},
+            "MF_A_PIN50_100_END": {(24.325, -2.1), (24.325, 2.1)},
+            "MF_B_PIN50_100_END": {(21.2, 2.1)},
+        },
+        "LB-100": {
+            "MF_A_PIN1_51_END": {(25.025, -2.1), (25.025, 2.1)},
+            "MF_B_PIN1_51_END": {(21.2, 2.1)},
+            "MF_A_PIN50_100_END": {(-25.025, -2.1), (-25.025, 2.1)},
+            "MF_B_PIN50_100_END": {(-21.2, -2.1)},
+        },
+    }[board]
     identifiers_are_valid = (
         len(mf_pads) == 6
         and all(identifier and identifier not in signal_identifiers for identifier in mf_identifiers)
         and sorted(Counter(mf_identifiers).values()) == [1, 1, 2, 2]
+        and set(mf_identifiers) == set(expected_mf_geometry)
     )
+    actual_mf_geometry: dict[str, set[tuple[float, float]]] = {
+        identifier: set() for identifier in expected_mf_geometry
+    }
+    for identifier, pad_type, pad_shape, block in mf_pads:
+        at_match = re.search(r"\(at (-?[0-9.]+) (-?[0-9.]+)(?: [^)]+)?\)", block)
+        if (
+            at_match is None
+            or pad_type != "thru_hole"
+            or pad_shape != "oval"
+            or "(size 1.400 2.400)" not in block
+            or "(drill oval 1.000 2.000)" not in block
+            or '(layers "*.Cu" "*.Mask")' not in block
+            or identifier not in actual_mf_geometry
+        ):
+            fail(
+                f"{path.relative_to(REPO_ROOT)} MF pad {identifier} does not match the "
+                "official Hirose 1.4 x 2.4 mm plated land with 1.0 x 2.0 mm slot"
+            )
+        actual_mf_geometry[identifier].add(
+            tuple(round(float(value), 3) for value in at_match.groups())
+        )
+    if actual_mf_geometry != expected_mf_geometry:
+        fail(
+            f"{path.relative_to(REPO_ROOT)} MF coordinates or plug/socket mirroring do not "
+            "match Hirose drawings 0000951879 and 0000951892"
+        )
     return (
         identifiers_are_valid
-        and "MF A/B: 6 TH / 4 circuits OPEN" not in text
+        and "MF A/B: 6 TH / 4 GND circuits" in text
         and validate_fx18_mf_ownership()
     )
 
@@ -1170,7 +1218,7 @@ def validate_footprint_binding_inventory(board: str, path: Path) -> tuple[int, i
     text = read_text(path)
     board_tokens = {
         "PB-100": ("TPS48110AQDGXRQ1", "JPB1", "CAN1", "high-current"),
-        "LB-100": ("STM32H563VIT6", "JPB1", "CAN1_TX_ROUTE", "DNP/open"),
+        "LB-100": ("STM32H563VIT6", "JPB1", "CAN1_TX_ROUTE", "No LB-100 population per ADR-0015"),
         "FB-100": ("USB4105-GF-A", "JFB1", "USB-C", "VBUS"),
     }
     for token in board_tokens[board]:

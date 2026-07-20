@@ -2,50 +2,50 @@ Ref,Instance block,Symbol key,Concrete symbol name,Symbol state,Notes
 J1,input-protection,INPUT_CONNECTOR,PB100_INPUT_CONNECTOR_CLASS_PRELIM,Created,Garage battery input connector class
 D1,input-protection,INPUT_TVS,PB100_INPUT_TVS_PRELIM,Created,Input load-dump TVS class
 U1,input-protection,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Created,LM74700-Q1 preliminary symbol
-Q1,input-protection,INPUT_REVERSE_FET,PB100_INPUT_NMOS_TOLL_PRELIM,Created,IAUTN06S5N008/TOLL pin evidence captured; footprint and 40 A thermal review remain open
+Q1,input-protection,INPUT_REVERSE_FET,PB100_POWER_NMOS_ESCAPE_PRELIM,Created,BUK7S1R2-80M 80 V LFPAK88 selected and bound; 40 A SOA and thermal review remains open
 RSH1,input-protection,TOTAL_CURRENT_SHUNT,PB100_INPUT_SHUNT_PRELIM,Created,Four-terminal total input current shunt class
 U2,input-protection,TOTAL_CURRENT_MONITOR,PB100_INA228_Q1_PRELIM,Created,INA228-Q1 preliminary symbol
 U3,logic-power,LOGIC_BUCK,PB100_LM5164QDDATQ1_PRELIM,Created,LM5164-Q1 preliminary symbol
 L1,logic-power,LOGIC_BUCK_INDUCTOR,PB100_BUCK_INDUCTOR_CLASS_PRELIM,Created,Buck inductor class
 JPB1,b2b-interface,B2B_CONNECTOR,PB100_JPB1_100PIN_PRELIM,Created,Generated from JPB1 pin map
 U101,outputs,HS_CTRL,PB100_TPS48110AQDGXRQ1_PRELIM,Created,OUT1 high-side controller
-Q101,outputs,OUT_FET,PB100_SIDR626LDP_PRELIM,Created,OUT1 default output MOSFET
+Q101,outputs,OUT_FET,PB100_POWER_NMOS_ESCAPE_PRELIM,Created,OUT1 selected BUK7S1R2-80M 80 V output MOSFET
 F101,outputs,OUTPUT_FUSE_HOLDER,PB100_OUTPUT_FUSE_CLASS_PRELIM,Created,OUT1 user-serviceable fuse class
 J101,outputs,OUTPUT_CONNECTOR,PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,Created,OUT1 garage output connector class
 U102,outputs,HS_CTRL,PB100_TPS48110AQDGXRQ1_PRELIM,Created,OUT2 high-side controller
-Q102,outputs,OUT_FET,PB100_SIDR626LDP_PRELIM,Created,OUT2 default output MOSFET; OUT2_ESCAPE_FET remains conditional alternate
+Q102,outputs,OUT_FET,PB100_POWER_NMOS_ESCAPE_PRELIM,Created,OUT2 selected BUK7S1R2-80M 80 V output MOSFET; OUT2 SOA and thermal review remains open
 F102,outputs,OUTPUT_FUSE_HOLDER,PB100_OUTPUT_FUSE_CLASS_PRELIM,Created,OUT2 user-serviceable fuse class
 J102,outputs,OUTPUT_CONNECTOR,PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,Created,OUT2 garage output connector class
 U103,outputs,HS_CTRL,PB100_TPS48110AQDGXRQ1_PRELIM,Created,OUT3 high-side controller
-Q103,outputs,OUT_FET,PB100_SIDR626LDP_PRELIM,Created,OUT3 default output MOSFET
+Q103,outputs,OUT_FET,PB100_POWER_NMOS_ESCAPE_PRELIM,Created,OUT3 selected BUK7S1R2-80M 80 V output MOSFET
 F103,outputs,OUTPUT_FUSE_HOLDER,PB100_OUTPUT_FUSE_CLASS_PRELIM,Created,OUT3 user-serviceable fuse class
 J103,outputs,OUTPUT_CONNECTOR,PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,Created,OUT3 garage output connector class
 U104,outputs,HS_CTRL,PB100_TPS48110AQDGXRQ1_PRELIM,Created,OUT4 high-side controller
-Q104,outputs,OUT_FET,PB100_SIDR626LDP_PRELIM,Created,OUT4 default output MOSFET
+Q104,outputs,OUT_FET,PB100_POWER_NMOS_ESCAPE_PRELIM,Created,OUT4 selected BUK7S1R2-80M 80 V output MOSFET
 F104,outputs,OUTPUT_FUSE_HOLDER,PB100_OUTPUT_FUSE_CLASS_PRELIM,Created,OUT4 user-serviceable fuse class
 J104,outputs,OUTPUT_CONNECTOR,PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,Created,OUT4 garage output connector class
 U105,outputs,HS_CTRL,PB100_TPS48110AQDGXRQ1_PRELIM,Created,OUT5 high-side controller
-Q105,outputs,OUT_FET,PB100_SIDR626LDP_PRELIM,Created,OUT5 default output MOSFET
+Q105,outputs,OUT_FET,PB100_POWER_NMOS_ESCAPE_PRELIM,Created,OUT5 selected BUK7S1R2-80M 80 V output MOSFET
 F105,outputs,OUTPUT_FUSE_HOLDER,PB100_OUTPUT_FUSE_CLASS_PRELIM,Created,OUT5 user-serviceable fuse class
 J105,outputs,OUTPUT_CONNECTOR,PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,Created,OUT5 garage output connector class
 U106,outputs,HS_CTRL,PB100_TPS48110AQDGXRQ1_PRELIM,Created,OUT6 high-side controller
-Q106,outputs,OUT_FET,PB100_SIDR626LDP_PRELIM,Created,OUT6 default output MOSFET
+Q106,outputs,OUT_FET,PB100_POWER_NMOS_ESCAPE_PRELIM,Created,OUT6 selected BUK7S1R2-80M 80 V output MOSFET
 F106,outputs,OUTPUT_FUSE_HOLDER,PB100_OUTPUT_FUSE_CLASS_PRELIM,Created,OUT6 user-serviceable fuse class
 J106,outputs,OUTPUT_CONNECTOR,PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,Created,OUT6 garage output connector class
 U107,outputs,HS_CTRL,PB100_TPS48110AQDGXRQ1_PRELIM,Created,OUT7 high-side controller
-Q107,outputs,OUT_FET,PB100_SIDR626LDP_PRELIM,Created,OUT7 default output MOSFET
+Q107,outputs,OUT_FET,PB100_POWER_NMOS_ESCAPE_PRELIM,Created,OUT7 selected BUK7S1R2-80M 80 V output MOSFET
 F107,outputs,OUTPUT_FUSE_HOLDER,PB100_OUTPUT_FUSE_CLASS_PRELIM,Created,OUT7 user-serviceable fuse class
 J107,outputs,OUTPUT_CONNECTOR,PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,Created,OUT7 garage output connector class
 U108,outputs,HS_CTRL,PB100_TPS48110AQDGXRQ1_PRELIM,Created,OUT8 high-side controller
-Q108,outputs,OUT_FET,PB100_SIDR626LDP_PRELIM,Created,OUT8 default output MOSFET
+Q108,outputs,OUT_FET,PB100_POWER_NMOS_ESCAPE_PRELIM,Created,OUT8 selected BUK7S1R2-80M 80 V output MOSFET
 F108,outputs,OUTPUT_FUSE_HOLDER,PB100_OUTPUT_FUSE_CLASS_PRELIM,Created,OUT8 user-serviceable fuse class
 J108,outputs,OUTPUT_CONNECTOR,PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,Created,OUT8 garage output connector class
 U109,outputs,HS_CTRL,PB100_TPS48110AQDGXRQ1_PRELIM,Created,OUT9 high-side controller
-Q109,outputs,OUT_FET,PB100_SIDR626LDP_PRELIM,Created,OUT9 default output MOSFET
+Q109,outputs,OUT_FET,PB100_POWER_NMOS_ESCAPE_PRELIM,Created,OUT9 selected BUK7S1R2-80M 80 V output MOSFET
 F109,outputs,OUTPUT_FUSE_HOLDER,PB100_OUTPUT_FUSE_CLASS_PRELIM,Created,OUT9 user-serviceable fuse class
 J109,outputs,OUTPUT_CONNECTOR,PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,Created,OUT9 garage output connector class
 U110,outputs,HS_CTRL,PB100_TPS48110AQDGXRQ1_PRELIM,Created,OUT10 high-side controller
-Q110,outputs,OUT_FET,PB100_SIDR626LDP_PRELIM,Created,OUT10 default output MOSFET
+Q110,outputs,OUT_FET,PB100_POWER_NMOS_ESCAPE_PRELIM,Created,OUT10 selected BUK7S1R2-80M 80 V output MOSFET
 F110,outputs,OUTPUT_FUSE_HOLDER,PB100_OUTPUT_FUSE_CLASS_PRELIM,Created,OUT10 user-serviceable fuse class
 J110,outputs,OUTPUT_CONNECTOR,PB100_OUTPUT_CONNECTOR_CLASS_PRELIM,Created,OUT10 garage output connector class
 RT1,telemetry,THERMAL_NTC,PB100_THERMAL_NTC_PRELIM,Created,TEMP_PCB thermal sensor class
@@ -58,4 +58,6 @@ R_CAN1_OE,can1-safety,CAN1_TX_DISABLE,PB100_CAN1_SAFETY_RESISTOR_PRELIM,Created,
 R_CAN1_TX_BIAS,can1-safety,CAN1_TX_DISABLE,PB100_CAN1_SAFETY_RESISTOR_PRELIM,Created,47k downstream CAN1_TXD_SAFE recessive-bias pull-up
 R_CAN1_STATUS_SER,can1-safety,CAN1_TX_DISABLE,PB100_CAN1_SAFETY_RESISTOR_PRELIM,Created,1k physical OE-to-status series readback
 R_CAN1_STATUS_PULL,can1-safety,CAN1_TX_DISABLE,PB100_CAN1_SAFETY_RESISTOR_PRELIM,Created,100k disabled-status default pull-up
+U_CAN1_PHY,can1-safety,CAN1_PHY,PB100_TJA1051TK3_CAN_PHY_PRELIM,Created,TJA1051TK/3/1J PB-owned transceiver with no TX bypass and independent RX
+D_CAN1,can1-safety,CAN1_ESD,PB100_ESD2CANFD24_Q1_PRELIM,Created,ESD2CANFD24QDBZRQ1 PB-owned CANH CANL harness protection
 TP1..TPn,test,TEST_POINT,PB100_TEST_POINT_CLASS_PRELIM,Created,Pattern row for schematic-review-defined test points

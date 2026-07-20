@@ -69,9 +69,13 @@ Equation:
 
 | Candidate path | Package class | Rds(on) basis | 40 A dissipation | 50 A dissipation | 60 A dissipation | Release note |
 |---|---|---:|---:|---:|---:|---|
-| `IAUTN06S5N008ATMA1` | TOLL / PG-HSOF-8-1 | 0.76 mΩ | 2.43 W | 3.80 W | 5.47 W | Preferred only if TVS overshoot and factory assembly review pass |
-| `BUK7S1R2-80M` | 80 V LFPAK88 | 1.2 mΩ | 3.84 W | 6.00 W | 8.64 W | Higher-voltage alternate with tighter thermal margin |
-| dual `SIDR626LDP` | dual PowerPAK fallback | 2.1 mΩ per FET at half current | 1.68 W per FET / 3.36 W total | 2.63 W per FET / 5.25 W total | 3.78 W per FET / 7.56 W total | Requires current-sharing, fuse-energy, and copper review |
+| `BUK7S1R2-80M` | selected 80 V LFPAK88 | 1.2 mΩ nominal with 2.0 hot-review multiplier | 3.84 W | 6.00 W | 8.64 W | Selected for Q1; SOA, copper, enclosure thermal and assembly evidence remain open |
+| `IAUTN08S5N012L` | 80 V TOLL / PG-HSOF-8-1 | exact hot RDS(on) to be normalized in substitution review | TBD | TBD | TBD | Non-drop-in 80 V alternative; cannot replace Q1 without renewed thermal and pin-map evidence |
+| `BUK7J2R4-80M` | 80 V LFPAK56E | exact hot RDS(on) to be normalized in substitution review | TBD | TBD | TBD | Non-drop-in 80 V alternative; cannot replace Q1 without renewed thermal and assembly evidence |
+
+Former `IAUTN06S5N008ATMA1` and dual `SIDR626LDP` 60 V calculations are
+retained in historical decision artifacts only and are not Rev.1 assembly
+substitutions.
 
 These values are conduction-only review numbers. They do not close transient
 surge, package-to-board thermal resistance, copper spreading, enclosure
