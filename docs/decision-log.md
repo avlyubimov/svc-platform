@@ -3006,3 +3006,22 @@ moving without starting layout or fabricating artifacts. Signal pad pitch, pad
 size, body outline, pin numbering, and source links are captured locally; paired
 stack datum, 20 mm spacing, pin-1 cross-board orientation, vibration retention,
 and assembly handling remain blocked in mechanical layout gates.
+
+## 2026-07-20 — PB-100 CAN1 and LM5013 footprint binding
+
+Decision: Close two additional PB-100 footprint-binding rows without changing
+architecture or starting layout. `LM5013-Q1` is bound only as a package-compatible
+DDA SO PowerPAD-8 alternate using the existing local
+`PB100:SOIC-8_L4.9-W3.9-P1.27-LS6.0-BL-EP2.9` footprint. CAN1 TX-disable
+hardware now has local footprint evidence for default-open `JP_CAN1`
+(`PB100:R0603_DNP_LINK_1608Metric`) and the `SN74LVC1G125-Q1`-class
+default-disabled DBV gate candidate (`PB100:SOT-23-5_DBV_TI`).
+
+Reason: TI package evidence confirms the `LM5013-Q1` alternate uses the same
+SO PowerPAD-8 class as the reviewed `LM5164QDDATQ1` footprint, and TI
+`SN74LVC1G125-Q1` DBV0005A evidence gives a source-derived SOT-23-5 land
+pattern for `U_CAN1`. The default vehicle-CAN TX route remains DNP/open per
+ADR-0002 and still requires a future ADR plus explicit hardware action before
+any TX population. This is footprint evidence only; no `PB-100.kicad_pcb`,
+Gerbers, drills, pick-place files, BOM/CPL order packages, manufacturing ZIPs,
+fabrication packages, panel outputs, or PCBA orders are created or authorized.

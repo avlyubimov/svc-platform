@@ -1,0 +1,160 @@
+(footprint "R0603_DNP_LINK_1608Metric"
+	(version 20260206)
+	(generator "codex")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "Generic 0603 1608 metric DNP/open resistor link footprint for PB-100 CAN1 TX disable JP_CAN1")
+	(tags "0603 1608 resistor jumper DNP CAN1 TX disable")
+	(property "Reference" "REF**"
+		(at 0 -1.45 0)
+		(layer "F.SilkS")
+		(uuid "853315d6-56a8-4680-8283-68a0d134658a")
+		(effects
+			(font
+				(size 0.7 0.7)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Value" "R0603_DNP_LINK_1608Metric"
+		(at 0 1.45 0)
+		(layer "F.Fab")
+		(uuid "662981b5-4dc2-40dd-9391-5909cfd727ea")
+		(effects
+			(font
+				(size 0.7 0.7)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Datasheet" "../PB-100-can1-tx-disable-design-calculation.md"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "ab07de21-d048-4b7e-b5be-710667961916")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" "0603 DNP/open 0 ohm link footprint for CAN1_TX_ROUTE physical missing-link barrier per ADR-0002"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "9e218d0c-0ff0-41b7-8e6a-66f188702233")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr smd)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_line
+		(start -1.45 -0.75)
+		(end 1.45 -0.75)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "ba8e8766-0e0b-48ac-bc7e-e6006b563a5f")
+	)
+	(fp_line
+		(start -1.45 0.75)
+		(end -1.45 -0.75)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "60fa2e49-4780-4143-b9e7-248fd33a3235")
+	)
+	(fp_line
+		(start 1.45 -0.75)
+		(end 1.45 0.75)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "e2afd757-b625-4eb6-a782-326f88db3821")
+	)
+	(fp_line
+		(start 1.45 0.75)
+		(end -1.45 0.75)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "aa43a116-2d09-4270-a634-93bfec42b26b")
+	)
+	(fp_line
+		(start -0.8 -0.4)
+		(end 0.8 -0.4)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "f120dc78-9e2a-4286-8c87-44fbcb9f6c54")
+	)
+	(fp_line
+		(start -0.8 0.4)
+		(end -0.8 -0.4)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "e4c242c9-472c-47fe-9b29-bcb4b21fb834")
+	)
+	(fp_line
+		(start 0.8 -0.4)
+		(end 0.8 0.4)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "90f4c751-b0b1-4821-b27c-194038aec364")
+	)
+	(fp_line
+		(start 0.8 0.4)
+		(end -0.8 0.4)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "3c6c00e6-7948-47dc-ba7a-7219bbff9b0c")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(uuid "94245b67-26fc-4c7f-a206-31ed1b1bd150")
+		(effects
+			(font
+				(size 0.45 0.45)
+				(thickness 0.08)
+			)
+		)
+	)
+	(pad "1" smd roundrect
+		(at -0.8 0)
+		(size 0.85 0.9)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.2)
+		(uuid "66986662-cf6c-49b4-8355-594bf2617f4a")
+	)
+	(pad "2" smd roundrect
+		(at 0.8 0)
+		(size 0.85 0.9)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.2)
+		(uuid "5092fc3e-00fb-43c5-a1f3-6c8241fc5cda")
+	)
+	(embedded_fonts no)
+)
