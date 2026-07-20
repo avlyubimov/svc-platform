@@ -66,13 +66,15 @@ Runtime boot tests verify rejected configuration leaves outputs off and runtime
 services uninitialized. Store-backed runtime boot tests verify persisted records
 are loaded before hardware capability acceptance.
 Configuration store tests verify persisted user configuration is selected ahead
-of firmware defaults after an update.
+of firmware defaults after an update, including reserved-field rejection and
+wrap-aware two-slot sequence selection.
 Configuration update tests verify unsafe or hardware-incompatible configurations
 are not prepared for persistence.
 CAN RX log tests verify CAN1/CAN2 receive-only frame capture, invalid-frame
-rejection, and ring-buffer overwrite accounting.
+rejection, ring-buffer overwrite accounting, and saturating diagnostic counters.
 CAN decode tests verify received frames publish internal state-change events
-through the Event Bus without repeating unchanged states.
+through the Event Bus without repeating unchanged states, and retry dropped edges
+when the Event Bus is full.
 Rule Event Bridge tests verify condition events drain into rule state, CAN-derived
 events can reach rule evaluation, and non-rule events remain available for safety
 dispatch.
@@ -82,7 +84,13 @@ Rule Engine rule-set tests verify ordered multi-rule execution, skipped-rule
 accounting, stop-on-first-failure behavior, and stale-telemetry denial through
 the Output Manager budget path.
 Rule Text tests verify multi-action `then[]` compilation into ordered
-`svc_rule_t` arrays using caller-owned storage.
+`svc_rule_t` arrays using caller-owned storage, canonical PWM action grammar,
+and side-effect-free rejection before caller-owned buffers are modified.
+Event Log tests verify fixed-size overwrite behavior and saturating dropped-entry
+accounting.
+System Safety tests verify battery cutoff, thermal cutoff, runtime current-budget
+shedding, stale/invalid telemetry safe-off behavior, overflow-safe battery
+elapsed-time conversion, and retry of dropped power-budget shed events.
 Repository config validation checks schema rule string patterns, rule grammar,
 non-empty `then[]`, mapped rule-action roles, and partial-PWM compatibility
 against the configured outputs.
