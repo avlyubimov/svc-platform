@@ -111,6 +111,7 @@ hardware/power-board/PB-100/PB-100-garage-connector-fuse-plan.csv,Garage assembl
 hardware/power-board/PB-100/PB-100-garage-install-freeze-checklist.csv,Garage assembly,Garage install freeze checklist,Required,validate_garage_install_freeze_checklist,Conditional
 hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv,Garage assembly,Garage install sourcing precheck,Required,validate_garage_install_sourcing_precheck,Conditional
 hardware/power-board/PB-100/PB-100-garage-install-closeout-precheck.csv,Garage assembly,Garage install closeout precheck,Required,validate_garage_install_closeout_precheck,Conditional
+hardware/power-board/PB-100/PB-100-garage-purchase-kit-candidates.csv,Garage assembly,Garage purchase-kit candidate evidence,Required,Document reviewed,Conditional
 production/bom/garage_bom_draft.csv,Production,Garage BOM draft,Required,validate_bom_symbol_map,Conditional
 production/bom/pb100_symbol_bom_map.csv,Production,Symbol-to-BOM map,Required,validate_bom_symbol_map,Conditional
 hardware/power-board/PB-100/PB-100-assembly-readiness-trace.csv,Production,Factory and garage assembly ownership trace,Required,validate_assembly_readiness_trace,Conditional

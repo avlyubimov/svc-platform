@@ -2617,3 +2617,22 @@ of zero or low JLCPCB stock risks, exact orderable suffixes, inspection/rework
 handling, garage housings, contacts, seals, crimp tooling, fuse holders,
 enclosure access, and purchase-ready kit evidence before schematic freeze or
 board release.
+
+## 2026-07-20 — PB-100 garage kit candidates narrowed without purchase lock
+
+Decision: PB-100 garage install evidence now has
+`hardware/power-board/PB-100/PB-100-garage-purchase-kit-candidates.csv`. The
+candidate kit narrows DTP06/DTP04, DT06/DT04, DTM06/DTM04, size 12/16/20
+contacts, wedgelocks, Littelfuse MAXI and MINI/ATO fuse-holder classes, and
+HDT-48-00-class crimp tooling against current TE and Littelfuse source pages.
+PBREL-012 remains `Conditional` and the plan still does not freeze exact
+connector MPNs.
+
+Reason: The previous garage evidence proved connector and fuse families but did
+not bind candidate housings, contacts, wedgelocks, fuse-holder classes, and
+tooling into one auditable purchase-kit artifact. This closes part of the
+external sourcing gap without authorizing PCB layout, connector footprints,
+fuse-holder footprints, enclosure CAD release, manufacturing ZIPs, fabrication
+packages, or PCBA order packages. Final lock still needs supplier stock, exact
+quantities, boots/backshells, insertion/removal tools, wire-gauge fit, enclosure
+entry, heat/service access, vibration inspection, and garage signoff.

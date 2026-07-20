@@ -7,6 +7,7 @@ Connectors,Deutsch DT 2-pin sets,OUT3-OUT10 outputs with size 16 13A contact cla
 Connectors,Deutsch output connector sets,DTP class for OUT1/OUT2 and DT class for OUT3-OUT10,10,Garage,Core,Aggregate PB-100 output connector BOM mapping row
 Connectors,Deutsch DTM 4-pin sets,CAN/service,2,Garage,Core,CAN/inputs
 Connectors,Deutsch DTM 8-pin set,External inputs,1,Garage,Should,Buttons/ADC/pulse
+Tooling,Deutsch solid-contact crimp tool,HDT-48-00-class tool for size 12 size 16 and size 20 solid contacts,1,Garage,Core,Required before ordering partial DTP DT DTM kits; insertion/removal tool remains separate
 Fuses,Mini/ATO blade fuses,5/10/15/20A kit,1,Garage,Core,Per channel
 Fuses,Per-output fuse holders,MINI/ATO blade holder or enclosure fuse block class,10,Garage,Core,Final holder style depends on enclosure
 Wire,Automotive wire red/black,6 mm2 / 10 AWG or larger after derating,2,Garage,Core,Battery input and main fuse path
