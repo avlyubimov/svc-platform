@@ -3218,3 +3218,19 @@ enclosure thermal, live sourcing or factory-assembly evidence. PBREL-004,
 PBREL-006, PBREL-007 and PBREL-011 therefore remain `Conditional`, and their
 engineering-closeout section statuses are synchronized to the release-blocker
 register. No PCB layout or manufacturing artifact is authorized.
+
+## 2026-07-20 — PB-100 validator decomposed by engineering ownership
+
+Decision: keep `tools/validate_pb100.py` as the stable command-line entrypoint
+and move its implementation into `tools/pb100_validation/`. Checks are grouped
+by KiCad, symbol/footprint evidence, release gates, pin contracts, outputs,
+input power, logic power, CAN1, current budget, current telemetry, thermal
+telemetry, factory sourcing, garage installation, TVS/load-dump protection,
+JPB1/LB interface, and review-packet ownership.
+
+The ordered set of 109 top-level checks and all 142 previous validator/helper
+functions are preserved. The release-manifest hook registry now discovers
+`validate_*` callables across the package instead of depending on one module's
+`globals()`. `make check` remains the compatibility contract. This is an
+implementation-maintainability change only; it does not change hardware
+architecture, freeze status, PCB authorization, or manufacturing readiness.
