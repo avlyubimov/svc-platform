@@ -48,7 +48,8 @@ Current host tests cover:
   recovery, and invalid telemetry behavior.
 - Event Bus FIFO order, overflow rejection, and empty-pop behavior.
 - Event Dispatcher output overcurrent/fault handling through Output Manager.
-- Event Log fixed-size diagnostic ring buffer with overwrite/drop accounting.
+- Event Log fixed-size diagnostic ring buffer with overwrite/drop accounting
+  that saturates instead of wrapping the diagnostic drop counter.
 - CAN1 listen-only TX denial and CAN2 expansion TX allowance.
 - CAN RX Log fixed-size receive-only frame capture for CAN1/CAN2.
 - CAN Event Decode from received frames to internal Event Bus state-change

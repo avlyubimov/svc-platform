@@ -2522,3 +2522,13 @@ Reason: Board-current enforcement must not allow a load because arithmetic
 wrapped a very large measured-current value into a small projected current. The
 change preserves the existing configuration-owned 40 A budget and shed ordering
 while making current projection fail closed.
+
+## 2026-07-20 — Event Log drop counter saturation
+
+Decision: Event Log overwrite accounting now saturates the diagnostic dropped
+entry counter at `UINT32_MAX` instead of allowing unsigned wraparound.
+
+Reason: The diagnostic log is intentionally bounded, but long-running overflow
+conditions must not make drop accounting appear fresh or low after counter wrap.
+Saturating preserves the latest event entries and keeps diagnostic evidence
+conservative without changing the fixed-size storage model.

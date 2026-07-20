@@ -58,6 +58,28 @@ static void test_overflow_keeps_latest_events(void)
     assert(last.event.value == SVC_EVENT_LOG_CAPACITY + 1U);
 }
 
+static void test_drop_count_saturates_on_overflow(void)
+{
+    svc_event_log_t log = {0};
+    svc_event_log_init(&log);
+
+    for (size_t event_index = 0U; event_index < SVC_EVENT_LOG_CAPACITY; ++event_index) {
+        svc_event_log_append(
+            &log,
+            (svc_event_t){SVC_EVENT_OUTPUT_STATE_CHANGED, SVC_OUTPUT_OUT1, (uint32_t)event_index},
+            (uint32_t)event_index);
+    }
+
+    log.dropped_count = UINT32_MAX;
+    svc_event_log_append(
+        &log,
+        (svc_event_t){SVC_EVENT_OUTPUT_STATE_CHANGED, SVC_OUTPUT_OUT1, 99U},
+        99U);
+
+    assert(svc_event_log_count(&log) == SVC_EVENT_LOG_CAPACITY);
+    assert(svc_event_log_dropped_count(&log) == UINT32_MAX);
+}
+
 static void test_get_rejects_invalid_index(void)
 {
     svc_event_log_t log = {0};
@@ -72,6 +94,7 @@ int main(void)
     test_init_starts_empty();
     test_append_and_get_preserve_order();
     test_overflow_keeps_latest_events();
+    test_drop_count_saturates_on_overflow();
     test_get_rejects_invalid_index();
     return 0;
 }

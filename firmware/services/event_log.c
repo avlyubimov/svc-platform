@@ -1,5 +1,7 @@
 #include "event_log.h"
 
+#include <stdint.h>
+
 void svc_event_log_init(svc_event_log_t *log)
 {
     if (log == NULL) {
@@ -24,7 +26,9 @@ void svc_event_log_append(
     if (log->count == SVC_EVENT_LOG_CAPACITY) {
         write_index = log->start;
         log->start = (log->start + 1U) % SVC_EVENT_LOG_CAPACITY;
-        ++log->dropped_count;
+        if (log->dropped_count < UINT32_MAX) {
+            ++log->dropped_count;
+        }
     } else {
         ++log->count;
     }
