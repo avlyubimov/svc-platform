@@ -2855,3 +2855,17 @@ panel/edge constraints. These are layout inputs, not architecture changes.
 Keeping board import `BLOCKED` prevents false `.kicad_pcb` evidence and keeps
 Gerbers, drills, pick-place files, BOM/CPL order packages, manufacturing ZIPs,
 fabrication packages, and PCBA orders blocked until layout review.
+
+## 2026-07-20 — Off-board items removed from footprint blockers
+
+Decision: Garage-installed items that do not require a PCB footprint are now
+marked `Not required` in the footprint-binding inventories instead of being
+counted as KiCad footprint blockers. This closes PB-100 output fuse holder and
+high-current connector footprint blockers, LB-100 service USB connector
+footprint blocker, and FB-100 garage FFC cable footprint blocker.
+
+Reason: These items still need mechanical-envelope, harness, service-access,
+garage-kit, and sourcing review, but they should not block KiCad footprint
+binding as if they were on-board SMT/THT land patterns. This reduces false
+board-import blockers while preserving the manufacturing boundary and without
+removing any DNP footprint or board capability.

@@ -954,6 +954,7 @@ def validate_footprint_binding_inventory(board: str, path: Path) -> int:
         if token not in text:
             fail(f"{path.relative_to(REPO_ROOT)} must include board-specific footprint token {token}")
     seen_items = set()
+    open_items = 0
     for row_number, row in enumerate(rows, 2):
         item = row["Footprint item"].strip()
         if item in seen_items:
@@ -964,16 +965,28 @@ def validate_footprint_binding_inventory(board: str, path: Path) -> int:
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
         if row["Assembly owner"].strip() not in {"Factory", "Garage", "Factory or DNP"}:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Assembly owner")
-        if row["KiCad footprint binding state"].strip() != "Open":
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: KiCad footprint binding state must be Open")
-        if row["Drawing review state"].strip() != "Open":
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Drawing review state must be Open")
-        if "BOARD_IMPORT_BLOCKED" not in row["Board-import impact"]:
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: board import must remain blocked")
+        binding_state = row["KiCad footprint binding state"].strip()
+        drawing_state = row["Drawing review state"].strip()
+        if binding_state not in {"Open", "Not required"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid KiCad footprint binding state")
+        if drawing_state not in {"Open", "Not required"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Drawing review state")
+        impact = row["Board-import impact"].strip()
+        if binding_state == "Open":
+            open_items += 1
+            if drawing_state != "Open":
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: open binding requires open drawing review")
+            if "BOARD_IMPORT_BLOCKED" not in impact:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: board import must remain blocked")
+        else:
+            if drawing_state != "Not required":
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Not required binding needs Not required drawing review")
+            if impact != "NO_FOOTPRINT_REQUIRED":
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Not required item must not block board import by footprint")
         next_action = row["Next action"].lower()
         if not any(verb in next_action for verb in ("review", "verify", "select", "keep", "close", "bind")):
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Next action must be actionable")
-    return len(rows)
+    return open_items
 
 
 def validate_footprint_binding_status() -> None:
