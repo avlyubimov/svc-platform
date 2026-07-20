@@ -53,7 +53,7 @@ Current coverage:
 | PB-100 PCB/layout | Blocked | Layout, Gerber, drill, placement, and manufacturing zips are blocked by the board-release blocker register; 2026-07-20 local ERC/netlist/host-test evidence is separated in `hardware/power-board/PB-100/PB-100-board-release-local-evidence-closeout.csv` |
 | Firmware safety core | Host-test ready | Output, overflow-safe delayed battery cutoff, runtime load shedding, stale-current safe-off, thermal derate/cutoff, CAN dropped-edge retry, telemetry, events, saturating diagnostic counters, logging, config, runtime boot, CAN-to-rule bridge, ambient-light rule conditions, ordered rule sets, multi-action rule compilation, rule runtime, and rule paths covered |
 | Configuration format | Host-test ready | JSON schema, canonical rule grammar, rule-action mapping, buffer-atomic rule compilation, PB-100 capability manifest, compiled capability baseline, config store reserved/sequence-wrap handling, config update, and examples are validated |
-| Production package | Draft | BOM sourcing snapshot was refreshed for selected manufacturer/distributor evidence on 2026-07-20; JLCPCB/PCBWay assembly, purchase-ready garage kits, and schematic closeout evidence remain open |
+| Production package | Draft | BOM sourcing snapshot was refreshed for selected manufacturer, distributor, and JLCPCB componentSearch evidence on 2026-07-20; PCBWay assembly, zero/low-stock risks, purchase-ready garage kits, and schematic closeout evidence remain open |
 
 ## Required before schematic freeze
 

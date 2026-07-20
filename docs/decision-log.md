@@ -2606,12 +2606,14 @@ or PCBA order packages.
 ## 2026-07-20 — PB-100 sourcing snapshot refreshed without BOM lock
 
 Decision: PB-100 factory and garage sourcing records were refreshed against
-selected manufacturer and distributor pages for the current PBREL pass, and the
-refresh was synchronized between the sourcing evidence snapshot and assembly
-recheck register. The refresh does not lock the BOM or authorize layout.
+selected manufacturer, distributor, and JLCPCB componentSearch pages for the
+current PBREL pass, and the refresh was synchronized between the sourcing
+evidence snapshot and assembly recheck register. The refresh does not lock the
+BOM or authorize layout.
 
 Reason: Distributor/manufacturer evidence can reduce stale sourcing risk, but
-PBREL-011 and PBREL-012 still require JLCPCB/PCBWay assembly-class evidence,
-exact orderable suffixes, inspection/rework handling, garage housings, contacts,
-seals, crimp tooling, fuse holders, enclosure access, and purchase-ready kit
-evidence before schematic freeze or board release.
+PBREL-011 and PBREL-012 still require PCBWay assembly-class evidence, resolution
+of zero or low JLCPCB stock risks, exact orderable suffixes, inspection/rework
+handling, garage housings, contacts, seals, crimp tooling, fuse holders,
+enclosure access, and purchase-ready kit evidence before schematic freeze or
+board release.
