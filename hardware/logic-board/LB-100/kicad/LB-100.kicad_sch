@@ -8,13 +8,13 @@
     (date "2026-07-20")
     (rev "schematic-scaffold")
     (company "SVC Platform")
-    (comment 1 "Schematic scaffold only. PCB layout is blocked until LB-100 schematic freeze.")
+    (comment 1 "Schematic freeze closed. Board import is blocked by layout-start gates.")
     (comment 2 "Requirements: ../LB-100-requirements.md and ADR-0014.")
     (comment 3 "CAN1 vehicle interface remains read-only by default.")
     (comment 4 "PB_5V_OUT allocation is 500 mA sustained unless reviewed.")
   )
   (lib_symbols)
-  (text "LB-100 schematic scaffold only.\n\nDo not create PCB layout from this project until LB-100 schematic freeze is closed.\n\nPrimary inputs:\n- ../LB-100-requirements.md\n- ../LB-100-power-budget-precheck.md\n- ../LB-100-schematic-freeze-checklist.md\n- ../LB-100-board-release-blocker-register.csv\n- ../../../power-board/PB-100/PB-100-b2b-pin-map.csv"
+  (text "LB-100 schematic scaffold only.\n\nDo not create LB-100.kicad_pcb from this project until ../LB-100-pcb-layout-start-checklist.csv closes footprint binding and mechanical envelope gates.\n\nPrimary inputs:\n- ../LB-100-requirements.md\n- ../LB-100-power-budget-precheck.md\n- ../LB-100-schematic-freeze-checklist.md\n- ../LB-100-pcb-layout-start-checklist.csv\n- ../LB-100-footprint-binding-inventory.csv\n- ../LB-100-board-release-blocker-register.csv\n- ../../../power-board/PB-100/PB-100-b2b-pin-map.csv"
     (at 30 35 0)
     (effects
       (font
@@ -24,7 +24,7 @@
     )
     (uuid "8630e559-6236-4a15-9ab8-a8b2f59d0de4")
   )
-  (text "Blocked in this scaffold:\n- PCB layout\n- Gerber generation\n- drill files\n- pick-place files\n- BOM/CPL order package\n- vehicle-CAN TX enable path"
+  (text "Blocked in this scaffold:\n- KiCad board import while footprint binding is open\n- KiCad board import while mechanical envelope is open\n- Gerber generation\n- drill files\n- pick-place files\n- BOM/CPL order package\n- vehicle-CAN TX enable path"
     (at 30 105 0)
     (effects
       (font
@@ -44,7 +44,7 @@
     )
     (uuid "b4a6cc8e-99e4-4a1e-9d1b-6dc9c6fd2291")
   )
-  (text "Schematic freeze evidence:\n- ../LB-100-schematic-review-closeout.md\n- ../LB-100-stm32h563-pin-binding-precheck.csv\n- ../LB-100-rail-budget-closeout-precheck.csv\n- ../LB-100-communication-safety-precheck.csv\n- ../LB-100-service-storage-sensor-precheck.csv\n- ../LB-100-mcu-sourcing-precheck.csv\n- ../LB-100-component-sourcing-precheck.csv\n\nPCB layout and manufacturing outputs remain separate post-freeze work."
+  (text "Schematic freeze evidence:\n- ../LB-100-schematic-review-closeout.md\n- ../LB-100-stm32h563-pin-binding-precheck.csv\n- ../LB-100-rail-budget-closeout-precheck.csv\n- ../LB-100-communication-safety-precheck.csv\n- ../LB-100-service-storage-sensor-precheck.csv\n- ../LB-100-mcu-sourcing-precheck.csv\n- ../LB-100-component-sourcing-precheck.csv\n- ../LB-100-pcb-layout-start-checklist.csv\n- ../LB-100-footprint-binding-inventory.csv\n\nPCB layout and manufacturing outputs remain separate post-freeze work."
     (at 155 130 0)
     (effects
       (font

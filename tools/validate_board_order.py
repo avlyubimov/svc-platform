@@ -15,6 +15,9 @@ LAYOUT_RULES = REPO_ROOT / "production" / "board-order" / "three_board_layout_ru
 LAYOUT_START_READINESS = (
     REPO_ROOT / "production" / "board-order" / "three_board_layout_start_readiness.csv"
 )
+FOOTPRINT_BINDING_STATUS = (
+    REPO_ROOT / "production" / "board-order" / "three_board_footprint_binding_status.csv"
+)
 PB100_FREEZE = PB100_DIR / "PB-100-schematic-freeze-checklist.md"
 ADR_0014 = REPO_ROOT / "docs" / "adr" / "ADR-0014-lb-fb-baseline-requirements.md"
 
@@ -58,6 +61,11 @@ LAYOUT_START_CHECKLISTS = {
     "PB-100": PB100_DIR / "PB-100-pcb-layout-start-checklist.csv",
     "LB-100": LB100_DIR / "LB-100-pcb-layout-start-checklist.csv",
     "FB-100": FB100_DIR / "FB-100-pcb-layout-start-checklist.csv",
+}
+FOOTPRINT_BINDING_INVENTORIES = {
+    "PB-100": PB100_DIR / "PB-100-footprint-binding-inventory.csv",
+    "LB-100": LB100_DIR / "LB-100-footprint-binding-inventory.csv",
+    "FB-100": FB100_DIR / "FB-100-footprint-binding-inventory.csv",
 }
 SCHEMATIC_REVIEW_CLOSEOUTS = {
     "LB-100": LB100_DIR / "LB-100-schematic-review-closeout.md",
@@ -123,6 +131,27 @@ LAYOUT_START_CHECKLIST_COLUMNS = (
     "Evidence",
     "Decision",
     "Blocked action",
+)
+FOOTPRINT_BINDING_STATUS_COLUMNS = (
+    "Board",
+    "Inventory",
+    "Evidence source",
+    "KiCad symbol state",
+    "Open footprint items",
+    "Board import state",
+    "Blocked action",
+)
+FOOTPRINT_BINDING_INVENTORY_COLUMNS = (
+    "Footprint item",
+    "Assembly owner",
+    "Preferred MPN or class",
+    "Package or mechanical class",
+    "Footprint source",
+    "KiCad footprint binding state",
+    "Drawing review state",
+    "Alternatives",
+    "Board-import impact",
+    "Next action",
 )
 BLOCKER_COLUMNS = (
     "Gate",
@@ -801,6 +830,8 @@ def validate_layout_start_readiness() -> None:
             "BOM/CPL",
             "manufacturing ZIP",
             f"{board}-pcb-layout-start-checklist.csv",
+            f"{board}-footprint-binding-inventory.csv",
+            "three_board_footprint_binding_status.csv",
             "footprint binding",
             "mechanical envelope",
         ):
@@ -857,6 +888,7 @@ def validate_layout_start_checklist(board: str, path: Path) -> None:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Blocked action must be explicit")
     for token in (
         "empty Footprint properties",
+        f"{board}-footprint-binding-inventory.csv",
         "production/board-order/three_board_layout_rules.md",
         "Gerbers",
         "drills",
@@ -875,6 +907,83 @@ def validate_layout_start_checklist(board: str, path: Path) -> None:
     for token in board_tokens[board]:
         if token not in text:
             fail(f"{path.relative_to(REPO_ROOT)} must include board-specific token {token}")
+
+
+def validate_footprint_binding_inventory(board: str, path: Path) -> int:
+    rows = validate_csv(path)
+    if not rows:
+        fail(f"empty footprint inventory: {path.relative_to(REPO_ROOT)}")
+    missing_columns = [column for column in FOOTPRINT_BINDING_INVENTORY_COLUMNS if column not in rows[0]]
+    if missing_columns:
+        fail(f"{path.relative_to(REPO_ROOT)} is missing columns: {', '.join(missing_columns)}")
+    text = read_text(path)
+    board_tokens = {
+        "PB-100": ("TPS48110AQDGXRQ1", "JPB1", "CAN1", "high-current"),
+        "LB-100": ("STM32H563VIT6", "JPB1", "CAN1_TX_ROUTE", "DNP/open"),
+        "FB-100": ("USB4105-GF-A", "JFB1", "USB-C", "VBUS"),
+    }
+    for token in board_tokens[board]:
+        if token not in text:
+            fail(f"{path.relative_to(REPO_ROOT)} must include board-specific footprint token {token}")
+    seen_items = set()
+    for row_number, row in enumerate(rows, 2):
+        item = row["Footprint item"].strip()
+        if item in seen_items:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: duplicate Footprint item {item}")
+        seen_items.add(item)
+        for column in FOOTPRINT_BINDING_INVENTORY_COLUMNS:
+            if not row[column].strip():
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
+        if row["Assembly owner"].strip() not in {"Factory", "Garage", "Factory or DNP"}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid Assembly owner")
+        if row["KiCad footprint binding state"].strip() != "Open":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: KiCad footprint binding state must be Open")
+        if row["Drawing review state"].strip() != "Open":
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Drawing review state must be Open")
+        if "BOARD_IMPORT_BLOCKED" not in row["Board-import impact"]:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: board import must remain blocked")
+        next_action = row["Next action"].lower()
+        if not any(verb in next_action for verb in ("review", "verify", "select", "keep", "close", "bind")):
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Next action must be actionable")
+    return len(rows)
+
+
+def validate_footprint_binding_status() -> None:
+    rows = validate_csv(FOOTPRINT_BINDING_STATUS)
+    missing_columns = [column for column in FOOTPRINT_BINDING_STATUS_COLUMNS if column not in rows[0]]
+    if missing_columns:
+        fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)} is missing columns: {', '.join(missing_columns)}")
+    seen_boards = set()
+    inventory_counts = {
+        board: validate_footprint_binding_inventory(board, path)
+        for board, path in FOOTPRINT_BINDING_INVENTORIES.items()
+    }
+    for row_number, row in enumerate(rows, 2):
+        board = row["Board"].strip()
+        seen_boards.add(board)
+        if board not in REQUIRED_ORDER_BOARDS:
+            fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: unknown board {board}")
+        inventory = row["Inventory"].strip()
+        if inventory != str(FOOTPRINT_BINDING_INVENTORIES[board].relative_to(REPO_ROOT)):
+            fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: wrong inventory path")
+        try:
+            open_items = int(row["Open footprint items"].strip())
+        except ValueError:
+            fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: Open footprint items must be an integer")
+        if open_items != inventory_counts[board]:
+            fail(
+                f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"open item count {open_items} does not match inventory count {inventory_counts[board]}"
+            )
+        if row["Board import state"].strip() != "BLOCKED":
+            fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: board import must be BLOCKED")
+        row_text = " ".join(row.values())
+        for token in (f"{board}.kicad_pcb", "empty Footprint", "Do not create", "package drawing review"):
+            if token not in row_text:
+                fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: must include {token}")
+    missing_boards = sorted(REQUIRED_ORDER_BOARDS - seen_boards)
+    if missing_boards:
+        fail(f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)} is missing boards: {', '.join(missing_boards)}")
 
 
 def validate_kicad_scaffold(board: str, board_dir: Path, status: str) -> None:
@@ -906,6 +1015,15 @@ def validate_kicad_scaffold(board: str, board_dir: Path, status: str) -> None:
         for token in ("Reviewed", "value-bearing", "schematic", "PCB layout and manufacturing outputs remain separate"):
             if token not in schematic_text and token not in read_text(closeout_path):
                 fail(f"{schematic_path.relative_to(REPO_ROOT)} or closeout must include {token}")
+        for token in (
+            f"{board}-pcb-layout-start-checklist.csv",
+            f"{board}-footprint-binding-inventory.csv",
+            f"{board}.kicad_pcb",
+            "footprint binding",
+            "mechanical envelope",
+        ):
+            if token not in schematic_text:
+                fail(f"{schematic_path.relative_to(REPO_ROOT)} must include layout-start token {token}")
         if board == "LB-100":
             for token in ("STM32H563VITx", "PB_5V_OUT", "219.2 mA", "415.2 mA", "CAN1", "DNP/open"):
                 if token not in schematic_text:
@@ -1000,6 +1118,7 @@ def main() -> int:
         ),
     )
     validate_layout_rules()
+    validate_footprint_binding_status()
     validate_layout_start_readiness()
     for board, path in LAYOUT_START_CHECKLISTS.items():
         validate_layout_start_checklist(board, path)

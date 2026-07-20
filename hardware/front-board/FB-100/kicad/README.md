@@ -17,6 +17,8 @@ and order evidence close.
 - `../FB-100-requirements.md`
 - `../FB-100-schematic-freeze-checklist.md`
 - `../FB-100-pcb-layout-start-checklist.csv`
+- `../FB-100-footprint-binding-inventory.csv`
 - `../FB-100-board-release-blocker-register.csv`
+- `../../../../production/board-order/three_board_footprint_binding_status.csv`
 - `../../../logic-board/LB-100/LB-100-requirements.md`
 - `../../../../docs/adr/ADR-0014-lb-fb-baseline-requirements.md`

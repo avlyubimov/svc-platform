@@ -2820,3 +2820,20 @@ layout-planning `READY`, KiCad board import `BLOCKED`, and JLCPCB/PCBWay order
 `production/board-order/three_board_layout_rules.md` while continuing to block
 Gerbers, drills, pick-place files, BOM/CPL order packages, manufacturing ZIPs,
 fabrication packages, and PCBA orders.
+
+## 2026-07-20 — Footprint binding inventory blocks board import
+
+Decision: The next board-import blocker is decomposed into explicit footprint
+binding inventories for PB-100, LB-100, and FB-100. The consolidated status file
+is `production/board-order/three_board_footprint_binding_status.csv`; per-board
+inventories are `PB-100-footprint-binding-inventory.csv`,
+`LB-100-footprint-binding-inventory.csv`, and
+`FB-100-footprint-binding-inventory.csv`.
+
+Reason: All three schematics are frozen, but the KiCad symbols still have empty
+`Footprint` properties or value-bearing text scaffolds without footprint-bound
+symbols. Creating `.kicad_pcb` files before package drawing review and footprint
+binding would produce false layout evidence. Board import therefore remains
+`BLOCKED` until package drawings, pad geometry, pin-1/orientation, DNP/open
+handling, assembly ownership, and mechanical keepout evidence close for every
+open footprint item.
