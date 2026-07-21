@@ -3494,3 +3494,27 @@ Qgd/Qgs at 75 V / 123 A as design values not subject to production testing.
 PBREL-007 remains `Conditional`, aggregate PB-100 remains `BLOCKED`, and no
 layout or manufacturing output is authorized until a qualified maximum-bound
 101 V / 40 A / 150 degC VDS-rise and ID-fall trajectory exists.
+
+## 2026-07-21 — Define the Q2 manufacturer-qualification contract
+
+Decision: do not mislabel the public Q2 datasheet values or a typical SPICE
+model as the required production maximum. The public 40 nC Qgd and 52 nC Qgs
+limits are specified at 75 V / 123 A, while the release corner is 101 V / 40 A
+from an initial Q2 junction temperature of 150 degC. Infineon's official MOSFET
+simulation guidance also states that its models describe typical devices and
+do not replace hardware evaluation.
+
+Decision: request a traceable Infineon application-engineering artifact for
+the exact `IAUTN15S6N025ATMA1`. The acceptance contract fixes the LM74930-Q1
+10.0-14.5 V initial HGATE drive range, 128 mA minimum sink, separate 7 us
+fully-enhanced deglitch, and ten events at 60 s spacing. Acceptance requires a
+process/temperature/lot-covered paired `VDS(t)` / `ID(t)` envelope, maximum
+Miller VDS-rise and post-Miller ID-fall times, residual-current criterion,
+guardband, and hot linear-mode SOA confirmation.
+
+Result: `PB-100-q2-maximum-bound-qualification.csv` machine-records the known
+inputs and missing vendor outputs; `PB-100-q2-vendor-support-request.md`
+contains the reviewed support request. Until a traceable response is received
+and reviewed, PBREL-007 stays Conditional, aggregate PB-100 stays `BLOCKED`,
+and PCB layout, prototype manufacturing, production, and field use remain
+unauthorized. No second developer is required.

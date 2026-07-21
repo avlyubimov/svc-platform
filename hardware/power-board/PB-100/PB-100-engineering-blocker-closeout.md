@@ -424,6 +424,8 @@ orders.
 - Evidence and calculations:
   `PB-100-surge-stopper-evidence.csv`,
   `PB-100-input-q2-evidence.csv`,
+  `PB-100-q2-maximum-bound-qualification.csv`,
+  `PB-100-q2-vendor-support-request.md`,
   `PB-100-transient-margin-evidence.csv`,
   `PB-100-staged-release-readiness.csv`,
   `PB-100-tvs-load-dump-margin-trace.csv`,

@@ -95,6 +95,33 @@ dynamic SOA, copper/current density, both MOSFET thermal paths, and enclosure
 coupling remain mandatory post-layout evidence. PB-BENCH-004 and PB-BENCH-010
 remain mandatory after an engineering prototype exists.
 
+### Q2 maximum-bound qualification route
+
+Public evidence cannot close this gate. The Q2 gate-charge maxima are stated at
+75 V / 123 A and are design-specified rather than production-tested. Infineon's
+official MOSFET simulation guidance describes public simulation models as
+typical-device aids that do not represent every specification or operating
+condition and do not replace hardware evaluation. The TI controller model does
+not add Infineon process or hot-corner guarantees, and AEC-Q101/PQR evidence by
+itself does not define the paired switching trajectory.
+
+The approved next action is therefore a traceable Infineon application-
+engineering request. `PB-100-q2-maximum-bound-qualification.csv` fixes the
+101 V / 40 A / 150 degC corner, 10.0-14.5 V initial VGS range, 128 mA minimum
+HGATE sink, separate 7 us fully-enhanced deglitch, and ten pulses at 60 s
+spacing. The accepted response must provide a process/temperature/lot-covered
+time-correlated `VDS(t)` and `ID(t)` envelope, maximum Miller VDS-rise time,
+maximum post-Miller ID-fall time, residual-current criterion, guardband, and
+hot linear-mode SOA confirmation for the exact orderable Q2.
+
+The support request is staged in `PB-100-q2-vendor-support-request.md`. It is
+not release evidence until a traceable Infineon case, email, model revision, or
+signed FAE artifact is received and reviewed. A typical-only SPICE plot,
+avalanche comparison, or unrelated gate-charge condition cannot close the
+gate. If Infineon cannot provide a production maximum, a separate empirical
+component-qualification plan requires Product Owner approval and must not be
+described as a manufacturer maximum.
+
 ## Production and Lifetime
 
 Both selected MOSFETs are automotive-qualified TOLL devices with 175 degC
@@ -120,6 +147,9 @@ remains 10-15 years, subject to controlled alternates and lifecycle recheck.
 - TI unsuppressed load-dump application brief: https://www.ti.com/lit/ab/snoaaa1/snoaaa1.pdf
 - Infineon Q1 datasheet: https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf
 - Infineon Q2 datasheet: https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn15s6n025-datasheet-en.pdf
+- Infineon power-MOSFET simulation guidance: https://www.infineon.com/assets/row/public/documents/24/42/infineon-applicationnote-powermosfet-simulationmodels-applicationnotes-en.pdf
 - `hardware/power-board/PB-100/PB-100-input-q1-evidence.csv`
 - `hardware/power-board/PB-100/PB-100-input-q2-evidence.csv`
 - `hardware/power-board/PB-100/PB-100-surge-stopper-evidence.csv`
+- `hardware/power-board/PB-100/PB-100-q2-maximum-bound-qualification.csv`
+- `hardware/power-board/PB-100/PB-100-q2-vendor-support-request.md`
