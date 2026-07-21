@@ -4,8 +4,9 @@ Status: In progress
 Last updated: 2026-07-21
 
 This document defines what “ready” means for the current repository state. It
-authorizes only controlled FB-100 board import. It does not authorize PB-100 or
-LB-100 PCB import, or fabrication/assembly outputs for any board.
+authorizes only controlled FB-100 placement and routing work. It does not
+authorize PB-100 or LB-100 PCB import, or fabrication/assembly outputs for any
+board.
 
 Release authorization uses four ordered states from ADR-0017:
 `BLOCKED`, `LAYOUT-ONLY`, `PROTO-ONLY`, and `PRODUCTION-READY`. `PROTO-ONLY`
@@ -61,6 +62,9 @@ Current coverage:
 - Deterministic LB-100 and FB-100 schematic generation plus focused exported-
   netlist topology, symbol-to-footprint pad-contract, and ERC validation under
   `tools/board_schematic_validation/`.
+- Deterministic FB-100 controlled-placement generation plus KiCad DRC,
+  schematic-parity, mounting-hole, and unrouted-milestone validation in
+  `tools/validate_fb100_layout.py`.
 - LB-100 and FB-100 baseline freeze manifests and release-blocker registers.
 - Firmware config JSON/schema validation.
 - Firmware host-test suite.
@@ -87,7 +91,7 @@ Current coverage:
 | LB-100 PCB/layout | BLOCKED | There are 0 active blockers (0 active LBREL blockers). Footprint, schematic, and corrected FX18 mechanical gates are closed; the separate signal-integrity and safety layout model remains Open, so no `LB-100.kicad_pcb` or manufacturing output is authorized |
 | FB-100 requirements | Frozen | Baseline is frozen by ADR-0014 and the schematic freeze is Closed |
 | FB-100 KiCad schematic | Reviewed | Deterministic 44-component, 46-net, footprint-bound capture covers USB-C/ESD/no-back-power VBUS presence with R13 3.9k current limit, R14 15k defined pulldown and C1 100nF, JFB1, ten role-free indicators, direct one-wire RGB, service/reset buttons, and DNP OLED; exported-netlist audit and ERC pass with zero findings |
-| FB-100 PCB/layout | LAYOUT-ONLY | There are 0 active blockers (0 active FBREL blockers). Schematic, footprint, USB/no-back-power, and mechanical gates are closed; controlled board import is authorized but no Gerber, drill, placement, BOM/CPL, manufacturing ZIP, or PCBA order exists yet |
+| FB-100 PCB/layout | LAYOUT-ONLY | There are 0 active blockers (0 active FBREL blockers). The controlled 80 mm x 35 mm board contains all 44 frozen schematic footprints plus four mounting holes; placement DRC and parity are machine-checked, while routing, copper pours, stackup-derived USB impedance, and final layout review remain open. No Gerber, drill, BOM/CPL, pick-place, manufacturing ZIP, or PCBA order exists |
 | Firmware safety core | Host-test ready | Output, overflow-safe delayed battery cutoff, runtime load shedding, stale-current safe-off, thermal derate/cutoff, CAN dropped-edge retry, telemetry, events, saturating diagnostic counters, logging, config, runtime boot, CAN-to-rule bridge, ambient-light rule conditions, ordered rule sets, multi-action rule compilation, rule runtime, and rule paths covered |
 | Configuration format | Host-test ready | JSON schema, canonical rule grammar, rule-action mapping, buffer-atomic rule compilation, PB-100 capability manifest, compiled capability baseline, config store reserved/sequence-wrap handling, config update, and examples are validated |
 | Production package | Draft | `production/board-order/three_board_jlcpcb_order_readiness.csv` tracks all three boards as NO-GO until their layout, fabrication, review, and assembly-output gates close |

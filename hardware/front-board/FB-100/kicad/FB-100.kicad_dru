@@ -1,0 +1,20 @@
+(version 1)
+
+(rule "FB-100 minimum copper clearance"
+    (constraint clearance (min 0.15mm)))
+
+(rule "FB-100 minimum routed width"
+    (constraint track_width (min 0.15mm)))
+
+(rule "FB-100 USB data width"
+    (condition "A.NetName == 'USB_D_P' || A.NetName == 'USB_D_N' || A.NetName == 'USB_D_P_CONN' || A.NetName == 'USB_D_N_CONN'")
+    (constraint track_width (min 0.15mm) (opt 0.20mm) (max 0.30mm)))
+
+(rule "FB-100 USB differential gap"
+    (condition "A.NetName == 'USB_D_P' || A.NetName == 'USB_D_N'")
+    (constraint diff_pair_gap (min 0.15mm) (opt 0.20mm) (max 0.30mm))
+    (constraint diff_pair_uncoupled (max 1.00mm)))
+
+(rule "FB-100 USB-C locator-hole clearance"
+    (condition "A.Reference == 'J1' && B.Reference == 'J1'")
+    (constraint hole_clearance (min 0.00mm)))

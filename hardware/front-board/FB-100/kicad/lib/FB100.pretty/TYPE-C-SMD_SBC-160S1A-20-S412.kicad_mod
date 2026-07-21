@@ -118,7 +118,7 @@
 			(type solid)
 		)
 		(fill no)
-		(layer "F.SilkS")
+		(layer "F.Fab")
 		(uuid "f06647eb-ddbf-428d-8373-330ae9232fde")
 	)
 	(fp_circle
@@ -194,7 +194,7 @@
 			)
 		)
 	)
-	(pad "" thru_hole circle
+	(pad "" np_thru_hole circle
 		(at -2.89 -1.33)
 		(size 0.65 0.65)
 		(drill 0.65)
@@ -202,7 +202,7 @@
 		(remove_unused_layers no)
 		(uuid "27d3e559-e7ef-4ee9-9416-84af29e58660")
 	)
-	(pad "" thru_hole circle
+	(pad "" np_thru_hole circle
 		(at 2.89 -1.33)
 		(size 0.65 0.65)
 		(drill 0.65)

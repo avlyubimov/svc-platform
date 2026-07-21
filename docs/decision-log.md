@@ -3518,3 +3518,24 @@ contains the reviewed support request. Until a traceable response is received
 and reviewed, PBREL-007 stays Conditional, aggregate PB-100 stays `BLOCKED`,
 and PCB layout, prototype manufacturing, production, and field use remain
 unauthorized. No second developer is required.
+
+## 2026-07-21 — Start controlled FB-100 placement
+
+Decision: record the Product Owner's submission of the Q2 maximum-bound request
+to Infineon as `AWAITING VENDOR`. This changes no PB gate: PBREL-007 remains
+Conditional, aggregate PB-100 remains `BLOCKED`, and no PB-100 layout or
+manufacturing output is authorized while the response is pending.
+
+Decision: use the already authorized FB-100 `LAYOUT-ONLY` state to create only
+the controlled placement milestone. The deterministic board applies the 80 mm
+x 35 mm envelope, four M2.5 holes, USB-C and JFB1 edge constraints, role-free
+indicator grid, button targets, and OLED-DNP keepout to all 44 frozen schematic
+components. Routing and copper pours remain open pending placement and stackup
+review.
+
+Result: KiCad 10.0.4 placement DRC has no shorts, accidental clearance errors,
+or courtyard overlaps. CI permits only the two intentional USB-C shell stakes
+at the X=0 edge, three generated connector-local override warnings, four
+board-only mounting holes in schematic parity, and the recorded unrouted
+connectivity set. Gerber, drill, BOM/CPL, pick-place, fabrication, assembly,
+prototype order, production release, and field use remain `NO-GO`.
