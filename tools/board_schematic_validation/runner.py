@@ -8,6 +8,25 @@ from .model import erc_violations, export_netlist, run
 from .rules import validate_fb, validate_lb
 
 
+def validate_electrical_pin_types(library: Path, ic_refs: tuple[str, ...]) -> list[str]:
+    text = library.read_text(encoding="utf-8")
+    failures: list[str] = []
+    for ref in ic_refs:
+        marker = f'(symbol "{library.stem}_{ref}"'
+        start = text.find(marker)
+        if start < 0:
+            failures.append(f"{library.name}: missing generated symbol {ref}")
+            continue
+        next_symbol = re.search(r'\n\s*\(symbol "', text[start + len(marker):])
+        end = -1 if next_symbol is None else start + len(marker) + next_symbol.start()
+        block = text[start:] if end < 0 else text[start:end]
+        if "(pin passive " in block:
+            failures.append(f"{library.name}:{ref}: IC pins must use reviewed electrical types, not passive")
+        if "(pin power_in " not in block:
+            failures.append(f"{library.name}:{ref}: IC symbol lacks power-input typing")
+    return failures
+
+
 def validate(repo_root: Path) -> list[str]:
     boards = {
         "LB-100": repo_root / "hardware/logic-board/LB-100/kicad/LB-100.kicad_sch",
@@ -26,6 +45,14 @@ def validate(repo_root: Path) -> list[str]:
         }
         failures.extend(validate_lb(netlists["LB-100"], boards["LB-100"].parent / "lib/LB100.pretty"))
         failures.extend(validate_fb(netlists["FB-100"], boards["FB-100"].parent / "lib/FB100.pretty"))
+        failures.extend(validate_electrical_pin_types(
+            boards["LB-100"].parent / "lib/LB100.kicad_sym",
+            tuple(f"U{index}" for index in range(1, 15)),
+        ))
+        failures.extend(validate_electrical_pin_types(
+            boards["FB-100"].parent / "lib/FB100.kicad_sym",
+            ("U1",),
+        ))
 
         reports = {
             board: erc_violations(path, temp / f"{board}-erc.json", repo_root=repo_root)

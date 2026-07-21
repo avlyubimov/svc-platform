@@ -1,12 +1,11 @@
 # PB-100 Schematic Readiness Review
 
-Status: Schematic freeze closed
+Status: Retracted; corrective schematic freeze is Open
 
 Review date: 2026-07-20
 
-This snapshot summarizes the PB-100 schematic-planning package after resolving
-all active planning blockers and closing schematic freeze. PCB layout is now a
-separate post-freeze task; this document does not authorize PCB layout, Gerbers,
+This historical snapshot is superseded by ADR-0016 and the current blocker
+register. PBREL-006 is Conditional and PBREL-007 is Open. This document does not authorize PCB layout, Gerbers,
 drills, pick-place files, BOM/CPL order packages, manufacturing ZIP files,
 fabrication packages, or PCBA orders.
 
@@ -15,16 +14,15 @@ fabrication packages, or PCBA orders.
 - Architecture v1.0 and PB-100 baseline requirements are frozen by ADR.
 - No active PB-100 architecture-planning blockers remain in the freeze
   checklist.
-- Board-release blockers PBREL-001 through PBREL-012 are closed for pre-layout
-  evidence and retained as history in
-  `hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`.
-- PB-100 schematic freeze is closed by
+- The current board-release register has two active blockers: PBREL-006 for Q1
+  physical thermal evidence and PBREL-007 for ISO load-dump protection.
+- PB-100 schematic freeze is Open; the former closeout is retracted in
   `hardware/power-board/PB-100/PB-100-schematic-review-closeout.md`.
 - ADR-0013 separates pre-layout closure from physical bench execution:
   assembled-board PB-BENCH records block first motorcycle power and production
   release, not first prototype PCB fabrication.
-- All formerly open or conditional schematic-readiness gates now have reviewed
-  schematic-level evidence.
+- Corrective ADR-0016 evidence records current TVS failures rather than
+  converting fixed numbers into a false pass.
 - Physical layout, fabrication, assembly, bench, sourcing-lot, SOA extraction,
   connector derating, and thermal/copper review remain controlled downstream
   work before board-print or production release.

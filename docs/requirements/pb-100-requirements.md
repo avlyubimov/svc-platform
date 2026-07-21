@@ -22,6 +22,21 @@ vehicle-agnostic and must not encode accessory roles in hardware.
   freeze.
 - Requires battery voltage and total input current measurement.
 
+### 2.1 Load-dump design envelope
+
+- ISO 16750-2 Test A design evidence must cover `Us = 79-101 V`,
+  `Ri = 0.5-4 ohm`, and `td = 40-400 ms` at cold and hot initial junction
+  conditions.
+- The final qualification plan must cover ten pulses with 60 s spacing.
+- Evidence must calculate TVS current, power, energy, transient thermal
+  impedance, junction temperature, tolerances, dynamic resistance,
+  temperature coefficient, self-heating, and layout/measurement uncertainty.
+- Every accepted corner must preserve at least `5 V` modeled margin to the
+  LM74700-Q1 60 V recommended ceiling. The 65 V absolute maximum is not a
+  design target.
+- Passing a peak clamp-voltage check alone does not satisfy the requirement.
+- See ADR-0016.
+
 ## 3. Generic outputs
 
 PB-100 must provide at least 10 generic protected outputs.

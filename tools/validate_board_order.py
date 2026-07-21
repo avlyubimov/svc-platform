@@ -716,7 +716,7 @@ def validate_fb100_interface_pinout() -> None:
         "USB_D_N",
         "USB_CC1",
         "USB_CC2",
-        "USB_VBUS_SENSE",
+        "USB_VBUS_DETECT_RAW",
         "CH_LED_1",
         "CH_LED_10",
         "SERVICE_BTN",

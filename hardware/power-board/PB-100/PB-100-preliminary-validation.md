@@ -35,9 +35,10 @@ does not approve schematic freeze or PCB layout.
 - LM74700QDBVRQ1-class reverse protection is compatible with the 12 V input
   target and cold-crank requirement when paired with a dedicated low-Rds input
   MOSFET strategy.
-- Active SM8S33AHM3-class input TVS yields a generated 59.45 V hot clamp-loop
-  bound and 20.55 V headroom to the selected 80 V MOSFET rating. Extracted
-  loop inductance and PB-BENCH-004 remain mandatory physical validation.
+- The SM8S33AHM3/I input TVS remains a candidate only. ADR-0016 generated
+  `79-101 V`, `0.5-4 ohm`, and `40-400 ms` evidence exposes energy/thermal
+  failures and only 2.40 V minimum LM74700 recommended margin. PBREL-007 is
+  Open pending a passing protection branch and PB-BENCH-004.
 - Active SM8S33AHM3-class input TVS is not automatically compatible with 40 V integrated
   smart switches. ADR-0011 resolves the Rev.1 conflict by moving OUT5, OUT8,
   and OUT9 to the external-controller output architecture.

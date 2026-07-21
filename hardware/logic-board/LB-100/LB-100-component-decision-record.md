@@ -10,8 +10,9 @@ ADR-0014 or ADR-0015 and does not authorize fabrication or production release.
 
 - Decision: use `TCA9539QPWRQ1` in TI PW TSSOP-24. It supplies the 16 role-free
   front-panel GPIOs that do not fit on the MCU after the approved JPB1 binding.
-  Reset and power-on configure every port as an input, so all channel LEDs and
-  the single-wire RGB command remain inactive until firmware configures them.
+  Reset and power-on configure every port as an input, so all channel LEDs
+  remain inactive until firmware configures them. The timing-critical
+  `STATUS_RGB_DATA` path is not routed through this I2C expander.
 - Why this part: automotive AEC-Q100 Grade 1, -40 to +125 degrees C, 1.65 to
   3.6 V supply, interrupt and reset pins, and current-sink capability suitable
   for the 1 kOhm FB-100 LED paths. JLCPCB lists `C201627` as an extended
@@ -38,10 +39,33 @@ ADR-0014 or ADR-0015 and does not authorize fabrication or production release.
   safety interlock; firmware must report expander failure and must never infer
   output safety from LED state.
 
+## SN74LVC1G17-Q1 USB VBUS Detector (U14)
+
+- Decision: use `SN74LVC1G17QDBVRQ1` as a 3.3 V Schmitt-input digital detector
+  between current-limited `USB_VBUS_DETECT_RAW` and STM32 PD10.
+- Why this part: AEC-Q100 qualification, 5.5 V-tolerant input at 3.3 V VCC,
+  Ioff partial-power-down protection, Schmitt thresholds, and inspectable
+  SOT-23-5 packaging prevent both the invalid ADC claim and back-power.
+- Alternative A: Nexperia `74LVC1G17-Q100`; automotive-qualified but requires
+  exact threshold, Ioff, pin-map, and sourcing review.
+- Alternative B: automotive onsemi `NC7SZ17`; non-drop-in sourcing and
+  electrical review are required before substitution.
+- Operating margin: the input is current-limited by FB R13 100 kOhm and the
+  output is limited to `LB_3V3_IO`; PD10 is used only as a digital input.
+- Maximum junction temperature and lifetime: use the selected datasheet limits
+  and the 10-year platform target; static detector dissipation is negligible,
+  but enclosure temperature remains a prototype check.
+- Availability and assembly: DBV SOT-23-5 is compatible with JLCPCB/PCBWay;
+  exact LCSC/JLC stock and PCN status require an order-date recheck.
+- Known risks: threshold variation during low VBUS ramps and ESD coupling;
+  firmware must debounce presence and layout must keep the raw 5 V path short.
+
 ## TPS22918-Q1 Switched Peripheral Rails (U12, U13)
 
 - Decision: use two `TPS22918TDBVRQ1` switches for `MICROSD_3V3` and
-  `RADIO_SENSOR_3V3`, each with a 1 nF CT capacitor and controlled QOD.
+  `RADIO_SENSOR_3V3`, each with a 1 nF CT capacitor and controlled QOD. BMI270
+  VDD uses the switched rail while BMI270 VDDIO/CSB and the I2C pull-ups remain
+  on `LB_3V3_IO` to avoid back-power.
 - Why this part: AEC-Q100 Grade 2, 1 to 5.5 V input, 2 A rating, 53 mOhm
   typical at 3.3 V, adjustable slew rate, shutdown leakage, and an inspectable
   SOT-23-6 package. It implements the ADR-0012 sleep boundary without direct

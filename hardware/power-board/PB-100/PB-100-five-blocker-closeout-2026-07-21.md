@@ -1,12 +1,11 @@
 # PB-100 Five-Blocker Closeout — 2026-07-21
 
-Status: Closed for the five PBREL pre-layout blockers; schematic freeze and PCB layout remain gated
+Status: Historical record; PBREL-006 is Conditional and PBREL-007 is reopened by ADR-0016
 
-This record supersedes the former conditional evidence for PBREL-001,
-PBREL-004, PBREL-006, PBREL-007, and PBREL-011. It closes decisions and
-calculations that can honestly be completed before hardware exists. It does not
-claim that post-prototype measurements, assembler quotations, DFM feedback, or
-first-article inspection have already happened.
+This record preserves the reasoning used by PR #34. ADR-0016 supersedes its
+PBREL-006/PBREL-007 conclusions after corrective review found that the
+10/1000 us model did not cover ISO 16750-2 load-dump duration, TVS energy, or
+transient thermal behavior. PBREL-001, PBREL-004, and PBREL-011 remain closed.
 
 ## PBREL-001 — CAN1 safety policy
 
@@ -29,23 +28,24 @@ and actual load pulse measurements remain post-layout/prototype acceptance.
 
 ## PBREL-006 — input reverse protection
 
-Closed by generated `PB-100-input-q1-evidence.csv` and
+Conditional by generated `PB-100-input-q1-evidence.csv` and
 `PB-100-mosfet-voltage-margin-review.md`. Q1 uses the same exact 80 V TOLL
 part. The 2.52 mOhm hot bound gives 4.032 W at 40 A. A 125 degC case ceiling
 predicts 126.61 degC junction and 48.39 degC margin to the 175 degC absolute
-maximum. A reviewed plane/polygon/bus current path and PB-BENCH-010 are hard
-later gates; no trace-only 40 A claim is accepted.
+maximum, but that calculation assumes rather than proves a 125 degC case.
+PBREL-006 remains Conditional until layout copper/thermal extraction and
+PB-BENCH-010 verify the boundary; no trace-only 40 A claim is accepted.
 
 ## PBREL-007 — TVS/load-dump protection
 
-Closed by generated `PB-100-transient-margin-evidence.csv`. The bounded source
-is 100 V open-circuit, 10/1000 us, 0.3766 ohm. `SM8S33AHM3/I` is adjusted from
-53.3 V at 25 degC to 58.15 V at a 125 degC initial junction. A 20 nH loop at
-15 A/us adds 0.30 V and a separate 1.00 V model/probe allowance produces
-59.45 V stress. Margins are 0.55 V to the LM74700 recommended ceiling, 5.55 V
-to its absolute maximum, 20.55 V to the MOSFETs, and 40.55 V to 100 V devices.
-Any extracted loop above 20 nH or PB-BENCH-004 result at/above 60 V rejects the
-layout/protection branch.
+Open by ADR-0016. The former 100 V, 10/1000 us, 0.3766 ohm calculation produced
+59.45 V and only 0.55 V to the LM74700 recommended ceiling; it is retained as
+rejected historical evidence, not a closeout. The replacement model covers
+ISO 16750-2 `79-101 V`, `0.5-4 ohm`, and `40-400 ms`, and calculates TVS
+current, energy, transient thermal impedance, tolerances, and self-heating.
+The current SM8S33AHM3/I candidate fails multiple corners, including the
+101 V / 0.5 ohm / 400 ms hot corner, so a new protection selection and
+PB-BENCH-004 are required before closure.
 
 ## PBREL-011 — factory assembly readiness
 
@@ -69,8 +69,8 @@ release gates.
 
 ## Boundary
 
-The board-release register may report zero active PBREL blockers after this
-closeout. PCB layout nevertheless remains `NO-GO` until the separate schematic
-freeze checklist, controlled promotion of all value-bearing symbols/passives,
-Product Owner approval, and layout-start checklist close. No `.kicad_pcb`,
-Gerber, drill, CPL, fabrication ZIP, or PCBA order package is authorized here.
+This historical record does not authorize layout or manufacturing. The
+board-release register has two active PBREL rows after corrective review:
+PBREL-006 is Conditional and PBREL-007 is Open. PCB layout remains `NO-GO`.
+No `.kicad_pcb`, Gerber, drill, CPL, fabrication ZIP, or PCBA order package is
+authorized here.

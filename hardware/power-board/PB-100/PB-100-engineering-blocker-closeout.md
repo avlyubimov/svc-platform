@@ -225,7 +225,8 @@ orders.
   with SM8S33 clamp margin; Why not alternative B: 60 V MOSFET path leaves less
   overshoot margin unless simulation/bench proves it; Expected lifetime: 10-15
   year platform target with automotive controller and MOSFET families; Operating
-  margin: 80 V MOSFET class against the generated 59.45 V hot stress bound;
+  margin: 80 V MOSFET class is retained against the current 57.60 V generated
+  ISO-corner peak while system protection remains Open under ADR-0016;
   Maximum junction temperature: use 175 °C MOSFET class and 150 °C/grade device
   controller limits where selected; Availability: TI/Nexperia plus Vishay/
   Infineon alternates; Automotive qualification: AEC-Q100 controller and
@@ -301,8 +302,9 @@ orders.
 
 ## PBREL-006 — Input reverse protection
 
-- Closeout status: Closed.
-- Closeout boundary: pre-layout evidence; see `PB-100-five-blocker-closeout-2026-07-21.md`.
+- Closeout status: Conditional.
+- Closeout boundary: datasheet screening only; layout extraction and
+  PB-BENCH-010 are required by ADR-0016.
 - Why blocker existed: the 40 A protected input path needs reverse-battery
   protection with low loss, load-dump voltage margin, gate control, and package
   thermal evidence.
@@ -313,10 +315,12 @@ orders.
 - Recommended solution: lock LM74700-Q1 plus Q1
   `IAUT300N08S5N012ATMA2`, with 100 nF VCAP, 10 ohm gate series, 100 kohm
   gate-source discharge, and a 15 V automotive gate clamp. Generated Q1
-  evidence fixes the 2.52 mOhm hot bound, 4.032 W at 40 A, 125 degC case
-  ceiling, and 48.39 degC junction margin.
+  evidence fixes the 2.52 mOhm hot bound and 4.032 W at 40 A. Its 126.61 degC
+  junction result assumes the package case is held at 125 degC, so the stated
+  48.39 degC absolute-maximum margin is conditional rather than physical proof.
 - Risks: final plane/polygon/bus extraction, solder voiding, negative transient
-  behavior, and enclosure temperature still need layout and bench validation.
+  behavior, case-to-board heat spreading, and enclosure temperature remain
+  unresolved until layout extraction and PB-BENCH-010.
 - Alternatives: IAUT300N08S5N014 80 V TOLL, BUK7J2R4-80M 80 V LFPAK56E, or the
   LM74502-Q1 controller family after controlled electrical and package review.
 - Cost impact: moderate; the 80 V TOLL path may cost more than a 60 V TOLL
@@ -334,7 +338,8 @@ orders.
   transient margin without overshoot evidence; Why not alternative B: dual
   PowerPAK path adds current sharing and placement complexity; Expected
   lifetime: 10-15 year platform target with automotive controller/MOSFET; 
-  Operating margin: 80 V MOSFET class against the 59.45 V bounded stress;
+  Operating margin: 80 V MOSFET class remains appropriate, but the input-node
+  load-dump stress is open under ADR-0016;
   Maximum junction temperature: 175 °C MOSFET class and selected
   controller temperature limits; Availability: TI/Nexperia plus Infineon/Vishay
   alternates; Automotive qualification: AEC-Q100 controller and AEC-Q101 MOSFET;
@@ -360,28 +365,33 @@ orders.
 
 ## PBREL-007 — TVS/load-dump protection
 
-- Closeout status: Closed.
-- Closeout boundary: pre-layout evidence; see `PB-100-five-blocker-closeout-2026-07-21.md`.
+- Closeout status: Open.
+- Closeout boundary: the former 10/1000 us result is rejected by ADR-0016.
 - Why blocker existed: SM8S33-class TVS clamp can stress 60 V downstream parts
   after overshoot, so schematic freeze needed a voltage-margin escape path.
 - Candidate comparison: Vishay SM8S33AHM3/I HM3 DO-218AC TVS is preferred for
   active AEC-Q101 load-dump class; obsolete MCC/NFD HE3 paths are rejected for
   lock; 80 V downstream MOSFET and 100 V buck selections are preferred over
   accepting unproven 60 V overshoot margin.
-- Recommended solution: keep the SM8S33AHM3/I TVS branch and the selected
-  80 V MOSFET baseline while retaining 100 V TPS4811 and LM5164/LM5013-class
-  devices. The deterministic 100 V 10/1000 us source, 125 degC TVS, 20 nH
-  loop, 15 A/us slew, and 1 V uncertainty model bounds stress at 59.45 V.
-  PB-BENCH-004 remains a post-prototype escape gate, not a pre-layout blocker.
-- Risks: board-level overshoot, TVS heating, trace inductance, and pulse energy
-  still require simulation/bench validation after physical design.
+- Recommended solution: retain the selected 80 V MOSFET and 100 V downstream
+  device classes, but do not freeze D1. Compare the SM8S33AHM3/I branch and
+  qualified alternatives against ISO 16750-2 `79-101 V`, `0.5-4 ohm`, and
+  `40-400 ms`, including current, energy, transient thermal impedance,
+  tolerances, self-heating, ten-pulse recovery, and at least 5 V margin to the
+  LM74700 60 V recommended ceiling.
+- Risks: current generated evidence predicts destructive TVS junction
+  temperatures in multiple low-Ri/long-duration corners and only 2.40 V
+  LM74700 recommended margin in the worst voltage corner. Board overshoot and
+  PB-BENCH-004 remain additional gates after a viable branch is selected.
 - Alternatives: Littelfuse SLD8S33A, Diodes DM8W33AQ-13, Bourns SM8S33A-Q
   class, or lower-clamp strategy after future review.
 - Cost impact: low to moderate; the HM3 TVS and 80 V MOSFET choices cost more
   than lowest-cost 60 V paths but reduce load-dump risk.
-- Thermal impact: TVS pulse heating is not a continuous dissipation item, but
-  copper, pulse spacing, and enclosure heating must be validated; 80 V MOSFETs
-  may increase RDS(on) versus 60 V candidates.
+- Thermal impact: the selected TVS model reaches 328.74 J and a predicted
+  925.6 degC junction in the 101 V / 0.5 ohm / 400 ms / 125 degC screening
+  corner using typical transient thermal impedance. This is a failure signal,
+  not a literal qualified temperature; maximum-bound thermal data and a new
+  protection candidate are required.
 - Production impact: DO-218AC placement/stencil/inspection must be reviewed and
   obsolete/NFD sources must not be used for BOM lock.
 - Field reliability impact: active TVS plus downstream 80 V/100 V headroom
@@ -391,9 +401,9 @@ orders.
   obsolete MCC/NFD sources are not lifecycle-safe; Why not alternative B: keeping
   60 V-only downstream paths requires unproven overshoot margin; Expected
   lifetime: 10-15 year platform target with active-source TVS alternates;
-  Operating margin: 80 V MOSFET/100 V regulator classes above 53.3 V clamp
-  point before overshoot; Maximum junction temperature: TVS/package pulse
-  derating and MOSFET/regulator junction limits remain reviewed separately;
+  Operating margin: the former 53.3 V clamp point and 59.45 V estimate do not
+  close energy or overshoot; Maximum junction temperature: 175 degC TVS limit
+  is exceeded by the present screening model;
   Availability: Vishay HM3 plus Littelfuse/Diodes/Bourns alternates; Automotive
   qualification: AEC-Q101 TVS branch; LCSC availability: local snapshot records
   JLCPCB source path; PCBWay/JLCPCB compatibility: DO-218AC handling review
@@ -409,8 +419,8 @@ orders.
   https://www.vishay.com/docs/98647/sm8s85ahm3.pdf,
   https://www.digikey.com/en/products/detail/vishay-general-semiconductor-diodes-division/SM8S33AHM3-I/25675894,
   and `production/bom/pb100_sourcing_evidence_snapshot.csv`.
-- Post-prototype validation: PB-BENCH-002 verifies transient/load-dump behavior
-  on the assembled board before field use.
+- Post-prototype validation: PB-BENCH-004 verifies transient/load-dump behavior
+  only after a candidate passes pre-layout energy and thermal review.
 - No-layout boundary: Does not authorize PCB layout, `PB-100.kicad_pcb`,
   Gerbers, drills, pick-place, BOM/CPL, manufacturing ZIP, or PCBA order.
 

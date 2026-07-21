@@ -3346,3 +3346,32 @@ closeout ledger and release manifest to match the blocker register. All twelve
 PBREL rows are now `Closed` for pre-layout evidence. PB-100 schematic freeze
 remains `Open` for controlled value-bearing sheet promotion, final review, and
 Product Owner approval; no PCB layout or manufacturing artifact is authorized.
+
+## 2026-07-21 — Corrective PB load-dump and LB/FB electrical review
+
+Decision: accept ADR-0016 and reopen PBREL-007. The former 100 V 10/1000 us
+59.45 V peak-stress calculation is rejected as load-dump closeout evidence.
+The project requirement is now the ISO 16750-2 Test A 12 V envelope of
+79-101 V, 0.5-4 ohm, and 40-400 ms with current, energy, transient thermal
+impedance, tolerance, self-heating, and repeated-pulse evidence. Generated
+screening shows that the current SM8S33AHM3/I branch fails multiple corners and
+does not preserve the required 5 V margin to the LM74700-Q1 60 V recommended
+ceiling.
+
+Decision: mark PBREL-006 Conditional until layout copper/thermal extraction and
+PB-BENCH-010 prove the assumed 125 degC Q1 case boundary. The selected
+IAUT300N08S5N012ATMA2 80 V TOLL voltage class remains accepted; its existing
+junction estimate is a screening condition rather than measured thermal proof.
+
+Decision: correct LB-100/FB-100 electrical capture without changing the frozen
+board architecture. IC electrical pin types now drive ERC; ADC_REF is sourced
+from the analog rail with local 1 uF/100 nF decoupling and AGND has one
+documented 0 ohm return to GND; USB VBUS presence is converted by a 5 V-tolerant
+digital buffer instead of an invalid PD10 ADC divider; STM32 PD7 directly drives
+the timing-critical LTC3212 LEDEN path; BMI270 VDDIO/CSB and the other I2C
+sensor interface supply remain on always-on LB_3V3_IO while BMI270 VDD alone is
+switched, preventing pull-up back-power.
+
+Result: corrective schematic validation remains green. PB-100 has two active
+release blockers and no `.kicad_pcb`, Gerber, drill, placement, manufacturing
+ZIP, or PCBA order artifact is created.

@@ -1,19 +1,17 @@
-Evidence item,Value,Unit,Basis,Result
-Waveform,100 V open-circuit 10/1000 us bounded source,,Reviewed conservative source model,INPUT
-Open-circuit source voltage,100.0,V,Model input,INPUT
-Equivalent source resistance,0.3766,ohm,(100 V - 53.3 V) / 124 A,INPUT
-TVS,SM8S33AHM3/I,,Active ADR-0011 branch,INPUT
-25 C clamp,53.30,V,124 A datasheet point,INPUT
-Initial TVS junction,125.0,degC,Hot-soak pre-layout bound,INPUT
-Temperature coefficient,0.091,%/degC,Vishay datasheet,INPUT
-Temperature-adjusted clamp,58.15,V,Clamp multiplied by temperature coefficient,INPUT
-Clamp-loop inductance ceiling,20.0,nH,Hard PCB constraint,INPUT
-Peak current slew,15.0,A/us,10 us rise rounded above 124 A / 10 us,INPUT
-Loop overshoot,0.30,V,L x di/dt,INPUT
-Model plus probe uncertainty,1.00,V,Conservative allowance,INPUT
-Bounded downstream stress,59.45,V,Hot clamp + loop overshoot + uncertainty,INPUT
-LM74700-Q1 recommended operating ceiling,0.55,V margin,60.0 V limit - 59.45 V stress,PASS
-LM74700-Q1 ANODE absolute maximum,5.55,V margin,65.0 V limit - 59.45 V stress,PASS
-IAUT300N08S5N012 VDS,20.55,V margin,80.0 V limit - 59.45 V stress,PASS
-TPS48110-Q1 and 100 V buck family,40.55,V margin,100.0 V limit - 59.45 V stress,PASS
-Layout escape condition,Measured stress must remain below 60 V and modeled loop inductance at or below 20 nH,,PB-BENCH-004 rejects the layout or protection branch if either limit is exceeded,MANDATORY POST-PROTOTYPE
+Us V,Ri ohm,td ms,Initial Tj C,Peak TVS current A,Peak clamp V,Peak TVS power W,TVS energy J,Typical ZthJM C/W,Predicted peak Tj C,Margin to LM74700 60 V,Result,Basis
+79,0.5,40,25,62.08,53.01,2996.0,14.05,0.218,218.1,6.99,FAIL,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation
+79,0.5,40,125,55.10,53.34,2851.4,13.70,0.218,317.5,6.66,FAIL,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation
+79,0.5,400,25,62.08,53.42,2996.0,137.43,0.338,444.6,6.58,FAIL,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation
+79,0.5,400,125,55.10,53.44,2851.4,136.51,0.338,544.4,6.56,FAIL,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation
+79,4,40,25,9.12,43.68,390.5,2.38,0.218,54.0,16.32,SCREENING PASS,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation
+79,4,40,125,8.20,47.30,381.3,2.02,0.218,152.1,12.70,SCREENING PASS,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation
+79,4,400,25,9.12,44.87,390.5,23.13,0.338,86.1,15.13,SCREENING PASS,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation
+79,4,400,125,8.20,48.24,381.3,19.62,0.338,182.9,11.76,FAIL,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation
+101,0.5,40,25,98.60,57.39,5127.2,32.96,0.218,400.7,2.61,FAIL,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation
+101,0.5,40,125,91.06,57.54,5078.4,32.95,0.218,500.6,2.46,FAIL,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation
+101,0.5,400,25,98.60,57.58,5127.2,328.75,0.338,825.6,2.42,FAIL,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation
+101,0.5,400,125,91.06,57.60,5078.4,328.74,0.338,925.6,2.40,FAIL,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation
+101,4,40,25,14.48,44.87,628.2,4.86,0.218,75.6,15.13,SCREENING PASS,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation
+101,4,40,125,13.55,48.57,638.2,4.49,0.218,174.7,11.43,SCREENING PASS,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation
+101,4,400,25,14.48,46.96,629.3,47.84,0.338,129.9,13.04,SCREENING PASS,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation
+101,4,400,125,13.55,48.94,638.2,44.53,0.338,229.5,11.06,FAIL,ISO 16750-2 Test A envelope; SM8S33AHM3/I max VBR/clamp/tolerance; temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; 10 pulses at 60 s require final validation

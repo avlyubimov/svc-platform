@@ -33,6 +33,7 @@ class Pin:
     number: str
     name: str
     net: str | None
+    electrical_type: str
 
 
 @dataclass(frozen=True)
@@ -100,7 +101,7 @@ class Schematic:
         for pin, side, x, y in layout:
             rotation = 0 if side == "left" else 180
             lines.append(
-                f'      (pin passive line (at {x:.2f} {y:.2f} {rotation}) (length 5.08) '
+                f'      (pin {pin.electrical_type} line (at {x:.2f} {y:.2f} {rotation}) (length 5.08) '
                 f'(name "{esc(pin.name)}" (effects (font (size 1.00 1.00)))) '
                 f'(number "{esc(pin.number)}" (effects (font (size 1.00 1.00)))))'
             )
@@ -229,17 +230,43 @@ def c(
     value: str,
     footprint: str,
     datasheet: str,
-    pins: list[tuple[str, str, str | None]],
+    pins: list[tuple[str, str, str | None] | tuple[str, str, str | None, str]],
     *,
     dnp: bool = False,
     in_bom: bool = True,
     on_board: bool = True,
 ) -> Component:
-    return Component(ref, value, footprint, datasheet, tuple(Pin(*pin) for pin in pins), dnp, in_bom, on_board)
+    normalized_pins = []
+    for pin in pins:
+        if len(pin) == 4:
+            number, name, net, electrical_type = pin
+        else:
+            number, name, net = pin
+            electrical_type = default_electrical_type(ref, name)
+        normalized_pins.append(Pin(number, name, net, electrical_type))
+    return Component(ref, value, footprint, datasheet, tuple(normalized_pins), dnp, in_bom, on_board)
+
+
+def default_electrical_type(ref: str, name: str) -> str:
+    if ref.startswith(("J", "R", "C", "D", "FB", "SW", "Y")):
+        return "passive"
+    if name in {"GND", "GNDIO", "VSS", "VSSA", "EP"} or name.startswith("GND"):
+        return "power_in"
+    if name in {"VIN", "VCC", "VDD", "VDDIO", "VDDH", "VDDUSB", "VBAT", "VTREF"}:
+        return "power_in"
+    if name in {"VOUT", "CPO", "INH", "32KHZ"}:
+        return "power_out"
+    if name in {"SDA", "SDx", "CANH", "CANL", "LIN", "A", "B"} or name.startswith(("P0", "P1")):
+        return "bidirectional"
+    if name in {"INT_N", "INT_SQW_N"}:
+        return "open_collector"
+    if name in {"RXD", "RO", "INT1", "INT2", "OSDO", "LEDG", "LEDR", "LEDB"}:
+        return "output"
+    return "input"
 
 
 def passive(ref: str, value: str, footprint: str, net1: str, net2: str, datasheet: str = "") -> Component:
-    return c(ref, value, footprint, datasheet, [("1", "1", net1), ("2", "2", net2)])
+    return c(ref, value, footprint, datasheet, [("1", "1", net1, "passive"), ("2", "2", net2, "passive")])
 
 
 def lb_jpb_nets() -> dict[int, str]:
@@ -273,9 +300,11 @@ def build_lb() -> Schematic:
         "JPB1 100 signals plus four GND MF circuits; PB_5V_OUT 500 mA allocation with reviewed 229.2 mA "
         "sustained and 381.2 mA service-peak budgets including FB-100 worst-case indication; ADR-0015 "
         "CAN1 FDCAN/read-only ownership with no LB "
-        "transceiver; CAN1_TX_ROUTE remains the PB DNP/open route. TCA9539-Q1 maps the approved JFB1 role-free "
-        "UI signals and powers up with all ports as inputs. CAN2/LIN/RS485 footprints are DNP by default. "
-        "USB VBUS is sense-only and cannot back-power PB_5V_OUT, LB_3V3_MAIN, or LB_3V3_IO. Reviewed footprint "
+        "transceiver; CAN1_TX_ROUTE remains the PB DNP/open route. TCA9539-Q1 maps the ten role-free channel LEDs "
+        "and slow UI signals and powers up with all ports as inputs. STM32 PD7 directly drives the timing-critical "
+        "LTC3212 LEDEN path. CAN2/LIN/RS485 footprints are DNP by default. USB VBUS uses a 5 V-tolerant "
+        "SN74LVC1G17-Q1 digital detector and cannot back-power PB_5V_OUT, LB_3V3_MAIN, or LB_3V3_IO. "
+        "ADC_REF is sourced and locally decoupled; AGND returns to GND at one documented zero-ohm point. Reviewed footprint "
         "binding and mechanical envelope remain governed by LB-100-pcb-layout-start-checklist.csv, "
         "LB-100-footprint-binding-inventory.csv, and LB-100-mechanical-envelope-inventory.csv. Do not create "
         "LB-100.kicad_pcb, Gerbers, drills, pick-place, BOM/CPL order package, or manufacturing outputs from this "
@@ -284,29 +313,56 @@ def build_lb() -> Schematic:
     sch = Schematic("LB-100", "LB-100 Logic Board — Value-Bearing Rev.1", notes)
     jpb = lb_jpb_nets()
     mcu_nets: dict[int, str | None] = {}
+    mcu_types: dict[int, str] = {}
     with (ROOT / "hardware/logic-board/LB-100/LB-100-stm32h563-pin-binding-precheck.csv").open(newline="", encoding="utf-8") as handle:
         for row in csv.DictReader(handle):
             if row["Package position"].isdigit():
-                mcu_nets[int(row["Package position"])] = row["Net"]
+                position = int(row["Package position"])
+                mcu_nets[position] = row["Net"]
+                evidence = f'{row["Peripheral or pin evidence"]} {row["Default or population rule"]}'.lower()
+                if "analog input" in evidence or "gpio input" in evidence or "interrupt input" in evidence:
+                    mcu_types[position] = "input"
+                elif "gpio output" in evidence or "pwm output" in evidence:
+                    mcu_types[position] = "output"
+                else:
+                    mcu_types[position] = "bidirectional"
     mcu_nets.update({
         6: "LB_3V3_MAIN", 8: "MCU_LSE_IN", 9: "MCU_LSE_OUT", 10: "GND", 11: "LB_3V3_MAIN",
         12: "MCU_HSE_IN", 13: "MCU_HSE_OUT", 14: "NRST", 19: "AGND", 20: "AGND", 21: "ADC_REF",
         22: "LB_3V3_ANALOG", 27: "GND", 28: "LB_3V3_MAIN", 48: "VCAP1", 49: "GND",
-        50: "LB_3V3_MAIN", 54: "IOX_INT_N", 57: "USB_VBUS_SENSE", 70: "USB_D_N", 71: "USB_D_P",
+        50: "LB_3V3_MAIN", 54: "IOX_INT_N", 57: "USB_VBUS_PRESENT", 70: "USB_D_N", 71: "USB_D_P",
         72: "SWDIO", 73: "LB_3V3_MAIN", 74: "GND",
         75: "LB_3V3_MAIN", 80: "MICROSD_CS_N", 81: "MICROSD_PWR_EN", 82: "RADIO_SENSOR_EN",
-        76: "SWCLK", 88: None, 94: "BOOT0", 97: "BLE_RESET_N", 98: "VCAP2", 99: "GND",
+        76: "SWCLK", 88: "STATUS_RGB_DATA", 94: "BOOT0", 97: "BLE_RESET_N", 98: "VCAP2", 99: "GND",
         100: "LB_3V3_MAIN",
+    })
+    mcu_types.update({
+        6: "power_in", 8: "input", 9: "output", 10: "power_in", 11: "power_in",
+        12: "input", 13: "output", 14: "input", 19: "power_in", 20: "power_in",
+        21: "power_in", 22: "power_in", 27: "power_in", 28: "power_in", 48: "power_out",
+        49: "power_in", 50: "power_in", 54: "input", 57: "input", 70: "bidirectional",
+        71: "bidirectional", 72: "bidirectional", 73: "power_in", 74: "power_in",
+        75: "power_in", 76: "input", 80: "output", 81: "output", 82: "output",
+        88: "output", 94: "input", 97: "output", 98: "power_out", 99: "power_in",
+        100: "power_in",
     })
     sch.add(c(
         "U1", "STM32H563VIT6", "LB100:LQFP-100_L14.0-W14.0-P0.50-LS16.0-BL",
         "https://www.st.com/resource/en/datasheet/stm32h563vi.pdf",
-        [(str(pos), STM32_NAMES[pos - 1], mcu_nets.get(pos)) for pos in range(1, 101)],
+        [(str(pos), STM32_NAMES[pos - 1], mcu_nets.get(pos), mcu_types.get(pos, "bidirectional")) for pos in range(1, 101)],
     ))
     sch.add(c(
         "JPB1", "FX18-100S-0.8SV10", "LB100:FX18-100S-0.8SV10_Hirose",
         "https://www.hirose.com/en/product/document?documentid=0000954081",
-        [(str(pin), jpb[pin], None if jpb[pin].startswith("SPARE_") else jpb[pin]) for pin in range(1, 101)] + [
+        [
+            (
+                str(pin),
+                jpb[pin],
+                None if jpb[pin].startswith("SPARE_") else jpb[pin],
+                "power_out" if pin in {1, 13} else "passive",
+            )
+            for pin in range(1, 101)
+        ] + [
             ("MF_A_PIN1_51_END", "MF_A_PIN1_51_END", "GND"),
             ("MF_B_PIN1_51_END", "MF_B_PIN1_51_END", "GND"),
             ("MF_A_PIN50_100_END", "MF_A_PIN50_100_END", "GND"),
@@ -314,7 +370,7 @@ def build_lb() -> Schematic:
         ],
     ))
     jfb_nets = [
-        "GND", "FB_3V3_OR_IO", "GND", "USB_D_P", "USB_D_N", "USB_CC1", "USB_CC2", "USB_VBUS_SENSE",
+        "GND", "FB_3V3_OR_IO", "GND", "USB_D_P", "USB_D_N", "USB_CC1", "USB_CC2", "USB_VBUS_DETECT_RAW",
         "STATUS_RGB_DATA", *[f"CH_LED_{index}" for index in range(1, 11)], "SERVICE_BTN", "RESET_BTN",
         "OLED_SCL", "OLED_SDA", "OLED_RST_OR_INT_DNP",
     ]
@@ -331,7 +387,7 @@ def build_lb() -> Schematic:
         ("1", "INT_N", "IOX_INT_N"), ("2", "A1", "GND"), ("3", "RESET_N", "NRST"),
         *[(str(4 + index), f"P0{index}", f"CH_LED_{index + 1}") for index in range(8)],
         ("12", "GND", "GND"), ("13", "P10", "CH_LED_9"), ("14", "P11", "CH_LED_10"),
-        ("15", "P12", "STATUS_RGB_DATA"), ("16", "P13", "SERVICE_BTN"),
+        ("15", "P12", None), ("16", "P13", "SERVICE_BTN"),
         ("17", "P14", "MICROSD_CARD_DETECT"), ("18", "P15", "IMU_INT1"),
         ("19", "P16", "RTC_INT_N"), ("20", "P17", "OLED_RST_OR_INT_DNP"),
         ("21", "A0", "GND"), ("22", "SCL", "PB_I2C_SCL"), ("23", "SDA", "PB_I2C_SDA"),
@@ -366,12 +422,12 @@ def build_lb() -> Schematic:
     ]))
     sch.add(c("U10", "BMI270", "LB100:LGA-14_L3.0-W2.5-P0.50-BR", "https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmi270-ds000.pdf", [
         ("1", "SDO", "GND"), ("2", "ASDx", None), ("3", "ASCx", None), ("4", "INT1", "IMU_INT1"),
-        ("5", "VDDIO", "RADIO_SENSOR_3V3"), ("6", "GNDIO", "GND"), ("7", "GND", "GND"),
+        ("5", "VDDIO", "LB_3V3_IO"), ("6", "GNDIO", "GND"), ("7", "GND", "GND"),
         ("8", "VDD", "RADIO_SENSOR_3V3"), ("9", "INT2", None), ("10", "OCSB", None), ("11", "OSDO", None),
-        ("12", "CSB", "RADIO_SENSOR_3V3"), ("13", "SCL", "PB_I2C_SCL"), ("14", "SDA", "PB_I2C_SDA"),
+        ("12", "CSB", "LB_3V3_IO"), ("13", "SCL", "PB_I2C_SCL"), ("14", "SDA", "PB_I2C_SDA"),
     ]))
     sch.add(c("U11", "VEML7700-TT", "LB100:SENSOR-SMD_EML7700-TT", "https://www.vishay.com/doc?84286=", [
-        ("1", "SCL", "PB_I2C_SCL"), ("2", "VDD", "RADIO_SENSOR_3V3"), ("3", "GND", "GND"), ("4", "SDA", "PB_I2C_SDA"),
+        ("1", "SCL", "PB_I2C_SCL"), ("2", "VDD", "LB_3V3_IO"), ("3", "GND", "GND"), ("4", "SDA", "PB_I2C_SDA"),
     ]))
     sch.add(c("JSD1", "TF-015", "LB100:TF-SMD_TF-015", "https://www.lcsc.com/datasheet/lcsc_datasheet_2112221030_SOFNG-TF-015_C113206.pdf", [
         ("1", "DAT2", "MICROSD_DAT2"), ("2", "CD_DAT3", "MICROSD_CS_N"), ("3", "CMD", "PB_SPI_MOSI"),
@@ -385,7 +441,7 @@ def build_lb() -> Schematic:
             ("4", "CT", f"{output}_CT"), ("5", "QOD", output), ("6", "VOUT", output),
         ]))
     sch.add(c("JBT1", "BACKUP_BATTERY_2V3_TO_3V6_DNP", "LB100:PinHeader_1x02_P2.54mm_Vertical", "../LB-100-component-decision-record.md", [
-        ("1", "BACKUP_AON", "BACKUP_AON"), ("2", "GND", "GND"),
+        ("1", "BACKUP_AON", "BACKUP_AON", "power_out"), ("2", "GND", "GND", "passive"),
     ], dnp=True))
     sch.add(c("JDBG1", "SWD_2x3_1.27mm", "LB100:PinHeader_2x03_P1.27mm_Vertical", "https://developer.arm.com/documentation/101416/latest/", [
         ("1", "VTREF", "LB_3V3_MAIN"), ("2", "SWDIO", "SWDIO"), ("3", "GND", "GND"),
@@ -397,6 +453,11 @@ def build_lb() -> Schematic:
     sch.add(c("Y2", "ABS07AIG-32.768kHz-7-T", "LB100:Crystal_SMD_3215-2Pin", "https://abracon.com/Resonators/ABS07AIG.pdf", [
         ("1", "XIN", "MCU_LSE_IN"), ("2", "XOUT", "MCU_LSE_OUT"),
     ]))
+    sch.add(c("U14", "SN74LVC1G17QDBVRQ1", "LB100:SOT-25_L3.0-W1.6-P0.95-LS2.8-TL", "https://www.ti.com/lit/ds/symlink/sn74lvc1g17-q1.pdf", [
+        ("1", "NC", None, "no_connect"), ("2", "A", "USB_VBUS_DETECT_RAW", "input"),
+        ("3", "GND", "GND", "power_in"), ("4", "Y", "USB_VBUS_PRESENT", "output"),
+        ("5", "VCC", "LB_3V3_IO", "power_in"),
+    ]))
 
     r0603 = "LB100:R_C_0603_1608Metric"
     c0603 = r0603
@@ -405,9 +466,9 @@ def build_lb() -> Schematic:
         passive("C2", "1uF 6.3V X7R", c0603, "LB_3V3_MAIN", "GND"),
         passive("C3", "10uF 6.3V X7R", "LB100:R_C_0805_2012Metric", "LB_3V3_MAIN", "GND"),
         passive("R1", "100k 1%", r0603, "PB_PWR_GOOD", "GND"),
-        passive("R2", "0R", r0603, "LB_3V3_MAIN", "LB_3V3_IO"),
-        passive("R3", "0R", r0603, "LB_3V3_MAIN", "FB_3V3_OR_IO"),
-        passive("FB1", "600R@100MHz 0.2A", r0603, "LB_3V3_MAIN", "LB_3V3_ANALOG"),
+        c("R2", "0R", r0603, "", [("1", "1", "LB_3V3_MAIN", "passive"), ("2", "2", "LB_3V3_IO", "power_out")]),
+        c("R3", "0R", r0603, "", [("1", "1", "LB_3V3_MAIN", "passive"), ("2", "2", "FB_3V3_OR_IO", "power_out")]),
+        c("FB1", "600R@100MHz 0.2A", r0603, "", [("1", "1", "LB_3V3_MAIN", "passive"), ("2", "2", "LB_3V3_ANALOG", "power_out")]),
         passive("C4", "1uF 6.3V X7R", c0603, "LB_3V3_ANALOG", "AGND"),
         passive("C5", "100nF 6.3V X7R", c0603, "LB_3V3_ANALOG", "AGND"),
         passive("C6", "2.2uF 6.3V X7R", c0603, "VCAP1", "GND"),
@@ -431,6 +492,12 @@ def build_lb() -> Schematic:
         passive("C12", "8.2pF 50V C0G", c0603, "MCU_LSE_OUT", "GND"),
         passive("C13", "1nF 50V C0G", c0603, "MICROSD_3V3_CT", "GND"),
         passive("C14", "1nF 50V C0G", c0603, "RADIO_SENSOR_3V3_CT", "GND"),
+        c("R16", "0R", r0603, "", [("1", "1", "LB_3V3_ANALOG", "passive"), ("2", "2", "ADC_REF", "power_out")]),
+        c("R17", "0R single-point analog return", r0603, "", [("1", "1", "AGND", "power_out"), ("2", "2", "GND", "passive")]),
+        passive("C28", "1uF 6.3V X7R", c0603, "ADC_REF", "AGND"),
+        passive("C29", "100nF 6.3V X7R", c0603, "ADC_REF", "AGND"),
+        passive("C30", "100nF 6.3V X7R", c0603, "LB_3V3_IO", "GND"),
+        passive("C31", "100nF 6.3V X7R BMI270 VDDIO", c0603, "LB_3V3_IO", "GND"),
     ]
     for index in range(15, 28):
         rail = "LB_3V3_MAIN" if index < 22 else "RADIO_SENSOR_3V3" if index < 26 else "MICROSD_3V3"
@@ -443,7 +510,7 @@ def build_lb() -> Schematic:
 def build_fb() -> Schematic:
     notes = (
         "FB-100 reviewed value-bearing Rev.1 capture. USB-C is USB2 device-only with two 5.1k Rd resistors, "
-        "USBLC6-2SC6 flow-through ESD, VBUS sense-only divider, and no connection from USB VBUS to FB_3V3_OR_IO. "
+        "USBLC6-2SC6 flow-through ESD, current-limited VBUS detect, and no connection from USB VBUS to FB_3V3_OR_IO. "
         "LTC3212 converts the approved STATUS_RGB_DATA single wire into three regulated cathode currents for the "
         "common-anode RGB LED. CH_LED_1..CH_LED_10 remain role-free and default off while LB TCA9539-Q1 ports "
         "are inputs. OLED is an optional four-wire I2C module header and is DNP by default. JFB1 uses the approved "
@@ -466,11 +533,14 @@ def build_fb() -> Schematic:
         ("4", "I_O2_OUT", "USB_D_N"), ("5", "VBUS", "USB_VBUS"), ("6", "I_O1_OUT", "USB_D_P"),
     ]))
     jfb_nets = [
-        "GND", "FB_3V3_OR_IO", "GND", "USB_D_P", "USB_D_N", "USB_CC1", "USB_CC2", "USB_VBUS_SENSE",
+        "GND", "FB_3V3_OR_IO", "GND", "USB_D_P", "USB_D_N", "USB_CC1", "USB_CC2", "USB_VBUS_DETECT_RAW",
         "STATUS_RGB_DATA", *[f"CH_LED_{index}" for index in range(1, 11)], "SERVICE_BTN", "RESET_BTN",
         "OLED_SCL", "OLED_SDA", "OLED_RST_OR_INT_DNP",
     ]
-    sch.add(c("JFB1", "AFC07-S24ECA-00", "FB100:FPC-SMD_AFC07-S24ECA-00", "https://jlcpcb.com/partdetail/AFC07-S24ECA-00/C262643", [(str(index), net, net) for index, net in enumerate(jfb_nets, 1)] + [("25", "SHIELD_A", "GND"), ("26", "SHIELD_B", "GND")]))
+    sch.add(c("JFB1", "AFC07-S24ECA-00", "FB100:FPC-SMD_AFC07-S24ECA-00", "https://jlcpcb.com/partdetail/AFC07-S24ECA-00/C262643", [
+        (str(index), net, net, "power_out" if index in {1, 2} else "passive")
+        for index, net in enumerate(jfb_nets, 1)
+    ] + [("25", "SHIELD_A", "GND", "passive"), ("26", "SHIELD_B", "GND", "passive")]))
     sch.add(c("U1", "LTC3212EDDB#TRPBF", "FB100:DFN-12-1EP_2x3mm_P0.45mm", "https://www.analog.com/media/en/technical-documentation/data-sheets/3212fb.pdf", [
         ("1", "CP", "RGB_CP"), ("2", "CPO", "RGB_LED_ANODE"), ("3", "LEDEN", "STATUS_RGB_DATA"),
         ("4", "ISETB", "FB_3V3_OR_IO"), ("5", "ISETR", "FB_3V3_OR_IO"), ("6", "ISETG", "RGB_ISETG"),
@@ -497,9 +567,8 @@ def build_fb() -> Schematic:
     extra = [
         passive("R11", "5.1k 1%", "FB100:R_C_0603_1608Metric", "USB_CC1", "GND"),
         passive("R12", "5.1k 1%", "FB100:R_C_0603_1608Metric", "USB_CC2", "GND"),
-        passive("R13", "100k 1%", "FB100:R_C_0603_1608Metric", "USB_VBUS", "USB_VBUS_SENSE"),
-        passive("R14", "27k 1%", "FB100:R_C_0603_1608Metric", "USB_VBUS_SENSE", "GND"),
-        passive("C1", "100nF 16V X7R", "FB100:R_C_0603_1608Metric", "USB_VBUS_SENSE", "GND"),
+        passive("R13", "100k 1% current limit", "FB100:R_C_0603_1608Metric", "USB_VBUS", "USB_VBUS_DETECT_RAW"),
+        passive("C1", "100nF 16V X7R", "FB100:R_C_0603_1608Metric", "USB_VBUS_DETECT_RAW", "GND"),
         passive("R15", "1M 1%", "FB100:R_C_0603_1608Metric", "USB_SHIELD", "GND"),
         passive("C2", "1nF 1kV C0G", "FB100:R_C_0603_1608Metric", "USB_SHIELD", "GND"),
         passive("C3", "1uF 6.3V X7R", "FB100:R_C_0603_1608Metric", "FB_3V3_OR_IO", "GND"),

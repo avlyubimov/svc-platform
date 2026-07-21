@@ -5,7 +5,7 @@ from __future__ import annotations
 import csv
 import io
 
-from .model import MOSFET, TRANSIENT
+from .model import LOAD_DUMP, MOSFET, TVS
 from .power import (
     BOOTSTRAP_F,
     Q1_CASE_ACCEPTANCE_C,
@@ -16,7 +16,7 @@ from .power import (
     q1_conduction_w,
     q1_junction_at_case_acceptance_c,
 )
-from .transient import margins
+from .transient import load_dump_results
 
 
 def _csv(rows: list[list[str]]) -> str:
@@ -27,40 +27,32 @@ def _csv(rows: list[list[str]]) -> str:
 
 
 def render_transient() -> str:
-    rows = [["Evidence item", "Value", "Unit", "Basis", "Result"]]
-    inputs = (
-        ("Waveform", TRANSIENT.waveform, "", "Reviewed conservative source model"),
-        ("Open-circuit source voltage", f"{TRANSIENT.open_circuit_v:.1f}", "V", "Model input"),
-        ("Equivalent source resistance", f"{TRANSIENT.source_resistance_ohm:.4f}", "ohm", "(100 V - 53.3 V) / 124 A"),
-        ("TVS", "SM8S33AHM3/I", "", "Active ADR-0011 branch"),
-        ("25 C clamp", f"{TRANSIENT.tvs_clamp_25c_v:.2f}", "V", "124 A datasheet point"),
-        ("Initial TVS junction", f"{TRANSIENT.tvs_initial_junction_c:.1f}", "degC", "Hot-soak pre-layout bound"),
-        ("Temperature coefficient", f"{100 * TRANSIENT.tvs_temp_coefficient_per_c:.3f}", "%/degC", "Vishay datasheet"),
-        ("Temperature-adjusted clamp", f"{TRANSIENT.hot_clamp_v:.2f}", "V", "Clamp multiplied by temperature coefficient"),
-        ("Clamp-loop inductance ceiling", f"{TRANSIENT.loop_inductance_h * 1e9:.1f}", "nH", "Hard PCB constraint"),
-        ("Peak current slew", f"{TRANSIENT.current_slew_a_per_s / 1e6:.1f}", "A/us", "10 us rise rounded above 124 A / 10 us"),
-        ("Loop overshoot", f"{TRANSIENT.loop_overshoot_v:.2f}", "V", "L x di/dt"),
-        ("Model plus probe uncertainty", f"{TRANSIENT.uncertainty_v:.2f}", "V", "Conservative allowance"),
-        ("Bounded downstream stress", f"{TRANSIENT.bounded_stress_v:.2f}", "V", "Hot clamp + loop overshoot + uncertainty"),
+    rows = [[
+        "Us V", "Ri ohm", "td ms", "Initial Tj C", "Peak TVS current A",
+        "Peak clamp V", "Peak TVS power W", "TVS energy J", "Typical ZthJM C/W",
+        "Predicted peak Tj C", "Margin to LM74700 60 V", "Result", "Basis",
+    ]]
+    basis = (
+        f"ISO 16750-2 Test A envelope; {TVS.mpn} max VBR/clamp/tolerance; "
+        "temperature coefficient and self-heating; typical Vishay ZthJM Foster fit; "
+        f"{LOAD_DUMP.pulse_count} pulses at {LOAD_DUMP.pulse_interval_s:.0f} s require final validation"
     )
-    rows.extend([[name, value, unit, basis, "INPUT"] for name, value, unit, basis in inputs])
-    rows.extend(
-        [
-            margin.item,
-            f"{margin.margin_v:.2f}",
-            "V margin",
-            f"{margin.limit_v:.1f} V limit - {TRANSIENT.bounded_stress_v:.2f} V stress",
-            margin.result,
-        ]
-        for margin in margins()
-    )
-    rows.append([
-        "Layout escape condition",
-        "Measured stress must remain below 60 V and modeled loop inductance at or below 20 nH",
-        "",
-        "PB-BENCH-004 rejects the layout or protection branch if either limit is exceeded",
-        "MANDATORY POST-PROTOTYPE",
-    ])
+    for result in load_dump_results():
+        rows.append([
+            f"{result.source_voltage_v:.0f}",
+            f"{result.source_resistance_ohm:g}",
+            f"{result.duration_s * 1000:.0f}",
+            f"{result.initial_junction_c:.0f}",
+            f"{result.peak_current_a:.2f}",
+            f"{result.peak_clamp_v:.2f}",
+            f"{result.peak_power_w:.1f}",
+            f"{result.energy_j:.2f}",
+            f"{result.zth_jm_c_per_w:.3f}",
+            f"{result.peak_junction_c:.1f}",
+            f"{result.recommended_margin_v:.2f}",
+            result.result,
+            basis,
+        ])
     return _csv(rows)
 
 

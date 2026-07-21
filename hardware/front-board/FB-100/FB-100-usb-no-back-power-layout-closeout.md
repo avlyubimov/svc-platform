@@ -34,7 +34,7 @@ Use `FB-100-usb-no-back-power-layout-rules.csv` as the layout model:
 - Place USB ESD on FB-100 between the USB-C receptacle and JFB1.
 - Route `USB_D_P` and `USB_D_N` as a short coupled pair with continuous ground
   reference and no avoidable stubs or vias.
-- Keep `USB_VBUS_SENSE` as a sense-only net; do not pour VBUS and do not
+- Keep `USB_VBUS_DETECT_RAW` as a current-limited detect-only net; do not pour VBUS and do not
   connect it to `FB_3V3_OR_IO`, `PB_5V_OUT`, `LB_3V3_IO`, PB-100, or outputs.
 - Keep `USB_CC1` and `USB_CC2` device-role only; no source-power behavior.
 - Treat shell and ESD return as a reviewed ESD/chassis return network, not as

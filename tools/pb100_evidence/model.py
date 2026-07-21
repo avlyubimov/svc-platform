@@ -48,38 +48,44 @@ class OutputClass:
 
 
 @dataclass(frozen=True)
-class TransientModel:
-    waveform: str
-    open_circuit_v: float
-    tvs_clamp_25c_v: float
-    tvs_test_current_a: float
-    tvs_initial_junction_c: float
-    tvs_temp_coefficient_per_c: float
+class LoadDumpRequirement:
+    source_voltages_v: tuple[float, ...]
+    source_resistances_ohm: tuple[float, ...]
+    durations_s: tuple[float, ...]
+    initial_junctions_c: tuple[float, ...]
+    battery_voltage_v: float
+    pulse_count: int
+    pulse_interval_s: float
+    required_recommended_margin_v: float
+
+
+@dataclass(frozen=True)
+class TvsModel:
+    mpn: str
+    vbr_max_25c_v: float
+    clamp_max_25c_v: float
+    clamp_test_current_a: float
+    temp_coefficient_per_c: float
     reference_temperature_c: float
+    max_junction_c: float
     loop_inductance_h: float
     current_slew_a_per_s: float
-    uncertainty_v: float
+    voltage_uncertainty_v: float
+    foster_thermal_resistances_c_per_w: tuple[float, ...]
+    foster_thermal_time_constants_s: tuple[float, ...]
     lm74700_recommended_max_v: float
     lm74700_absolute_max_v: float
     mosfet_limit_v: float
     controller_limit_v: float
+    datasheet: str
 
     @property
-    def source_resistance_ohm(self) -> float:
-        return (self.open_circuit_v - self.tvs_clamp_25c_v) / self.tvs_test_current_a
-
-    @property
-    def hot_clamp_v(self) -> float:
-        delta_c = self.tvs_initial_junction_c - self.reference_temperature_c
-        return self.tvs_clamp_25c_v * (1 + self.tvs_temp_coefficient_per_c * delta_c)
+    def dynamic_resistance_25c_ohm(self) -> float:
+        return (self.clamp_max_25c_v - self.vbr_max_25c_v) / self.clamp_test_current_a
 
     @property
     def loop_overshoot_v(self) -> float:
         return self.loop_inductance_h * self.current_slew_a_per_s
-
-    @property
-    def bounded_stress_v(self) -> float:
-        return self.hot_clamp_v + self.loop_overshoot_v + self.uncertainty_v
 
 
 MOSFET = Mosfet(
@@ -170,19 +176,37 @@ OUTPUT_CLASSES = (
 )
 
 
-TRANSIENT = TransientModel(
-    waveform="100 V open-circuit 10/1000 us bounded source",
-    open_circuit_v=100.0,
-    tvs_clamp_25c_v=53.3,
-    tvs_test_current_a=124.0,
-    tvs_initial_junction_c=125.0,
-    tvs_temp_coefficient_per_c=0.00091,
+LOAD_DUMP = LoadDumpRequirement(
+    source_voltages_v=(79.0, 101.0),
+    source_resistances_ohm=(0.5, 4.0),
+    durations_s=(0.040, 0.400),
+    initial_junctions_c=(25.0, 125.0),
+    battery_voltage_v=13.5,
+    pulse_count=10,
+    pulse_interval_s=60.0,
+    required_recommended_margin_v=5.0,
+)
+
+
+TVS = TvsModel(
+    mpn="SM8S33AHM3/I",
+    vbr_max_25c_v=40.6,
+    clamp_max_25c_v=53.3,
+    clamp_test_current_a=124.0,
+    temp_coefficient_per_c=0.00091,
     reference_temperature_c=25.0,
+    max_junction_c=175.0,
     loop_inductance_h=20e-9,
     current_slew_a_per_s=15e6,
-    uncertainty_v=1.0,
+    voltage_uncertainty_v=1.0,
+    # Three-term Foster fit to the typical junction-to-mount transient thermal
+    # impedance curve in Vishay document 98647, revision 14-Oct-2025.  Typical
+    # data is useful for screening but cannot close a worst-case release gate.
+    foster_thermal_resistances_c_per_w=(0.06, 0.12, 0.17),
+    foster_thermal_time_constants_s=(0.0004, 0.010, 0.150),
     lm74700_recommended_max_v=60.0,
     lm74700_absolute_max_v=65.0,
     mosfet_limit_v=80.0,
     controller_limit_v=100.0,
+    datasheet="https://www.vishay.com/docs/98647/sm8s85ahm3.pdf",
 )
