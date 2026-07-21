@@ -44,10 +44,10 @@ remaining gates.
 - Output stage: TPS48110AQDGXRQ1-class external high-side controller remains the
   baseline for all OUT1..OUT10 channels; low-current channels keep ADR-0011 no
   direct 40 V smart-switch rail.
-- Voltage margin: ADR-0018 selects U1 `LM74930Q1RGERQ1` hard cutoff at
+- Voltage margin: ADR-0018 selects U1 `LM74930QRGERQ1` hard cutoff at
   48.99-54.89 V with raw-side Q2 `IAUTN15S6N025ATMA1` 150 V TOLL. The
   historical single `SM8S33AHM3/I` HM3 DO-218AC branch remains rejected and
-  D1 is DNP. PBREL-007 design selection is Closed; actual overshoot, extracted
+  D1 is DNP. PBREL-007 pre-layout stage is Closed while the blocker remains Conditional overall; actual overshoot, extracted
   dynamic SOA, and PB-BENCH-004 remain later gates.
 - Input reverse protection: selected Q1 IAUT300N08S5N012ATMA2 80 V MOSFET
   uses the LM74930-Q1 protected DGATE side. Passive PCB copper plus a thermal

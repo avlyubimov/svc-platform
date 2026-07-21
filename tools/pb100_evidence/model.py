@@ -94,8 +94,14 @@ class SurgeStopper:
     cutoff_mosfet_mpn: str
     cutoff_mosfet_voltage_v: float
     cutoff_mosfet_rds_on_max_25c_ohm: float
+    cutoff_mosfet_hot_multiplier: float
     cutoff_mosfet_gate_charge_max_c: float
-    cutoff_mosfet_avalanche_energy_j: float
+    cutoff_mosfet_rth_jc_max_k_per_w: float
+    cutoff_mosfet_max_junction_c: float
+    cutoff_mosfet_soa_reference_temperature_c: float
+    cutoff_mosfet_soa_reference_voltage_v: float
+    cutoff_mosfet_soa_reference_pulse_s: float
+    cutoff_mosfet_soa_current_min_a: float
     ov_top_ohm: float
     ov_bottom_ohm: float
     resistor_tolerance: float
@@ -154,6 +160,18 @@ class SurgeStopper:
     @property
     def conservative_turnoff_s(self) -> float:
         return self.hgate_turnoff_delay_max_s + self.gate_discharge_s
+
+    @property
+    def cutoff_mosfet_rds_on_hot_ohm(self) -> float:
+        return self.cutoff_mosfet_rds_on_max_25c_ohm * self.cutoff_mosfet_hot_multiplier
+
+    def soa_current_limit_a(self, initial_junction_c: float) -> float:
+        temperature_headroom = self.cutoff_mosfet_max_junction_c - initial_junction_c
+        reference_headroom = (
+            self.cutoff_mosfet_max_junction_c
+            - self.cutoff_mosfet_soa_reference_temperature_c
+        )
+        return self.cutoff_mosfet_soa_current_min_a * temperature_headroom / reference_headroom
 
 
 MOSFET = Mosfet(
@@ -281,12 +299,18 @@ TVS = TvsModel(
 
 
 SURGE_STOPPER = SurgeStopper(
-    controller_mpn="LM74930Q1RGERQ1",
+    controller_mpn="LM74930QRGERQ1",
     cutoff_mosfet_mpn="IAUTN15S6N025ATMA1",
     cutoff_mosfet_voltage_v=150.0,
     cutoff_mosfet_rds_on_max_25c_ohm=0.0025,
+    cutoff_mosfet_hot_multiplier=1.8,
     cutoff_mosfet_gate_charge_max_c=139e-9,
-    cutoff_mosfet_avalanche_energy_j=0.490,
+    cutoff_mosfet_rth_jc_max_k_per_w=0.42,
+    cutoff_mosfet_max_junction_c=175.0,
+    cutoff_mosfet_soa_reference_temperature_c=25.0,
+    cutoff_mosfet_soa_reference_voltage_v=101.0,
+    cutoff_mosfet_soa_reference_pulse_s=10e-6,
+    cutoff_mosfet_soa_current_min_a=200.0,
     ov_top_ohm=84_400.0,
     ov_bottom_ohm=1_000.0,
     resistor_tolerance=0.01,

@@ -3443,9 +3443,15 @@ complete thermal path of no more than 6.20 K/W. PBREL-006 closes as a
 design-selection gate while extraction and PB-BENCH-010 remain later stages.
 
 Decision: replace the failed single-SM8S33AHM3/I load-dump branch with
-`LM74930Q1RGERQ1` hard cutoff, 42.2 kOhm + 42.2 kOhm / 1.00 kOhm OV divider, protected 80 V
+`LM74930QRGERQ1` hard cutoff, 42.2 kOhm + 42.2 kOhm / 1.00 kOhm OV divider, protected 80 V
 Q1 on DGATE, and raw-side `IAUTN15S6N025ATMA1` 150 V Q2 on HGATE. Generated
-evidence gives 48.99-54.89 V cutoff, 0.0327 J worst conservative transition
-energy, 15.0x energy margin, and explicit load disconnection. PBREL-007 closes
-only as a pre-layout design gate; extracted overshoot/SOA and PB-BENCH-004
-remain post-layout/prototype gates. Production and field use remain NO-GO.
+evidence gives 48.99-54.89 V cutoff and explicit load disconnection.
+
+Correction: the initial 0.0327 J to 0.490 J avalanche comparison did not prove
+linear-mode SOA. Replace it with 16 cold/hot ISO corner rows, a conservative
+101 V / 40 A / 10 us SOA screen derated to 66.67 A at 125 degC, and generated
+Q2 conduction evidence: 4.000 W at the 25 degC maximum, 7.200 W hot, and a
+3.47 K/W post-layout full-path limit. PBREL-007 remains Conditional overall;
+its closed pre-layout stage preserves `LAYOUT-ONLY`. Extracted overshoot/SOA
+and PB-BENCH-004 remain post-layout/prototype gates. Production and field use
+remain NO-GO.

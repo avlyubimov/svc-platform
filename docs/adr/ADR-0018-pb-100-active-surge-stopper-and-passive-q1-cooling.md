@@ -21,7 +21,7 @@ thermal evidence that cannot exist before PCB layout.
   thermal extraction remain its post-layout gate; PB-BENCH-010 at 40 A remains
   its prototype-qualification gate.
 - Replace LM74700-Q1 plus the active single-SM8S33A branch with
-  `LM74930Q1RGERQ1` in hard overvoltage-cutoff mode. Load disconnection during
+  `LM74930QRGERQ1` in hard overvoltage-cutoff mode. Load disconnection during
   load dump is explicitly allowed.
 - Use two 42.2 kOhm 1% series upper resistors and a 1.00 kOhm 1% lower
   resistor. The split keeps each upper resistor below 51 V at the 101 V design
@@ -41,26 +41,36 @@ thermal evidence that cannot exist before PCB layout.
 - Q1 alternative A: IAUT300N08S5N014ATMA1; same package but higher loss.
 - Q1 alternative B: BUK7J2R4-80MX; non-drop-in and higher loss.
 - Selected Q2: IAUTN15S6N025ATMA1; 150 V, 2.5 mOhm maximum at 25 degC,
-  490 mJ single-pulse avalanche rating, TOLL, AEC-Q101 qualified.
+  TOLL, AEC-Q101 qualified. Its avalanche rating is not used as linear-mode
+  turn-off evidence.
 - Q2 alternative A: IAUTN12S5N017ATMA1; lower loss but only 19 V static margin
   to 101 V before layout overshoot.
 - Q2 alternative B: IAUTN15S6N038ATMA1; 150 V but higher conduction loss.
 
 ## Margins and Evidence
 
-The generated pre-layout model covers every 79/101 V, 0.5/4 ohm, and
-40/400 ms corner. It uses the 7 us maximum LM74930-Q1 OV deglitch plus the
-minimum 128 mA HGATE sink and Q2 maximum 139 nC gate charge. The worst
-conservative transition-energy bound is 0.0327 J, giving 15.0x margin to the
-Q2 0.490 J single-pulse avalanche rating. Q2 has 49 V static VDS margin to the
-101 V source; protected Q1 retains 25.11 V to its 80 V rating at the maximum
-54.89 V cutoff.
+The generated pre-layout model covers all 16 combinations of 79/101 V,
+0.5/4 ohm, 40/400 ms, and 25/125 degC initial junction temperature. It uses
+the 7 us maximum LM74930-Q1 OV deglitch plus the minimum 128 mA HGATE sink and
+Q2 maximum 139 nC gate charge, giving an 8.09 us turn-off bound. Q2 is screened
+as a linear-mode switch at 40 A against the longer 10 us SOA curve. A
+conservative digitized lower bound of 200 A at 101 V and 25 degC is derated by
+junction-temperature headroom to 66.67 A at 125 degC, leaving 1.67x current
+margin. The 0.0327 J rectangular transition-energy bound is retained only as
+supporting information, not as avalanche or SOA qualification.
 
-This closes only pre-layout architecture and component selection. Extracted
-loop inductance, switching overshoot, Q2 dynamic SOA, copper/current density,
-both MOSFET thermal paths, and enclosure coupling remain mandatory post-layout
-evidence. PB-BENCH-004 and PB-BENCH-010 remain mandatory after an engineering
-prototype exists.
+Q2 dissipates 4.000 W at 40 A using the 2.5 mOhm 25 degC maximum. A
+conservative 1.8x hot multiplier gives 4.50 mOhm and 7.200 W. At 125 degC
+ambient and a 150 degC design target, the complete Q2 ambient-to-junction path
+must be no worse than 3.47 K/W. Q2 has 49 V static VDS margin to the 101 V
+source; protected Q1 retains 25.11 V to its 80 V rating at the maximum 54.89 V
+cutoff.
+
+This closes the PBREL-007 pre-layout stage and authorizes only `LAYOUT-ONLY`.
+PBREL-007 remains Conditional overall. Extracted loop inductance, switching
+overshoot, Q2 dynamic SOA, copper/current density, both MOSFET thermal paths,
+and enclosure coupling remain mandatory post-layout evidence. PB-BENCH-004 and
+PB-BENCH-010 remain mandatory after an engineering prototype exists.
 
 ## Production and Lifetime
 
@@ -73,8 +83,9 @@ remains 10-15 years, subject to controlled alternates and lifecycle recheck.
 
 ## Consequences
 
-- PBREL-006 and PBREL-007 pre-layout design stages are closed and individually
-  authorize `LAYOUT-ONLY`.
+- PBREL-006 is closed as a design-selection blocker. PBREL-007 remains
+  Conditional overall while its closed pre-layout stage authorizes
+  `LAYOUT-ONLY`.
 - No `.kicad_pcb` or manufacturing package is created by this decision.
 - `PROTO-ONLY` remains blocked until post-layout extraction is reviewed.
 - Production and field use remain `NO-GO` until prototype qualification and all
@@ -88,4 +99,5 @@ remains 10-15 years, subject to controlled alternates and lifecycle recheck.
 - Infineon Q1 datasheet: https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf
 - Infineon Q2 datasheet: https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn15s6n025-datasheet-en.pdf
 - `hardware/power-board/PB-100/PB-100-input-q1-evidence.csv`
+- `hardware/power-board/PB-100/PB-100-input-q2-evidence.csv`
 - `hardware/power-board/PB-100/PB-100-surge-stopper-evidence.csv`

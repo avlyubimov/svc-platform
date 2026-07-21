@@ -31,7 +31,7 @@ order.
 | Total current shunt | Bourns CSS4J-4026R-L500F-class 0.5 mΩ four-terminal shunt | Bourns CSS4J-4026R-1L00F-class 1.0 mΩ; Isabellenhuette BVN/BAS or equivalent AEC-Q200 four-terminal family | CSS4J-4026 or reviewed power shunt | 0.5 mΩ gives 30 mV at 60 A and 1.8 W; compatible with INA228 ±40.96 mV range candidate |
 | Temperature sensor | TDK NTCGS103JF103FT8-class 10 kΩ AEC-Q200 NTC | Vishay NTCS0402E3 10 kΩ AEC-Q200 150 °C class; Murata NCU18XH103D6SRB-class 10 kΩ 0603 AEC-Q200 150 °C; TI TMP117/TMP112-class digital sensor optional | 0402 preferred for NTC; SOT/DFN only for optional digital sensor | PB-100 uses PCB reference plus two power-zone thermal points; divider values and calibration remain schematic-freeze items |
 | Logic buck regulator | TI LM5164-Q1 | TI LM5013-Q1; TI TPS54360B-Q1/TPS54360-Q1 | SOIC/HSOIC PowerPAD | LM5164-Q1 for 1 A 100 V rail; LM5013-Q1 preferred over 60 V family if more current is needed |
-| Input active cutoff and reverse protection | TI LM74930Q1RGERQ1 selected | TI LM74800-Q1 family; TI LM74900-Q1 family after full cutoff/timing revalidation | VQFN-24 RGE selected | Common-source hard cutoff must remain no higher than 55 V |
+| Input active cutoff and reverse protection | TI LM74930QRGERQ1 selected | TI LM74800-Q1 family; TI LM74900-Q1 family after full cutoff/timing revalidation | VQFN-24 RGE selected | Common-source hard cutoff must remain no higher than 55 V |
 | Raw-side surge cutoff MOSFET | Infineon IAUTN15S6N025ATMA1 150 V TOLL selected | 150 V automotive TOLL family; 150 V automotive LFPAK family after SOA/footprint revalidation | PG-HSOF-8-1 TOLL selected | Generated transition-energy screen passes; extracted dynamic SOA remains post-layout |
 | Input reverse MOSFET | Infineon IAUT300N08S5N012ATMA2 80 V TOLL selected | Infineon IAUT300N08S5N014ATMA1 same-footprint TOLL; Nexperia BUK7J2R4-80MX 80 V LFPAK56E non-drop-in | PG-HSOF-8-1 TOLL selected with segmented paste | Generated 40 A thermal bound and pre-layout sourcing pass; plane/polygon/bus and prototype thermal acceptance remain gates |
 | Legacy input TVS | Vishay SM8S33AHM3/I DNP only | Littelfuse SLD8S33A; Diodes DM8W33AQ-13; Bourns SM8S33A-Q retained as rejected comparisons | DO-218AC footprint retained unpopulated | A single TVS is not the approved load-dump solution under ADR-0018 |
@@ -51,7 +51,7 @@ The current strategy is:
 - All Rev.1 outputs: TPS48110AQDGXRQ1 high-side controller plus selected
   IAUT300N08S5N012ATMA2 80 V PG-HSOF-8-1 TOLL N-MOSFET.
 - Low-current integrated smart switches: deferred alternatives only.
-- Input active cutoff: LM74930Q1RGERQ1 with common-source external MOSFETs.
+- Input active cutoff: LM74930QRGERQ1 with common-source external MOSFETs.
 - Raw-side cutoff MOSFET: IAUTN15S6N025ATMA1 150 V TOLL selected for Q2.
 - Input reverse and output MOSFET: IAUT300N08S5N012ATMA2 80 V TOLL selected,
   with IAUT300N08S5N014ATMA1 as the same-footprint controlled alternative and
@@ -86,8 +86,8 @@ The current strategy is:
   rejected 60 V history, not as a Rev.1 assembly substitute:
   https://www.lcsc.com/product-detail/C3279576.html and
   https://www.vishay.com/docs/77277/sidr626ldp.pdf
-- TI LM74930Q1RGERQ1 is the selected active surge-stopper controller:
-  https://www.ti.com/product/LM74930-Q1/part-details/LM74930Q1RGERQ1
+- TI LM74930QRGERQ1 is the selected active surge-stopper controller:
+  https://www.ti.com/product/LM74930-Q1/part-details/LM74930QRGERQ1
 - Infineon IAUTN15S6N025ATMA1 is the selected 150 V raw-side Q2:
   https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn15s6n025-datasheet-en.pdf
 - Infineon IAUTN06S5N008 is retained only as rejected 60 V TOLL history:

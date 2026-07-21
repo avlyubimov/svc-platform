@@ -3,12 +3,12 @@ J1,INPUT_CONNECTOR,PB100_INPUT_CONNECTOR_CLASS_PRELIM,Battery positive,VBAT_RAW,
 J1,INPUT_CONNECTOR,PB100_INPUT_CONNECTOR_CLASS_PRELIM,Battery return,GND,Harness to PB-100,Return path present,Ground return and harness gauge review closes
 D1,INPUT_TVS,PB100_SM8S33AHM3I,Legacy clamp high side,VBAT_RAW,DNP footprint,Not populated under ADR-0018,Do not credit D1 as load-dump protection
 D1,INPUT_TVS,PB100_SM8S33AHM3I,Legacy clamp return,GND,DNP footprint,Not populated under ADR-0018,Do not credit D1 as load-dump protection
-U1,INPUT_IDEAL_DIODE,PB100_LM74930Q1RGERQ1,Common-source anode sense,INPUT_COMMON_SOURCE,PB-100 sense,Follows Q1/Q2 common source,Common-source topology review closes
-U1,INPUT_IDEAL_DIODE,PB100_LM74930Q1RGERQ1,Protected cathode sense,VBAT_REV_PROT,PB-100 sense,Valid after Q1 before shunt,Protected-node threshold review closes
-U1,INPUT_IDEAL_DIODE,PB100_LM74930Q1RGERQ1,Q1 ideal-diode gate,Q1_DGATE,Controller to Q1,Off when controller unpowered,DGATE turn-off and Q1 package review closes
-U1,INPUT_IDEAL_DIODE,PB100_LM74930Q1RGERQ1,Q2 load-disconnect gate,Q2_HGATE,Controller to Q2,Low during overvoltage,HGATE turn-off and Q2 SOA review closes
-U1,INPUT_IDEAL_DIODE,PB100_LM74930Q1RGERQ1,Overvoltage threshold,LM74930_OV,Divider to controller,Hard cutoff at 48.99-54.89 V,Comparator tolerance and leakage review closes
-U1,INPUT_IDEAL_DIODE,PB100_LM74930Q1RGERQ1,Open-drain fault output,INPUT_PROT_FAULT_N,Controller diagnostic,Low during overvoltage or undervoltage,Diagnostic pull-up ownership review closes
+U1,INPUT_IDEAL_DIODE,PB100_LM74930QRGERQ1,Common-source anode sense,INPUT_COMMON_SOURCE,PB-100 sense,Follows Q1/Q2 common source,Common-source topology review closes
+U1,INPUT_IDEAL_DIODE,PB100_LM74930QRGERQ1,Protected cathode sense,VBAT_REV_PROT,PB-100 sense,Valid after Q1 before shunt,Protected-node threshold review closes
+U1,INPUT_IDEAL_DIODE,PB100_LM74930QRGERQ1,Q1 ideal-diode gate,Q1_DGATE,Controller to Q1,Off when controller unpowered,DGATE turn-off and Q1 package review closes
+U1,INPUT_IDEAL_DIODE,PB100_LM74930QRGERQ1,Q2 load-disconnect gate,Q2_HGATE,Controller to Q2,Low during overvoltage,HGATE turn-off and Q2 SOA review closes
+U1,INPUT_IDEAL_DIODE,PB100_LM74930QRGERQ1,Overvoltage threshold,LM74930_OV,Divider to controller,Hard cutoff at 48.99-54.89 V,Comparator tolerance and leakage review closes
+U1,INPUT_IDEAL_DIODE,PB100_LM74930QRGERQ1,Open-drain fault output,INPUT_PROT_FAULT_N,Controller diagnostic,Low during overvoltage or undervoltage,Diagnostic pull-up ownership review closes
 Q1,INPUT_REVERSE_FET,PB100_POWER_NMOS_TOLL_80V,Common-source terminals,INPUT_COMMON_SOURCE,Power path,IAUT300N08S5N012ATMA2 pins 2-8 source orientation reviewed,TOLL 40 A passive copper and thermal review closes
 Q1,INPUT_REVERSE_FET,PB100_POWER_NMOS_TOLL_80V,Protected-side Tab drain,VBAT_REV_PROT,Power path,IAUT300N08S5N012ATMA2 Tab drain orientation reviewed,TOLL 40 A passive copper and thermal review closes
 Q1,INPUT_REVERSE_FET,PB100_POWER_NMOS_TOLL_80V,Gate pin 1,Q1_DGATE,Controller to Q1,Off when controller is unpowered,Gate discharge and 40 A thermal review closes

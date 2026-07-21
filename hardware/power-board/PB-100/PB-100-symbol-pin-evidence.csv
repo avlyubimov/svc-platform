@@ -24,31 +24,31 @@ PB100_LM74700QDBVRQ1_PRELIM,3,EN,https://www.ti.com/lit/ds/symlink/lm74700-q1.pd
 PB100_LM74700QDBVRQ1_PRELIM,4,CATHODE,https://www.ti.com/lit/ds/symlink/lm74700-q1.pdf,SNOSD17G December 2020,DBV SOT-23-6,Ideal-diode cathode
 PB100_LM74700QDBVRQ1_PRELIM,5,GATE,https://www.ti.com/lit/ds/symlink/lm74700-q1.pdf,SNOSD17G December 2020,DBV SOT-23-6,External N-MOSFET gate drive
 PB100_LM74700QDBVRQ1_PRELIM,6,ANODE,https://www.ti.com/lit/ds/symlink/lm74700-q1.pdf,SNOSD17G December 2020,DBV SOT-23-6,Ideal-diode anode and input power
-PB100_LM74930Q1RGERQ1,1,DGATE,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Ideal-diode MOSFET gate drive
-PB100_LM74930Q1RGERQ1,2,A,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Ideal-diode anode and common-source sense
-PB100_LM74930Q1RGERQ1,3,SW,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Internal battery-sense switch output
-PB100_LM74930Q1RGERQ1,4,UVLO,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Undervoltage threshold input
-PB100_LM74930Q1RGERQ1,5,OV,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Overvoltage threshold input
-PB100_LM74930Q1RGERQ1,6,EN,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Enable input
-PB100_LM74930Q1RGERQ1,7,MODE,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Reverse-current blocking mode input
-PB100_LM74930Q1RGERQ1,8,N.C.,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,No connection
-PB100_LM74930Q1RGERQ1,9,TMR,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Fault timer input
-PB100_LM74930Q1RGERQ1,10,IMON,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Current-monitor output
-PB100_LM74930Q1RGERQ1,11,ILIM,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Overcurrent threshold input
-PB100_LM74930Q1RGERQ1,12,FLT,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Open-drain fault output
-PB100_LM74930Q1RGERQ1,13,GND,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Ground
-PB100_LM74930Q1RGERQ1,14,HGATE,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Load-disconnect MOSFET gate drive
-PB100_LM74930Q1RGERQ1,15,OUT,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Load-disconnect source sense
-PB100_LM74930Q1RGERQ1,16,OVCLAMP,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Overvoltage clamp-mode selector
-PB100_LM74930Q1RGERQ1,17,N.C.,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,No connection
-PB100_LM74930Q1RGERQ1,18,ISCP,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Short-circuit threshold input
-PB100_LM74930Q1RGERQ1,19,CS-,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Current-sense negative input
-PB100_LM74930Q1RGERQ1,20,CS+,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Current-sense positive input
-PB100_LM74930Q1RGERQ1,21,N.C.,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,No connection
-PB100_LM74930Q1RGERQ1,22,VS,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Controller supply input
-PB100_LM74930Q1RGERQ1,23,CAP,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Charge-pump output
-PB100_LM74930Q1RGERQ1,24,C,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Ideal-diode cathode sense
-PB100_LM74930Q1RGERQ1,25,RTN,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Exposed pad intentionally floating
+PB100_LM74930QRGERQ1,1,DGATE,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Ideal-diode MOSFET gate drive
+PB100_LM74930QRGERQ1,2,A,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Ideal-diode anode and common-source sense
+PB100_LM74930QRGERQ1,3,SW,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Internal battery-sense switch output
+PB100_LM74930QRGERQ1,4,UVLO,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Undervoltage threshold input
+PB100_LM74930QRGERQ1,5,OV,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Overvoltage threshold input
+PB100_LM74930QRGERQ1,6,EN,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Enable input
+PB100_LM74930QRGERQ1,7,MODE,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Reverse-current blocking mode input
+PB100_LM74930QRGERQ1,8,N.C.,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,No connection
+PB100_LM74930QRGERQ1,9,TMR,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Fault timer input
+PB100_LM74930QRGERQ1,10,IMON,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Current-monitor output
+PB100_LM74930QRGERQ1,11,ILIM,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Overcurrent threshold input
+PB100_LM74930QRGERQ1,12,FLT,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Open-drain fault output
+PB100_LM74930QRGERQ1,13,GND,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Ground
+PB100_LM74930QRGERQ1,14,HGATE,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Load-disconnect MOSFET gate drive
+PB100_LM74930QRGERQ1,15,OUT,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Load-disconnect source sense
+PB100_LM74930QRGERQ1,16,OVCLAMP,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Overvoltage clamp-mode selector
+PB100_LM74930QRGERQ1,17,N.C.,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,No connection
+PB100_LM74930QRGERQ1,18,ISCP,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Short-circuit threshold input
+PB100_LM74930QRGERQ1,19,CS-,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Current-sense negative input
+PB100_LM74930QRGERQ1,20,CS+,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Current-sense positive input
+PB100_LM74930QRGERQ1,21,N.C.,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,No connection
+PB100_LM74930QRGERQ1,22,VS,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Controller supply input
+PB100_LM74930QRGERQ1,23,CAP,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Charge-pump output
+PB100_LM74930QRGERQ1,24,C,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Ideal-diode cathode sense
+PB100_LM74930QRGERQ1,25,RTN,https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf,SNOSDF6 October 2023,RGE VQFN-24,Exposed pad intentionally floating
 PB100_POWER_NMOS_TOLL_150V,1,G,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn15s6n025-datasheet-en.pdf,Rev 1.0 2025-04-30,PG-HSOF-8-1,Gate
 PB100_POWER_NMOS_TOLL_150V,2,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn15s6n025-datasheet-en.pdf,Rev 1.0 2025-04-30,PG-HSOF-8-1,Source
 PB100_POWER_NMOS_TOLL_150V,3,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn15s6n025-datasheet-en.pdf,Rev 1.0 2025-04-30,PG-HSOF-8-1,Source

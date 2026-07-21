@@ -299,13 +299,15 @@ def validate_staged_release_readiness() -> None:
             "PB-BENCH-010",
         ),
         "PBREL-007": (
-            "LM74930Q1RGERQ1",
+            "LM74930QRGERQ1",
             "IAUTN15S6N025ATMA1",
             "79-101 V",
             "0.5-4 ohm",
             "40-400 ms",
             "48.99-54.89 V",
-            "0.0327 J",
+            "25/125 C",
+            "1.67x",
+            "7.200 W",
             "PB-BENCH-004",
         ),
     }

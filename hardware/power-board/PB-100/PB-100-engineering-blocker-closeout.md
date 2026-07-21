@@ -313,7 +313,7 @@ orders.
   `IAUT300N08S5N014ATMA1` is the same-footprint alternative and
   `BUK7J2R4-80MX` is a non-drop-in alternative. The 60 V branches are rejected.
 - Recommended solution: retain Q1 on the protected DGATE side of U1
-  `LM74930Q1RGERQ1`.
+  `LM74930QRGERQ1`.
   Use passive cooling only: PCB copper polygons plus a thermal pad to the metal
   enclosure. The generated hot bound is 2.52 mOhm and 4.032 W at 40 A. With
   125 degC ambient and a 150 degC junction target, the complete ambient-to-
@@ -368,16 +368,18 @@ orders.
 
 ## PBREL-007 — TVS/load-dump protection
 
-- Closeout status: Closed.
-- Closeout boundary: ADR-0018 closes the active-cutoff design selection and
-  authorizes `LAYOUT-ONLY`. Extracted loop/overshoot and dynamic SOA control
-  `PROTO-ONLY`; PB-BENCH-004 controls production readiness.
+- Closeout status: Conditional.
+- Stage status: pre-layout Closed and current authorization `LAYOUT-ONLY`.
+- Closeout boundary: ADR-0018 accepts the active-cutoff design selection and
+  authorizes `LAYOUT-ONLY`, but does not close PBREL-007 overall. Extracted
+  loop/overshoot and dynamic SOA control `PROTO-ONLY`; PB-BENCH-004 controls
+  production readiness.
 - Why blocker existed: SM8S33-class TVS clamp can stress 60 V downstream parts
   and cannot safely absorb the full 40-400 ms unsuppressed envelope by itself.
 - Candidate comparison: the single populated `SM8S33AHM3/I` branch is rejected.
   LM74930-Q1 hard cutoff with raw-side 150 V Q2 is selected. A pure TVS
   alternative would require new maximum-bound energy and thermal evidence.
-- Recommended solution: U1 `LM74930Q1RGERQ1`, Q2
+- Recommended solution: U1 `LM74930QRGERQ1`, Q2
   `IAUTN15S6N025ATMA1` 150 V TOLL on HGATE, and Q1
   `IAUT300N08S5N012ATMA2` 80 V TOLL on protected DGATE. A split
   42.2k+42.2k/1.00k 1% OV divider gives 48.99-54.89 V cutoff including threshold,
@@ -390,9 +392,11 @@ orders.
   plus 150 V-class FET only after pin/package, cutoff, gate-charge, and SOA review.
 - Cost impact: moderate; active cutoff and Q2 add parts but avoid an oversized
   single-pulse energy absorber and preserve downstream voltage margin.
-- Thermal impact: the conservative 101 V / 0.5 ohm / 40 A controller-delay plus
-  gate-discharge transition is 0.0327 J, giving 15.0x margin to Q2's 0.49 J
-  single-pulse avalanche evidence. This is pre-layout screening, not final SOA.
+- Thermal impact: the 8.09 us turn-off is screened at 40 A against the 101 V /
+  10 us linear-mode SOA curve. The 125 degC derated limit is 66.67 A, or 1.67x
+  margin. Q2 dissipates 4.000 W at its 25 degC maximum RDS(on) and 7.200 W at
+  the conservative hot bound, requiring a full post-layout path no worse than
+  3.47 K/W. The 0.0327 J value is informational, not avalanche qualification.
 - Production impact: RGE exposed-pad isolation, Q2 TOLL stencil/voiding, short
   gate/clamp loops, and D1 DNP inspection require DFM and first-article review.
 - Field reliability impact: hard cutoff prevents the 40-400 ms load-dump energy
@@ -413,6 +417,7 @@ orders.
   loop inductance, gate ringing, dynamic SOA, and repetitive transient recovery.
 - Evidence and calculations:
   `PB-100-surge-stopper-evidence.csv`,
+  `PB-100-input-q2-evidence.csv`,
   `PB-100-transient-margin-evidence.csv`,
   `PB-100-staged-release-readiness.csv`,
   `PB-100-tvs-load-dump-margin-trace.csv`,

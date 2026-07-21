@@ -9,7 +9,7 @@ from .common import PB100_DIR, REPO_ROOT, fail, read_text
 
 SELECTED_MOSFET = "IAUT300N08S5N012ATMA2"
 SELECTED_SURGE_FET = "IAUTN15S6N025ATMA1"
-SELECTED_CONTROLLER = "LM74930Q1RGERQ1"
+SELECTED_CONTROLLER = "LM74930QRGERQ1"
 SELECTED_FOOTPRINT = "PB100:PG-HSOF-8-1_TOLL_Infineon"
 SELECTED_CONTROLLER_FOOTPRINT = "PB100:VQFN-24_RGE_4x4mm_P0.5mm_EP2.4mm"
 FIVE_BLOCKERS = {"PBREL-001", "PBREL-004", "PBREL-006", "PBREL-007", "PBREL-011"}
@@ -36,7 +36,7 @@ def validate_five_blocker_release_evidence() -> None:
     status_by_id = {row["Blocker ID"]: row["Status"] for row in blocker_rows}
     if set(status_by_id) != {f"PBREL-{number:03d}" for number in range(1, 13)}:
         fail("PB-100 blocker register must contain PBREL-001 through PBREL-012 exactly")
-    expected_active: dict[str, str] = {}
+    expected_active = {"PBREL-007": "Conditional"}
     actual_active = {
         blocker_id: status
         for blocker_id, status in status_by_id.items()
@@ -91,26 +91,47 @@ def validate_five_blocker_release_evidence() -> None:
 
     surge_rows = _rows("PB-100-surge-stopper-evidence.csv")
     expected_surge_corners = {
-        (us, ri, duration)
+        (us, ri, duration, initial)
         for us in {"79", "101"}
         for ri in {"0.5", "4"}
         for duration in {"40", "400"}
+        for initial in {"25", "125"}
     }
     actual_surge_corners = {
-        (row["Us V"], row["Ri ohm"], row["td ms"])
+        (row["Us V"], row["Ri ohm"], row["td ms"], row["Initial Tj C"])
         for row in surge_rows
     }
     if actual_surge_corners != expected_surge_corners:
         fail("active surge-stopper evidence must cover every ISO design corner")
     for row in surge_rows:
-        if row["Result"] != "PASS PRE-LAYOUT" or row["Load response"] != "DISCONNECT":
+        if row["Result"] != "PASS PRE-LAYOUT SCREEN" or row["Load response"] != "DISCONNECT":
             fail("active surge-stopper corners must pass pre-layout by disconnecting the load")
         if float(row["OV cutoff max V"]) > 55.0:
             fail("active surge-stopper maximum cutoff must not exceed 55 V")
-        if float(row["Q2 avalanche-energy margin x"]) < 15.0:
-            fail("active surge-stopper Q2 screening margin must remain at least 15x")
+        if float(row["Q2 linear-mode ID A"]) != 40.0:
+            fail("active surge-stopper SOA screen must use the full 40 A load current")
+        if float(row["Turn-off bound us"]) > float(row["SOA reference pulse us"]):
+            fail("active surge-stopper turn-off bound must fit within the SOA pulse curve")
+        if float(row["SOA reference VDS V"]) < 101.0:
+            fail("active surge-stopper SOA screen must use at least the 101 V design corner")
+        if float(row["SOA current margin x"]) < 1.5:
+            fail("temperature-derated Q2 linear-mode SOA margin must remain at least 1.5x")
+        if row["Pulse count"] != "10" or row["Pulse spacing s"] != "60":
+            fail("active surge-stopper evidence must preserve ten pulses at 60 s spacing")
         if float(row["Q1 protected-node margin V"]) < 25.0:
             fail("active surge-stopper must preserve at least 25 V static margin for Q1")
+    if "Q2 avalanche-energy margin x" in surge_rows[0]:
+        fail("Q2 linear-mode SOA must not be accepted from avalanche-energy margin")
+
+    q2_by_item = {row["Evidence item"]: row for row in _rows("PB-100-input-q2-evidence.csv")}
+    if q2_by_item["Exact orderable MPN"]["Value"] != SELECTED_SURGE_FET:
+        fail("generated Q2 evidence must use the selected orderable surge MOSFET")
+    if q2_by_item["Q2 conduction loss at 25 C maximum"]["Value"] != "4.000":
+        fail("generated Q2 evidence must retain the 4.000 W minimum conduction loss")
+    if q2_by_item["Q2 hot conduction loss"]["Value"] != "7.200":
+        fail("generated Q2 evidence must retain the conservative 7.200 W hot loss")
+    if q2_by_item["Maximum full thermal path"]["Value"] != "3.47":
+        fail("generated Q2 evidence must retain the 3.47 K/W post-layout limit")
 
     q1_by_item = {row["Evidence item"]: row for row in _rows("PB-100-input-q1-evidence.csv")}
     if q1_by_item["Exact orderable MPN"]["Value"] != SELECTED_MOSFET:

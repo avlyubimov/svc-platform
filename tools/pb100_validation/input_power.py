@@ -167,7 +167,7 @@ def validate_input_reverse_package_trace() -> None:
             fail(f"input reverse package trace must include {token}")
 
     controller_text = " ".join(rows_by_item["Controller gate path"].values())
-    for token in ("LM74930Q1RGERQ1", "Q1_DGATE", "Q2_HGATE", "controller is unpowered"):
+    for token in ("LM74930QRGERQ1", "Q1_DGATE", "Q2_HGATE", "controller is unpowered"):
         if token not in controller_text:
             fail(f"input reverse controller trace must include {token}")
 
@@ -454,7 +454,7 @@ def validate_input_reverse_q1_derivation_precheck() -> None:
     precheck_text = read_text(path)
     for token in (
         "TI LM74930-Q1",
-        "LM74930Q1RGERQ1",
+        "LM74930QRGERQ1",
         "Q1_DGATE",
         "Q2_HGATE",
         "LM74930_CAP",
@@ -535,7 +535,7 @@ def validate_input_reverse_q1_closeout_precheck() -> None:
     precheck_text = read_text(path)
     for token in (
         "TI LM74930-Q1",
-        "LM74930Q1RGERQ1",
+        "LM74930QRGERQ1",
         "LM74930_CAP",
         "LM74930_VS",
         "100nF",
@@ -559,7 +559,7 @@ def validate_input_reverse_q1_closeout_precheck() -> None:
         "SM8S33AHM3/I",
         "DNP",
         "ADR-0018",
-        "LM74930Q1RGERQ1",
+        "LM74930QRGERQ1",
         "IAUTN15S6N025ATMA1",
         "54.89V",
         "PBREL-007",
