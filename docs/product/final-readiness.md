@@ -85,7 +85,7 @@ Current coverage:
 | Architecture v1.0 | Ready | Frozen by ADR; PB-100 requirement changes still need ADR |
 | PB-100 requirements | Ready for controlled schematic completion | Baseline plus ADR-0016/ADR-0018 active-cutoff and passive-thermal requirements are frozen; schematic freeze remains open |
 | PB-100 KiCad scaffold | Preliminary capture | Child sheets now contain ERC-clean preliminary capture content and exported netlist coverage; schematic freeze remains open |
-| PB-100 PCB/layout | BLOCKED | There is 1 active blocker: `PBREL-007`. PBREL-006 is Closed, but PBREL-007 pre-layout is Conditional because its `Tj_initial=150 C` Q2 trajectory relies on provisional graph and Qgd/Qgs inputs despite the passing 59.52 V protected-node peak budget. The separate Q2-C100 coupon now has ERC/DRC-clean complete pad-to-pad electrical routing, zero unconnected items, seven-spoke TOLL source fanout and a generated pre-FAB copper/via/loop arithmetic screen. The screen explicitly is not thermal or extracted-inductance proof; `FAB-REVIEW`, supplier field solutions, fixture/safety closure, DUT lots and results remain open. The aggregate authorization remains `BLOCKED`, creating `PB-100.kicad_pcb` is prohibited, and coupon fabrication is also blocked. Prototype output requires `PROTO-ONLY`; production and field use remain `NO-GO` |
+| PB-100 PCB/layout | BLOCKED | There is 1 active blocker: `PBREL-007`. PBREL-006 is Closed, but PBREL-007 pre-layout is Conditional because its `Tj_initial=150 C` Q2 trajectory relies on provisional graph and Qgd/Qgs inputs despite the passing 59.52 V protected-node peak budget. The separate Q2-C100 coupon has complete pad-to-pad electrical routing, seven-spoke TOLL source fanout, a generated pre-FAB copper/via/loop arithmetic screen, exact Molex board-interface kits and exact Harwin board test points. The screen is not thermal or extracted-inductance proof; the headers still need 2.0 mm fit/DFM, and `FAB-REVIEW`, rated instrument/probe selection, supplier field solutions, fixture/safety closure, DUT lots and results remain open. The aggregate authorization remains `BLOCKED`, creating `PB-100.kicad_pcb` is prohibited, and coupon fabrication is also blocked. Prototype output requires `PROTO-ONLY`; production and field use remain `NO-GO` |
 | LB-100 requirements | Frozen | Baseline is frozen by ADR-0014 and the schematic freeze is Closed |
 | LB-100 KiCad schematic | Reviewed | Deterministic 81-component, 191-net, footprint-bound capture adds typed IC pins/ERC, sourced and decoupled ADC_REF, one-point AGND return, digital USB VBUS detection, direct STM32-to-LTC3212 drive, back-power-safe sensor supplies, and three switched-rail Ioff buffers isolating E73 UART/reset; exported-netlist audit and ERC pass with only the two reviewed cross-board USB CC single-pin warnings |
 | LB-100 PCB/layout | BLOCKED | There are 0 active blockers (0 active LBREL blockers). Footprint, schematic, and corrected FX18 mechanical gates are closed; the separate signal-integrity and safety layout model remains Open, so no `LB-100.kicad_pcb` or manufacturing output is authorized |
@@ -136,8 +136,10 @@ Current coverage:
   three lots. Q2-C100 now commits the exact-device/controller schematic,
   preliminary four-layer PCB, critical high-current and gate routing, BOM,
   variants and probe/safety boundaries. Its pad-to-pad routing is complete with
-  zero unconnected items, but the open `FAB-REVIEW`, fixture-source and safety
-  gates prohibit fabrication and energized use.
+  zero unconnected items, and exact Molex board-interface kits plus Harwin
+  board test points are selected. The open `FAB-REVIEW`, 2.0 mm header fit,
+  rated instrument/probe, remaining fixture-source and safety gates prohibit
+  fabrication and energized use.
   Only `QUALIFICATION-COUPON-ONLY` work is authorized; PB-100 remains blocked
   until the measured evidence passes. Independently authorized FB-100 layout
   may continue.

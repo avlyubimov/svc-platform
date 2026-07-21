@@ -225,9 +225,11 @@ artifact may supersede or reduce future lot testing only after review.
 The controlled Q2-C100 schematic, preliminary four-layer PCB, complete pad-to-
 pad electrical routing, BOM, assembly variants, probe interfaces and
 fabrication gate now exist under `qualification/Q2-C100`. KiCad 10.0.4 ERC and
-board DRC have zero violations and zero unconnected items. Fabrication review,
-the manufacturing package, exact fixture hardware and the complete laboratory
-safety system remain open. No DUT lot population, calibrated setup or test
+board DRC have zero violations and zero unconnected items. Exact board headers
+and board test points are selected, but fabrication review, 2.0 mm header fit,
+the manufacturing package, rated instrument/probe hardware, remaining fixture
+hardware and the complete laboratory safety system remain open. No DUT lot
+population, calibrated setup or test
 result exists yet. Q2Q-010 through Q2Q-015 therefore remain
 `PENDING EMPIRICAL`, PBREL-007 remains `Conditional`, aggregate PB-100 remains
 `BLOCKED`, and production/field use remain `NO-GO`.

@@ -95,6 +95,32 @@ equivalent but lacks soft termination and is therefore only a controlled
 fallback after assembly-strain review. CAP differential waveform validation
 remains part of controller correlation; nominal value alone is not credited.
 
+## Fixture connectors and probe points
+
+JHEAT, JTEMP and JDRIVE use Molex `436500228`, `436500328` and `436500428`
+single-row vertical TH headers with matching 43645 housings and gold 43030
+contacts. Two, three and four positions make the complete harnesses physically
+different without claiming optional manufacturer key coding. The selected
+`...28` headers avoid the snap-retention feature that is explicitly sensitive
+to board thickness. Generic 2.54 mm headers are rejected because they lack a
+shroud and latch; Micro-Fit+ is not a drop-in because it is dual-row.
+
+The selected headers recommend a 1.57 mm board while the coupon is 2.0 mm.
+Their 3.18 mm tails do not prove locator seating or solder acceptance, so this
+selection remains conditional on supplier DFM and a physical sample review.
+The harness housings are limited to 105 degC and the family to 30 mating cycles;
+heater derating and replaceable-harness ownership remain open. These passive
+parts have no junction-temperature value and no vehicle-lifetime claim.
+
+Probe attachment uses exact Harwin `S1751-46R`, selected for a published
+3.45 x 1.85 mm land, tape-and-reel assembly and compatibility with standard
+probes/clips. Smaller S2751/S2761 alternatives require miniature attachment
+hardware; large TH loops add drilled lands and loop area. Harwin does not rate
+S1751 for voltage or bandwidth, so the exact 101 V/100 MHz probe chain and
+locked-enclosure procedure remain separate evidence. Full kit details, risks,
+production handling and primary sources are in
+`Q2-C100-fixture-interface-selection.md`.
+
 Primary evidence: [Vishay CRCW-HP e3](https://www.vishay.com/docs/20043/crcwhpe3.pdf),
 [Bourns CRS-Q](https://www.bourns.com/docs/product-datasheets/crs-q.pdf),
 [Bourns CMP-Q](https://www.bourns.com/docs/product-datasheets/CMP-Q.pdf),

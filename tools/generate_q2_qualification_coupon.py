@@ -38,6 +38,8 @@ NEXPERIA_ZENER_DS = "https://assets.nexperia.com/documents/data-sheet/BZT52H-Q_S
 TDK_CVS_PAGE = "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=CGA6N3X7R2A225M230AE"
 TDK_CCAP_PAGE = "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=CGA3E2X7R1H104K080AE"
 VISHAY_CRCW_HP_DS = "https://www.vishay.com/docs/20043/crcwhpe3.pdf"
+MOLEX_MICROFIT_DRAWING = "https://www.molex.com/content/dam/molex/molex-dot-com/products/automated/en-us/salesdrawingpdf/436/43650/436500827_sd.pdf"
+HARWIN_S1751_PAGE = "https://www.harwin.com/products/S1751-46R"
 
 
 @dataclass(frozen=True)
@@ -62,11 +64,11 @@ PLACEMENTS = {
     "ROV1": Placement(57.0, 18.0, 90.0),
     "ROV2": Placement(57.0, 26.0, 90.0),
     "ROV3": Placement(57.0, 34.0, 90.0),
-    "JDRIVE": Placement(8.0, 48.0, 90.0),
+    "JDRIVE": Placement(6.0, 48.0),
     "JHEAT": Placement(69.0, 75.0),
-    "JTEMP": Placement(69.0, 82.0),
+    "JTEMP": Placement(69.0, 87.0),
     "TPD": Placement(48.0, 34.0),
-    "TPG": Placement(30.0, 35.0),
+    "TPG": Placement(31.0, 35.0),
     "TPS": Placement(48.0, 42.0),
     "TPHG": Placement(27.0, 35.0),
     "TPOUT": Placement(48.0, 69.0),
@@ -180,9 +182,9 @@ def build_coupon() -> Schematic:
         schematic.add(c(ref, "CGA6N3X7R2A225M230AE 2.2uF 100V X7R", "Q2C100:C_1210_3225Metric", TDK_CVS_PAGE, [("1", "1", "CTRL_VS"), ("2", "2", "GND")]))
     schematic.add(c("CCAP", "CGA3E2X7R1H104K080AE 100nF 50V X7R", passive_0603, TDK_CCAP_PAGE, [("1", "1", "CTRL_CAP"), ("2", "2", "CTRL_VS")]))
 
-    schematic.add(c("JDRIVE", "FORCED_DRIVER_KELVIN", "Q2C100:PinHeader_1x04_P2.54", "PB-100-q2-empirical-qualification-plan.md", [("1", "GATE", "Q2_HGATE"), ("2", "SOURCE_K", "COMMON_SOURCE"), ("3", "TRIGGER", "EXT_TRIGGER"), ("4", "INTERLOCK", "EXT_INTERLOCK")]))
-    schematic.add(c("JHEAT", "ISOLATED_CASE_HEATER", "Q2C100:PinHeader_1x02_P2.54", "PB-100-q2-empirical-qualification-plan.md", [("1", "HEAT+", "HEATER_POS"), ("2", "HEAT-", "HEATER_NEG")]))
-    schematic.add(c("JTEMP", "ISOLATED_TSEP_INPUT", "Q2C100:PinHeader_1x02_P2.54", "PB-100-q2-empirical-qualification-plan.md", [("1", "T+", "TSEP_POS"), ("2", "T-", "TSEP_NEG")]))
+    schematic.add(c("JDRIVE", "436500428 MICRO-FIT 4POS DRIVER", "Q2C100:MicroFit_43650_0428_Vertical_R90", MOLEX_MICROFIT_DRAWING, [("1", "GATE", "Q2_HGATE"), ("2", "SOURCE_K", "COMMON_SOURCE"), ("3", "TRIGGER", "EXT_TRIGGER"), ("4", "INTERLOCK", "EXT_INTERLOCK")]))
+    schematic.add(c("JHEAT", "436500228 MICRO-FIT 2POS HEATER", "Q2C100:MicroFit_43650_0228_Vertical", MOLEX_MICROFIT_DRAWING, [("1", "HEAT+", "HEATER_POS"), ("2", "HEAT-", "HEATER_NEG")]))
+    schematic.add(c("JTEMP", "436500328 MICRO-FIT 3POS TEMP", "Q2C100:MicroFit_43650_0328_Vertical", MOLEX_MICROFIT_DRAWING, [("1", "T+", "TSEP_POS"), ("2", "T-", "TSEP_NEG"), ("3", "KEY_NC", None, "no_connect")]))
 
     testpoints = {
         "TPD": ("QDUT_DRAIN_KELVIN", "RAW_101V"),
@@ -196,7 +198,7 @@ def build_coupon() -> Schematic:
         "TPGND": ("PROBE_GND", "GND"),
     }
     for ref, (value, net) in testpoints.items():
-        schematic.add(c(ref, value, "Q2C100:TestPoint_Loop_1.0mm", "PB-100-q2-empirical-qualification-plan.md", [("1", "TP", net, "passive")]))
+        schematic.add(c(ref, f"S1751-46R {value}", "Q2C100:Harwin_S1751-46R", HARWIN_S1751_PAGE, [("1", "TP", net, "passive")]))
 
     # Explicit off-board fixture endpoints keep ERC meaningful without placing
     # fictitious hardware on the coupon.
@@ -279,9 +281,12 @@ def render_footprint(component: Component, placement: Placement, net_codes: dict
     library, footprint_name = component.footprint.split(":", 1)
     source_dir = PB_FP_DIR if library == "PB100" else LOCAL_FP_DIR
     source_path = source_dir / f"{footprint_name}.kicad_mod"
-    if source_path.is_file():
+    if library == "PB100":
         source_text = source_path.read_text(encoding="utf-8")
     else:
+        # Q2C100 library files are outputs, not generator inputs.  Rendering
+        # directly from the in-memory source makes one generation pass atomic
+        # when a local footprint definition changes.
         source_text = custom_footprints()[source_path]
     text = replace_uuids(source_text, component.ref)
     text = re.sub(r'^\(footprint\s+"[^"]+"', f'(footprint "{library}:{esc(footprint_name)}"', text, count=1)
@@ -330,7 +335,23 @@ def render_footprint(component: Component, placement: Placement, net_codes: dict
     return "\n".join(f"\t{line}" if line else line for line in text.splitlines())
 
 
-def simple_footprint(name: str, pads: list[str], *, body_x: float, body_y: float, attr: str = "smd") -> str:
+def simple_footprint(
+    name: str,
+    pads: list[str],
+    *,
+    body_x: float,
+    body_y: float,
+    attr: str = "smd",
+    courtyard_margin: float | None = None,
+) -> str:
+    courtyard = []
+    if courtyard_margin is not None:
+        courtyard = [
+            f'\t(fp_rect (start {-body_x / 2 - courtyard_margin:.2f} {-body_y / 2 - courtyard_margin:.2f}) '
+            f'(end {body_x / 2 + courtyard_margin:.2f} {body_y / 2 + courtyard_margin:.2f}) '
+            f'(stroke (width 0.05) (type default)) (fill none) (layer "F.CrtYd") '
+            f'(uuid "{layout_uid(name, "courtyard")}"))'
+        ]
     lines = [
         f'(footprint "{name}"',
         '\t(version 20260206)',
@@ -340,6 +361,7 @@ def simple_footprint(name: str, pads: list[str], *, body_x: float, body_y: float
         f'\t(property "Value" "{name}" (at 0 {body_y / 2 + 1.5:.2f} 0) (layer "F.Fab") (uuid "{layout_uid(name, "value")}") (effects (font (size 0.8 0.8) (thickness 0.12))))',
         f'\t(attr {attr})',
         f'\t(fp_rect (start {-body_x / 2:.2f} {-body_y / 2:.2f}) (end {body_x / 2:.2f} {body_y / 2:.2f}) (stroke (width 0.1) (type default)) (fill none) (layer "F.Fab") (uuid "{layout_uid(name, "fab")}"))',
+        *courtyard,
         *pads,
         ')',
     ]
@@ -376,27 +398,55 @@ def custom_footprints() -> dict[Path, str]:
         body_y=1.6,
     )
 
-    for count in (2, 4):
+    # Molex SD-43650-010: single-row vertical TH header, 3.00 mm pitch,
+    # 1.02 mm recommended signal holes and two 1.27 mm polarizing-peg holes.
+    # The footprint deliberately uses the no-retention ...28 variants.  Their
+    # official 1.57 mm recommended board thickness still requires supplier
+    # fit/DFM confirmation before the coupon's fixed 2.0 mm stackup may pass
+    # FAB-REVIEW.
+    for count in (2, 3):
+        start = -(count - 1) * 1.5
         pads = []
-        start = -(count - 1) * 1.27
         for index in range(count):
-            x = start + index * 2.54
+            x = start + index * 3.0
             shape = "rect" if index == 0 else "circle"
-            pads.append(f'\t(pad "{index + 1}" thru_hole {shape} (at {x:.2f} 0) (size 1.7 1.7) (drill 1.0) (layers "*.Cu" "*.Mask") (uuid "{layout_uid("header", count, index)}"))')
-        footprints[f"PinHeader_1x0{count}_P2.54"] = simple_footprint(
-            f"PinHeader_1x0{count}_P2.54",
+            pads.append(f'\t(pad "{index + 1}" thru_hole {shape} (at {x:.2f} 0) (size 1.80 1.80) (drill 1.05) (layers "*.Cu" "*.Mask") (uuid "{layout_uid("microfit-signal", count, index)}"))')
+        for index, x in enumerate((start, -start)):
+            pads.append(f'\t(pad "" np_thru_hole circle (at {x:.2f} 3.00) (size 1.30 1.30) (drill 1.30) (layers "*.Cu" "*.Mask") (uuid "{layout_uid("microfit-peg", count, index)}"))')
+        name = f"MicroFit_43650_0{count}28_Vertical"
+        footprints[name] = simple_footprint(
+            name,
             pads,
-            body_x=count * 2.54,
-            body_y=2.54,
+            body_x=3.0 * count + 3.65,
+            body_y=9.90,
             attr="through_hole",
         )
 
-    footprints["TestPoint_Loop_1.0mm"] = simple_footprint(
-        "TestPoint_Loop_1.0mm",
-        [f'\t(pad "1" thru_hole circle (at 0 0) (size 2.4 2.4) (drill 1.0) (layers "*.Cu" "*.Mask") (uuid "{layout_uid("testpoint-pad")}"))'],
-        body_x=2.5,
-        body_y=2.5,
+    # JDRIVE uses the same official 43650-0428 hole pattern pre-rotated in its
+    # library footprint.  Keeping the board instance at zero rotation avoids
+    # a KiCad library-parity mismatch while moving both locator pegs clear of
+    # the dense controller/Kelvin routing.
+    drive_pads = []
+    for index in range(4):
+        y = 4.5 - index * 3.0
+        shape = "rect" if index == 0 else "circle"
+        drive_pads.append(f'\t(pad "{index + 1}" thru_hole {shape} (at 0 {y:.2f}) (size 1.80 1.80) (drill 1.05) (layers "*.Cu" "*.Mask") (uuid "{layout_uid("microfit-drive-signal", index)}"))')
+    for index, y in enumerate((4.5, -4.5)):
+        drive_pads.append(f'\t(pad "" np_thru_hole circle (at -3.00 {y:.2f}) (size 1.30 1.30) (drill 1.30) (layers "*.Cu" "*.Mask") (uuid "{layout_uid("microfit-drive-peg", index)}"))')
+    footprints["MicroFit_43650_0428_Vertical_R90"] = simple_footprint(
+        "MicroFit_43650_0428_Vertical_R90",
+        drive_pads,
+        body_x=9.90,
+        body_y=15.65,
         attr="through_hole",
+    )
+
+    footprints["Harwin_S1751-46R"] = simple_footprint(
+        "Harwin_S1751-46R",
+        [smd_pad("1", 0, 0, 3.45, 1.85)],
+        body_x=3.25,
+        body_y=1.63,
+        courtyard_margin=0.25,
     )
     footprints["MountingHole_M3_NPTH"] = simple_footprint(
         "MountingHole_M3_NPTH",
@@ -540,10 +590,10 @@ def low_energy_routing(net_codes: dict[str, int]) -> list[str]:
 
     # Kelvin/probe branches join the already frozen critical power and HGATE
     # geometry without changing the controller-to-DUT correlation path.
-    routes.extend(route_path(net_codes, "COMMON_SOURCE", "F.Cu", 0.4, ((8.0, 49.27), (11.0, 49.27), (13.0, 47.0)), "jdrive-source"))
+    routes.extend(route_path(net_codes, "COMMON_SOURCE", "F.Cu", 0.4, ((6.0, 49.5), (11.0, 49.5), (13.0, 47.0)), "jdrive-source"))
     routes.extend(route_path(net_codes, "COMMON_SOURCE", "F.Cu", 0.5, ((48.0, 42.0), (46.0, 42.0), (44.2, 39.1)), "source-probe"))
-    routes.extend(route_path(net_codes, "Q2_HGATE", "F.Cu", 0.25, ((8.0, 51.81), (12.0, 52.5), (26.0, 52.5), (26.0, 47.0), (22.0, 47.0)), "hgate-fixture"))
-    routes.extend(route_path(net_codes, "Q2_HGATE", "F.Cu", 0.25, ((27.0, 35.0), (30.0, 35.0), (35.8, 39.1)), "hgate-probes"))
+    routes.extend(route_path(net_codes, "Q2_HGATE", "F.Cu", 0.25, ((6.0, 52.5), (12.0, 52.5), (26.0, 52.5), (26.0, 47.0), (22.0, 47.0)), "hgate-fixture"))
+    routes.extend(route_path(net_codes, "Q2_HGATE", "F.Cu", 0.25, ((27.0, 35.0), (31.0, 35.0), (35.8, 39.1)), "hgate-probes"))
 
     # RAW divider/feed and drain-probe branches terminate directly on the
     # existing high-current copper.  RAW clearance remains governed by the
@@ -592,11 +642,11 @@ def low_energy_routing(net_codes: dict[str, int]) -> list[str]:
     ):
         routes.append(signal_via(net_codes, "GND", fanout[0], fanout[1], token))
         routes.extend(route_path(net_codes, "GND", "F.Cu", 0.25, (start, fanout), token))
-    routes.extend(route_path(net_codes, "GND", "B.Cu", 0.3, ((9.0, 27.35), (5.5, 27.35), (5.5, 32.5), (19.8, 32.5), (25.8, 32.5)), "gnd-upper-left"))
+    routes.extend(route_path(net_codes, "GND", "B.Cu", 0.3, ((9.0, 27.35), (1.5, 27.35), (1.5, 32.5), (19.8, 32.5), (25.8, 32.5)), "gnd-upper-left"))
     routes.extend(route_path(net_codes, "GND", "B.Cu", 0.3, ((64.0, 31.0), (68.0, 31.0), (68.0, 39.5), (50.0, 39.5)), "gnd-upper-right"))
     routes.append(signal_via(net_codes, "GND", 50.0, 39.5, "gnd-upper-right-layer-change"))
     routes.extend(route_path(net_codes, "GND", "In2.Cu", 0.3, ((50.0, 39.5), (52.0, 42.0), (52.0, 75.0), (12.0, 75.0), (10.0, 70.0)), "gnd-upper-right-layer-change"))
-    routes.extend(route_path(net_codes, "GND", "B.Cu", 0.3, ((5.5, 27.35), (5.5, 70.0), (10.0, 70.0)), "gnd-trunk"))
+    routes.extend(route_path(net_codes, "GND", "B.Cu", 0.3, ((1.5, 27.35), (1.5, 70.0), (10.0, 70.0)), "gnd-trunk"))
     routes.extend(route_path(net_codes, "GND", "F.Cu", 0.20, ((17.75, 47.0), (17.75, 48.5), (18.75, 48.5), (18.75, 47.0)), "gnd-pin9-11"))
     routes.append(signal_via(net_codes, "GND", 18.25, 50.5, "gnd-pin9-11"))
     routes.extend(route_path(net_codes, "GND", "F.Cu", 0.20, ((18.25, 48.5), (18.25, 50.5)), "gnd-pin9-11-via"))
@@ -606,8 +656,8 @@ def low_energy_routing(net_codes: dict[str, int]) -> list[str]:
     routes.extend(route_path(net_codes, "GND", "F.Cu", 0.20, ((20.0, 44.75), (21.5, 44.75), (21.5, 42.5), (24.0, 42.5), (24.0, 41.5)), "gnd-pin16"))
     routes.extend(route_path(net_codes, "GND", "B.Cu", 0.3, ((24.0, 41.5), (28.0, 46.0), (28.0, 54.0), (12.0, 54.0)), "gnd-controller-a"))
     routes.append(signal_via(net_codes, "GND", 12.0, 54.0, "gnd-controller-layer-change"))
-    routes.append(signal_via(net_codes, "GND", 5.5, 54.0, "gnd-controller-trunk-layer-change"))
-    routes.extend(route_path(net_codes, "GND", "In2.Cu", 0.3, ((12.0, 54.0), (5.5, 54.0)), "gnd-controller-layer-change"))
+    routes.append(signal_via(net_codes, "GND", 1.5, 54.0, "gnd-controller-trunk-layer-change"))
+    routes.extend(route_path(net_codes, "GND", "In2.Cu", 0.3, ((12.0, 54.0), (1.5, 54.0)), "gnd-controller-layer-change"))
     routes.extend(route_path(net_codes, "GND", "B.Cu", 0.3, ((18.25, 50.5), (22.0, 54.0)), "gnd-controller-b"))
     routes.extend(route_path(net_codes, "GND", "B.Cu", 0.3, ((24.0, 49.5), (22.0, 54.0)), "gnd-controller-c"))
 
@@ -622,6 +672,18 @@ def low_energy_routing(net_codes: dict[str, int]) -> list[str]:
     routes.extend(route_path(net_codes, "SYSTEM_OUT", "F.Cu", 0.25, ((18.75, 43.0), (19.25, 43.0), (19.25, 42.5), (20.75, 42.5)), "out-pins18-20"))
     routes.extend(route_path(net_codes, "SYSTEM_OUT", "In1.Cu", 0.25, ((14.5, 34.0), (20.75, 42.5), (26.0, 43.75), (30.0, 44.0), (30.0, 59.5), (48.0, 59.5), (48.0, 69.0)), "out-sense"))
     routes.extend(route_path(net_codes, "SYSTEM_OUT", "B.Cu", 0.5, ((48.0, 69.0), (43.0, 72.0)), "out-probe"))
+
+    # The previous TH probe loops implicitly connected every copper layer.
+    # Exact S1751-46R parts are F.Cu SMT, so these local vias deliberately
+    # preserve the already-reviewed internal/back-layer measurement routes.
+    for token, net, x, y in (
+        ("tpov-layer-change", "CTRL_OV", 61.0, 34.0),
+        ("tpvs-layer-change", "CTRL_VS", 12.0, 35.0),
+        ("tpflt-layer-change", "CTRL_FLT_N", 18.0, 68.0),
+        ("tpgnd-layer-change", "GND", 10.0, 70.0),
+        ("tpout-layer-change", "SYSTEM_OUT", 48.0, 69.0),
+    ):
+        routes.append(signal_via(net_codes, net, x, y, token))
 
     return routes
 

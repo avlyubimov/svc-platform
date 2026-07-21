@@ -59,6 +59,11 @@ controller-side HGATE point; TPOV, TPVS, TPFLT and TPGND expose trigger/control
 observability. Drain current is measured outside the gate/source Kelvin loop by
 the calibrated external current channel defined in the qualification plan.
 
+Each board probe point uses exact Harwin `S1751-46R` hardware. That part has no
+manufacturer voltage or measurement-bandwidth rating, so its MPN and land do
+not validate the measurement chain. The exact differential/current/gate probe
+MPNs, adapters, loading, deskew and common-mode limits remain open.
+
 No grounded oscilloscope input may be attached directly to RAW_101V or the
 floating VDS measurement. VDS requires the rated differential probe. Probe
 capacitance and loop area are recorded in the fixture loading budget.
@@ -70,3 +75,10 @@ the direct LM74930-Q1 waveform. `FORCED-B` removes UCTRL/QREV by population and
 uses JCOMMON as the load point. An assembly with UCTRL populated while an
 external driver is attached is prohibited unless a separate contention review
 authorizes that one setup.
+
+JHEAT/JTEMP/JDRIVE use distinct two-, three- and four-position Molex Micro-Fit
+interfaces. JTEMP pin 3 is an explicit physical no-connect; it is not a guard,
+shield or safety return. These different circuit counts reduce wrong-harness
+risk but are not manufacturer key codes. The exact kit and the unresolved
+2.0 mm board-fit boundary are controlled by
+`Q2-C100-fixture-interface-selection.md`.

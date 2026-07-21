@@ -47,6 +47,9 @@ required field solutions and cannot close 40 A or loop behavior.
   transfer rows at each package-side boundary;
 - RVS, ROV1/2, ROV3 and CCAP exact primary MPNs and independent alternatives
   are recorded; their remaining application calculations stay open;
+- exact Molex 2/3/4-position board interfaces and Harwin `S1751-46R` test
+  points are bound to generated footprints; 2.0 mm header fit and the actual
+  rated measurement instruments remain open;
 - manufacturing outputs: none.
 
 `FAB-REVIEW` remains open. Zero DRC and zero unconnected items prove electrical
@@ -58,8 +61,9 @@ capacity, transient loop behavior, safety-system completion or fabricability.
 1. Use the committed arithmetic screen to complete creepage/clearance,
    field-solver/loop-inductance and 40 A electrothermal review with the selected
    supplier stackup and complete fixture.
-2. Close exact MPNs for fixture headers, probe loops and the external safety
-   enclosure/interlock interfaces.
+2. Obtain written/supplier DFM and physical-sample acceptance for the selected
+   Molex headers on the 2.0 mm board; close the exact rated probes, adapters,
+   instruments and external safety enclosure/interlock interfaces.
 3. Prove effective CTRL_VS capacitance is at least 1.0 uF at 56 V across the
    accepted temperature range.
 4. Close RVS Zener-tolerance/startup-pulse/local-temperature derating, review

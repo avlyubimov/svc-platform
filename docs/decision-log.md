@@ -3677,3 +3677,27 @@ Result: generated KiCad remains the controlled Q2-C100 coupon only. The new
 geometry and calculations are pinned by CI; thermal, field-solver, supplier
 DFM, fixture/probe sourcing, capacitance, safety and independent review remain
 open. Coupon fabrication/energized use and PB-100 layout remain blocked.
+
+## 2026-07-21 — Bind Q2-C100 board fixture interfaces without closing safety
+
+Decision: replace the generic 2.54 mm JHEAT/JTEMP/JDRIVE placeholders with
+exact Molex Micro-Fit 3.0 vertical TH board headers `436500228`, `436500328`
+and `436500428`. Use matching `436450208/0308/0408` receptacles, 18 AWG gold
+`430300039` heater contacts and 20-24 AWG gold `430300002` signal contacts.
+The two-, three- and four-position harnesses cannot fully cross-mate; JTEMP
+position 3 remains physically empty and is not assigned as a guard or shield.
+
+Decision: replace the generic TH probe loops with exact Harwin `S1751-46R`
+SMT test points and their published 3.45 x 1.85 mm land. This selects only the
+board attachment hardware. Harwin publishes neither a working-voltage nor a
+measurement-bandwidth rating for the test point, so the rated 101 V/100 MHz
+probe chain, loading, adapters, deskew and enclosure procedure remain open.
+
+Result: the generated footprints now carry the official Molex 3.00 mm signal
+pitch, signal-hole and polarizing-peg geometry plus a square pin-1 pad. Molex
+recommends a 1.57 mm board for the selected headers while Q2-C100 is 2.0 mm;
+the 3.18 mm tails do not prove seating or solder acceptance. Supplier DFM and
+a physical fit sample remain mandatory. The connector and test-point MPN
+selection therefore reduces fixture-source ambiguity but does not close
+`FAB-REVIEW`, touch safety or Q2E-003. Coupon fabrication/energized use and
+PB-100 layout remain blocked.

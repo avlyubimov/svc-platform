@@ -62,8 +62,9 @@ criterion.
    busbar, load, supply return and probe attachments.
 4. Independent review of solver models, boundary conditions, mesh convergence,
    material properties and safety margins.
-5. Exact fixture/probe MPNs, effective CTRL_VS capacitance proof and the full
-   interlocked laboratory safety system required by the fabrication gate.
+5. The selected Micro-Fit header 2.0 mm fit/DFM, exact rated instrument/probe
+   MPNs, effective CTRL_VS capacitance proof and the full interlocked
+   laboratory safety system required by the fabrication gate.
 
 The row-by-row calculations and their explicit assumptions are in
 `Q2-C100-pre-fab-screening.csv`.

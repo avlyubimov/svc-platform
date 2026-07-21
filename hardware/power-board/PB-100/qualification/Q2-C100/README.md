@@ -24,6 +24,11 @@ The committed KiCad milestone contains:
   each common-source package boundary;
 - exact AEC-Q200 Vishay CRCW-HP RVS/ROV resistors and exact TDK soft-termination
   CCAP, each with an independent controlled alternative.
+- exact 2/3/4-position Molex Micro-Fit `436500228`, `436500328` and
+  `436500428` board headers and mating harness kits, with the 2.0 mm versus
+  recommended 1.57 mm fit mismatch kept open;
+- exact Harwin `S1751-46R` SMT probe-attachment hardware, without treating it
+  as voltage-, bandwidth- or touch-safety evidence.
 
 KiCad 10.0.4 ERC has zero findings. Board DRC has zero rule violations and
 zero unconnected items. CI also pins the four-layer routing set, direct F.Cu HGATE
@@ -52,8 +57,11 @@ Population differences are controlled by `Q2-C100-assembly-variants.csv`.
 
 Do not energize or fabricate this revision. Before the status can change to
 `FAB-REVIEW`, the supplier stackup/creepage, thermal/current-density and loop-
-inductance reviews, exact fixture/probe MPNs, interlock behavior, external
-current limiting, stored-energy discharge, enclosure/shield, remote trigger,
-instrument ratings, heater control and laboratory safety review must close.
+inductance reviews, 2.0 mm Micro-Fit fit/DFM, exact instrument/probe and
+external safety-interface MPNs, interlock behavior, external current limiting,
+stored-energy discharge, enclosure/shield, remote trigger, instrument ratings,
+heater control and laboratory safety review must close. Board interface
+selection is recorded in `Q2-C100-fixture-interface-selection.md` and does not
+make exposed connectors or test points touch-safe.
 Gerber, drill, pick-and-place and manufacturing ZIP files are prohibited in the
 current state.

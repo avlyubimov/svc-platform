@@ -58,6 +58,10 @@ def validate_documents() -> None:
             "zero unconnected items",
             "CORRELATION-A",
             "FORCED-B",
+            "436500228",
+            "436500328",
+            "436500428",
+            "S1751-46R",
             "Gerber, drill, pick-and-place and manufacturing ZIP files are prohibited",
         ),
     )
@@ -74,6 +78,8 @@ def validate_documents() -> None:
             "CRCW120610K0FKEAHP",
             "CRCW120642K2FKEAHP",
             "at least 1.0 uF",
+            "S1751-46R",
+            "distinct two-, three- and four-position Molex Micro-Fit",
             "No grounded oscilloscope input",
         ),
     )
@@ -127,6 +133,10 @@ def validate_documents() -> None:
             "CRS1206QFX-1002ELF",
             "CGA3E2X7R1H104K080AE",
             "GCJ188R71H104KA12D",
+            "436500228",
+            "436500328",
+            "436500428",
+            "S1751-46R",
         ),
     )
     require_tokens(
@@ -141,7 +151,28 @@ def validate_documents() -> None:
             "CRCW120642K2FKEAHP",
             "CRCW06031K00FKEAHP",
             "CGA3E2X7R1H104K080AE",
+            "436450208",
+            "436450308",
+            "436450408",
+            "430300002",
+            "430300039",
+            "S1751-46R",
             "FAB-REVIEW",
+        ),
+    )
+    require_tokens(
+        COUPON / "Q2-C100-fixture-interface-selection.md",
+        (
+            "EXACT BOARD INTERFACE PARTS SELECTED / FIT, PROBES, SAFETY AND FAB-REVIEW OPEN",
+            "SD-43650-010",
+            "1.57 mm PCB",
+            "2.0 mm",
+            "3.18 mm terminal tails",
+            "30 mating cycles",
+            "manufacturer key coding",
+            "S1751-46R",
+            "does not specify a working-voltage or measurement-bandwidth rating",
+            "does not authorize fabrication or energized use",
         ),
     )
     require_tokens(COUPON / "Q2-C100-assembly-variants.csv", ("CORRELATION-A", "FORCED-B", "No simultaneous external drive"))
@@ -201,6 +232,9 @@ def validate_netlist(kicad_cli: str, temp: Path) -> None:
         "ROV3": ("CRCW06031K00FKEAHP 1.00k 1%", "Q2C100:R_C_0603_1608Metric"),
         "RVS": ("CRCW120610K0FKEAHP 10.0k 1%", "Q2C100:R_1206_3216Metric"),
         "CCAP": ("CGA3E2X7R1H104K080AE 100nF 50V X7R", "Q2C100:R_C_0603_1608Metric"),
+        "JDRIVE": ("436500428 MICRO-FIT 4POS DRIVER", "Q2C100:MicroFit_43650_0428_Vertical_R90"),
+        "JHEAT": ("436500228 MICRO-FIT 2POS HEATER", "Q2C100:MicroFit_43650_0228_Vertical"),
+        "JTEMP": ("436500328 MICRO-FIT 3POS TEMP", "Q2C100:MicroFit_43650_0328_Vertical"),
     }
     for ref, expected in expected_components.items():
         if components.get(ref) != expected:
@@ -218,6 +252,19 @@ def validate_netlist(kicad_cli: str, temp: Path) -> None:
     require_net(nets, "QREV_DGATE", {("QREV", "1"), ("UCTRL", "1")})
     require_net(nets, "SYSTEM_OUT", {("JOUT", "1"), ("QREV", "Tab"), ("TPOUT", "1")} | {("UCTRL", pin) for pin in ("18", "19", "20", "24")})
     require_net(nets, "CTRL_VS", {("CCAP", "2"), ("CVS1", "1"), ("CVS2", "1"), ("DZVS", "1"), ("RVS", "2"), ("TPVS", "1")} | {("UCTRL", pin) for pin in ("4", "6", "7", "22")})
+    for ref in ("TPD", "TPG", "TPS", "TPHG", "TPOUT", "TPOV", "TPVS", "TPFLT", "TPGND"):
+        value, footprint = components.get(ref, ("", ""))
+        if not value.startswith("S1751-46R ") or footprint != "Q2C100:Harwin_S1751-46R":
+            fail(f"Q2-C100 {ref} test-point selection mismatch: {components.get(ref)}")
+    for name, endpoint in {
+        "EXT_TRIGGER": ("JDRIVE", "3"),
+        "EXT_INTERLOCK": ("JDRIVE", "4"),
+        "HEATER_POS": ("JHEAT", "1"),
+        "HEATER_NEG": ("JHEAT", "2"),
+        "TSEP_POS": ("JTEMP", "1"),
+        "TSEP_NEG": ("JTEMP", "2"),
+    }.items():
+        require_net(nets, name, {endpoint})
     for forbidden in (("UCTRL", "25"), ("UCTRL", "3")):
         if any(forbidden in endpoints and not name.startswith("unconnected-") for name, endpoints in nets.items()):
             fail(f"Q2-C100 forbidden controller connection exists: {forbidden}")
@@ -267,9 +314,19 @@ def validate_board_contract() -> None:
             'PAD-TO-PAD ROUTING COMPLETE; FAB REVIEW OPEN',
             '(segment ',
             '(via ',
+            'Q2C100:MicroFit_43650_0228_Vertical',
+            'Q2C100:MicroFit_43650_0328_Vertical',
+            'Q2C100:MicroFit_43650_0428_Vertical_R90',
+            'Q2C100:Harwin_S1751-46R',
+            '(size 1.80 1.80) (drill 1.05)',
+            '(size 1.30 1.30) (drill 1.30)',
+            '(size 3.45 1.85)',
         ),
     )
     board_text = BOARD.read_text(encoding="utf-8")
+    for placeholder in ("PinHeader_1x", "TestPoint_Loop_1.0mm"):
+        if placeholder in board_text or placeholder in SCHEMATIC.read_text(encoding="utf-8"):
+            fail(f"Q2-C100 obsolete fixture placeholder remains: {placeholder}")
     if "\n\t(zone " in board_text:
         fail("Q2-C100 pre-FAB-REVIEW milestone must not introduce unreviewed copper zones")
 
