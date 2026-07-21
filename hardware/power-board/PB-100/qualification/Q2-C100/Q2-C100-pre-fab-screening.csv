@@ -1,0 +1,10 @@
+ID,Description,Current_A,Length_mm,Width_mm,Copper_layers,Cross_section_mm2,Current_density_A_per_mm2,R20_mOhm,R150_mOhm,P150_W,Status,Boundary
+RAW_MAIN_PAIR,RAW terminal to QDUT approach,40.00,16.00,7.00,2,0.9800,40.82,0.2815,0.4253,0.6804,SCREEN_ONLY,F.Cu + B.Cu assumed to share equally
+RAW_QDUT_NECK_FCU,RAW approach to QDUT drain land,40.00,5.45,6.50,1,0.4550,87.91,0.2065,0.3120,0.4992,SCREEN_ONLY,F.Cu only; package spreading omitted
+COMMON_SPINE_PAIR,Common-source vertical spine,40.00,14.00,6.00,2,0.8400,47.62,0.2873,0.4341,0.6946,SCREEN_ONLY,F.Cu + B.Cu assumed to share equally
+SYSTEM_QREV_NECK_FCU,QREV drain land to output spine,40.00,5.45,8.00,1,0.5600,71.43,0.1678,0.2535,0.4056,SCREEN_ONLY,F.Cu only; package spreading omitted
+SYSTEM_MAIN_PAIR,Output approach to SYSTEM_OUT terminal,40.00,18.00,7.00,2,0.9800,40.82,0.3167,0.4784,0.7655,SCREEN_ONLY,F.Cu + B.Cu assumed to share equally
+FORCED_BRANCH_PAIR,Common spine to forced-load terminal,40.00,30.00,6.00,2,0.8400,47.62,0.6157,0.9303,1.4885,SCREEN_ONLY,FORCED-B only; F.Cu + B.Cu equal-sharing assumption
+SOURCE_BUS_HALF,One half of a TOLL source collection bus,20.00,3.60,4.00,1,0.2800,71.43,0.2217,0.3349,0.1340,SCREEN_ONLY,Symmetric 20 A half-bus assumption; must be field-checked
+SOURCE_LEADS_AGGREGATE,Seven parallel 0.8 mm source spokes per TOLL,40.00,3.65,5.60 aggregate,1,0.3920,102.04,N/A,N/A,N/A,SCREEN_ONLY,Equal lead sharing is not assumed; package and bus spreading require field/thermal review
+POWER_VIA_ROW_MIN_PLATING,One five-via transfer row at minimum hole-wall copper,40.00,2.00 board thickness,0.60 drill,5 barrels,0.2356,169.77,N/A,N/A,N/A,CONDITIONAL,Conservative one-row screen; actual current sharing and finished plating require supplier proof

@@ -3647,3 +3647,33 @@ safety, DUT lots, correlation, measurements and independent review remain
 open. Q2Q-010 through Q2Q-015 stay `PENDING EMPIRICAL`; PBREL-007 remains
 `Conditional`; coupon fabrication/energized use and PB-100 layout remain
 blocked.
+
+## 2026-07-21 — Strengthen Q2-C100 current fanout and add pre-FAB screens
+
+Decision: remove the serial 0.8 mm source-row bottleneck from both Q2-C100 TOLL
+devices. Connect every physical source land with its own 0.8 mm spoke into a
+4.0 mm collection bus, widen the common-source outer-layer spine to 6.0 mm,
+widen the RAW and SYSTEM_OUT single-layer package necks to 6.5 mm and 8.0 mm,
+and use two five-via 1.2/0.6 mm transfer rows on each side of the common-source
+spine. The previous geometry could place the full 40 A through one 0.8 mm
+serial neck and was therefore not credible for FAB review.
+
+Decision: commit generated cross-section/resistance/loss and loop-bound
+arithmetic rather than calling zero DRC a current-capacity result. At 150 degC
+copper the five straight correlation corridors have a 1.9033 mOhm / 3.0453 W
+lower bound before source fanout, vias, package lands, contacts and fixture.
+The 101 V to 120 V waveform window combined with the provisional 0.41 us
+current-fall bound gives an absolute 194.75 nH ceiling before uncertainty and
+other overshoot. Supplier stackup, electrothermal field solution and complete
+fixture extraction remain mandatory.
+
+Decision: bind RVS/ROV to exact AEC-Q200 Vishay CRCW-HP primary MPNs with
+Bourns CRS-Q/CMP-Q independent alternatives. Bind CCAP to exact TDK
+`CGA3E2X7R1H104K080AE` 100 nF / 50 V soft-termination AEC-Q200 with Murata
+`GCJ188R71H104KA12D` as the independent alternative. RVS startup pulse,
+Zener-tolerance and local-temperature derating are not closed by MPN selection.
+
+Result: generated KiCad remains the controlled Q2-C100 coupon only. The new
+geometry and calculations are pinned by CI; thermal, field-solver, supplier
+DFM, fixture/probe sourcing, capacitance, safety and independent review remain
+open. Coupon fabrication/energized use and PB-100 layout remain blocked.

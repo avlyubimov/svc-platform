@@ -18,13 +18,22 @@ The committed KiCad milestone contains:
   connection;
 - a four-layer, 2.0 mm preliminary stackup boundary and a 2.0 mm RAW_101V
   clearance rule outside the unavoidable reviewed QDUT/RVS/ROV component
-  geometries.
+  geometries;
+- seven independent source spokes per TOLL, 4.0 mm source collection buses,
+  reinforced outer-layer power corridors and two five-via transition rows at
+  each common-source package boundary;
+- exact AEC-Q200 Vishay CRCW-HP RVS/ROV resistors and exact TDK soft-termination
+  CCAP, each with an independent controlled alternative.
 
 KiCad 10.0.4 ERC has zero findings. Board DRC has zero rule violations and
 zero unconnected items. CI also pins the four-layer routing set, direct F.Cu HGATE
 path, separate internal Kelvin/sense layers, outer-layer power-spine widths,
 power-via stitching, 0.20 mm default clearance and 2.0 mm RAW_101V clearance
-rule. This electrical-routing milestone is not permission to fabricate.
+rule. `Q2-C100-pre-fab-screening.md` reproducibly calculates the known copper
+cross-sections, a 3.0453 W straight-corridor hot-loss lower bound and the
+194.75 nH absolute waveform-derived loop ceiling. None is a thermal or
+extracted-inductance pass. This electrical-routing milestone is not permission
+to fabricate.
 
 ## Build variants
 

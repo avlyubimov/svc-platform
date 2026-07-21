@@ -3,8 +3,8 @@
 
 Q2-C100 is a dedicated laboratory coupon.  It is not PB-100 and it does not
 authorize PB-100 board import or manufacturing output.  The generated board
-captures the critical high-current and gate-drive geometry while the remaining
-low-energy routing stays visibly open until the test-fixture review closes.
+captures the controlled electrical-routing milestone while fabrication,
+thermal, loop-inductance, sourcing, and laboratory-safety review stay open.
 """
 
 from __future__ import annotations
@@ -36,6 +36,8 @@ INFINEON_Q1_DS = "https://www.infineon.com/assets/row/public/documents/10/49/inf
 WURTH_TERMINAL_DS = "https://www.we-online.com/components/products/datasheet/786202073.pdf"
 NEXPERIA_ZENER_DS = "https://assets.nexperia.com/documents/data-sheet/BZT52H-Q_SER.pdf"
 TDK_CVS_PAGE = "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=CGA6N3X7R2A225M230AE"
+TDK_CCAP_PAGE = "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=CGA3E2X7R1H104K080AE"
+VISHAY_CRCW_HP_DS = "https://www.vishay.com/docs/20043/crcwhpe3.pdf"
 
 
 @dataclass(frozen=True)
@@ -169,14 +171,14 @@ def build_coupon() -> Schematic:
     )
 
     passive_0603 = "Q2C100:R_C_0603_1608Metric"
-    schematic.add(c("ROV1", "42.2k 1% AEC-Q200", "Q2C100:R_1206_3216Metric", TI_DS, [("1", "1", "RAW_101V"), ("2", "2", "OV_MID")]))
-    schematic.add(c("ROV2", "42.2k 1% AEC-Q200", "Q2C100:R_1206_3216Metric", TI_DS, [("1", "1", "OV_MID"), ("2", "2", "CTRL_OV")]))
-    schematic.add(c("ROV3", "1.00k 1% AEC-Q200", passive_0603, TI_DS, [("1", "1", "CTRL_OV"), ("2", "2", "GND")]))
-    schematic.add(c("RVS", "10.0k 1% 1206 AEC-Q200", "Q2C100:R_1206_3216Metric", TI_DS, [("1", "1", "RAW_101V"), ("2", "2", "CTRL_VS")]))
+    schematic.add(c("ROV1", "CRCW120642K2FKEAHP 42.2k 1%", "Q2C100:R_1206_3216Metric", VISHAY_CRCW_HP_DS, [("1", "1", "RAW_101V"), ("2", "2", "OV_MID")]))
+    schematic.add(c("ROV2", "CRCW120642K2FKEAHP 42.2k 1%", "Q2C100:R_1206_3216Metric", VISHAY_CRCW_HP_DS, [("1", "1", "OV_MID"), ("2", "2", "CTRL_OV")]))
+    schematic.add(c("ROV3", "CRCW06031K00FKEAHP 1.00k 1%", passive_0603, VISHAY_CRCW_HP_DS, [("1", "1", "CTRL_OV"), ("2", "2", "GND")]))
+    schematic.add(c("RVS", "CRCW120610K0FKEAHP 10.0k 1%", "Q2C100:R_1206_3216Metric", VISHAY_CRCW_HP_DS, [("1", "1", "RAW_101V"), ("2", "2", "CTRL_VS")]))
     schematic.add(c("DZVS", "BZT52H-B56-Q 56V", "Q2C100:SOD123F", NEXPERIA_ZENER_DS, [("1", "K", "CTRL_VS"), ("2", "A", "GND")]))
     for ref in ("CVS1", "CVS2"):
         schematic.add(c(ref, "CGA6N3X7R2A225M230AE 2.2uF 100V X7R", "Q2C100:C_1210_3225Metric", TDK_CVS_PAGE, [("1", "1", "CTRL_VS"), ("2", "2", "GND")]))
-    schematic.add(c("CCAP", "100nF 25V X7R AEC-Q200", passive_0603, TI_DS, [("1", "1", "CTRL_CAP"), ("2", "2", "CTRL_VS")]))
+    schematic.add(c("CCAP", "CGA3E2X7R1H104K080AE 100nF 50V X7R", passive_0603, TDK_CCAP_PAGE, [("1", "1", "CTRL_CAP"), ("2", "2", "CTRL_VS")]))
 
     schematic.add(c("JDRIVE", "FORCED_DRIVER_KELVIN", "Q2C100:PinHeader_1x04_P2.54", "PB-100-q2-empirical-qualification-plan.md", [("1", "GATE", "Q2_HGATE"), ("2", "SOURCE_K", "COMMON_SOURCE"), ("3", "TRIGGER", "EXT_TRIGGER"), ("4", "INTERLOCK", "EXT_INTERLOCK")]))
     schematic.add(c("JHEAT", "ISOLATED_CASE_HEATER", "Q2C100:PinHeader_1x02_P2.54", "PB-100-q2-empirical-qualification-plan.md", [("1", "HEAT+", "HEATER_POS"), ("2", "HEAT-", "HEATER_NEG")]))
@@ -467,25 +469,27 @@ def critical_routing(net_codes: dict[str, int]) -> list[str]:
         routes.extend(
             [
                 segment(net_codes, "RAW_101V", layer, 7.0, (40.0, 12.0), (40.0, 28.0), "raw-main"),
-                segment(net_codes, "COMMON_SOURCE", layer, 5.0, (40.0, 43.0), (40.0, 57.0), "common-spine"),
+                segment(net_codes, "COMMON_SOURCE", layer, 6.0, (40.0, 43.0), (40.0, 57.0), "common-spine"),
                 segment(net_codes, "COMMON_SOURCE", layer, 6.0, (40.0, 50.0), (70.0, 50.0), "common-terminal"),
                 segment(net_codes, "SYSTEM_OUT", layer, 7.0, (40.0, 72.0), (40.0, 90.0), "out-main"),
             ]
         )
     routes.extend(
         [
-            segment(net_codes, "RAW_101V", "F.Cu", 5.0, (40.0, 28.0), (40.0, 33.45), "raw-neck"),
-            segment(net_codes, "COMMON_SOURCE", "F.Cu", 0.8, (37.0, 39.1), (44.2, 39.1), "qdut-source-row"),
-            segment(net_codes, "COMMON_SOURCE", "F.Cu", 0.8, (40.0, 39.1), (40.0, 43.0), "qdut-source-neck"),
-            segment(net_codes, "COMMON_SOURCE", "F.Cu", 0.8, (35.8, 60.9), (43.0, 60.9), "qrev-source-row"),
-            segment(net_codes, "COMMON_SOURCE", "F.Cu", 0.8, (40.0, 57.0), (40.0, 60.9), "qrev-source-neck"),
-            segment(net_codes, "SYSTEM_OUT", "F.Cu", 5.0, (40.0, 66.55), (40.0, 72.0), "out-neck"),
+            segment(net_codes, "RAW_101V", "F.Cu", 6.5, (40.0, 28.0), (40.0, 33.45), "raw-neck"),
+            segment(net_codes, "COMMON_SOURCE", "F.Cu", 4.0, (37.0, 42.75), (44.2, 42.75), "qdut-source-bus"),
+            segment(net_codes, "COMMON_SOURCE", "F.Cu", 4.0, (35.8, 57.25), (43.0, 57.25), "qrev-source-bus"),
+            segment(net_codes, "SYSTEM_OUT", "F.Cu", 8.0, (40.0, 66.55), (40.0, 72.0), "out-neck"),
             segment(net_codes, "Q2_HGATE", "F.Cu", 0.25, (20.0, 45.75), (22.0, 45.75), "hgate-a"),
             segment(net_codes, "Q2_HGATE", "F.Cu", 0.25, (22.0, 45.75), (22.0, 47.0), "hgate-b"),
             segment(net_codes, "Q2_HGATE", "F.Cu", 0.25, (22.0, 47.0), (28.0, 47.0), "hgate-c"),
             segment(net_codes, "Q2_HGATE", "F.Cu", 0.25, (28.0, 47.0), (35.8, 39.1), "hgate-d"),
         ]
     )
+    for index, x in enumerate((37.0, 38.2, 39.4, 40.6, 41.8, 43.0, 44.2), 2):
+        routes.append(segment(net_codes, "COMMON_SOURCE", "F.Cu", 0.8, (x, 39.1), (x, 42.75), f"qdut-source-{index}"))
+    for index, x in enumerate((35.8, 37.0, 38.2, 39.4, 40.6, 41.8, 43.0), 2):
+        routes.append(segment(net_codes, "COMMON_SOURCE", "F.Cu", 0.8, (x, 60.9), (x, 57.25), f"qrev-source-{index}"))
     # DGATE and the two controller source-sense paths cross power copper only
     # on separate internal layers and return through local vias.
     routes.extend(
@@ -514,9 +518,15 @@ def critical_routing(net_codes: dict[str, int]) -> list[str]:
         ]
     )
     for net, points in {
-        "RAW_101V": ((37.0, 20.0), (43.0, 20.0), (37.0, 28.0), (43.0, 28.0)),
-        "COMMON_SOURCE": ((37.0, 43.0), (43.0, 43.0), (37.0, 50.0), (43.0, 50.0), (50.0, 50.0), (60.0, 50.0), (37.0, 57.0), (43.0, 57.0)),
-        "SYSTEM_OUT": ((37.0, 72.0), (43.0, 72.0), (37.0, 80.0), (43.0, 80.0)),
+        "RAW_101V": ((37.0, 20.0), (43.0, 20.0), (37.0, 28.0), (38.5, 28.0), (40.0, 28.0), (41.5, 28.0), (43.0, 28.0)),
+        "COMMON_SOURCE": (
+            (37.0, 42.0), (38.5, 42.0), (40.0, 42.0), (41.5, 42.0), (43.0, 42.0),
+            (37.0, 43.5), (38.5, 43.5), (40.0, 43.5), (41.5, 43.5), (43.0, 43.5),
+            (37.0, 50.0), (43.0, 50.0), (50.0, 50.0), (60.0, 50.0),
+            (37.0, 56.5), (38.5, 56.5), (40.0, 56.5), (41.5, 56.5), (43.0, 56.5),
+            (37.0, 58.0), (38.5, 58.0), (40.0, 58.0), (41.5, 58.0), (43.0, 58.0),
+        ),
+        "SYSTEM_OUT": ((37.0, 72.0), (38.5, 72.0), (40.0, 72.0), (41.5, 72.0), (43.0, 72.0), (37.0, 80.0), (43.0, 80.0)),
     }.items():
         for index, (x, y) in enumerate(points):
             routes.append(via(net_codes, net, x, y, f"{net}-{index}"))
@@ -610,7 +620,7 @@ def low_energy_routing(net_codes: dict[str, int]) -> list[str]:
         routes.append(signal_via(net_codes, "SYSTEM_OUT", fanout[0], fanout[1], token))
         routes.extend(route_path(net_codes, "SYSTEM_OUT", "F.Cu", 0.25, (start, fanout), token))
     routes.extend(route_path(net_codes, "SYSTEM_OUT", "F.Cu", 0.25, ((18.75, 43.0), (19.25, 43.0), (19.25, 42.5), (20.75, 42.5)), "out-pins18-20"))
-    routes.extend(route_path(net_codes, "SYSTEM_OUT", "In1.Cu", 0.25, ((14.5, 34.0), (20.75, 42.5), (26.0, 43.75), (30.0, 44.0), (30.0, 58.0), (48.0, 58.0), (48.0, 69.0)), "out-sense"))
+    routes.extend(route_path(net_codes, "SYSTEM_OUT", "In1.Cu", 0.25, ((14.5, 34.0), (20.75, 42.5), (26.0, 43.75), (30.0, 44.0), (30.0, 59.5), (48.0, 59.5), (48.0, 69.0)), "out-sense"))
     routes.extend(route_path(net_codes, "SYSTEM_OUT", "B.Cu", 0.5, ((48.0, 69.0), (43.0, 72.0)), "out-probe"))
 
     return routes

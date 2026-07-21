@@ -65,17 +65,41 @@ effective capacitance of at least 1.0 uF at 56 V over temperature.
 
 ## OV divider package boundary
 
-ROV1 and ROV2 use 1206 lands. Their equal 42.2 kOhm values split the raw-side
-working voltage, while the larger package preserves routing room for the
-reviewed 2.0 mm RAW_101V clearance outside the component body and provides a
-better working-voltage/pulse starting point than 0603. A 0603 upper leg is
-rejected because its land geometry and voltage margin are poor for this
-101 V qualification fixture. A larger 1210/2512 network would add loop area
-without closing the still-required resistor-series pulse and working-voltage
-evidence. ROV3 remains 0603 because it is the low-side 1.00 kOhm leg and does
-not see RAW_101V. Exact AEC-Q200 MPNs, tolerance/temperature coefficients,
-maximum continuous working voltage, pulse load and a second source remain open
-before `FAB-REVIEW`.
+ROV1 and ROV2 use exact Vishay `CRCW120642K2FKEAHP` 1206 parts. Their equal
+42.2 kOhm values split the raw-side working voltage, while the larger package
+preserves routing room for the reviewed 2.0 mm RAW_101V clearance outside the
+component body. The CRCW-HP family is AEC-Q200, 0.75 W at 70 degC and 200 V
+maximum operating voltage for 1206; each nominal upper element sees about
+49.9 V and 59 mW at 101 V. `CRS1206QFX-4222ELF` is the independent Bourns
+0.5 W / 200 V anti-surge alternative. A 0603 upper leg is rejected because its
+land geometry and voltage margin are poor for this fixture. A 1210/2512
+network would add area without improving the divider function.
+
+RVS uses exact `CRCW120610K0FKEAHP`; `CRS1206QFX-1002ELF` is its independent
+Bourns alternative. The 1206 pulse-proof class is retained because startup can
+temporarily apply substantially more than the clamped steady-state voltage.
+The exact Zener tolerance, startup pulse, local temperature and derating
+calculation remains open; selecting the MPN does not close that application
+proof. ROV3 uses exact `CRCW06031K00FKEAHP` because it is the low-side 1.00
+kOhm leg and does not see RAW_101V. `CMP0603QFX-1001ELF` is its independent
+Bourns AEC-Q200 anti-surge alternative.
+
+## Charge-pump capacitor
+
+CCAP uses exact TDK `CGA3E2X7R1H104K080AE`: 100 nF +/-10%, 50 V, X7R,
+-55..125 degC, AEC-Q200 and soft termination in EIA 0603. The 50 V rating is
+preferred over the former generic 25 V class, and soft termination reduces
+board-flex crack risk. Murata `GCJ188R71H104KA12D` is the independent 50 V,
+X7R soft-termination alternative. TDK `CGA3E2X7R1H104K080AA` is electrically
+equivalent but lacks soft termination and is therefore only a controlled
+fallback after assembly-strain review. CAP differential waveform validation
+remains part of controller correlation; nominal value alone is not credited.
+
+Primary evidence: [Vishay CRCW-HP e3](https://www.vishay.com/docs/20043/crcwhpe3.pdf),
+[Bourns CRS-Q](https://www.bourns.com/docs/product-datasheets/crs-q.pdf),
+[Bourns CMP-Q](https://www.bourns.com/docs/product-datasheets/CMP-Q.pdf),
+[TDK CGA3E2X7R1H104K080AE](https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=CGA3E2X7R1H104K080AE),
+and [Murata GCJ188R71H104KA12](https://search.murata.co.jp/Ceramy/image/img/A01X/G101/ENG/GCJ188R71H104KA12-01.pdf).
 
 ## Reliability, production and cost boundary
 

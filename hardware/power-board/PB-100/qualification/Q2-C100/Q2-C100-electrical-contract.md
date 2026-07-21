@@ -38,13 +38,15 @@ controller pin plus measurement uncertainty reaches 65 V.
 
 ## Controller passives
 
-- OV divider: 42.2 kOhm + 42.2 kOhm / 1.00 kOhm, 1%, from RAW_101V to GND.
-- VS feed: 10.0 kOhm 1206 from RAW_101V.
+- OV divider: two `CRCW120642K2FKEAHP` 42.2 kOhm 1% upper elements and
+  `CRCW06031K00FKEAHP` 1.00 kOhm 1% lower element, from RAW_101V to GND.
+- VS feed: `CRCW120610K0FKEAHP`, 10.0 kOhm 1% 1206, from RAW_101V.
 - VS clamp: `BZT52H-B56-Q`, nominal 56 V, AEC-Q101.
 - VS storage: two `CGA6N3X7R2A225M230AE`, 2.2 uF, 100 V, X7R,
   AEC-Q200. The assembled effective total at 56 V and the test temperature
   must be measured and remain at least 1.0 uF before energizing.
-- CAP-to-VS: 100 nF, 25 V, X7R, AEC-Q200.
+- CAP-to-VS: `CGA3E2X7R1H104K080AE`, 100 nF, 50 V, X7R, AEC-Q200,
+  soft termination.
 
 TI requires at least 1 uF on VS for the resistor/Zener unsuppressed-load-dump
 topology. Nominal capacitance alone is not acceptance evidence because MLCC DC

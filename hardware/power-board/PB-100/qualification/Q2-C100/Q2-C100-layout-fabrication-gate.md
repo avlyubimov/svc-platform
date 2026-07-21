@@ -23,6 +23,14 @@ heating, loop inductance and connector/interface temperature. Initial QDUT
 150 degC is created by the controlled heater/calibration method, not by assuming
 the coupon's unverified steady-state thermal impedance.
 
+The first committed arithmetic screen is
+`Q2-C100-pre-fab-screening.md` / `.csv`. It records a 1.9033 mOhm and 3.0453 W
+lower bound for five straight correlation-path corridors at 150 degC copper,
+plus source-fanout/via cross-sections and a waveform-derived 194.75 nH absolute
+loop ceiling. Package lands, spreading, via resistance, contacts, unequal layer
+sharing and fixture conductors are excluded, so these values are inputs to the
+required field solutions and cannot close 40 A or loop behavior.
+
 ## Current machine-checked milestone
 
 - schematic ERC findings: 0;
@@ -34,6 +42,11 @@ the coupon's unverified steady-state thermal impedance.
   probe and fixture paths;
 - the direct F.Cu-only HGATE path, separate In1/In2 sense/Kelvin routes,
   outer-layer power-spine widths and power-via stitching are pinned by CI;
+- every TOLL source pad has its own 0.8 mm spoke into a 4.0 mm collection bus;
+  the common-source spine is 6.0 mm on both outer layers and has two five-via
+  transfer rows at each package-side boundary;
+- RVS, ROV1/2, ROV3 and CCAP exact primary MPNs and independent alternatives
+  are recorded; their remaining application calculations stay open;
 - manufacturing outputs: none.
 
 `FAB-REVIEW` remains open. Zero DRC and zero unconnected items prove electrical
@@ -42,13 +55,15 @@ capacity, transient loop behavior, safety-system completion or fabricability.
 
 ## Required before `FAB-REVIEW`
 
-1. Complete creepage/clearance, field-solver/loop-inductance and 40 A thermal
-   review using the selected supplier stackup.
+1. Use the committed arithmetic screen to complete creepage/clearance,
+   field-solver/loop-inductance and 40 A electrothermal review with the selected
+   supplier stackup and complete fixture.
 2. Close exact MPNs for fixture headers, probe loops and the external safety
    enclosure/interlock interfaces.
 3. Prove effective CTRL_VS capacitance is at least 1.0 uF at 56 V across the
    accepted temperature range.
-4. Review controller/passive placement against the TI layout guidance and the
+4. Close RVS Zener-tolerance/startup-pulse/local-temperature derating, review
+   controller/passive placement against TI layout guidance, and review the
    QDUT land against Infineon assembly guidance.
 5. Commit current-limit, fuse, dump/discharge, emergency stop, remote trigger,
    shield and laboratory safety evidence.

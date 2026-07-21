@@ -41,9 +41,13 @@ def require_tokens(path: Path, tokens: tuple[str, ...]) -> None:
 
 
 def validate_generated_files() -> None:
-    result = run([sys.executable, "tools/generate_q2_qualification_coupon.py", "--check"])
-    if result.returncode:
-        fail(result.stdout.strip() or result.stderr.strip() or "Q2-C100 generated files are stale")
+    for generator in (
+        "tools/generate_q2_qualification_coupon.py",
+        "tools/generate_q2_coupon_prefab_screening.py",
+    ):
+        result = run([sys.executable, generator, "--check"])
+        if result.returncode:
+            fail(result.stdout.strip() or result.stderr.strip() or f"generated files are stale: {generator}")
 
 
 def validate_documents() -> None:
@@ -66,6 +70,9 @@ def validate_documents() -> None:
             "65 V",
             "BZT52H-B56-Q",
             "CGA6N3X7R2A225M230AE",
+            "CGA3E2X7R1H104K080AE",
+            "CRCW120610K0FKEAHP",
+            "CRCW120642K2FKEAHP",
             "at least 1.0 uF",
             "No grounded oscilloscope input",
         ),
@@ -80,6 +87,28 @@ def validate_documents() -> None:
             "unconnected items: 0",
             "`FAB-REVIEW` remains open",
             "Required before `FAB-REVIEW`",
+            "3.0453 W",
+            "two five-via",
+        ),
+    )
+    require_tokens(
+        COUPON / "Q2-C100-pre-fab-screening.md",
+        (
+            "CALCULATION SCREEN COMPLETE / THERMAL, EXTRACTION AND FAB-REVIEW OPEN",
+            "1.9033 mOhm",
+            "3.0453 W",
+            "seven TOLL source pads",
+            "194.75 nH",
+            "not an IPC-2152 ampacity claim",
+        ),
+    )
+    require_tokens(
+        COUPON / "Q2-C100-pre-fab-screening.csv",
+        (
+            "RAW_QDUT_NECK_FCU",
+            "SOURCE_LEADS_AGGREGATE",
+            "POWER_VIA_ROW_MIN_PLATING",
+            "CONDITIONAL",
         ),
     )
     require_tokens(
@@ -94,9 +123,27 @@ def validate_documents() -> None:
             "greater-than-10-year",
             "JLCPCB/PCBWay",
             "500 USD",
+            "CRCW120610K0FKEAHP",
+            "CRS1206QFX-1002ELF",
+            "CGA3E2X7R1H104K080AE",
+            "GCJ188R71H104KA12D",
         ),
     )
-    require_tokens(COUPON / "Q2-C100-bom.csv", ("QDUT", "UCTRL", "QREV", "786202073", "BZT52H-B56-Q", "FAB-REVIEW"))
+    require_tokens(
+        COUPON / "Q2-C100-bom.csv",
+        (
+            "QDUT",
+            "UCTRL",
+            "QREV",
+            "786202073",
+            "BZT52H-B56-Q",
+            "CRCW120610K0FKEAHP",
+            "CRCW120642K2FKEAHP",
+            "CRCW06031K00FKEAHP",
+            "CGA3E2X7R1H104K080AE",
+            "FAB-REVIEW",
+        ),
+    )
     require_tokens(COUPON / "Q2-C100-assembly-variants.csv", ("CORRELATION-A", "FORCED-B", "No simultaneous external drive"))
 
     forbidden_suffixes = {".gbr", ".ger", ".drl", ".xln", ".pos", ".zip"}
@@ -149,8 +196,11 @@ def validate_netlist(kicad_cli: str, temp: Path) -> None:
         "QREV": ("IAUT300N08S5N012ATMA2", "PB100:PG-HSOF-8-1_TOLL_Infineon"),
         "UCTRL": ("LM74930QRGERQ1", "PB100:VQFN-24_RGE_4x4mm_P0.5mm_EP2.4mm"),
         "DZVS": ("BZT52H-B56-Q 56V", "Q2C100:SOD123F"),
-        "ROV1": ("42.2k 1% AEC-Q200", "Q2C100:R_1206_3216Metric"),
-        "ROV2": ("42.2k 1% AEC-Q200", "Q2C100:R_1206_3216Metric"),
+        "ROV1": ("CRCW120642K2FKEAHP 42.2k 1%", "Q2C100:R_1206_3216Metric"),
+        "ROV2": ("CRCW120642K2FKEAHP 42.2k 1%", "Q2C100:R_1206_3216Metric"),
+        "ROV3": ("CRCW06031K00FKEAHP 1.00k 1%", "Q2C100:R_C_0603_1608Metric"),
+        "RVS": ("CRCW120610K0FKEAHP 10.0k 1%", "Q2C100:R_1206_3216Metric"),
+        "CCAP": ("CGA3E2X7R1H104K080AE 100nF 50V X7R", "Q2C100:R_C_0603_1608Metric"),
     }
     for ref, expected in expected_components.items():
         if components.get(ref) != expected:
@@ -296,6 +346,53 @@ def validate_board_contract() -> None:
     if routed_nets != expected_routed_nets:
         fail(f"Q2-C100 routed-net set changed: {sorted(routed_nets)}")
 
+    geometry_pattern = re.compile(
+        r'^\t\(segment \(start ([-0-9.]+) ([-0-9.]+)\) \(end ([-0-9.]+) ([-0-9.]+)\) '
+        r'\(width ([0-9.]+)\) \(layer "([^"]+)"\) \(net (\d+)\)',
+        re.MULTILINE,
+    )
+    geometry = {
+        (
+            float(x1),
+            float(y1),
+            float(x2),
+            float(y2),
+            float(width),
+            layer,
+            net_by_code[int(code)],
+        )
+        for x1, y1, x2, y2, width, layer, code in geometry_pattern.findall(board_text)
+    }
+    required_power_geometry = {
+        (40.0, 12.0, 40.0, 28.0, 7.0, layer, "RAW_101V")
+        for layer in ("F.Cu", "B.Cu")
+    } | {
+        (40.0, 43.0, 40.0, 57.0, 6.0, layer, "COMMON_SOURCE")
+        for layer in ("F.Cu", "B.Cu")
+    } | {
+        (40.0, 50.0, 70.0, 50.0, 6.0, layer, "COMMON_SOURCE")
+        for layer in ("F.Cu", "B.Cu")
+    } | {
+        (40.0, 72.0, 40.0, 90.0, 7.0, layer, "SYSTEM_OUT")
+        for layer in ("F.Cu", "B.Cu")
+    } | {
+        (40.0, 28.0, 40.0, 33.45, 6.5, "F.Cu", "RAW_101V"),
+        (40.0, 66.55, 40.0, 72.0, 8.0, "F.Cu", "SYSTEM_OUT"),
+        (37.0, 42.75, 44.2, 42.75, 4.0, "F.Cu", "COMMON_SOURCE"),
+        (35.8, 57.25, 43.0, 57.25, 4.0, "F.Cu", "COMMON_SOURCE"),
+    }
+    qdut_spokes = {
+        (x, 39.1, x, 42.75, 0.8, "F.Cu", "COMMON_SOURCE")
+        for x in (37.0, 38.2, 39.4, 40.6, 41.8, 43.0, 44.2)
+    }
+    qrev_spokes = {
+        (x, 60.9, x, 57.25, 0.8, "F.Cu", "COMMON_SOURCE")
+        for x in (35.8, 37.0, 38.2, 39.4, 40.6, 41.8, 43.0)
+    }
+    missing_geometry = (required_power_geometry | qdut_spokes | qrev_spokes) - geometry
+    if missing_geometry:
+        fail(f"Q2-C100 reviewed high-current geometry changed: {sorted(missing_geometry)}")
+
     segment_layers: dict[str, set[str]] = {}
     for width, layer, net in segments:
         segment_layers.setdefault(net, set()).add(layer)
@@ -308,7 +405,7 @@ def validate_board_contract() -> None:
     if "In1.Cu" not in segment_layers["SYSTEM_OUT"]:
         fail("SYSTEM_OUT must retain separate In1.Cu controller-sense routing")
 
-    for net, minimum_width in (("RAW_101V", 7.0), ("COMMON_SOURCE", 5.0), ("SYSTEM_OUT", 7.0)):
+    for net, minimum_width in (("RAW_101V", 7.0), ("COMMON_SOURCE", 6.0), ("SYSTEM_OUT", 7.0)):
         for layer in ("F.Cu", "B.Cu"):
             if not any(
                 routed_net == net and routed_layer == layer and width >= minimum_width
@@ -327,13 +424,40 @@ def validate_board_contract() -> None:
     ]
     if any(size < 0.8 or drill < 0.4 for size, drill, _ in vias):
         fail("Q2-C100 contains a via below the reviewed 0.8/0.4 mm minimum")
-    for net, minimum_count in (("RAW_101V", 4), ("COMMON_SOURCE", 13), ("SYSTEM_OUT", 4)):
+    for net, minimum_count in (("RAW_101V", 7), ("COMMON_SOURCE", 29), ("SYSTEM_OUT", 7)):
         power_vias = [(size, drill) for size, drill, via_net in vias if via_net == net]
         reviewed_power_vias = [
             (size, drill) for size, drill in power_vias if size >= 1.2 and drill >= 0.6
         ]
         if len(reviewed_power_vias) < minimum_count:
             fail(f"Q2-C100 {net} power-via stitching changed")
+
+    via_geometry_pattern = re.compile(
+        r'^\t\(via \(at ([-0-9.]+) ([-0-9.]+)\) \(size ([0-9.]+)\) \(drill ([0-9.]+)\) '
+        r'\(layers "F.Cu" "B.Cu"\) \(net (\d+)\)',
+        re.MULTILINE,
+    )
+    via_geometry = {
+        (float(x), float(y), float(size), float(drill), net_by_code[int(code)])
+        for x, y, size, drill, code in via_geometry_pattern.findall(board_text)
+    }
+    required_vias = {
+        (x, y, 1.2, 0.6, "RAW_101V")
+        for x, y in ((37.0, 20.0), (43.0, 20.0), (37.0, 28.0), (38.5, 28.0), (40.0, 28.0), (41.5, 28.0), (43.0, 28.0))
+    } | {
+        (x, y, 1.2, 0.6, "COMMON_SOURCE")
+        for y in (42.0, 43.5, 56.5, 58.0)
+        for x in (37.0, 38.5, 40.0, 41.5, 43.0)
+    } | {
+        (x, 50.0, 1.2, 0.6, "COMMON_SOURCE")
+        for x in (37.0, 43.0, 50.0, 60.0)
+    } | {
+        (x, y, 1.2, 0.6, "SYSTEM_OUT")
+        for x, y in ((37.0, 72.0), (38.5, 72.0), (40.0, 72.0), (41.5, 72.0), (43.0, 72.0), (37.0, 80.0), (43.0, 80.0))
+    }
+    missing_vias = required_vias - via_geometry
+    if missing_vias:
+        fail(f"Q2-C100 reviewed power-via field changed: {sorted(missing_vias)}")
 
 
 def main() -> int:
