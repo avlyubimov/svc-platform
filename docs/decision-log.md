@@ -3618,3 +3618,32 @@ Exactly 36 low-energy fixture connections remain deliberately open and are
 machine-pinned. Q2E-003 moves from `NOT STARTED` to `IN PROGRESS`; Gerber,
 drill, fabrication, energized testing, PB-100 board import and PB-100 release
 remain prohibited.
+
+## 2026-07-21 — Complete Q2-C100 pad-to-pad electrical routing
+
+Decision: route every remaining Q2-C100 pad-to-pad controller-support, probe
+and fixture connection without changing the accepted QDUT/UCTRL topology or
+adding a gate-path selector. Preserve explicit traces instead of introducing
+an unreviewed plane: Q2_HGATE remains F.Cu-only, QREV_DGATE and protected-side
+sense use In1.Cu, source Kelvin uses In2.Cu, and the high-current RAW/common/
+output spines remain duplicated on both outer layers with stitched vias.
+
+Decision: enlarge ROV1 and ROV2 from 0603 to 1206 lands. The two 42.2 kOhm
+upper-divider elements split the 101 V raw-side working voltage; 1206 gives a
+more credible working-voltage/pulse starting point and enough geometry for the
+2.0 mm RAW_101V clearance outside the reviewed body. Exact AEC-Q200 MPN,
+temperature/tolerance, continuous working-voltage and pulse evidence still
+close at `FAB-REVIEW`; ROV3 remains 0603 on the low-side node.
+
+Result: KiCad 10.0.4 reports ERC 0, DRC 0 and zero unconnected items. Schematic
+parity differs only by intentional board-only H1-H4. CI now independently pins
+the routed-net set, four-layer routing boundary, 0.20 mm minimum track floor,
+direct HGATE layer, internal Kelvin/sense layers, outer power-spine widths,
+power-via geometry and the 2.0 mm RAW clearance rule.
+
+This closes only the electrical-routing subtask of Q2E-003. `FAB-REVIEW`, exact
+fixture/probe sourcing, thermal/current-density and loop extraction, laboratory
+safety, DUT lots, correlation, measurements and independent review remain
+open. Q2Q-010 through Q2Q-015 stay `PENDING EMPIRICAL`; PBREL-007 remains
+`Conditional`; coupon fabrication/energized use and PB-100 layout remain
+blocked.

@@ -27,27 +27,32 @@ the coupon's unverified steady-state thermal impedance.
 
 - schematic ERC findings: 0;
 - board DRC rule violations: 0;
-- open low-energy fixture connections: exactly 36;
+- unconnected items: 0;
 - schematic-parity differences: four board-only M3 mounting holes only;
-- routed critical nets: RAW_101V, COMMON_SOURCE, SYSTEM_OUT, Q2_HGATE,
-  QREV_DGATE and separate UCTRL A/OUT Kelvin returns;
+- all required pad-to-pad connections are routed, including RAW_101V,
+  COMMON_SOURCE, SYSTEM_OUT, Q2_HGATE, QREV_DGATE, controller support,
+  probe and fixture paths;
+- the direct F.Cu-only HGATE path, separate In1/In2 sense/Kelvin routes,
+  outer-layer power-spine widths and power-via stitching are pinned by CI;
 - manufacturing outputs: none.
+
+`FAB-REVIEW` remains open. Zero DRC and zero unconnected items prove electrical
+completion of this controlled source milestone; they do not prove 40 A thermal
+capacity, transient loop behavior, safety-system completion or fabricability.
 
 ## Required before `FAB-REVIEW`
 
-1. Route every remaining fixture/control connection and obtain zero
-   unconnected items without weakening DRC.
-2. Complete creepage/clearance, field-solver/loop-inductance and 40 A thermal
+1. Complete creepage/clearance, field-solver/loop-inductance and 40 A thermal
    review using the selected supplier stackup.
-3. Close exact MPNs for fixture headers, probe loops and the external safety
+2. Close exact MPNs for fixture headers, probe loops and the external safety
    enclosure/interlock interfaces.
-4. Prove effective CTRL_VS capacitance is at least 1.0 uF at 56 V across the
+3. Prove effective CTRL_VS capacitance is at least 1.0 uF at 56 V across the
    accepted temperature range.
-5. Review controller/passive placement against the TI layout guidance and the
+4. Review controller/passive placement against the TI layout guidance and the
    QDUT land against Infineon assembly guidance.
-6. Commit current-limit, fuse, dump/discharge, emergency stop, remote trigger,
+5. Commit current-limit, fuse, dump/discharge, emergency stop, remote trigger,
    shield and laboratory safety evidence.
-7. Obtain independent electrical, layout and safety sign-off.
+6. Obtain independent electrical, layout and safety sign-off.
 
 Only then may a separate reviewed change generate coupon Gerber/drill files.
 That change still cannot generate or authorize PB-100 manufacturing output.

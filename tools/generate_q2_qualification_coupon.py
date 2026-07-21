@@ -56,10 +56,10 @@ PLACEMENTS = {
     "DZVS": Placement(12.0, 29.0, 90.0),
     "CVS1": Placement(18.0, 29.0),
     "CVS2": Placement(24.0, 29.0),
-    "CCAP": Placement(25.0, 43.0),
+    "CCAP": Placement(21.0, 39.5, 90.0),
     "ROV1": Placement(57.0, 18.0, 90.0),
-    "ROV2": Placement(57.0, 24.0, 90.0),
-    "ROV3": Placement(57.0, 30.0, 90.0),
+    "ROV2": Placement(57.0, 26.0, 90.0),
+    "ROV3": Placement(57.0, 34.0, 90.0),
     "JDRIVE": Placement(8.0, 48.0, 90.0),
     "JHEAT": Placement(69.0, 75.0),
     "JTEMP": Placement(69.0, 82.0),
@@ -95,7 +95,7 @@ def build_coupon() -> Schematic:
                 "Forced build: do not populate UCTRL/QREV; drive QDUT at JDRIVE pins 1/2.",
                 "No populated Rg or CdV/dt exists in either accepted build.",
                 "RAW_101V may reach 101 V; LM74930 protected pins remain on <=65 V nets.",
-                "Power-loop geometry is routed; low-energy fixture routing remains open.",
+                "All pad-to-pad electrical connections are routed; FAB-REVIEW remains open.",
             )
         ),
         paper="A2",
@@ -169,8 +169,8 @@ def build_coupon() -> Schematic:
     )
 
     passive_0603 = "Q2C100:R_C_0603_1608Metric"
-    schematic.add(c("ROV1", "42.2k 1% AEC-Q200", passive_0603, TI_DS, [("1", "1", "RAW_101V"), ("2", "2", "OV_MID")]))
-    schematic.add(c("ROV2", "42.2k 1% AEC-Q200", passive_0603, TI_DS, [("1", "1", "OV_MID"), ("2", "2", "CTRL_OV")]))
+    schematic.add(c("ROV1", "42.2k 1% AEC-Q200", "Q2C100:R_1206_3216Metric", TI_DS, [("1", "1", "RAW_101V"), ("2", "2", "OV_MID")]))
+    schematic.add(c("ROV2", "42.2k 1% AEC-Q200", "Q2C100:R_1206_3216Metric", TI_DS, [("1", "1", "OV_MID"), ("2", "2", "CTRL_OV")]))
     schematic.add(c("ROV3", "1.00k 1% AEC-Q200", passive_0603, TI_DS, [("1", "1", "CTRL_OV"), ("2", "2", "GND")]))
     schematic.add(c("RVS", "10.0k 1% 1206 AEC-Q200", "Q2C100:R_1206_3216Metric", TI_DS, [("1", "1", "RAW_101V"), ("2", "2", "CTRL_VS")]))
     schematic.add(c("DZVS", "BZT52H-B56-Q 56V", "Q2C100:SOD123F", NEXPERIA_ZENER_DS, [("1", "K", "CTRL_VS"), ("2", "A", "GND")]))
@@ -427,11 +427,38 @@ def segment(net_codes: dict[str, int], net: str, layer: str, width: float, start
     )
 
 
-def via(net_codes: dict[str, int], net: str, x: float, y: float, token: str) -> str:
+def via(
+    net_codes: dict[str, int],
+    net: str,
+    x: float,
+    y: float,
+    token: str,
+    *,
+    size: float = 1.2,
+    drill: float = 0.6,
+) -> str:
     return (
-        f'\t(via (at {x:.3f} {y:.3f}) (size 1.2) (drill 0.6) (layers "F.Cu" "B.Cu") '
+        f'\t(via (at {x:.3f} {y:.3f}) (size {size:.3f}) (drill {drill:.3f}) (layers "F.Cu" "B.Cu") '
         f'(net {net_codes[net]}) (uuid "{layout_uid("via", token)}"))'
     )
+
+
+def signal_via(net_codes: dict[str, int], net: str, x: float, y: float, token: str) -> str:
+    return via(net_codes, net, x, y, token, size=0.8, drill=0.4)
+
+
+def route_path(
+    net_codes: dict[str, int],
+    net: str,
+    layer: str,
+    width: float,
+    points: tuple[tuple[float, float], ...],
+    token: str,
+) -> list[str]:
+    return [
+        segment(net_codes, net, layer, width, start, end, f"{token}-{index}")
+        for index, (start, end) in enumerate(zip(points, points[1:]), 1)
+    ]
 
 
 def critical_routing(net_codes: dict[str, int]) -> list[str]:
@@ -477,11 +504,13 @@ def critical_routing(net_codes: dict[str, int]) -> list[str]:
             segment(net_codes, "COMMON_SOURCE", "In2.Cu", 0.25, (23.0, 44.0), (37.0, 45.25), "out-kelvin-inner"),
             via(net_codes, "COMMON_SOURCE", 37.0, 45.25, "out-kelvin-right"),
             segment(net_codes, "COMMON_SOURCE", "F.Cu", 0.25, (16.0, 44.25), (14.0, 44.25), "a-kelvin-top-a"),
-            segment(net_codes, "COMMON_SOURCE", "F.Cu", 0.25, (14.0, 44.25), (13.0, 47.0), "a-kelvin-top-b"),
-            via(net_codes, "COMMON_SOURCE", 13.0, 47.0, "a-kelvin-left"),
-            segment(net_codes, "COMMON_SOURCE", "In2.Cu", 0.25, (13.0, 47.0), (13.0, 40.0), "a-kelvin-inner-a"),
+            segment(net_codes, "COMMON_SOURCE", "F.Cu", 0.25, (14.0, 44.25), (12.0, 44.25), "a-kelvin-top-b"),
+            via(net_codes, "COMMON_SOURCE", 12.0, 44.25, "a-kelvin-left"),
+            segment(net_codes, "COMMON_SOURCE", "In2.Cu", 0.25, (12.0, 44.25), (13.0, 40.0), "a-kelvin-inner-a"),
             segment(net_codes, "COMMON_SOURCE", "In2.Cu", 0.25, (13.0, 40.0), (37.0, 40.0), "a-kelvin-inner-b"),
             via(net_codes, "COMMON_SOURCE", 37.0, 40.0, "a-kelvin-right"),
+            via(net_codes, "COMMON_SOURCE", 13.0, 47.0, "drive-source-left"),
+            segment(net_codes, "COMMON_SOURCE", "In2.Cu", 0.25, (13.0, 47.0), (12.0, 44.25), "drive-source-inner"),
         ]
     )
     for net, points in {
@@ -491,6 +520,99 @@ def critical_routing(net_codes: dict[str, int]) -> list[str]:
     }.items():
         for index, (x, y) in enumerate(points):
             routes.append(via(net_codes, net, x, y, f"{net}-{index}"))
+    return routes
+
+
+def low_energy_routing(net_codes: dict[str, int]) -> list[str]:
+    """Route board-level fixture, controller support, and probe connections."""
+
+    routes: list[str] = []
+
+    # Kelvin/probe branches join the already frozen critical power and HGATE
+    # geometry without changing the controller-to-DUT correlation path.
+    routes.extend(route_path(net_codes, "COMMON_SOURCE", "F.Cu", 0.4, ((8.0, 49.27), (11.0, 49.27), (13.0, 47.0)), "jdrive-source"))
+    routes.extend(route_path(net_codes, "COMMON_SOURCE", "F.Cu", 0.5, ((48.0, 42.0), (46.0, 42.0), (44.2, 39.1)), "source-probe"))
+    routes.extend(route_path(net_codes, "Q2_HGATE", "F.Cu", 0.25, ((8.0, 51.81), (12.0, 52.5), (26.0, 52.5), (26.0, 47.0), (22.0, 47.0)), "hgate-fixture"))
+    routes.extend(route_path(net_codes, "Q2_HGATE", "F.Cu", 0.25, ((27.0, 35.0), (30.0, 35.0), (35.8, 39.1)), "hgate-probes"))
+
+    # RAW divider/feed and drain-probe branches terminate directly on the
+    # existing high-current copper.  RAW clearance remains governed by the
+    # dedicated 2 mm rule outside reviewed component geometry.
+    routes.extend(route_path(net_codes, "RAW_101V", "F.Cu", 0.5, ((20.0, 21.75), (36.5, 21.75)), "raw-rvs"))
+    routes.extend(route_path(net_codes, "RAW_101V", "F.Cu", 0.5, ((57.0, 19.75), (43.5, 19.75)), "raw-ov"))
+    routes.extend(route_path(net_codes, "RAW_101V", "F.Cu", 0.5, ((48.0, 34.0), (44.35, 34.0)), "raw-probe"))
+
+    routes.extend(route_path(net_codes, "OV_MID", "F.Cu", 0.25, ((57.0, 16.25), (61.0, 16.25), (61.0, 27.75), (57.0, 27.75)), "ov-mid"))
+    routes.extend(route_path(net_codes, "CTRL_OV", "F.Cu", 0.25, ((57.0, 24.25), (53.0, 24.25), (53.0, 34.85), (57.0, 34.85), (61.0, 34.85), (61.0, 34.0)), "ov-local"))
+    routes.append(signal_via(net_codes, "CTRL_OV", 14.0, 51.0, "ov-controller"))
+    routes.extend(route_path(net_codes, "CTRL_OV", "B.Cu", 0.25, ((61.0, 34.0), (61.0, 38.5), (32.0, 38.5), (32.0, 58.0), (9.5, 58.0), (9.5, 52.0), (14.0, 51.0)), "ov-controller"))
+    routes.extend(route_path(net_codes, "CTRL_OV", "F.Cu", 0.20, ((14.0, 51.0), (14.0, 45.75), (16.0, 45.75)), "ov-fanout"))
+
+    # CTRL_VS storage and local controller fanout.  The two groups join at the
+    # plated TPVS node so effective-capacitance checks have a defined probe.
+    routes.extend(route_path(net_codes, "CTRL_VS", "F.Cu", 0.3, ((20.0, 18.25), (17.0, 18.25), (17.0, 26.0), (22.2, 26.0), (22.2, 29.0)), "vs-rvs"))
+    routes.extend(route_path(net_codes, "CTRL_VS", "F.Cu", 0.3, ((12.0, 30.65), (14.0, 30.65), (14.0, 26.0), (22.2, 26.0)), "vs-zener"))
+    routes.extend(route_path(net_codes, "CTRL_VS", "F.Cu", 0.3, ((16.2, 29.0), (16.2, 26.0)), "vs-cvs1"))
+    routes.extend(route_path(net_codes, "CTRL_VS", "F.Cu", 0.3, ((12.0, 35.0), (12.0, 30.65)), "vs-probe"))
+    routes.append(signal_via(net_codes, "CTRL_VS", 23.0, 38.0, "vs-controller"))
+    routes.extend(route_path(net_codes, "CTRL_VS", "B.Cu", 0.25, ((12.0, 35.0), (12.0, 37.0), (23.0, 38.0)), "vs-controller"))
+    routes.extend(route_path(net_codes, "CTRL_VS", "F.Cu", 0.20, ((17.75, 43.0), (17.75, 41.75), (20.0, 41.75), (23.0, 41.75), (23.0, 38.0), (21.0, 38.65)), "vs-pin22-ccap"))
+    routes.append(signal_via(net_codes, "CTRL_VS", 13.5, 45.25, "vs-pin4"))
+    routes.extend(route_path(net_codes, "CTRL_VS", "F.Cu", 0.20, ((16.0, 45.25), (13.5, 45.25)), "vs-pin4"))
+    routes.extend(route_path(net_codes, "CTRL_VS", "B.Cu", 0.25, ((13.5, 45.25), (18.0, 45.0), (23.0, 38.0)), "vs-pin4"))
+    routes.append(signal_via(net_codes, "CTRL_VS", 15.0, 49.0, "vs-pin6"))
+    routes.append(signal_via(net_codes, "CTRL_VS", 16.75, 49.0, "vs-pin7"))
+    routes.extend(route_path(net_codes, "CTRL_VS", "F.Cu", 0.20, ((16.0, 46.25), (15.0, 46.25), (15.0, 49.0)), "vs-pin6"))
+    routes.extend(route_path(net_codes, "CTRL_VS", "F.Cu", 0.20, ((16.75, 47.0), (16.75, 49.0)), "vs-pin7"))
+    routes.extend(route_path(net_codes, "CTRL_VS", "B.Cu", 0.25, ((15.0, 49.0), (16.75, 49.0), (18.0, 47.0), (22.0, 47.0), (22.0, 38.0), (23.0, 38.0)), "vs-pin6-7"))
+
+    routes.extend(route_path(net_codes, "CTRL_CAP", "F.Cu", 0.20, ((17.25, 43.0), (17.25, 41.0), (19.0, 41.0), (21.0, 40.35)), "cap-local"))
+
+    routes.append(signal_via(net_codes, "CTRL_FLT_N", 19.25, 49.5, "fault-controller"))
+    routes.extend(route_path(net_codes, "CTRL_FLT_N", "F.Cu", 0.20, ((19.25, 47.0), (19.25, 49.5)), "fault-fanout"))
+    routes.extend(route_path(net_codes, "CTRL_FLT_N", "In2.Cu", 0.25, ((19.25, 49.5), (25.0, 55.0), (25.0, 66.0), (18.0, 68.0)), "fault-probe"))
+
+    # Explicit GND traces preserve the isolated RTN pad and avoid introducing
+    # an unreviewed plane into a high-energy qualification fixture.
+    for token, start, fanout in (
+        ("gnd-zener", (12.0, 27.35), (9.0, 27.35)),
+        ("gnd-cvs1", (19.8, 29.0), (19.8, 32.5)),
+        ("gnd-cvs2", (25.8, 29.0), (25.8, 32.5)),
+        ("gnd-ov", (57.0, 33.15), (64.0, 31.0)),
+    ):
+        routes.append(signal_via(net_codes, "GND", fanout[0], fanout[1], token))
+        routes.extend(route_path(net_codes, "GND", "F.Cu", 0.25, (start, fanout), token))
+    routes.extend(route_path(net_codes, "GND", "B.Cu", 0.3, ((9.0, 27.35), (5.5, 27.35), (5.5, 32.5), (19.8, 32.5), (25.8, 32.5)), "gnd-upper-left"))
+    routes.extend(route_path(net_codes, "GND", "B.Cu", 0.3, ((64.0, 31.0), (68.0, 31.0), (68.0, 39.5), (50.0, 39.5)), "gnd-upper-right"))
+    routes.append(signal_via(net_codes, "GND", 50.0, 39.5, "gnd-upper-right-layer-change"))
+    routes.extend(route_path(net_codes, "GND", "In2.Cu", 0.3, ((50.0, 39.5), (52.0, 42.0), (52.0, 75.0), (12.0, 75.0), (10.0, 70.0)), "gnd-upper-right-layer-change"))
+    routes.extend(route_path(net_codes, "GND", "B.Cu", 0.3, ((5.5, 27.35), (5.5, 70.0), (10.0, 70.0)), "gnd-trunk"))
+    routes.extend(route_path(net_codes, "GND", "F.Cu", 0.20, ((17.75, 47.0), (17.75, 48.5), (18.75, 48.5), (18.75, 47.0)), "gnd-pin9-11"))
+    routes.append(signal_via(net_codes, "GND", 18.25, 50.5, "gnd-pin9-11"))
+    routes.extend(route_path(net_codes, "GND", "F.Cu", 0.20, ((18.25, 48.5), (18.25, 50.5)), "gnd-pin9-11-via"))
+    routes.append(signal_via(net_codes, "GND", 24.0, 49.5, "gnd-pin13"))
+    routes.extend(route_path(net_codes, "GND", "F.Cu", 0.20, ((20.0, 46.25), (20.75, 46.25), (20.75, 48.25), (24.0, 49.5)), "gnd-pin13"))
+    routes.append(signal_via(net_codes, "GND", 24.0, 41.5, "gnd-pin16"))
+    routes.extend(route_path(net_codes, "GND", "F.Cu", 0.20, ((20.0, 44.75), (21.5, 44.75), (21.5, 42.5), (24.0, 42.5), (24.0, 41.5)), "gnd-pin16"))
+    routes.extend(route_path(net_codes, "GND", "B.Cu", 0.3, ((24.0, 41.5), (28.0, 46.0), (28.0, 54.0), (12.0, 54.0)), "gnd-controller-a"))
+    routes.append(signal_via(net_codes, "GND", 12.0, 54.0, "gnd-controller-layer-change"))
+    routes.append(signal_via(net_codes, "GND", 5.5, 54.0, "gnd-controller-trunk-layer-change"))
+    routes.extend(route_path(net_codes, "GND", "In2.Cu", 0.3, ((12.0, 54.0), (5.5, 54.0)), "gnd-controller-layer-change"))
+    routes.extend(route_path(net_codes, "GND", "B.Cu", 0.3, ((18.25, 50.5), (22.0, 54.0)), "gnd-controller-b"))
+    routes.extend(route_path(net_codes, "GND", "B.Cu", 0.3, ((24.0, 49.5), (22.0, 54.0)), "gnd-controller-c"))
+
+    # All four protected-side controller sense pins join SYSTEM_OUT on In1.Cu,
+    # clear of the existing DGATE route.  TPOUT then joins the B.Cu power path.
+    for token, start, fanout in (
+        ("out-group", (20.0, 43.75), (20.75, 42.5)),
+        ("out-pin24", (16.75, 43.0), (14.5, 34.0)),
+    ):
+        routes.append(signal_via(net_codes, "SYSTEM_OUT", fanout[0], fanout[1], token))
+        routes.extend(route_path(net_codes, "SYSTEM_OUT", "F.Cu", 0.25, (start, fanout), token))
+    routes.extend(route_path(net_codes, "SYSTEM_OUT", "F.Cu", 0.25, ((18.75, 43.0), (19.25, 43.0), (19.25, 42.5), (20.75, 42.5)), "out-pins18-20"))
+    routes.extend(route_path(net_codes, "SYSTEM_OUT", "In1.Cu", 0.25, ((14.5, 34.0), (20.75, 42.5), (26.0, 43.75), (30.0, 44.0), (30.0, 58.0), (48.0, 58.0), (48.0, 69.0)), "out-sense"))
+    routes.extend(route_path(net_codes, "SYSTEM_OUT", "B.Cu", 0.5, ((48.0, 69.0), (43.0, 72.0)), "out-probe"))
+
     return routes
 
 
@@ -542,6 +664,7 @@ def render_board(schematic: Schematic) -> str:
     for ref, x, y in (("H1", 5.0, 5.0), ("H2", 75.0, 5.0), ("H3", 5.0, 95.0), ("H4", 75.0, 95.0)):
         lines.append(mounting_hole(ref, x, y))
     lines.extend(critical_routing(net_codes))
+    lines.extend(low_energy_routing(net_codes))
     lines.extend(
         [
             f'\t(gr_rect (start 0 0) (end 80 100) (stroke (width 0.1) (type default)) (fill none) (layer "Edge.Cuts") (uuid "{layout_uid("outline")}"))',
@@ -549,7 +672,7 @@ def render_board(schematic: Schematic) -> str:
             f'\t(gr_text "Q2-C100 Rev.1  QUALIFICATION COUPON ONLY" (at 40 97 0) (layer "F.SilkS") (uuid "{layout_uid("label-main")}") (effects (font (size 1.1 1.1) (thickness 0.18))))',
             f'\t(gr_text "RAW 101V" (at 65 10 0) (layer "F.SilkS") (uuid "{layout_uid("label-raw")}") (effects (font (size 1.2 1.2) (thickness 0.18))))',
             f'\t(gr_text "DANGER - NOT FOR VEHICLE / NOT FOR FAB" (at 40 3 0) (layer "F.SilkS") (uuid "{layout_uid("label-danger")}") (effects (font (size 1 1) (thickness 0.16))))',
-            f'\t(gr_text "CRITICAL POWER + GATE LOOP ROUTED; FIXTURE NETS OPEN" (at 40 94.5 0) (layer "Cmts.User") (uuid "{layout_uid("label-state")}") (effects (font (size 0.9 0.9) (thickness 0.14))))',
+            f'\t(gr_text "PAD-TO-PAD ROUTING COMPLETE; FAB REVIEW OPEN" (at 40 94.5 0) (layer "Cmts.User") (uuid "{layout_uid("label-state")}") (effects (font (size 0.9 0.9) (thickness 0.14))))',
         ]
     )
     lines.append(")")

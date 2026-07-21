@@ -17,8 +17,9 @@ COUPON = ROOT / "hardware" / "power-board" / "PB-100" / "qualification" / "Q2-C1
 KICAD = COUPON / "kicad"
 SCHEMATIC = KICAD / "Q2-C100.kicad_sch"
 BOARD = KICAD / "Q2-C100.kicad_pcb"
+RULES = KICAD / "Q2-C100.kicad_dru"
 REQUIRED_KICAD_VERSION = "10.0.4"
-EXPECTED_OPEN_LOW_ENERGY_ITEMS = 36
+EXPECTED_UNCONNECTED_ITEMS = 0
 
 
 def fail(message: str) -> None:
@@ -49,8 +50,8 @@ def validate_documents() -> None:
     require_tokens(
         COUPON / "README.md",
         (
-            "CONTROLLED ROUTING IN PROGRESS / NOT FOR FABRICATION",
-            "exactly 36 unconnected",
+            "ELECTRICAL ROUTING COMPLETE / FABRICATION BLOCKED",
+            "zero unconnected items",
             "CORRELATION-A",
             "FORCED-B",
             "Gerber, drill, pick-and-place and manufacturing ZIP files are prohibited",
@@ -76,7 +77,8 @@ def validate_documents() -> None:
             "2.0 mm finished thickness",
             "1.475 +/-0.05 mm finished hole",
             "board DRC rule violations: 0",
-            "exactly 36",
+            "unconnected items: 0",
+            "`FAB-REVIEW` remains open",
             "Required before `FAB-REVIEW`",
         ),
     )
@@ -147,6 +149,8 @@ def validate_netlist(kicad_cli: str, temp: Path) -> None:
         "QREV": ("IAUT300N08S5N012ATMA2", "PB100:PG-HSOF-8-1_TOLL_Infineon"),
         "UCTRL": ("LM74930QRGERQ1", "PB100:VQFN-24_RGE_4x4mm_P0.5mm_EP2.4mm"),
         "DZVS": ("BZT52H-B56-Q 56V", "Q2C100:SOD123F"),
+        "ROV1": ("42.2k 1% AEC-Q200", "Q2C100:R_1206_3216Metric"),
+        "ROV2": ("42.2k 1% AEC-Q200", "Q2C100:R_1206_3216Metric"),
     }
     for ref, expected in expected_components.items():
         if components.get(ref) != expected:
@@ -186,8 +190,8 @@ def validate_erc_and_drc(kicad_cli: str, temp: Path) -> None:
     drc = json.loads(drc_path.read_text(encoding="utf-8"))
     if drc.get("violations"):
         fail(f"Q2-C100 DRC findings changed: {Counter(finding.get('type') for finding in drc['violations'])}")
-    if len(drc.get("unconnected_items", [])) != EXPECTED_OPEN_LOW_ENERGY_ITEMS:
-        fail(f"Q2-C100 open low-energy milestone changed: expected {EXPECTED_OPEN_LOW_ENERGY_ITEMS}, found {len(drc.get('unconnected_items', []))}")
+    if len(drc.get("unconnected_items", [])) != EXPECTED_UNCONNECTED_ITEMS:
+        fail(f"Q2-C100 must have zero unconnected items; found {len(drc.get('unconnected_items', []))}")
     parity = drc.get("schematic_parity", [])
     if Counter(finding.get("type") for finding in parity) != Counter({"extra_footprint": 4}):
         fail(f"Q2-C100 schematic parity changed: {Counter(finding.get('type') for finding in parity)}")
@@ -210,13 +214,126 @@ def validate_board_contract() -> None:
             '(4 "In2.Cu" power)',
             'Q2-C100 Rev.1  QUALIFICATION COUPON ONLY',
             'DANGER - NOT FOR VEHICLE / NOT FOR FAB',
+            'PAD-TO-PAD ROUTING COMPLETE; FAB REVIEW OPEN',
             '(segment ',
             '(via ',
         ),
     )
     board_text = BOARD.read_text(encoding="utf-8")
     if "\n\t(zone " in board_text:
-        fail("Q2-C100 controlled-routing milestone must not introduce unreviewed copper zones")
+        fail("Q2-C100 pre-FAB-REVIEW milestone must not introduce unreviewed copper zones")
+
+    require_tokens(
+        RULES,
+        (
+            'rule "Q2-C100 default clearance"',
+            "clearance (min 0.20mm)",
+            'rule "Q2-C100 RAW 101V clearance"',
+            "clearance (min 2.00mm)",
+            "A.Reference == 'QDUT'",
+            "A.Reference == 'ROV1'",
+            "A.Reference == 'RVS'",
+        ),
+    )
+
+    net_by_code = {
+        int(code): name
+        for code, name in re.findall(r'^\t\(net (\d+) "([^"]*)"\)$', board_text, re.MULTILINE)
+    }
+    expected_nets = {
+        0: "",
+        1: "COMMON_SOURCE",
+        2: "CTRL_CAP",
+        3: "CTRL_FLT_N",
+        4: "CTRL_OV",
+        5: "CTRL_VS",
+        6: "EXT_INTERLOCK",
+        7: "EXT_TRIGGER",
+        8: "GND",
+        9: "HEATER_NEG",
+        10: "HEATER_POS",
+        11: "OV_MID",
+        12: "Q2_HGATE",
+        13: "QREV_DGATE",
+        14: "RAW_101V",
+        15: "SYSTEM_OUT",
+        16: "TSEP_NEG",
+        17: "TSEP_POS",
+    }
+    if net_by_code != expected_nets:
+        fail(f"Q2-C100 board net table changed: {net_by_code}")
+
+    segment_pattern = re.compile(
+        r'^\t\(segment \(start [-0-9.]+ [-0-9.]+\) \(end [-0-9.]+ [-0-9.]+\) '
+        r'\(width ([0-9.]+)\) \(layer "([^"]+)"\) \(net (\d+)\)',
+        re.MULTILINE,
+    )
+    segments = [
+        (float(width), layer, net_by_code[int(code)])
+        for width, layer, code in segment_pattern.findall(board_text)
+    ]
+    if not segments:
+        fail("Q2-C100 board has no parsed routing segments")
+    if any(width < 0.20 for width, _, _ in segments):
+        fail("Q2-C100 contains a track below the reviewed 0.20 mm routing floor")
+    if any(layer not in {"F.Cu", "In1.Cu", "In2.Cu", "B.Cu"} for _, layer, _ in segments):
+        fail("Q2-C100 contains routing outside the reviewed four copper layers")
+
+    routed_nets = {net for _, _, net in segments}
+    expected_routed_nets = {
+        "COMMON_SOURCE",
+        "CTRL_CAP",
+        "CTRL_FLT_N",
+        "CTRL_OV",
+        "CTRL_VS",
+        "GND",
+        "OV_MID",
+        "Q2_HGATE",
+        "QREV_DGATE",
+        "RAW_101V",
+        "SYSTEM_OUT",
+    }
+    if routed_nets != expected_routed_nets:
+        fail(f"Q2-C100 routed-net set changed: {sorted(routed_nets)}")
+
+    segment_layers: dict[str, set[str]] = {}
+    for width, layer, net in segments:
+        segment_layers.setdefault(net, set()).add(layer)
+    if segment_layers["Q2_HGATE"] != {"F.Cu"}:
+        fail("Q2_HGATE must remain a direct F.Cu-only correlation path")
+    if "In1.Cu" not in segment_layers["QREV_DGATE"]:
+        fail("QREV_DGATE must retain its reviewed In1.Cu crossing")
+    if "In2.Cu" not in segment_layers["COMMON_SOURCE"]:
+        fail("COMMON_SOURCE must retain separate In2.Cu Kelvin routing")
+    if "In1.Cu" not in segment_layers["SYSTEM_OUT"]:
+        fail("SYSTEM_OUT must retain separate In1.Cu controller-sense routing")
+
+    for net, minimum_width in (("RAW_101V", 7.0), ("COMMON_SOURCE", 5.0), ("SYSTEM_OUT", 7.0)):
+        for layer in ("F.Cu", "B.Cu"):
+            if not any(
+                routed_net == net and routed_layer == layer and width >= minimum_width
+                for width, routed_layer, routed_net in segments
+            ):
+                fail(f"Q2-C100 {net} lacks the reviewed {minimum_width:.1f} mm {layer} power spine")
+
+    via_pattern = re.compile(
+        r'^\t\(via \(at [-0-9.]+ [-0-9.]+\) \(size ([0-9.]+)\) \(drill ([0-9.]+)\) '
+        r'\(layers "F.Cu" "B.Cu"\) \(net (\d+)\)',
+        re.MULTILINE,
+    )
+    vias = [
+        (float(size), float(drill), net_by_code[int(code)])
+        for size, drill, code in via_pattern.findall(board_text)
+    ]
+    if any(size < 0.8 or drill < 0.4 for size, drill, _ in vias):
+        fail("Q2-C100 contains a via below the reviewed 0.8/0.4 mm minimum")
+    for net, minimum_count in (("RAW_101V", 4), ("COMMON_SOURCE", 13), ("SYSTEM_OUT", 4)):
+        power_vias = [(size, drill) for size, drill, via_net in vias if via_net == net]
+        reviewed_power_vias = [
+            (size, drill) for size, drill in power_vias if size >= 1.2 and drill >= 0.6
+        ]
+        if len(reviewed_power_vias) < minimum_count:
+            fail(f"Q2-C100 {net} power-via stitching changed")
 
 
 def main() -> int:
@@ -231,7 +348,7 @@ def main() -> int:
         temp = Path(temp_dir)
         validate_netlist(kicad_cli, temp)
         validate_erc_and_drc(kicad_cli, temp)
-    print("Q2-C100 validation passed (ERC 0, DRC 0, parity 4 board holes, 36 controlled low-energy opens).")
+    print("Q2-C100 validation passed (ERC 0, DRC 0, unconnected 0, parity 4 board holes; FAB-REVIEW remains open).")
     return 0
 
 

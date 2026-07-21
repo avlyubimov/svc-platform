@@ -63,6 +63,20 @@ requires at least 1 uF in the resistor/Zener load-dump topology and MLCC DC bias
 can remove the nominal margin. The chosen parts still require measured
 effective capacitance of at least 1.0 uF at 56 V over temperature.
 
+## OV divider package boundary
+
+ROV1 and ROV2 use 1206 lands. Their equal 42.2 kOhm values split the raw-side
+working voltage, while the larger package preserves routing room for the
+reviewed 2.0 mm RAW_101V clearance outside the component body and provides a
+better working-voltage/pulse starting point than 0603. A 0603 upper leg is
+rejected because its land geometry and voltage margin are poor for this
+101 V qualification fixture. A larger 1210/2512 network would add loop area
+without closing the still-required resistor-series pulse and working-voltage
+evidence. ROV3 remains 0603 because it is the low-side 1.00 kOhm leg and does
+not see RAW_101V. Exact AEC-Q200 MPNs, tolerance/temperature coefficients,
+maximum continuous working voltage, pulse load and a second source remain open
+before `FAB-REVIEW`.
+
 ## Reliability, production and cost boundary
 
 The expected component lifecycle is sufficient for a multi-lot laboratory

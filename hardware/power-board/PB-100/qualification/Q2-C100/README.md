@@ -1,6 +1,6 @@
 # Q2-C100 Qualification Coupon
 
-Status: `CONTROLLED ROUTING IN PROGRESS / NOT FOR FABRICATION`
+Status: `ELECTRICAL ROUTING COMPLETE / FABRICATION BLOCKED`
 
 Q2-C100 is the dedicated laboratory coupon authorized by
 `PB-100-q2-empirical-qualification-plan.md`. It is not PB-100, is not a vehicle
@@ -13,16 +13,18 @@ The committed KiCad milestone contains:
 - separate RAW drain, common-source and system-output REDCUBE terminals;
 - a direct UCTRL HGATE-to-QDUT gate connection with no Rg or CdV/dt element;
 - Kelvin and fixture probe interfaces, isolated heater and TSEP interfaces;
-- the routed high-current path, direct HGATE path, DGATE path and controller
-  A/OUT Kelvin returns;
+- the routed high-current path, direct HGATE path, DGATE path, controller
+  A/OUT Kelvin returns and every remaining pad-to-pad control/fixture
+  connection;
 - a four-layer, 2.0 mm preliminary stackup boundary and a 2.0 mm RAW_101V
   clearance rule outside the unavoidable reviewed QDUT/RVS/ROV component
   geometries.
 
-KiCad 10.0.4 ERC has zero findings. Board DRC has zero rule violations. The
-board deliberately retains exactly 36 unconnected low-energy fixture items;
-the validator treats any change to that number as a reviewed milestone change,
-not as permission to fabricate.
+KiCad 10.0.4 ERC has zero findings. Board DRC has zero rule violations and
+zero unconnected items. CI also pins the four-layer routing set, direct F.Cu HGATE
+path, separate internal Kelvin/sense layers, outer-layer power-spine widths,
+power-via stitching, 0.20 mm default clearance and 2.0 mm RAW_101V clearance
+rule. This electrical-routing milestone is not permission to fabricate.
 
 ## Build variants
 
@@ -40,8 +42,9 @@ Population differences are controlled by `Q2-C100-assembly-variants.csv`.
 ## Hard safety boundary
 
 Do not energize or fabricate this revision. Before the status can change to
-`FAB-REVIEW`, all 36 low-energy connections, interlock behavior, external
+`FAB-REVIEW`, the supplier stackup/creepage, thermal/current-density and loop-
+inductance reviews, exact fixture/probe MPNs, interlock behavior, external
 current limiting, stored-energy discharge, enclosure/shield, remote trigger,
 instrument ratings, heater control and laboratory safety review must close.
-Gerber, drill, pick-and-place and manufacturing ZIP files are prohibited in
-the current state.
+Gerber, drill, pick-and-place and manufacturing ZIP files are prohibited in the
+current state.

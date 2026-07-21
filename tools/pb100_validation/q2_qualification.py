@@ -163,7 +163,7 @@ def validate_q2_maximum_bound_qualification() -> None:
             "0.10 V",
             "PASS EMPIRICAL",
             "controlled Q2-C100 schematic",
-            "exactly 36 low-energy fixture connections",
+            "zero unconnected items",
         ),
         "Q2 empirical qualification plan",
     )
@@ -180,7 +180,7 @@ def validate_q2_maximum_bound_qualification() -> None:
         row = empirical_by_id[evidence_id]
         if row["Status"] != "IN PROGRESS":
             fail(f"{evidence_id} must distinguish controlled routing from completed coupon evidence")
-        for token in ("Q2-C100", "36 low-energy connections", "fabrication review"):
+        for token in ("Q2-C100", "zero unconnected items", "FAB-REVIEW"):
             if token not in " ".join(row.values()):
                 fail(f"{evidence_id} must retain the controlled coupon milestone token {token}")
     for evidence_id in Q2_EMPIRICAL_NOT_STARTED:
