@@ -119,8 +119,9 @@ by a future ADR; firmware cannot bypass the open link.
 
 The CAN1 physical-layer entries move from LB-100 to PB-100 in the BOM, sourcing
 registers, rail budgets, footprint inventories, and verification scripts.
-PBREL-001 remains `Conditional` until the complete value-bearing PB schematic,
-exported-netlist audit, sourcing/assembly evidence, and connector boundary are
-closed. LBREL-004 covers controller pin binding and firmware policy only. PCB
-layout remains blocked until the independent electrical, mechanical, thermal,
-and release gates close. No existing DNP footprint is removed.
+PBREL-001 is `Closed` for pre-layout release evidence: the captured schematic,
+exported-netlist audit, component route, connector boundary, DNP/open link, and
+physical readback topology are synchronized. LBREL-004 covers controller pin
+binding and firmware policy only. Value-bearing schematic review, DNP first
+article inspection, PB-BENCH-012, and PCB layout authorization remain separate
+later gates. No existing DNP footprint is removed.

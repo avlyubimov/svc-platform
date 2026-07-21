@@ -13,43 +13,41 @@ does not approve schematic freeze or PCB layout.
   systems.
 - LM74700-Q1: 3.2-65 V automotive ideal-diode controller with external
   N-MOSFET.
-- BUK7S1R2-80M: selected 80 V automotive N-MOSFET, 1.2 mOhm class,
-  LFPAK88, for Q1 and Q101-Q110.
-- IAUTN08S5N012L 80 V TOLL and BUK7J2R4-80M 80 V LFPAK56E are
-  non-drop-in alternatives. SIDR626LDP and IAUTN06S5N008 60 V evidence is
-  historical and rejected for the Rev.1 assembly baseline.
+- IAUT300N08S5N012ATMA2: selected 80 V automotive N-MOSFET, 1.2 mOhm class,
+  PG-HSOF-8-1 TOLL, for Q1 and Q101-Q110.
+- IAUT300N08S5N014ATMA1 80 V TOLL is the controlled same-footprint
+  alternative and BUK7J2R4-80MX 80 V LFPAK56E is deliberately non-drop-in.
+  SIDR626LDP and IAUTN06S5N008 60 V evidence is historical and rejected for
+  the Rev.1 assembly baseline.
 - Active AEC-Q101 SM8S33AHM3-class TVS: 33 V standoff, 53.3 V clamp at
   rated pulse current in the HM3 DO-218AC branch. MCC SM8S33A is EOL evidence
   only and Vishay HE3 is NFD stock-only evidence; neither may be locked.
 
 ## Preliminary findings
 
-- TPS48110AQDGXRQ1 plus selected external BUK7S1R2-80M 80 V MOSFET is the
+- TPS48110AQDGXRQ1 plus selected external IAUT300N08S5N012ATMA2 80 V MOSFET is the
   Rev.1 path for all output channels.
-- Selected LFPAK88 conduction loss is acceptable as a planning input, but SOA
-  and thermal validation are still required for compressor inrush and
-  steady-state loads.
+- Generated class envelopes close pre-layout SOA and thermal calculations;
+  layout extraction and prototype thermal validation remain physical gates.
 - OUT2 compressor/inrush planning uses the envelope in
-  `hardware/power-board/PB-100/PB-100-out2-soa.md`; the selected BUK7S1R2-80M
-  still requires detailed SOA review.
+  `hardware/power-board/PB-100/PB-100-out2-soa.md`; the selected IAUT300N08S5N012ATMA2
+  is bounded by 30 A for 100 ms, 80 A for 4 ms, and 95.91 A for 5 us.
 - LM74700QDBVRQ1-class reverse protection is compatible with the 12 V input
   target and cold-crank requirement when paired with a dedicated low-Rds input
   MOSFET strategy.
-- Active SM8S33AHM3-class input TVS has 26.7 V nominal datasheet-clamp
-  headroom to the selected 80 V MOSFET rating; actual loop overshoot still
-  requires reproducible validation.
+- Active SM8S33AHM3-class input TVS yields a generated 59.45 V hot clamp-loop
+  bound and 20.55 V headroom to the selected 80 V MOSFET rating. Extracted
+  loop inductance and PB-BENCH-004 remain mandatory physical validation.
 - Active SM8S33AHM3-class input TVS is not automatically compatible with 40 V integrated
   smart switches. ADR-0011 resolves the Rev.1 conflict by moving OUT5, OUT8,
   and OUT9 to the external-controller output architecture.
 
-## Schematic blockers added
+## Remaining physical gates
 
-- Validate the low-current TPS48110 plus MOSFET implementation for OUT5, OUT8,
-  and OUT9.
-- Confirm detailed MOSFET SOA for OUT2 against the defined startup/inrush
-  envelope before PCB layout.
-- Confirm thermal stack-up for all output classes and the input
-  reverse-protection MOSFET in the intended enclosure.
+- Promote reviewed values into the final value-bearing schematic sheets.
+- Confirm extracted clamp-loop inductance does not exceed 20 nH during layout.
+- Confirm output and input-MOSFET case temperatures do not exceed 125 degC in
+  the intended enclosure during prototype validation.
 
 ## Related tables
 

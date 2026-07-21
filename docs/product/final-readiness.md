@@ -72,7 +72,7 @@ Current coverage:
 | Architecture v1.0 | Ready | Frozen by ADR; PB-100 requirement changes still need ADR |
 | PB-100 requirements | Ready for schematic planning | Baseline is frozen; schematic freeze remains open |
 | PB-100 KiCad scaffold | Preliminary capture | Child sheets now contain ERC-clean preliminary capture content and exported netlist coverage; schematic freeze remains open |
-| PB-100 PCB/layout | Blocked | The release register has 5 active blockers: `PBREL-001`, `PBREL-004`, `PBREL-006`, `PBREL-007`, `PBREL-011`. The corrected P-SV10 plus S-SV10 FX18 mechanical gate is closed for pre-layout work; transient, SOA, thermal, CAN1 integration, sourcing, factory, and symbol-promotion evidence still block PCB import and manufacturing outputs |
+| PB-100 PCB/layout | Blocked by schematic freeze | The release register has 0 active PBREL blockers. The 2026-07-21 closeout adds generated transient, SOA, Q1 thermal, CAN1 and factory evidence; controlled promotion of the accepted passives/clamps, full schematic review, Product Owner freeze approval, and layout-start checklist still block PCB import and manufacturing outputs |
 | LB-100 requirements | Frozen | Baseline is frozen by ADR-0014 and the schematic freeze is Closed |
 | LB-100 KiCad schematic | Reviewed | Deterministic 63-component, 186-net, footprint-bound capture covers STM32H563, JPB1/JFB1, switched service rails, storage/sensors, UI I/O, and ADR-0015 logic-only CAN1; exported-netlist audit and ERC pass with only the two reviewed cross-board USB CC single-pin warnings |
 | LB-100 PCB/layout | Blocked | There are 0 active blockers (0 active LBREL blockers). Footprint, schematic, and corrected FX18 mechanical gates are closed; the separate signal-integrity and safety layout model remains Open, so no `LB-100.kicad_pcb` or manufacturing output is authorized |
@@ -104,10 +104,10 @@ Current coverage:
   evidence only and Vishay `SM8S33AHE3_A/I` remains NFD evidence only.
   Schematic freeze still requires live source continuity, DO-218AC assembly,
   pulse-energy, and actual clamp-loop validation.
-- TVS/load-dump margin now has a downstream voltage-class trace for the active
-  `SM8S33AHM3/I` branch and its 53.3 V clamp point; schematic freeze must still
-  validate actual overshoot on the selected 80 V MOSFET paths, DO-218AC
-  assembly handling, and any lower-clamp future path through a review or ADR.
+- TVS/load-dump margin now has a generated 59.45 V hot clamp-loop bound for the
+  active `SM8S33AHM3/I` branch, including temperature, loop inductance, current
+  slew, and uncertainty. Schematic/layout review must preserve the 20 nH loop
+  ceiling; PB-BENCH-004 rejects any measured result at or above 60 V.
 - TVS/load-dump freeze review now ties the active SM8S33AHM3/I branch,
   selected 80 V MOSFET baseline, rejected 60 V history, 100 V
   pass-with-margin paths, 40 V smart-switch ADR boundary, sourcing gate, and
@@ -127,9 +127,11 @@ Current coverage:
   defaults, 40 V ADR boundary, schematic-value dependencies, sourcing,
   validation sync, and no-layout boundary to
   `hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv`.
-- MOSFET voltage-margin review selects `BUK7S1R2-80M` 80 V LFPAK88 for Q1 and
-  Q101-Q110. `IAUTN08S5N012L` and `BUK7J2R4-80M` remain controlled non-drop-in
-  80 V alternatives; former 60 V paths are rejected for Rev.1 assembly.
+- MOSFET voltage-margin review selects active/preferred
+  `IAUT300N08S5N012ATMA2` 80 V TOLL for Q1 and Q101-Q110.
+  `IAUT300N08S5N014ATMA1` is the controlled same-footprint alternative and
+  `BUK7J2R4-80MX` is a non-drop-in LFPAK56E alternative; preliminary LFPAK88
+  and former 60 V paths are rejected for Rev.1 assembly.
 - OUT5, OUT8, and OUT9 now have a low-current baseline trace enforcing the
   ADR-0011 external-controller plus selected external 80 V MOSFET architecture
   and blocking any direct 40 V smart-switch rail without a future ADR.
@@ -306,19 +308,20 @@ Current coverage:
   manufacturing boundary to
   `hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv`.
 - Q1 input reverse MOSFET pin evidence and schematic capture use selected
-  `BUK7S1R2-80M` 80 V LFPAK88; schematic freeze must still close 40 A
-  copper/thermal/SOA review, assembly handling, and gate clamp behavior.
+  `IAUT300N08S5N012ATMA2` 80 V TOLL with pins 1, 2-8, and `Tab`. Generated
+  40 A evidence closes the pre-layout SOA/thermal blocker; exact gate passives,
+  reviewed plane/polygon/bus current path, and PB-BENCH-010 remain later gates.
 - Q1 input reverse planning now has a package/thermal trace tying
-  selected `BUK7S1R2-80M`, the two controlled non-drop-in 80 V alternatives,
+  selected `IAUT300N08S5N012ATMA2`, the two controlled non-drop-in 80 V alternatives,
   the 40 A board budget, shunt measurement boundary, and assembly-source
   blockers together. Former 60 V calculations are history only.
 - Q1 input reverse freeze review now ties LM74700 default-off behavior,
-  selected LFPAK88 and controlled non-drop-in 80 V alternatives, protected
+  selected TOLL and controlled non-drop-in 80 V alternatives, protected
   measurement sequence, HM3 TVS dependency, sourcing gate, and no-layout
   boundary into
   `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`.
 - Q1 input reverse freeze checklist now ties gate clamp/discharge timing,
-  selected LFPAK88 and controlled 80 V package alternatives, protected
+  selected TOLL and controlled 80 V package alternatives, protected
   measurement sequence, 40 A thermal/copper/SOA audit, assembly sourcing, and
   no-layout boundary into
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`.
@@ -398,8 +401,13 @@ Current coverage:
   bridging policy, DNP/open missing-link evidence, default-disabled gate,
   physical status readback, RX independence, firmware/capability evidence,
   bench procedure, factory DNP sourcing, and no-layout boundary to PBREL-001.
+- CAN1 physical closeout additionally freezes the exact DTM04-4P/DTM06-4S
+  garage harness kit and records PB-BENCH-012 as a post-prototype first-power
+  gate in `hardware/power-board/PB-100/PB-100-can1-physical-closeout.md`.
 - Close current and thermal telemetry scaling, filtering, and calibration notes.
-- Close OUT2 SOA extraction and input reverse-protection thermal review.
+- Promote the accepted output-controller passives, local clamp diodes, and Q1
+  gate network into reviewed value-bearing sheets; keep generated SOA/thermal
+  evidence synchronized and preserve its hard escape conditions.
 - Synchronize factory and garage BOM drafts with final selections.
 - Keep `make check` passing with local `kicad-cli` available, zero ERC
   violations, and a successful KiCad S-expression netlist export.

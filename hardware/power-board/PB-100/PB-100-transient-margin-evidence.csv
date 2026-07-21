@@ -1,0 +1,19 @@
+Evidence item,Value,Unit,Basis,Result
+Waveform,100 V open-circuit 10/1000 us bounded source,,Reviewed conservative source model,INPUT
+Open-circuit source voltage,100.0,V,Model input,INPUT
+Equivalent source resistance,0.3766,ohm,(100 V - 53.3 V) / 124 A,INPUT
+TVS,SM8S33AHM3/I,,Active ADR-0011 branch,INPUT
+25 C clamp,53.30,V,124 A datasheet point,INPUT
+Initial TVS junction,125.0,degC,Hot-soak pre-layout bound,INPUT
+Temperature coefficient,0.091,%/degC,Vishay datasheet,INPUT
+Temperature-adjusted clamp,58.15,V,Clamp multiplied by temperature coefficient,INPUT
+Clamp-loop inductance ceiling,20.0,nH,Hard PCB constraint,INPUT
+Peak current slew,15.0,A/us,10 us rise rounded above 124 A / 10 us,INPUT
+Loop overshoot,0.30,V,L x di/dt,INPUT
+Model plus probe uncertainty,1.00,V,Conservative allowance,INPUT
+Bounded downstream stress,59.45,V,Hot clamp + loop overshoot + uncertainty,INPUT
+LM74700-Q1 recommended operating ceiling,0.55,V margin,60.0 V limit - 59.45 V stress,PASS
+LM74700-Q1 ANODE absolute maximum,5.55,V margin,65.0 V limit - 59.45 V stress,PASS
+IAUT300N08S5N012 VDS,20.55,V margin,80.0 V limit - 59.45 V stress,PASS
+TPS48110-Q1 and 100 V buck family,40.55,V margin,100.0 V limit - 59.45 V stress,PASS
+Layout escape condition,Measured stress must remain below 60 V and modeled loop inductance at or below 20 nH,,PB-BENCH-004 rejects the layout or protection branch if either limit is exceeded,MANDATORY POST-PROTOTYPE

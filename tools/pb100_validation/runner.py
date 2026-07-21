@@ -17,6 +17,7 @@ from . import (
     protection,
     interface,
     review,
+    release_evidence,
 )
 from . import common
 from .common import PB100_DIR, REPO_ROOT, fail, register_validation_hooks, validate_csv
@@ -48,6 +49,7 @@ CHECKS = (
     release.validate_schematic_review_closeout,
     release.validate_board_release_blocker_register,
     release.validate_board_print_closure_matrix,
+    release_evidence.validate_five_blocker_release_evidence,
     review.validate_schematic_capture_work_queue,
     review.validate_schematic_capture_plan,
     review.validate_review_release_manifest,
@@ -152,6 +154,7 @@ VALIDATION_MODULES = (
     protection,
     interface,
     review,
+    release_evidence,
 )
 
 register_validation_hooks(

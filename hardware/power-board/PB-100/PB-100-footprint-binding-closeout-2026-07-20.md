@@ -2,6 +2,11 @@
 
 Status: Footprint-binding evidence update
 
+Historical scope note: the package rows listed as remaining at the end of this
+2026-07-20 record were subsequently closed. The current selected MOSFET is
+`IAUT300N08S5N012ATMA2` PG-HSOF-8-1 TOLL; the current footprint status is
+authoritative in `PB-100-footprint-binding-progress.csv`.
+
 This closeout binds two package-specific PB-100 footprint rows without changing
 architecture and without creating `PB-100.kicad_pcb`, Gerbers, drill files,
 pick-place files, BOM/CPL order packages, manufacturing ZIP files, fabrication
@@ -58,15 +63,16 @@ packages, panel outputs, or PCBA orders.
 - Field reliability: improves safety because CAN1 TX remains blocked by both production DNP/open state and default-disabled gate behavior.
 - Known risks: JLC stock-zero consign status, first-article DNP inspection, disabled-status readback polarity, and reset/unpowered bench verification remain BOM lock and post-prototype gates.
 
-## Remaining PB Footprint Blockers
+## Historical state at this closeout
 
-The PB footprint gate remains open because these rows still require package
-drawing review or package-selection evidence before board import:
+At the time of this record the following rows still required review; they are
+not current blockers:
 
 - TOLL / PG-HSOF-8-1 input-reverse and OUT2 escape MOSFET path.
-- LFPAK88 80 V alternate MOSFET path.
+- Historical LFPAK88 package-evidence path.
 - DO-218AC input TVS.
 - CSS4J-4026 four-terminal current shunt.
 - Optional digital temperature sensor if retained as DNP.
 
-No PCB layout or manufacturing output is authorized by this closeout.
+Those rows were later closed by exact symbol/footprint and generated evidence.
+No PCB layout or manufacturing output is authorized by this historical record.

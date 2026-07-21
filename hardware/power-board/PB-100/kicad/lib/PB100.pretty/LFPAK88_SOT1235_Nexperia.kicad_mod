@@ -24,7 +24,7 @@
 		(uuid "970dc3a1-d59f-4dae-b13a-05c17cfd75d2")
 		(effects (font (size 1.27 1.27)))
 	)
-	(property "Description" "LFPAK88 SOT1235 copper footprint with pin1 gate pin2-4 source and mb mounting-base drain pad matching PB100_POWER_NMOS_ESCAPE_PRELIM; 12 segmented F.Paste apertures are separated from the mb copper/mask pad; solder-void review remains layout/DFM gate"
+	(property "Description" "LFPAK88 SOT1235 copper footprint with pin1 gate pin2-4 source and mb mounting-base drain pad matching PB100_POWER_NMOS_TOLL_80V; 12 segmented F.Paste apertures are separated from the mb copper/mask pad; solder-void review remains layout/DFM gate"
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)

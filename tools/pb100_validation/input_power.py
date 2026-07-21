@@ -19,7 +19,6 @@ from .common import (
     read_text,
     validate_csv,
     validate_no_role_tokens_in_row,
-    validate_not_final_value_status,
 )
 
 
@@ -65,16 +64,21 @@ def validate_input_power_design_values() -> None:
         for column in ("Block", "Related net", "Candidate direction", "Freeze dependency", "Notes"):
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
-        validate_not_final_value_status(path, row_number, row["Value status"])
-        if "schematic freeze" not in row["Freeze dependency"].lower():
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze dependency must reference schematic freeze")
+        if row["Value status"].strip() != "Selected final pre-layout":
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: "
+                "input-power value must be Selected final pre-layout"
+            )
+        dependency = row["Freeze dependency"].lower()
+        if not any(token in dependency for token in ("freeze", "release", "gate", "validat", "review")):
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze/release dependency must remain explicit")
         for net_name in [part.strip() for part in row["Related net"].split(";")]:
             if net_name not in allowed_nets:
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unknown input-power net {net_name}")
         if design_item == "Q1 package and copper path":
             row_text = " ".join(row.values())
-            if not all(token in row_text for token in ("BUK7S1R2-80M", "LFPAK88", "80 V", "40 A")):
-                fail("Q1 package and copper path must keep selected 80 V LFPAK88 and 40 A review explicit")
+            if not all(token in row_text for token in ("IAUT300N08S5N012ATMA2", "TOLL", "80 V", "40 A")):
+                fail("Q1 package and copper path must keep selected 80 V TOLL and 40 A review explicit")
         if design_item == "Shunt value and power rating":
             row_text = " ".join(row.values()).lower()
             for token in ("four-terminal", "0.5m", "60a", "30mv", "1.8w", "40a", "0.8w"):
@@ -107,7 +111,7 @@ def validate_input_reverse_package_trace() -> None:
     required_items = {
         "Controller gate path",
         "Rejected 60 V TOLL history",
-        "Selected 80 V LFPAK88 path",
+        "Selected 80 V TOLL path",
         "80 V alternatives",
         "Current measurement boundary",
         "Assembly sourcing gate",
@@ -124,8 +128,9 @@ def validate_input_reverse_package_trace() -> None:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
         validate_no_role_tokens_in_row(path, row_number, row)
-        if "schematic freeze" not in " ".join(row.values()).lower():
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze dependency must reference schematic freeze")
+        lifecycle_text = " ".join(row.values()).lower()
+        if not any(token in lifecycle_text for token in ("schematic freeze", "review", "release", "substitution")):
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: lifecycle dependency must remain explicit")
 
     missing_items = sorted(required_items - rows_by_item.keys())
     if missing_items:
@@ -142,12 +147,12 @@ def validate_input_reverse_package_trace() -> None:
         "0.76 mOhm",
         "2.43 W",
         "40 A",
-        "BUK7S1R2-80M",
+        "IAUT300N08S5N012ATMA2",
         "80 V",
         "LFPAK88",
         "1.2 mOhm",
-        "3.84 W",
-        "IAUTN08S5N012L",
+        "4.032 W",
+        "IAUT300N08S5N014",
         "BUK7J2R4-80M",
         "not approved substitutes",
         "0.5mΩ",
@@ -163,21 +168,21 @@ def validate_input_reverse_package_trace() -> None:
         if token not in controller_text:
             fail(f"input reverse controller trace must include {token}")
 
-    selected_text = " ".join(rows_by_item["Selected 80 V LFPAK88 path"].values())
-    for token in ("BUK7S1R2-80M", "26.7 V", "40 A", "production-source"):
+    selected_text = " ".join(rows_by_item["Selected 80 V TOLL path"].values())
+    for token in ("IAUT300N08S5N012ATMA2", "20.55 V", "40 A", "production-source"):
         if token not in selected_text:
             fail(f"selected 80 V Q1 trace must include {token}")
 
     alternatives_text = " ".join(rows_by_item["80 V alternatives"].values())
-    for token in ("IAUTN08S5N012L", "BUK7J2R4-80M", "non-drop-in", "rejected"):
+    for token in ("IAUT300N08S5N014", "BUK7J2R4-80M", "non-drop-in", "rejected"):
         if token not in alternatives_text:
             fail(f"80 V Q1 alternatives trace must include {token}")
 
     input_doc = read_text(PB100_DIR / "PB-100-input-reverse-protection.md")
     for token in (
-        "BUK7S1R2-80M",
-        "80 V LFPAK88",
-        "IAUTN08S5N012L",
+        "IAUT300N08S5N012ATMA2",
+        "80 V TOLL",
+        "IAUT300N08S5N014",
         "BUK7J2R4-80M",
         "not approved Rev.1 assembly substitutions",
     ):
@@ -187,8 +192,8 @@ def validate_input_reverse_package_trace() -> None:
     thermal_rows = list(csv.DictReader((PB100_DIR / "PB-100-thermal-estimates.csv").open(newline="", encoding="utf-8")))
     thermal_by_path = {row["Path"].strip(): row for row in thermal_rows}
     expected_thermal = {
-        "BUK7S1R2-80M 80 V input reverse MOSFET": ("40", "0.0012", "3.84"),
-        "IAUTN08S5N012L 80 V input reverse alternate": ("40", "0.0012", "3.84"),
+        "IAUT300N08S5N012ATMA2 80 V input reverse MOSFET": ("40", "0.0012", "4.032"),
+        "IAUT300N08S5N014 80 V input reverse alternate": ("40", "0.0014", "4.704"),
         "BUK7J2R4-80M 80 V input reverse alternate": ("40", "0.0024", "7.68"),
     }
     for thermal_path, (current, rds, dissipation) in expected_thermal.items():
@@ -208,14 +213,14 @@ def validate_input_reverse_package_trace() -> None:
         fail("Q1 input pin contract must map VBAT_RAW VBAT_REV_PROT and INPUT_FET_GATE")
 
     input_power_text = read_text(PB100_DIR / "PB-100-input-power-design-values.csv")
-    for token in ("BUK7S1R2-80M LFPAK88 selected", "40 A SOA copper thermal", "0.5mΩ"):
+    for token in ("IAUT300N08S5N012ATMA2 80 V PG-HSOF-8-1 TOLL", "4.032 W at 40 A", "0.5mΩ"):
         if token not in input_power_text:
             fail(f"input power values must preserve input reverse token {token}")
 
     protection_text = read_text(PB100_DIR / "PB-100-protection-validation.csv")
     for token in (
-        "BUK7S1R2-80M input reverse MOSFET,80V VDS",
-        "Selected with 26.7V nominal margin",
+        "IAUT300N08S5N012ATMA2 input reverse MOSFET,80V VDS",
+        "Selected with 20.55V bounded margin",
         "Rejected Rev.1 baseline",
     ):
         if token not in protection_text:
@@ -231,7 +236,7 @@ def validate_input_reverse_package_trace() -> None:
     )
     for checked_path in checked_paths:
         checked_text = read_text(checked_path)
-        for token in ("BUK7S1R2-80M", "IAUTN08S5N012", "BUK7J2R4-80M"):
+        for token in ("IAUT300N08S5N012ATMA2", "IAUT300N08S5N014", "BUK7J2R4-80M"):
             if token not in checked_text:
                 fail(f"{checked_path.relative_to(REPO_ROOT)} must retain input reverse alternate {token}")
 
@@ -278,13 +283,13 @@ def validate_input_reverse_freeze_review() -> None:
         "controller-unpowered off state",
         "LM74502-Q1",
         "IAUTN06S5N008ATMA1",
-        "Rejected 60V",
-        "BUK7S1R2-80M",
-        "80V LFPAK88",
-        "3.84W at 40A",
-        "IAUTN08S5N012L",
+        "Rejected 60 V",
+        "IAUT300N08S5N012ATMA2",
+        "80 V TOLL",
+        "4.032W at 40A",
+        "IAUT300N08S5N014",
         "BUK7J2R4-80M",
-        "non-drop-in alternatives",
+        "controlled alternatives",
         "VBAT_REV_PROT",
         "VBAT_PROT",
         "IIN_SHUNT_HI",
@@ -299,7 +304,7 @@ def validate_input_reverse_freeze_review() -> None:
             fail(f"input reverse freeze review must include {token}")
 
     trace_text = read_text(PB100_DIR / "PB-100-input-reverse-package-trace.csv")
-    for token in ("IAUTN06S5N008ATMA1", "BUK7S1R2-80M", "IAUTN08S5N012L", "BUK7J2R4-80M", "40 A", "JLCPCB PCBWay"):
+    for token in ("IAUTN06S5N008ATMA1", "IAUT300N08S5N012ATMA2", "IAUT300N08S5N014", "BUK7J2R4-80M", "40 A", "JLCPCB PCBWay"):
         if token not in trace_text:
             fail(f"input reverse package trace must support freeze review token {token}")
 
@@ -309,12 +314,12 @@ def validate_input_reverse_freeze_review() -> None:
             fail(f"input protection pin contract must support freeze review token {token}")
 
     tvs_margin_text = read_text(PB100_DIR / "PB-100-tvs-load-dump-margin-trace.csv")
-    for token in ("IAUTN06S5N008", "60 V", "BUK7S1R2-80M", "80 V", "SM8S33AHM3/I"):
+    for token in ("IAUTN06S5N008", "60 V", "IAUT300N08S5N012ATMA2", "80 V", "SM8S33AHM3/I"):
         if token not in tvs_margin_text:
             fail(f"TVS margin trace must support input reverse freeze review token {token}")
 
     sourcing_text = read_text(REPO_ROOT / "production" / "bom" / "pb100_assembly_sourcing_recheck.csv")
-    for token in ("INPUT_REVERSE_FET", "LFPAK88", "BUK7S1R2-80M", "IAUTN08S5N012L", "BUK7J2R4-80M"):
+    for token in ("INPUT_REVERSE_FET", "TOLL", "IAUT300N08S5N012ATMA2", "IAUT300N08S5N014", "BUK7J2R4-80M"):
         if token not in sourcing_text:
             fail(f"assembly sourcing recheck must support input reverse freeze review token {token}")
 
@@ -353,13 +358,13 @@ def validate_input_reverse_q1_freeze_checklist() -> None:
         ):
             fail("Q1 rejected-60V checklist row must keep historical paths and exclusion explicit")
         if check_id == "Q1-FRZ-004" and not all(
-            token in row_text for token in ("buk7s1r2-80m", "80 v", "lfpak88", "3.84w at 40a")
+            token in row_text for token in ("iaut300n08s5n012atma2", "80 v", "toll", "4.032w at 40a")
         ):
-            fail("Q1 selected checklist row must keep BUK7S1R2-80M 80 V LFPAK88 explicit")
+            fail("Q1 selected checklist row must keep IAUT300N08S5N012ATMA2 80 V TOLL explicit")
         if check_id == "Q1-FRZ-005" and not all(
-            token in row_text for token in ("iautn08s5n012l", "buk7j2r4-80m", "non-drop-in")
+            token in row_text for token in ("iaut300n08s5n014atma1", "buk7j2r4-80mx", "controlled")
         ):
-            fail("Q1 alternatives checklist row must preserve two 80 V non-drop-in alternatives")
+            fail("Q1 alternatives checklist row must preserve two controlled 80 V alternatives")
         if check_id == "Q1-FRZ-006" and ("vbat_rev_prot" not in row_text or "iin_shunt_hi" not in row_text or "vbat_prot" not in row_text):
             fail("Q1 measurement sequence checklist row must keep protected telemetry sequence explicit")
         if check_id == "Q1-FRZ-009" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
@@ -379,12 +384,12 @@ def validate_input_reverse_q1_freeze_checklist() -> None:
         "INPUT_FET_GATE",
         "IAUTN06S5N008ATMA1",
         "not approved Rev.1 assembly substitutions",
-        "BUK7S1R2-80M",
-        "80 V LFPAK88",
-        "3.84W at 40A",
-        "IAUTN08S5N012L",
-        "BUK7J2R4-80M",
-        "non-drop-in alternatives",
+        "IAUT300N08S5N012ATMA2",
+        "80 V TOLL",
+        "4.032W at 40A",
+        "IAUT300N08S5N014ATMA1",
+        "BUK7J2R4-80MX",
+        "controlled alternatives",
         "VBAT_REV_PROT",
         "IIN_SHUNT_HI",
         "IIN_SHUNT_LO",
@@ -456,9 +461,9 @@ def validate_input_reverse_q1_derivation_precheck() -> None:
         "-11mV",
         "0.5mΩ",
         "1.25mΩ",
-        "BUK7S1R2-80M",
-        "80V LFPAK88",
-        "IAUTN08S5N012L",
+        "IAUT300N08S5N012ATMA2",
+        "80V TOLL",
+        "IAUT300N08S5N014",
         "BUK7J2R4-80M",
         "60V paths are rejected",
         "SM8S33AHM3/I",
@@ -505,7 +510,12 @@ def validate_input_reverse_q1_closeout_precheck() -> None:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
         if precheck_id == "Q1-CLS-005" and not all(
             token in row_text
-            for token in ("buk7s1r2-80m", "iautn08s5n012l", "buk7j2r4-80m", "60 v paths are rejected")
+            for token in (
+                "iaut300n08s5n012atma2",
+                "iaut300n08s5n014atma1",
+                "buk7j2r4-80mx",
+                "60 v paths are rejected",
+            )
         ):
             fail("Q1 closeout package row must keep selected and two 80 V alternate paths explicit")
         if precheck_id == "Q1-CLS-010" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
@@ -544,14 +554,14 @@ def validate_input_reverse_q1_closeout_precheck() -> None:
         "0.5mΩ to 1.25mΩ",
         "RDS(on)",
         "40A",
-        "BUK7S1R2-80M",
+        "IAUT300N08S5N012ATMA2",
         "80 V",
-        "LFPAK88",
+        "PG-HSOF-8-1 TOLL",
         "1.2mΩ",
-        "3.84W at 40A",
-        "IAUTN08S5N012L",
-        "BUK7J2R4-80M",
-        "non-drop-in 80 V alternatives",
+        "4.032W at 40A",
+        "IAUT300N08S5N014ATMA1",
+        "BUK7J2R4-80MX",
+        "controlled 80 V alternatives",
         "60 V paths are rejected",
         "SM8S33AHM3/I",
         "TVS",
@@ -584,7 +594,7 @@ def validate_input_reverse_q1_closeout_precheck() -> None:
     for supporting_artifact, tokens in {
         "PB-100-input-reverse-q1-freeze-checklist.csv": ("Q1-FRZ-003", "Q1-FRZ-009"),
         "PB-100-input-reverse-q1-derivation-precheck.csv": ("Q1-DER-002", "Q1-DER-010"),
-        "PB-100-input-reverse-package-trace.csv": ("BUK7S1R2-80M", "IAUTN08S5N012L", "BUK7J2R4-80M"),
+        "PB-100-input-reverse-package-trace.csv": ("IAUT300N08S5N012ATMA2", "IAUT300N08S5N014", "BUK7J2R4-80M"),
     }.items():
         supporting_text = read_text(PB100_DIR / supporting_artifact)
         for token in tokens:

@@ -58,7 +58,7 @@ def validate_garage_connector_fuse_plan() -> None:
         for column in GARAGE_CONNECTOR_FUSE_PLAN_COLUMNS:
             if not row[column].strip():
                 fail(f"{csv_path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
-        if row["Status"].strip() not in {"Candidate", "Conditional"}:
+        if row["Status"].strip() not in {"Candidate", "Conditional", "Selected final pre-layout"}:
             fail(f"{csv_path.relative_to(REPO_ROOT)}:{row_number}: invalid Status {row['Status'].strip()}")
 
     missing_interfaces = sorted(required_interfaces - rows_by_interface.keys())

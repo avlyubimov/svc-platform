@@ -1,110 +1,86 @@
 # PB-100 80 V MOSFET Voltage-Class Decision
 
-Status: Accepted by Product Owner on 2026-07-20; voltage class frozen, PCB layout not authorized
+Status: Accepted by Product Owner; selected production path reviewed 2026-07-21; PCB layout not authorized
 
 ## Decision
 
-PB-100 Rev.1 uses `BUK7S1R2-80M` in LFPAK88 SOT1235 for input reverse
-MOSFET Q1 and output MOSFETs Q101 through Q110. All eleven schematic instances
-bind `PB100:LFPAK88_SOT1235_Nexperia` and use the data-sheet pin contract:
-pin 1 gate, pins 2 through 4 source, and mounting base `mb` drain.
+PB-100 Rev.1 uses `IAUT300N08S5N012ATMA2` for input reverse MOSFET Q1 and
+output MOSFETs Q101 through Q110. It is an active/preferred automotive 80 V
+MOSFET in PG-HSOF-8-1 TOLL. The exact orderable part is tape-and-reel, MSL1,
+AEC qualified, and the manufacturer currently plans availability through at
+least 2038.
 
-The former 60 V `SIDR626LDP` and `IAUTN06S5N008` paths are rejected for the
-Rev.1 assembly baseline. Their footprint and calculation records remain as
-engineering history and are not approved substitutes. Returning to a 60 V
-path requires explicit Product Owner review plus reproducible overshoot proof.
+Every selected schematic instance binds
+`PB100:PG-HSOF-8-1_TOLL_Infineon` with pin 1 gate, pins 2 through 8 source, and
+`Tab` drain. The checked-in footprint keeps 42 separated paste apertures over
+the drain copper. The historical LFPAK88 and former 60 V footprint evidence is
+retained but is not selected.
 
 ## Why this component
 
-- 80 V VDS gives 26.7 V nominal headroom above the current 53.3 V TVS clamp
-  planning point, versus only 6.7 V for a 60 V MOSFET.
-- The manufacturer preliminary data sheet specifies 1.2 mOhm maximum RDS(on)
-  at 25 C, 2.4 mOhm at 125 C, a 175 C maximum junction temperature, and
-  AEC-Q101 qualification intent.
-- The existing reviewed LFPAK88 footprint has pin/pad identity evidence and
-  twelve segmented paste apertures over the mounting-base drain pad.
-- One voltage and package baseline across Q1 and Q101 through Q110 reduces
-  substitution and assembly ambiguity while preserving generic output roles.
+- 80 V VDS leaves 20.55 V above the generated 59.45 V hot clamp-loop
+  overshoot bound.
+- Maximum RDS(on) is 1.2 mOhm at 10 V; the conservative hot design bound uses
+  2.1x, or 2.52 mOhm.
+- Maximum RthJC is 0.4 K/W, maximum junction temperature is 175 degC, maximum
+  gate charge is 231 nC, and the package is 100% avalanche tested.
+- At the 40 A board budget Q1 dissipates 4.032 W at the hot resistance bound.
+  With the hard 125 degC case acceptance ceiling, the junction estimate is
+  126.61 degC and retains 48.39 degC to the absolute maximum.
+- One exact package for Q1 and Q101-Q110 reduces stencil, inspection, and
+  substitution ambiguity while preserving role-free outputs.
 
 ## Alternatives
 
-### Alternative A — `IAUTN08S5N012L`, 80 V TOLL
+### Alternative A — `IAUT300N08S5N014ATMA1`
 
-Retained as an automotive 80 V production alternative. It is not drop-in:
-TOLL uses a different footprint, paste field, copper geometry, and thermal
-model. A controlled substitution must repeat pin-map, SOA, thermal, assembly,
-and sourcing review. It was not selected because one LFPAK88 baseline is
-already captured and reduces Rev.1 package variation.
+Active/preferred 80 V automotive TOLL with the same PG-HSOF-8-1 pin contract,
+1.4 mOhm maximum RDS(on), 0.5 K/W maximum RthJC, and manufacturer availability
+planned through at least 2038. It is the preferred same-footprint alternate,
+but a substitution still requires updated SOA, gate-charge, loss, BOM, and
+factory review.
 
-### Alternative B — `BUK7J2R4-80M`, 80 V LFPAK56E
+### Alternative B — `BUK7J2R4-80MX`
 
-Retained as an 80 V automotive Nexperia-family alternative. It is not drop-in
-because LFPAK56E has a different package and higher conduction loss at the
-40 A board input. It was not selected because the smaller package gives less
-thermal margin for Q1 and OUT2.
+Production 80 V automotive `BUK7J2R4-80M` in LFPAK56E. It offers gull-wing AOI
+inspection and lower gate charge, but its 2.4 mOhm maximum room-temperature
+RDS(on), different footprint, and smaller package reduce Q1/OUT2 thermal margin.
+It is deliberately non-drop-in.
 
-### Rejected 60 V paths
+### Rejected preliminary and 60 V paths
 
-`SIDR626LDP` and `IAUTN06S5N008` could be reconsidered only if clamp-loop
-overshoot were proven below their reviewed limit and the Product Owner approved
-a future baseline change. They are not Rev.1 alternatives. Product Owner chose
-80 V so Rev.1 does not depend on that narrow 6.7 V nominal headroom.
+Preliminary `BUK7S1R2-80M` LFPAK88 is not a production selection. The 60 V
+`SIDR626LDP` and `IAUTN06S5N008` paths are also rejected because the accepted
+59.45 V bound leaves no useful component/measurement tolerance.
 
-## Operating and thermal margin
+## Availability and factory path
 
-At the current 53.3 V clamp planning point:
+The selected Infineon part is active/preferred, but the project does not claim
+live JLC stock. Rev.1 allows JLC global/preorder/private-part consignment or
+PCBWay kitted/consigned assembly using an authorized-distributor reel. TOLL
+stencil, paste coverage, MSL handling, polarity, solder-void acceptance, and
+first-article inspection must be reconfirmed with the actual assembler quote.
 
-| Voltage class | Nominal headroom | Result |
-|---|---:|---|
-| 60 V | 6.7 V | Rejected for Rev.1 MOSFET assembly baseline |
-| 80 V | 26.7 V | Selected; actual clamp-loop stress still requires validation |
-| 100 V | 46.7 V | Retained for controller and buck paths |
+This pre-layout source/process evidence closes PBREL-006 and the power-package
+portion of PBREL-011. Quote, DFM response, FAI, PB-BENCH-010, and order-date
+lifecycle/stock recheck remain later release gates and are not misreported as
+completed tests.
 
-Using 2.4 mOhm at 125 C as a conservative conduction value gives 3.84 W at
-40 A for Q1, 0.78 W at 18 A for OUT2, 0.35 W at 12 A, 0.15 W at 8 A, and
-0.04 W at 4 A. These values exclude switching, inrush, avalanche, copper and
-connector loss. They close only the voltage-class choice, not the SOA or
-thermal-layout gates.
+## Hard escape conditions
 
-The design target is operation below the 175 C absolute maximum with junction
-margin demonstrated from the final copper, ambient, airflow, pulse duty cycle,
-and assembly voiding evidence. No lifetime claim is accepted yet; automotive
-service-life suitability remains conditional on that thermal mission-profile
-review and qualified production sourcing.
+- Reopen protection if PB-BENCH-004 measures 60 V or more downstream of D1.
+- Reopen layout if the extracted D1-to-Q1/controller clamp loop exceeds 20 nH.
+- Reopen thermal design if Q1 or an output MOSFET case exceeds 125 degC at its
+  accepted continuous envelope.
+- Do not substitute any MOSFET from a BOM-only equivalence; repeat electrical,
+  footprint, thermal, source, and factory review.
 
-## Availability and production
+## Primary evidence
 
-- Automotive qualification: the selected data sheet identifies AEC-Q101;
-  exact production qualification status must be reconfirmed because the
-  reviewed February 2024 data sheet is preliminary.
-- LCSC/JLCPCB: no locked live stock code is claimed. Exact reel availability
-  and extended/consigned assembly handling remain open.
-- PCBWay/JLCPCB compatibility: LFPAK88 paste segmentation is captured, but
-  factory confirmation of bottom-termination handling, solder void criteria,
-  AOI/X-ray plan, and thermal-pad process is required before order.
-- Expected lifetime: automotive project lifetime target; not yet substantiated
-  until production-status, mission-profile, junction-temperature, and source
-  continuity evidence close.
-
-## Known risks and remaining gates
-
-- The preferred data sheet is preliminary; production status or orderability
-  may force a controlled migration to one of the 80 V alternatives.
-- Q1 40 A copper and thermal design, OUT2 startup SOA, per-channel inductive
-  energy, and actual TVS-plus-loop overshoot remain open.
-- `Vstress = Vclamp + Lloop * di/dt` must be validated with reproducible model
-  or bench evidence. The 80 V selection increases margin but does not replace
-  transient verification.
-- No PCB placement, high-current copper, Gerber, drill, or pick-place output is
-  authorized by this decision alone.
-
-## Evidence
-
-- Nexperia BUK7S1R2-80M data sheet:
-  <https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf>
-- Infineon IAUTN08S5N012L product page:
-  <https://www.infineon.com/part/IAUTN08S5N012L>
-- TVS margin trace: `PB-100-tvs-load-dump-margin-trace.csv`.
-- Thermal estimates: `PB-100-thermal-estimates.csv`.
-- Factory sourcing recheck:
-  `production/bom/pb100_assembly_sourcing_recheck.csv`.
+- Selected product page: <https://www.infineon.com/part/IAUT300N08S5N012>
+- Selected data sheet:
+  <https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf>
+- Same-footprint alternative: <https://www.infineon.com/part/IAUT300N08S5N014>
+- Non-drop-in alternative: <https://www.nexperia.com/product/BUK7J2R4-80M>
+- Generated Q1 evidence: `PB-100-input-q1-evidence.csv`.
+- Generated transient evidence: `PB-100-transient-margin-evidence.csv`.

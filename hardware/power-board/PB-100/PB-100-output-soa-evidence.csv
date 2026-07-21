@@ -1,0 +1,7 @@
+Output class,Channels,Fuse A,Configured A,Rsense mOhm,RIWRN ohm,IOC actual A,RISCP ohm,ISC actual A,CTMR nF,tOC ms,RIMON ohm,IMON full-scale A,IMON full-scale V,Continuous loss W,Startup case,Startup energy J,Fast transient case,Fast transient energy J,10us 60V SOA current margin A,Result
+High current,OUT2,20,18,0.500,67300,34.96,2610,95.91,680,9.95,12100,60,3.29,0.816,30 A / 100 ms,0.2268,80 A / 4 ms,0.0645,104.1,PASS
+Medium current 15 A,OUT1,15,12,1.000,49900,23.65,3400,60.28,680,9.95,12100,30,3.29,0.363,20 A / 100 ms,0.1008,50 A / 4 ms,0.0252,139.7,PASS
+Medium current 10 A,OUT3 OUT4 OUT6 OUT7 OUT10,10,8,1.500,49900,15.77,3830,44.66,680,9.95,12100,20,3.29,0.161,13 A / 100 ms,0.0426,35 A / 4 ms,0.0123,155.3,PASS
+Low current 5 A,OUT5 OUT8 OUT9,5,4,3.000,49900,7.88,3740,21.86,680,9.95,12100,10,3.29,0.040,6.5 A / 100 ms,0.0106,17.5 A / 4 ms,0.0031,178.1,PASS
+All classes,Q101-Q110,,,,,,,,,,,,,,TPS48110AQDGXRQ1 short response,,ISC checked at 5 us max,,Datasheet 10 us / 60 V lower bound 200 A,PASS
+All classes,Q101-Q110,,,,,,,,470,,,,,,Bootstrap sizing,,Qg(max)/1 V = 231 nF,,,PASS

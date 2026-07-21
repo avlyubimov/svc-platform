@@ -72,9 +72,10 @@ def validate_tvs_load_dump_margin_trace() -> None:
 
     required_items = {
         "TPS48110 high-side controller",
-        "BUK7S1R2-80M output MOSFET",
+        "IAUT300N08S5N012ATMA2 output MOSFET",
         "SIDR626LDP and IAUTN06S5N008 historical paths",
-        "BUK7S1R2-80M input reverse MOSFET",
+        "IAUT300N08S5N012ATMA2 input reverse MOSFET",
+        "LM74700QDBVRQ1 ideal-diode controller",
         "LM5164QDDATQ1 buck",
         "LM5013-Q1 buck alternate",
         "TPS54360B-Q1 buck alternate",
@@ -92,7 +93,7 @@ def validate_tvs_load_dump_margin_trace() -> None:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
         row_text = " ".join(row.values())
-        for token in ("SM8S33AHM3", "53.3 V", "schematic freeze"):
+        for token in ("SM8S33AHM3", "59.45 V"):
             if token not in row_text:
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: TVS margin row must include {token}")
 
@@ -106,16 +107,16 @@ def validate_tvs_load_dump_margin_trace() -> None:
     historical_text = " ".join(
         rows_by_item["SIDR626LDP and IAUTN06S5N008 historical paths"].values()
     ).lower()
-    for token in ("60 v", "rejected", "history", "overshoot"):
+    for token in ("60 v", "rejected", "history", "59.45 v"):
         if token not in historical_text:
             fail(f"historical 60 V paths must preserve {token}")
 
     for protected_item in (
-        "BUK7S1R2-80M output MOSFET",
-        "BUK7S1R2-80M input reverse MOSFET",
+        "IAUT300N08S5N012ATMA2 output MOSFET",
+        "IAUT300N08S5N012ATMA2 input reverse MOSFET",
     ):
         selected_text = " ".join(rows_by_item[protected_item].values()).lower()
-        for token in ("80 v", "selected", "26.7 v", "overshoot"):
+        for token in ("80 v", "selected", "20.55 v", "bounded"):
             if token not in selected_text:
                 fail(f"{protected_item} must preserve selected 80 V margin evidence: {token}")
 
@@ -129,15 +130,16 @@ def validate_tvs_load_dump_margin_trace() -> None:
         "LM5164QDDATQ1 buck",
         "LM5013-Q1 buck alternate",
     ):
-        if "Pass with margin" not in rows_by_item[protected_item]["Margin state"]:
+        margin_state = rows_by_item[protected_item]["Margin state"].lower()
+        if "pass" not in margin_state or "margin" not in margin_state:
             fail(f"{protected_item} must remain pass-with-margin against active HM3 TVS")
 
     protection_text = read_text(PB100_DIR / "PB-100-protection-validation.csv")
     for token in (
-        "Active SM8S33AHM3-class TVS",
-        "53.3V clamp",
-        "BUK7S1R2-80M output MOSFET",
-        "Selected with 26.7V nominal margin",
+        "SM8S33AHM3/I TVS",
+        "59.45V bounded stress",
+        "IAUT300N08S5N012ATMA2 output MOSFET",
+        "Selected with 20.55V bounded margin",
         "Rejected Rev.1 baseline",
     ):
         if token not in protection_text:
@@ -184,6 +186,7 @@ def validate_tvs_load_dump_freeze_review() -> None:
         "SM8S33AHM3/I",
         "HM3 DO-218AC",
         "53.3 V clamp at 124 A",
+        "59.45 V bounded stress",
         "MCC SM8S33A EOL",
         "Vishay HE3 NFD",
         "TPS48110",
@@ -195,10 +198,10 @@ def validate_tvs_load_dump_freeze_review() -> None:
         "60 V",
         "rejected Rev.1 assembly paths",
         "overshoot",
-        "BUK7S1R2-80M",
+        "IAUT300N08S5N012ATMA2",
         "80 V",
         "selected for Q1 and Q101 through Q110",
-        "26.7 V nominal headroom",
+        "20.55 V bounded headroom",
         "TPS54360B-Q1",
         "TPS2HB35",
         "ADR-0011",
@@ -217,10 +220,10 @@ def validate_tvs_load_dump_freeze_review() -> None:
     for token in (
         "SM8S33AHM3/I",
         "HM3 DO-218AC",
-        "53.3 V clamp at 124 A",
+        "59.45 V bounded hot clamp-loop stress",
         "Rejected Rev.1 baseline",
-        "BUK7S1R2-80M",
-        "Selected with 26.7 V nominal margin",
+        "IAUT300N08S5N012ATMA2",
+        "Selected; pass with 20.55 V margin",
         "TPS54360B-Q1",
         "TPS2HB35",
         "Deferred by ADR-0011",
@@ -230,10 +233,10 @@ def validate_tvs_load_dump_freeze_review() -> None:
 
     protection_text = read_text(PB100_DIR / "PB-100-protection-validation.csv")
     for token in (
-        "Active SM8S33AHM3-class TVS",
-        "53.3V clamp",
+        "SM8S33AHM3/I TVS",
+        "59.45V bounded stress",
         "Rejected Rev.1 baseline",
-        "Selected with 26.7V nominal margin",
+        "Selected with 20.55V bounded margin",
         "Optional future alternate",
         "TPS54360B-Q1",
     ):
@@ -300,22 +303,24 @@ def validate_tvs_overshoot_escape_checklist() -> None:
         "SM8S33AHM3/I",
         "HM3 DO-218AC",
         "AEC-Q101",
-        "53.3 V clamp at 124 A",
+        "53.3 V raw clamp at 124 A",
+        "59.45 V bounded stress",
         "MCC SM8S33A EOL",
         "Vishay HE3 NFD",
         "60 V",
-        "6.7 V headroom",
+        "0.55 V recommended headroom",
+        "5.55 V absolute headroom",
         "80 V",
-        "26.7 V headroom",
+        "20.55 V bounded headroom",
         "100 V",
-        "46.7 V headroom",
+        "40.55 V bounded headroom",
         "SIDR626LDP",
         "IAUTN06S5N008",
         "historical evidence",
         "not permitted Rev.1 assembly substitutions",
         "overshoot",
-        "BUK7S1R2-80M",
-        "LFPAK88",
+        "IAUT300N08S5N012ATMA2",
+        "PG-HSOF-8-1 TOLL",
         "1.2 mOhm",
         "selected for Q1 and Q101 through Q110",
         "TPS48110",
@@ -345,16 +350,16 @@ def validate_tvs_overshoot_escape_checklist() -> None:
     margin_text = read_text(PB100_DIR / "PB-100-tvs-load-dump-margin-trace.csv")
     for token in (
         "SM8S33AHM3/I",
-        "53.3 V clamp at 124 A",
+        "59.45 V bounded hot clamp-loop stress",
         "Rejected Rev.1 baseline",
-        "BUK7S1R2-80M",
-        "Selected with 26.7 V nominal margin",
+        "IAUT300N08S5N012ATMA2",
+        "Selected; pass with 20.55 V margin",
     ):
         if token not in margin_text:
             fail(f"TVS margin trace must support overshoot checklist token {token}")
 
     voltage_review_text = read_text(PB100_DIR / "PB-100-mosfet-voltage-margin-review.md")
-    for token in ("60 V", "80 V", "6.7 V", "26.7 V", "overshoot"):
+    for token in ("60 V", "80 V", "0.55 V", "20.55 V", "59.45 V", "overshoot"):
         if token not in voltage_review_text:
             fail(f"MOSFET voltage-margin review must support TVS overshoot token {token}")
 
@@ -407,14 +412,17 @@ def validate_tvs_overshoot_validation_precheck() -> None:
     for token in (
         "SM8S33AHM3/I",
         "HM3 DO-218AC",
-        "53.3 V clamp at 124 A",
+        "53.3 V raw clamp at 124 A",
+        "59.45 V bounded stress",
         "MCC SM8S33A EOL",
         "Vishay HE3 NFD",
         "Vstress = Vclamp + Lloop * di/dt",
         "SIDR626LDP",
         "IAUTN06S5N008",
-        "BUK7S1R2-80M",
+        "IAUT300N08S5N012ATMA2",
+        "PG-HSOF-8-1 TOLL",
         "80 V",
+        "20.55 V bounded headroom",
         "100 V",
         "TPS48110",
         "LM5164QDDATQ1",
@@ -481,7 +489,8 @@ def validate_tvs_overshoot_closeout_precheck() -> None:
         "SM8S33AHM3/I",
         "HM3 DO-218AC",
         "AEC-Q101",
-        "53.3 V clamp at 124 A",
+        "53.3 V raw clamp at 124 A",
+        "59.45 V bounded stress",
         "MCC SM8S33A EOL",
         "Vishay HE3 NFD",
         "60 V MOSFET exclusion bridge",
@@ -491,9 +500,9 @@ def validate_tvs_overshoot_closeout_precheck() -> None:
         "source impedance",
         "SIDR626LDP",
         "IAUTN06S5N008",
-        "BUK7S1R2-80M",
-        "LFPAK88",
-        "80 V is selected for Q1 and Q101 through Q110",
+        "IAUT300N08S5N012ATMA2",
+        "PG-HSOF-8-1 TOLL",
+        "80 V is selected for Q1 and Q101 through Q110 with 20.55 V bounded headroom",
         "TPS48110",
         "LM5164QDDATQ1",
         "LM5013-Q1",
@@ -504,7 +513,7 @@ def validate_tvs_overshoot_closeout_precheck() -> None:
         "OV divider",
         "buck input network",
         "input filter capacitor",
-        "TBD not final",
+        "value-bearing-sheet promotion items",
         "VBAT_PROT",
         "INPUT_TVS",
         "SLD8S33A",

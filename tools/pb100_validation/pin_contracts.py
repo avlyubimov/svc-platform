@@ -435,8 +435,8 @@ def validate_input_protection_pin_contract() -> None:
         for row in q1_rows
         for column in ("Interface point", "Default state", "Freeze dependency")
     )
-    if not all(token in q1_close_text for token in ("BUK7S1R2-80M", "LFPAK88", "40 A")):
-        fail("Q1 input protection rows must keep selected 80 V LFPAK88 and 40 A review explicit")
+    if not all(token in q1_close_text for token in ("IAUT300N08S5N012ATMA2", "TOLL", "40 A")):
+        fail("Q1 input protection rows must keep selected 80 V TOLL and 40 A review explicit")
 
 
 def validate_logic_power_design_placeholders() -> None:

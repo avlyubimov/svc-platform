@@ -59,7 +59,7 @@ REQUIRED_FACTS = {
     ),
     PB100_DIR / "PB-100-schematic-readiness-dashboard.csv": (
         "ADR-0015 Accepted",
-        "BUK7S1R2-80M 80 V LFPAK88",
+        "IAUT300N08S5N012ATMA2 80 V TOLL",
         "six official plated lands",
         "four GND MF circuits",
     ),
@@ -69,7 +69,7 @@ REQUIRED_FACTS = {
         "four GND MF circuits",
     ),
     PB100_DIR / "PB-100-footprint-binding-progress.csv": (
-        "BUK7S1R2-80M 80 V baseline",
+        "IAUT300N08S5N012ATMA2 80 V baseline",
         "six official plated lands",
         "four GND MF circuits",
         "zero Open rows",
@@ -266,6 +266,52 @@ def validate_required_facts() -> None:
                 raise ValidationError(f"{relative(path)} must include current fact {token!r}")
 
 
+def validate_pb100_local_closeout() -> None:
+    register_rows = {
+        row["Blocker ID"].strip(): row
+        for row in read_csv(BLOCKER_REGISTERS["PB-100"])
+    }
+    closeout_path = PB100_DIR / "PB-100-board-release-local-evidence-closeout.csv"
+    closeout_rows = {
+        row["Blocker ID"].strip(): row
+        for row in read_csv(closeout_path)
+    }
+    if set(closeout_rows) != set(register_rows):
+        raise ValidationError(
+            f"{relative(closeout_path)} blocker IDs must match the PB-100 blocker register"
+        )
+
+    for blocker_id, register_row in register_rows.items():
+        register_status = register_row["Status"].strip()
+        impact = closeout_rows[blocker_id]["Status impact"].strip()
+        if register_status == "Closed" and not impact.startswith("Closed for pre-layout"):
+            raise ValidationError(
+                f"{relative(closeout_path)}:{blocker_id} contradicts Closed register status"
+            )
+        if register_status in {"Open", "Conditional"} and register_status.lower() not in impact.lower():
+            raise ValidationError(
+                f"{relative(closeout_path)}:{blocker_id} must report {register_status} impact"
+            )
+
+    manifest_path = PB100_DIR / "PB-100-review-release-manifest.csv"
+    manifest_rows = {
+        row["Artifact"].strip(): row
+        for row in read_csv(manifest_path)
+    }
+    artifact = "hardware/power-board/PB-100/PB-100-board-release-local-evidence-closeout.csv"
+    expected_manifest_status = (
+        "Closed"
+        if all(row["Status"].strip() == "Closed" for row in register_rows.values())
+        else "Conditional"
+    )
+    actual_manifest_status = manifest_rows.get(artifact, {}).get("Status", "").strip()
+    if actual_manifest_status != expected_manifest_status:
+        raise ValidationError(
+            f"{relative(manifest_path)} local closeout row must be "
+            f"{expected_manifest_status}, got {actual_manifest_status or 'missing'}"
+        )
+
+
 def validate_no_stale_claims() -> None:
     for path in ACTIVE_DOCUMENTS:
         text = read_text(path).lower()
@@ -281,4 +327,5 @@ def validate() -> None:
     validate_final_readiness(expected)
     validate_footprint_gate_status()
     validate_required_facts()
+    validate_pb100_local_closeout()
     validate_no_stale_claims()

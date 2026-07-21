@@ -1,8 +1,8 @@
 # Component Family Shortlist
 
-Status: Initial factory-assembly shortlist
+Status: PB-100 critical power selections synchronized; remaining families are shortlist items
 
-Evidence snapshot date: 2026-06-30
+Evidence snapshot date: 2026-07-21
 
 This document selects component families for schematic planning. It is not a
 final MPN lock. LCSC/JLCPCB/PCBWay availability, assembly class, price, and
@@ -26,13 +26,13 @@ order.
 | Expansion CAN transceiver | TI TCAN1042-Q1 | NXP TJA1051/TJA1057 | SOIC-8 or VSON/HVSON | CAN2 may transmit for bench or accessory use |
 | High-side output controller | TI TPS4811-Q1 | TI TPS1211-Q1; TI TPS4810-Q1 | VSSOP/HTSSOP class | Rev.1 baseline for all PB-100 outputs with external N-MOSFETs |
 | Smart high-side switch | TI TPS2HB16-Q1 | TI TPS2HB35-Q1; TI TPS1H100-Q1 | HTSSOP class | Deferred low-current alternate after ADR-0011; requires lower-clamp strategy |
-| Output MOSFET | Nexperia BUK7S1R2-80M 80 V LFPAK88 selected | Infineon IAUTN08S5N012L 80 V TOLL; Nexperia BUK7J2R4-80M 80 V LFPAK56E | LFPAK88 selected; alternatives are non-drop-in | Selected for Q101-Q110; per-channel SOA thermal inductive-clamp sourcing and assembly evidence remain gates |
+| Output MOSFET | Infineon IAUT300N08S5N012ATMA2 80 V TOLL selected | Infineon IAUT300N08S5N014ATMA1 same-footprint TOLL; Nexperia BUK7J2R4-80MX 80 V LFPAK56E non-drop-in | PG-HSOF-8-1 TOLL selected with segmented paste | Generated per-class SOA and pre-layout sourcing pass; exact sheet-value promotion and physical acceptance remain gates |
 | Current monitor | TPS48110 IMON for outputs; TI INA228/INA229 or INA226 for input | External analog monitor; firmware-calibrated ADC path | VSSOP/SOIC class | Per-output telemetry uses controller IMON; total input current uses dedicated shunt monitor |
 | Total current shunt | Bourns CSS4J-4026R-L500F-class 0.5 mΩ four-terminal shunt | Bourns CSS4J-4026R-1L00F-class 1.0 mΩ; Isabellenhuette BVN/BAS or equivalent AEC-Q200 four-terminal family | CSS4J-4026 or reviewed power shunt | 0.5 mΩ gives 30 mV at 60 A and 1.8 W; compatible with INA228 ±40.96 mV range candidate |
 | Temperature sensor | TDK NTCGS103JF103FT8-class 10 kΩ AEC-Q200 NTC | Vishay NTCS0402E3 10 kΩ AEC-Q200 150 °C class; Murata NCU18XH103D6SRB-class 10 kΩ 0603 AEC-Q200 150 °C; TI TMP117/TMP112-class digital sensor optional | 0402 preferred for NTC; SOT/DFN only for optional digital sensor | PB-100 uses PCB reference plus two power-zone thermal points; divider values and calibration remain schematic-freeze items |
 | Logic buck regulator | TI LM5164-Q1 | TI LM5013-Q1; TI TPS54360B-Q1/TPS54360-Q1 | SOIC/HSOIC PowerPAD | LM5164-Q1 for 1 A 100 V rail; LM5013-Q1 preferred over 60 V family if more current is needed |
 | Input reverse protection | TI LM74700-Q1/LM74502-Q1 class | ADI/LTC ideal diode controller families | MSOP/SOIC class | Controller family only; MOSFET is tracked separately |
-| Input reverse MOSFET | Nexperia BUK7S1R2-80M 80 V LFPAK88 selected | Infineon IAUTN08S5N012L 80 V TOLL; Nexperia BUK7J2R4-80M 80 V LFPAK56E | LFPAK88 selected; alternatives are non-drop-in | 40 A SOA copper thermal production status and assembly handling remain gates |
+| Input reverse MOSFET | Infineon IAUT300N08S5N012ATMA2 80 V TOLL selected | Infineon IAUT300N08S5N014ATMA1 same-footprint TOLL; Nexperia BUK7J2R4-80MX 80 V LFPAK56E non-drop-in | PG-HSOF-8-1 TOLL selected with segmented paste | Generated 40 A thermal bound and pre-layout sourcing pass; plane/polygon/bus and prototype thermal acceptance remain gates |
 | Input TVS/load dump | Vishay SM8S33AHM3/I active HM3 TVS | Vishay SM8S33AHE3_A/I NFD stock-only; Littelfuse SLD8S33A; Diodes DM8W33AQ-13; Bourns SM8S33A-Q class | DO-218AC/SMC as needed | MCC SM8S33A source is EOL and HE3 is NFD evidence only; final clamp voltage depends on MOSFET and buck ratings |
 | PB-100/LB-100 board-to-board connector | Hirose FX18-100P-0.8SV10 plus FX18-100S-0.8SV10 selected pair | Samtec Q Strip/high-density mezzanine class; Molex SlimStack 100-position class | 100-position 0.8 mm FX18 official 20 mm stack | Six-land footprints, MF ownership, four-spacer retention, fixture, and pre-layout mechanics are closed; live stock, factory handling, and PB-BENCH-014/015 remain release gates |
 | FRAM | Fujitsu/Infineon MB85 I2C/SPI FRAM | Cypress/Infineon Excelon FRAM | SOIC/TSSOP/DFN | Configuration and black-box storage |
@@ -47,13 +47,13 @@ Detailed candidate MPNs for PB-100 schematic planning are tracked in
 
 The current strategy is:
 
-- All Rev.1 outputs: TPS48110AQDGXRQ1-class high-side controller plus selected
-  BUK7S1R2-80M-class 80 V LFPAK88 N-MOSFET.
+- All Rev.1 outputs: TPS48110AQDGXRQ1 high-side controller plus selected
+  IAUT300N08S5N012ATMA2 80 V PG-HSOF-8-1 TOLL N-MOSFET.
 - Low-current integrated smart switches: deferred alternatives only.
 - Input reverse protection: LM74700QDBVRQ1-class ideal-diode controller.
-- Input reverse and output MOSFET: BUK7S1R2-80M-class 80 V LFPAK88 selected,
-  with IAUTN08S5N012L 80 V TOLL and BUK7J2R4-80M 80 V LFPAK56E retained as
-  non-drop-in alternatives.
+- Input reverse and output MOSFET: IAUT300N08S5N012ATMA2 80 V TOLL selected,
+  with IAUT300N08S5N014ATMA1 as the same-footprint controlled alternative and
+  BUK7J2R4-80MX 80 V LFPAK56E as a non-drop-in production escape path.
 - Input transient clamp: Vishay SM8S33AHM3/I active HM3 load-dump TVS or
   reviewed equivalent. MCC SM8S33A is treated as EOL evidence only, and Vishay
   HE3 is treated as NFD stock-only evidence; neither may be locked.
@@ -87,7 +87,13 @@ The current strategy is:
 - TI LM74700QDBVRQ1 was listed at LCSC on the snapshot date: https://www.lcsc.com/product-detail/C2941042.html
 - Infineon IAUTN06S5N008 is retained only as rejected 60 V TOLL history:
   https://www.infineon.com/part/IAUTN06S5N008
-- Nexperia BUK7S1R2-80M data sheet lists an 80 V 1.2 mOhm automotive LFPAK88 MOSFET: https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf
+- Infineon IAUT300N08S5N012 is the selected 80 V automotive
+  PG-HSOF-8-1 TOLL MOSFET for Q1 and Q101-Q110:
+  https://www.infineon.com/part/IAUT300N08S5N012
+- Infineon IAUT300N08S5N014 is the controlled same-footprint alternative:
+  https://www.infineon.com/part/IAUT300N08S5N014
+- Nexperia BUK7J2R4-80M is the controlled non-drop-in 80 V LFPAK56E
+  alternative: https://www.nexperia.com/product/BUK7J2R4-80M
 - MCC SM8S33A reference now shows EOL/obsolete status and is retained only as a
   cautionary sourcing note: https://www.mccsemi.com/products/esd-protection-and-power-tvs/tvs/SM8S33A
 - Vishay SM8S HM3 AEC-Q101 DO-218AC data was checked as the active TVS class
@@ -119,12 +125,13 @@ The current strategy is:
 - TI LM5013-Q1 is active as a 6-100 V 3.5 A automotive buck regulator: https://www.ti.com/product/LM5013-Q1
 - TI TPS54360B-Q1 is active as an automotive 60 V 3.5 A buck regulator: https://www.ti.com/product/TPS54360B-Q1
 
-## Open checks before schematic freeze
+## Remaining gates before schematic freeze
 
-- Confirm JLCPCB/PCBWay assembly class for each selected MPN.
-- Confirm thermal budget for each output current class.
-- Confirm MOSFET SOA for compressor and heated-seat inrush cases.
-- Confirm TVS clamp voltage against buck, MOSFET, and high-side controller limits.
+- Synchronize remaining passive and clamp values into value-bearing sheets.
+- Carry the generated output SOA and hot-loss limits into layout and prototype
+  thermal acceptance.
+- Keep the generated 59.45 V transient bound below the 20 nH layout escape
+  limit and confirm it in PB-BENCH-004.
 - Confirm high-side controller availability through at least two suppliers.
-- Confirm TOLL/LFPAK88 assembly support at JLCPCB/PCBWay or use the documented
-  parallel PowerPAK fallback for input reverse protection.
+- Confirm selected PG-HSOF-8-1 TOLL handling at actual JLCPCB/PCBWay quote;
+  IAUT300N08S5N014ATMA1 and BUK7J2R4-80MX remain controlled alternatives.
