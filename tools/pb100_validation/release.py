@@ -565,7 +565,7 @@ def validate_engineering_blocker_closeout() -> None:
             "LM74930QRGERQ1",
             "IAUTN15S6N025ATMA1",
             "SM8S33AHM3/I",
-            "1.67x",
+            "2.08x",
             "7.200 W",
             "3.47 K/W",
             "overshoot",

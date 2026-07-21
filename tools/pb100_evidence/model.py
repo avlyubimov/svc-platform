@@ -60,6 +60,13 @@ class LoadDumpRequirement:
 
 
 @dataclass(frozen=True)
+class LoadDumpThermalState:
+    name: str
+    ambient_c: float
+    preload_current_a: float
+
+
+@dataclass(frozen=True)
 class TvsModel:
     mpn: str
     vbr_max_25c_v: float
@@ -95,7 +102,7 @@ class SurgeStopper:
     cutoff_mosfet_voltage_v: float
     cutoff_mosfet_rds_on_max_25c_ohm: float
     cutoff_mosfet_hot_multiplier: float
-    cutoff_mosfet_gate_charge_max_c: float
+    cutoff_mosfet_gate_drain_charge_max_c: float
     cutoff_mosfet_rth_jc_max_k_per_w: float
     cutoff_mosfet_max_junction_c: float
     cutoff_mosfet_soa_reference_temperature_c: float
@@ -154,12 +161,8 @@ class SurgeStopper:
         )
 
     @property
-    def gate_discharge_s(self) -> float:
-        return self.cutoff_mosfet_gate_charge_max_c / self.hgate_sink_current_min_a
-
-    @property
-    def conservative_turnoff_s(self) -> float:
-        return self.hgate_turnoff_delay_max_s + self.gate_discharge_s
+    def miller_transition_s(self) -> float:
+        return self.cutoff_mosfet_gate_drain_charge_max_c / self.hgate_sink_current_min_a
 
     @property
     def cutoff_mosfet_rds_on_hot_ohm(self) -> float:
@@ -172,6 +175,22 @@ class SurgeStopper:
             - self.cutoff_mosfet_soa_reference_temperature_c
         )
         return self.cutoff_mosfet_soa_current_min_a * temperature_headroom / reference_headroom
+
+    @property
+    def hot_conduction_loss_w(self) -> float:
+        return self.continuous_current_a**2 * self.cutoff_mosfet_rds_on_hot_ohm
+
+    @property
+    def target_full_thermal_path_k_per_w(self) -> float:
+        return (150.0 - 125.0) / self.hot_conduction_loss_w
+
+    def steady_initial_junction_c(
+        self,
+        ambient_c: float,
+        preload_current_a: float,
+    ) -> float:
+        preload_loss_w = preload_current_a**2 * self.cutoff_mosfet_rds_on_hot_ohm
+        return ambient_c + preload_loss_w * self.target_full_thermal_path_k_per_w
 
 
 MOSFET = Mosfet(
@@ -274,6 +293,13 @@ LOAD_DUMP = LoadDumpRequirement(
 )
 
 
+LOAD_DUMP_THERMAL_STATES = (
+    LoadDumpThermalState("Cold start", 25.0, 0.0),
+    LoadDumpThermalState("Hot soak", 125.0, 0.0),
+    LoadDumpThermalState("Hot steady 40 A", 125.0, 40.0),
+)
+
+
 TVS = TvsModel(
     mpn="SM8S33AHM3/I",
     vbr_max_25c_v=40.6,
@@ -304,13 +330,13 @@ SURGE_STOPPER = SurgeStopper(
     cutoff_mosfet_voltage_v=150.0,
     cutoff_mosfet_rds_on_max_25c_ohm=0.0025,
     cutoff_mosfet_hot_multiplier=1.8,
-    cutoff_mosfet_gate_charge_max_c=139e-9,
+    cutoff_mosfet_gate_drain_charge_max_c=40e-9,
     cutoff_mosfet_rth_jc_max_k_per_w=0.42,
     cutoff_mosfet_max_junction_c=175.0,
     cutoff_mosfet_soa_reference_temperature_c=25.0,
     cutoff_mosfet_soa_reference_voltage_v=101.0,
-    cutoff_mosfet_soa_reference_pulse_s=10e-6,
-    cutoff_mosfet_soa_current_min_a=200.0,
+    cutoff_mosfet_soa_reference_pulse_s=1e-6,
+    cutoff_mosfet_soa_current_min_a=500.0,
     ov_top_ohm=84_400.0,
     ov_bottom_ohm=1_000.0,
     resistor_tolerance=0.01,

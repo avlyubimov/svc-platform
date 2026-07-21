@@ -24,17 +24,17 @@ def derive_blocker_authorization(rows: Iterable[Mapping[str, str]]) -> str:
         raise ValueError("staged blocker must contain each release stage exactly once")
 
     closed_count = 0
-    found_blocked = False
+    found_open = False
     for stage in STAGES:
         status = rows_by_stage[stage]["Stage status"].strip()
-        if status not in {"Closed", "Blocked"}:
+        if status not in {"Closed", "Conditional", "Blocked"}:
             raise ValueError(f"invalid stage status {status!r}")
         if status == "Closed":
-            if found_blocked:
+            if found_open:
                 raise ValueError("release stages must close in order")
             closed_count += 1
         else:
-            found_blocked = True
+            found_open = True
     return RELEASE_STATES[closed_count]
 
 

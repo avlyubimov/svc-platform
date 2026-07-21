@@ -34,12 +34,14 @@ does not approve schematic freeze or PCB layout.
   is bounded by 30 A for 100 ms, 80 A for 4 ms, and 95.91 A for 5 us.
 - LM74930QRGERQ1 drives common-source Q2/Q1 devices and hard-disconnects the
   load at a generated `48.99-54.89 V` threshold across tolerance and leakage.
-- The raw-side IAUTN15S6N025ATMA1 screens the `79-101 V`, `0.5-4 ohm`, and
-  `40-400 ms` envelope at 25/125 degC initial junction temperature. The
-  conservative 101 V / 40 A / 10 us SOA screen retains 1.67x margin at
-  125 degC. Q2 hot conduction loss is 7.200 W and requires a post-layout full
-  thermal path no worse than 3.47 K/W. Final loop overshoot and dynamic SOA
-  remain post-layout, with PB-BENCH-004 later.
+- The raw-side IAUTN15S6N025ATMA1 model covers the `79-101 V`, `0.5-4 ohm`,
+  and `40-400 ms` envelope at 25/125/150 degC initial junction temperature.
+  Seven-microsecond deglitch is fully enhanced; the separate 0.31 us Qgd
+  transition gives a provisional 2.08x SOA screen at 150 degC. Q2 hot
+  conduction loss is 7.200 W and requires a post-layout full thermal path no
+  worse than 3.47 K/W. A qualified maximum-bound trajectory is still required
+  before layout; final loop overshoot and dynamic SOA remain post-layout, with
+  PB-BENCH-004 later.
 - A populated SM8S33AHM3-class input TVS is not automatically compatible with 40 V integrated
   smart switches. ADR-0011 resolves the Rev.1 conflict by moving OUT5, OUT8,
   and OUT9 to the external-controller output architecture.

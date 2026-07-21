@@ -47,8 +47,9 @@ remaining gates.
 - Voltage margin: ADR-0018 selects U1 `LM74930QRGERQ1` hard cutoff at
   48.99-54.89 V with raw-side Q2 `IAUTN15S6N025ATMA1` 150 V TOLL. The
   historical single `SM8S33AHM3/I` HM3 DO-218AC branch remains rejected and
-  D1 is DNP. PBREL-007 pre-layout stage is Closed while the blocker remains Conditional overall; actual overshoot, extracted
-  dynamic SOA, and PB-BENCH-004 remain later gates.
+  D1 is DNP. PBREL-007 pre-layout remains Conditional and aggregate
+  authorization is BLOCKED pending a qualified maximum-bound Q2 trajectory;
+  actual overshoot, extracted dynamic SOA, and PB-BENCH-004 remain later gates.
 - Input reverse protection: selected Q1 IAUT300N08S5N012ATMA2 80 V MOSFET
   uses the LM74930-Q1 protected DGATE side. Passive PCB copper plus a thermal
   pad to the metal enclosure is required; 4.032 W at 40 A, Tj <=150 C, and

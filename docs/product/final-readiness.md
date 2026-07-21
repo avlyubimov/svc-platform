@@ -81,7 +81,7 @@ Current coverage:
 | Architecture v1.0 | Ready | Frozen by ADR; PB-100 requirement changes still need ADR |
 | PB-100 requirements | Ready for controlled schematic completion | Baseline plus ADR-0016/ADR-0018 active-cutoff and passive-thermal requirements are frozen; schematic freeze remains open |
 | PB-100 KiCad scaffold | Preliminary capture | Child sheets now contain ERC-clean preliminary capture content and exported netlist coverage; schematic freeze remains open |
-| PB-100 PCB/layout | LAYOUT-ONLY authorization; implementation still blocked | There is 1 active blocker: `PBREL-007` (Conditional overall). PBREL-006 is Closed and both staged blockers are individually `LAYOUT-ONLY`, so aggregate authorization remains `LAYOUT-ONLY`; the Open schematic-freeze and layout-start checklists still prohibit creating `PB-100.kicad_pcb`. Prototype output requires `PROTO-ONLY`; production and field use remain `NO-GO` |
+| PB-100 PCB/layout | BLOCKED | There is 1 active blocker: `PBREL-007`. PBREL-006 is Closed, but PBREL-007 pre-layout is Conditional because its `Tj_initial=150 C` Q2 trajectory relies on provisional graph/Qgd inputs, so aggregate authorization remains `BLOCKED` and creating `PB-100.kicad_pcb` is prohibited. Prototype output requires `PROTO-ONLY`; production and field use remain `NO-GO` |
 | LB-100 requirements | Frozen | Baseline is frozen by ADR-0014 and the schematic freeze is Closed |
 | LB-100 KiCad schematic | Reviewed | Deterministic 81-component, 191-net, footprint-bound capture adds typed IC pins/ERC, sourced and decoupled ADC_REF, one-point AGND return, digital USB VBUS detection, direct STM32-to-LTC3212 drive, back-power-safe sensor supplies, and three switched-rail Ioff buffers isolating E73 UART/reset; exported-netlist audit and ERC pass with only the two reviewed cross-board USB CC single-pin warnings |
 | LB-100 PCB/layout | BLOCKED | There are 0 active blockers (0 active LBREL blockers). Footprint, schematic, and corrected FX18 mechanical gates are closed; the separate signal-integrity and safety layout model remains Open, so no `LB-100.kicad_pcb` or manufacturing output is authorized |
@@ -118,9 +118,10 @@ Current coverage:
   tolerance, and self-heating calculations. Those rows preserve the rejected
   single-TVS failure; ADR-0018 instead selects hard cutoff at `48.99-54.89 V`.
 - ADR-0017 separates PBREL-006/PBREL-007 evidence into pre-layout,
-  post-layout, and prototype-qualification stages. Both design selections are
-  Closed and aggregate authorization is `LAYOUT-ONLY`; board import remains
-  blocked by schematic-freeze/layout-start, and production remains `NO-GO`.
+  post-layout, and prototype-qualification stages. PBREL-006 selection is
+  Closed, but PBREL-007 pre-layout remains Conditional pending a qualified
+  maximum-bound Q2 turnoff trajectory; aggregate authorization is `BLOCKED`,
+  board import is prohibited, and production remains `NO-GO`.
 - Load-dump freeze review now ties LM74930-Q1 hard cutoff, selected 150 V Q2,
   protected-side 80 V Q1, rejected single-TVS history, 40 V smart-switch ADR boundary, sourcing gate, and
   no-layout boundary into

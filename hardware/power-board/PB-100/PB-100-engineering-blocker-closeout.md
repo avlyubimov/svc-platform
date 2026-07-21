@@ -369,11 +369,11 @@ orders.
 ## PBREL-007 — TVS/load-dump protection
 
 - Closeout status: Conditional.
-- Stage status: pre-layout Closed and current authorization `LAYOUT-ONLY`.
-- Closeout boundary: ADR-0018 accepts the active-cutoff design selection and
-  authorizes `LAYOUT-ONLY`, but does not close PBREL-007 overall. Extracted
-  loop/overshoot and dynamic SOA control `PROTO-ONLY`; PB-BENCH-004 controls
-  production readiness.
+- Stage status: pre-layout Conditional and current authorization `BLOCKED`.
+- Closeout boundary: ADR-0018 accepts the active-cutoff architecture, but a
+  qualified maximum-bound 101 V / 40 A Q2 trajectory is still required before
+  `LAYOUT-ONLY`. Extracted loop/overshoot and dynamic SOA later control
+  `PROTO-ONLY`; PB-BENCH-004 controls production readiness.
 - Why blocker existed: SM8S33-class TVS clamp can stress 60 V downstream parts
   and cannot safely absorb the full 40-400 ms unsuppressed envelope by itself.
 - Candidate comparison: the single populated `SM8S33AHM3/I` branch is rejected.
@@ -392,11 +392,13 @@ orders.
   plus 150 V-class FET only after pin/package, cutoff, gate-charge, and SOA review.
 - Cost impact: moderate; active cutoff and Q2 add parts but avoid an oversized
   single-pulse energy absorber and preserve downstream voltage margin.
-- Thermal impact: the 8.09 us turn-off is screened at 40 A against the 101 V /
-  10 us linear-mode SOA curve. The 125 degC derated limit is 66.67 A, or 1.67x
-  margin. Q2 dissipates 4.000 W at its 25 degC maximum RDS(on) and 7.200 W at
-  the conservative hot bound, requiring a full post-layout path no worse than
-  3.47 K/W. The 0.0327 J value is informational, not avalanche qualification.
+- Thermal impact: 7.200 W hot conduction through the 3.47 K/W target path sets
+  150 degC initial Tj at 125 degC ambient. The 7 us deglitch keeps Q2 fully
+  enhanced; the separate maximum-Qgd/minimum-HGATE calculation gives a
+  provisional 0.31 us transition. The 101 V / 1 us SOA screen derates to
+  83.33 A at 150 degC, or 2.08x, but remains Conditional because Qgd is not
+  guaranteed at this corner and the SOA value is graph-derived. Transition
+  energy is informational, not avalanche qualification.
 - Production impact: RGE exposed-pad isolation, Q2 TOLL stencil/voiding, short
   gate/clamp loops, and D1 DNP inspection require DFM and first-article review.
 - Field reliability impact: hard cutoff prevents the 40-400 ms load-dump energy
