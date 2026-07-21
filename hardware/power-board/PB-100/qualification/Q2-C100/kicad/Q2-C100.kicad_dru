@@ -1,0 +1,12 @@
+(version 1)
+
+(rule "Q2-C100 default clearance"
+    (constraint clearance (min 0.20mm)))
+
+(rule "Q2-C100 RAW 101V clearance"
+    (condition "(A.NetName == 'RAW_101V' || B.NetName == 'RAW_101V') && !(A.Reference == 'QDUT' || B.Reference == 'QDUT' || A.Reference == 'ROV1' || B.Reference == 'ROV1' || A.Reference == 'RVS' || B.Reference == 'RVS')")
+    (constraint clearance (min 2.00mm)))
+
+(rule "Q2-C100 routed width"
+    (condition "A.NetName == 'Q2_HGATE' || A.NetName == 'QREV_DGATE' || A.NetName == 'COMMON_SOURCE' || A.NetName == 'RAW_101V' || A.NetName == 'SYSTEM_OUT'")
+    (constraint track_width (min 0.25mm)))

@@ -223,6 +223,8 @@ def validate_five_blocker_release_evidence() -> None:
         fail("input sheet must contain exact selected LM74930-Q1 value in its local symbol and U1")
     if f'(property "Footprint" "{SELECTED_CONTROLLER_FOOTPRINT}"' not in input_sheet:
         fail("input sheet must bind the selected LM74930-Q1 RGE footprint")
+    if '(property "Value" "CGA6N3X7R2A225M230AE 2.2uF 100V X7R; Ceff>=1uF@56V"' not in input_sheet:
+        fail("input sheet must retain the selected >=1 uF effective LM74930 VS storage capacitor")
     for sheet_name, sheet_text in (("outputs", output_sheet), ("input", input_sheet)):
         if f'(property "Footprint" "{SELECTED_FOOTPRINT}"' not in sheet_text:
             fail(f"{sheet_name} sheet must bind the selected TOLL footprint")

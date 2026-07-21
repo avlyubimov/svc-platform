@@ -1,0 +1,5 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "Q2C100") (type "KiCad") (uri "${KIPRJMOD}/lib/Q2C100.pretty") (options "") (descr "Q2-C100 generated footprints"))
+  (lib (name "PB100") (type "KiCad") (uri "${KIPRJMOD}/../../../kicad/lib/PB100.pretty") (options "") (descr "Reviewed PB-100 power footprints reused by Q2-C100"))
+)
