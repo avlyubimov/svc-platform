@@ -73,6 +73,8 @@ def validate_lb(netlist: Netlist, library_dir: Path) -> list[str]:
     require_component(netlist, "U1", "STM32H563VIT6", "LB100:LQFP-100_L14.0-W14.0-P0.50-LS16.0-BL", failures)
     require_component(netlist, "U3", "TCA9539QPWRQ1", "LB100:TSSOP-24_4.4x7.8mm_P0.65mm", failures)
     require_component(netlist, "U14", "SN74LVC1G17QDBVRQ1", "LB100:SOT-25_L3.0-W1.6-P0.95-LS2.8-TL", failures)
+    for ref in ("U15", "U16", "U17"):
+        require_component(netlist, ref, "SN74LVC1G125QDBVRQ1", "LB100:SOT-25_L3.0-W1.6-P0.95-LS2.8-TL", failures)
     require_component(netlist, "JPB1", "FX18-100S-0.8SV10", "LB100:FX18-100S-0.8SV10_Hirose", failures)
     require_component(netlist, "JFB1", "AFC07-S24ECA-00", "LB100:FPC-SMD_AFC07-S24ECA-00", failures)
 
@@ -104,7 +106,39 @@ def validate_lb(netlist: Netlist, library_dir: Path) -> list[str]:
     require_net(netlist, "AGND", {("U1", "19"), ("U1", "20"), ("R17", "1")}, failures, exact=False)
     require_net(netlist, "GND", {("R17", "2")}, failures, exact=False)
     require_net(netlist, "LB_3V3_IO", {("U10", "5"), ("U10", "12"), ("U11", "2")}, failures, exact=False)
-    require_net(netlist, "RADIO_SENSOR_3V3", {("U10", "8")}, failures, exact=False)
+    require_net(
+        netlist,
+        "RADIO_SENSOR_3V3",
+        {
+            ("U7", "19"), ("U10", "8"), ("U15", "5"), ("U16", "5"),
+            ("U17", "5"), ("R9", "1"), ("R18", "2"), ("R19", "2"),
+        },
+        failures,
+        exact=False,
+    )
+    require_net(netlist, "UART_TX", {("JPB1", "78"), ("R22", "2"), ("U1", "78"), ("U15", "2")}, failures)
+    require_net(netlist, "BLE_UART_RX_MODULE", {("U7", "22"), ("U15", "4"), ("R18", "1")}, failures)
+    require_net(netlist, "BLE_UART_TX_MODULE", {("U7", "20"), ("U16", "2"), ("R19", "1")}, failures)
+    require_net(netlist, "UART_RX", {("JPB1", "79"), ("U1", "79"), ("U16", "4"), ("R20", "2")}, failures)
+    require_net(netlist, "BLE_RESET_N_MCU", {("R21", "1"), ("U1", "97"), ("U17", "2")}, failures)
+    require_net(netlist, "BLE_RESET_N", {("U7", "26"), ("U17", "4"), ("R9", "2")}, failures)
+    require_net(
+        netlist,
+        "GND",
+        {
+            ("U15", "1"), ("U15", "3"), ("U16", "1"), ("U16", "3"),
+            ("U17", "1"), ("U17", "3"), ("R21", "2"),
+        },
+        failures,
+        exact=False,
+    )
+    require_component(netlist, "R9", "10k 1% switched reset pull-up", "LB100:R_C_0603_1608Metric", failures)
+    require_component(netlist, "R18", "22k 1% switched UART idle clamp", "LB100:R_C_0603_1608Metric", failures)
+    require_component(netlist, "R19", "22k 1% switched UART idle clamp", "LB100:R_C_0603_1608Metric", failures)
+    require_component(netlist, "R20", "100k 1% MCU UART idle pull-up", "LB100:R_C_0603_1608Metric", failures)
+    require_component(netlist, "R21", "100k 1% reset default assert", "LB100:R_C_0603_1608Metric", failures)
+    require_component(netlist, "R22", "100k 1% MCU UART idle pull-up", "LB100:R_C_0603_1608Metric", failures)
+    require_net(netlist, "LB_3V3_MAIN", {("R20", "1"), ("R22", "1")}, failures, exact=False)
 
     mf_pins = {
         ("JPB1", "MF_A_PIN1_51_END"),
@@ -134,7 +168,11 @@ def validate_fb(netlist: Netlist, library_dir: Path) -> list[str]:
     require_net(netlist, "USB_D_N_CONN", {("J1", "A7"), ("J1", "B7"), ("D1", "3")}, failures)
     require_net(netlist, "USB_D_P", {("D1", "6"), ("JFB1", "4")}, failures)
     require_net(netlist, "USB_D_N", {("D1", "4"), ("JFB1", "5")}, failures)
-    require_net(netlist, "USB_VBUS_DETECT_RAW", {("C1", "1"), ("JFB1", "8"), ("R13", "2")}, failures)
+    require_net(netlist, "USB_VBUS_DETECT_RAW", {("C1", "1"), ("JFB1", "8"), ("R13", "2"), ("R14", "1")}, failures)
+    require_net(netlist, "GND", {("C1", "2"), ("R14", "2")}, failures, exact=False)
+    require_component(netlist, "R13", "3.9k 1% current limit", "FB100:R_C_0603_1608Metric", failures)
+    require_component(netlist, "R14", "15k 1% defined pulldown", "FB100:R_C_0603_1608Metric", failures)
+    require_component(netlist, "C1", "100nF 16V X7R 10%", "FB100:R_C_0603_1608Metric", failures)
     require(not ({("J1", "A4"), ("J1", "A9"), ("J1", "B4"), ("J1", "B9")} & set(netlist.nets.get("FB_3V3_OR_IO", frozenset()))), "USB VBUS back-powers FB_3V3_OR_IO", failures)
 
     for index in range(1, 11):

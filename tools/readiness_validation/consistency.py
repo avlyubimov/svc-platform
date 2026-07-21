@@ -90,8 +90,8 @@ REQUIRED_FACTS = {
         "six official plated",
         "four GND MF circuits",
         "zero active LBREL blockers",
-        "70 components",
-        "188 electrical nets",
+        "81 components",
+        "191 electrical nets",
     ),
     LB100_DIR / "LB-100-schematic-review-closeout.md": (
         "ADR-0015 Accepted",
@@ -114,6 +114,11 @@ REQUIRED_FACTS = {
         "six official plated lands",
         "four GND MF circuits",
         "20.3 +/-0.127 mm",
+    ),
+    FB100_DIR / "FB-100-schematic-freeze-checklist.md": (
+        "zero active FBREL blockers",
+        "44 components",
+        "46 nets",
     ),
 }
 

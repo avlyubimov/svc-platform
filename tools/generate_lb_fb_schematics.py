@@ -303,7 +303,10 @@ def build_lb() -> Schematic:
         "transceiver; CAN1_TX_ROUTE remains the PB DNP/open route. TCA9539-Q1 maps the ten role-free channel LEDs "
         "and slow UI signals and powers up with all ports as inputs. STM32 PD7 directly drives the timing-critical "
         "LTC3212 LEDEN path. CAN2/LIN/RS485 footprints are DNP by default. USB VBUS uses a 5 V-tolerant "
-        "SN74LVC1G17-Q1 digital detector and cannot back-power PB_5V_OUT, LB_3V3_MAIN, or LB_3V3_IO. "
+        "SN74LVC1G17-Q1 digital detector with a defined raw-input pulldown and cannot back-power PB_5V_OUT, "
+        "LB_3V3_MAIN, or LB_3V3_IO. Three RADIO_SENSOR_3V3-powered SN74LVC1G125-Q1 buffers isolate both "
+        "BLE UART directions and reset while the E73 rail is off; module-side UART pulls and the reset pull-up "
+        "keep every E73 digital pin within its unpowered limit. "
         "ADC_REF is sourced and locally decoupled; AGND returns to GND at one documented zero-ohm point. Reviewed footprint "
         "binding and mechanical envelope remain governed by LB-100-pcb-layout-start-checklist.csv, "
         "LB-100-footprint-binding-inventory.csv, and LB-100-mechanical-envelope-inventory.csv. Do not create "
@@ -333,7 +336,7 @@ def build_lb() -> Schematic:
         50: "LB_3V3_MAIN", 54: "IOX_INT_N", 57: "USB_VBUS_PRESENT", 70: "USB_D_N", 71: "USB_D_P",
         72: "SWDIO", 73: "LB_3V3_MAIN", 74: "GND",
         75: "LB_3V3_MAIN", 80: "MICROSD_CS_N", 81: "MICROSD_PWR_EN", 82: "RADIO_SENSOR_EN",
-        76: "SWCLK", 88: "STATUS_RGB_DATA", 94: "BOOT0", 97: "BLE_RESET_N", 98: "VCAP2", 99: "GND",
+        76: "SWCLK", 88: "STATUS_RGB_DATA", 94: "BOOT0", 97: "BLE_RESET_N_MCU", 98: "VCAP2", 99: "GND",
         100: "LB_3V3_MAIN",
     })
     mcu_types.update({
@@ -342,7 +345,7 @@ def build_lb() -> Schematic:
         21: "power_in", 22: "power_in", 27: "power_in", 28: "power_in", 48: "power_out",
         49: "power_in", 50: "power_in", 54: "input", 57: "input", 70: "bidirectional",
         71: "bidirectional", 72: "bidirectional", 73: "power_in", 74: "power_in",
-        75: "power_in", 76: "input", 80: "output", 81: "output", 82: "output",
+        75: "power_in", 76: "input", 78: "output", 79: "input", 80: "output", 81: "output", 82: "output",
         88: "output", 94: "input", 97: "output", 98: "power_out", 99: "power_in",
         100: "power_in",
     })
@@ -409,7 +412,15 @@ def build_lb() -> Schematic:
         ("7", "B", None), ("8", "VCC", "LB_3V3_MAIN"),
     ], dnp=True))
     e73_names = ["P1.11", "P1.10", "P0.03", "P0.28", "GND", "P1.13", "P0.02", "P0.29", "P0.31", "P0.30", "XL1", "P0.26", "XL2", "P0.06", "P0.05", "P0.08", "P1.09", "P0.04", "VCC", "P0.12", "GND", "P0.07", "VDDH", "GND", "DCCH", "RESET", "VBUS", "P0.15", "USB_DM", "P0.17", "USB_DP", "P0.20", "P0.13", "P0.22", "P0.24", "P1.00", "SWDIO", "P1.02", "SWDCLK", "P1.04", "NFC1", "P1.06", "NFC2"]
-    e73_nets: dict[int, str | None] = {5: "GND", 19: "RADIO_SENSOR_3V3", 20: "UART_RX", 21: "GND", 22: "UART_TX", 24: "GND", 26: "BLE_RESET_N"}
+    e73_nets: dict[int, str | None] = {
+        5: "GND",
+        19: "RADIO_SENSOR_3V3",
+        20: "BLE_UART_TX_MODULE",
+        21: "GND",
+        22: "BLE_UART_RX_MODULE",
+        24: "GND",
+        26: "BLE_RESET_N",
+    }
     sch.add(c("U7", "E73-2G4M08S1C", "LB100:WIRELM-SMD_E73-2G4M08S1C", "https://www.ebyte.com/product/444.html", [(str(index), name, e73_nets.get(index)) for index, name in enumerate(e73_names, 1)]))
     sch.add(c("U8", "FM24CL64B-GTR", "LB100:SOIC-8_L4.9-W3.9-P1.27-LS6.0-BL", "https://www.infineon.com/assets/row/public/documents/10/57/infineon-fm24cl64b-64-kbit-8-k-8-serial-i2c-automotive-f-ram-datasheet-additionaltechnicalinformation-en.pdf", [
         ("1", "A0", "GND"), ("2", "A1", "GND"), ("3", "A2", "GND"), ("4", "VSS", "GND"),
@@ -458,6 +469,18 @@ def build_lb() -> Schematic:
         ("3", "GND", "GND", "power_in"), ("4", "Y", "USB_VBUS_PRESENT", "output"),
         ("5", "VCC", "LB_3V3_IO", "power_in"),
     ]))
+    radio_buffer_footprint = "LB100:SOT-25_L3.0-W1.6-P0.95-LS2.8-TL"
+    radio_buffer_datasheet = "https://www.ti.com/lit/ds/symlink/sn74lvc1g125-q1.pdf"
+    for ref, source, sink in (
+        ("U15", "UART_TX", "BLE_UART_RX_MODULE"),
+        ("U16", "BLE_UART_TX_MODULE", "UART_RX"),
+        ("U17", "BLE_RESET_N_MCU", "BLE_RESET_N"),
+    ):
+        sch.add(c(ref, "SN74LVC1G125QDBVRQ1", radio_buffer_footprint, radio_buffer_datasheet, [
+            ("1", "OE_N", "GND", "input"), ("2", "A", source, "input"),
+            ("3", "GND", "GND", "power_in"), ("4", "Y", sink, "tri_state"),
+            ("5", "VCC", "RADIO_SENSOR_3V3", "power_in"),
+        ]))
 
     r0603 = "LB100:R_C_0603_1608Metric"
     c0603 = r0603
@@ -479,7 +502,7 @@ def build_lb() -> Schematic:
         passive("R6", "2.2k 1%", r0603, "LB_3V3_IO", "PB_I2C_SCL"),
         passive("R7", "2.2k 1%", r0603, "LB_3V3_IO", "PB_I2C_SDA"),
         passive("R8", "4.7k 1%", r0603, "LB_3V3_MAIN", "IOX_INT_N"),
-        passive("R9", "10k 1%", r0603, "LB_3V3_MAIN", "BLE_RESET_N"),
+        passive("R9", "10k 1% switched reset pull-up", r0603, "RADIO_SENSOR_3V3", "BLE_RESET_N"),
         passive("R10", "47k 1%", r0603, "MICROSD_3V3", "MICROSD_DAT1"),
         passive("R11", "47k 1%", r0603, "MICROSD_3V3", "MICROSD_DAT2"),
         passive("R12", "10k 1%", r0603, "MICROSD_3V3", "MICROSD_CS_N"),
@@ -498,6 +521,14 @@ def build_lb() -> Schematic:
         passive("C29", "100nF 6.3V X7R", c0603, "ADC_REF", "AGND"),
         passive("C30", "100nF 6.3V X7R", c0603, "LB_3V3_IO", "GND"),
         passive("C31", "100nF 6.3V X7R BMI270 VDDIO", c0603, "LB_3V3_IO", "GND"),
+        passive("R18", "22k 1% switched UART idle clamp", r0603, "BLE_UART_RX_MODULE", "RADIO_SENSOR_3V3"),
+        passive("R19", "22k 1% switched UART idle clamp", r0603, "BLE_UART_TX_MODULE", "RADIO_SENSOR_3V3"),
+        passive("R20", "100k 1% MCU UART idle pull-up", r0603, "LB_3V3_MAIN", "UART_RX"),
+        passive("R21", "100k 1% reset default assert", r0603, "BLE_RESET_N_MCU", "GND"),
+        passive("R22", "100k 1% MCU UART idle pull-up", r0603, "LB_3V3_MAIN", "UART_TX"),
+        passive("C32", "100nF 6.3V X7R U15", c0603, "RADIO_SENSOR_3V3", "GND"),
+        passive("C33", "100nF 6.3V X7R U16", c0603, "RADIO_SENSOR_3V3", "GND"),
+        passive("C34", "100nF 6.3V X7R U17", c0603, "RADIO_SENSOR_3V3", "GND"),
     ]
     for index in range(15, 28):
         rail = "LB_3V3_MAIN" if index < 22 else "RADIO_SENSOR_3V3" if index < 26 else "MICROSD_3V3"
@@ -567,8 +598,9 @@ def build_fb() -> Schematic:
     extra = [
         passive("R11", "5.1k 1%", "FB100:R_C_0603_1608Metric", "USB_CC1", "GND"),
         passive("R12", "5.1k 1%", "FB100:R_C_0603_1608Metric", "USB_CC2", "GND"),
-        passive("R13", "100k 1% current limit", "FB100:R_C_0603_1608Metric", "USB_VBUS", "USB_VBUS_DETECT_RAW"),
-        passive("C1", "100nF 16V X7R", "FB100:R_C_0603_1608Metric", "USB_VBUS_DETECT_RAW", "GND"),
+        passive("R13", "3.9k 1% current limit", "FB100:R_C_0603_1608Metric", "USB_VBUS", "USB_VBUS_DETECT_RAW"),
+        passive("R14", "15k 1% defined pulldown", "FB100:R_C_0603_1608Metric", "USB_VBUS_DETECT_RAW", "GND"),
+        passive("C1", "100nF 16V X7R 10%", "FB100:R_C_0603_1608Metric", "USB_VBUS_DETECT_RAW", "GND"),
         passive("R15", "1M 1%", "FB100:R_C_0603_1608Metric", "USB_SHIELD", "GND"),
         passive("C2", "1nF 1kV C0G", "FB100:R_C_0603_1608Metric", "USB_SHIELD", "GND"),
         passive("C3", "1uF 6.3V X7R", "FB100:R_C_0603_1608Metric", "FB_3V3_OR_IO", "GND"),

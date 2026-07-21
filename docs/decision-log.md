@@ -3375,3 +3375,38 @@ switched, preventing pull-up back-power.
 Result: corrective schematic validation remains green. PB-100 has two active
 release blockers and no `.kicad_pcb`, Gerber, drill, placement, manufacturing
 ZIP, or PCBA order artifact is created.
+
+## 2026-07-21 — E73 powered-off isolation and defined USB VBUS removal
+
+Decision: temporarily treat `LBREL-005`, `LBREL-007`, `FBREL-002`, and
+`FBREL-006` as Conditional after review found that E73 UART/reset were driven
+from the always-on STM32 domain while `RADIO_SENSOR_3V3` was off and that
+`USB_VBUS_DETECT_RAW` had no DC pulldown. Re-close those four schematic gates
+only with the corrective topology and machine-checked evidence below.
+
+Decision: retain the switched E73 rail and add U15-U17
+`SN74LVC1G125-Q1` gates powered from `RADIO_SENSOR_3V3`. Both UART directions
+and reset now cross the domain through `Ioff` buffers. R18/R19 22 kOhm idle
+pulls terminate on the quick-output-discharged switched rail and bound
+module-side powered-off UART voltage to 0.222 V maximum, while R9 moves to the
+switched rail so RESET is bounded to 0.101 V maximum. R20/R22 hold both
+always-on UART sides idle-high and R21 keeps reset asserted until firmware
+releases it after rail settling. All module-side bounds are below the
+nRF52840 `VDD + 0.3 V` absolute limit at VDD = 0 V. The always-on alternative
+was rejected because it would make parking-current and fault containment rely
+only on nRF52840 System OFF firmware behavior.
+
+Decision: change FB R13 to 3.9 kOhm, add R14 15 kOhm from
+`USB_VBUS_DETECT_RAW` to GND, and retain C1 100 nF. With VBUS 4.75-5.50 V,
+1% resistors, U14 input leakage, and a conservative 70-130 nF effective
+capacitance range, the raw input is 3.723 V minimum when present and 0.152 V
+maximum when absent. It crosses even the 3.43 V maximum positive threshold in
+the complete TI table within 1.04 ms and falls below the minimum 0.77 V
+Schmitt threshold within 3.81 ms.
+
+Decision: extend `tools/board_schematic_validation/rules.py` to require the
+exact switched-buffer nets, module-side clamps, switched reset pull-up, and
+USB R13/R14/C1 topology. The generated LB netlist is now 81 components and
+191 nets; FB is 44 components and 46 nets. ERC and exported-netlist validation
+pass. `PBREL-006` remains Conditional, `PBREL-007` remains Open, and no
+`.kicad_pcb` or manufacturing output is authorized.
