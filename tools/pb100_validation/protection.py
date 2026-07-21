@@ -116,7 +116,8 @@ def validate_tvs_load_dump_margin_trace() -> None:
         "PB-100-protection-validation.csv",
         (
             "48.99-54.89V",
-            "1.67x hot SOA margin",
+            "2.08x provisional hot SOA margin",
+            "150 C initial Tj",
             "PBREL-006 design gate Closed",
             "SM8S33AHM3/I legacy D1",
             "NOT APPROVED",
@@ -137,7 +138,7 @@ def validate_tvs_load_dump_freeze_review() -> None:
             "LM74930QRGERQ1",
             "IAUTN15S6N025ATMA1",
             "48.99-54.89 V",
-            "PBREL-007 remains Conditional overall while its pre-layout stage is Closed",
+            "PBREL-007 pre-layout stage remains Conditional",
             "PB-100.kicad_pcb",
         ),
     )
@@ -159,6 +160,7 @@ def validate_tvs_overshoot_escape_checklist() -> None:
             "Q2 linear-mode SOA",
             "dynamic SOA",
             "7.200 W",
+            "150 C initial Tj",
             "ten pulses separated by 60 s",
             "PB-100.kicad_pcb",
         ),
@@ -180,7 +182,7 @@ def validate_tvs_overshoot_validation_precheck() -> None:
         fail("TVS validation must require extracted parasitic inductance")
     _require_tokens(
         "PB-100-tvs-overshoot-validation-precheck.csv",
-        ("16 boundary rows", "Cutoff tolerance", "dynamic SOA", "ten pulses", "PB-100.kicad_pcb"),
+        ("24 boundary rows", "Cutoff tolerance", "dynamic SOA", "ten pulses", "PB-100.kicad_pcb"),
     )
 
 
@@ -200,10 +202,10 @@ def validate_tvs_overshoot_closeout_precheck() -> None:
             "ADR-0016",
             "ADR-0018",
             "no higher than 55 V",
-            "Hot derated SOA limit is 66.67 A",
+            "Hot derated SOA limit is provisionally 83.33 A",
             "dynamic SOA",
             "Ten pulses at 60 s",
-            "PBREL-007 remains Conditional overall with pre-layout stage Closed",
+            "PBREL-007 pre-layout stage remains Conditional",
             "PB-100.kicad_pcb",
         ),
     )

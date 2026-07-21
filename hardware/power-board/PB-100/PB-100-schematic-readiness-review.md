@@ -5,8 +5,9 @@ Status: Retracted; corrective schematic freeze is Open
 Review date: 2026-07-20
 
 This historical snapshot is superseded by ADR-0016, ADR-0018, and the current
-blocker register. PBREL-006 is Closed and PBREL-007 is Conditional overall; both pre-layout stages are Closed and each
-is `LAYOUT-ONLY`; ADR-0017 keeps post-layout and prototype evidence separate.
+blocker register. PBREL-006 is Closed, but PBREL-007 pre-layout is Conditional
+and its aggregate authorization is `BLOCKED`; ADR-0017 keeps post-layout and
+prototype evidence separate.
 This document does not authorize PCB layout, Gerbers,
 drills, pick-place files, BOM/CPL order packages, manufacturing ZIP files,
 fabrication packages, or PCBA orders.
@@ -16,9 +17,9 @@ fabrication packages, or PCBA orders.
 - Architecture v1.0 and PB-100 baseline requirements are frozen by ADR.
 - No active PB-100 architecture-planning blockers remain in the freeze
   checklist.
-- The current board-release register has one active PBREL blocker: PBREL-007 Conditional.
-  PBREL-006 and PBREL-007 are individually `LAYOUT-ONLY`; board import remains
-  blocked by the separate Open schematic-freeze and layout-start gates.
+- The current board-release register has one active PBREL blocker: PBREL-007
+  Conditional. PBREL-006 is `LAYOUT-ONLY`, PBREL-007 is `BLOCKED`, and board
+  import is prohibited until its pre-layout trajectory evidence closes.
 - PB-100 schematic freeze is Open; the former closeout is retracted in
   `hardware/power-board/PB-100/PB-100-schematic-review-closeout.md`.
 - ADR-0013 and ADR-0017 separate pre-layout, post-layout, and physical bench

@@ -1,6 +1,6 @@
 # PB-100 Input Protection Selection
 
-Status: Q1 selected; PBREL-007 Conditional with pre-layout stage accepted under ADR-0018
+Status: Q1 selected; PBREL-007 pre-layout Conditional under ADR-0018
 
 ## Selected Architecture
 
@@ -41,25 +41,31 @@ verified after layout and by PB-BENCH-010 at 40 A.
 
 ## Surge and SOA Screening
 
-`PB-100-surge-stopper-evidence.csv` covers all 16 combinations of 79/101 V,
-0.5/4 ohm, 40/400 ms, and 25/125 degC initial junction temperature. The
-8.09 us turn-off bound is screened at 40 A against a conservative digitized
-200 A lower bound from the 101 V / 10 us / 25 degC SOA curve. Junction-
-temperature headroom derating gives 66.67 A at 125 degC and 1.67x margin. The
-0.0327 J rectangular transition value is informational and is not compared
-with avalanche energy. The 150 V Q2 retains 49 V static margin; Q1 retains
-25.11 V at the worst 54.89 V cutoff.
+`PB-100-surge-stopper-evidence.csv` covers 24 combinations of 79/101 V,
+0.5/4 ohm, 40/400 ms, and cold, hot-soak, and hot steady-40 A thermal states.
+The hot state links 7.200 W conduction through the 3.47 K/W target path, so
+load dump starts at `Tj=150 degC`. The 7 us OV deglitch is modeled with Q2
+fully enhanced at approximately 0.18 V VDS. Linear transition is modeled
+separately from maximum 40 nC Qgd and minimum 128 mA HGATE sink, giving a
+provisional 0.31 us bound. A conservative digitized 500 A lower bound from the
+101 V / 1 us / 25 degC SOA curve derates to 83.33 A at 150 degC, or a
+provisional 2.08x screen. Rectangular transition energy is informational and
+is not compared with avalanche energy. The 150 V Q2 retains 49 V static
+margin; Q1 retains 25.11 V at the worst 54.89 V cutoff.
 
 `PB-100-input-q2-evidence.csv` calculates 4.000 W at the 2.5 mOhm 25 degC
 maximum and 7.200 W from a conservative 4.50 mOhm hot bound. The complete
 Q2 thermal path must be no worse than 3.47 K/W for 125 degC ambient and the
 150 degC target.
 
-The calculations close the pre-layout stage only, not final dynamic proof.
-PBREL-007 remains Conditional overall. Extracted
-loop inductance, overshoot, Q2 SOA, normal-conduction thermal behavior, and
-enclosure coupling remain post-layout evidence. PB-BENCH-004 remains a
-post-prototype gate.
+The calculations do not yet close the pre-layout stage. Qgd is
+design-specified at 75 V / 123 A rather than production-tested at the
+101 V / 40 A cutoff corner, and the SOA bound is graph-derived. A qualified
+maximum-bound trajectory is required before `LAYOUT-ONLY`. PBREL-007 remains
+Conditional and aggregate authorization is `BLOCKED`. After pre-layout
+closure, extracted loop inductance, overshoot, Q2 SOA, normal-conduction
+thermal behavior, and enclosure coupling remain post-layout evidence.
+PB-BENCH-004 remains a post-prototype gate.
 
 ## Alternatives and Risks
 
@@ -81,10 +87,10 @@ controlled alternates and lifecycle monitoring.
 
 ## Release Boundary
 
-- PBREL-006 is closed; PBREL-007 remains Conditional overall with its
-  pre-layout stage closed at `LAYOUT-ONLY`.
-- Controlled PCB layout still requires normal schematic-freeze and layout-start
-  approval.
+- PBREL-006 is closed; PBREL-007 pre-layout remains Conditional and aggregate
+  authorization is `BLOCKED`.
+- Controlled PCB layout requires PBREL-007 pre-layout closure plus normal
+  schematic-freeze and layout-start approval.
 - `PROTO-ONLY` requires post-layout copper, thermal, SOA, and clamp-loop
   extraction.
 - Production and field use remain `NO-GO` until PB-BENCH-004,

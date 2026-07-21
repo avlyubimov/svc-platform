@@ -648,8 +648,12 @@ def validate_sourcing_evidence_snapshot() -> None:
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid {column}")
         row_text = " ".join(row.values()).lower()
         blocker_text = row["Open sourcing blocker"].lower()
+        explicit_pre_layout_state = any(
+            token in blocker_text
+            for token in ("none for pbrel pre-layout", "required for pbrel pre-layout")
+        )
         if "open:" not in blocker_text and not (
-            "none for pbrel pre-layout" in blocker_text
+            explicit_pre_layout_state
             and any(token in blocker_text for token in ("remain", "recheck"))
         ):
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: later blocker/gate must remain explicit")

@@ -49,15 +49,22 @@ thermal evidence that cannot exist before PCB layout.
 
 ## Margins and Evidence
 
-The generated pre-layout model covers all 16 combinations of 79/101 V,
-0.5/4 ohm, 40/400 ms, and 25/125 degC initial junction temperature. It uses
-the 7 us maximum LM74930-Q1 OV deglitch plus the minimum 128 mA HGATE sink and
-Q2 maximum 139 nC gate charge, giving an 8.09 us turn-off bound. Q2 is screened
-as a linear-mode switch at 40 A against the longer 10 us SOA curve. A
-conservative digitized lower bound of 200 A at 101 V and 25 degC is derated by
-junction-temperature headroom to 66.67 A at 125 degC, leaving 1.67x current
-margin. The 0.0327 J rectangular transition-energy bound is retained only as
-supporting information, not as avalanche or SOA qualification.
+The corrected generated model covers 24 combinations of 79/101 V,
+0.5/4 ohm, 40/400 ms, and three Q2 thermal states: 25 degC cold start,
+125 degC hot soak, and 125 degC ambient after steady 40 A preload. Initial
+junction temperature is calculated as `Tambient + Pcontinuous * RthJA_target`;
+the hot steady state therefore starts the load dump at 150 degC rather than
+125 degC.
+
+The 7 us maximum LM74930-Q1 OV deglitch is not treated as linear-mode time.
+Q2 remains fully enhanced during that delay with approximately 0.18 V VDS at
+40 A and the conservative 4.50 mOhm hot resistance. The provisional Miller
+transition uses Q2 maximum 40 nC Qgd divided by the LM74930-Q1 minimum 128 mA
+HGATE sink, giving 0.31 us. A conservative digitized lower bound of 500 A at
+101 V from the 25 degC, 1 us SOA curve is derated by junction-temperature
+headroom to 83.33 A at 150 degC, leaving a provisional 2.08x current screen.
+The rectangular transition-energy bound remains supporting information only,
+not avalanche or SOA qualification.
 
 Q2 dissipates 4.000 W at 40 A using the 2.5 mOhm 25 degC maximum. A
 conservative 1.8x hot multiplier gives 4.50 mOhm and 7.200 W. At 125 degC
@@ -66,11 +73,16 @@ must be no worse than 3.47 K/W. Q2 has 49 V static VDS margin to the 101 V
 source; protected Q1 retains 25.11 V to its 80 V rating at the maximum 54.89 V
 cutoff.
 
-This closes the PBREL-007 pre-layout stage and authorizes only `LAYOUT-ONLY`.
-PBREL-007 remains Conditional overall. Extracted loop inductance, switching
-overshoot, Q2 dynamic SOA, copper/current density, both MOSFET thermal paths,
-and enclosure coupling remain mandatory post-layout evidence. PB-BENCH-004 and
-PB-BENCH-010 remain mandatory after an engineering prototype exists.
+The hot-corner screen does not close PBREL-007 pre-layout. Infineon marks Qgd
+as design-specified rather than production-tested and specifies its maximum at
+75 V / 123 A, not the 101 V / 40 A cutoff corner; the SOA bound is also
+digitized from a typical graph. A qualified maximum-bound gate-discharge model
+or vendor-supported trajectory is required before `LAYOUT-ONLY`. Until then
+PBREL-007 pre-layout is Conditional and aggregate authorization is `BLOCKED`.
+After pre-layout closure, extracted loop inductance, switching overshoot, Q2
+dynamic SOA, copper/current density, both MOSFET thermal paths, and enclosure
+coupling remain mandatory post-layout evidence. PB-BENCH-004 and PB-BENCH-010
+remain mandatory after an engineering prototype exists.
 
 ## Production and Lifetime
 
@@ -83,9 +95,8 @@ remains 10-15 years, subject to controlled alternates and lifecycle recheck.
 
 ## Consequences
 
-- PBREL-006 is closed as a design-selection blocker. PBREL-007 remains
-  Conditional overall while its closed pre-layout stage authorizes
-  `LAYOUT-ONLY`.
+- PBREL-006 is closed as a design-selection blocker. PBREL-007 pre-layout
+  remains Conditional and aggregate authorization is `BLOCKED`.
 - No `.kicad_pcb` or manufacturing package is created by this decision.
 - `PROTO-ONLY` remains blocked until post-layout extraction is reviewed.
 - Production and field use remain `NO-GO` until prototype qualification and all

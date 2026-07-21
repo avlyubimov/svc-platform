@@ -3455,3 +3455,22 @@ Q2 conduction evidence: 4.000 W at the 25 degC maximum, 7.200 W hot, and a
 its closed pre-layout stage preserves `LAYOUT-ONLY`. Extracted overshoot/SOA
 and PB-BENCH-004 remain post-layout/prototype gates. Production and field use
 remain NO-GO.
+
+## 2026-07-21 — Correct PBREL-007 hot-start SOA evidence
+
+Correction: link Q2 load-dump initial junction temperature to continuous
+heating. The 7.200 W hot loss through the 3.47 K/W target path raises Q2 from
+125 degC ambient to 150 degC before the pulse. Generated evidence now covers
+24 source/thermal combinations including that hot steady-40 A state.
+
+Correction: do not add the LM74930-Q1 7 us OV deglitch interval to linear-mode
+time. Q2 remains fully enhanced during deglitch. The separate provisional
+transition uses 40 nC maximum Qgd divided by 128 mA minimum HGATE sink, giving
+0.31 us. The conservative graph-derived 101 V / 1 us screen derates to
+83.33 A at 150 degC, or 2.08x at 40 A.
+
+Decision: the numerical screen is not final pre-layout proof because Qgd is
+design-specified at 75 V / 123 A and the SOA current is digitized from a graph.
+PBREL-007 pre-layout returns to `Conditional`; aggregate PB-100 authorization
+is `BLOCKED` until a qualified maximum-bound 101 V / 40 A trajectory exists.
+No `.kicad_pcb` or manufacturing output is authorized.

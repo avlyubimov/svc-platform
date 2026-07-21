@@ -11,5 +11,12 @@ RthJC max,0.42,K/W,Datasheet maximum,INPUT
 Ambient design point,125.0,degC,Worst-case enclosure ambient requirement,INPUT
 Target junction ceiling,150.0,degC,Design target below 175 C device maximum,PASS PRE-LAYOUT
 Maximum full thermal path,3.47,K/W,(Tj target - ambient) / Q2 hot conduction loss,POST-LAYOUT LIMIT
-Repeated-pulse condition,10 pulses / 60 s spacing,,Each SOA row starts at the declared 25 C or 125 C junction condition,PASS PRE-LAYOUT SCREEN
+Hot steady initial junction,150.0,degC,Tambient + I^2 RDS(on)hot times target full thermal path,INPUT TO SOA
+Maximum gate-drain charge,40,nC,Datasheet Qgd maximum; design-specified at 75 V / 123 A,CONDITIONAL INPUT
+OV deglitch maximum,7.00,us,Q2 remains fully enhanced during the controller deglitch interval,SEPARATE FROM LINEAR MODE
+Miller transition bound,0.31,us,Qgd maximum divided by minimum HGATE sink current,PROVISIONAL
+Hot-corner SOA current limit,83.33,A,Conservative 101 V / 1 us curve bound derated from 25 C to the 150 C initial junction,PROVISIONAL
+Hot-corner SOA margin,2.08,x,Temperature-derated current limit divided by 40 A,PROVISIONAL PASS
+Repeated-pulse condition,10 pulses / 60 s spacing,,Generated corners include 150 C initial junction after steady 40 A preload,CONDITIONAL PRE-LAYOUT
+Pre-layout gate status,Conditional,,Qgd is not guaranteed at the 101 V / 40 A corner and graph-derived SOA needs a qualified maximum-bound trajectory,BLOCKED
 Physical verification boundary,Extracted copper thermal interface enclosure and common-source overshoot,,Post-layout evidence and PB-BENCH-004 must verify dynamic SOA and recovery,MANDATORY POST-LAYOUT

@@ -5,7 +5,7 @@ from __future__ import annotations
 import csv
 import io
 
-from .model import LOAD_DUMP, MOSFET, SURGE_STOPPER, TVS
+from .model import LOAD_DUMP, LOAD_DUMP_THERMAL_STATES, MOSFET, SURGE_STOPPER, TVS
 from .power import (
     BOOTSTRAP_F,
     Q1_AMBIENT_C,
@@ -59,39 +59,57 @@ def render_transient() -> str:
 
 def render_surge_stopper() -> str:
     rows = [[
-        "Us V", "Ri ohm", "td ms", "Initial Tj C", "OV cutoff min V",
+        "Us V", "Ri ohm", "td ms", "Thermal state", "Ambient C",
+        "Preload current A", "Initial Tj C", "OV cutoff min V",
         "OV cutoff nominal V", "OV cutoff max V", "Q2 linear-mode ID A",
-        "Turn-off bound us", "Linear-mode rectangular energy bound J",
+        "OV deglitch us", "Fully-enhanced Q2 VDS V", "Deglitch conduction energy J",
+        "Qgd max nC", "Miller transition bound us",
+        "Linear-mode rectangular energy bound J",
         "SOA reference VDS V", "SOA reference pulse us",
         "Temperature-derated SOA current limit A", "SOA current margin x",
         "Pulse count", "Pulse spacing s", "Q2 VDS margin V",
-        "Q1 protected-node margin V", "Load response", "Result", "Basis",
+        "Q1 protected-node margin V", "Load response", "SOA screen", "Result", "Basis",
     ]]
     basis = (
-        "Infineon Tc=25C single-pulse 10us SOA curve: conservative digitized "
-        "200A lower bound at 101V; current limit scaled by junction-temperature "
-        "headroom to 175C; final extracted-loop SOA and bench validation required"
+        "LM74930 maximum 7us OV deglitch is modeled with Q2 fully enhanced; "
+        "linear transition uses maximum 40nC Qgd / minimum 128mA HGATE sink. "
+        "Infineon Tc=25C single-pulse 1us SOA curve uses a conservative digitized "
+        "500A lower bound at 101V scaled by junction-temperature headroom to 175C. "
+        "Qgd is design-specified at 75V/123A, so a qualified maximum-bound trajectory "
+        "is still required before pre-layout closure"
     )
     for source_voltage_v in LOAD_DUMP.source_voltages_v:
         for source_resistance_ohm in LOAD_DUMP.source_resistances_ohm:
             linear_mode_current_a = SURGE_STOPPER.continuous_current_a
-            transient_energy_j = (
+            fully_enhanced_vds_v = (
+                linear_mode_current_a * SURGE_STOPPER.cutoff_mosfet_rds_on_hot_ohm
+            )
+            deglitch_energy_j = (
+                fully_enhanced_vds_v
+                * linear_mode_current_a
+                * SURGE_STOPPER.hgate_turnoff_delay_max_s
+            )
+            linear_mode_energy_j = (
                 source_voltage_v
                 * linear_mode_current_a
-                * SURGE_STOPPER.conservative_turnoff_s
+                * SURGE_STOPPER.miller_transition_s
             )
             for duration_s in LOAD_DUMP.durations_s:
-                for initial_junction_c in LOAD_DUMP.initial_junctions_c:
+                for thermal_state in LOAD_DUMP_THERMAL_STATES:
+                    initial_junction_c = SURGE_STOPPER.steady_initial_junction_c(
+                        thermal_state.ambient_c,
+                        thermal_state.preload_current_a,
+                    )
                     soa_current_limit_a = SURGE_STOPPER.soa_current_limit_a(
                         initial_junction_c
                     )
                     soa_margin = soa_current_limit_a / linear_mode_current_a
-                    passed = (
+                    soa_screen_passed = (
                         SURGE_STOPPER.cutoff_max_v <= 55.0
                         and SURGE_STOPPER.cutoff_mosfet_voltage_v > source_voltage_v
                         and SURGE_STOPPER.protected_mosfet_voltage_v
                         > SURGE_STOPPER.cutoff_max_v
-                        and SURGE_STOPPER.conservative_turnoff_s
+                        and SURGE_STOPPER.miller_transition_s
                         <= SURGE_STOPPER.cutoff_mosfet_soa_reference_pulse_s
                         and soa_margin >= 1.5
                     )
@@ -99,13 +117,20 @@ def render_surge_stopper() -> str:
                         f"{source_voltage_v:.0f}",
                         f"{source_resistance_ohm:g}",
                         f"{duration_s * 1000:.0f}",
+                        thermal_state.name,
+                        f"{thermal_state.ambient_c:.0f}",
+                        f"{thermal_state.preload_current_a:.0f}",
                         f"{initial_junction_c:.0f}",
                         f"{SURGE_STOPPER.cutoff_min_v:.2f}",
                         f"{SURGE_STOPPER.cutoff_nominal_v:.2f}",
                         f"{SURGE_STOPPER.cutoff_max_v:.2f}",
                         f"{linear_mode_current_a:.2f}",
-                        f"{SURGE_STOPPER.conservative_turnoff_s * 1e6:.2f}",
-                        f"{transient_energy_j:.4f}",
+                        f"{SURGE_STOPPER.hgate_turnoff_delay_max_s * 1e6:.2f}",
+                        f"{fully_enhanced_vds_v:.3f}",
+                        f"{deglitch_energy_j:.6f}",
+                        f"{SURGE_STOPPER.cutoff_mosfet_gate_drain_charge_max_c * 1e9:.0f}",
+                        f"{SURGE_STOPPER.miller_transition_s * 1e6:.2f}",
+                        f"{linear_mode_energy_j:.6f}",
                         f"{SURGE_STOPPER.cutoff_mosfet_soa_reference_voltage_v:.0f}",
                         f"{SURGE_STOPPER.cutoff_mosfet_soa_reference_pulse_s * 1e6:.0f}",
                         f"{soa_current_limit_a:.2f}",
@@ -115,7 +140,8 @@ def render_surge_stopper() -> str:
                         f"{SURGE_STOPPER.cutoff_mosfet_voltage_v - source_voltage_v:.2f}",
                         f"{SURGE_STOPPER.protected_mosfet_voltage_v - SURGE_STOPPER.cutoff_max_v:.2f}",
                         "DISCONNECT",
-                        "PASS PRE-LAYOUT SCREEN" if passed else "FAIL",
+                        "PASS" if soa_screen_passed else "FAIL",
+                        "CONDITIONAL PRE-LAYOUT" if soa_screen_passed else "FAIL",
                         basis,
                     ])
     return _csv(rows)
@@ -127,7 +153,13 @@ def render_q2() -> str:
     loss_hot_w = current_a**2 * SURGE_STOPPER.cutoff_mosfet_rds_on_hot_ohm
     target_junction_c = 150.0
     ambient_c = 125.0
-    maximum_path = (target_junction_c - ambient_c) / loss_hot_w
+    maximum_path = SURGE_STOPPER.target_full_thermal_path_k_per_w
+    hot_initial_junction_c = SURGE_STOPPER.steady_initial_junction_c(
+        ambient_c,
+        current_a,
+    )
+    hot_soa_limit_a = SURGE_STOPPER.soa_current_limit_a(hot_initial_junction_c)
+    hot_soa_margin = hot_soa_limit_a / current_a
     rows = [
         ["Evidence item", "Value", "Unit", "Basis", "Result"],
         ["Exact orderable MPN", SURGE_STOPPER.cutoff_mosfet_mpn, "", "Infineon automotive 150 V TOLL", "PASS"],
@@ -142,7 +174,14 @@ def render_q2() -> str:
         ["Ambient design point", f"{ambient_c:.1f}", "degC", "Worst-case enclosure ambient requirement", "INPUT"],
         ["Target junction ceiling", f"{target_junction_c:.1f}", "degC", f"Design target below {SURGE_STOPPER.cutoff_mosfet_max_junction_c:.0f} C device maximum", "PASS PRE-LAYOUT"],
         ["Maximum full thermal path", f"{maximum_path:.2f}", "K/W", "(Tj target - ambient) / Q2 hot conduction loss", "POST-LAYOUT LIMIT"],
-        ["Repeated-pulse condition", f"{LOAD_DUMP.pulse_count} pulses / {LOAD_DUMP.pulse_interval_s:.0f} s spacing", "", "Each SOA row starts at the declared 25 C or 125 C junction condition", "PASS PRE-LAYOUT SCREEN"],
+        ["Hot steady initial junction", f"{hot_initial_junction_c:.1f}", "degC", "Tambient + I^2 RDS(on)hot times target full thermal path", "INPUT TO SOA"],
+        ["Maximum gate-drain charge", f"{SURGE_STOPPER.cutoff_mosfet_gate_drain_charge_max_c * 1e9:.0f}", "nC", "Datasheet Qgd maximum; design-specified at 75 V / 123 A", "CONDITIONAL INPUT"],
+        ["OV deglitch maximum", f"{SURGE_STOPPER.hgate_turnoff_delay_max_s * 1e6:.2f}", "us", "Q2 remains fully enhanced during the controller deglitch interval", "SEPARATE FROM LINEAR MODE"],
+        ["Miller transition bound", f"{SURGE_STOPPER.miller_transition_s * 1e6:.2f}", "us", "Qgd maximum divided by minimum HGATE sink current", "PROVISIONAL"],
+        ["Hot-corner SOA current limit", f"{hot_soa_limit_a:.2f}", "A", "Conservative 101 V / 1 us curve bound derated from 25 C to the 150 C initial junction", "PROVISIONAL"],
+        ["Hot-corner SOA margin", f"{hot_soa_margin:.2f}", "x", "Temperature-derated current limit divided by 40 A", "PROVISIONAL PASS"],
+        ["Repeated-pulse condition", f"{LOAD_DUMP.pulse_count} pulses / {LOAD_DUMP.pulse_interval_s:.0f} s spacing", "", "Generated corners include 150 C initial junction after steady 40 A preload", "CONDITIONAL PRE-LAYOUT"],
+        ["Pre-layout gate status", "Conditional", "", "Qgd is not guaranteed at the 101 V / 40 A corner and graph-derived SOA needs a qualified maximum-bound trajectory", "BLOCKED"],
         ["Physical verification boundary", "Extracted copper thermal interface enclosure and common-source overshoot", "", "Post-layout evidence and PB-BENCH-004 must verify dynamic SOA and recovery", "MANDATORY POST-LAYOUT"],
     ]
     return _csv(rows)
