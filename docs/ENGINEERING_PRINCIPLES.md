@@ -34,7 +34,9 @@ work. Codex must not independently change architecture.
 - Do not simplify architecture for convenience.
 - Do not replace generic outputs with dedicated functions.
 - Do not bind hardware to BMW-specific logic.
-- Do not start PCB layout before all engineering gates are closed.
+- Do not start PCB layout before all pre-layout engineering gates are closed.
+  Post-layout extraction and prototype-bench gates remain active under
+  ADR-0017 without creating a layout deadlock.
 - Do not create KiCad PCB layout, Gerbers, drills, pick-place files, BOM/CPL
   order packages, manufacturing ZIPs, or PCBA order artifacts before schematic
   freeze authorizes them.
@@ -111,6 +113,9 @@ instead of falsifying pre-layout closure.
 - PCB layout must precede fabrication and assembly output generation.
 - BOM, CPL, pick-place, Gerber, drill, and manufacturing ZIP outputs are release
   artifacts, not planning artifacts.
+- Engineering-prototype release artifacts are allowed only at `PROTO-ONLY` and
+  must remain segregated from production output. Production and field release
+  require `PRODUCTION-READY` plus the normal production gates.
 - JLCPCB/PCBWay compatibility must be checked for selected parts and meaningful
   alternatives before BOM lock.
 - Package-specific handling, orientation, DNP/open inspection, and rework risks

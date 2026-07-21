@@ -47,6 +47,7 @@ CHECKS = (
     release.validate_schematic_freeze_gap_register,
     release.validate_engineering_blocker_closeout,
     release.validate_schematic_review_closeout,
+    release.validate_staged_release_readiness,
     release.validate_board_release_blocker_register,
     release.validate_board_print_closure_matrix,
     release_evidence.validate_five_blocker_release_evidence,

@@ -453,7 +453,9 @@ def validate_test_plan_traceability() -> None:
     text = read_text(path)
     required_trace_artifacts = (
         "ADR-0013-pb-100-prelayout-vs-postprototype-validation.md",
+        "ADR-0017-pb-100-staged-release-authorization.md",
         "PB-100-post-prototype-validation-gate.csv",
+        "PB-100-staged-release-readiness.csv",
         "PB-100-logic-power-rail-trace.csv",
         "PB-100-logic-power-freeze-review.csv",
         "PB-100-high-medium-output-baseline-trace.csv",

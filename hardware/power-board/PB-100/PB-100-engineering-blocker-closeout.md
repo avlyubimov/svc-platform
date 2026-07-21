@@ -303,8 +303,9 @@ orders.
 ## PBREL-006 — Input reverse protection
 
 - Closeout status: Conditional.
-- Closeout boundary: datasheet screening only; layout extraction and
-  PB-BENCH-010 are required by ADR-0016.
+- Closeout boundary: the datasheet screen closes the ADR-0017 pre-layout stage
+  at `LAYOUT-ONLY`; layout extraction controls `PROTO-ONLY`, and PB-BENCH-010
+  controls the blocker-specific production-ready transition.
 - Why blocker existed: the 40 A protected input path needs reverse-battery
   protection with low loss, load-dump voltage margin, gate control, and package
   thermal evidence.
@@ -348,6 +349,7 @@ orders.
   soldering and input copper heating.
 - Evidence and calculations:
   `PB-100-input-q1-evidence.csv`,
+  `PB-100-staged-release-readiness.csv`,
   `PB-100-input-reverse-protection.md`,
   `PB-100-input-reverse-package-trace.csv`,
   `PB-100-input-reverse-q1-freeze-checklist.csv`,
@@ -366,7 +368,8 @@ orders.
 ## PBREL-007 — TVS/load-dump protection
 
 - Closeout status: Open.
-- Closeout boundary: the former 10/1000 us result is rejected by ADR-0016.
+- Closeout boundary: the former 10/1000 us result is rejected by ADR-0016 and
+  the current candidate remains `BLOCKED` at the ADR-0017 pre-layout stage.
 - Why blocker existed: SM8S33-class TVS clamp can stress 60 V downstream parts
   after overshoot, so schematic freeze needed a voltage-margin escape path.
 - Candidate comparison: Vishay SM8S33AHM3/I HM3 DO-218AC TVS is preferred for
@@ -410,6 +413,7 @@ orders.
   required; Known risks: trace inductance overshoot and TVS pulse energy.
 - Evidence and calculations:
   `PB-100-transient-margin-evidence.csv`,
+  `PB-100-staged-release-readiness.csv`,
   `PB-100-tvs-load-dump-margin-trace.csv`,
   `PB-100-tvs-load-dump-freeze-review.csv`,
   `PB-100-tvs-overshoot-escape-checklist.csv`,

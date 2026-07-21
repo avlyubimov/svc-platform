@@ -3410,3 +3410,26 @@ USB R13/R14/C1 topology. The generated LB netlist is now 81 components and
 191 nets; FB is 44 components and 46 nets. ERC and exported-netlist validation
 pass. `PBREL-006` remains Conditional, `PBREL-007` remains Open, and no
 `.kicad_pcb` or manufacturing output is authorized.
+
+## 2026-07-21 — Remove the PB-100 layout/qualification gate deadlock
+
+Decision: accept ADR-0017 and replace the binary PB board-print gate with four
+ordered authorization states: `BLOCKED`, `LAYOUT-ONLY`, `PROTO-ONLY`, and
+`PRODUCTION-READY`. Pre-layout component selection and calculations permit only
+controlled layout; reviewed copper/current/thermal and clamp-loop extraction
+permits only a marked engineering prototype; prototype qualification permits
+the blocker-specific production-ready transition. All other applicable PB bench
+and production gates still apply before field or production release.
+
+Decision: keep PBREL-006 Conditional and PBREL-007 Open as overall blockers but
+track their stage evidence in `PB-100-staged-release-readiness.csv`. PBREL-006
+is individually `LAYOUT-ONLY`; PBREL-007 is `BLOCKED` because the current TVS
+branch fails its ADR-0016 pre-layout model. Aggregate PB-100 authorization is
+therefore still `BLOCKED`, with production and field use `NO-GO`. No second
+developer is required.
+
+Decision: make the earlier LB/FB powered-off calculations executable evidence.
+`tools/generate_lb_fb_release_evidence.py` now recalculates the 0.2222 V E73
+UART powered-off clamp, 3.7231 V minimum USB-present level, 0.1515 V maximum
+USB-absent level, and 3.4389 ms removal time against the retained 3.81 ms bound;
+schematic validation rejects stale or failing generated evidence.

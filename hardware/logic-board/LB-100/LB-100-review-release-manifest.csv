@@ -26,4 +26,6 @@ hardware/logic-board/LB-100/LB-100-service-storage-sensor-precheck.csv,Service,S
 hardware/logic-board/LB-100/LB-100-component-decision-record.md,Engineering,LB active component decision record,Required,validate_board_schematics,Closed
 hardware/power-board/PB-100/PB-100-fx18-paired-stack-closeout.md,Mechanical,Corrected PB/LB FX18 paired-stack closeout,Required,validate_board_order,Closed
 tools/generate_lb_fb_schematics.py,KiCad schematic,Deterministic LB/FB schematic generator,Required,validate_board_schematics,Ready
+tools/generate_lb_fb_release_evidence.py,Validation,Deterministic powered-off calculation generator,Required,validate_board_schematics,Ready
+hardware/logic-board/LB-100/LB-100-fb-powered-off-calculation-evidence.csv,Validation,Generated E73 and USB powered-off margins,Required,validate_board_schematics,Closed
 tools/board_schematic_validation,Validation,Focused LB/FB topology pad-contract and ERC package,Required,validate_board_schematics,Ready

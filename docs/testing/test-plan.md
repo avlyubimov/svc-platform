@@ -4,10 +4,11 @@
 
 PB-100 bench tests that require an assembled PB-100 board are post-prototype
 validation gates. Per
-`docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md`,
-schematic freeze and first prototype board-print authorization require the test
-plan, test hooks, calculations, simulations, and source evidence; they do not
-require physical bench records from a board that has not been built yet.
+`docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md` and
+`docs/adr/ADR-0017-pb-100-staged-release-authorization.md`, schematic freeze
+and `LAYOUT-ONLY` require the test plan, test hooks, calculations, simulations,
+and source evidence. Reviewed post-layout extraction permits `PROTO-ONLY`;
+physical bench records then gate production and field release.
 
 ## Bench test before motorcycle
 
@@ -29,6 +30,9 @@ post-prototype validation gate in
 `hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv` is
 complete.
 
+PBREL-006/PBREL-007 transition sequencing is tracked in
+`hardware/power-board/PB-100/PB-100-staged-release-readiness.csv`.
+
 ## PB-100 bench validation matrix
 
 | ID | Area | Test | Pass condition |
@@ -36,13 +40,13 @@ complete.
 | PB-BENCH-001 | Bring-up | Power PB-100 from current-limited supply at 6 V, 12 V, and 18 V with outputs disabled | No abnormal current draw; logic rail and `PB_PWR_GOOD` behave as expected |
 | PB-BENCH-002 | Safe default | Hold LB-100 reset or disconnected and check `OUT1` through `OUT10` | All outputs remain off |
 | PB-BENCH-003 | Reverse protection | Apply reverse polarity only through a current-limited fixture | No downstream rail energizes and no damage occurs |
-| PB-BENCH-004 | TVS/load dump | Validate clamp behavior by simulator or suitable surge test fixture | Clamp remains below selected device limits with documented margin |
+| PB-BENCH-004 | TVS/load dump | Validate the assembled engineering prototype with a suitable surge fixture | Clamp, energy, thermal behavior, and repeated-pulse recovery remain below selected device limits with documented margin |
 | PB-BENCH-005 | Per-output current telemetry | Measure each output at 0%, 25%, 50%, and 100% of configured current limit | Telemetry error is inside the schematic-defined calibration target |
 | PB-BENCH-006 | Total input current telemetry | Load multiple outputs up to the 40 A board-budget target | Input current telemetry follows independent measurement inside calibration target |
 | PB-BENCH-007 | OUT2 inrush envelope | Exercise the `PB-100-out2-soa-envelope.csv` pulse cases on a fused bench fixture | Controller does not exceed validated MOSFET SOA or fault timing |
 | PB-BENCH-008 | Overcurrent and short fault | Apply controlled overcurrent and short-circuit tests per output class | Output faults and latches off inside the selected controller/FET SOA |
 | PB-BENCH-009 | Thermal derating | Run representative high, medium, and low-current load combinations in enclosure conditions | Firmware sees PCB and power-zone temperature and derates before unsafe temperature |
-| PB-BENCH-010 | Board current budget | Configure load priorities and request loads above the 40 A budget | Firmware refuses startup or sheds lower-priority loads |
+| PB-BENCH-010 | Board current budget | Configure load priorities and request loads above the 40 A budget while measuring Q1 case temperature | Firmware refuses startup or sheds lower-priority loads and Q1 remains inside the extracted 125 C case boundary |
 | PB-BENCH-011 | Fuse behavior | Open and overload fused outputs under controlled load | Fault state is visible and output is isolated by fuse behavior |
 | PB-BENCH-012 | CAN1 listen-only | Connect CAN analyzer and attempt any Rev.1 CAN1 TX path with TX disable defaulted | No vehicle-CAN transmit frame is observed; disabled status is visible |
 | PB-BENCH-013 | CAN2 expansion | Exercise CAN2 on bench only | CAN2 can transmit without affecting CAN1 listen-only policy |

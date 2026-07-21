@@ -5,11 +5,12 @@ Status: Schematic planning package ready for review; not frozen
 This package converts frozen PB-100 requirements into schematic-planning inputs.
 It is not a PCB layout package.
 
-Per ADR-0013, pre-layout closure requires calculations, source evidence,
-package/footprint review inputs, schematic test hooks, and bench procedures.
-Physical PB-BENCH execution that needs an assembled board is deferred to the
-post-prototype validation gate and blocks first motorcycle power and production
-release, not first prototype PCB fabrication.
+Per ADR-0013 and ADR-0017, pre-layout closure requires calculations, source
+evidence, package/footprint review inputs, schematic test hooks, and bench
+procedures and permits only `LAYOUT-ONLY`. Reviewed extraction permits
+`PROTO-ONLY` engineering fabrication. Physical PB-BENCH execution that needs an
+assembled board is deferred to the post-prototype validation gate and blocks
+first motorcycle power, field use, and production release.
 
 ## Governing documents
 
@@ -21,6 +22,7 @@ release, not first prototype PCB fabrication.
 - `docs/adr/ADR-0010-pb-100-power-path-candidate-strategy.md`
 - `docs/adr/ADR-0011-pb-100-low-current-output-stage.md`
 - `docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md`
+- `docs/adr/ADR-0017-pb-100-staged-release-authorization.md`
 - `docs/can/can-safety.md`
 - `docs/production/component-family-shortlist.md`
 - `firmware/configs/hardware/pb-100-capabilities.json`
@@ -45,6 +47,7 @@ release, not first prototype PCB fabrication.
 - `hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv`
 - `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv`
+- `hardware/power-board/PB-100/PB-100-staged-release-readiness.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv`

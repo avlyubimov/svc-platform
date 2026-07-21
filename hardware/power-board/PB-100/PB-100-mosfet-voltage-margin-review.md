@@ -1,6 +1,6 @@
 # PB-100 80 V MOSFET Voltage-Class Decision
 
-Status: 80 V class accepted; PBREL-006 Conditional and PBREL-007 Open; PCB layout not authorized
+Status: 80 V class accepted; PBREL-006 is individually LAYOUT-ONLY; aggregate PCB layout remains BLOCKED by PBREL-007 and schematic freeze
 
 ## Decision
 
@@ -63,8 +63,9 @@ stencil, paste coverage, MSL handling, polarity, solder-void acceptance, and
 first-article inspection must be reconfirmed with the actual assembler quote.
 
 This pre-layout source/process evidence supports the MOSFET choice and the
-power-package portion of PBREL-011. PBREL-006 is Conditional until copper and
-thermal extraction plus PB-BENCH-010 prove the assumed 125 degC case boundary.
+power-package portion of PBREL-011. PBREL-006 remains Conditional overall, but
+its pre-layout stage is closed. Copper/thermal extraction controls PROTO-ONLY
+and PB-BENCH-010 controls the blocker-specific production-ready transition.
 
 ## Hard escape conditions
 

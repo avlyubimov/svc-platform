@@ -14,6 +14,9 @@ Sources of truth:
 
 `consistency.py` verifies that the two three-board readiness CSV files and
 `docs/product/final-readiness.md` report the same active blockers. It also
+validates the ADR-0017 `BLOCKED` / `LAYOUT-ONLY` / `PROTO-ONLY` /
+`PRODUCTION-READY` transitions, ordered PBREL-006/PBREL-007 stage closure, and
+aggregate PB-100 authorization against the post-prototype gate. It also
 rejects stale active-document claims about ADR-0015, CAN1 ownership, FX18 lands,
 or the selected 80 V MOSFET baseline.
 

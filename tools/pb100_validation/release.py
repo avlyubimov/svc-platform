@@ -1,5 +1,12 @@
 from __future__ import annotations
 
+from readiness_validation.stages import (
+    AUTHORIZATION_AFTER_CLOSE,
+    RELEASE_STATES,
+    STAGES,
+    derive_blocker_authorization,
+)
+
 from .common import (
     BOARD_PRINT_CLOSURE_MATRIX_COLUMNS,
     BOARD_RELEASE_BLOCKER_REGISTER_COLUMNS,
@@ -15,6 +22,44 @@ from .common import (
     validate_csv,
     validate_no_role_tokens_in_row,
 )
+
+
+STAGED_BLOCKERS = {"PBREL-006", "PBREL-007"}
+
+
+def staged_release_rows_by_blocker() -> dict[str, list[dict[str, str]]]:
+    path = PB100_DIR / "PB-100-staged-release-readiness.csv"
+    validate_csv(path)
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
+    rows_by_blocker: dict[str, list[dict[str, str]]] = {}
+    for row in rows:
+        rows_by_blocker.setdefault(row["Blocker ID"].strip(), []).append(row)
+    return rows_by_blocker
+
+
+def validate_staged_release_readiness() -> None:
+    path = PB100_DIR / "PB-100-staged-release-readiness.csv"
+    rows_by_blocker = staged_release_rows_by_blocker()
+    if set(rows_by_blocker) != STAGED_BLOCKERS:
+        fail(f"{path.relative_to(REPO_ROOT)} must stage PBREL-006 and PBREL-007 exactly")
+    for blocker_id, rows in rows_by_blocker.items():
+        try:
+            authorization = derive_blocker_authorization(rows)
+        except ValueError as exc:
+            fail(f"{path.relative_to(REPO_ROOT)}:{blocker_id}: {exc}")
+        if authorization not in RELEASE_STATES:
+            fail(f"{path.relative_to(REPO_ROOT)}:{blocker_id}: invalid authorization")
+        reported = {row["Current blocker authorization"].strip() for row in rows}
+        if reported != {authorization}:
+            fail(f"{path.relative_to(REPO_ROOT)}:{blocker_id} must report {authorization}")
+        if {row["Stage"].strip() for row in rows} != set(STAGES):
+            fail(f"{path.relative_to(REPO_ROOT)}:{blocker_id} must contain all three stages")
+        for row in rows:
+            stage = row["Stage"].strip()
+            if row["Authorization after close"].strip() != AUTHORIZATION_AFTER_CLOSE[stage]:
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{blocker_id}/{stage} has invalid transition"
+                )
 
 
 def freeze_checklist_rows_by_gate() -> dict[str, dict[str, str]]:
@@ -613,7 +658,7 @@ def validate_schematic_review_closeout() -> None:
         "actual overshoot",
         "FX18 MF/TH mechanics",
         "post-prototype",
-        "board-print remains NO-GO",
+        "Production and field release remain NO-GO",
         "CAN1_TX_ROUTE",
         "DNP/open",
         "40 A default total current budget",
@@ -656,6 +701,7 @@ def validate_board_release_blocker_register() -> None:
     required_closeout_by_gate = required_closeout_artifact_by_gate()
     expected_blocker_id_by_gate = pbrel_id_by_gate()
     closeout_statuses = engineering_blocker_closeout_statuses()
+    staged_rows = staged_release_rows_by_blocker()
     allowed_statuses = {"Closed", "Conditional", "Open", "Blocked"}
     seen_gates = set()
     seen_blockers = set()
@@ -688,13 +734,29 @@ def validate_board_release_blocker_register() -> None:
                 f"must have Closed closeout in {ENGINEERING_BLOCKER_CLOSEOUT}"
             )
         if gates_by_status[gate] == "Closed" and status != "Closed":
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: closed freeze gate {gate} cannot keep an active blocker")
+            if blocker_id not in STAGED_BLOCKERS:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: closed freeze gate {gate} cannot keep an active blocker")
+            pre_layout = next(
+                row for row in staged_rows[blocker_id] if row["Stage"].strip() == "Pre-layout design"
+            )
+            if pre_layout["Stage status"].strip() != "Closed":
+                fail(
+                    f"{path.relative_to(REPO_ROOT)}:{row_number}: closed freeze gate {gate} "
+                    "requires a Closed pre-layout stage"
+                )
         for column in BOARD_RELEASE_BLOCKER_REGISTER_COLUMNS:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
         row_text = " ".join(row.values()).lower()
-        if "block" not in row["Layout impact"].lower() or "layout" not in row["Layout impact"].lower():
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Layout impact must explicitly block layout")
+        layout_impact = row["Layout impact"].lower()
+        if "block" not in layout_impact or "layout" not in layout_impact:
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Layout impact must define the layout boundary")
+        if blocker_id in STAGED_BLOCKERS:
+            for token in ("layout-only", "production", "field"):
+                if token not in layout_impact:
+                    fail(
+                        f"{path.relative_to(REPO_ROOT)}:{row_number}: staged Layout impact must include {token}"
+                    )
         if "final" not in row["Required close evidence"].lower():
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Required close evidence must require final evidence")
         if "review" not in row_text and "test" not in row_text:
@@ -774,9 +836,15 @@ def validate_board_print_closure_matrix() -> None:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: close evidence must require dated evidence")
         if "do not" not in row["Board-print blocked action"].lower():
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Board-print blocked action must be explicit")
-        for token in ("pb-100.kicad_pcb", "gerbers", "drills", "pick-place", "manufacturing zip"):
-            if token not in row["Board-print blocked action"].lower():
-                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Board-print blocked action must block {token}")
+        blocked_action = row["Board-print blocked action"].lower()
+        required_tokens = (
+            ("proto-only", "production", "field", "gerbers", "drills", "pick-place", "manufacturing zip")
+            if blocker_id in STAGED_BLOCKERS
+            else ("pb-100.kicad_pcb", "gerbers", "drills", "pick-place", "manufacturing zip")
+        )
+        for token in required_tokens:
+            if token not in blocked_action:
+                fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Board-print blocked action must include {token}")
         validate_no_role_tokens_in_row(path, row_number, row)
 
     missing_gates = sorted(blockers_by_gate.keys() - rows_by_gate.keys())

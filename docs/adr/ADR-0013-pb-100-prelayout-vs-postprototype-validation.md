@@ -22,9 +22,10 @@ Requiring physical bench execution before the first PCB fabrication package is a
 process deadlock.
 
 ## Decision
-PB-100 schematic freeze and first board-print authorization require only
-pre-layout evidence. Bench tests that need physical PB-100 hardware are deferred
-to a post-prototype validation gate.
+PB-100 schematic freeze requires only pre-layout evidence. First engineering-
+prototype board-print authorization additionally requires the post-layout
+verification defined by ADR-0017. Bench tests that need physical PB-100
+hardware are deferred to a post-prototype validation gate.
 
 Pre-layout closure may use:
 
@@ -52,3 +53,7 @@ exist.
 
 Post-prototype validation is tracked separately in
 `hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv`.
+
+ADR-0017 supersedes the former two-state authorization wording with explicit
+`BLOCKED`, `LAYOUT-ONLY`, `PROTO-ONLY`, and `PRODUCTION-READY` transitions. It
+does not change which evidence belongs before layout or after prototype build.

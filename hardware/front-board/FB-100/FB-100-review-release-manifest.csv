@@ -20,4 +20,6 @@ hardware/front-board/FB-100/FB-100-ui-control-closeout-precheck.csv,UI,Role-free
 hardware/front-board/FB-100/FB-100-mechanical-envelope-precheck.csv,Mechanical,Mechanical envelope closeout,Required,validate_board_order,Ready
 hardware/front-board/FB-100/FB-100-component-decision-record.md,Engineering,FB active component decision record,Required,validate_board_schematics,Closed
 tools/generate_lb_fb_schematics.py,KiCad schematic,Deterministic LB/FB schematic generator,Required,validate_board_schematics,Ready
+tools/generate_lb_fb_release_evidence.py,Validation,Deterministic powered-off calculation generator,Required,validate_board_schematics,Ready
+hardware/logic-board/LB-100/LB-100-fb-powered-off-calculation-evidence.csv,Validation,Generated E73 and USB powered-off margins,Required,validate_board_schematics,Closed
 tools/board_schematic_validation,Validation,Focused LB/FB topology pad-contract and ERC package,Required,validate_board_schematics,Ready

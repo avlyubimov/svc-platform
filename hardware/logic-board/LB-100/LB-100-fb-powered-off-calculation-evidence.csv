@@ -1,0 +1,5 @@
+Calculation,Calculated value,Unit,Acceptance limit,Limit type,Margin,Result
+E73 UART powered-off clamp,0.2222,V,0.3000,MAX,0.0778,PASS
+USB VBUS minimum present,3.7231,V,3.4300,MIN,0.2931,PASS
+USB VBUS maximum absent,0.1515,V,0.7700,MAX,0.6185,PASS
+USB VBUS removal time,3.4389,ms,3.8100,MAX,0.3711,PASS

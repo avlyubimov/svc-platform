@@ -77,7 +77,10 @@ files, fabrication packages, or PCBA orders.
 
 ## Output Boundary
 
-The next allowed work is footprint binding, mechanical envelope closure, and
-controlled KiCad board creation for layout review. Manufacturing outputs remain blocked
-until every board has reviewed PCB layout, DRC/ERC/DFM evidence, assembly-source
-review, fabrication outputs, assembly outputs, and Product Owner approval.
+The next allowed work follows each board's release state. `LAYOUT-ONLY` permits
+controlled KiCad board creation and review. `PROTO-ONLY` permits marked
+engineering-prototype Gerbers, drills, BOM/CPL, placement, assembly, and order
+outputs after post-layout extraction. `PRODUCTION-READY` plus the normal
+production package gates is required for production and field release.
+Manufacturing outputs remain blocked in `BLOCKED` and `LAYOUT-ONLY`; prototype
+outputs must never be represented as production-ready evidence.

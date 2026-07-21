@@ -27,9 +27,10 @@ remaining gates.
 - Physical PB-BENCH execution remains deferred to
   `PB-100-post-prototype-validation-gate.csv` and blocks first motorcycle power,
   field use, and production release.
-- PCB layout is a separate post-freeze task. board-print remains NO-GO until
-  reviewed layout, fabrication outputs, assembly outputs, and order evidence
-  exist.
+- ADR-0017 makes PCB layout a `LAYOUT-ONLY` post-freeze task and requires
+  reviewed extraction before any `PROTO-ONLY` engineering fabrication package.
+  Production and field release remain NO-GO until prototype qualification and
+  the normal production gates close.
 
 ## Reviewed Value-Bearing Schematic Inputs
 
@@ -69,6 +70,7 @@ remaining gates.
 - `PB-100-validation-traceability.csv`
 - `PB-100-board-release-blocker-register.csv`
 - `PB-100-board-print-closure-matrix.csv`
+- `PB-100-staged-release-readiness.csv`
 - `PB-100-engineering-blocker-closeout.md`
 - `PB-100-review-release-manifest.csv`
 - `PB-100-schematic-package.md`

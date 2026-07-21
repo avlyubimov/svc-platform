@@ -1488,6 +1488,7 @@ ALLOWED_CAPTURE_STATUSES = {
 }
 REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md",
+    "docs/adr/ADR-0017-pb-100-staged-release-authorization.md",
     ENGINEERING_BLOCKER_CLOSEOUT,
     SCHEMATIC_REVIEW_CLOSEOUT,
     "hardware/power-board/PB-100/PB-100-schematic-package.md",
@@ -1506,6 +1507,7 @@ REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "hardware/power-board/PB-100/PB-100-board-current-budget-value-derivation-precheck.csv",
     "hardware/power-board/PB-100/PB-100-board-current-budget-closeout-precheck.csv",
     "hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv",
+    "hardware/power-board/PB-100/PB-100-staged-release-readiness.csv",
     "hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv",
     "hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv",
     "hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv",
