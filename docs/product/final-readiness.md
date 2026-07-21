@@ -81,7 +81,7 @@ Current coverage:
 | Architecture v1.0 | Ready | Frozen by ADR; PB-100 requirement changes still need ADR |
 | PB-100 requirements | Ready for controlled schematic completion | Baseline plus ADR-0016/ADR-0018 active-cutoff and passive-thermal requirements are frozen; schematic freeze remains open |
 | PB-100 KiCad scaffold | Preliminary capture | Child sheets now contain ERC-clean preliminary capture content and exported netlist coverage; schematic freeze remains open |
-| PB-100 PCB/layout | LAYOUT-ONLY authorization; implementation still blocked | There are 0 active PBREL design blockers. PBREL-006 and PBREL-007 are individually `LAYOUT-ONLY`, so aggregate authorization remains `LAYOUT-ONLY`; the Open schematic-freeze and layout-start checklists still prohibit creating `PB-100.kicad_pcb`. Prototype output requires `PROTO-ONLY`; production and field use remain `NO-GO` |
+| PB-100 PCB/layout | LAYOUT-ONLY authorization; implementation still blocked | There is 1 active blocker: `PBREL-007` (Conditional overall). PBREL-006 is Closed and both staged blockers are individually `LAYOUT-ONLY`, so aggregate authorization remains `LAYOUT-ONLY`; the Open schematic-freeze and layout-start checklists still prohibit creating `PB-100.kicad_pcb`. Prototype output requires `PROTO-ONLY`; production and field use remain `NO-GO` |
 | LB-100 requirements | Frozen | Baseline is frozen by ADR-0014 and the schematic freeze is Closed |
 | LB-100 KiCad schematic | Reviewed | Deterministic 81-component, 191-net, footprint-bound capture adds typed IC pins/ERC, sourced and decoupled ADC_REF, one-point AGND return, digital USB VBUS detection, direct STM32-to-LTC3212 drive, back-power-safe sensor supplies, and three switched-rail Ioff buffers isolating E73 UART/reset; exported-netlist audit and ERC pass with only the two reviewed cross-board USB CC single-pin warnings |
 | LB-100 PCB/layout | BLOCKED | There are 0 active blockers (0 active LBREL blockers). Footprint, schematic, and corrected FX18 mechanical gates are closed; the separate signal-integrity and safety layout model remains Open, so no `LB-100.kicad_pcb` or manufacturing output is authorized |
@@ -110,7 +110,7 @@ Current coverage:
 - Select final critical MPNs and at least two alternatives for each critical
   component family.
 - Recheck JLCPCB/PCBWay assembly availability and package suitability.
-- The planning baseline selects `LM74930Q1RGERQ1` with 150 V
+- The planning baseline selects `LM74930QRGERQ1` with 150 V
   `IAUTN15S6N025ATMA1` Q2 and protected-side 80 V
   `IAUT300N08S5N012ATMA2` Q1. `SM8S33AHM3/I` is retained DNP only.
 - TVS/load-dump evidence now covers the ADR-0016 `79-101 V`, `0.5-4 ohm`, and

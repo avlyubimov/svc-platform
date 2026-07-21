@@ -116,7 +116,7 @@ def validate_tvs_load_dump_margin_trace() -> None:
         "PB-100-protection-validation.csv",
         (
             "48.99-54.89V",
-            "0.0327J",
+            "1.67x hot SOA margin",
             "PBREL-006 design gate Closed",
             "SM8S33AHM3/I legacy D1",
             "NOT APPROVED",
@@ -134,10 +134,10 @@ def validate_tvs_load_dump_freeze_review() -> None:
     _require_tokens(
         "PB-100-tvs-load-dump-freeze-review.csv",
         (
-            "LM74930Q1RGERQ1",
+            "LM74930QRGERQ1",
             "IAUTN15S6N025ATMA1",
             "48.99-54.89 V",
-            "PBREL-007 design selection is Closed",
+            "PBREL-007 remains Conditional overall while its pre-layout stage is Closed",
             "PB-100.kicad_pcb",
         ),
     )
@@ -156,8 +156,9 @@ def validate_tvs_overshoot_escape_checklist() -> None:
             "79-101 V",
             "0.5-4 ohm",
             "40-400 ms",
-            "Q2 transition energy",
+            "Q2 linear-mode SOA",
             "dynamic SOA",
+            "7.200 W",
             "ten pulses separated by 60 s",
             "PB-100.kicad_pcb",
         ),
@@ -199,10 +200,10 @@ def validate_tvs_overshoot_closeout_precheck() -> None:
             "ADR-0016",
             "ADR-0018",
             "no higher than 55 V",
-            "Worst transition is 0.0327 J",
+            "Hot derated SOA limit is 66.67 A",
             "dynamic SOA",
             "Ten pulses at 60 s",
-            "PBREL-007 design selection is Closed",
+            "PBREL-007 remains Conditional overall with pre-layout stage Closed",
             "PB-100.kicad_pcb",
         ),
     )

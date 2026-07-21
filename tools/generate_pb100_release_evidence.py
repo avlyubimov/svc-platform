@@ -11,6 +11,7 @@ from pb100_evidence.render import (
     render_factory,
     render_output_soa,
     render_q1,
+    render_q2,
     render_surge_stopper,
     render_transient,
 )
@@ -23,6 +24,7 @@ OUTPUTS = {
     PB100_DIR / "PB-100-surge-stopper-evidence.csv": render_surge_stopper,
     PB100_DIR / "PB-100-output-soa-evidence.csv": render_output_soa,
     PB100_DIR / "PB-100-input-q1-evidence.csv": render_q1,
+    PB100_DIR / "PB-100-input-q2-evidence.csv": render_q2,
     PB100_DIR / "PB-100-factory-production-evidence.csv": render_factory,
 }
 

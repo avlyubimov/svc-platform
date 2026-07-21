@@ -584,12 +584,12 @@
     (pin passive line (at -7.62 0 0) (length 5.08) (name "A" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27)))))
     (pin passive line (at 7.62 0 180) (length 5.08) (name "B" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27)))))
   )
-  (symbol "PB100_LM74930Q1RGERQ1"
+  (symbol "PB100_LM74930QRGERQ1"
     (pin_names (offset 0.8))
     (in_bom no)
     (on_board no)
     (property "Reference" "U" (at 0 20.32 0) (effects (font (size 1.27 1.27))))
-    (property "Value" "LM74930Q1RGERQ1" (at 0 17.78 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "LM74930QRGERQ1" (at 0 17.78 0) (effects (font (size 1.27 1.27))))
     (property "Footprint" "PB100:VQFN-24_RGE_4x4mm_P0.5mm_EP2.4mm" (at 0 -22.86 0) (effects (font (size 1.27 1.27)) hide))
     (property "Datasheet" "https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf" (at 0 -25.4 0) (effects (font (size 1.27 1.27)) hide))
     (rectangle (start -15.24 15.24) (end 15.24 -15.24) (stroke (width 0.254) (type default)) (fill (type background)))

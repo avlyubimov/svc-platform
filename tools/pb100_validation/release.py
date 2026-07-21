@@ -554,7 +554,7 @@ def validate_engineering_blocker_closeout() -> None:
             "no direct 40 V",
         ),
         "PBREL-006": (
-            "LM74930Q1RGERQ1",
+            "LM74930QRGERQ1",
             "IAUT300N08S5N012ATMA2",
             "40 A",
             "Q1",
@@ -562,11 +562,12 @@ def validate_engineering_blocker_closeout() -> None:
             "passive",
         ),
         "PBREL-007": (
-            "LM74930Q1RGERQ1",
+            "LM74930QRGERQ1",
             "IAUTN15S6N025ATMA1",
             "SM8S33AHM3/I",
-            "54.89 V",
-            "0.0327 J",
+            "1.67x",
+            "7.200 W",
+            "3.47 K/W",
             "overshoot",
         ),
         "PBREL-008": (
@@ -671,7 +672,7 @@ def validate_schematic_review_closeout() -> None:
         "ADR-0011",
         "SM8S33AHM3/I",
         "80 V MOSFET",
-        "LM74930Q1RGERQ1",
+        "LM74930QRGERQ1",
         "IAUTN15S6N025ATMA1",
         "LM5164QDDATQ1",
         "INA228-Q1",

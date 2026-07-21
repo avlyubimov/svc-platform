@@ -219,7 +219,7 @@ def validate_symbol_capture_worklist() -> None:
 
         concrete_symbol_name = row["Concrete symbol name"].strip()
         exact_selected_symbols = {
-            "PB100_LM74930Q1RGERQ1",
+            "PB100_LM74930QRGERQ1",
             "PB100_POWER_NMOS_TOLL_80V",
             "PB100_POWER_NMOS_TOLL_150V",
             "PB100_SM8S33AHM3I",
@@ -329,7 +329,7 @@ def validate_symbol_capture_progress() -> None:
         elif symbol_name == "PB100_POWER_NMOS_TOLL_150V":
             if '(property "Footprint" "PB100:PG-HSOF-8-1_TOLL_Infineon"' not in symbol_block:
                 fail("selected 150 V surge MOSFET symbol must bind the reviewed TOLL footprint")
-        elif symbol_name == "PB100_LM74930Q1RGERQ1":
+        elif symbol_name == "PB100_LM74930QRGERQ1":
             expected_footprint = 'PB100:VQFN-24_RGE_4x4mm_P0.5mm_EP2.4mm'
             if f'(property "Footprint" "{expected_footprint}"' not in symbol_block:
                 fail("selected LM74930-Q1 symbol must bind the reviewed RGE footprint")
@@ -1017,7 +1017,7 @@ def validate_schematic_readiness_dashboard() -> None:
     if symbol_row["Status"].strip() != expected_symbol_status:
         fail(f"Symbol readiness must be {expected_symbol_status} for current schematic freeze state")
     symbol_text = " ".join(symbol_row.values())
-    for token in ("LM74930Q1RGERQ1", "IAUTN15S6N025ATMA1", "IAUT300N08S5N012ATMA2 80 V TOLL"):
+    for token in ("LM74930QRGERQ1", "IAUTN15S6N025ATMA1", "IAUT300N08S5N012ATMA2 80 V TOLL"):
         if token not in symbol_text:
             fail(f"Symbol readiness must include selected input-power token {token}")
 

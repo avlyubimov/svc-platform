@@ -305,7 +305,7 @@ def validate_component_pin_template(
 def validate_input_and_power_pin_templates() -> None:
     validate_component_pin_template(
         "PB-100-input-controller-pin-template.csv",
-        "PB100_LM74930Q1RGERQ1",
+        "PB100_LM74930QRGERQ1",
         {
             "GND",
             "INPUT_COMMON_SOURCE",

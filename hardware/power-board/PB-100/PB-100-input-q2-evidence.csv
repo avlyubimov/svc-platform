@@ -1,0 +1,15 @@
+Evidence item,Value,Unit,Basis,Result
+Exact orderable MPN,IAUTN15S6N025ATMA1,,Infineon automotive 150 V TOLL,PASS
+Voltage rating,150,V,Datasheet minimum V(BR)DSS,PASS
+RDS(on) max at 25 C,2.50,mOhm,10 V / 100 A datasheet maximum,INPUT
+Hot multiplier,1.80,x,Conservative bound from datasheet typical RDS(on)-versus-Tj curve,INPUT
+Hot review RDS(on),4.50,mOhm,25 C maximum times hot multiplier,PASS PRE-LAYOUT
+Continuous input current,40,A,ADR-0008 board-current budget,INPUT
+Q2 conduction loss at 25 C maximum,4.000,W,I^2 times 25 C maximum RDS(on),PASS
+Q2 hot conduction loss,7.200,W,I^2 times hot review RDS(on),PASS PRE-LAYOUT
+RthJC max,0.42,K/W,Datasheet maximum,INPUT
+Ambient design point,125.0,degC,Worst-case enclosure ambient requirement,INPUT
+Target junction ceiling,150.0,degC,Design target below 175 C device maximum,PASS PRE-LAYOUT
+Maximum full thermal path,3.47,K/W,(Tj target - ambient) / Q2 hot conduction loss,POST-LAYOUT LIMIT
+Repeated-pulse condition,10 pulses / 60 s spacing,,Each SOA row starts at the declared 25 C or 125 C junction condition,PASS PRE-LAYOUT SCREEN
+Physical verification boundary,Extracted copper thermal interface enclosure and common-source overshoot,,Post-layout evidence and PB-BENCH-004 must verify dynamic SOA and recovery,MANDATORY POST-LAYOUT

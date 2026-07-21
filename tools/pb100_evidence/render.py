@@ -59,55 +59,92 @@ def render_transient() -> str:
 
 def render_surge_stopper() -> str:
     rows = [[
-        "Us V", "Ri ohm", "td ms", "OV cutoff min V", "OV cutoff nominal V",
-        "OV cutoff max V", "Q2 available current A", "Turn-off bound us",
-        "Conservative Q2 transient energy J", "Q2 avalanche-energy margin x",
-        "Q2 VDS margin V", "Q1 protected-node margin V", "Load response", "Result",
+        "Us V", "Ri ohm", "td ms", "Initial Tj C", "OV cutoff min V",
+        "OV cutoff nominal V", "OV cutoff max V", "Q2 linear-mode ID A",
+        "Turn-off bound us", "Linear-mode rectangular energy bound J",
+        "SOA reference VDS V", "SOA reference pulse us",
+        "Temperature-derated SOA current limit A", "SOA current margin x",
+        "Pulse count", "Pulse spacing s", "Q2 VDS margin V",
+        "Q1 protected-node margin V", "Load response", "Result", "Basis",
     ]]
+    basis = (
+        "Infineon Tc=25C single-pulse 10us SOA curve: conservative digitized "
+        "200A lower bound at 101V; current limit scaled by junction-temperature "
+        "headroom to 175C; final extracted-loop SOA and bench validation required"
+    )
     for source_voltage_v in LOAD_DUMP.source_voltages_v:
         for source_resistance_ohm in LOAD_DUMP.source_resistances_ohm:
-            available_current_a = min(
-                SURGE_STOPPER.continuous_current_a,
-                max(
-                    0.0,
-                    (source_voltage_v - SURGE_STOPPER.cutoff_max_v)
-                    / source_resistance_ohm,
-                ),
-            )
+            linear_mode_current_a = SURGE_STOPPER.continuous_current_a
             transient_energy_j = (
                 source_voltage_v
-                * available_current_a
+                * linear_mode_current_a
                 * SURGE_STOPPER.conservative_turnoff_s
             )
-            energy_margin = (
-                SURGE_STOPPER.cutoff_mosfet_avalanche_energy_j / transient_energy_j
-                if transient_energy_j
-                else float("inf")
-            )
             for duration_s in LOAD_DUMP.durations_s:
-                passed = (
-                    SURGE_STOPPER.cutoff_max_v <= 55.0
-                    and SURGE_STOPPER.cutoff_mosfet_voltage_v > source_voltage_v
-                    and SURGE_STOPPER.protected_mosfet_voltage_v
-                    > SURGE_STOPPER.cutoff_max_v
-                    and energy_margin >= 10.0
-                )
-                rows.append([
-                    f"{source_voltage_v:.0f}",
-                    f"{source_resistance_ohm:g}",
-                    f"{duration_s * 1000:.0f}",
-                    f"{SURGE_STOPPER.cutoff_min_v:.2f}",
-                    f"{SURGE_STOPPER.cutoff_nominal_v:.2f}",
-                    f"{SURGE_STOPPER.cutoff_max_v:.2f}",
-                    f"{available_current_a:.2f}",
-                    f"{SURGE_STOPPER.conservative_turnoff_s * 1e6:.2f}",
-                    f"{transient_energy_j:.4f}",
-                    f"{energy_margin:.1f}",
-                    f"{SURGE_STOPPER.cutoff_mosfet_voltage_v - source_voltage_v:.2f}",
-                    f"{SURGE_STOPPER.protected_mosfet_voltage_v - SURGE_STOPPER.cutoff_max_v:.2f}",
-                    "DISCONNECT",
-                    "PASS PRE-LAYOUT" if passed else "FAIL",
-                ])
+                for initial_junction_c in LOAD_DUMP.initial_junctions_c:
+                    soa_current_limit_a = SURGE_STOPPER.soa_current_limit_a(
+                        initial_junction_c
+                    )
+                    soa_margin = soa_current_limit_a / linear_mode_current_a
+                    passed = (
+                        SURGE_STOPPER.cutoff_max_v <= 55.0
+                        and SURGE_STOPPER.cutoff_mosfet_voltage_v > source_voltage_v
+                        and SURGE_STOPPER.protected_mosfet_voltage_v
+                        > SURGE_STOPPER.cutoff_max_v
+                        and SURGE_STOPPER.conservative_turnoff_s
+                        <= SURGE_STOPPER.cutoff_mosfet_soa_reference_pulse_s
+                        and soa_margin >= 1.5
+                    )
+                    rows.append([
+                        f"{source_voltage_v:.0f}",
+                        f"{source_resistance_ohm:g}",
+                        f"{duration_s * 1000:.0f}",
+                        f"{initial_junction_c:.0f}",
+                        f"{SURGE_STOPPER.cutoff_min_v:.2f}",
+                        f"{SURGE_STOPPER.cutoff_nominal_v:.2f}",
+                        f"{SURGE_STOPPER.cutoff_max_v:.2f}",
+                        f"{linear_mode_current_a:.2f}",
+                        f"{SURGE_STOPPER.conservative_turnoff_s * 1e6:.2f}",
+                        f"{transient_energy_j:.4f}",
+                        f"{SURGE_STOPPER.cutoff_mosfet_soa_reference_voltage_v:.0f}",
+                        f"{SURGE_STOPPER.cutoff_mosfet_soa_reference_pulse_s * 1e6:.0f}",
+                        f"{soa_current_limit_a:.2f}",
+                        f"{soa_margin:.2f}",
+                        f"{LOAD_DUMP.pulse_count}",
+                        f"{LOAD_DUMP.pulse_interval_s:.0f}",
+                        f"{SURGE_STOPPER.cutoff_mosfet_voltage_v - source_voltage_v:.2f}",
+                        f"{SURGE_STOPPER.protected_mosfet_voltage_v - SURGE_STOPPER.cutoff_max_v:.2f}",
+                        "DISCONNECT",
+                        "PASS PRE-LAYOUT SCREEN" if passed else "FAIL",
+                        basis,
+                    ])
+    return _csv(rows)
+
+
+def render_q2() -> str:
+    current_a = SURGE_STOPPER.continuous_current_a
+    loss_25c_w = current_a**2 * SURGE_STOPPER.cutoff_mosfet_rds_on_max_25c_ohm
+    loss_hot_w = current_a**2 * SURGE_STOPPER.cutoff_mosfet_rds_on_hot_ohm
+    target_junction_c = 150.0
+    ambient_c = 125.0
+    maximum_path = (target_junction_c - ambient_c) / loss_hot_w
+    rows = [
+        ["Evidence item", "Value", "Unit", "Basis", "Result"],
+        ["Exact orderable MPN", SURGE_STOPPER.cutoff_mosfet_mpn, "", "Infineon automotive 150 V TOLL", "PASS"],
+        ["Voltage rating", f"{SURGE_STOPPER.cutoff_mosfet_voltage_v:.0f}", "V", "Datasheet minimum V(BR)DSS", "PASS"],
+        ["RDS(on) max at 25 C", f"{SURGE_STOPPER.cutoff_mosfet_rds_on_max_25c_ohm * 1e3:.2f}", "mOhm", "10 V / 100 A datasheet maximum", "INPUT"],
+        ["Hot multiplier", f"{SURGE_STOPPER.cutoff_mosfet_hot_multiplier:.2f}", "x", "Conservative bound from datasheet typical RDS(on)-versus-Tj curve", "INPUT"],
+        ["Hot review RDS(on)", f"{SURGE_STOPPER.cutoff_mosfet_rds_on_hot_ohm * 1e3:.2f}", "mOhm", "25 C maximum times hot multiplier", "PASS PRE-LAYOUT"],
+        ["Continuous input current", f"{current_a:.0f}", "A", "ADR-0008 board-current budget", "INPUT"],
+        ["Q2 conduction loss at 25 C maximum", f"{loss_25c_w:.3f}", "W", "I^2 times 25 C maximum RDS(on)", "PASS"],
+        ["Q2 hot conduction loss", f"{loss_hot_w:.3f}", "W", "I^2 times hot review RDS(on)", "PASS PRE-LAYOUT"],
+        ["RthJC max", f"{SURGE_STOPPER.cutoff_mosfet_rth_jc_max_k_per_w:.2f}", "K/W", "Datasheet maximum", "INPUT"],
+        ["Ambient design point", f"{ambient_c:.1f}", "degC", "Worst-case enclosure ambient requirement", "INPUT"],
+        ["Target junction ceiling", f"{target_junction_c:.1f}", "degC", f"Design target below {SURGE_STOPPER.cutoff_mosfet_max_junction_c:.0f} C device maximum", "PASS PRE-LAYOUT"],
+        ["Maximum full thermal path", f"{maximum_path:.2f}", "K/W", "(Tj target - ambient) / Q2 hot conduction loss", "POST-LAYOUT LIMIT"],
+        ["Repeated-pulse condition", f"{LOAD_DUMP.pulse_count} pulses / {LOAD_DUMP.pulse_interval_s:.0f} s spacing", "", "Each SOA row starts at the declared 25 C or 125 C junction condition", "PASS PRE-LAYOUT SCREEN"],
+        ["Physical verification boundary", "Extracted copper thermal interface enclosure and common-source overshoot", "", "Post-layout evidence and PB-BENCH-004 must verify dynamic SOA and recovery", "MANDATORY POST-LAYOUT"],
+    ]
     return _csv(rows)
 
 
@@ -203,7 +240,7 @@ def render_factory() -> str:
         ],
         [
             "U1 active cutoff and Q2 raw-side MOSFET",
-            "LM74930Q1RGERQ1 plus IAUTN15S6N025ATMA1",
+            "LM74930QRGERQ1 plus IAUTN15S6N025ATMA1",
             "VQFN-24 RGE plus PG-HSOF-8-1 TOLL; exposed-pad and segmented-paste review",
             "LM74800-Q1 family plus 150 V automotive TOLL after full revalidation",
             "LM74900-Q1 family plus 150 V automotive LFPAK after full revalidation",

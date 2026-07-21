@@ -2,7 +2,7 @@ Symbol key,BOM file,BOM item,Qty basis,Population,Assembly owner,Status,Notes
 HS_CTRL,factory_bom_draft.csv,High-side switch/controller,10,Populated,Factory,Candidate,One controller per generic output channel
 OUT_FET,factory_bom_draft.csv,MOSFET,10,Populated,Factory,Selected 80 V TOLL,IAUT300N08S5N012ATMA2 external MOSFET per output channel; generated class SOA passes
 OUT2_ESCAPE_FET,factory_bom_draft.csv,MOSFET,1 within output quantity,Populated selected path,Factory,Selected 80 V TOLL,Q102 uses IAUT300N08S5N012ATMA2 and the 30A/100ms 80A/4ms 95.91A/5us envelope passes
-INPUT_IDEAL_DIODE,factory_bom_draft.csv,Active surge and reverse protection,1,Populated,Factory,Selected,LM74930Q1RGERQ1 controls common-source Q2/Q1 and disconnects the load during overvoltage
+INPUT_IDEAL_DIODE,factory_bom_draft.csv,Active surge and reverse protection,1,Populated,Factory,Selected,LM74930QRGERQ1 controls common-source Q2/Q1 and disconnects the load during overvoltage
 INPUT_CONNECTOR,garage_bom_draft.csv,Battery input connector,1,Garage installed,Garage,Conditional,High-current sealed connector or ring-lug harness entry TBD
 INPUT_REVERSE_FET,factory_bom_draft.csv,Input reverse MOSFET,1,Populated,Factory,Selected 80 V TOLL,IAUT300N08S5N012ATMA2 TOLL hot bound is 4.032W at 40A and requires a full passive path no worse than 6.20K/W at 125C ambient
 INPUT_SURGE_FET,factory_bom_draft.csv,Input surge cutoff MOSFET,1,Populated,Factory,Selected 150 V TOLL,IAUTN15S6N025ATMA1 raw-side HGATE cutoff FET with post-layout dynamic SOA validation
