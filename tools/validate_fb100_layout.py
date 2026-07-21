@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -18,6 +19,11 @@ REQUIRED_KICAD_VERSION = "10.0.4"
 EXPECTED_UNCONNECTED_ITEMS = 103
 EXPECTED_LOCAL_OVERRIDES = {"J1", "J2", "JFB1"}
 EXPECTED_BOARD_ONLY_FOOTPRINTS = {"H1", "H2", "H3", "H4"}
+EXPECTED_EDGE_ITEM_UUIDS = {
+    "fb0719a1-1843-5594-91c9-801588abb5dc": "BOARD_OUTLINE",
+    "2130a68b-ae92-520a-b8f3-3a1de6853de5": "J1_PAD_3_USB_SHIELD",
+    "0b390b2f-9137-5ce3-8b57-77e787288b2e": "J1_PAD_4_USB_SHIELD",
+}
 
 
 def fail(message: str) -> None:
@@ -31,6 +37,18 @@ def item_descriptions(finding: dict[str, object]) -> set[str]:
         for item in items
         if isinstance(item, dict)
     }
+
+
+def item_references(finding: dict[str, object], candidates: set[str]) -> set[str]:
+    references = set()
+    for description in item_descriptions(finding):
+        for candidate in candidates:
+            reference_pattern = (
+                rf"(?<![A-Za-z0-9_]){re.escape(candidate)}(?![A-Za-z0-9_])"
+            )
+            if re.search(reference_pattern, description):
+                references.add(candidate)
+    return references
 
 
 def validate_generated_files() -> None:
@@ -129,24 +147,26 @@ def validate_drc() -> None:
     local_overrides = set()
     for finding in violations:
         finding_type = finding.get("type")
-        descriptions = item_descriptions(finding)
         if finding_type == "copper_edge_clearance":
-            if "Rectangle on Edge.Cuts" not in descriptions:
-                fail("USB-C edge-entry exception must reference the board outline")
-            edge_pads.update(
-                description
-                for description in descriptions
-                if description.startswith("PTH pad ")
-            )
+            item_uuids = {
+                str(item.get("uuid", ""))
+                for item in finding.get("items", [])
+                if isinstance(item, dict)
+            }
+            labels = {
+                EXPECTED_EDGE_ITEM_UUIDS.get(item_uuid) for item_uuid in item_uuids
+            }
+            if None in labels or "BOARD_OUTLINE" not in labels or len(labels) != 2:
+                fail(
+                    "unexpected objects in USB-C edge-entry exception: "
+                    f"{sorted(item_uuids)}"
+                )
+            edge_pads.update(label for label in labels if label != "BOARD_OUTLINE")
         elif finding_type == "lib_footprint_mismatch":
-            local_overrides.update(
-                description.removeprefix("Footprint ")
-                for description in descriptions
-                if description.startswith("Footprint ")
-            )
+            local_overrides.update(item_references(finding, EXPECTED_LOCAL_OVERRIDES))
     if edge_pads != {
-        "PTH pad 3 [USB_SHIELD] of J1",
-        "PTH pad 4 [USB_SHIELD] of J1",
+        "J1_PAD_3_USB_SHIELD",
+        "J1_PAD_4_USB_SHIELD",
     }:
         fail(f"unexpected USB-C edge-entry findings: {sorted(edge_pads)}")
     if local_overrides != EXPECTED_LOCAL_OVERRIDES:
@@ -166,12 +186,12 @@ def validate_drc() -> None:
         {"extra_footprint": 4}
     ):
         fail("FB-100 schematic parity must contain only the four board mounting holes")
-    parity_footprints = {
-        description.removeprefix("Footprint ")
-        for finding in parity_findings
-        for description in item_descriptions(finding)
-        if description.startswith("Footprint ")
-    }
+    parity_footprints = set().union(
+        *(
+            item_references(finding, EXPECTED_BOARD_ONLY_FOOTPRINTS)
+            for finding in parity_findings
+        )
+    )
     if parity_footprints != EXPECTED_BOARD_ONLY_FOOTPRINTS:
         fail(f"unexpected FB-100 board-only footprints: {sorted(parity_footprints)}")
 
