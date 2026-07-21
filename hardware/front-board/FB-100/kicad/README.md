@@ -1,15 +1,14 @@
 # FB-100 KiCad Project
 
-Status: Schematic freeze closed; layout-start preparation open; no PCB layout
+Status: Schematic freeze closed; controlled board import ready; no PCB layout yet
 
-This directory contains a non-layout KiCad project for FB-100 schematic
-planning.
+This directory contains the reviewed value-bearing FB-100 KiCad schematic and
+project-local symbol/footprint libraries.
 
 There is intentionally no `FB-100.kicad_pcb` file. Schematic freeze,
-mechanical-envelope layout inputs, USB/no-back-power layout inputs, and
-project-local footprint binding are closed, but KiCad board import remains
-blocked until `../FB-100-pcb-layout-start-checklist.csv` closes schematic symbol
-promotion. Gerbers, drills, pick-place files, BOM/CPL order packages, and
+mechanical-envelope layout inputs, USB/no-back-power layout inputs, project-
+local footprint binding, and schematic symbol promotion are closed. Controlled
+KiCad board import may begin. Gerbers, drills, pick-place files, BOM/CPL order packages, and
 zipped manufacturing outputs remain blocked until layout review and order
 evidence close.
 

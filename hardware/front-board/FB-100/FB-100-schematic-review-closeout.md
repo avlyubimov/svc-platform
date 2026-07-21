@@ -1,13 +1,12 @@
 # FB-100 Schematic Review Closeout
 
-Status: Retracted; schematic freeze is Open
-Review date: 2026-07-20
+Status: Closed for schematic freeze
+Review date: 2026-07-21
 
-This former closeout no longer freezes the FB-100 Rev.1 schematic inputs. The
-current KiCad sheet is a text scaffold without component symbols. It
-does not create or approve KiCad PCB layout, Gerbers, drills, pick-place files,
-BOM/CPL order packages, manufacturing ZIP files, fabrication packages, or PCBA
-orders.
+This closeout freezes the FB-100 Rev.1 value-bearing schematic inputs. The
+deterministic KiCad sheet contains 44 component instances, 46 exported nets,
+project-local symbols, and non-empty project-local Footprint properties. It does
+not create or approve KiCad PCB layout or manufacturing outputs.
 
 ## Reviewed Schematic Content
 
@@ -16,8 +15,9 @@ orders.
   power/reference pins.
 - USB service: USB-C device-only service path uses CC Rd behavior, ESD
   protection, shield/return policy, and VBUS sense-only no-back-power boundary.
-- UI: RGB status LED, role-free channel LEDs, SERVICE/RESET controls, and
-  optional OLED DNP footprint are captured without accessory role names.
+- UI: LTC3212 one-wire driver and common-anode RGB status LED, ten role-free
+  1 kOhm channel LED paths, SERVICE/RESET controls, and optional OLED module
+  header DNP are captured without accessory role names.
 - Mechanical: prototype envelope, mounting, USB access, LED/button alignment,
   OLED keep-out, service sealing, and enclosure boundary are reviewed.
 - Assembly: factory/garage component sourcing is date-stamped with alternates
@@ -35,13 +35,24 @@ orders.
 - `FB-100-mechanical-envelope-precheck.csv`
 - `FB-100-component-sourcing-precheck.csv`
 - `hardware/front-board/FB-100/kicad/FB-100.kicad_sch`
+- `FB-100-component-decision-record.md`
+- `tools/validate_board_schematics.py`
+
+## Validation Result
+
+- KiCad XML netlist export: 44 components, 46 nets.
+- ERC: zero findings.
+- Topology: USB-C device role, two CC Rd resistors, flow-through ESD, VBUS
+  sense-only divider, no-back-power boundary, channel LEDs, one-wire RGB,
+  buttons, DNP OLED, every footprint file, and every symbol-to-pad set pass the
+  focused validator.
 
 ## Remaining Non-Freeze Work
 
 - PCB placement, routing, USB connector mechanical alignment, button/LED
   placement, fabrication outputs, assembly outputs, and JLCPCB/PCBWay order
   files are separate post-freeze work.
-- Exact passives and footprints must stay synchronized with the reviewed
-  schematic evidence during layout preparation.
+- Exact values and footprints are now generator- and validator-locked; changes
+  require regenerating the sheets and passing the exported-netlist audit.
 - Any change to service connector power model, UI signal ownership, or
   mechanical interface requires ADR review.

@@ -20,7 +20,7 @@ fabrication packages, panel outputs, or PCBA orders.
 - LM5164 logic buck: `PB100:SOIC-8_L4.9-W3.9-P1.27-LS6.0-BL-EP2.9`.
 - INA228-class input-current monitor: `PB100:VSSOP-10_L3.0-W3.0-P0.50-LS4.9-BL`.
 - TDK-class 0402 thermal NTCs: `PB100:R0402`.
-- JPB1 Hirose FX18 PB/LB pair: `PB100:FX18-100P-0.8SV10_Hirose` paired with `LB100:FX18-100S-0.8SV20_Hirose`.
+- JPB1 Hirose FX18 PB/LB pair: `PB100:FX18-100P-0.8SV10_Hirose` paired with `LB100:FX18-100S-0.8SV10_Hirose`.
 - LM5013-Q1 logic buck alternate: package-compatible with the existing reviewed `PB100:SOIC-8_L4.9-W3.9-P1.27-LS6.0-BL-EP2.9` DDA SO PowerPAD-8 footprint.
 - CAN1 TX-disable hardware: `PB100:R0603_DNP_LINK_1608Metric` for default-open `JP_CAN1` and `PB100:SOT-23-5_DBV_TI` for the `SN74LVC1G125-Q1`-class default-disabled gate candidate.
 - Vishay SM8S input TVS: `PB100:DO-218AC_Vishay_SM8S`.
@@ -33,12 +33,14 @@ fabrication packages, panel outputs, or PCBA orders.
 
 The FX18 footprints are source-derived from the official Hirose FX18 catalog
 recommended land pattern and the official 2026 2D drawings for
-`FX18-100P-0.8SV10` and `FX18-100S-0.8SV20`. Both footprints capture six
+`FX18-100P-0.8SV10` and `FX18-100S-0.8SV10`. Both footprints capture six
 official plated lands with four GND MF circuits, unique logical identifiers,
 mirrored X geometry, and preserved pin-1 orientation. Footprint binding is
-closed; physical paired datum, 20 mm stack tolerance, vibration retention,
-assembly-fixture, and handling evidence remain in the mechanical envelope gate
-before board import.
+closed. `PB-100-fx18-paired-stack-closeout.md` corrects the pair to P-SV10 plus
+S-SV10 and closes the official 20 mm stack, four 20.3 +/-0.127 mm spacers,
+shared holes, fixture, and inspection plan for pre-layout work. Physical
+continuity and vibration execution remain PB-BENCH-014/015 gates before
+motorcycle power or production.
 
 ## Footprint Inventory Result
 
@@ -47,7 +49,6 @@ non-footprint gates still block KiCad board import:
 
 - Controlled schematic symbol promotion from preliminary symbols to bound
   footprint properties.
-- Mechanical envelope review.
 - Thermal/current layout model and high-current copper review.
 - Package-specific paste aperture via field solder voiding and assembly notes.
 

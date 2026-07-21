@@ -7,7 +7,7 @@ RSH1,input-protection,Total input current shunt,Bourns CSS4J-4026R-L500F-class 0
 U2,input-protection,Total input current monitor,INA228/INA229 or INA226 class,VSSOP/SOIC,1,Candidate,Must support 0-60A range target
 U3,logic-power,Protected 5V buck regulator,LM5164QDDATQ1,SO PowerPAD-8,1,Preferred candidate,LM5013-Q1 if 1A budget exceeded
 L1,logic-power,Buck inductor,Automotive shielded inductor,TBD,1,Value TBD,Final value from regulator design
-JPB1,b2b-interface,PB-100 to LB-100 connector,Hirose FX18-100P-0.8SV10 plus FX18-100S-0.8SV20 candidate pair,100-position 0.8 mm FX18 20 mm stack candidate,1,Candidate pair,No PCB placement until stack height footprint and vibration review close
+JPB1,b2b-interface,PB-100 to LB-100 connector,Hirose FX18-100P-0.8SV10 plus FX18-100S-0.8SV10 selected pair,100-position 0.8 mm FX18 official 20 mm stack,1,Selected and mechanically closed for pre-layout,No PCB placement until the independent PB schematic thermal CAN1 and factory gates close; PB-BENCH-014/015 remain post-prototype
 U101,outputs,OUT1 high-side controller,TPS48110AQDGXRQ1,19-VSSOP,OUT1,Candidate,Generic output controller
 Q101,outputs,OUT1 output MOSFET,BUK7S1R2-80M 80 V,LFPAK88 SOT1235,OUT1,Selected by Product Owner,SOA and thermal still require schematic evidence
 F101,outputs,OUT1 user-serviceable fuse,15A fuse holder,TBD,OUT1,Garage candidate,Reference default fuse only

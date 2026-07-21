@@ -5,7 +5,7 @@
   },
   "project": {
     "name": "LB-100",
-    "description": "SVC LB-100 Logic Board schematic scaffold; PCB layout intentionally blocked"
+    "description": "SVC LB-100 Logic Board reviewed value-bearing schematic; PCB import waits for signal-integrity closure"
   },
   "schematic": {
     "drawing": {

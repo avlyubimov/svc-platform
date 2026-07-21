@@ -346,7 +346,7 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-b2b-interface-freeze-checklist.csv",
         "PB-100-b2b-interface-closeout-precheck.csv",
         "FX18-100P-0.8SV10",
-        "FX18-100S-0.8SV20",
+        "FX18-100S-0.8SV10",
         "exact LB-100 MCU pin binding",
     ):
         if token not in b2b_text:
@@ -490,7 +490,7 @@ def validate_engineering_blocker_closeout() -> None:
         ),
         "PBREL-003": (
             "FX18-100P-0.8SV10",
-            "FX18-100S-0.8SV20",
+            "FX18-100S-0.8SV10",
             "STM32H563VITx",
             "JPB1",
         ),

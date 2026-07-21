@@ -1,10 +1,11 @@
 # LB-100 Power Budget Precheck
 
-Status: Schematic-review input; not final
+Status: Closed contract input; implemented by the accepted Rev.1 schematic
 
-This precheck defines the load-budget contract that LB-100 must satisfy before
-PB-100 can freeze the protected `PB_5V_OUT` buck regulator. It does not select
-LB-100 regulators, power switches, sleep hardware, or exact MCU pins.
+This precheck defined the initial load-budget contract. The current accepted
+selection and totals are recorded in `LB-100-rail-budget-closeout-precheck.csv`
+and `LB-100-component-decision-record.md`: 229.2 mA sustained and 381.2 mA
+service peak against the 500 mA `PB_5V_OUT` allocation.
 
 ## Contract With PB-100
 
@@ -12,14 +13,14 @@ LB-100 regulators, power switches, sleep hardware, or exact MCU pins.
   LB-100 logic-board use.
 - PB-100 reserves another 500 mA for PB-side controllers, telemetry, expansion,
   and design margin.
-- If LB-100 schematic review needs more than 500 mA sustained from
-  `PB_5V_OUT`, PB-100 must keep the LM5013-Q1-class higher-current 100 V buck
-  fallback active before schematic freeze.
+- If a future reviewed LB-100 assembly exceeds 500 mA sustained from
+  `PB_5V_OUT`, the PB regulator choice and both board budgets must be reopened;
+  the current Rev.1 schematic does not trigger the LM5013-Q1-class escape path.
 - `PB_5V_OUT` must not power accessory loads.
 - `LB_3V3_IO` is a logic reference and pull-up domain for PB-side interfaces,
   not a PB-100 load supply.
 
-## LB-100 Loads To Budget Before Freeze
+## Original Load Checklist
 
 | Load group | Budget status | Notes |
 |---|---|---|
@@ -32,7 +33,7 @@ LB-100 regulators, power switches, sleep hardware, or exact MCU pins.
 | PB-side pull-ups and status inputs | Required | Include `PB_I2C`, `PB_PWR_GOOD`, and CAN1 disabled-status pull-ups |
 | Expansion reserve | Should | Keep future sensors and debug adapters out of the guaranteed 500 mA until reviewed |
 
-## Freeze Checks
+## Closed Freeze Checks
 
 - Produce an LB-100 rail tree with active, sleep, and deep-sleep current states.
 - Prove ADR-0012 sleep and deep-sleep current targets at the battery input.

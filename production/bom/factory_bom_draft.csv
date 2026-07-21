@@ -1,6 +1,10 @@
 Subsystem,Item,Suggested part/class,Package/assembly,Qty,Assembly,Priority,Notes
 Logic,MCU,STM32H563VIT6 preferred; STM32H573VIT6 security alternate; STM32H563RGT6 downscope fallback requiring review,LQFP-100 preferred,1,Factory,Core,Product target accepted in ADR-0005; sourced in LB-100-mcu-sourcing-precheck.csv
 Logic,3V3 regulator,XC6220B331MR-G preferred; AMS1117-3.3 fallback only if thermal/dropout review accepts,SOT-25/SOT-223 class,1,Factory,Core,LB_3V3_MAIN_REG source evidence in LB-100-component-sourcing-precheck.csv
+Logic,UI I/O expander,TCA9539QPWRQ1 preferred; PCA9539-Q1 class alternate after pin review,TSSOP-24,1,Factory,Core,Automotive-qualified role-free front-panel I/O; C201627 sourcing and footprint are reviewed
+Logic,Peripheral load switch,TPS22918TDBVRQ1 class preferred; TPS22919-Q1 reviewed family alternate,SOT-23-6,2,Factory,Core,U_SW_BLE and U_SW_SD isolate optional service domains; exact orderable suffix is rechecked at release
+Logic,HSE crystal,Automotive 8 MHz 3225 four-pad crystal class,3225 four-pad,1,Factory,Core,Exact AEC-Q200 MPN load capacitance and startup margin close before production release
+Logic,LSE crystal,Automotive 32.768 kHz 3215 two-pad crystal class,3215 two-pad,1,Factory,Core,Exact AEC-Q200 MPN load capacitance and startup margin close before production release
 Power,CAN1 PB physical layer,NXP TJA1051TK/3/1J preferred; TJA1057GTK/3Z same-class alternate; TCAN1042HGV-Q1 reviewed non-drop-in alternate,HVSON-8-EP on PB-100,1,Factory,Core,ADR-0015 Accepted candidate A; PB owns CAN1 transceiver and harness physical layer while LB owns FDCAN protocol and read-only policy
 Logic,CAN2 transceiver,NXP TJA1051T/1J preferred; TJA1051T/CM or TJA1051TK/3 alternate,SOIC-8/HVSON class,1,Factory,Should,Expansion CAN may transmit; source evidence in LB-100-component-sourcing-precheck.csv
 Logic,BLE module,E73-2G4M08S1C preferred; MS88SF3 nRF52840 alternate,Module,1,Factory,Should,UART/SPI control remains configuration-owned
@@ -19,7 +23,7 @@ Power,TVS protection,Vishay SM8S33AHM3/I active HM3 branch for the selected 80 V
 Power,Reverse protection,LM74700QDBVRQ1 or LM74700QDRQ1; LM74502-Q1 alternative,SOT-23/SOIC plus external FET,1,Factory,Core,Input reverse polarity
 Power,DC/DC,LM5164QDDATQ1 default; LM5013-Q1 high-current 100V alternate; TPS54360B-Q1 conditional 60V alternate,SOIC/HSOIC PowerPAD,1,Factory,Core,Logic power current and TVS margin decide final family
 Power,Buck inductor,Automotive shielded power inductor class,TBD after regulator design,1,Factory,Core,Value saturation current and heating close with LM5164-Q1 design
-Power,PB-100/LB-100 board-to-board connector,Hirose FX18-100P-0.8SV10 plus FX18-100S-0.8SV20 candidate pair,100 signal positions plus four GND MF circuits and six plated TH lands,1,Factory,Core,Official signal and MF land geometry captured with mirrored pin-1 orientation; stack vibration and assembly handling remain review gates
+Power,PB-100/LB-100 board-to-board connector,Hirose FX18-100P-0.8SV10 CL0579-0034-1-00 plus FX18-100S-0.8SV10 CL0579-0058-0-00,100 signal positions plus four GND MF circuits and six plated TH lands,1 pair,Factory,Core,Official P-SV10 plus S-SV10 pair gives the required 20 mm stack; use four 20.3 +/-0.127 mm M2.5 spacers and execute PB-BENCH-014/015 before motorcycle power or production
 Power,Board identity resistor network,Precision resistor divider class,0603/0805,1,Factory,Should,PB_ID_ADC fallback board revision identity
 Power,Test points,Generic bring-up and telemetry test points,PCB pads or SMT test points,TBD,Factory,Should,Exact count from schematic review before layout
 Power,CAN1 TX disable hardware,JP_CAN1 and JP_CAN1_NORMAL DNP/open links plus SN74LVC1G125-Q1-class gate,Two 0603 DNP/open links plus SOT-23-5 DBV gate,1 set,Factory,Core,CAN1_TX_DISABLE production boundary: no default-populated vehicle-CAN TX path; both hardware actions require a future ADR
@@ -30,9 +34,10 @@ Comms,LIN transceiver,TJA1021T/20/CM preferred DNP reserve; automotive LIN alter
 Comms,RS485 transceiver,SP3485EN-L/TR preferred DNP reserve; MAX3485ESA alternate,SOIC-8 class,1,Factory,Future,Footprint can be DNP; source evidence in LB-100-component-sourcing-precheck.csv
 Front,USB-C service connector,USB4105-GF-A preferred; TYPE-C-31-M-12 alternate,USB-C receptacle SMD,1,Factory,Core,FB-100 device-only service connector; no system-rail back-power
 Front,USB ESD protection,USBLC6-2SC6 preferred; TPD2EUSB30ADRTR alternate,SOT-23-6/USON class,1,Factory,Core,Protect USB_D_P/USB_D_N at FB-100 connector
-Front,Status RGB LED,JLCPCB RGB LED class preferred; built-in IC RGB class alternate,SMD RGB LED,1,Factory,Should,Status-only indicator; no accessory role mapping
-Front,Channel indicator LEDs,JLCPCB discrete LED indication class,0603/0805 SMD LED,10,Factory,Core,Labels remain OUT1..OUT10 role-free
+Front,Status RGB LED,Everlight 19-237/R6GHBHC-A01/2T common-anode class preferred,SMD-4P 1.6x1.6 mm,1,Factory,Should,Status-only indicator driven by LTC3212; no accessory role mapping
+Front,RGB status driver,LTC3212EDDB#TRPBF; protocol-compatible alternate still requires qualification,DFN-12-1EP 2x3 mm,1,Factory,Should,One-wire RGB control preserves JFB1 contract; C684295 is out of stock so consignment or alternate qualification is required before production
+Front,Channel indicator LEDs,JLCPCB discrete 0805 indication class,0805 SMD LED,10,Factory,Core,Labels remain OUT1..OUT10 role-free; each path uses a reviewed 1k current limiter below 2 mA at 3.3 V
 Front,FPC connector,AFC07-S24ECA-00 preferred; FPC-05F-24PH20 alternate,24-pin 0.5 mm FPC/FFC connector,1,Factory,Core,JFB1 front-panel cable interface
 Front,Service/reset buttons,Panasonic EVPBB4A9B000 preferred; XKB TS-1187A variants alternate,SMD tactile switch,2,Factory,Core,Active-low SERVICE and RESET controls
-Front,Optional OLED display,QG-2864KLBEG01 DNP preferred; HS96L03W2C03 or N091-2832TSWFG02-H14 DNP alternate,0.96/0.91 inch OLED module footprint class,0-1,Factory,Future,DNP by default; keep-out only until population decision
-Front,LED/button passives,JLCPCB basic resistor/capacitor classes,0603/0402 class,TBD,Factory,Core,Final values close during reviewed FB-100 schematic sheets
+Front,Optional OLED display,Generic 1x4 I2C OLED module header DNP; QG-2864KLBEG01 or N091-2832TSWFG02-H14 direct-solder display only by variant review,1x4 2.54 mm header,0-1,Factory,Future,DNP by default; module height window pin order and keep-out require layout review
+Front,LED/button/USB passives,1k LED resistors 5.1k USB-C Rd resistors 100k/27k VBUS divider and reviewed 0603/0805 capacitors,0603/0805 class,Defined by FB-100 schematic,Factory,Core,Exact values and footprints are present in the reviewed value-bearing FB-100 schematic

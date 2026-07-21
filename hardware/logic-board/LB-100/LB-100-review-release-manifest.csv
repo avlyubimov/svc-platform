@@ -9,11 +9,11 @@ hardware/logic-board/LB-100/LB-100-mcu-sourcing-precheck.csv,Production,LB-100 M
 hardware/logic-board/LB-100/LB-100-schematic-freeze-checklist.md,Review gate,LB-100 schematic freeze checklist,Required,validate_board_order,Closed
 hardware/logic-board/LB-100/LB-100-schematic-review-closeout.md,Review gate,LB-100 reviewed value-bearing schematic closeout,Required,validate_board_order,Closed
 hardware/logic-board/LB-100/LB-100-board-release-blocker-register.csv,Review gate,LB-100 board-release blocker register,Required,validate_board_order,Closed
-hardware/logic-board/LB-100/kicad/LB-100.kicad_pro,KiCad scaffold,KiCad project metadata,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/kicad/LB-100.kicad_pro,KiCad project,KiCad project metadata,Required,validate_board_order,Ready
 hardware/logic-board/LB-100/kicad/LB-100.kicad_sch,KiCad schematic,Reviewed value-bearing top schematic sheet,Required,validate_board_order,Closed
-hardware/logic-board/LB-100/kicad/sym-lib-table,KiCad scaffold,Symbol library table,Required,validate_board_order,Ready
-hardware/logic-board/LB-100/kicad/fp-lib-table,KiCad scaffold,Footprint library table,Required,validate_board_order,Ready
-hardware/logic-board/LB-100/kicad/lib/LB100.kicad_sym,KiCad scaffold,Project symbol library,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/kicad/sym-lib-table,KiCad project,Symbol library table,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/kicad/fp-lib-table,KiCad project,Footprint library table,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/kicad/lib/LB100.kicad_sym,KiCad implementation,Value-bearing project symbol library,Required,validate_board_order,Ready
 docs/adr/ADR-0005-stm32h5-product-target.md,Architecture,MCU target baseline,Required,Document reviewed,Frozen
 docs/adr/ADR-0012-system-sleep-wake-and-parking-current.md,Power,Sleep wake and parking current baseline,Required,Document reviewed,Ready
 docs/adr/ADR-0002-can-read-only-default.md,Safety,CAN1 read-only default,Required,Document reviewed,Frozen
@@ -23,3 +23,7 @@ hardware/logic-board/LB-100/LB-100-rail-budget-closeout-precheck.csv,Power,LB-10
 hardware/logic-board/LB-100/LB-100-component-sourcing-precheck.csv,Production,LB-100 component sourcing precheck,Required,validate_board_order,Ready
 hardware/logic-board/LB-100/LB-100-communication-safety-precheck.csv,Safety,CAN and expansion safety closeout,Required,validate_board_order,Ready
 hardware/logic-board/LB-100/LB-100-service-storage-sensor-precheck.csv,Service,Service storage sensor closeout,Required,validate_board_order,Ready
+hardware/logic-board/LB-100/LB-100-component-decision-record.md,Engineering,LB active component decision record,Required,validate_board_schematics,Closed
+hardware/power-board/PB-100/PB-100-fx18-paired-stack-closeout.md,Mechanical,Corrected PB/LB FX18 paired-stack closeout,Required,validate_board_order,Closed
+tools/generate_lb_fb_schematics.py,KiCad schematic,Deterministic LB/FB schematic generator,Required,validate_board_schematics,Ready
+tools/board_schematic_validation,Validation,Focused LB/FB topology pad-contract and ERC package,Required,validate_board_schematics,Ready

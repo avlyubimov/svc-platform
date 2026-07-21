@@ -5,7 +5,7 @@
   },
   "project": {
     "name": "FB-100",
-    "description": "SVC FB-100 Front Panel Board schematic scaffold; PCB layout intentionally blocked"
+    "description": "SVC FB-100 Front Panel Board reviewed value-bearing schematic; controlled PCB import ready"
   },
   "schematic": {
     "drawing": {

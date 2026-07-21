@@ -34,7 +34,7 @@ order.
 | Input reverse protection | TI LM74700-Q1/LM74502-Q1 class | ADI/LTC ideal diode controller families | MSOP/SOIC class | Controller family only; MOSFET is tracked separately |
 | Input reverse MOSFET | Nexperia BUK7S1R2-80M 80 V LFPAK88 selected | Infineon IAUTN08S5N012L 80 V TOLL; Nexperia BUK7J2R4-80M 80 V LFPAK56E | LFPAK88 selected; alternatives are non-drop-in | 40 A SOA copper thermal production status and assembly handling remain gates |
 | Input TVS/load dump | Vishay SM8S33AHM3/I active HM3 TVS | Vishay SM8S33AHE3_A/I NFD stock-only; Littelfuse SLD8S33A; Diodes DM8W33AQ-13; Bourns SM8S33A-Q class | DO-218AC/SMC as needed | MCC SM8S33A source is EOL and HE3 is NFD evidence only; final clamp voltage depends on MOSFET and buck ratings |
-| PB-100/LB-100 board-to-board connector | Hirose FX18-100P-0.8SV10 plus FX18-100S-0.8SV20 candidate pair | Samtec Q Strip/high-density mezzanine class; Molex SlimStack 100-position class | 100-position 0.8 mm FX18 20 mm stack candidate | Candidate pair supports 100-position JPB1 planning; stack height vibration retention footprint and PCBA handling remain schematic-freeze items |
+| PB-100/LB-100 board-to-board connector | Hirose FX18-100P-0.8SV10 plus FX18-100S-0.8SV10 selected pair | Samtec Q Strip/high-density mezzanine class; Molex SlimStack 100-position class | 100-position 0.8 mm FX18 official 20 mm stack | Six-land footprints, MF ownership, four-spacer retention, fixture, and pre-layout mechanics are closed; live stock, factory handling, and PB-BENCH-014/015 remain release gates |
 | FRAM | Fujitsu/Infineon MB85 I2C/SPI FRAM | Cypress/Infineon Excelon FRAM | SOIC/TSSOP/DFN | Configuration and black-box storage |
 | RTC | Microchip MCP7940 class | NXP PCF8523/PCF8563; DS3231 class | SOIC/TSSOP/DFN/module | Prefer low-IQ SMD IC over hobby module |
 | IMU | Bosch BMI270/BMI323 | TDK ICM-42688 class | LGA | Optional for Rev.1 if layout risk is high |
@@ -64,9 +64,10 @@ The current strategy is:
   for `TEMP_PCB`, `TEMP_PWR_A`, and `TEMP_PWR_B`. The schematic must still
   close divider values, ADC scaling, placement, and calibration.
 - Board-to-board interface: Hirose `FX18-100P-0.8SV10` plus
-  `FX18-100S-0.8SV20` candidate pair for `JPB1`. The schematic must still close
-  exact stack height, footprint drawing, vibration retention, assembly handling,
-  and LB-100 MCU resource binding.
+  `FX18-100S-0.8SV10` selected pair for `JPB1`. The official 20 mm stack,
+  footprint drawings, MF ownership, LB-100 MCU binding, four-spacer retention,
+  fixture, and inspection plan are closed for pre-layout work. Live stock,
+  factory handling, and post-prototype continuity/vibration execution remain.
 
 ## Evidence links
 
@@ -108,8 +109,8 @@ The current strategy is:
   https://www.murata.com/-/media/webrenewal/tool/library/common-pdf/static-model/component-list-ntc-2508.ashx?cvid=20250930011345000000&la=en
 - Hirose FX18-100P-0.8SV10 product page was checked for the PB-100/LB-100
   candidate plug: https://www.hirose.com/product/p/CL0579-0034-1-00
-- Hirose FX18-100S-0.8SV20 product page was checked for the PB-100/LB-100
-  candidate receptacle: https://www.hirose.com/product/p/CL0579-0038-2-00
+- Hirose FX18-100S-0.8SV10 product page was checked for the PB-100/LB-100
+  candidate receptacle: https://www.hirose.com/product/p/CL0579-0058-0-00
 - Hirose FX18 series catalog was checked for 0.8 mm pitch, 100-position, and
   power/MF-contact planning evidence:
   https://www.hirose.com/product/series/catalogdownload?category=FX18
