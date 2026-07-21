@@ -52,6 +52,7 @@ class LoadDumpRequirement:
     source_voltages_v: tuple[float, ...]
     source_resistances_ohm: tuple[float, ...]
     durations_s: tuple[float, ...]
+    rise_times_s: tuple[float, ...]
     initial_junctions_c: tuple[float, ...]
     battery_voltage_v: float
     pulse_count: int
@@ -102,6 +103,7 @@ class SurgeStopper:
     cutoff_mosfet_voltage_v: float
     cutoff_mosfet_rds_on_max_25c_ohm: float
     cutoff_mosfet_hot_multiplier: float
+    cutoff_mosfet_gate_source_charge_max_c: float
     cutoff_mosfet_gate_drain_charge_max_c: float
     cutoff_mosfet_rth_jc_max_k_per_w: float
     cutoff_mosfet_max_junction_c: float
@@ -119,6 +121,7 @@ class SurgeStopper:
     ov_leakage_max_a: float
     hgate_turnoff_delay_max_s: float
     hgate_sink_current_min_a: float
+    protected_node_overshoot_allowance_v: float
     protected_mosfet_voltage_v: float
     continuous_current_a: float
     controller_datasheet: str
@@ -165,6 +168,14 @@ class SurgeStopper:
         return self.cutoff_mosfet_gate_drain_charge_max_c / self.hgate_sink_current_min_a
 
     @property
+    def post_miller_current_fall_s(self) -> float:
+        return self.cutoff_mosfet_gate_source_charge_max_c / self.hgate_sink_current_min_a
+
+    @property
+    def linear_transition_s(self) -> float:
+        return self.miller_transition_s + self.post_miller_current_fall_s
+
+    @property
     def cutoff_mosfet_rds_on_hot_ohm(self) -> float:
         return self.cutoff_mosfet_rds_on_max_25c_ohm * self.cutoff_mosfet_hot_multiplier
 
@@ -191,6 +202,33 @@ class SurgeStopper:
     ) -> float:
         preload_loss_w = preload_current_a**2 * self.cutoff_mosfet_rds_on_hot_ohm
         return ambient_c + preload_loss_w * self.target_full_thermal_path_k_per_w
+
+    def input_rise_during_ov_delay_v(
+        self,
+        source_voltage_v: float,
+        battery_voltage_v: float,
+        rise_time_s: float,
+    ) -> float:
+        conservative_slew_v_per_s = (
+            source_voltage_v - battery_voltage_v
+        ) / rise_time_s
+        return conservative_slew_v_per_s * self.hgate_turnoff_delay_max_s
+
+    def protected_node_peak_budget_v(
+        self,
+        source_voltage_v: float,
+        battery_voltage_v: float,
+        rise_time_s: float,
+    ) -> float:
+        return (
+            self.cutoff_max_v
+            + self.input_rise_during_ov_delay_v(
+                source_voltage_v,
+                battery_voltage_v,
+                rise_time_s,
+            )
+            + self.protected_node_overshoot_allowance_v
+        )
 
 
 MOSFET = Mosfet(
@@ -285,6 +323,7 @@ LOAD_DUMP = LoadDumpRequirement(
     source_voltages_v=(79.0, 101.0),
     source_resistances_ohm=(0.5, 4.0),
     durations_s=(0.040, 0.400),
+    rise_times_s=(0.005, 0.010),
     initial_junctions_c=(25.0, 125.0),
     battery_voltage_v=13.5,
     pulse_count=10,
@@ -330,6 +369,7 @@ SURGE_STOPPER = SurgeStopper(
     cutoff_mosfet_voltage_v=150.0,
     cutoff_mosfet_rds_on_max_25c_ohm=0.0025,
     cutoff_mosfet_hot_multiplier=1.8,
+    cutoff_mosfet_gate_source_charge_max_c=52e-9,
     cutoff_mosfet_gate_drain_charge_max_c=40e-9,
     cutoff_mosfet_rth_jc_max_k_per_w=0.42,
     cutoff_mosfet_max_junction_c=175.0,
@@ -347,6 +387,7 @@ SURGE_STOPPER = SurgeStopper(
     ov_leakage_max_a=200e-9,
     hgate_turnoff_delay_max_s=7e-6,
     hgate_sink_current_min_a=0.128,
+    protected_node_overshoot_allowance_v=4.5,
     protected_mosfet_voltage_v=80.0,
     continuous_current_a=40.0,
     controller_datasheet="https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf",

@@ -3474,3 +3474,23 @@ design-specified at 75 V / 123 A and the SOA current is digitized from a graph.
 PBREL-007 pre-layout returns to `Conditional`; aggregate PB-100 authorization
 is `BLOCKED` until a qualified maximum-bound 101 V / 40 A trajectory exists.
 No `.kicad_pcb` or manufacturing output is authorized.
+
+## 2026-07-21 — Add complete Q2 charge envelope and protected-node peak budget
+
+Correction: the 0.31 us Qgd interval covers only Miller VDS rise. Add a
+separate post-Miller current-fall phase conservatively bounded by the complete
+52 nC maximum Qgs. At the 128 mA minimum HGATE sink the phases are 0.31 us and
+0.41 us, for a 0.72 us provisional linear-transition envelope. The existing
+101 V / 1 us graph-derived SOA screen remains 2.08x at 150 degC initial Tj.
+
+Correction: 54.89 V is the maximum OV threshold, not the maximum protected-node
+voltage. Expand the generated matrix to 48 rows with the TI 5-10 ms rise-time
+range. At 101 V / 5 ms the conservative input rise during the 7 us delay is
+0.1225 V. Adding a 4.50 V pre-layout commutation allocation produces a
+59.52 V protected-node peak budget and 20.48 V margin to the selected 80 V Q1.
+
+Decision: these calculations do not close PBREL-007 because Infineon specifies
+Qgd/Qgs at 75 V / 123 A as design values not subject to production testing.
+PBREL-007 remains `Conditional`, aggregate PB-100 remains `BLOCKED`, and no
+layout or manufacturing output is authorized until a qualified maximum-bound
+101 V / 40 A / 150 degC VDS-rise and ID-fall trajectory exists.

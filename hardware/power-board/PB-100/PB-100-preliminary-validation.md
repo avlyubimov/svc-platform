@@ -36,8 +36,11 @@ does not approve schematic freeze or PCB layout.
   load at a generated `48.99-54.89 V` threshold across tolerance and leakage.
 - The raw-side IAUTN15S6N025ATMA1 model covers the `79-101 V`, `0.5-4 ohm`,
   and `40-400 ms` envelope at 25/125/150 degC initial junction temperature.
-  Seven-microsecond deglitch is fully enhanced; the separate 0.31 us Qgd
-  transition gives a provisional 2.08x SOA screen at 150 degC. Q2 hot
+  Seven-microsecond deglitch is fully enhanced; the separate 0.31 us Miller
+  VDS-rise and 0.41 us post-Miller ID-fall form a 0.72 us provisional charge
+  envelope with 2.08x SOA screen at 150 degC. Five-to-ten-millisecond input
+  rise and a 4.5 V commutation allocation give a 59.52 V protected-node peak
+  budget. Q2 hot
   conduction loss is 7.200 W and requires a post-layout full thermal path no
   worse than 3.47 K/W. A qualified maximum-bound trajectory is still required
   before layout; final loop overshoot and dynamic SOA remain post-layout, with

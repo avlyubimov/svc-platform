@@ -338,8 +338,8 @@ orders.
   transient margin without overshoot evidence; Why not alternative B: dual
   PowerPAK path and active cooling add complexity and failure modes; Expected
   lifetime: 10-15 year platform target with automotive controller/MOSFET;
-  Operating margin: at least 25.11 V static margin from the 54.89 V maximum
-  cutoff to Q1's 80 V rating before extracted overshoot;
+  Operating margin: the 59.52 V protected-node peak budget leaves 20.48 V to
+  Q1's 80 V rating, including a 4.50 V commutation-overshoot allocation;
   Maximum junction temperature: 175 °C MOSFET class and selected
   150 °C design target; Availability: TI plus Infineon and reviewed
   alternates; Automotive qualification: AEC-Q100 controller and AEC-Q101 MOSFET;
@@ -394,11 +394,14 @@ orders.
   single-pulse energy absorber and preserve downstream voltage margin.
 - Thermal impact: 7.200 W hot conduction through the 3.47 K/W target path sets
   150 degC initial Tj at 125 degC ambient. The 7 us deglitch keeps Q2 fully
-  enhanced; the separate maximum-Qgd/minimum-HGATE calculation gives a
-  provisional 0.31 us transition. The 101 V / 1 us SOA screen derates to
-  83.33 A at 150 degC, or 2.08x, but remains Conditional because Qgd is not
-  guaranteed at this corner and the SOA value is graph-derived. Transition
-  energy is informational, not avalanche qualification.
+  enhanced; maximum Qgd/minimum HGATE gives a 0.31 us Miller VDS-rise, and
+  complete maximum Qgs bounds post-Miller ID fall at 0.41 us. The complete
+  provisional envelope is 0.72 us. The 101 V / 1 us SOA screen derates to
+  83.33 A at 150 degC, or 2.08x, but remains Conditional because Qgd/Qgs are
+  not guaranteed at this corner and the SOA value is graph-derived. The
+  5-10 ms rise-time calculation plus 4.50 V commutation allocation gives a
+  59.52 V protected-node peak budget. Transition energy is informational,
+  not avalanche qualification.
 - Production impact: RGE exposed-pad isolation, Q2 TOLL stencil/voiding, short
   gate/clamp loops, and D1 DNP inspection require DFM and first-article review.
 - Field reliability impact: hard cutoff prevents the 40-400 ms load-dump energy
@@ -409,8 +412,9 @@ orders.
   a single SM8S33A fails the generated energy/thermal corners; Why not alternative
   B: a 60 V MOSFET lacks sufficient extracted-overshoot margin; Expected lifetime:
   10-15 year platform target with automotive controller and MOSFETs; Operating
-  margin: maximum static cutoff 54.89 V leaves 25.11 V to protected Q1 and 49 V
-  to Q2 at a 101 V raw surge; Maximum junction temperature: component ratings
+  margin: the 59.52 V protected-node peak budget leaves 20.48 V to protected
+  Q1, while Q2 retains 49 V at a 101 V raw surge; Maximum junction temperature:
+  component ratings
   remain subject to extracted dynamic SOA and bench temperature; Availability:
   TI and Infineon authorized sourcing with alternatives requiring review;
   Automotive qualification: AEC-Q100 controller and AEC-Q101 MOSFETs; LCSC

@@ -118,6 +118,7 @@ def validate_tvs_load_dump_margin_trace() -> None:
             "48.99-54.89V",
             "2.08x provisional hot SOA margin",
             "150 C initial Tj",
+            "59.52V protected-node peak budget",
             "PBREL-006 design gate Closed",
             "SM8S33AHM3/I legacy D1",
             "NOT APPROVED",
@@ -138,6 +139,7 @@ def validate_tvs_load_dump_freeze_review() -> None:
             "LM74930QRGERQ1",
             "IAUTN15S6N025ATMA1",
             "48.99-54.89 V",
+            "59.52 V peak budget",
             "PBREL-007 pre-layout stage remains Conditional",
             "PB-100.kicad_pcb",
         ),
@@ -161,6 +163,7 @@ def validate_tvs_overshoot_escape_checklist() -> None:
             "dynamic SOA",
             "7.200 W",
             "150 C initial Tj",
+            "5-10 ms",
             "ten pulses separated by 60 s",
             "PB-100.kicad_pcb",
         ),
@@ -182,7 +185,7 @@ def validate_tvs_overshoot_validation_precheck() -> None:
         fail("TVS validation must require extracted parasitic inductance")
     _require_tokens(
         "PB-100-tvs-overshoot-validation-precheck.csv",
-        ("24 boundary rows", "Cutoff tolerance", "dynamic SOA", "ten pulses", "PB-100.kicad_pcb"),
+        ("48 boundary rows", "Cutoff tolerance", "dynamic SOA", "ten pulses", "PB-100.kicad_pcb"),
     )
 
 
@@ -203,6 +206,7 @@ def validate_tvs_overshoot_closeout_precheck() -> None:
             "ADR-0018",
             "no higher than 55 V",
             "Hot derated SOA limit is provisionally 83.33 A",
+            "protected-node peak budget is 59.52 V",
             "dynamic SOA",
             "Ten pulses at 60 s",
             "PBREL-007 pre-layout stage remains Conditional",
