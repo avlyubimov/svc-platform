@@ -50,6 +50,7 @@ CHECKS = (
     release.validate_staged_release_readiness,
     release.validate_board_release_blocker_register,
     release.validate_board_print_closure_matrix,
+    release_evidence.validate_q2_maximum_bound_qualification,
     release_evidence.validate_five_blocker_release_evidence,
     review.validate_schematic_capture_work_queue,
     review.validate_schematic_capture_plan,

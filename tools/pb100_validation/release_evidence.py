@@ -13,11 +13,89 @@ SELECTED_CONTROLLER = "LM74930QRGERQ1"
 SELECTED_FOOTPRINT = "PB100:PG-HSOF-8-1_TOLL_Infineon"
 SELECTED_CONTROLLER_FOOTPRINT = "PB100:VQFN-24_RGE_4x4mm_P0.5mm_EP2.4mm"
 FIVE_BLOCKERS = {"PBREL-001", "PBREL-004", "PBREL-006", "PBREL-007", "PBREL-011"}
+Q2_QUALIFICATION_INPUTS = {
+    "Q2Q-001": "IAUTN15S6N025ATMA1",
+    "Q2Q-002": "LM74930QRGERQ1 hard overvoltage cutoff",
+    "Q2Q-003": "101 V maximum during qualification trajectory",
+    "Q2Q-004": "40 A before cutoff",
+    "Q2Q-005": "150 degC before cutoff",
+    "Q2Q-006": "10.0-14.5 V VGS",
+    "Q2Q-007": "128 mA minimum sink current",
+    "Q2Q-008": "7 us maximum with Q2 fully enhanced",
+    "Q2Q-009": "10 pulses with 60 s spacing",
+}
+Q2_QUALIFICATION_PENDING = {f"Q2Q-{number:03d}" for number in range(10, 17)}
 
 
 def _rows(name: str) -> list[dict[str, str]]:
     with (PB100_DIR / name).open(newline="", encoding="utf-8") as stream:
         return list(csv.DictReader(stream))
+
+
+def validate_q2_maximum_bound_qualification() -> None:
+    rows = _rows("PB-100-q2-maximum-bound-qualification.csv")
+    rows_by_id = {row["Qualification ID"]: row for row in rows}
+    expected_ids = set(Q2_QUALIFICATION_INPUTS) | Q2_QUALIFICATION_PENDING | {
+        "Q2Q-017",
+        "Q2Q-018",
+    }
+    if len(rows_by_id) != len(rows) or set(rows_by_id) != expected_ids:
+        fail("Q2 maximum-bound qualification ledger must contain Q2Q-001 through Q2Q-018 exactly")
+
+    for qualification_id, required_bound in Q2_QUALIFICATION_INPUTS.items():
+        row = rows_by_id[qualification_id]
+        if row["Required bound"] != required_bound or row["Status"] != "PASS INPUT":
+            fail(f"{qualification_id} must preserve the reviewed qualification input")
+
+    for qualification_id in Q2_QUALIFICATION_PENDING:
+        if rows_by_id[qualification_id]["Status"] != "PENDING VENDOR":
+            fail(f"{qualification_id} must remain PENDING VENDOR until traceable Infineon evidence exists")
+    if rows_by_id["Q2Q-016"]["Current evidence"] != "NOT RECEIVED":
+        fail("Q2Q-016 must not claim a vendor response before a traceable artifact is reviewed")
+    if rows_by_id["Q2Q-017"]["Status"] != "DRAFT READY":
+        fail("Q2 vendor request must remain explicitly staged as a draft before submission")
+    if rows_by_id["Q2Q-018"]["Required bound"] != "BLOCKED until Q2Q-010 through Q2Q-016 are accepted":
+        fail("Q2 qualification decision must depend on every missing vendor evidence item")
+    if rows_by_id["Q2Q-018"]["Status"] != "BLOCKED":
+        fail("Q2 pre-layout qualification must remain BLOCKED while vendor evidence is pending")
+
+    request = read_text(PB100_DIR / "PB-100-q2-vendor-support-request.md")
+    for token in (
+        "IAUTN15S6N025ATMA1",
+        "LM74930QRGERQ1",
+        "101 V",
+        "40 A",
+        "150 degC",
+        "10.0-14.5 V",
+        "128 mA",
+        "7 us",
+        "ten load-dump events with 60 s spacing",
+        "VDS(t)",
+        "ID(t)",
+        "process, temperature, and lot coverage",
+        "typical SPICE",
+        "support@infineon.com",
+        "not yet sent",
+        "no `PB-100.kicad_pcb`",
+    ):
+        if token not in request:
+            fail(f"Q2 vendor qualification request is missing {token}")
+
+    blocker = next(
+        row
+        for row in _rows("PB-100-board-release-blocker-register.csv")
+        if row["Blocker ID"] == "PBREL-007"
+    )
+    if blocker["Status"] != "Conditional" or "PB-100-q2-maximum-bound-qualification.csv" not in " ".join(blocker.values()):
+        fail("PBREL-007 must remain Conditional and reference the Q2 qualification ledger")
+
+    pre_layout = next(
+        row
+        for row in _rows("PB-100-staged-release-readiness.csv")
+        if row["Blocker ID"] == "PBREL-007" and row["Stage"] == "Pre-layout design"
+    )
+    if pre_layout["Stage status"] != "Conditional" or pre_layout["Current blocker authorization"] != "BLOCKED":
+        fail("PBREL-007 pre-layout must remain Conditional with BLOCKED authorization")
 
 
 def validate_five_blocker_release_evidence() -> None:

@@ -1,0 +1,19 @@
+Qualification ID,Subject,Required bound,Current evidence,Accepted source,Status
+Q2Q-001,Exact orderable device,IAUTN15S6N025ATMA1,Selected Q2 matches the Infineon orderable MPN,Infineon datasheet plus schematic and BOM identity,PASS INPUT
+Q2Q-002,Gate controller,LM74930QRGERQ1 hard overvoltage cutoff,Selected U1 drives Q2 HGATE directly,TI datasheet plus schematic identity,PASS INPUT
+Q2Q-003,Raw-side drain voltage,101 V maximum during qualification trajectory,ADR-0016 load-dump requirement,Approved project requirement,PASS INPUT
+Q2Q-004,Initial drain current,40 A before cutoff,ADR-0008 continuous board-current requirement,Approved project requirement,PASS INPUT
+Q2Q-005,Initial junction temperature,150 degC before cutoff,Generated 7.200 W hot preload through the 3.47 K/W target path,Reviewed generated thermal evidence,PASS INPUT
+Q2Q-006,Initial gate drive range,10.0-14.5 V VGS,LM74930-Q1 specified HGATE-to-OUT range for VS above 5 V,TI datasheet electrical-characteristics limits,PASS INPUT
+Q2Q-007,Gate pull-down drive,128 mA minimum sink current,LM74930-Q1 HGATE minimum sink current,TI datasheet electrical-characteristics minimum,PASS INPUT
+Q2Q-008,Controller detection delay,7 us maximum with Q2 fully enhanced,LM74930-Q1 OV turn-off deglitch maximum,TI datasheet electrical-characteristics maximum,PASS INPUT
+Q2Q-009,Repetition condition,10 pulses with 60 s spacing,ADR-0016 repeated load-dump requirement,Approved project requirement,PASS INPUT
+Q2Q-010,Maximum gate-discharge bound,Process and temperature maximum at the Q2Q-001 through Q2Q-009 corner,Public Qgd and Qgs maxima are design-specified at 75 V and 123 A rather than this corner,Written Infineon application-engineering bound or an Infineon-approved qualification method,PENDING VENDOR
+Q2Q-011,Maximum Miller VDS-rise time,Upper bound from HGATE fall through completion of VDS rise,Current 0.31 us value is provisional,Written Infineon application-engineering trajectory or qualified corner model,PENDING VENDOR
+Q2Q-012,Maximum post-Miller ID-fall time,Upper bound from Miller exit until drain current reaches the stated residual-current criterion,Current 0.41 us value is provisional,Written Infineon application-engineering trajectory or qualified corner model,PENDING VENDOR
+Q2Q-013,Paired VDS and ID trajectory,Time-correlated maximum-bound VDS(t) and ID(t) through complete turnoff,No qualified time-correlated trajectory exists,Written Infineon application-engineering trajectory with time origin and residual-current criterion,PENDING VENDOR
+Q2Q-014,Hot linear-mode SOA confirmation,Trajectory is inside Q2 SOA at initial Tj 150 degC with stated margin,Current 2.08x graph-derived screen is provisional,Written Infineon application-engineering confirmation tied to Q2Q-013,PENDING VENDOR
+Q2Q-015,Production coverage,Bound identifies process temperature and lot coverage plus any guardband,Public typical simulation models do not establish production maximums,Written Infineon qualification statement,PENDING VENDOR
+Q2Q-016,Vendor response identifier,Infineon case email or signed FAE document identifier,NOT RECEIVED,Traceable Infineon support artifact,PENDING VENDOR
+Q2Q-017,Vendor request state,Reviewed request ready for submission,DRAFT READY,PB-100-q2-vendor-support-request.md,DRAFT READY
+Q2Q-018,Pre-layout qualification decision,BLOCKED until Q2Q-010 through Q2Q-016 are accepted,PBREL-007 remains Conditional and PB-100 remains BLOCKED,Machine validation plus Product Owner evidence review,BLOCKED
