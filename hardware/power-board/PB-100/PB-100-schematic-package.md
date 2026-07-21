@@ -183,9 +183,10 @@ release, not first prototype PCB fabrication.
   hooks, post-prototype evidence gate, sourcing/symbol synchronization, and
   no-layout manufacturing boundary are tracked in
   `hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`.
-- Input reverse freeze review: LM74700 gate/default-off behavior, TOLL/LFPAK88
-  and PowerPAK alternates, protected measurement sequence, HM3 TVS dependency,
-  sourcing gate, and no-layout boundary are tracked in
+- Input reverse freeze review: LM74700 gate/default-off behavior, selected
+  PG-HSOF-8-1 TOLL and controlled TOLL/LFPAK56E alternatives, protected
+  measurement sequence, HM3 TVS dependency, sourcing gate, and no-layout
+  boundary are tracked in
   `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`.
 - Input reverse Q1 freeze checklist: gate clamp/discharge timing, package
   alternates, protected measurement sequence, 40 A thermal/copper/SOA audit,
@@ -198,7 +199,8 @@ release, not first prototype PCB fabrication.
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`.
 - Input reverse Q1 closeout precheck: controller source boundary, VCAP/gate
   default-off behavior, ideal-diode reverse-current behavior, RDS(on) thermal
-  window, TOLL/LFPAK88/PowerPAK alternatives, TVS overshoot dependency,
+  window, selected TOLL and controlled TOLL/LFPAK56E alternatives, TVS
+  overshoot dependency,
   protected measurement sequence, assembly sourcing, input capture sync, and
   no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`.
@@ -221,7 +223,7 @@ release, not first prototype PCB fabrication.
   boundary are tracked in
   `hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv`.
 - MOSFET voltage-margin review: the Product Owner selected the 80 V
-  BUK7S1R2-80M baseline; former 60 V paths are rejected. Actual clamp-loop
+  IAUT300N08S5N012ATMA2 baseline; former 60 V paths are rejected. Actual clamp-loop
   overshoot, SOA and thermal evidence remain freeze gates. See
   `hardware/power-board/PB-100/PB-100-mosfet-voltage-margin-review.md`.
 - Logic power freeze review: LM5164/LM5013/TPS54360B regulator boundaries,
@@ -323,9 +325,9 @@ release, not first prototype PCB fabrication.
 
 | Class | Outputs | Target fuse | Target current limit | Initial implementation direction |
 |---|---|---:|---:|---|
-| High current | OUT2 | 20 A | 18 A | TPS48110AQDGXRQ1-class controller plus selected BUK7S1R2-80M 80 V LFPAK88 N-MOSFET |
-| Medium current | OUT1, OUT3, OUT4, OUT6, OUT7, OUT10 | 10-15 A | 8-12 A | TPS48110AQDGXRQ1-class controller plus selected BUK7S1R2-80M 80 V LFPAK88 N-MOSFET |
-| Low current | OUT5, OUT8, OUT9 | 5 A | 4 A | TPS48110AQDGXRQ1-class controller plus selected BUK7S1R2-80M 80 V LFPAK88 N-MOSFET |
+| High current | OUT2 | 20 A | 18 A | TPS48110AQDGXRQ1-class controller plus selected IAUT300N08S5N012ATMA2 80 V TOLL N-MOSFET |
+| Medium current | OUT1, OUT3, OUT4, OUT6, OUT7, OUT10 | 10-15 A | 8-12 A | TPS48110AQDGXRQ1-class controller plus selected IAUT300N08S5N012ATMA2 80 V TOLL N-MOSFET |
+| Low current | OUT5, OUT8, OUT9 | 5 A | 4 A | TPS48110AQDGXRQ1-class controller plus selected IAUT300N08S5N012ATMA2 80 V TOLL N-MOSFET |
 
 ## Required schematic blocks
 

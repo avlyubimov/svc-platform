@@ -218,10 +218,17 @@ def validate_symbol_capture_worklist() -> None:
         worklist_keys.add(symbol_key)
 
         concrete_symbol_name = row["Concrete symbol name"].strip()
-        if not concrete_symbol_name.startswith("PB100_") or not concrete_symbol_name.endswith("_PRELIM"):
+        exact_selected_symbols = {
+            "PB100_POWER_NMOS_TOLL_80V",
+            "PB100_SM8S33AHM3I",
+        }
+        if not concrete_symbol_name.startswith("PB100_") or (
+            not concrete_symbol_name.endswith("_PRELIM")
+            and concrete_symbol_name not in exact_selected_symbols
+        ):
             fail(
                 f"{path.relative_to(REPO_ROOT)}:{row_number}: concrete symbol name "
-                "must use PB100_*_PRELIM"
+                "must use PB100_*_PRELIM or an explicitly selected exact symbol"
             )
         if row["Library"].strip() != "PB100":
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: library must be PB100")
@@ -250,7 +257,7 @@ def validate_symbol_capture_worklist() -> None:
         if "do not" not in row["Blocked action"].lower():
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocked action must be explicit")
 
-        created = "preliminary symbol created" in row["Pin evidence status"].strip().lower()
+        created = "symbol created" in row["Pin evidence status"].strip().lower()
         symbol_present = f'(symbol "{concrete_symbol_name}"' in symbol_text
         if not created:
             if not row["Pin evidence status"].strip().lower().startswith("pending"):
@@ -280,7 +287,7 @@ def validate_symbol_capture_progress() -> None:
     symbol_text = read_text(KICAD_DIR / "lib" / "PB100.kicad_sym")
     for row_number, row in enumerate(rows, 2):
         pin_status = row["Pin evidence status"].strip().lower()
-        if "preliminary symbol created" not in pin_status:
+        if "symbol created" not in pin_status:
             continue
 
         symbol_name = row["Concrete symbol name"].strip()
@@ -314,9 +321,12 @@ def validate_symbol_capture_progress() -> None:
         if symbol_name == "PB100_JPB1_100PIN_PRELIM":
             if '(property "Footprint" "PB100:FX18-100P-0.8SV10_Hirose"' not in symbol_block:
                 fail("JPB1 preliminary symbol must bind the Product Owner-approved FX18 footprint")
-        elif symbol_name == "PB100_POWER_NMOS_ESCAPE_PRELIM":
-            if '(property "Footprint" "PB100:LFPAK88_SOT1235_Nexperia"' not in symbol_block:
-                fail("selected 80 V power MOSFET symbol must bind the reviewed LFPAK88 footprint")
+        elif symbol_name == "PB100_POWER_NMOS_TOLL_80V":
+            if '(property "Footprint" "PB100:PG-HSOF-8-1_TOLL_Infineon"' not in symbol_block:
+                fail("selected 80 V power MOSFET symbol must bind the reviewed TOLL footprint")
+        elif symbol_name == "PB100_SM8S33AHM3I":
+            if '(property "Footprint" "PB100:DO-218AC_Vishay_SM8S"' not in symbol_block:
+                fail("selected SM8S33AHM3/I symbol must bind the reviewed DO-218AC footprint")
         elif '(property "Footprint" ""' not in symbol_block:
             fail(f"preliminary symbol {symbol_name} must not lock a footprint")
 
@@ -352,7 +362,7 @@ def validate_symbol_pin_evidence() -> None:
     created_symbols = {
         row["Concrete symbol name"].strip()
         for row in worklist_rows
-        if "preliminary symbol created" in row["Pin evidence status"].strip().lower()
+        if "symbol created" in row["Pin evidence status"].strip().lower()
     }
 
     symbol_text = read_text(KICAD_DIR / "lib" / "PB100.kicad_sym")
@@ -510,19 +520,16 @@ def validate_symbol_footprint_pad_map() -> None:
 
 
 def validate_input_reverse_fet_symbol_evidence() -> None:
-    symbol_name = "PB100_POWER_NMOS_ESCAPE_PRELIM"
+    symbol_name = "PB100_POWER_NMOS_TOLL_80V"
     symbol_text = read_text(KICAD_DIR / "lib" / "PB100.kicad_sym")
     block = symbol_block(symbol_text, symbol_name)
     if not block:
         fail(f"{symbol_name} must exist after Q1 pin evidence is captured")
 
-    for pin_number, pin_name in (
-        ("1", "G"),
-        ("2", "S"),
-        ("3", "S"),
-        ("4", "S"),
-        ("mb", "D"),
-    ):
+    expected_pins = (("1", "G"),) + tuple(
+        (str(pin_number), "S") for pin_number in range(2, 9)
+    ) + (("Tab", "D"),)
+    for pin_number, pin_name in expected_pins:
         expected_name = f'(name "{pin_name}"'
         expected_number = f'(number "{pin_number}"'
         if not any(expected_name in line and expected_number in line for line in block.splitlines()):
@@ -532,16 +539,16 @@ def validate_input_reverse_fet_symbol_evidence() -> None:
         fail(f"{symbol_name} must remain excluded from BOM")
     if "(on_board no)" not in block:
         fail(f"{symbol_name} must remain excluded from board")
-    if '(property "Value" "BUK7S1R2-80M"' not in block:
-        fail(f"{symbol_name} must lock the Product Owner-approved BUK7S1R2-80M value")
-    if '(property "Footprint" "PB100:LFPAK88_SOT1235_Nexperia"' not in block:
-        fail(f"{symbol_name} must bind the reviewed LFPAK88 footprint")
+    if '(property "Value" "IAUT300N08S5N012ATMA2"' not in block:
+        fail(f"{symbol_name} must lock the Product Owner-approved IAUT300N08S5N012ATMA2 value")
+    if '(property "Footprint" "PB100:PG-HSOF-8-1_TOLL_Infineon"' not in block:
+        fail(f"{symbol_name} must bind the reviewed TOLL footprint")
 
     open_items_text = read_text(PB100_DIR / "PB-100-symbol-open-items.md")
     if "Evidence captured" not in open_items_text:
         fail("Q1 symbol-open-items row must mark evidence captured")
-    if "40 A copper/thermal review remains open" not in open_items_text:
-        fail("Q1 symbol-open-items row must keep 40 A copper/thermal review open")
+    if "final plane/polygon/bus review remains a layout gate" not in open_items_text.lower():
+        fail("Q1 symbol-open-items row must preserve the later physical thermal gate")
 
 
 def validate_jpb1_symbol_from_pin_map() -> None:
@@ -652,15 +659,18 @@ def validate_instance_symbol_map() -> None:
                 f"{path.relative_to(REPO_ROOT)}:{row_number}: {ref} maps to {symbol_name}, "
                 f"but worklist uses {worklist_row['Concrete symbol name'].strip()}"
             )
-        if symbol_state not in {"Created", "Pending"}:
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Symbol state must be Created or Pending")
+        if symbol_state not in {"Created", "Selected", "Pending"}:
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: "
+                "Symbol state must be Created, Selected, or Pending"
+            )
         symbol_present = f'(symbol "{symbol_name}"' in symbol_text
-        if symbol_state == "Created" and not symbol_present and symbol_name not in PIN_MAP_EVIDENCE_SYMBOLS:
+        if symbol_state in {"Created", "Selected"} and not symbol_present and symbol_name not in PIN_MAP_EVIDENCE_SYMBOLS:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: created symbol is missing: {symbol_name}")
         if symbol_state == "Pending" and symbol_present:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: pending symbol is already present: {symbol_name}")
         if ref == "Q102" and not all(
-            token in row["Notes"] for token in ("BUK7S1R2-80M", "SOA", "thermal")
+            token in row["Notes"] for token in ("IAUT300N08S5N012ATMA2", "SOA", "thermal")
         ):
             fail("Q102 instance-symbol map must preserve selected 80 V SOA/thermal evidence")
 

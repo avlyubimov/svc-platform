@@ -17,7 +17,7 @@
 		(uuid "5506d672-548a-41d7-b862-3bfa66653777")
 		(effects (font (size 1 1) (thickness 0.15)))
 	)
-	(property "Datasheet" "https://www.vishay.com/docs/98647/sm8s85ahm3.pdf"
+	(property "Datasheet" "https://www.vishay.com/docs/88392/sm8s.pdf"
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)

@@ -1,14 +1,14 @@
 Ref,Symbol key,Concrete symbol name,Interface point,Planned net,Direction,Default state,Freeze dependency
 J1,INPUT_CONNECTOR,PB100_INPUT_CONNECTOR_CLASS_PRELIM,Battery positive,VBAT_RAW,Harness to PB-100,Protected by near-battery main fuse,Garage connector current derating closes
 J1,INPUT_CONNECTOR,PB100_INPUT_CONNECTOR_CLASS_PRELIM,Battery return,GND,Harness to PB-100,Return path present,Ground return and harness gauge review closes
-D1,INPUT_TVS,PB100_INPUT_TVS_PRELIM,Clamp high side,VBAT_RAW,Clamp to ground,Inactive until transient,TVS clamp and overshoot margin close
-D1,INPUT_TVS,PB100_INPUT_TVS_PRELIM,Clamp return,GND,Clamp to ground,Return path present,TVS pulse-current return review closes
+D1,INPUT_TVS,PB100_SM8S33AHM3I,Clamp high side,VBAT_RAW,Clamp to ground,Inactive until transient,TVS clamp and overshoot margin close
+D1,INPUT_TVS,PB100_SM8S33AHM3I,Clamp return,GND,Clamp to ground,Return path present,TVS pulse-current return review closes
 U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Input sense,VBAT_RAW,PB-100 sense,Tracks raw fused battery,Reverse-controller datasheet review closes
 U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Protected sense,VBAT_REV_PROT,PB-100 sense,Valid after reverse path,Reverse-controller threshold and surge review closes
 U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Reverse FET gate drive,INPUT_FET_GATE,Controller to FET,Off when controller unpowered,Gate clamp and turn-off behavior review closes
-Q1,INPUT_REVERSE_FET,PB100_POWER_NMOS_ESCAPE_PRELIM,Raw-side source terminal,VBAT_RAW,Power path,BUK7S1R2-80M pins 2-4 source orientation reviewed in schematic,LFPAK88 40 A SOA copper and thermal review close
-Q1,INPUT_REVERSE_FET,PB100_POWER_NMOS_ESCAPE_PRELIM,Protected-side mounting-base drain,VBAT_REV_PROT,Power path,BUK7S1R2-80M mounting-base drain orientation reviewed in schematic,LFPAK88 40 A SOA copper and thermal review close
-Q1,INPUT_REVERSE_FET,PB100_POWER_NMOS_ESCAPE_PRELIM,Gate pin 1,INPUT_FET_GATE,Controller to FET,Off when controller is unpowered,Gate clamp and 40 A thermal review close
+Q1,INPUT_REVERSE_FET,PB100_POWER_NMOS_TOLL_80V,Raw-side source terminal,VBAT_RAW,Power path,IAUT300N08S5N012ATMA2 pins 2-8 source orientation reviewed in schematic,TOLL 40 A SOA copper and thermal review close
+Q1,INPUT_REVERSE_FET,PB100_POWER_NMOS_TOLL_80V,Protected-side Tab drain,VBAT_REV_PROT,Power path,IAUT300N08S5N012ATMA2 Tab drain orientation reviewed in schematic,TOLL 40 A SOA copper and thermal review close
+Q1,INPUT_REVERSE_FET,PB100_POWER_NMOS_TOLL_80V,Gate pin 1,INPUT_FET_GATE,Controller to FET,Off when controller is unpowered,Gate clamp and 40 A thermal review close
 RSH1,TOTAL_CURRENT_SHUNT,PB100_INPUT_SHUNT_PRELIM,High-side Kelvin,IIN_SHUNT_HI,Measurement,Zero current baseline,0.5mΩ shunt value and power rating close
 RSH1,TOTAL_CURRENT_SHUNT,PB100_INPUT_SHUNT_PRELIM,Low-side Kelvin,IIN_SHUNT_LO,Measurement,Zero current baseline,0.5mΩ Kelvin routing review close
 RSH1,TOTAL_CURRENT_SHUNT,PB100_INPUT_SHUNT_PRELIM,Protected output,VBAT_PROT,Power path,Feeds protected board rail,0.5mΩ shunt dissipation and copper review close

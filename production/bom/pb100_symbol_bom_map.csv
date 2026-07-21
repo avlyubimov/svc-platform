@@ -1,11 +1,11 @@
 Symbol key,BOM file,BOM item,Qty basis,Population,Assembly owner,Status,Notes
 HS_CTRL,factory_bom_draft.csv,High-side switch/controller,10,Populated,Factory,Candidate,One controller per generic output channel
-OUT_FET,factory_bom_draft.csv,MOSFET,10,Populated,Factory,Selected 80 V,BUK7S1R2-80M external MOSFET per output channel
-OUT2_ESCAPE_FET,factory_bom_draft.csv,MOSFET,1 within output quantity,Populated selected path,Factory,Selected 80 V,Q102 uses BUK7S1R2-80M while OUT2 SOA and thermal remain conditional
+OUT_FET,factory_bom_draft.csv,MOSFET,10,Populated,Factory,Selected 80 V TOLL,IAUT300N08S5N012ATMA2 external MOSFET per output channel; generated class SOA passes
+OUT2_ESCAPE_FET,factory_bom_draft.csv,MOSFET,1 within output quantity,Populated selected path,Factory,Selected 80 V TOLL,Q102 uses IAUT300N08S5N012ATMA2 and the 30A/100ms 80A/4ms 95.91A/5us envelope passes
 INPUT_IDEAL_DIODE,factory_bom_draft.csv,Reverse protection,1,Populated,Factory,Candidate,LM74700-class controller plus external MOSFET strategy
 INPUT_CONNECTOR,garage_bom_draft.csv,Battery input connector,1,Garage installed,Garage,Conditional,High-current sealed connector or ring-lug harness entry TBD
-INPUT_REVERSE_FET,factory_bom_draft.csv,Input reverse MOSFET,1,Populated,Factory,Selected 80 V,BUK7S1R2-80M LFPAK88 selected pending 40 A SOA thermal and sourcing evidence
-INPUT_TVS,factory_bom_draft.csv,TVS protection,1,Populated,Factory,Conditional,Clamp voltage must match downstream device limits
+INPUT_REVERSE_FET,factory_bom_draft.csv,Input reverse MOSFET,1,Populated,Factory,Selected 80 V TOLL,IAUT300N08S5N012ATMA2 TOLL hot bound is 4.032W at 40A with 125C case ceiling
+INPUT_TVS,factory_bom_draft.csv,TVS protection,1,Populated,Factory,Selected,SM8S33AHM3/I DO-218AC with generated 59.45V bounded downstream stress
 LOGIC_BUCK,factory_bom_draft.csv,DC/DC,1,Populated,Factory,Candidate,Protected PB_5V_OUT logic rail regulator
 LOGIC_BUCK_INDUCTOR,factory_bom_draft.csv,Buck inductor,1,Populated,Factory,Value TBD,Value and saturation current close with buck design
 TOTAL_CURRENT_MONITOR,factory_bom_draft.csv,Current sensor,1,Populated,Factory,Candidate,Total input current monitor plus controller IMON paths

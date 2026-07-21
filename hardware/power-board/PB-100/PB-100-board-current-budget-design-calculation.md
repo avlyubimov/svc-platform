@@ -1,6 +1,6 @@
 # PB-100 Board Current Budget Design Calculation
 
-Status: Schematic-freeze evidence, not frozen
+Status: PBREL current-budget evidence closed; schematic freeze remains open
 
 This document converts the ADR-0008 current-budget decision into a numeric
 pre-layout check for PB-100 Rev.1. It is not a PCB layout package. No PCB layout copper geometry,
@@ -17,7 +17,7 @@ authorized by this calculation.
 | Total-current telemetry range | 0-60 A | `PB-100-current-telemetry-map.csv` |
 | Total-current shunt candidate | 0.5 mΩ four-terminal AEC-Q200 class | `PB-100-input-power-design-values.csv` |
 | Summed output current limits | 82 A | PB-100 capability manifest |
-| Reverse-FET thermal multiplier | 2.0 × room-temperature Rds(on) | `PB-100-thermal-estimates.csv` |
+| Reverse-FET hot bound | 2.1 × maximum room-temperature Rds(on) | `PB-100-input-q1-evidence.csv` |
 
 The 82 A summed output limit is intentionally oversubscribed. The board is not
 sized for simultaneous maximum output current. Configuration stays separate from firmware,
@@ -65,13 +65,14 @@ budget and 0-60 A telemetry range.
 
 Equation:
 
-- `Pfet = I^2 * Rds(on) * 2.0`
+- `Rds_hot = Rds25_max * 2.1`
+- `Pfet = I^2 * Rds_hot`
 
 | Candidate path | Package class | Rds(on) basis | 40 A dissipation | 50 A dissipation | 60 A dissipation | Release note |
 |---|---|---:|---:|---:|---:|---|
-| `BUK7S1R2-80M` | selected 80 V LFPAK88 | 1.2 mΩ nominal with 2.0 hot-review multiplier | 3.84 W | 6.00 W | 8.64 W | Selected for Q1; SOA, copper, enclosure thermal and assembly evidence remain open |
-| `IAUTN08S5N012L` | 80 V TOLL / PG-HSOF-8-1 | exact hot RDS(on) to be normalized in substitution review | TBD | TBD | TBD | Non-drop-in 80 V alternative; cannot replace Q1 without renewed thermal and pin-map evidence |
-| `BUK7J2R4-80M` | 80 V LFPAK56E | exact hot RDS(on) to be normalized in substitution review | TBD | TBD | TBD | Non-drop-in 80 V alternative; cannot replace Q1 without renewed thermal and assembly evidence |
+| `IAUT300N08S5N012ATMA2` | selected 80 V PG-HSOF-8-1 TOLL | 1.2 mΩ maximum with 2.1 hot-review multiplier | 4.032 W | 6.30 W | 9.072 W | Selected for Q1; generated pre-layout SOA/thermal passes and physical copper/enclosure validation remains later |
+| `IAUT300N08S5N014ATMA1` | same-footprint 80 V TOLL | 1.4 mΩ maximum with 2.1 planning multiplier | 4.704 W | 7.35 W | 10.584 W | Controlled alternative A; repeat electrical/SOA review before substitution |
+| `BUK7J2R4-80MX` | non-drop-in 80 V LFPAK56E | 2.4 mΩ maximum with 2.0 planning multiplier | 7.68 W | 12.00 W | 17.28 W | Controlled alternative B; repeat pin-map thermal and assembly review before substitution |
 
 Former `IAUTN06S5N008ATMA1` and dual `SIDR626LDP` 60 V calculations are
 retained in historical decision artifacts only and are not Rev.1 assembly
@@ -91,10 +92,10 @@ loss check for any future proposed high-current copper segment is:
 - Every 1 mΩ in the protected high-current path dissipates 2.5 W at 50 A.
 - Every 1 mΩ in the protected high-current path dissipates 3.6 W at 60 A.
 
-Before schematic freeze can close PBREL-002, the release packet must still
-review connector derating, battery-input wire gauge, shunt package heating,
-Q1 package thermal path, protected-rail distribution, and bench telemetry
-calibration.
+PBREL-002 pre-layout evidence is closed. Schematic freeze still requires the
+selected values to be promoted and reviewed; layout and prototype gates still
+cover connector derating, wire gauge, shunt heating, physical Q1 thermal path,
+protected-rail distribution, and bench telemetry calibration.
 
 ## Freeze Requirements
 
@@ -103,7 +104,7 @@ calibration.
   limit.
 - Keep total-current telemetry independent of summed per-output IMON.
 - Keep the total-current shunt four-terminal with Kelvin sense.
-- Keep Q1 package and alternate paths visible until the 40 A thermal review
-  closes.
+- Keep the selected Q1 and both controlled 80 V alternatives traceable; preserve
+  the 125 C case ceiling and later plane/polygon/bus thermal review.
 - Keep `PB-100.kicad_pcb` absent and block all layout/manufacturing output until
   the schematic freeze checklist closes.

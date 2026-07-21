@@ -24,7 +24,6 @@ from .common import (
     read_text,
     validate_csv,
     validate_no_role_tokens_in_row,
-    validate_not_final_value_status,
 )
 
 
@@ -140,9 +139,13 @@ def validate_output_stage_design_values() -> None:
         for column in ("Applies to", "Related net pattern", "Candidate direction", "Freeze dependency", "Notes"):
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
-        validate_not_final_value_status(path, row_number, row["Value status"])
-        if "schematic freeze" not in row["Freeze dependency"].lower():
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze dependency must reference schematic freeze")
+        if row["Value status"].strip() != "Selected final pre-layout":
+            fail(
+                f"{path.relative_to(REPO_ROOT)}:{row_number}: "
+                "output design value must be Selected final pre-layout"
+            )
+        if "freeze" not in row["Freeze dependency"].lower():
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze dependency must remain explicit")
         related_patterns = [part.strip() for part in row["Related net pattern"].split(";")]
         if not related_patterns:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: missing related net pattern")
@@ -220,8 +223,9 @@ def validate_output_stage_value_freeze_checklist() -> None:
         "OUT2",
         "20A fuse",
         "18A configured limit",
-        "40A 1s",
-        "80A 100ms",
+        "30A 100ms",
+        "80A 4ms",
+        "95.91A 5us",
         "OUTn_IWRN_SET",
         "OUTn_ISCP_SET",
         "OUTn_TMR",
@@ -232,7 +236,7 @@ def validate_output_stage_value_freeze_checklist() -> None:
         "0-30A",
         "0-20A",
         "0-8A",
-        "BUK7S1R2-80M",
+        "IAUT300N08S5N012ATMA2",
         "80V",
         "No PCB layout",
         "PB-100.kicad_pcb",
@@ -271,8 +275,8 @@ def validate_output_stage_value_derivation_precheck() -> None:
         row_text = " ".join(row.values()).lower()
         if derivation_id == "OUTDRV-004" and ("equation 6" not in row_text or "riwrn" not in row_text):
             fail("output derivation precheck must include RIWRN Equation 6")
-        if derivation_id == "OUTDRV-005" and ("equation 7" not in row_text or "10ms" not in row_text):
-            fail("output derivation precheck must include TMR Equation 7 and OUT2 10ms boundary")
+        if derivation_id == "OUTDRV-005" and ("equation 7" not in row_text or "9.95ms" not in row_text):
+            fail("output derivation precheck must include TMR Equation 7 and selected 9.95ms timing")
         if derivation_id == "OUTDRV-006" and ("equation 11" not in row_text or "riscp" not in row_text):
             fail("output derivation precheck must include RISCP Equation 11")
         if derivation_id == "OUTDRV-007" and ("equation 12" not in row_text or "equation 13" not in row_text):
@@ -396,7 +400,7 @@ def validate_output_stage_closeout_precheck() -> None:
         "Gate drive resistors",
         "Current sense topology",
         "Inductive clamp strategy",
-        "Value status TBD not final",
+        "Value status Selected final pre-layout",
         "OUTn_IWRN_SET",
         "OUTn_ISCP_SET",
         "OUTn_TMR",
@@ -406,7 +410,7 @@ def validate_output_stage_closeout_precheck() -> None:
         "RIWRN",
         "RISCP",
         "CTMR",
-        "10ms",
+        "9.95ms",
         "OUTn_BST",
         "OUTn_PU",
         "OUTn_PD",
@@ -426,15 +430,16 @@ def validate_output_stage_closeout_precheck() -> None:
         "LB-100 ADC",
         "OUT2 SOA",
         "fuse energy",
-        "40A 1s",
-        "80A 100ms",
-        "BUK7S1R2-80M",
+        "30A 100ms",
+        "80A 4ms",
+        "95.91A 5us",
+        "IAUT300N08S5N012ATMA2",
         "80V",
         "PB-100-tvs-load-dump-margin-trace.csv",
         "PB-100-mosfet-voltage-margin-review.md",
         "ADR-0011",
         "external-controller",
-        "BUK7S1R2-80M 80V N-MOSFET",
+        "IAUT300N08S5N012ATMA2 80V N-MOSFET",
         "no direct 40 V smart-switch rail",
         "no direct 40V smart-switch rail",
         "output-channel-template.kicad_sch",
@@ -463,8 +468,11 @@ def validate_output_stage_closeout_precheck() -> None:
         output_class = row["Output class"].strip()
         if output_class in seen_items:
             seen_items[output_class].add(row["Design item"].strip())
-            if "tbd not final" not in row["Value status"].lower():
-                fail("output-stage closeout precheck requires design values to remain non-final before freeze")
+            if row["Value status"].strip() != "Selected final pre-layout":
+                fail(
+                    "output-stage closeout precheck requires generated values to be "
+                    "selected final pre-layout"
+                )
     for output_class, items in seen_items.items():
         missing_items = sorted(REQUIRED_OUTPUT_STAGE_ITEMS - items)
         if missing_items:
@@ -515,7 +523,7 @@ def validate_low_current_output_baseline_trace() -> None:
             "Low current",
             "5",
             "4",
-            "TPS48110AQDGXRQ1 plus selected BUK7S1R2-80M 80V LFPAK88 N-MOSFET",
+            "TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET",
             "configuration only",
             "no direct 40 V smart-switch rail",
             "future ADR",
@@ -632,7 +640,7 @@ def validate_high_medium_output_baseline_trace() -> None:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
         row_text = " ".join(row.values())
-        for token in ("TPS48110AQDGXRQ1 plus selected BUK7S1R2-80M 80V LFPAK88 MOSFET", "layout"):
+        for token in ("TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL MOSFET", "layout"):
             if token not in row_text:
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: high/medium row must include {token}")
 
@@ -671,7 +679,7 @@ def validate_high_medium_output_baseline_trace() -> None:
                 fail(f"{output} must exist in matrix, capability manifest, and config example")
             if matrix_row["Class"].strip() != expected["class"]:
                 fail(f"{output} must remain {expected['class']} in output channel matrix")
-            if matrix_row["Initial switch direction"].strip() != "TPS48110AQDGXRQ1 plus selected BUK7S1R2-80M 80V LFPAK88 N-MOSFET":
+            if matrix_row["Initial switch direction"].strip() != "TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET":
                 fail(f"{output} must keep TPS48110 external MOSFET switch direction")
             if int(matrix_row["Target fuse A"]) != int(expected["fuses"]):
                 fail(f"{output} fuse target must match high/medium trace")
@@ -753,8 +761,9 @@ def validate_high_medium_output_freeze_review() -> None:
         "OUT2",
         "20A fuse",
         "18A configured limit",
-        "40A 1s",
-        "80A 100ms",
+        "30A 100ms",
+        "80A 4ms",
+        "95.91A 5us",
         "OUT2 escape path",
         "OUT1",
         "OUT3 OUT4 OUT6 OUT7 OUT10",
@@ -784,12 +793,12 @@ def validate_high_medium_output_freeze_review() -> None:
             fail(f"high/medium output freeze review must cite {token}")
 
     high_medium_text = read_text(PB100_DIR / "PB-100-high-medium-output-baseline-trace.csv")
-    for token in ("OUT2", "OUT1", "OUT3 OUT4 OUT6 OUT7 OUT10", "TPS48110AQDGXRQ1 plus selected BUK7S1R2-80M 80V LFPAK88 MOSFET"):
+    for token in ("OUT2", "OUT1", "OUT3 OUT4 OUT6 OUT7 OUT10", "TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL MOSFET"):
         if token not in high_medium_text:
             fail(f"high/medium baseline trace must support freeze review token {token}")
 
     soa_text = read_text(PB100_DIR / "PB-100-out2-soa-envelope.csv")
-    for token in ("40", "1 s", "80", "100 ms", "10 ms max"):
+    for token in ("30", "100 ms", "80", "4 ms", "95.91", "5 us max"):
         if token not in soa_text:
             fail(f"OUT2 SOA envelope must support freeze review token {token}")
 
@@ -843,7 +852,7 @@ def validate_low_current_output_freeze_review() -> None:
         "5A fuse",
         "4A configured current limit",
         "TPS48110AQDGXRQ1",
-        "BUK7S1R2-80M 80V external N-MOSFET",
+        "IAUT300N08S5N012ATMA2 80V external N-MOSFET",
         "no direct 40V smart-switch rail",
         "future ADR",
         "OUTn_CTL",

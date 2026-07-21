@@ -1,10 +1,10 @@
 Path,Output class,Current A,Rds or Ron ohm,Temperature multiplier,Estimated dissipation W,Status,Notes
-BUK7S1R2-80M 80 V external MOSFET,High current OUT2,18,0.0012,2.0,0.78,Needs thermal validation,125 C maximum RDS(on) 2.4mOhm equivalent; excludes switching and inrush
-BUK7S1R2-80M 80 V external MOSFET,Medium current 12A channel,12,0.0012,2.0,0.35,Needs thermal validation,Applies to OUT1 class; excludes switching loss
-BUK7S1R2-80M 80 V external MOSFET,Medium current 8A channel,8,0.0012,2.0,0.15,Needs thermal validation,Applies to OUT3 OUT4 OUT6 OUT7 OUT10 class
-BUK7S1R2-80M 80 V external MOSFET,Low current 4A channel,4,0.0012,2.0,0.04,Rev.1 baseline estimate,Applies to OUT5 OUT8 OUT9; controller losses excluded
+IAUT300N08S5N012ATMA2 80 V external MOSFET,High current OUT2,18,0.0012,2.1,0.816,Generated pre-layout bound,2.52mOhm hot equivalent; excludes switching and documented pulse envelopes
+IAUT300N08S5N012ATMA2 80 V external MOSFET,Medium current 12A channel,12,0.0012,2.1,0.363,Generated pre-layout bound,Applies to OUT1 class; excludes switching loss
+IAUT300N08S5N012ATMA2 80 V external MOSFET,Medium current 8A channel,8,0.0012,2.1,0.161,Generated pre-layout bound,Applies to OUT3 OUT4 OUT6 OUT7 OUT10 class
+IAUT300N08S5N012ATMA2 80 V external MOSFET,Low current 4A channel,4,0.0012,2.1,0.040,Generated pre-layout bound,Applies to OUT5 OUT8 OUT9; controller losses excluded
 TPS2HB35 integrated switch,Low current 4A channel,4,0.035,2.0,1.12,Deferred alternate,Not Rev.1 baseline after ADR-0011
 TPS2HB16 integrated switch,Low current 4A channel,4,0.016,2.0,0.51,Deferred alternate,Not Rev.1 baseline after ADR-0011
-BUK7S1R2-80M 80 V input reverse MOSFET,Board input 40A budget,40,0.0012,2.0,3.84,Selected input strategy,LFPAK88 package assembly SOA copper and PCB thermal must be checked
-IAUTN08S5N012L 80 V input reverse alternate,Board input 40A budget,40,0.0012,2.0,3.84,Documented alternate,TOLL package uses separate footprint and requires controlled substitution review
+IAUT300N08S5N012ATMA2 80 V input reverse MOSFET,Board input 40A budget,40,0.0012,2.1,4.032,Selected input strategy,TOLL package assembly SOA passes pre-layout; physical copper and enclosure thermal remain later gates
+IAUT300N08S5N014 80 V input reverse alternate,Board input 40A budget,40,0.0014,2.1,4.704,Documented alternate,TOLL package is same-footprint but requires controlled electrical substitution review
 BUK7J2R4-80M 80 V input reverse alternate,Board input 40A budget,40,0.0024,2.0,7.68,Documented alternate,LFPAK56E requires separate SOA thermal footprint and assembly review

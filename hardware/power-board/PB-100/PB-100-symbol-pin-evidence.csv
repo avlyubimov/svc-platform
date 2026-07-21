@@ -43,8 +43,8 @@ PB100_INA228_Q1_PRELIM,7,GND,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLY
 PB100_INA228_Q1_PRELIM,8,VBUS,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,Bus voltage input
 PB100_INA228_Q1_PRELIM,9,IN-,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,Current sense negative input
 PB100_INA228_Q1_PRELIM,10,IN+,https://www.ti.com/lit/ds/symlink/ina228-q1.pdf,SLYS022A June 2021,DGS VSSOP-10,Current sense positive input
-PB100_INPUT_TVS_PRELIM,1,VBAT_PROT,hardware/power-board/PB-100/PB-100-protection-validation.csv,Internal Rev.1 schematic class,TVS class,Protected rail side of input TVS
-PB100_INPUT_TVS_PRELIM,2,GND,hardware/power-board/PB-100/PB-100-protection-validation.csv,Internal Rev.1 schematic class,TVS class,Ground side of input TVS
+PB100_SM8S33AHM3I,1,VBAT_PROT,https://www.vishay.com/docs/88392/sm8s.pdf,Vishay SM8S Rev. 27-Oct-2023,DO-218AC,Protected rail side of selected SM8S33AHM3/I
+PB100_SM8S33AHM3I,2,GND,https://www.vishay.com/docs/88392/sm8s.pdf,Vishay SM8S Rev. 27-Oct-2023,DO-218AC,Ground side of selected SM8S33AHM3/I
 PB100_INPUT_SHUNT_PRELIM,1,PWR_IN,hardware/power-board/PB-100/PB-100-current-telemetry.md,Internal Rev.1 schematic class,Four-terminal shunt class,High-current input side
 PB100_INPUT_SHUNT_PRELIM,2,PWR_OUT,hardware/power-board/PB-100/PB-100-current-telemetry.md,Internal Rev.1 schematic class,Four-terminal shunt class,High-current protected rail side
 PB100_INPUT_SHUNT_PRELIM,3,SNS_IN,hardware/power-board/PB-100/PB-100-current-telemetry.md,Internal Rev.1 schematic class,Four-terminal shunt class,Kelvin sense input side
@@ -82,11 +82,15 @@ PB100_SIDR626LDP_PRELIM,5,D,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B M
 PB100_SIDR626LDP_PRELIM,6,D,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B May 2024,PowerPAK SO-8DC,Drain lead
 PB100_SIDR626LDP_PRELIM,7,D,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B May 2024,PowerPAK SO-8DC,Drain lead
 PB100_SIDR626LDP_PRELIM,8,D,https://www.vishay.com/doc/?77277=,S24-0476 Rev. B May 2024,PowerPAK SO-8DC,Drain lead
-PB100_POWER_NMOS_ESCAPE_PRELIM,1,G,https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf,Preliminary data sheet February 2024,LFPAK88 SOT1235,Gate
-PB100_POWER_NMOS_ESCAPE_PRELIM,2,S,https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf,Preliminary data sheet February 2024,LFPAK88 SOT1235,Source
-PB100_POWER_NMOS_ESCAPE_PRELIM,3,S,https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf,Preliminary data sheet February 2024,LFPAK88 SOT1235,Source
-PB100_POWER_NMOS_ESCAPE_PRELIM,4,S,https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf,Preliminary data sheet February 2024,LFPAK88 SOT1235,Source
-PB100_POWER_NMOS_ESCAPE_PRELIM,mb,D,https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf,Preliminary data sheet February 2024,LFPAK88 SOT1235,Mounting base connected to drain
+PB100_POWER_NMOS_TOLL_80V,1,G,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf,Data Sheet Rev. 1.2 2022-04-21,PG-HSOF-8-1 TOLL,Gate
+PB100_POWER_NMOS_TOLL_80V,2,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf,Data Sheet Rev. 1.2 2022-04-21,PG-HSOF-8-1 TOLL,Source
+PB100_POWER_NMOS_TOLL_80V,3,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf,Data Sheet Rev. 1.2 2022-04-21,PG-HSOF-8-1 TOLL,Source
+PB100_POWER_NMOS_TOLL_80V,4,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf,Data Sheet Rev. 1.2 2022-04-21,PG-HSOF-8-1 TOLL,Source
+PB100_POWER_NMOS_TOLL_80V,5,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf,Data Sheet Rev. 1.2 2022-04-21,PG-HSOF-8-1 TOLL,Source
+PB100_POWER_NMOS_TOLL_80V,6,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf,Data Sheet Rev. 1.2 2022-04-21,PG-HSOF-8-1 TOLL,Source
+PB100_POWER_NMOS_TOLL_80V,7,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf,Data Sheet Rev. 1.2 2022-04-21,PG-HSOF-8-1 TOLL,Source
+PB100_POWER_NMOS_TOLL_80V,8,S,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf,Data Sheet Rev. 1.2 2022-04-21,PG-HSOF-8-1 TOLL,Source
+PB100_POWER_NMOS_TOLL_80V,Tab,D,https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf,Data Sheet Rev. 1.2 2022-04-21,PG-HSOF-8-1 TOLL,Drain tab
 PB100_CAN1_TX_DISABLE_PRELIM,1,CAN1_TX_DISABLE_CMD,hardware/power-board/PB-100/PB-100-can1-tx-disable.md,Internal Rev.1 schematic class,DNP/default-disabled CAN1 safety gate,Disable command input
 PB100_CAN1_TX_DISABLE_PRELIM,2,CAN1_TX_DISABLED_STATUS,hardware/power-board/PB-100/PB-100-can1-tx-disable.md,Internal Rev.1 schematic class,DNP/default-disabled CAN1 safety gate,Disable status output
 PB100_CAN1_TX_DISABLE_PRELIM,3,CAN1_TX_ROUTE,hardware/power-board/PB-100/PB-100-can1-tx-disable.md,Internal Rev.1 schematic class,DNP/default-disabled CAN1 safety gate,DNP/open TX route

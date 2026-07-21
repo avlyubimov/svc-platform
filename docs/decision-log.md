@@ -3307,3 +3307,42 @@ import still waits for its signal-integrity/safety layout model; FB controlled
 board import is ready. PB-100 retains five active blockers:
 PBREL-001/004/006/007/011. No `.kicad_pcb`, Gerber, drill, placement,
 manufacturing ZIP, or PCBA order artifact is created by this decision.
+
+## 2026-07-21 — PB-100 five pre-layout blocker closeout
+
+Decision: supersede the preliminary 2026-07-20 LFPAK88 selection with exact
+Infineon `IAUT300N08S5N012ATMA2`, an active/preferred automotive 80 V
+PG-HSOF-8-1 TOLL MOSFET, for Q1 and Q101-Q110. The same-footprint controlled
+alternative is `IAUT300N08S5N014ATMA1`; `BUK7J2R4-80MX` LFPAK56E remains a
+deliberately non-drop-in alternative. Generated Q1 evidence records the
+2.52 mOhm hot bound, 4.032 W loss at 40 A, 126.61 degC junction estimate at the
+125 degC case limit, and 48.39 degC absolute-junction margin.
+
+Decision: close PBREL-004 with generated per-class TPS48110-Q1 values and SOA
+envelopes. OUT2 is bounded at 30 A for 100 ms, 80 A for 4 ms, and 95.91 A for
+5 us; every output retains role-free configuration, local clamp, sense,
+timer, threshold, and fuse evidence. Physical pulse and thermal execution stay
+in the layout/prototype gates.
+
+Decision: close PBREL-007 with a reproducible transient model. The
+SM8S33AHM3/I 53.3 V raw 124 A clamp point is temperature-adjusted and combined
+with a 20 nH loop, 15 A/us edge, and 1 V uncertainty to produce a 59.45 V
+bounded stress. This leaves 20.55 V to the selected 80 V MOSFETs. Reopen the
+design if extracted clamp-loop inductance exceeds 20 nH or PB-BENCH-004
+measures 60 V or more.
+
+Decision: close PBREL-001 from the captured and exported CAN1 topology,
+including the DNP/open JP_CAN1 missing link, OE/TXD pulls, physical disabled
+readback, PB-owned transceiver/protection, RX-only return, and exact DTM04-4P /
+DTM06-4S harness boundary. Close PBREL-011 from the exact TOLL/TVS/output/CAN1
+and FX18 source/process routes, alternates, paste, DNP, inspection, and honest
+consignment evidence. Order-date stock, quote, DFM, FAI, DNP inspection, and
+bench execution remain later gates.
+
+Decision: generate release calculations from `tools/pb100_evidence/`, validate
+their freshness and cross-artifact bindings in
+`tools/pb100_validation/release_evidence.py`, and require the local PBREL
+closeout ledger and release manifest to match the blocker register. All twelve
+PBREL rows are now `Closed` for pre-layout evidence. PB-100 schematic freeze
+remains `Open` for controlled value-bearing sheet promotion, final review, and
+Product Owner approval; no PCB layout or manufacturing artifact is authorized.

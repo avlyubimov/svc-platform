@@ -11,8 +11,8 @@ fabrication packages, panel outputs, or PCBA orders.
 ## Closed In This Increment
 
 - TPS48110 high-side controller: `PB100:VSSOP-20_19P-L5.0-W3.0-P0.50-LS5.0-BL_PE16`.
-- BUK7S1R2-80M selected 80 V output and input-reverse MOSFET:
-  `PB100:LFPAK88_SOT1235_Nexperia`.
+- IAUT300N08S5N012ATMA2 selected 80 V output and input-reverse MOSFET:
+  `PB100:PG-HSOF-8-1_TOLL_Infineon`.
 - SIDR626LDP historical 60 V package evidence:
   `PB100:POWERPAK-SO-8_L6.1-W5.1-P1.27-BL-EP`; it is not a Rev.1 assembly
   substitute.

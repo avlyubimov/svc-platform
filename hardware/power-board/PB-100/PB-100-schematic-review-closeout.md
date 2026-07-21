@@ -44,10 +44,10 @@ remaining gates.
   baseline for all OUT1..OUT10 channels; low-current channels keep ADR-0011 no
   direct 40 V smart-switch rail.
 - Voltage margin: SM8S33AHM3/I HM3 DO-218AC TVS remains active, obsolete/NFD
-  TVS sources remain excluded, and BUK7S1R2-80M 80 V LFPAK88 is selected for
+  TVS sources remain excluded, and IAUT300N08S5N012ATMA2 80 V TOLL is selected for
   Q1 and Q101-Q110. Actual clamp-loop overshoot remains Conditional.
 - Input reverse protection: LM74700QDBVRQ1-class ideal-diode controller with
-  selected Q1 BUK7S1R2-80M 80 V LFPAK88 package strategy.
+  selected Q1 IAUT300N08S5N012ATMA2 80 V TOLL package strategy.
 - Logic power: LM5164QDDATQ1-class 100 V 1 A buck remains baseline with
   LM5013-Q1-class 100 V fallback; `PB_5V_OUT` remains limited to LB-100 and
   PB-side low-power circuitry, not accessory loads.

@@ -20,18 +20,22 @@ orders.
 
 ## PBREL-001 — CAN1 safety policy
 
-- Closeout status: Conditional.
+- Closeout status: Closed.
+- Closeout boundary: pre-layout evidence; see `PB-100-five-blocker-closeout-2026-07-21.md`.
 - Why blocker existed: vehicle CAN1 must remain read-only by hardware default,
   not only by firmware policy, and reset or unpowered states must not create a
   transmit path.
-- Candidate comparison: DNP/open `CAN1_TX_ROUTE` plus SN74LVC1G125-Q1-class
-  default-disabled gate and status readback is preferred; firmware-only disable
-  is rejected because it fails during firmware fault or reset; populated TX
+- Candidate comparison: SN74LVC1G125-Q1-class gate plus downstream DNP/open
+  `JP_CAN1`, an independent silent-mode DNP, and physical OE readback are
+  preferred; firmware-only disable is rejected because it fails during
+  firmware fault or reset; populated TX
   routing with a simple jumper is rejected because production can accidentally
   ship a transmit-capable path without a future ADR.
-- Recommended solution: keep `CAN1_TX_ROUTE` DNP/open by default, use
-  `CAN1_TX_DISABLE_CMD` and `CAN1_TX_DISABLED_STATUS` as physical safety/status
-  signals, retain future ADR plus explicit hardware action for any CAN1 TX.
+- Recommended solution: preserve `CAN1_TX_ROUTE -> U_CAN1 ->
+  CAN1_TX_GATE_OUT -> JP_CAN1 DNP/open -> CAN1_TXD_SAFE -> U_CAN1_PHY.TXD`,
+  keep RXD only on `CAN1_RX_ROUTE`, and use `CAN1_TX_DISABLE_CMD` plus the
+  1 kohm/100 kohm physical `CAN1_TX_DISABLED_STATUS` readback. The exact
+  DTM04-4P/DTM06-4S harness kit is frozen in the physical closeout.
 - Risks: production DNP inspection, gate polarity review, reset default, and
   status readback interpretation remain schematic-review details.
 - Alternatives: SN74LV1T125-Q1 translator gate, transceiver silent-mode-only
@@ -59,6 +63,7 @@ orders.
   compatibility: small SMD factory assembly plus DNP inspection; Known risks:
   exact suffix stock and DNP handling.
 - Evidence and calculations:
+  `PB-100-can1-physical-closeout.md`,
   `PB-100-can1-default-disable-freeze-checklist.csv`,
   `PB-100-can1-default-disable-derivation-precheck.csv`,
   `PB-100-can1-default-disable-closeout-precheck.csv`,
@@ -183,22 +188,25 @@ orders.
 
 ## PBREL-004 — High/medium output stage
 
-- Closeout status: Conditional.
+- Closeout status: Closed.
+- Closeout boundary: pre-layout evidence; see `PB-100-five-blocker-closeout-2026-07-21.md`.
 - Why blocker existed: OUT2 and medium-current outputs need high-side switching,
   current sense, fault handling, PWM, fuse coordination, and SOA margin before
   output-stage placement or copper can start.
 - Candidate comparison: TPS48110AQDGXRQ1 external-controller architecture is
   preferred; integrated smart switches are rejected for Rev.1 voltage-margin
-  risk; the Product Owner selected BUK7S1R2-80M 80 V LFPAK88 and rejected the
+  risk; the Product Owner selected IAUT300N08S5N012ATMA2 80 V TOLL and rejected the
   former 60 V assembly paths.
 - Recommended solution: keep TPS48110AQDGXRQ1 for all output channels and use
-  BUK7S1R2-80M 80 V LFPAK88 for Q101-Q110, while keeping IAUTN08S5N012L
-  80 V TOLL and BUK7J2R4-80M 80 V LFPAK56E as controlled non-drop-in
-  alternatives.
-- Risks: OUT2 compressor inrush SOA, gate resistor tuning, inductive clamp
-  energy, and thermal copper still require schematic/layout/post-prototype
-  validation.
-- Alternatives: IAUTN08S5N012L 80 V TOLL or BUK7J2R4-80M 80 V LFPAK56E after
+  IAUT300N08S5N012ATMA2 80 V TOLL for Q101-Q110, while keeping
+  IAUT300N08S5N014ATMA1 as a controlled same-footprint alternative and
+  BUK7J2R4-80MX LFPAK56E as a controlled non-drop-in alternative. Per-class
+  sense, threshold, timer, bootstrap, gate, fuse-compatible SOA, and populated
+  STPS40170CGY-TR local clamp values are recorded in generated evidence.
+- Risks: measured load pulses, gate waveform, clamp energy, case temperature,
+  and copper/enclosure rise remain explicit layout/post-prototype acceptance
+  checks and do not masquerade as completed measurements.
+- Alternatives: IAUT300N08S5N014ATMA1 80 V TOLL or BUK7J2R4-80MX 80 V LFPAK56E after
   pin-map, SOA, thermal, footprint, sourcing and assembly review. SIDR626LDP
   and IAUTN06S5N008 remain rejected 60 V history.
 - Cost impact: high relative to integrated switches because every channel keeps
@@ -217,7 +225,7 @@ orders.
   with SM8S33 clamp margin; Why not alternative B: 60 V MOSFET path leaves less
   overshoot margin unless simulation/bench proves it; Expected lifetime: 10-15
   year platform target with automotive controller and MOSFET families; Operating
-  margin: 80 V MOSFET class against 53.3 V TVS clamp point before overshoot;
+  margin: 80 V MOSFET class against the generated 59.45 V hot stress bound;
   Maximum junction temperature: use 175 °C MOSFET class and 150 °C/grade device
   controller limits where selected; Availability: TI/Nexperia plus Vishay/
   Infineon alternates; Automotive qualification: AEC-Q100 controller and
@@ -225,13 +233,14 @@ orders.
   controller and MOSFET source paths; PCBWay/JLCPCB compatibility: power package
   assembly review required; Known risks: OUT2 SOA and package heating.
 - Evidence and calculations:
-  `PB-100-out2-soa.md`, `PB-100-high-medium-output-freeze-review.csv`,
+  `PB-100-output-soa-evidence.csv`, `PB-100-out2-soa.md`,
+  `PB-100-output-stage-design-values.csv`, `PB-100-high-medium-output-freeze-review.csv`,
   `PB-100-output-stage-value-freeze-checklist.csv`,
   `PB-100-output-stage-value-derivation-precheck.csv`, and
   `PB-100-output-stage-closeout-precheck.csv`.
 - Datasheet and sourcing evidence:
   https://www.ti.com/lit/ds/symlink/tps4811-q1.pdf,
-  https://assets.nexperia.com/documents/data-sheet/BUK7Y3R1-80M.pdf, and
+  https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf, and
   `production/bom/pb100_sourcing_evidence_snapshot.csv`.
 - Post-prototype validation: PB-BENCH-003, PB-BENCH-004, PB-BENCH-006, and
   PB-BENCH-010 verify output switching, fault response, current budget, and
@@ -292,22 +301,25 @@ orders.
 
 ## PBREL-006 — Input reverse protection
 
-- Closeout status: Conditional.
+- Closeout status: Closed.
+- Closeout boundary: pre-layout evidence; see `PB-100-five-blocker-closeout-2026-07-21.md`.
 - Why blocker existed: the 40 A protected input path needs reverse-battery
   protection with low loss, load-dump voltage margin, gate control, and package
   thermal evidence.
 - Candidate comparison: LM74700QDBVRQ1 ideal-diode controller plus 80 V
-  BUK7S1R2-80M-class LFPAK88 MOSFET is selected; IAUTN08S5N012L 80 V TOLL
+  IAUT300N08S5N012ATMA2-class TOLL MOSFET is selected; IAUT300N08S5N014 80 V TOLL
   and BUK7J2R4-80M 80 V LFPAK56E are non-drop-in alternatives. The 60 V
   IAUTN06S5N008 and SIDR626LDP paths are rejected for Rev.1 assembly.
-- Recommended solution: lock the schematic-review direction to LM74700-Q1 plus
-  Q1 80 V LFPAK88 BUK7S1R2-80M-class path, with gate clamp/turn-off values
-  derived in schematic review.
-- Risks: LFPAK88 assembly support, copper thermal model, gate clamp values, and
-  negative transient behavior still need footprint and bench validation.
-- Alternatives: IAUTN08S5N012L 80 V TOLL, BUK7J2R4-80M 80 V LFPAK56E, or the
+- Recommended solution: lock LM74700-Q1 plus Q1
+  `IAUT300N08S5N012ATMA2`, with 100 nF VCAP, 10 ohm gate series, 100 kohm
+  gate-source discharge, and a 15 V automotive gate clamp. Generated Q1
+  evidence fixes the 2.52 mOhm hot bound, 4.032 W at 40 A, 125 degC case
+  ceiling, and 48.39 degC junction margin.
+- Risks: final plane/polygon/bus extraction, solder voiding, negative transient
+  behavior, and enclosure temperature still need layout and bench validation.
+- Alternatives: IAUT300N08S5N014 80 V TOLL, BUK7J2R4-80M 80 V LFPAK56E, or the
   LM74502-Q1 controller family after controlled electrical and package review.
-- Cost impact: moderate; the 80 V LFPAK88 path may cost more than a 60 V TOLL
+- Cost impact: moderate; the 80 V TOLL path may cost more than a 60 V TOLL
   path but buys voltage margin and package current density.
 - Thermal impact: 1.2mΩ nominal class gives 1.92 W at 40 A before temperature
   multiplier and copper derating; this is lower than a 2.1mΩ single PowerPAK
@@ -317,19 +329,20 @@ orders.
 - Field reliability impact: ideal-diode behavior reduces reverse-battery loss
   and avoids a series diode heat source on the main input path.
 - Engineering decision: Why this component/solution: LM74700-Q1 supports
-  low-loss external NMOS reverse protection and BUK7S1R2-80M adds 80 V headroom;
+  low-loss external NMOS reverse protection and IAUT300N08S5N012ATMA2 adds 80 V headroom;
   Why not alternative A: 60 V TOLL has excellent RDS(on) but insufficient
   transient margin without overshoot evidence; Why not alternative B: dual
   PowerPAK path adds current sharing and placement complexity; Expected
   lifetime: 10-15 year platform target with automotive controller/MOSFET; 
-  Operating margin: 80 V MOSFET class against 53.3 V TVS clamp point before
-  overshoot; Maximum junction temperature: 175 °C MOSFET class and selected
+  Operating margin: 80 V MOSFET class against the 59.45 V bounded stress;
+  Maximum junction temperature: 175 °C MOSFET class and selected
   controller temperature limits; Availability: TI/Nexperia plus Infineon/Vishay
   alternates; Automotive qualification: AEC-Q100 controller and AEC-Q101 MOSFET;
   LCSC availability: local snapshot tracks stock risk; PCBWay/JLCPCB
-  compatibility: LFPAK88/TOLL assembly review required; Known risks: package
+  compatibility: TOLL assembly review required; Known risks: package
   soldering and input copper heating.
 - Evidence and calculations:
+  `PB-100-input-q1-evidence.csv`,
   `PB-100-input-reverse-protection.md`,
   `PB-100-input-reverse-package-trace.csv`,
   `PB-100-input-reverse-q1-freeze-checklist.csv`,
@@ -337,7 +350,7 @@ orders.
   `PB-100-input-reverse-q1-closeout-precheck.csv`.
 - Datasheet and sourcing evidence:
   https://www.ti.com/lit/ds/symlink/lm74700-q1.pdf,
-  https://assets.nexperia.com/documents/data-sheet/BUK7S1R2-80M.pdf, and
+  https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf, and
   `production/bom/pb100_sourcing_evidence_snapshot.csv`.
 - Post-prototype validation: PB-BENCH-001, PB-BENCH-002, PB-BENCH-006, and
   PB-BENCH-010 verify input polarity, transient behavior, current budget, and
@@ -347,7 +360,8 @@ orders.
 
 ## PBREL-007 — TVS/load-dump protection
 
-- Closeout status: Conditional.
+- Closeout status: Closed.
+- Closeout boundary: pre-layout evidence; see `PB-100-five-blocker-closeout-2026-07-21.md`.
 - Why blocker existed: SM8S33-class TVS clamp can stress 60 V downstream parts
   after overshoot, so schematic freeze needed a voltage-margin escape path.
 - Candidate comparison: Vishay SM8S33AHM3/I HM3 DO-218AC TVS is preferred for
@@ -356,8 +370,9 @@ orders.
   accepting unproven 60 V overshoot margin.
 - Recommended solution: keep the SM8S33AHM3/I TVS branch and the selected
   80 V MOSFET baseline while retaining 100 V TPS4811 and LM5164/LM5013-class
-  devices. Voltage-class choice is closed; the blocker remains Conditional
-  until actual clamp-loop overshoot and TVS pulse-energy evidence closes.
+  devices. The deterministic 100 V 10/1000 us source, 125 degC TVS, 20 nH
+  loop, 15 A/us slew, and 1 V uncertainty model bounds stress at 59.45 V.
+  PB-BENCH-004 remains a post-prototype escape gate, not a pre-layout blocker.
 - Risks: board-level overshoot, TVS heating, trace inductance, and pulse energy
   still require simulation/bench validation after physical design.
 - Alternatives: Littelfuse SLD8S33A, Diodes DM8W33AQ-13, Bourns SM8S33A-Q
@@ -384,6 +399,7 @@ orders.
   JLCPCB source path; PCBWay/JLCPCB compatibility: DO-218AC handling review
   required; Known risks: trace inductance overshoot and TVS pulse energy.
 - Evidence and calculations:
+  `PB-100-transient-margin-evidence.csv`,
   `PB-100-tvs-load-dump-margin-trace.csv`,
   `PB-100-tvs-load-dump-freeze-review.csv`,
   `PB-100-tvs-overshoot-escape-checklist.csv`,
@@ -552,14 +568,15 @@ orders.
 
 ## PBREL-011 — Factory assembly readiness
 
-- Closeout status: Conditional.
+- Closeout status: Closed.
+- Closeout boundary: pre-layout evidence; see `PB-100-five-blocker-closeout-2026-07-21.md`.
 - Why blocker existed: critical factory-populated PB-100 parts needed dated
   manufacturer/distributor/JLCPCB/PCBWay evidence, package handling notes, DNP
   inspection, and alternatives before blocker closure.
-- Candidate comparison: JLCPCB Extended plus authorized distributor sourcing is
-  preferred for prototype; PCBWay remains a parallel assembly path; unsupported
-  manual assembly of VSSOP, PowerPAK, TOLL, LFPAK88, DO-218AC, CSS4J, and FX18
-  packages is rejected.
+- Candidate comparison: JLC global/preorder/private-part consignment plus an
+  authorized reel is preferred for prototype; PCBWay kitted/consigned assembly
+  remains parallel. Unsupported manual assembly of VSSOP, PowerPAK, TOLL
+  PG-HSOF-8-1, DO-218AC, D2PAK, CSS4J, and FX18 packages is rejected.
 - Recommended solution: keep factory-owned critical keys in
   `production/bom/pb100_sourcing_evidence_snapshot.csv` and
   `pb100_assembly_sourcing_recheck.csv`, with at least two alternatives for
@@ -591,6 +608,7 @@ orders.
   records exact JLCPCB componentSearch results; PCBWay/JLCPCB compatibility:
   package-specific review is required; Known risks: stock churn and rework.
 - Evidence and calculations:
+  `PB-100-factory-production-evidence.csv`,
   `PB-100-factory-assembly-platform-evidence.csv`,
   `PB-100-factory-assembly-sourcing-precheck.csv`,
   `PB-100-factory-assembly-freeze-checklist.csv`,

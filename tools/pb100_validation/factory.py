@@ -66,8 +66,9 @@ def validate_assembly_sourcing_recheck() -> None:
         for column in ASSEMBLY_SOURCING_RECHECK_COLUMNS:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
-        if "schematic freeze" not in row["Freeze dependency"].lower():
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: freeze dependency must reference schematic freeze")
+        dependency = row["Freeze dependency"].lower()
+        if not any(token in dependency for token in ("schematic freeze", "later gate", "release", "post-prototype")):
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: lifecycle dependency must remain explicit")
         row_text = " ".join(row.values()).lower()
         if symbol_key == "CAN1_TX_DISABLE":
             if "dnp/open" not in row_text or "no default-populated tx" not in row_text:
@@ -90,8 +91,8 @@ def validate_assembly_sourcing_recheck() -> None:
         if "alternat" not in row["Alternate coverage"].lower() and symbol_key != "CAN1_TX_DISABLE":
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: alternate coverage must remain explicit")
         if symbol_key == "INPUT_REVERSE_FET":
-            if not all(token in row_text for token in ("80 v", "lfpak88", "40 a")):
-                fail("INPUT_REVERSE_FET sourcing row must keep selected 80 V LFPAK88 and 40 A review explicit")
+            if not all(token in row_text for token in ("80v", "toll", "40a")):
+                fail("INPUT_REVERSE_FET sourcing row must keep selected 80 V TOLL and 40 A review explicit")
 
     missing_keys = sorted(critical_readiness.keys() - seen_keys)
     extra_keys = sorted(seen_keys - critical_readiness.keys())
@@ -252,15 +253,15 @@ def validate_factory_assembly_freeze_checklist() -> None:
         "tray",
         "cut tape",
         "authorized distributor",
-        "2026-07-16",
+        "2026-07-21",
         "date-stamped",
         "TPS48110AQDGXRQ1",
-        "SIDR626LDP-T1-RE3",
-        "IAUTN06S5N008ATMA1",
-        "BUK7S1R2-80M",
-        "PowerPAK",
+        "IAUT300N08S5N012ATMA2",
+        "IAUT300N08S5N014ATMA1",
+        "BUK7J2R4-80MX",
         "TOLL",
-        "LFPAK88",
+        "PG-HSOF-8-1",
+        "LFPAK56E",
         "19-VSSOP",
         "SM8S33AHM3/I",
         "SLD8S33A",
@@ -306,7 +307,7 @@ def validate_factory_assembly_freeze_checklist() -> None:
     for token in ("JLCPCB/PCBWay", "Alternates", "Verify", "schematic freeze"):
         if token not in sourcing_text:
             fail(f"assembly sourcing recheck must support factory checklist token {token}")
-    for token in ("2026-07-16", "Open:", "DNP/open"):
+    for token in ("2026-07-21", "live-stock claim", "DNP/open"):
         if token not in evidence_text:
             fail(f"sourcing evidence snapshot must support factory checklist token {token}")
 
@@ -382,14 +383,14 @@ def validate_factory_assembly_sourcing_precheck() -> None:
         "Alternate 1",
         "Alternate 2",
         "TPS48110AQDGXRQ1",
-        "SIDR626LDP-T1-RE3",
-        "IAUTN06S5N008ATMA1",
-        "BUK7S1R2-80M",
+        "IAUT300N08S5N012ATMA2",
+        "IAUT300N08S5N014ATMA1",
+        "BUK7J2R4-80MX",
         "LM74700QDBVRQ1",
         "19-VSSOP",
-        "PowerPAK",
         "TOLL",
-        "LFPAK88",
+        "PG-HSOF-8-1",
+        "LFPAK56E",
         "SOT-23-6",
         "SM8S33AHM3/I",
         "SLD8S33A",
@@ -415,11 +416,11 @@ def validate_factory_assembly_sourcing_precheck() -> None:
         "DNP/open",
         "no default-populated TX",
         "future ADR",
-        "2026-07-16",
-        "2026-07-17",
+        "2026-07-21",
+        "order-date",
         "authorized distributor",
         "manufacturer evidence",
-        "Open:",
+        "no live-stock claim",
         "No PCB layout",
         "PB-100.kicad_pcb",
         "Gerbers",
@@ -437,7 +438,7 @@ def validate_factory_assembly_sourcing_precheck() -> None:
     for token in ("JLCPCB/PCBWay", "authorized distributor", "schematic freeze"):
         if token not in sourcing_text:
             fail(f"assembly sourcing recheck must support factory sourcing precheck token {token}")
-    for token in ("2026-07-16", "Open:", "DNP/open"):
+    for token in ("2026-07-21", "live-stock claim", "DNP/open"):
         if token not in evidence_text:
             fail(f"sourcing evidence snapshot must support factory sourcing precheck token {token}")
 
@@ -519,14 +520,14 @@ def validate_factory_assembly_closeout_precheck() -> None:
         "Alternate 1",
         "Alternate 2",
         "TPS48110AQDGXRQ1",
-        "SIDR626LDP-T1-RE3",
-        "IAUTN06S5N008ATMA1",
-        "BUK7S1R2-80M",
+        "IAUT300N08S5N012ATMA2",
+        "IAUT300N08S5N014ATMA1",
+        "BUK7J2R4-80MX",
         "LM74700QDBVRQ1",
         "19-VSSOP",
-        "PowerPAK",
         "TOLL",
-        "LFPAK88",
+        "PG-HSOF-8-1",
+        "LFPAK56E",
         "SOT-23-6",
         "SM8S33AHM3/I",
         "SLD8S33A",
@@ -552,11 +553,11 @@ def validate_factory_assembly_closeout_precheck() -> None:
         "DNP/open",
         "no default-populated TX",
         "future ADR",
-        "2026-07-16",
-        "2026-07-17",
+        "2026-07-21",
+        "order-date",
         "authorized distributor",
         "manufacturer evidence",
-        "Open:",
+        "no live-stock claim",
         "No PCB layout",
         "PB-100.kicad_pcb",
         "Gerbers",
@@ -586,7 +587,7 @@ def validate_factory_assembly_closeout_precheck() -> None:
     for token in ("JLCPCB/PCBWay", "authorized distributor", "schematic freeze"):
         if token not in sourcing_text:
             fail(f"assembly sourcing recheck must support factory closeout precheck token {token}")
-    for token in ("2026-07-16", "Open:", "DNP/open"):
+    for token in ("2026-07-21", "live-stock claim", "DNP/open"):
         if token not in evidence_text:
             fail(f"sourcing evidence snapshot must support factory closeout precheck token {token}")
 
@@ -644,8 +645,12 @@ def validate_sourcing_evidence_snapshot() -> None:
             if not evidence_link_is_valid(row[column].strip()):
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid {column}")
         row_text = " ".join(row.values()).lower()
-        if "open:" not in row["Open sourcing blocker"].lower():
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: blocker must remain explicit")
+        blocker_text = row["Open sourcing blocker"].lower()
+        if "open:" not in blocker_text and not (
+            "none for pbrel pre-layout" in blocker_text
+            and any(token in blocker_text for token in ("remain", "recheck"))
+        ):
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: later blocker/gate must remain explicit")
         if symbol_key == "INPUT_TVS":
             for token in ("obsolete", "eol", "do not lock", "active"):
                 if token not in row_text:

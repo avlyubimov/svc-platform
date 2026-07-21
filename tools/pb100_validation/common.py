@@ -960,9 +960,9 @@ REQUIRED_INPUT_POWER_ITEMS = {
 }
 REQUIRED_INPUT_REVERSE_FREEZE_REVIEW_ITEMS = {
     "Controller gate default",
-    "Rejected 60V history",
-    "Selected 80V LFPAK88 path",
-    "80V non-drop-in alternatives",
+    "Rejected 60 V history",
+    "Selected 80 V TOLL path",
+    "80 V alternatives",
     "Protected measurement sequence",
     "TVS overshoot dependency",
     "Assembly and sourcing gate",

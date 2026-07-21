@@ -1,5 +1,5 @@
 Case,Current A,Duration,Rds ohm,Temperature multiplier,Estimated conduction W,Estimated conduction energy J,Validation result,Required action
-OUT2 continuous configured limit,18,continuous,0.0021,2.0,1.36,N/A,Steady-state estimate,Validate board and enclosure thermal rise
-OUT2 compressor startup pulse,40,1 s,0.0021,2.0,6.72,6.72,Preliminary envelope only,Confirm FET pulse SOA and controller fully-enhanced behavior
-OUT2 fast inrush transient,80,100 ms,0.0021,2.0,26.88,2.69,Preliminary envelope only,Confirm fuse controller and FET pulse SOA
-OUT2 hard short linear limit,18,10 ms max,N/A,N/A,N/A,N/A,Must fault quickly,Controller must not hold linear current limit indefinitely
+OUT2 continuous configured limit,18,continuous,0.0012,2.1,0.816,N/A,Pass pre-layout electrical bound,Keep Q102 case at or below 125C and validate board/enclosure rise in PB-BENCH-010
+OUT2 fuse-compatible startup pulse,30,100 ms,0.0012,2.1,2.268,0.2268,Pass pre-layout fuse and enhanced-mode bound,Verify compressor startup does not exceed the documented 30A/100ms envelope
+OUT2 fast enhanced-mode transient,80,4 ms,0.0012,2.1,16.128,0.0645,Pass pre-layout conduction-energy bound,Keep gate fully enhanced and verify measured pulse against fuse/controller timing
+OUT2 hard short detection,95.91,5 us max,N/A,N/A,N/A,N/A,Pass conservative 10us 60V SOA comparison,TPS48110AQDGXRQ1 must pull PD low within 5us maximum and PB-BENCH-005 must verify

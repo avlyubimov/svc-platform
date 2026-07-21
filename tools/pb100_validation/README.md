@@ -11,6 +11,7 @@ to one design area does not require editing a monolithic validator.
 | `kicad.py` | KiCad scaffold, ERC, exported netlist, layout-artifact boundary |
 | `symbols.py` | Symbol, footprint, pin evidence, instance maps and capture readiness |
 | `release.py` | Schematic-freeze, blocker-register and board-print state consistency |
+| `release_evidence.py` | Generated five-blocker SOA, transient, Q1, factory, selected-part and freshness invariants |
 | `pin_contracts.py` | Controller, input-protection and logic-power pin contracts |
 | `outputs.py` | Generic output classes, values, SOA/freeze and closeout traces |
 | `input_power.py` | Input protection and reverse-MOSFET evidence |

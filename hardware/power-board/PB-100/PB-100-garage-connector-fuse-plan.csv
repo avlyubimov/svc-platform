@@ -11,6 +11,6 @@ OUT7,10A fuse / 8A limit,DEUTSCH DT 2-pin class,Candidate,DT size 16 13A contact
 OUT8,5A fuse / 4A limit,DEUTSCH DT 2-pin class,Candidate,DT chosen for output connector commonality with 5A fuse class
 OUT9,5A fuse / 4A limit,DEUTSCH DT 2-pin class,Candidate,DT chosen for output connector commonality with 5A fuse class
 OUT10,10A fuse / 8A limit,DEUTSCH DT 2-pin class,Candidate,DT size 16 13A contact class has margin for 10A fuse class
-CAN/service,Signal current,DEUTSCH DTM 4-pin class,Candidate,DTM size 20 7.5A contact class is signal/CAN only and must not carry output power
+CAN/service,Signal current,DTM04-4P plus DTM06-4S with size-20 contacts,Selected final pre-layout,Cavities 1 GND 2 CANL 3 CANH 4 CAN_SERVICE_RESERVE DNP; twisted pair on 2/3; signal only and never output power
 External inputs,Signal current,DEUTSCH DTM 8-pin class,Candidate,Buttons ADC pulse and low-current signals only with DTM size 20 contacts
 Per-channel fuses,5A 10A 15A 20A,MINI/ATO blade fuse family,Candidate,Final holder style must keep fuses user-serviceable from service cover or external fuse block

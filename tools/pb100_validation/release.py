@@ -236,9 +236,10 @@ def validate_schematic_freeze_gap_register() -> None:
         "PB-100-input-reverse-q1-closeout-precheck.csv",
         "Q1",
         "40 A",
-        "BUK7S1R2-80M",
+        "IAUT300N08S5N012ATMA2",
         "80 V",
-        "LFPAK88",
+        "PG-HSOF-8-1",
+        "TOLL",
         "SOA",
     ):
         if token not in input_text:
@@ -375,17 +376,17 @@ def validate_schematic_freeze_gap_register() -> None:
 
 def required_closeout_artifact_by_gate() -> dict[str, str]:
     return {
-        "CAN1 safety policy": "pb-100-can1-default-disable-closeout-precheck.csv",
+        "CAN1 safety policy": "pb-100-five-blocker-closeout-2026-07-21.md",
         "Board current budget": "pb-100-board-current-budget-closeout-precheck.csv",
         "Board-to-board interface": "pb-100-b2b-interface-closeout-precheck.csv",
-        "High/medium output stage": "pb-100-output-stage-closeout-precheck.csv",
+        "High/medium output stage": "pb-100-five-blocker-closeout-2026-07-21.md",
         "Low-current output stage": "pb-100-output-stage-closeout-precheck.csv",
-        "Input reverse protection": "pb-100-input-reverse-q1-closeout-precheck.csv",
-        "TVS/load-dump protection": "pb-100-tvs-overshoot-closeout-precheck.csv",
+        "Input reverse protection": "pb-100-five-blocker-closeout-2026-07-21.md",
+        "TVS/load-dump protection": "pb-100-five-blocker-closeout-2026-07-21.md",
         "Logic power rails": "pb-100-logic-power-closeout-precheck.csv",
         "Current telemetry": "pb-100-current-telemetry-closeout-precheck.csv",
         "Thermal telemetry": "pb-100-thermal-telemetry-closeout-precheck.csv",
-        "Factory assembly readiness": "pb-100-factory-assembly-closeout-precheck.csv",
+        "Factory assembly readiness": "pb-100-five-blocker-closeout-2026-07-21.md",
         "Garage assembly readiness": "pb-100-garage-install-closeout-precheck.csv",
     }
 
@@ -496,7 +497,7 @@ def validate_engineering_blocker_closeout() -> None:
         ),
         "PBREL-004": (
             "TPS48110AQDGXRQ1",
-            "BUK7S1R2-80M",
+            "IAUT300N08S5N012ATMA2",
             "OUT2",
             "SOA",
         ),
@@ -509,7 +510,7 @@ def validate_engineering_blocker_closeout() -> None:
         ),
         "PBREL-006": (
             "LM74700QDBVRQ1",
-            "BUK7S1R2-80M",
+            "IAUT300N08S5N012ATMA2",
             "40 A",
             "Q1",
         ),
@@ -545,7 +546,8 @@ def validate_engineering_blocker_closeout() -> None:
             "DNP/open",
             "PowerPAK",
             "TOLL",
-            "LFPAK88",
+            "PG-HSOF-8-1",
+            "D2PAK",
             "DO-218AC",
             "FX18",
         ),

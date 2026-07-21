@@ -3,8 +3,8 @@
 	(generator "codex")
 	(generator_version "10.0")
 	(layer "F.Cu")
-	(descr "Infineon PG-HSOF-8-1 TOLL source-derived board-import footprint for IAUTN06S5N008 class MOSFET")
-	(tags "PG-HSOF-8-1 TOLL Infineon MOSFET IAUTN06S5N008")
+	(descr "Infineon PG-HSOF-8-1 TOLL source-derived board-import footprint for IAUT300N08S5N012ATMA2")
+	(tags "PG-HSOF-8-1 TOLL Infineon MOSFET IAUT300N08S5N012ATMA2 80V")
 	(property "Reference" "REF**"
 		(at 0 -7.3 0)
 		(layer "F.SilkS")
@@ -24,14 +24,14 @@
 		(uuid "1f75f8a7-2140-4b2b-a44a-819a2c987fbd")
 		(effects (font (size 1.27 1.27)))
 	)
-	(property "Description" "PG-HSOF-8-1 copper footprint with pin1 gate pin2-8 source and Tab drain pad matching PB100_INPUT_NMOS_TOLL_PRELIM; 42 segmented F.Paste apertures are separated from the Tab copper/mask pad; via field remains layout/DFM gate"
+	(property "Description" "PG-HSOF-8-1 copper footprint with pin1 gate pin2-8 source and Tab drain pad matching PB100_POWER_NMOS_TOLL_80V; 42 segmented F.Paste apertures are separated from the Tab copper/mask pad; via field remains layout/DFM gate"
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
 		(uuid "bcb31c5c-c7b8-4072-b7ff-6a112ad60106")
 		(effects (font (size 1.27 1.27)))
 	)
-	(property "LCSC Part" "C20190986"
+	(property "LCSC Part" "C3278548"
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)

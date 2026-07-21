@@ -294,8 +294,8 @@ def validate_schematic_capture_work_queue() -> None:
         refs_covered_by_sheet.setdefault(sheet_file, set()).update(row_refs)
         if "Q1" in row_refs:
             row_text = " ".join(row.values())
-            if not all(token in row_text for token in ("INPUT_REVERSE_FET", "BUK7S1R2-80M", "LFPAK88", "40 A")):
-                fail("Q1 capture work must keep selected 80 V LFPAK88 and 40 A review explicit")
+            if not all(token in row_text for token in ("INPUT_REVERSE_FET", "IAUT300N08S5N012ATMA2", "TOLL", "40 A")):
+                fail("Q1 capture work must keep selected 80 V TOLL and 40 A review explicit")
         if work_item == "CAP-CAN1":
             row_text = " ".join(row.values()).lower()
             if "dnp/open" not in row_text or "future adr" not in row_text:
