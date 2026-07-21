@@ -3539,3 +3539,54 @@ at the X=0 edge, three generated connector-local override warnings, four
 board-only mounting holes in schematic parity, and the recorded unrouted
 connectivity set. Gerber, drill, BOM/CPL, pick-place, fabrication, assembly,
 prototype order, production release, and field use remain `NO-GO`.
+
+## 2026-07-21 — Record non-qualifying Infineon Q2 response
+
+Decision: record Infineon response `IFX-260721-2228076` /
+`CRM0032570008656` as `RECEIVED NON-QUALIFYING`. The response redirected the
+sender to Infineon's support options and hotline but supplied no maximum-bound
+gate-discharge value, paired `VDS(t)` / `ID(t)` trajectory, corner model, hot
+linear-mode SOA confirmation, process/temperature/lot coverage, guardband,
+residual-current criterion, or FAE statement.
+
+Decision: preserve Q2Q-010 through Q2Q-015 as `PENDING VENDOR`, record the
+traceable but non-qualifying response in Q2Q-016, and move Q2Q-017 to
+`REROUTE REQUIRED`. The reviewed request must be submitted through Infineon
+MyCases Technical Support with both response identifiers and routed to
+Automotive MOSFET Applications or product engineering. If Infineon cannot
+provide a production maximum, the existing Product Owner approval requirement
+for a separate empirical component-qualification plan remains in force.
+
+Result: PBREL-007 remains `Conditional`; aggregate PB-100 authorization remains
+`BLOCKED`; no PB-100 board import or manufacturing output is authorized.
+FB-100 retains its independent `LAYOUT-ONLY` authorization, so controlled
+FB-100 routing may continue without misrepresenting the PB-100 evidence state.
+
+## 2026-07-21 — Retain Q2 and select controlled empirical qualification
+
+Decision: apply the Product Owner's two-route boundary: replace Q2 only if a
+candidate's available evidence actually closes Q2Q-010 through Q2Q-015;
+otherwise retain the selected device and obtain the missing trajectory by
+test. The reviewed comparison found no credible automotive 150 V replacement
+with a public production-covered 101 V / 40 A / 150 degC paired trajectory.
+The reviewed automotive alternatives are non-drop-in, higher-loss and retain
+the same evidence gap; the 150 V Linear FET alternative is industrial D2PAK,
+not automotive TOLL. Retain `IAUTN15S6N025ATMA1`.
+
+Decision: approve the project-specific empirical route defined in
+`PB-100-q2-empirical-qualification-plan.md`. Five non-qualification DUTs first
+characterize the fixture. Phase B uses thirty new DUTs, ten from each of at
+least three independent lot/date codes, with ten events per DUT at 60 s
+spacing. The exact 101 V / 40 A / 150 degC corner, both VGS endpoints,
+synchronized VDS/ID/VGS acquisition, measurement uncertainty, 1.25x guardband,
+post-stress parametrics, immutable raw data and independent review are fixed
+before observing results. The evidence is project qualification, never an
+Infineon production-maximum claim.
+
+Decision: create a `QUALIFICATION-COUPON-ONLY` authorization for the dedicated
+test artifact. It permits coupon design and controlled laboratory evidence
+generation, but does not authorize `PB-100.kicad_pcb`, PB-100 placement/routing
+or PB-100 manufacturing output. Q2Q-010 through Q2Q-015 move to
+`PENDING EMPIRICAL`; Q2Q-016 remains the traceable non-qualifying redirect;
+MyCases continues in parallel. PBREL-007 remains Conditional and aggregate
+PB-100 authorization remains `BLOCKED` until the completed package passes.
