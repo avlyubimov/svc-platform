@@ -50,8 +50,12 @@ ADR-0014 or ADR-0015 and does not authorize fabrication or production release.
   exact threshold, Ioff, pin-map, and sourcing review.
 - Alternative B: automotive onsemi `NC7SZ17`; non-drop-in sourcing and
   electrical review are required before substitution.
-- Operating margin: the input is current-limited by FB R13 100 kOhm and the
-  output is limited to `LB_3V3_IO`; PD10 is used only as a digital input.
+- Operating margin: FB R13 3.9 kOhm and R14 15 kOhm produce at least 3.723 V
+  at 4.75 V VBUS after resistor and input-leakage tolerance, above even the
+  3.43 V maximum positive threshold in the complete TI table. After disconnect,
+  R14 holds the input below 0.152 V and discharges the worst-case 130 nF node
+  below the 0.77 V minimum falling threshold within 3.81 ms. The output is limited to `LB_3V3_IO`; PD10
+  is used only as a digital input.
 - Maximum junction temperature and lifetime: use the selected datasheet limits
   and the 10-year platform target; static detector dissipation is negligible,
   but enclosure temperature remains a prototype check.
@@ -59,6 +63,36 @@ ADR-0014 or ADR-0015 and does not authorize fabrication or production release.
   exact LCSC/JLC stock and PCN status require an order-date recheck.
 - Known risks: threshold variation during low VBUS ramps and ESD coupling;
   firmware must debounce presence and layout must keep the raw 5 V path short.
+
+## SN74LVC1G125-Q1 E73 Isolation (U15-U17)
+
+- Decision: use three `SN74LVC1G125QDBVRQ1` gates powered by
+  `RADIO_SENSOR_3V3` to isolate STM32 UART TX, UART RX, and reset from the E73
+  while its switched rail is off. R18/R19 are 22 kOhm module-side idle pull-ups
+  to the quick-output-discharged switched rail; R9 is a switched-domain reset
+  pull-up; R20/R22 hold both isolated STM32 UART sides idle-high; R21 keeps the
+  reset command asserted until firmware deliberately releases it after rail
+  settling.
+- Why this part: AEC-Q100 Grade 1, -40 to +125 degrees C, 1.65-5.5 V supply,
+  5.5 V-tolerant inputs, three-state output, `Ioff` back-drive protection, and
+  the already reviewed DBV SOT-23-5 footprint.
+- Alternative A: Nexperia `74LVC1G125-Q100`, also Grade 1 with partial-power-
+  down `IOFF`, after package and order-code review.
+- Alternative B: TI `SN74LVC1G125B-Q1`, after exact suffix, pin-map, and source
+  review.
+- Operating margin: maximum `Ioff` through each 22.22 kOhm UART clamp is
+  0.222 V and through the 10.10 kOhm switched reset pull is 0.101 V, both below
+  the nRF52840 powered-off `VDD + 0.3 V` limit. Driven-high pull current is at
+  most 0.166 mA versus the buffer's 16 mA guaranteed 3 V drive test point.
+- Maximum junction temperature and lifetime: 150 degrees C absolute maximum,
+  125 degrees C maximum ambient, and 229 degrees C/W DBV theta-JA. Static
+  self-heating is below 0.01 degrees C. The design target is at least 10 years
+  with order-date lifecycle and PCN review.
+- Availability and assembly: TI marks the family active; DBV SOT-23-5 is a
+  normal JLCPCB/PCBWay SMT process. Exact Q1 stock remains a purchase-time or
+  consignment recheck.
+- Known risks: firmware must wait for rail settling, C32-C34 must be adjacent
+  to their buffers, and no alternate may omit powered-off input/output `Ioff`.
 
 ## TPS22918-Q1 Switched Peripheral Rails (U12, U13)
 
@@ -86,7 +120,8 @@ ADR-0014 or ADR-0015 and does not authorize fabrication or production release.
   footprint and is suitable for JLCPCB/PCBWay optical inspection.
 - Risks: QOD configuration and CT value affect power-down and inrush. Firmware
   must wait for the rail settling interval; later bench tests must verify SD
-  write interruption and radio reset behavior.
+  write interruption and radio reset behavior. QOD also provides the defined
+  zero-volt return used by the switched E73 reset pull-up.
 
 ## Clock and Service Population
 

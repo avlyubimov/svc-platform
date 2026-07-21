@@ -34,8 +34,10 @@ Use `FB-100-usb-no-back-power-layout-rules.csv` as the layout model:
 - Place USB ESD on FB-100 between the USB-C receptacle and JFB1.
 - Route `USB_D_P` and `USB_D_N` as a short coupled pair with continuous ground
   reference and no avoidable stubs or vias.
-- Keep `USB_VBUS_DETECT_RAW` as a current-limited detect-only net; do not pour VBUS and do not
-  connect it to `FB_3V3_OR_IO`, `PB_5V_OUT`, `LB_3V3_IO`, PB-100, or outputs.
+- Keep `USB_VBUS_DETECT_RAW` as a detect-only net with R13 3.9 kOhm from VBUS,
+  R14 15 kOhm to GND, and C1 100 nF. Preserve the calculated defined-low state
+  and do not pour VBUS or connect it to `FB_3V3_OR_IO`, `PB_5V_OUT`,
+  `LB_3V3_IO`, PB-100, or outputs.
 - Keep `USB_CC1` and `USB_CC2` device-role only; no source-power behavior.
 - Treat shell and ESD return as a reviewed ESD/chassis return network, not as
   a high-current or signal-return substitute.
@@ -70,6 +72,7 @@ Use `FB-100-usb-no-back-power-layout-rules.csv` as the layout model:
 - `FB-100-interface-pinout-closeout.csv`
 - `FB-100-interface-signal-plan.csv`
 - `FB-100-mechanical-layout-inputs.csv`
+- `hardware/logic-board/LB-100/LB-100-fb-powered-off-corrective-review-2026-07-21.md`
 - ST USBLC6-2 datasheet:
   `https://www.st.com/resource/en/datasheet/usblc6-2.pdf`
 - TI TPD2EUSB30 datasheet:

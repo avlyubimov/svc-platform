@@ -10,7 +10,7 @@ ownership or the 24-pin JFB1 contract.
 The deterministic generator now assigns `input`, `output`, `bidirectional`,
 `power_in`, and `power_out` pin types to IC and rail-source pins. Connector and
 passive-component pins remain passive. The validator rejects any passive pin on
-U1-U14 LB IC symbols or U1 FB and requires a power input on every checked IC.
+U1-U17 LB IC symbols or U1 FB and requires a power input on every checked IC.
 KiCad ERC therefore checks driver/power semantics instead of accepting an
 all-passive library.
 
@@ -24,7 +24,8 @@ the complete VREF+ net and both sides of the single-point return.
 ## USB VBUS presence
 
 FB-100 no longer creates a 100 kOhm / 27 kOhm analog divider. R13 limits
-current from `USB_VBUS` to `USB_VBUS_DETECT_RAW`; LB U14
+current from `USB_VBUS` to `USB_VBUS_DETECT_RAW`; R14 provides the mandatory
+defined pulldown and C1 supplies bounded filtering. LB U14
 `SN74LVC1G17QDBVRQ1` provides a 5 V-tolerant input with Ioff and a 3.3 V digital
 output `USB_VBUS_PRESENT` to STM32 PD10. PD10 is treated as a digital input and
 is not claimed as ADC-capable.
@@ -36,7 +37,9 @@ and a small inspectable SOT-23-5 package. Alternative A is Nexperia
 alternative requires threshold, Ioff, pin-map, sourcing, and footprint review.
 The buffer dissipates only leakage/static current for this slow signal; maximum
 junction and operating limits remain those of the selected datasheet. Order-
-date LCSC/JLCPCB/PCBWay availability remains a production recheck.
+date LCSC/JLCPCB/PCBWay availability remains a production recheck. The final
+`3.9 kOhm / 15 kOhm / 100 nF` network and its Schmitt-threshold, leakage, and timing proof
+are recorded in `LB-100-fb-powered-off-corrective-review-2026-07-21.md`.
 
 ## LTC3212 timing source
 
@@ -52,7 +55,9 @@ are on always-on `LB_3V3_IO`, matching the always-on I2C pull-up domain. The
 VEML7700 interface supply is also always-on. This prevents SDA/SCL from rising
 above an unpowered VDDIO domain and violating the BMI270 `VDDIO + 0.3 V`
 absolute input limit. Firmware must not access BMI270 until switched VDD is
-settled.
+settled. The E73 on the same switched rail is separately isolated from STM32
+UART and reset by three `SN74LVC1G125-Q1` gates as documented in
+`LB-100-fb-powered-off-corrective-review-2026-07-21.md`.
 
 ## Evidence
 
@@ -66,4 +71,3 @@ settled.
 No `LB-100.kicad_pcb`, `FB-100.kicad_pcb`, Gerbers, drills, pick-place,
 BOM/CPL manufacturing package, or manufacturing ZIP is authorized by this
 review.
-

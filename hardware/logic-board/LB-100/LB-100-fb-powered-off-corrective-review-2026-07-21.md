@@ -1,0 +1,159 @@
+# LB-100 / FB-100 Powered-Off Corrective Review — 2026-07-21
+
+Status: Closed for schematic evidence; PCB layout and manufacturing remain blocked
+
+This review corrects the E73 powered-off interface and the floating USB VBUS
+presence node without changing ADR-0014, the JPB1 contract, or the JFB1
+contract. On discovery, `LBREL-005`, `LBREL-007`, `FBREL-002`, and
+`FBREL-006` were treated as `Conditional`. They return to `Closed` only with
+the generated topology, calculations, component evidence, exported-netlist
+rules, and ERC result recorded here.
+
+## E73 powered-off isolation
+
+The E73 nRF52840 module remains powered from switched `RADIO_SENSOR_3V3`.
+Direct STM32 connections are replaced by three `SN74LVC1G125-Q1` buffers:
+
+| Device | Direction | Source net | Module-side net |
+|---|---|---|---|
+| U15 | STM32 to E73 | `UART_TX` | `BLE_UART_RX_MODULE` |
+| U16 | E73 to STM32 | `BLE_UART_TX_MODULE` | `UART_RX` |
+| U17 | STM32 to E73 | `BLE_RESET_N_MCU` | `BLE_RESET_N` |
+
+All three buffers use `RADIO_SENSOR_3V3` as VCC and have active-low OE tied to
+GND. They operate whenever the module rail is valid and enter the TI-specified
+partial-power-down state with no powered output when the rail is zero. R18 and
+R19 are 22 kOhm module-side idle pull-ups to `RADIO_SENSOR_3V3`; the
+TPS22918-Q1 quick-output-discharge path clamps those pulls to ground when the
+rail is off. R9 is a 10 kOhm reset pull-up moved from `LB_3V3_MAIN` to
+`RADIO_SENSOR_3V3`. R20 and R22 hold both STM32 UART sides at the idle-high
+level while the buffers are off, and R21 holds the STM32 reset command asserted
+low until firmware deliberately releases E73 after the rail settles. Buffer
+`Ioff` prevents the always-on pulls from reaching the unpowered module.
+
+Nordic specifies a maximum nRF52840 I/O voltage of `VDD + 0.3 V` for
+`VDD <= 3.6 V`. TI specifies `Ioff <= +/-10 uA` for the selected buffer with
+VCC at 0 V and an input or output at 5.5 V.
+
+- U15 output leakage through R18 gives at most `10 uA * 22.22 kOhm = 0.222 V`
+  at the E73 UART RX pin when `RADIO_SENSOR_3V3 = 0 V`.
+- U16 input leakage through R19 gives the same `0.222 V` bound at the E73 UART
+  TX pin.
+- U17 output leakage through R9 and the TPS22918-Q1 quick-output-discharge path
+  gives at most `10 uA * 10.10 kOhm = 0.101 V` at E73 RESET.
+- Every result is below the `0.3 V` powered-off absolute limit. During rail
+  ramp, the buffer and E73 share the same supply, so buffer outputs track the
+  module supply instead of the always-on 3.3 V domain.
+- The 22 kOhm switched UART pulls draw at most
+  `3.6 V / 21.78 kOhm = 0.166 mA` from a driven-low line. This is negligible
+  against the buffer's 16 mA guaranteed 3 V drive test point and the nRF52840
+  GPIO capability.
+
+### Component decision
+
+- Why selected: `SN74LVC1G125-Q1` is AEC-Q100 Grade 1, operates from -40 to
+  +125 degrees C, accepts inputs to 5.5 V, provides a three-state output, and
+  specifies `Ioff` back-drive protection. The DBV SOT-23-5 pinout matches the
+  existing reviewed local footprint.
+- Alternative A: Nexperia `74LVC1G125-Q100`, also AEC-Q100 Grade 1 with
+  partial-power-down `IOFF`; package and order-code review is required before
+  substitution.
+- Alternative B: TI `SN74LVC1G125B-Q1`; it retains automotive qualification
+  and partial-power-down behavior but requires exact suffix, pin-map, and
+  sourcing review.
+- Why not a passive series-only solution: a resistor limits clamp current but
+  does not keep the E73 input below `VDD + 0.3 V`.
+- Why not leave E73 always powered: nRF52840 System OFF is viable, but it makes
+  parking current and fault isolation depend on firmware rather than retaining
+  the accepted switched-radio hardware boundary.
+- Operating margin: 3.0-3.6 V rail versus 1.65-5.5 V buffer operation; 3.3 V
+  logic versus 5.5 V tolerant inputs; less than 0.222 V at each unpowered E73
+  digital pin versus the 0.3 V limit.
+- Thermal and lifetime: TI specifies 150 degrees C absolute maximum junction,
+  125 degrees C maximum ambient, and 229 degrees C/W DBV theta-JA. Static
+  dissipation is below 36 uW per buffer at 3.6 V before small UART switching
+  loss, so self-heating is below 0.01 degrees C. The design target is at least
+  10 years with order-date lifecycle and PCN review.
+- Availability and assembly: TI marks the Q1 device active. SOT-23-5 is a
+  standard JLCPCB/PCBWay SMT class; the exact automotive order code remains a
+  purchase-time stock or consignment recheck.
+- Known risks: firmware must not transmit before `RADIO_SENSOR_3V3` settles;
+  layout must place C32-C34 at U15-U17 and keep module-side nets out of the
+  always-on domain. A substituted buffer must retain `Ioff` on both input and
+  output in the power-off state.
+
+Cost impact is three SOT-23-5 gates, three 100 nF capacitors, and five small
+resistors plus the existing R9 rail reassignment. Thermal impact is negligible. Production impact is additional AOI
+coverage for three identical five-pin devices. Field reliability improves
+because software state can no longer drive an unpowered radio input.
+
+## USB VBUS presence discharge
+
+FB R13 is changed to 3.9 kOhm 1%, R14 adds a 15 kOhm 1% pulldown from
+`USB_VBUS_DETECT_RAW` to GND, and C1 remains 100 nF X7R. The calculation uses:
+
+- USB VBUS `4.75-5.50 V`;
+- resistor tolerance `+/-1%`;
+- U14 powered input leakage `+/-10 uA`;
+- U14 power-off `Ioff <= +/-25 uA`;
+- conservative effective C1 timing range `70-130 nF`, covering tolerance,
+  X7R temperature change, and DC-bias uncertainty;
+- U14 is a Schmitt device, so TI specifies `VT+`/`VT-` rather than separate
+  `VIH`/`VIL`. The calculation conservatively uses the highest `VT+` in the
+  entire TI table, `3.43 V` at VCC = 5.5 V, even though U14 runs at 3.0-3.6 V.
+  The low-state calculation uses the lowest `VT-`, `0.77 V` at VCC = 3 V.
+
+Worst-case static results:
+
+- minimum attached voltage:
+  `4.75 * 14.85 / (3.939 + 14.85) - 10 uA * (3.939 || 14.85) = 3.723 V`;
+  margin to the worst-table 3.43 V positive threshold is `0.293 V`;
+- maximum attached voltage:
+  `5.50 * 15.15 / (3.861 + 15.15) + 10 uA * (3.861 || 15.15) = 4.414 V`,
+  below the 5.5 V recommended input ceiling;
+- maximum disconnected voltage from input leakage:
+  `10 uA * 15.15 kOhm = 0.152 V`, providing `0.618 V` margin below the
+  minimum 0.77 V falling Schmitt threshold;
+- maximum powered-off raw voltage is below 4.46 V after applying U14's larger
+  25 uA `Ioff` bound, still below the 5.5 V recommended input ceiling;
+- maximum USB current is below `0.32 mA`, including the larger power-off
+  leakage bound; resistor dissipation remains below 1.4 mW.
+
+With C1 at 130 nF, the worst charging time constant is 0.407 ms and the node
+crosses the 3.43 V conservative high bound within 1.04 ms. With USB physically disconnected, R14 alone
+discharges C1; the worst time constant is 1.970 ms and the node falls below
+the minimum 0.77 V Schmitt threshold within 3.81 ms. Firmware may debounce the
+result but does not provide the electrical low state.
+
+## Machine checks and release boundary
+
+`tools/board_schematic_validation/rules.py` now rejects:
+
+- any direct STM32-to-E73 UART or reset topology;
+- buffer VCC on an always-on rail;
+- a reset pull-up outside `RADIO_SENSOR_3V3`;
+- missing switched-domain UART clamps, either STM32-side idle pull, or the
+  reset-command default pulldown;
+- a `USB_VBUS_DETECT_RAW` net without R14 to GND;
+- resistor/capacitor value regressions in either corrective network.
+
+The generated netlists contain 81 LB components / 191 nets and 44 FB
+components / 46 nets. ERC passes with only the two previously reviewed LB
+cross-board `USB_CC1`/`USB_CC2` isolated-label warnings and zero FB findings.
+
+No `.kicad_pcb`, Gerber, drill, pick-place, BOM/CPL manufacturing package,
+manufacturing ZIP, fabrication package, or PCBA order is created or authorized.
+`PBREL-006` remains `Conditional`; `PBREL-007` remains `Open`.
+
+## Sources
+
+- Nordic nRF52840 absolute maximum ratings:
+  https://docs.nordicsemi.com/bundle/ps_nrf52840/page/abs_max_ratings.html
+- TI SN74LVC1G125-Q1 datasheet:
+  https://www.ti.com/lit/ds/symlink/sn74lvc1g125-q1.pdf
+- Nexperia 74LVC1G125-Q100 datasheet:
+  https://assets.nexperia.com/documents/data-sheet/74LVC1G125_Q100.pdf
+- TI SN74LVC1G17-Q1 datasheet:
+  https://www.ti.com/lit/ds/symlink/sn74lvc1g17-q1.pdf
+- TI TPS22918-Q1 datasheet:
+  https://www.ti.com/lit/ds/symlink/tps22918-q1.pdf

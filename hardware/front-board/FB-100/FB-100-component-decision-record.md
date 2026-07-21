@@ -53,10 +53,13 @@ fabrication or production release.
   pin-compatible Everlight 19-237 common-anode bins or a reviewed smart RGB
   implementation; polarity must never be inferred from package size.
 - USB-C remains device-only with two independent 5.1 kOhm Rd resistors and
-  USBLC6-2SC6 ESD protection. R13 100 kOhm current-limits
-  `USB_VBUS_DETECT_RAW`; LB-100 converts it to `USB_VBUS_PRESENT` with a
-  5 V-tolerant Schmitt buffer. `USB_VBUS` has no connection to
-  `FB_3V3_OR_IO` or another system supply.
+  USBLC6-2SC6 ESD protection. R13 3.9 kOhm current-limits
+  `USB_VBUS_DETECT_RAW`, R14 15 kOhm defines the disconnected low state, and
+  C1 100 nF filters the input. LB-100 converts it to `USB_VBUS_PRESENT` with a
+  5 V-tolerant Schmitt buffer. Worst-case input voltage is 3.723-4.414 V while
+  attached and at most 0.152 V while disconnected; removal is recognized
+  within 3.81 ms at the worst modeled capacitance. `USB_VBUS` has no connection
+  to `FB_3V3_OR_IO` or another system supply.
 - SERVICE and RESET use the sourced Panasonic switch class with 10 kOhm pulls
   and 100 nF debounce capacitors. RESET reaches LB `NRST` through the reviewed
   0 Ohm link; neither button can enable PB outputs.

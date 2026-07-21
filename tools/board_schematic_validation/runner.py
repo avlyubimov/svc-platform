@@ -47,7 +47,7 @@ def validate(repo_root: Path) -> list[str]:
         failures.extend(validate_fb(netlists["FB-100"], boards["FB-100"].parent / "lib/FB100.pretty"))
         failures.extend(validate_electrical_pin_types(
             boards["LB-100"].parent / "lib/LB100.kicad_sym",
-            tuple(f"U{index}" for index in range(1, 15)),
+            tuple(f"U{index}" for index in range(1, 18)),
         ))
         failures.extend(validate_electrical_pin_types(
             boards["FB-100"].parent / "lib/FB100.kicad_sym",
