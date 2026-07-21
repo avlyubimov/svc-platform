@@ -126,6 +126,16 @@ Current coverage:
   Closed, but PBREL-007 pre-layout remains Conditional pending a qualified
   maximum-bound Q2 turnoff trajectory; aggregate authorization is `BLOCKED`,
   board import is prohibited, and production remains `NO-GO`.
+- Infineon email response `IFX-260721-2228076` / `CRM0032570008656` supplied no
+  technical trajectory, model, or FAE statement. It is recorded as
+  `RECEIVED NON-QUALIFYING`; the request must be rerouted through MyCases in
+  parallel. The replacement audit found no automotive 150 V candidate whose
+  public evidence closes Q2Q-010 through Q2Q-015, so
+  `IAUTN15S6N025ATMA1` is retained for a dedicated empirical program: five
+  characterization DUTs followed by 30 new qualification DUTs from at least
+  three lots. Only `QUALIFICATION-COUPON-ONLY` work is authorized; PB-100
+  remains blocked until the measured evidence passes. Independently authorized
+  FB-100 layout may continue.
 - Load-dump freeze review now ties LM74930-Q1 hard cutoff, selected 150 V Q2,
   protected-side 80 V Q1, rejected single-TVS history, 40 V smart-switch ADR boundary, sourcing gate, and
   no-layout boundary into

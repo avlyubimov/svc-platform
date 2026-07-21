@@ -1,6 +1,6 @@
 # PB-100 Q2 Maximum-Bound Qualification Request
 
-Status: `SENT` 2026-07-21 — awaiting response
+Status: `EMAIL RESPONSE RECEIVED — NON-QUALIFYING` 2026-07-21; MyCases reroute required
 
 ## Purpose
 
@@ -8,6 +8,16 @@ Obtain manufacturer-supported maximum-bound turn-off evidence for
 `IAUTN15S6N025ATMA1` before PBREL-007 may authorize `LAYOUT-ONLY`. The request
 does not change the accepted LM74930-Q1 hard-cutoff architecture, selected
 MOSFET, passive cooling decision, schematic, or post-layout/prototype gates.
+
+## Email Channel Result
+
+Infineon response `IFX-260721-2228076` / `CRM0032570008656` redirected the
+sender to the support portal and hotline without supplying technical evidence.
+The reviewed disposition is recorded in
+`PB-100-q2-vendor-response-2026-07-21.md`. The request must now be submitted as
+an Infineon MyCases Technical Support case and routed to Automotive MOSFET
+Applications or product engineering. The PBREL-007 acceptance contract is
+unchanged.
 
 ## Public Evidence Audit
 
@@ -70,16 +80,20 @@ a time-correlated trajectory will remain supporting evidence only.
 
 ## Acceptance Contract
 
-PBREL-007 pre-layout can close only after Q2Q-010 through Q2Q-016 in
-`PB-100-q2-maximum-bound-qualification.csv` are populated from a traceable
-Infineon artifact and independently reviewed. The accepted artifact must prove
-the full paired trajectory, not merely separate scalar timing estimates.
+PBREL-007 pre-layout can close only after Q2Q-010 through Q2Q-015 in
+`PB-100-q2-maximum-bound-qualification.csv` pass through either a traceable
+Infineon artifact or the accepted empirical evidence package. Either route
+must prove the full paired trajectory, not merely separate scalar timing
+estimates. Q2Q-016 preserves the non-qualifying redirect but does not close any
+of Q2Q-010 through Q2Q-015.
 
-If Infineon cannot provide a production maximum, the Product Owner must approve
-a separate component-level qualification plan defining sample count, lot
-coverage, instrumentation bandwidth, 150 degC preconditioning, guardband, and
-post-stress parametric acceptance. Such testing would be empirical project
-qualification, not a manufacturer production-maximum claim.
+The Product Owner has allowed the empirical route when a replacement cannot
+close the gap. `PB-100-q2-replacement-evidence-audit.md` retains the selected
+Q2 and `PB-100-q2-empirical-qualification-plan.md` defines sample count, lot
+coverage, instrumentation bandwidth, 150 degC preconditioning, guardband and
+post-stress parametric acceptance. Such testing is empirical project
+qualification, not a manufacturer production-maximum claim. MyCases remains a
+parallel route to stronger vendor evidence.
 
 Until acceptance, PBREL-007 remains `Conditional`, aggregate PB-100 remains
 `BLOCKED`, and no `PB-100.kicad_pcb`, prototype manufacturing package,
@@ -129,4 +143,5 @@ SVC Platform project
 - Infineon power-MOSFET simulation-model application note:
   https://www.infineon.com/assets/row/public/documents/24/42/infineon-applicationnote-powermosfet-simulationmodels-applicationnotes-en.pdf
 - Infineon support entry point: https://www.infineon.com/support
+- Infineon MyCases direct technical-support channel: https://mycases.infineon.com
 - TI LM74930-Q1 datasheet: https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf

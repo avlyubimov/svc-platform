@@ -105,7 +105,7 @@ condition and do not replace hardware evaluation. The TI controller model does
 not add Infineon process or hot-corner guarantees, and AEC-Q101/PQR evidence by
 itself does not define the paired switching trajectory.
 
-The approved next action is therefore a traceable Infineon application-
+The first approved action was therefore a traceable Infineon application-
 engineering request. `PB-100-q2-maximum-bound-qualification.csv` fixes the
 101 V / 40 A / 150 degC corner, 10.0-14.5 V initial VGS range, 128 mA minimum
 HGATE sink, separate 7 us fully-enhanced deglitch, and ten pulses at 60 s
@@ -118,9 +118,23 @@ The support request is staged in `PB-100-q2-vendor-support-request.md`. It is
 not release evidence until a traceable Infineon case, email, model revision, or
 signed FAE artifact is received and reviewed. A typical-only SPICE plot,
 avalanche comparison, or unrelated gate-charge condition cannot close the
-gate. If Infineon cannot provide a production maximum, a separate empirical
-component-qualification plan requires Product Owner approval and must not be
-described as a manufacturer maximum.
+gate. Infineon's email response `IFX-260721-2228076` /
+`CRM0032570008656` was a non-qualifying redirect to the support portal. The
+Product Owner then allowed either a replacement that actually closes the
+evidence gap or empirical qualification of the selected Q2. The reviewed
+replacement audit found no automotive 150 V candidate with the required public
+production-covered paired hot trajectory, so the selected engineering route is
+to retain `IAUTN15S6N025ATMA1` and execute
+`PB-100-q2-empirical-qualification-plan.md` while MyCases proceeds in parallel.
+
+The empirical plan requires five separate characterization DUTs followed by
+thirty new qualification DUTs from at least three independent lot/date codes,
+synchronized 200 MHz-class VDS/ID/VGS acquisition, measured 150 degC initial
+Tj, ten events per qualification DUT at 60 s spacing, explicit uncertainty and
+1.25x guardband, post-stress parametrics and independent review. It remains
+project-specific evidence and must not be described as a manufacturer maximum.
+Only a dedicated qualification coupon is authorized before the results pass;
+PB-100 board import remains prohibited.
 
 ## Production and Lifetime
 
@@ -153,3 +167,7 @@ remains 10-15 years, subject to controlled alternates and lifecycle recheck.
 - `hardware/power-board/PB-100/PB-100-surge-stopper-evidence.csv`
 - `hardware/power-board/PB-100/PB-100-q2-maximum-bound-qualification.csv`
 - `hardware/power-board/PB-100/PB-100-q2-vendor-support-request.md`
+- `hardware/power-board/PB-100/PB-100-q2-vendor-response-2026-07-21.md`
+- `hardware/power-board/PB-100/PB-100-q2-replacement-evidence-audit.md`
+- `hardware/power-board/PB-100/PB-100-q2-empirical-qualification-plan.md`
+- `hardware/power-board/PB-100/PB-100-q2-empirical-qualification-readiness.csv`
