@@ -1,6 +1,6 @@
 # PB-100 80 V MOSFET Voltage-Class Decision
 
-Status: Accepted by Product Owner; selected production path reviewed 2026-07-21; PCB layout not authorized
+Status: 80 V class accepted; PBREL-006 Conditional and PBREL-007 Open; PCB layout not authorized
 
 ## Decision
 
@@ -18,15 +18,16 @@ retained but is not selected.
 
 ## Why this component
 
-- 80 V VDS leaves 20.55 V above the generated 59.45 V hot clamp-loop
-  overshoot bound.
+- 80 V VDS retains useful voltage-class headroom above the current generated
+  57.60 V ISO-corner peak. This does not close TVS energy or LM74700 margin.
 - Maximum RDS(on) is 1.2 mOhm at 10 V; the conservative hot design bound uses
   2.1x, or 2.52 mOhm.
 - Maximum RthJC is 0.4 K/W, maximum junction temperature is 175 degC, maximum
   gate charge is 231 nC, and the package is 100% avalanche tested.
 - At the 40 A board budget Q1 dissipates 4.032 W at the hot resistance bound.
-  With the hard 125 degC case acceptance ceiling, the junction estimate is
-  126.61 degC and retains 48.39 degC to the absolute maximum.
+  If the case can be held at 125 degC, the junction estimate is 126.61 degC and
+  retains 48.39 degC to the absolute maximum. Layout extraction and
+  PB-BENCH-010 must prove that case condition.
 - One exact package for Q1 and Q101-Q110 reduces stencil, inspection, and
   substitution ambiguity while preserving role-free outputs.
 
@@ -50,8 +51,8 @@ It is deliberately non-drop-in.
 ### Rejected preliminary and 60 V paths
 
 Preliminary `BUK7S1R2-80M` LFPAK88 is not a production selection. The 60 V
-`SIDR626LDP` and `IAUTN06S5N008` paths are also rejected because the accepted
-59.45 V bound leaves no useful component/measurement tolerance.
+`SIDR626LDP` and `IAUTN06S5N008` paths are also rejected because 60 V provides
+no useful component/measurement tolerance against the load-dump clamp.
 
 ## Availability and factory path
 
@@ -61,15 +62,16 @@ PCBWay kitted/consigned assembly using an authorized-distributor reel. TOLL
 stencil, paste coverage, MSL handling, polarity, solder-void acceptance, and
 first-article inspection must be reconfirmed with the actual assembler quote.
 
-This pre-layout source/process evidence closes PBREL-006 and the power-package
-portion of PBREL-011. Quote, DFM response, FAI, PB-BENCH-010, and order-date
-lifecycle/stock recheck remain later release gates and are not misreported as
-completed tests.
+This pre-layout source/process evidence supports the MOSFET choice and the
+power-package portion of PBREL-011. PBREL-006 is Conditional until copper and
+thermal extraction plus PB-BENCH-010 prove the assumed 125 degC case boundary.
 
 ## Hard escape conditions
 
-- Reopen protection if PB-BENCH-004 measures 60 V or more downstream of D1.
-- Reopen layout if the extracted D1-to-Q1/controller clamp loop exceeds 20 nH.
+- Keep PBREL-007 Open until an ADR-0016 protection branch passes energy thermal
+  tolerance self-heating and 5 V recommended-margin checks.
+- Reject any layout whose extracted D1-to-Q1/controller loop invalidates the
+  accepted protection model.
 - Reopen thermal design if Q1 or an output MOSFET case exceeds 125 degC at its
   accepted continuous envelope.
 - Do not substitute any MOSFET from a BOM-only equivalence; repeat electrical,

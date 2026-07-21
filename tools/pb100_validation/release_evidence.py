@@ -33,14 +33,19 @@ def validate_five_blocker_release_evidence() -> None:
     status_by_id = {row["Blocker ID"]: row["Status"] for row in blocker_rows}
     if set(status_by_id) != {f"PBREL-{number:03d}" for number in range(1, 13)}:
         fail("PB-100 blocker register must contain PBREL-001 through PBREL-012 exactly")
-    if any(status != "Closed" for status in status_by_id.values()):
-        open_ids = sorted(blocker_id for blocker_id, status in status_by_id.items() if status != "Closed")
-        fail(f"PB-100 PBREL pre-layout blockers are not all closed: {', '.join(open_ids)}")
+    expected_active = {"PBREL-006": "Conditional", "PBREL-007": "Open"}
+    actual_active = {
+        blocker_id: status
+        for blocker_id, status in status_by_id.items()
+        if status != "Closed"
+    }
+    if actual_active != expected_active:
+        fail(f"PB-100 active blocker state must be {expected_active}, got {actual_active}")
 
     for blocker_id in FIVE_BLOCKERS:
         row = next(row for row in blocker_rows if row["Blocker ID"] == blocker_id)
         row_text = " ".join(row.values())
-        if "pre-layout" not in row_text or "later" not in row_text:
+        if blocker_id not in expected_active and ("pre-layout" not in row_text or "later" not in row_text):
             fail(f"{blocker_id} must distinguish closed pre-layout evidence from later physical gates")
 
     output_rows = _rows("PB-100-output-soa-evidence.csv")
@@ -59,27 +64,34 @@ def validate_five_blocker_release_evidence() -> None:
             fail(f"OUT2 generated evidence {field} must be {value}, got {high[field]}")
 
     transient_rows = _rows("PB-100-transient-margin-evidence.csv")
-    transient_by_item = {row["Evidence item"]: row for row in transient_rows}
-    if transient_by_item["Bounded downstream stress"]["Value"] != "59.45":
-        fail("generated transient evidence must preserve the reviewed 59.45 V bound")
-    for item in (
-        "LM74700-Q1 recommended operating ceiling",
-        "LM74700-Q1 ANODE absolute maximum",
-        "IAUT300N08S5N012 VDS",
-        "TPS48110-Q1 and 100 V buck family",
-    ):
-        if transient_by_item[item]["Result"] != "PASS":
-            fail(f"generated transient margin must pass for {item}")
+    expected_corners = {
+        (us, ri, duration, initial)
+        for us in {"79", "101"}
+        for ri in {"0.5", "4"}
+        for duration in {"40", "400"}
+        for initial in {"25", "125"}
+    }
+    actual_corners = {
+        (row["Us V"], row["Ri ohm"], row["td ms"], row["Initial Tj C"])
+        for row in transient_rows
+    }
+    if actual_corners != expected_corners:
+        fail("generated load-dump evidence must cover every ISO 16750-2 design corner")
+    if not any(row["Result"] == "FAIL" for row in transient_rows):
+        fail("PBREL-007 must remain open while the selected TVS fails load-dump screening")
+    for row in transient_rows:
+        for field in (
+            "Peak TVS current A", "Peak clamp V", "Peak TVS power W", "TVS energy J",
+            "Typical ZthJM C/W", "Predicted peak Tj C", "Margin to LM74700 60 V",
+        ):
+            float(row[field])
 
     q1_by_item = {row["Evidence item"]: row for row in _rows("PB-100-input-q1-evidence.csv")}
-    for item, value in (
-        ("Exact orderable MPN", SELECTED_MOSFET),
-        ("Q1 conduction loss", "4.032"),
-        ("Junction at acceptance ceiling", "126.61"),
-        ("Junction margin", "48.39"),
-    ):
-        if q1_by_item[item]["Value"] != value or q1_by_item[item]["Result"] != "PASS":
-            fail(f"generated Q1 evidence must keep {item}={value} PASS")
+    if q1_by_item["Exact orderable MPN"]["Value"] != SELECTED_MOSFET:
+        fail("generated Q1 evidence must use the selected orderable MOSFET")
+    for item in ("Q1 conduction loss", "Junction at acceptance ceiling", "Junction margin"):
+        if float(q1_by_item[item]["Value"]) <= 0 or q1_by_item[item]["Result"] != "PASS":
+            fail(f"generated Q1 evidence must keep a positive screening result for {item}")
 
     factory_rows = _rows("PB-100-factory-production-evidence.csv")
     if not factory_rows or any("PASS" not in row["Pre-layout result"] for row in factory_rows):

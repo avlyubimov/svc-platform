@@ -72,6 +72,7 @@ def validate_lb(netlist: Netlist, library_dir: Path) -> list[str]:
     validate_footprints(netlist, "LB100", library_dir, failures)
     require_component(netlist, "U1", "STM32H563VIT6", "LB100:LQFP-100_L14.0-W14.0-P0.50-LS16.0-BL", failures)
     require_component(netlist, "U3", "TCA9539QPWRQ1", "LB100:TSSOP-24_4.4x7.8mm_P0.65mm", failures)
+    require_component(netlist, "U14", "SN74LVC1G17QDBVRQ1", "LB100:SOT-25_L3.0-W1.6-P0.95-LS2.8-TL", failures)
     require_component(netlist, "JPB1", "FX18-100S-0.8SV10", "LB100:FX18-100S-0.8SV10_Hirose", failures)
     require_component(netlist, "JFB1", "AFC07-S24ECA-00", "LB100:FPC-SMD_AFC07-S24ECA-00", failures)
 
@@ -89,15 +90,21 @@ def validate_lb(netlist: Netlist, library_dir: Path) -> list[str]:
 
     require_net(netlist, "USB_D_N", {("JFB1", "5"), ("U1", "70")}, failures)
     require_net(netlist, "USB_D_P", {("JFB1", "4"), ("U1", "71")}, failures)
-    require_net(netlist, "USB_VBUS_SENSE", {("JFB1", "8"), ("U1", "57")}, failures)
+    require_net(netlist, "USB_VBUS_DETECT_RAW", {("JFB1", "8"), ("U14", "2")}, failures)
+    require_net(netlist, "USB_VBUS_PRESENT", {("U1", "57"), ("U14", "4")}, failures)
     require_net(netlist, "SWDIO", {("JDBG1", "2"), ("U1", "72")}, failures)
     require_net(netlist, "SWCLK", {("JDBG1", "4"), ("U1", "76")}, failures)
 
     for index in range(1, 11):
         iox_pin = str(index + 3) if index <= 8 else str(index + 4)
         require_net(netlist, f"CH_LED_{index}", {("JFB1", str(index + 9)), ("U3", iox_pin)}, failures)
-    require_net(netlist, "STATUS_RGB_DATA", {("JFB1", "9"), ("U3", "15")}, failures)
+    require_net(netlist, "STATUS_RGB_DATA", {("JFB1", "9"), ("U1", "88")}, failures)
     require_net(netlist, "SERVICE_BTN", {("JFB1", "20"), ("U3", "16")}, failures)
+    require_net(netlist, "ADC_REF", {("U1", "21"), ("R16", "2"), ("C28", "1"), ("C29", "1"), ("JPB1", "66")}, failures)
+    require_net(netlist, "AGND", {("U1", "19"), ("U1", "20"), ("R17", "1")}, failures, exact=False)
+    require_net(netlist, "GND", {("R17", "2")}, failures, exact=False)
+    require_net(netlist, "LB_3V3_IO", {("U10", "5"), ("U10", "12"), ("U11", "2")}, failures, exact=False)
+    require_net(netlist, "RADIO_SENSOR_3V3", {("U10", "8")}, failures, exact=False)
 
     mf_pins = {
         ("JPB1", "MF_A_PIN1_51_END"),
@@ -127,7 +134,7 @@ def validate_fb(netlist: Netlist, library_dir: Path) -> list[str]:
     require_net(netlist, "USB_D_N_CONN", {("J1", "A7"), ("J1", "B7"), ("D1", "3")}, failures)
     require_net(netlist, "USB_D_P", {("D1", "6"), ("JFB1", "4")}, failures)
     require_net(netlist, "USB_D_N", {("D1", "4"), ("JFB1", "5")}, failures)
-    require_net(netlist, "USB_VBUS_SENSE", {("C1", "1"), ("JFB1", "8"), ("R13", "2"), ("R14", "1")}, failures)
+    require_net(netlist, "USB_VBUS_DETECT_RAW", {("C1", "1"), ("JFB1", "8"), ("R13", "2")}, failures)
     require(not ({("J1", "A4"), ("J1", "A9"), ("J1", "B4"), ("J1", "B9")} & set(netlist.nets.get("FB_3V3_OR_IO", frozenset()))), "USB VBUS back-powers FB_3V3_OR_IO", failures)
 
     for index in range(1, 11):

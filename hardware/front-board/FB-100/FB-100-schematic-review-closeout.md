@@ -4,7 +4,7 @@ Status: Closed for schematic freeze
 Review date: 2026-07-21
 
 This closeout freezes the FB-100 Rev.1 value-bearing schematic inputs. The
-deterministic KiCad sheet contains 44 component instances, 46 exported nets,
+deterministic KiCad sheet contains 43 component instances, 46 exported nets,
 project-local symbols, and non-empty project-local Footprint properties. It does
 not create or approve KiCad PCB layout or manufacturing outputs.
 
@@ -13,9 +13,10 @@ not create or approve KiCad PCB layout or manufacturing outputs.
 - Interface: 24-pin `JFB1` cable pinout is closed with USB service, status RGB,
   OUT1..OUT10 channel indicators, SERVICE/RESET buttons, optional OLED, and
   power/reference pins.
-- USB service: USB-C device-only service path uses CC Rd behavior, ESD
-  protection, shield/return policy, and VBUS sense-only no-back-power boundary.
-- UI: LTC3212 one-wire driver and common-anode RGB status LED, ten role-free
+- USB service: USB-C device-only service path uses CC Rd behavior, ESD,
+  shield/return policy, and current-limited `USB_VBUS_DETECT_RAW` to the LB
+  5 V-tolerant digital detector with no analog divider or power injection.
+- UI: direct STM32-driven LTC3212 one-wire driver and common-anode RGB status LED, ten role-free
   1 kOhm channel LED paths, SERVICE/RESET controls, and optional OLED module
   header DNP are captured without accessory role names.
 - Mechanical: prototype envelope, mounting, USB access, LED/button alignment,
@@ -40,7 +41,7 @@ not create or approve KiCad PCB layout or manufacturing outputs.
 
 ## Validation Result
 
-- KiCad XML netlist export: 44 components, 46 nets.
+- KiCad XML netlist export: 43 components, 46 nets.
 - ERC: zero findings.
 - Topology: USB-C device role, two CC Rd resistors, flow-through ESD, VBUS
   sense-only divider, no-back-power boundary, channel LEDs, one-wire RGB,

@@ -52,9 +52,11 @@ fabrication or production release.
 - Status LED is `19-237/R6GHBHC-A01/2T`, common anode. Alternatives are other
   pin-compatible Everlight 19-237 common-anode bins or a reviewed smart RGB
   implementation; polarity must never be inferred from package size.
-- USB-C remains device-only with two independent 5.1 kOhm Rd resistors,
-  USBLC6-2SC6 ESD protection, and a 100 kOhm/27 kOhm VBUS sense divider.
-  `USB_VBUS` has no connection to `FB_3V3_OR_IO`.
+- USB-C remains device-only with two independent 5.1 kOhm Rd resistors and
+  USBLC6-2SC6 ESD protection. R13 100 kOhm current-limits
+  `USB_VBUS_DETECT_RAW`; LB-100 converts it to `USB_VBUS_PRESENT` with a
+  5 V-tolerant Schmitt buffer. `USB_VBUS` has no connection to
+  `FB_3V3_OR_IO` or another system supply.
 - SERVICE and RESET use the sourced Panasonic switch class with 10 kOhm pulls
   and 100 nF debounce capacitors. RESET reaches LB `NRST` through the reviewed
   0 Ohm link; neither button can enable PB outputs.

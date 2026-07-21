@@ -70,14 +70,14 @@ Current coverage:
 | Area | Status | Notes |
 |---|---|---|
 | Architecture v1.0 | Ready | Frozen by ADR; PB-100 requirement changes still need ADR |
-| PB-100 requirements | Ready for schematic planning | Baseline is frozen; schematic freeze remains open |
+| PB-100 requirements | Ready for corrective schematic planning | Baseline plus ADR-0016 ISO load-dump requirement are frozen; schematic freeze remains open |
 | PB-100 KiCad scaffold | Preliminary capture | Child sheets now contain ERC-clean preliminary capture content and exported netlist coverage; schematic freeze remains open |
-| PB-100 PCB/layout | Blocked by schematic freeze | The release register has 0 active PBREL blockers. The 2026-07-21 closeout adds generated transient, SOA, Q1 thermal, CAN1 and factory evidence; controlled promotion of the accepted passives/clamps, full schematic review, Product Owner freeze approval, and layout-start checklist still block PCB import and manufacturing outputs |
+| PB-100 PCB/layout | Blocked by schematic freeze | There are 2 active blockers: `PBREL-006`, `PBREL-007`. Q1 thermal evidence is Conditional until layout extraction and PB-BENCH-010; the current TVS branch fails the ADR-0016 ISO load-dump energy/thermal/margin screen. No PCB import or manufacturing output is authorized |
 | LB-100 requirements | Frozen | Baseline is frozen by ADR-0014 and the schematic freeze is Closed |
-| LB-100 KiCad schematic | Reviewed | Deterministic 63-component, 186-net, footprint-bound capture covers STM32H563, JPB1/JFB1, switched service rails, storage/sensors, UI I/O, and ADR-0015 logic-only CAN1; exported-netlist audit and ERC pass with only the two reviewed cross-board USB CC single-pin warnings |
+| LB-100 KiCad schematic | Reviewed | Deterministic 70-component, 188-net, footprint-bound capture adds typed IC pins/ERC, sourced and decoupled ADC_REF, one-point AGND return, digital USB VBUS detection, direct STM32-to-LTC3212 drive, and back-power-safe sensor supplies; exported-netlist audit and ERC pass with only the two reviewed cross-board USB CC single-pin warnings |
 | LB-100 PCB/layout | Blocked | There are 0 active blockers (0 active LBREL blockers). Footprint, schematic, and corrected FX18 mechanical gates are closed; the separate signal-integrity and safety layout model remains Open, so no `LB-100.kicad_pcb` or manufacturing output is authorized |
 | FB-100 requirements | Frozen | Baseline is frozen by ADR-0014 and the schematic freeze is Closed |
-| FB-100 KiCad schematic | Reviewed | Deterministic 44-component, 46-net, footprint-bound capture covers USB-C/ESD/no-back-power, JFB1, ten role-free indicators, one-wire RGB, service/reset buttons, and DNP OLED; exported-netlist audit and ERC pass with zero findings |
+| FB-100 KiCad schematic | Reviewed | Deterministic 43-component, 46-net, footprint-bound capture covers USB-C/ESD/no-back-power current-limited VBUS presence, JFB1, ten role-free indicators, direct one-wire RGB, service/reset buttons, and DNP OLED; exported-netlist audit and ERC pass with zero findings |
 | FB-100 PCB/layout | Ready for controlled import | There are 0 active blockers (0 active FBREL blockers). Schematic, footprint, USB/no-back-power, and mechanical gates are closed; no `.kicad_pcb`, Gerber, drill, placement, BOM/CPL, manufacturing ZIP, or PCBA order exists yet |
 | Firmware safety core | Host-test ready | Output, overflow-safe delayed battery cutoff, runtime load shedding, stale-current safe-off, thermal derate/cutoff, CAN dropped-edge retry, telemetry, events, saturating diagnostic counters, logging, config, runtime boot, CAN-to-rule bridge, ambient-light rule conditions, ordered rule sets, multi-action rule compilation, rule runtime, and rule paths covered |
 | Configuration format | Host-test ready | JSON schema, canonical rule grammar, rule-action mapping, buffer-atomic rule compilation, PB-100 capability manifest, compiled capability baseline, config store reserved/sequence-wrap handling, config update, and examples are validated |
@@ -104,13 +104,14 @@ Current coverage:
   evidence only and Vishay `SM8S33AHE3_A/I` remains NFD evidence only.
   Schematic freeze still requires live source continuity, DO-218AC assembly,
   pulse-energy, and actual clamp-loop validation.
-- TVS/load-dump margin now has a generated 59.45 V hot clamp-loop bound for the
-  active `SM8S33AHM3/I` branch, including temperature, loop inductance, current
-  slew, and uncertainty. Schematic/layout review must preserve the 20 nH loop
-  ceiling; PB-BENCH-004 rejects any measured result at or above 60 V.
+- TVS/load-dump evidence now covers the ADR-0016 `79-101 V`, `0.5-4 ohm`, and
+  `40-400 ms` envelope with current, energy, transient thermal impedance,
+  tolerance, and self-heating calculations. The current `SM8S33AHM3/I` branch
+  fails multiple corners and reaches only 2.40 V minimum margin to the
+  LM74700-Q1 60 V recommended ceiling; PBREL-007 remains Open.
 - TVS/load-dump freeze review now ties the active SM8S33AHM3/I branch,
-  selected 80 V MOSFET baseline, rejected 60 V history, 100 V
-  pass-with-margin paths, 40 V smart-switch ADR boundary, sourcing gate, and
+  selected 80 V MOSFET baseline, rejected 60 V history, 100 V device-class
+  paths, 40 V smart-switch ADR boundary, sourcing gate, and
   no-layout boundary into
   `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`.
 - TVS/load-dump overshoot closure now has

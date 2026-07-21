@@ -1,7 +1,7 @@
 # PB-100 Input Reverse-Protection MOSFET Strategy
 
-Status: exact 80 V Q1 and pre-layout SOA/thermal/sourcing evidence closed;
-value-bearing gate-network promotion and physical layout acceptance remain open
+Status: 80 V Q1 selection accepted; PBREL-006 Conditional pending physical
+thermal evidence and PBREL-007 Open under ADR-0016
 
 ## Problem
 
@@ -27,11 +27,12 @@ remain historical evidence. They are not approved Rev.1 assembly substitutions.
 
 ## Operating and lifetime evidence
 
-- The generated 59.45 V downstream-stress bound leaves 20.55 V to the selected
-  80 V rating. Layout must enforce the 20 nH clamp-loop ceiling and
-  PB-BENCH-004 rejects measured stress at or above 60 V.
-- At the hard 125 C case ceiling the 4.032 W bound and 0.4 K/W RthJC produce
-  126.61 C junction, leaving 48.39 C to the 175 C absolute maximum.
+- The selected 80 V class remains appropriate against the current 57.60 V
+  generated ISO-corner peak. PBREL-007 remains Open because the TVS fails
+  thermal/energy screening and LM74700 margin is only 2.40 V.
+- If layout and cooling hold the case at 125 C the 4.032 W bound and 0.4 K/W
+  RthJC produce 126.61 C junction. PBREL-006 is Conditional until extraction
+  and PB-BENCH-010 demonstrate that case condition.
 - Manufacturer evidence marks the selected automotive part active/preferred and
   planned through at least 2038. The project lifetime target remains 10-15 years;
   order-date lifecycle and authorized-reel continuity are still rechecked.

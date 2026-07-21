@@ -6,7 +6,7 @@ JFB1,4,USB_D_P,FB-100 to LB-100,LB-100,High-Z until attach,Routes to STM32H563 P
 JFB1,5,USB_D_N,FB-100 to LB-100,LB-100,High-Z until attach,Routes to STM32H563 PA11 USB_DM through USBLC6-class ESD,Closed,Do not swap D+/D- or bypass ESD
 JFB1,6,USB_CC1,FB-100/LB-100,LB-100,5.1k Rd device role,USB-C service is device-only and detect-only,Closed,Do not advertise source or dual-role power without ADR
 JFB1,7,USB_CC2,FB-100/LB-100,LB-100,5.1k Rd device role,USB-C service is device-only and detect-only,Closed,Do not advertise source or dual-role power without ADR
-JFB1,8,USB_VBUS_SENSE,FB-100 to LB-100,LB-100,Divider/sense only,VBUS presence cannot back-power LB_3V3_IO PB_5V_OUT or PB-100,Closed,Do not connect VBUS to system rails
+JFB1,8,USB_VBUS_DETECT_RAW,FB-100 to LB-100,LB-100,100 kOhm current-limited raw input to 5 V-tolerant LB buffer,VBUS presence cannot back-power LB_3V3_IO PB_5V_OUT or PB-100 and PD10 remains digital-only,Closed,Do not connect VBUS to system rails
 JFB1,9,STATUS_RGB_DATA,LB-100 to FB-100,LB-100,Low/off until firmware drives,Role-free status RGB data or discrete RGB driver input,Closed,Do not encode vehicle accessory roles in LED hardware
 JFB1,10,CH_LED_1,LB-100 to FB-100,LB-100,Off until firmware drives,Role-free OUT1 indicator,Closed,Do not label by accessory role
 JFB1,11,CH_LED_2,LB-100 to FB-100,LB-100,Off until firmware drives,Role-free OUT2 indicator,Closed,Do not label by accessory role

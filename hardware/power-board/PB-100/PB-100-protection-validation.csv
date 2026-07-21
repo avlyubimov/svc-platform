@@ -1,11 +1,11 @@
 Protected item,Relevant limit,Protection candidate,Protection value,Preliminary result,Required action
-TPS48110 high-side controller,100V absolute family,SM8S33AHM3/I TVS,59.45V bounded stress,Pass with 40.55V margin,Enforce 20nH loop and confirm waveform in PB-BENCH-004
-IAUT300N08S5N012ATMA2 output MOSFET,80V VDS,SM8S33AHM3/I TVS,59.45V bounded stress,Selected with 20.55V bounded margin,Validate extracted clamp loop SOA thermal and inductive energy during layout/prototype gates
-LM74700 reverse controller,65V absolute and 60V recommended limits,SM8S33AHM3/I TVS,59.45V bounded stress,Pass with 5.55V absolute and 0.55V recommended margin,Reject measured stress at or above 60V and retain PB-BENCH-004
+TPS48110 high-side controller,100V absolute family,SM8S33AHM3/I TVS,57.60V peak in generated ISO corners,Voltage class passes but TVS thermal survival fails,Keep 100V class and select a protection branch that passes ADR-0016
+IAUT300N08S5N012ATMA2 output MOSFET,80V VDS,SM8S33AHM3/I TVS,57.60V peak in generated ISO corners,80V selection retained; system protection remains Open,Validate extracted clamp loop SOA thermal and inductive energy only after D1 passes
+LM74700 reverse controller,65V absolute and 60V recommended limits,SM8S33AHM3/I TVS,57.60V peak in generated ISO corners,Fail required 5V recommended margin; only 2.40V remains,Select a lower-stress protection branch and retain PB-BENCH-004
 IAUTN06S5N008 input reverse MOSFET,60V VDS,Active SM8S33AHM3-class TVS,53.3V clamp,Rejected Rev.1 baseline,Historical evidence only; do not populate without Product Owner review and overshoot proof
-IAUT300N08S5N012ATMA2 input reverse MOSFET,80V VDS,SM8S33AHM3/I TVS,59.45V bounded stress,Selected with 20.55V bounded margin,Validate extracted clamp loop 40A physical copper thermal package assembly and availability during later gates
+IAUT300N08S5N012ATMA2 input reverse MOSFET,80V VDS,SM8S33AHM3/I TVS,57.60V peak in generated ISO corners,80V selection retained; PBREL-006 Conditional,Validate extracted clamp loop 40A physical copper thermal package assembly and PB-BENCH-010
 TPS2HB35 smart switch,40V load-dump class,Active SM8S33AHM3-class TVS,53.3V clamp,Deferred not Rev.1 baseline,Keep out unless future ADR adds lower clamp strategy
 TPS2HB35 smart switch,40V load-dump class,SM8S24A/SMCJ24A-class TVS,about 39V clamp,Optional future alternate,Validate jump-start load-dump and derating before any future use
-LM5164QDDATQ1 buck,100V input,SM8S33AHM3/I TVS,59.45V bounded stress,Pass with 40.55V margin,Confirm final buck input network and EMI components
-LM5013-Q1 buck,100V input,SM8S33AHM3/I TVS,59.45V bounded stress,Pass with 40.55V margin,Confirm final buck input network and EMI components
+LM5164QDDATQ1 buck,100V input,SM8S33AHM3/I TVS,57.60V peak in generated ISO corners,Voltage class passes but TVS thermal survival fails,Confirm final buck input network after protection selection
+LM5013-Q1 buck,100V input,SM8S33AHM3/I TVS,57.60V peak in generated ISO corners,Voltage class passes but TVS thermal survival fails,Confirm final buck input network after protection selection
 TPS54360B-Q1 buck,60V input class,Active SM8S33AHM3-class TVS,53.3V clamp,Conditional,Confirm exact absolute max/load-dump rating before choosing this alternative

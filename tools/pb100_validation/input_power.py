@@ -64,10 +64,15 @@ def validate_input_power_design_values() -> None:
         for column in ("Block", "Related net", "Candidate direction", "Freeze dependency", "Notes"):
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
-        if row["Value status"].strip() != "Selected final pre-layout":
+        expected_status = (
+            "Open under ADR-0016"
+            if design_item == "TVS clamp selection"
+            else "Selected final pre-layout"
+        )
+        if row["Value status"].strip() != expected_status:
             fail(
                 f"{path.relative_to(REPO_ROOT)}:{row_number}: "
-                "input-power value must be Selected final pre-layout"
+                f"input-power value must be {expected_status}"
             )
         dependency = row["Freeze dependency"].lower()
         if not any(token in dependency for token in ("freeze", "release", "gate", "validat", "review")):
@@ -169,7 +174,7 @@ def validate_input_reverse_package_trace() -> None:
             fail(f"input reverse controller trace must include {token}")
 
     selected_text = " ".join(rows_by_item["Selected 80 V TOLL path"].values())
-    for token in ("IAUT300N08S5N012ATMA2", "20.55 V", "40 A", "production-source"):
+    for token in ("IAUT300N08S5N012ATMA2", "ADR-0016", "40 A", "production-source"):
         if token not in selected_text:
             fail(f"selected 80 V Q1 trace must include {token}")
 
@@ -220,7 +225,7 @@ def validate_input_reverse_package_trace() -> None:
     protection_text = read_text(PB100_DIR / "PB-100-protection-validation.csv")
     for token in (
         "IAUT300N08S5N012ATMA2 input reverse MOSFET,80V VDS",
-        "Selected with 20.55V bounded margin",
+        "80V selection retained; PBREL-006 Conditional",
         "Rejected Rev.1 baseline",
     ):
         if token not in protection_text:
@@ -565,8 +570,10 @@ def validate_input_reverse_q1_closeout_precheck() -> None:
         "60 V paths are rejected",
         "SM8S33AHM3/I",
         "TVS",
-        "peak stress margin",
-        "80V limit",
+        "ADR-0016",
+        "energy",
+        "transient thermal",
+        "PBREL-007",
         "IIN_SHUNT_HI",
         "IIN_SHUNT_LO",
         "0.5mΩ shunt",
