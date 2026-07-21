@@ -52,8 +52,8 @@ def validate_q2_maximum_bound_qualification() -> None:
             fail(f"{qualification_id} must remain PENDING VENDOR until traceable Infineon evidence exists")
     if rows_by_id["Q2Q-016"]["Current evidence"] != "NOT RECEIVED":
         fail("Q2Q-016 must not claim a vendor response before a traceable artifact is reviewed")
-    if rows_by_id["Q2Q-017"]["Status"] != "DRAFT READY":
-        fail("Q2 vendor request must remain explicitly staged as a draft before submission")
+    if rows_by_id["Q2Q-017"]["Status"] != "AWAITING VENDOR":
+        fail("Q2 vendor request must record submission while the response remains pending")
     if rows_by_id["Q2Q-018"]["Required bound"] != "BLOCKED until Q2Q-010 through Q2Q-016 are accepted":
         fail("Q2 qualification decision must depend on every missing vendor evidence item")
     if rows_by_id["Q2Q-018"]["Status"] != "BLOCKED":
@@ -75,7 +75,8 @@ def validate_q2_maximum_bound_qualification() -> None:
         "process, temperature, and lot coverage",
         "typical SPICE",
         "support@infineon.com",
-        "not yet sent",
+        "Status: `SENT`",
+        "awaiting response",
         "no `PB-100.kicad_pcb`",
     ):
         if token not in request:

@@ -1518,7 +1518,15 @@ def validate_kicad_scaffold(board: str, board_dir: Path, status: str) -> None:
                         f"temporary path token {forbidden_token}"
                     )
     readme = read_text(kicad_dir / "README.md")
-    if f"no `{board}.kicad_pcb`" not in readme:
+    pcbs = layout_files(board_dir)
+    if pcbs:
+        expected_layout = kicad_dir / f"{board}.kicad_pcb"
+        if board != "FB-100" or pcbs != [expected_layout]:
+            fail(f"unexpected controlled layout artifact: {pcbs[0].relative_to(REPO_ROOT)}")
+        for token in (f"controlled `{board}.kicad_pcb`", "no manufacturing outputs"):
+            if token not in readme:
+                fail(f"{(kicad_dir / 'README.md').relative_to(REPO_ROOT)} must include {token}")
+    elif f"no `{board}.kicad_pcb`" not in readme:
         fail(f"{(kicad_dir / 'README.md').relative_to(REPO_ROOT)} must explicitly block {board}.kicad_pcb")
     schematic_text = read_text(schematic_path)
     if status == "Closed":
@@ -1585,7 +1593,7 @@ def main() -> int:
     validate_contract_csv(
         FB100_CONTRACTS[1],
         FB100_MECHANICAL_COLUMNS,
-        ("FB-MECH-001", "USB-C", "No FB-100 PCB layout", "JLCPCB/PCBWay"),
+        ("FB-MECH-001", "USB-C", "controlled FB-100", "JLCPCB/PCBWay"),
     )
     validate_lb100_pin_binding()
     validate_sourcing_precheck(

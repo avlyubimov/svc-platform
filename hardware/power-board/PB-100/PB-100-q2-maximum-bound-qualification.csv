@@ -15,5 +15,5 @@ Q2Q-013,Paired VDS and ID trajectory,Time-correlated maximum-bound VDS(t) and ID
 Q2Q-014,Hot linear-mode SOA confirmation,Trajectory is inside Q2 SOA at initial Tj 150 degC with stated margin,Current 2.08x graph-derived screen is provisional,Written Infineon application-engineering confirmation tied to Q2Q-013,PENDING VENDOR
 Q2Q-015,Production coverage,Bound identifies process temperature and lot coverage plus any guardband,Public typical simulation models do not establish production maximums,Written Infineon qualification statement,PENDING VENDOR
 Q2Q-016,Vendor response identifier,Infineon case email or signed FAE document identifier,NOT RECEIVED,Traceable Infineon support artifact,PENDING VENDOR
-Q2Q-017,Vendor request state,Reviewed request ready for submission,DRAFT READY,PB-100-q2-vendor-support-request.md,DRAFT READY
+Q2Q-017,Vendor request state,Submitted request awaiting Infineon response,SENT BY PRODUCT OWNER 2026-07-21,PB-100-q2-vendor-support-request.md,AWAITING VENDOR
 Q2Q-018,Pre-layout qualification decision,BLOCKED until Q2Q-010 through Q2Q-016 are accepted,PBREL-007 remains Conditional and PB-100 remains BLOCKED,Machine validation plus Product Owner evidence review,BLOCKED

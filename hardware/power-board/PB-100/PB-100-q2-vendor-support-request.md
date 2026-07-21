@@ -1,6 +1,6 @@
 # PB-100 Q2 Maximum-Bound Qualification Request
 
-Status: `DRAFT READY` — not yet sent
+Status: `SENT` 2026-07-21 — awaiting response
 
 ## Purpose
 

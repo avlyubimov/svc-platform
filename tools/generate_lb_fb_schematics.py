@@ -547,9 +547,9 @@ def build_fb() -> Schematic:
         "are inputs. OLED is an optional four-wire I2C module header and is DNP by default. JFB1 uses the approved "
         "24-pin contract. Reviewed footprint binding and mechanical envelope remain governed by "
         "FB-100-pcb-layout-start-checklist.csv, FB-100-footprint-binding-inventory.csv, and "
-        "FB-100-mechanical-envelope-inventory.csv. Do not create FB-100.kicad_pcb, Gerbers, drills, pick-place, "
-        "BOM/CPL order package, or manufacturing outputs from this schematic. PCB layout and manufacturing outputs "
-        "remain separate."
+        "FB-100-mechanical-envelope-inventory.csv. A controlled FB-100.kicad_pcb placement exists under "
+        "LAYOUT-ONLY authorization. Do not create Gerbers, drills, pick-place, BOM/CPL order packages, or other "
+        "manufacturing outputs. PCB layout and manufacturing outputs remain separate."
     )
     sch = Schematic("FB-100", "FB-100 Front Panel — Value-Bearing Rev.1", notes)
     sch.add(c("J1", "USB4105-GF-A", "FB100:TYPE-C-SMD_SBC-160S1A-20-S412", "https://gct.co/connector/usb4105", [
