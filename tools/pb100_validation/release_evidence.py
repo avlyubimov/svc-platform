@@ -91,10 +91,11 @@ def validate_five_blocker_release_evidence() -> None:
 
     surge_rows = _rows("PB-100-surge-stopper-evidence.csv")
     expected_surge_corners = {
-        (us, ri, duration, thermal_state, ambient, preload, initial)
+        (us, ri, duration, rise_time, thermal_state, ambient, preload, initial)
         for us in {"79", "101"}
         for ri in {"0.5", "4"}
         for duration in {"40", "400"}
+        for rise_time in {"5", "10"}
         for thermal_state, ambient, preload, initial in {
             ("Cold start", "25", "0", "25"),
             ("Hot soak", "125", "0", "125"),
@@ -103,7 +104,8 @@ def validate_five_blocker_release_evidence() -> None:
     }
     actual_surge_corners = {
         (
-            row["Us V"], row["Ri ohm"], row["td ms"], row["Thermal state"],
+            row["Us V"], row["Ri ohm"], row["td ms"], row["Rise time ms"],
+            row["Thermal state"],
             row["Ambient C"], row["Preload current A"], row["Initial Tj C"],
         )
         for row in surge_rows
@@ -121,20 +123,38 @@ def validate_five_blocker_release_evidence() -> None:
             fail("active surge-stopper SOA screen must use the full 40 A load current")
         if float(row["OV deglitch us"]) != 7.0:
             fail("active surge-stopper evidence must retain the maximum OV deglitch interval")
+        if float(row["Input rise during OV delay V"]) > 0.123:
+            fail("active surge-stopper OV-delay input rise exceeds the 5 ms rise-time bound")
+        if float(row["Pre-layout commutation overshoot allowance V"]) != 4.5:
+            fail("active surge-stopper must reserve the 4.5 V pre-layout commutation allowance")
+        if row["Protected-node screen"] != "PASS":
+            fail("active surge-stopper protected-node peak budget must remain below 80 V")
+        if float(row["Protected-node peak budget V"]) > 59.52:
+            fail("active surge-stopper protected-node peak budget exceeds 59.52 V")
+        if float(row["Protected MOSFET rating V"]) != 80.0:
+            fail("active surge-stopper protected-node screen must use the selected 80 V Q1")
+        if float(row["Protected-node margin V"]) < 20.48:
+            fail("active surge-stopper protected-node budget must retain at least 20.48 V")
         if float(row["Fully-enhanced Q2 VDS V"]) > 0.2:
             fail("OV deglitch must model Q2 fully enhanced rather than in linear mode")
         if float(row["Qgd max nC"]) != 40.0:
             fail("active surge-stopper transition must use maximum Qgd rather than total gate charge")
         if float(row["Miller transition bound us"]) > float(row["SOA reference pulse us"]):
             fail("active surge-stopper Miller transition must fit within the SOA pulse curve")
+        if float(row["Qgs max nC"]) != 52.0:
+            fail("active surge-stopper post-Miller envelope must use complete maximum Qgs")
+        if float(row["Post-Miller ID-fall bound us"]) != 0.41:
+            fail("active surge-stopper evidence must include the post-Miller current fall")
+        if float(row["Complete linear-transition bound us"]) != 0.72:
+            fail("active surge-stopper evidence must retain the complete transition bound")
+        if float(row["Complete linear-transition bound us"]) > float(row["SOA reference pulse us"]):
+            fail("active surge-stopper complete transition must fit within the SOA pulse curve")
         if float(row["SOA reference VDS V"]) < 101.0:
             fail("active surge-stopper SOA screen must use at least the 101 V design corner")
         if float(row["SOA current margin x"]) < 1.5:
             fail("temperature-derated Q2 linear-mode SOA margin must remain at least 1.5x")
         if row["Pulse count"] != "10" or row["Pulse spacing s"] != "60":
             fail("active surge-stopper evidence must preserve ten pulses at 60 s spacing")
-        if float(row["Q1 protected-node margin V"]) < 25.0:
-            fail("active surge-stopper must preserve at least 25 V static margin for Q1")
     if "Q2 avalanche-energy margin x" in surge_rows[0]:
         fail("Q2 linear-mode SOA must not be accepted from avalanche-energy margin")
     if "Turn-off bound us" in surge_rows[0]:
@@ -153,8 +173,22 @@ def validate_five_blocker_release_evidence() -> None:
         fail("generated Q2 evidence must start the hot SOA corner at 150 C")
     if q2_by_item["Maximum gate-drain charge"]["Value"] != "40":
         fail("generated Q2 evidence must use the maximum gate-drain charge")
+    if q2_by_item["Maximum gate-source charge"]["Value"] != "52":
+        fail("generated Q2 evidence must use maximum Qgs for the post-Miller bound")
     if q2_by_item["Miller transition bound"]["Value"] != "0.31":
         fail("generated Q2 evidence must separate the 0.31 us Miller transition")
+    if q2_by_item["Post-Miller current-fall bound"]["Value"] != "0.41":
+        fail("generated Q2 evidence must include the 0.41 us post-Miller current fall")
+    if q2_by_item["Complete linear-transition bound"]["Value"] != "0.72":
+        fail("generated Q2 evidence must retain the 0.72 us complete transition")
+    if q2_by_item["ISO load-dump rise-time range"]["Value"] != "5-10":
+        fail("generated Q2 evidence must retain the ISO 5-10 ms rise-time range")
+    if q2_by_item["Pre-layout commutation overshoot allowance"]["Value"] != "4.50":
+        fail("generated Q2 evidence must reserve the 4.5 V pre-layout overshoot allowance")
+    if q2_by_item["Worst protected-node peak budget"]["Value"] != "59.52":
+        fail("generated Q2 evidence must retain the 59.52 V protected-node peak budget")
+    if q2_by_item["Protected-node margin to 80 V Q1"]["Value"] != "20.48":
+        fail("generated Q2 evidence must retain the 20.48 V protected-node margin")
     if q2_by_item["Hot-corner SOA margin"]["Value"] != "2.08":
         fail("generated Q2 evidence must retain the provisional 2.08x hot SOA screen")
     if q2_by_item["Pre-layout gate status"]["Value"] != "Conditional":
