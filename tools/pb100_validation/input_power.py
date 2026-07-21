@@ -41,9 +41,11 @@ def validate_input_power_design_values() -> None:
         "VBAT_RAW",
         "VBAT_REV_PROT",
         "VBAT_PROT",
-        "LM74700_VCAP",
-        "INPUT_PROT_EN",
-        "INPUT_FET_GATE",
+        "INPUT_COMMON_SOURCE",
+        "LM74930_CAP",
+        "LM74930_VS",
+        "Q1_DGATE",
+        "Q2_HGATE",
         "IIN_SHUNT_HI",
         "IIN_SHUNT_LO",
         "IIN_MON_A0",
@@ -64,11 +66,7 @@ def validate_input_power_design_values() -> None:
         for column in ("Block", "Related net", "Candidate direction", "Freeze dependency", "Notes"):
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
-        expected_status = (
-            "Open under ADR-0016"
-            if design_item == "TVS clamp selection"
-            else "Selected final pre-layout"
-        )
+        expected_status = "Selected final pre-layout"
         if row["Value status"].strip() != expected_status:
             fail(
                 f"{path.relative_to(REPO_ROOT)}:{row_number}: "
@@ -161,7 +159,7 @@ def validate_input_reverse_package_trace() -> None:
         "BUK7J2R4-80M",
         "not approved substitutes",
         "0.5mΩ",
-        "VBAT_REV_PROT",
+        "INPUT_COMMON_SOURCE",
         "IIN_SHUNT_HI/IIN_SHUNT_LO",
         "JLCPCB PCBWay",
     ):
@@ -169,12 +167,12 @@ def validate_input_reverse_package_trace() -> None:
             fail(f"input reverse package trace must include {token}")
 
     controller_text = " ".join(rows_by_item["Controller gate path"].values())
-    for token in ("LM74700QDBVRQ1", "INPUT_FET_GATE", "controller-unpowered off"):
+    for token in ("LM74930Q1RGERQ1", "Q1_DGATE", "Q2_HGATE", "controller is unpowered"):
         if token not in controller_text:
             fail(f"input reverse controller trace must include {token}")
 
     selected_text = " ".join(rows_by_item["Selected 80 V TOLL path"].values())
-    for token in ("IAUT300N08S5N012ATMA2", "ADR-0016", "40 A", "production-source"):
+    for token in ("IAUT300N08S5N012ATMA2", "ADR-0018", "40 A", "production-source", "6.20 K/W"):
         if token not in selected_text:
             fail(f"selected 80 V Q1 trace must include {token}")
 
@@ -214,8 +212,8 @@ def validate_input_reverse_package_trace() -> None:
 
     pin_contract_rows = list(csv.DictReader((PB100_DIR / "PB-100-input-protection-pin-contract.csv").open(newline="", encoding="utf-8")))
     q1_nets = {row["Planned net"].strip() for row in pin_contract_rows if row["Ref"].strip() == "Q1"}
-    if q1_nets != {"VBAT_RAW", "VBAT_REV_PROT", "INPUT_FET_GATE"}:
-        fail("Q1 input pin contract must map VBAT_RAW VBAT_REV_PROT and INPUT_FET_GATE")
+    if q1_nets != {"INPUT_COMMON_SOURCE", "VBAT_REV_PROT", "Q1_DGATE"}:
+        fail("Q1 input pin contract must map INPUT_COMMON_SOURCE VBAT_REV_PROT and Q1_DGATE")
 
     input_power_text = read_text(PB100_DIR / "PB-100-input-power-design-values.csv")
     for token in ("IAUT300N08S5N012ATMA2 80 V PG-HSOF-8-1 TOLL", "4.032 W at 40 A", "0.5mΩ"):
@@ -225,7 +223,7 @@ def validate_input_reverse_package_trace() -> None:
     protection_text = read_text(PB100_DIR / "PB-100-protection-validation.csv")
     for token in (
         "IAUT300N08S5N012ATMA2 input reverse MOSFET,80V VDS",
-        "80V selection retained; PBREL-006 Conditional",
+        "80V selection retained; PBREL-006 design gate Closed",
         "Rejected Rev.1 baseline",
     ):
         if token not in protection_text:
@@ -283,10 +281,10 @@ def validate_input_reverse_freeze_review() -> None:
 
     review_text = read_text(path)
     for token in (
-        "LM74700-Q1",
-        "INPUT_FET_GATE",
+        "LM74930-Q1",
+        "Q1_DGATE",
+        "Q2_HGATE",
         "controller-unpowered off state",
-        "LM74502-Q1",
         "IAUTN06S5N008ATMA1",
         "Rejected 60 V",
         "IAUT300N08S5N012ATMA2",
@@ -295,11 +293,12 @@ def validate_input_reverse_freeze_review() -> None:
         "IAUT300N08S5N014",
         "BUK7J2R4-80M",
         "controlled alternatives",
-        "VBAT_REV_PROT",
+        "INPUT_COMMON_SOURCE",
         "VBAT_PROT",
         "IIN_SHUNT_HI",
         "IIN_SHUNT_LO",
-        "HM3 TVS",
+        "SM8S33AHM3/I D1 DNP",
+        "IAUTN15S6N025ATMA1",
         "JLCPCB PCBWay",
         "critical alternatives",
         "No PCB layout",
@@ -314,7 +313,7 @@ def validate_input_reverse_freeze_review() -> None:
             fail(f"input reverse package trace must support freeze review token {token}")
 
     pin_contract_text = read_text(PB100_DIR / "PB-100-input-protection-pin-contract.csv")
-    for token in ("Q1", "VBAT_RAW", "VBAT_REV_PROT", "INPUT_FET_GATE", "IIN_SHUNT_HI", "IIN_SHUNT_LO"):
+    for token in ("Q1", "Q2", "INPUT_COMMON_SOURCE", "Q1_DGATE", "Q2_HGATE", "VBAT_PROT", "IIN_SHUNT_HI", "IIN_SHUNT_LO"):
         if token not in pin_contract_text:
             fail(f"input protection pin contract must support freeze review token {token}")
 
@@ -356,8 +355,8 @@ def validate_input_reverse_q1_freeze_checklist() -> None:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
         row_text = " ".join(row.values()).lower()
-        if check_id == "Q1-FRZ-002" and ("input_fet_gate" not in row_text or "turn-off timing" not in row_text):
-            fail("Q1 gate checklist row must keep INPUT_FET_GATE and turn-off timing explicit")
+        if check_id == "Q1-FRZ-002" and ("q1_dgate" not in row_text or "q2_hgate" not in row_text or "turn-off timing" not in row_text):
+            fail("Q1 gate checklist row must keep both LM74930-Q1 gates and turn-off timing explicit")
         if check_id == "Q1-FRZ-003" and not all(
             token in row_text for token in ("iautn06s5n008atma1", "dual sidr626ldp", "not approved")
         ):
@@ -370,7 +369,7 @@ def validate_input_reverse_q1_freeze_checklist() -> None:
             token in row_text for token in ("iaut300n08s5n014atma1", "buk7j2r4-80mx", "controlled")
         ):
             fail("Q1 alternatives checklist row must preserve two controlled 80 V alternatives")
-        if check_id == "Q1-FRZ-006" and ("vbat_rev_prot" not in row_text or "iin_shunt_hi" not in row_text or "vbat_prot" not in row_text):
+        if check_id == "Q1-FRZ-006" and ("input_common_source" not in row_text or "iin_shunt_hi" not in row_text or "vbat_prot" not in row_text):
             fail("Q1 measurement sequence checklist row must keep protected telemetry sequence explicit")
         if check_id == "Q1-FRZ-009" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
             fail("Q1 no-layout checklist row must block PCB layout explicitly")
@@ -384,9 +383,9 @@ def validate_input_reverse_q1_freeze_checklist() -> None:
 
     checklist_text = read_text(path)
     for token in (
-        "LM74700-Q1",
-        "LM74502-Q1",
-        "INPUT_FET_GATE",
+        "LM74930-Q1",
+        "Q1_DGATE",
+        "Q2_HGATE",
         "IAUTN06S5N008ATMA1",
         "not approved Rev.1 assembly substitutions",
         "IAUT300N08S5N012ATMA2",
@@ -395,11 +394,12 @@ def validate_input_reverse_q1_freeze_checklist() -> None:
         "IAUT300N08S5N014ATMA1",
         "BUK7J2R4-80MX",
         "controlled alternatives",
-        "VBAT_REV_PROT",
+        "INPUT_COMMON_SOURCE",
         "IIN_SHUNT_HI",
         "IIN_SHUNT_LO",
         "VBAT_PROT",
         "40 A thermal",
+        "6.20 K/W",
         "JLCPCB PCBWay",
         "No PCB layout",
         "PB-100.kicad_pcb",
@@ -435,12 +435,12 @@ def validate_input_reverse_q1_derivation_precheck() -> None:
             if not row[column].strip():
                 fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: empty {column}")
         row_text = " ".join(row.values()).lower()
-        if derivation_id == "Q1-DER-002" and ("equation 1" not in row_text or "0.1uf" not in row_text):
-            fail("Q1 derivation precheck must include VCAP Equation 1 and 0.1uF minimum")
-        if derivation_id == "Q1-DER-003" and ("gate" not in row_text or "anode" not in row_text or "disabled" not in row_text):
-            fail("Q1 derivation precheck must keep gate default-off conditions explicit")
-        if derivation_id == "Q1-DER-005" and ("0.5mω" not in row_text or "1.25mω" not in row_text):
-            fail("Q1 derivation precheck must include 40 A RDS(on) operating window")
+        if derivation_id == "Q1-DER-002" and ("cap-to-vs" not in row_text or "100nf" not in row_text):
+            fail("Q1 derivation precheck must include LM74930-Q1 CAP-to-VS support")
+        if derivation_id == "Q1-DER-003" and ("q1_dgate" not in row_text or "q2_hgate" not in row_text or "off" not in row_text):
+            fail("Q1 derivation precheck must keep both gates and default-off conditions explicit")
+        if derivation_id == "Q1-DER-005" and ("2.52mohm" not in row_text or "6.20k/w" not in row_text):
+            fail("Q1 derivation precheck must include the hot loss and passive thermal target")
         if derivation_id == "Q1-DER-010" and ("pb-100.kicad_pcb" not in row_text or "manufacturing" not in row_text):
             fail("Q1 derivation precheck must block layout and manufacturing outputs")
 
@@ -453,26 +453,25 @@ def validate_input_reverse_q1_derivation_precheck() -> None:
 
     precheck_text = read_text(path)
     for token in (
-        "TI LM74700-Q1",
-        "LM74502-Q1",
-        "INPUT_FET_GATE",
-        "LM74700_VCAP",
-        "Equation 1",
-        "6.6V",
-        "0.1uF",
-        "10 times MOSFET CISS",
-        "20mV",
-        "50mV",
-        "-11mV",
-        "0.5mΩ",
-        "1.25mΩ",
+        "TI LM74930-Q1",
+        "LM74930Q1RGERQ1",
+        "Q1_DGATE",
+        "Q2_HGATE",
+        "LM74930_CAP",
+        "LM74930_VS",
+        "100nF",
+        "INPUT_COMMON_SOURCE",
+        "2.52mOhm",
+        "6.20K/W",
         "IAUT300N08S5N012ATMA2",
         "80V TOLL",
         "IAUT300N08S5N014",
         "BUK7J2R4-80M",
         "60V paths are rejected",
-        "SM8S33AHM3/I",
-        "VBAT_REV_PROT",
+        "SM8S33AHM3/I remains DNP",
+        "IAUTN15S6N025ATMA1",
+        "54.89V",
+        "VBAT_PROT",
         "IIN_SHUNT_HI",
         "IIN_SHUNT_LO",
         "VBAT_PROT",
@@ -535,28 +534,17 @@ def validate_input_reverse_q1_closeout_precheck() -> None:
 
     precheck_text = read_text(path)
     for token in (
-        "TI LM74700-Q1",
-        "LM74700QDBVRQ1",
-        "LM74502-Q1",
-        "Equation 1",
-        "TDRV_EN",
-        "C(VCAP)",
-        "V(VCAP_UVLOR)",
-        "300uA",
-        "0.1uF",
-        "VCAP",
-        "CISS",
-        "EN",
-        "VCAP-to-ANODE",
-        "GATE internally connected to ANODE",
-        "INPUT_FET_GATE",
-        "20mV forward regulation",
-        "50mV conduction",
-        "-11mV reverse-current shutdown",
+        "TI LM74930-Q1",
+        "LM74930Q1RGERQ1",
+        "LM74930_CAP",
+        "LM74930_VS",
+        "100nF",
+        "Q1_DGATE",
+        "Q2_HGATE",
+        "INPUT_COMMON_SOURCE",
         "VBAT_RAW",
-        "VBAT_REV_PROT",
         "VBAT_PROT",
-        "0.5mΩ to 1.25mΩ",
+        "2.52mOhm",
         "RDS(on)",
         "40A",
         "IAUT300N08S5N012ATMA2",
@@ -569,10 +557,11 @@ def validate_input_reverse_q1_closeout_precheck() -> None:
         "controlled 80 V alternatives",
         "60 V paths are rejected",
         "SM8S33AHM3/I",
-        "TVS",
-        "ADR-0016",
-        "energy",
-        "transient thermal",
+        "DNP",
+        "ADR-0018",
+        "LM74930Q1RGERQ1",
+        "IAUTN15S6N025ATMA1",
+        "54.89V",
         "PBREL-007",
         "IIN_SHUNT_HI",
         "IIN_SHUNT_LO",

@@ -39,12 +39,13 @@ The protected LM74700-Q1 node shall retain at least `5 V` modeled margin to the
 is a destructive boundary, not design margin. Passing the 80 V MOSFET voltage
 class does not close controller or TVS thermal evidence.
 
-The current SM8S33AHM3/I branch is a candidate, not a closed solution. PBREL-007
-is `Open` until a selected protection branch passes the complete model and its
-datasheet supports the required energy/thermal use, followed by extracted-loop
-review and PB-BENCH-004. PBREL-006 is `Conditional` until Q1 copper/thermal
-extraction and PB-BENCH-010 confirm that the assumed 125 degC case ceiling is
-achievable.
+ADR-0018 rejects the current SM8S33AHM3/I branch as the active energy sink and
+selects LM74930-Q1 hard cutoff with a 150 V raw-side MOSFET. The PBREL-007
+pre-layout stage is now closed by generated cutoff and transient-SOA evidence.
+Extracted-loop review and PB-BENCH-004 remain separate post-layout and
+prototype-qualification stages under ADR-0017. PBREL-006 retains accepted
+pre-layout Q1 selection evidence; copper/thermal extraction and PB-BENCH-010
+remain its separate post-layout and prototype-qualification stages.
 
 ## Consequences
 
@@ -54,9 +55,11 @@ achievable.
 - TVS arrays, staged suppression, higher-power parts, or controller isolation
   may be compared without removing required capabilities; any architecture
   change still needs Product Owner approval and another ADR.
-- No `PB-100.kicad_pcb`, Gerbers, drills, pick-place, BOM/CPL manufacturing
-  package, manufacturing ZIP, or PCBA order may be created before corrective
-  review and the normal layout-start gates close.
+- No `PB-100.kicad_pcb` may be created before the pre-layout and normal
+  layout-start gates close. No engineering-prototype Gerber/BOM package may be
+  created before post-layout verification reaches `PROTO-ONLY`. Production and
+  field release remain prohibited until prototype qualification and the normal
+  production gates close.
 
 ## Evidence
 
@@ -67,4 +70,3 @@ achievable.
 - TI LM74700-Q1 datasheet:
   https://www.ti.com/lit/ds/symlink/lm74700-q1.pdf
 - `hardware/power-board/PB-100/PB-100-transient-margin-evidence.csv`
-

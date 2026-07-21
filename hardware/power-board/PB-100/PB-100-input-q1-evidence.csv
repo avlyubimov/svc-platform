@@ -9,8 +9,9 @@ Hot review RDS(on),2.52,mOhm,25 C max x hot multiplier,PASS
 Continuous board current,40,A,ADR-0008 budget,INPUT
 Q1 conduction loss,4.032,W,I^2 x hot RDS(on),PASS
 RthJC max,0.40,K/W,Datasheet maximum,INPUT
-Case-temperature acceptance ceiling,125.0,degC,Hard post-layout thermal constraint,INPUT
-Junction at acceptance ceiling,126.61,degC,Tcase + loss x RthJC,PASS
-Junction margin,48.39,degC,175 C maximum - calculated junction,PASS
-PCB copper condition,Plane/polygon or reviewed bus path; no trace-only 40 A claim,,Layout constraint; PB-BENCH-010 later verifies enclosure rise,MANDATORY POST-LAYOUT
+Cooling architecture,Passive PCB copper plus thermal pad to metal enclosure,,Active cooling is not selected,PASS PRE-LAYOUT
+Ambient design point,125.0,degC,Worst-case enclosure ambient requirement,INPUT
+Target junction ceiling,150.0,degC,Design target below 175 C device maximum,PASS PRE-LAYOUT
+Maximum full thermal path,6.20,K/W,(Tj target - ambient) / Q1 conduction loss,POST-LAYOUT LIMIT
+PCB copper condition,Plane/polygon plus passive enclosure heat path; no trace-only 40 A claim,,Layout extraction and PB-BENCH-010 verify the full thermal path,MANDATORY POST-LAYOUT
 Source route,JLC global/preorder/consignment or PCBWay kitted/consigned,,No false live-stock claim; order-date recheck required,PASS PRE-LAYOUT

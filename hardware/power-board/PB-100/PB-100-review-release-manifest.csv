@@ -2,8 +2,10 @@ Artifact,Category,Freeze role,Required for freeze,Validation hook,Status
 docs/architecture/Architecture-Review-v1.0.md,Architecture,Frozen baseline,Required,Document reviewed,Frozen
 docs/requirements/pb-100-requirements.md,Requirements,PB-100 baseline,Required,Document reviewed,Frozen
 docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md,Architecture,Pre-layout versus post-prototype validation split,Required,Document reviewed,Frozen
+docs/adr/ADR-0017-pb-100-staged-release-authorization.md,Architecture,Four-state staged PB release authorization,Required,validate_staged_release_readiness,Frozen
 docs/testing/test-plan.md,Validation,Bench validation baseline,Required,Document reviewed,Ready
 hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv,Validation,Post-prototype bench validation gate,Required,validate_post_prototype_validation_gate,Conditional
+hardware/power-board/PB-100/PB-100-staged-release-readiness.csv,Validation,PBREL-006 and PBREL-007 ordered release stages,Required,validate_staged_release_readiness,Open
 hardware/power-board/PB-100/PB-100-schematic-package.md,Review package,Schematic package index,Required,Manifest and docs validation,Closed
 hardware/power-board/PB-100/PB-100-schematic-readiness-review.md,Review package,Readiness snapshot,Required,Manifest and docs validation,Open
 hardware/power-board/PB-100/PB-100-review-release-manifest.csv,Review package,Freeze release manifest,Required,validate_review_release_manifest,Conditional
@@ -14,7 +16,7 @@ hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv,Review pac
 hardware/power-board/PB-100/PB-100-engineering-blocker-closeout.md,Review package,PBREL engineering blocker closeout,Required,validate_engineering_blocker_closeout,Closed
 hardware/power-board/PB-100/PB-100-schematic-review-closeout.md,Review package,PB-100 schematic review closeout,Required,validate_schematic_review_closeout,Closed
 hardware/power-board/PB-100/PB-100-board-print-closure-matrix.csv,Review package,Board-print closure matrix,Required,validate_board_print_closure_matrix,Open
-hardware/power-board/PB-100/PB-100-board-release-local-evidence-closeout.csv,Review package,Local PBREL evidence closeout ledger,Required,Document reviewed,Conditional
+hardware/power-board/PB-100/PB-100-board-release-local-evidence-closeout.csv,Review package,Local PBREL evidence closeout ledger,Required,Document reviewed,Closed
 hardware/power-board/PB-100/PB-100-validation-traceability.csv,Validation,Freeze-gate validation trace,Required,validate_validation_traceability,Closed
 hardware/power-board/PB-100/PB-100-schematic-capture-plan.md,Schematic capture,Capture process,Required,Document reviewed,Ready
 hardware/power-board/PB-100/PB-100-schematic-capture-work-queue.csv,Schematic capture,Sheet-level capture work queue,Required,validate_schematic_capture_work_queue,Conditional
@@ -39,7 +41,7 @@ hardware/power-board/PB-100/PB-100-symbol-capture-worklist.csv,Symbols,Symbol ca
 hardware/power-board/PB-100/PB-100-symbol-pin-evidence.csv,Symbols,Symbol pin evidence,Required,validate_symbol_pin_evidence,Conditional
 hardware/power-board/PB-100/PB-100-symbol-open-items.md,Symbols,Symbol risk register,Required,validate_symbol_capture_worklist,Ready
 hardware/power-board/PB-100/PB-100-input-protection-pin-contract.csv,Input protection,Input protection contract,Required,validate_input_protection_pin_contract,Conditional
-hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv,Input protection,LM74700 pin template,Required,validate_input_and_power_pin_templates,Conditional
+hardware/power-board/PB-100/PB-100-input-controller-pin-template.csv,Input protection,LM74930-Q1 RGE pin template,Required,validate_input_and_power_pin_templates,Conditional
 hardware/power-board/PB-100/PB-100-current-monitor-pin-template.csv,Telemetry,INA228 pin template,Required,validate_input_and_power_pin_templates,Conditional
 hardware/power-board/PB-100/PB-100-board-current-budget-trace.csv,Telemetry,Board current budget trace,Required,validate_board_current_budget_trace,Conditional
 hardware/power-board/PB-100/PB-100-board-current-budget-freeze-review.csv,Telemetry,40 A board-current freeze review,Required,validate_board_current_budget_freeze_review,Conditional
@@ -51,7 +53,7 @@ hardware/power-board/PB-100/PB-100-input-power-design-values.csv,Input protectio
 hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv,Input protection,Q1 reverse-protection package and thermal trace,Required,validate_input_reverse_package_trace,Conditional
 hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv,Input protection,Q1 reverse-protection freeze review,Required,validate_input_reverse_freeze_review,Conditional
 hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv,Input protection,Q1 gate thermal and assembly freeze checklist,Required,validate_input_reverse_q1_freeze_checklist,Conditional
-hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv,Input protection,Q1 LM74700 derivation precheck,Required,validate_input_reverse_q1_derivation_precheck,Conditional
+hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv,Input protection,Q1 passive-path and LM74930-Q1 derivation precheck,Required,validate_input_reverse_q1_derivation_precheck,Conditional
 hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv,Input protection,Q1 input reverse closeout precheck,Required,validate_input_reverse_q1_closeout_precheck,Conditional
 hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv,Logic power,Protected 5 V logic power rail trace,Required,validate_logic_power_rail_trace,Conditional
 hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv,Logic power,Logic power freeze review,Required,validate_logic_power_freeze_review,Conditional

@@ -16,7 +16,9 @@ fabrication packages, panel outputs, or PCBA orders.
 - SIDR626LDP historical 60 V package evidence:
   `PB100:POWERPAK-SO-8_L6.1-W5.1-P1.27-BL-EP`; it is not a Rev.1 assembly
   substitute.
-- LM74700 reverse-protection controller: `PB100:SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL`.
+- LM74930-Q1 active surge/reverse controller: `PB100:VQFN-24_RGE_4x4mm_P0.5mm_EP2.4mm`; RTN pad remains electrically isolated from GND.
+- IAUTN15S6N025ATMA1 150 V surge cutoff MOSFET: the reviewed `PB100:PG-HSOF-8-1_TOLL_Infineon` binding is reused for Q2.
+- SM8S33AHM3/I legacy footprint: `PB100:DO-218AC_Vishay_SM8S` remains bound to D1 but D1 is DNP and is not the load-dump solution.
 - LM5164 logic buck: `PB100:SOIC-8_L4.9-W3.9-P1.27-LS6.0-BL-EP2.9`.
 - INA228-class input-current monitor: `PB100:VSSOP-10_L3.0-W3.0-P0.50-LS4.9-BL`.
 - TDK-class 0402 thermal NTCs: `PB100:R0402`.

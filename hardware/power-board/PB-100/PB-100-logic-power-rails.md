@@ -22,8 +22,8 @@ Higher-current alternate:
 Conditional alternate:
 
 - TPS54360B-Q1 class, 60 V input, 3.5 A buck. This remains conditional because
-  it has less margin against an active SM8S33AHM3-class TVS clamp than the
-  100 V families.
+  it has less protected-domain overshoot margin than the 100 V families;
+  ADR-0018 no longer credits an active SM8S33AHM3 clamp.
 
 ## Rail ownership
 

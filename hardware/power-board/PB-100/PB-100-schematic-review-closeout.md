@@ -27,9 +27,10 @@ remaining gates.
 - Physical PB-BENCH execution remains deferred to
   `PB-100-post-prototype-validation-gate.csv` and blocks first motorcycle power,
   field use, and production release.
-- PCB layout is a separate post-freeze task. board-print remains NO-GO until
-  reviewed layout, fabrication outputs, assembly outputs, and order evidence
-  exist.
+- ADR-0017 makes PCB layout a `LAYOUT-ONLY` post-freeze task and requires
+  reviewed extraction before any `PROTO-ONLY` engineering fabrication package.
+  Production and field release remain NO-GO until prototype qualification and
+  the normal production gates close.
 
 ## Reviewed Value-Bearing Schematic Inputs
 
@@ -43,12 +44,16 @@ remaining gates.
 - Output stage: TPS48110AQDGXRQ1-class external high-side controller remains the
   baseline for all OUT1..OUT10 channels; low-current channels keep ADR-0011 no
   direct 40 V smart-switch rail.
-- Voltage margin: SM8S33AHM3/I HM3 DO-218AC remains a candidate and
-  obsolete/NFD sources remain excluded. ADR-0016 screening fails TVS energy,
-  thermal, and LM74700 margin requirements; PBREL-007 is Open. The selected
-  IAUT300N08S5N012ATMA2 80 V TOLL class remains accepted for Q1 and Q101-Q110.
-- Input reverse protection: LM74700QDBVRQ1-class ideal-diode controller with
-  selected Q1 IAUT300N08S5N012ATMA2 80 V TOLL package strategy.
+- Voltage margin: ADR-0018 selects U1 `LM74930Q1RGERQ1` hard cutoff at
+  48.99-54.89 V with raw-side Q2 `IAUTN15S6N025ATMA1` 150 V TOLL. The
+  historical single `SM8S33AHM3/I` HM3 DO-218AC branch remains rejected and
+  D1 is DNP. PBREL-007 design selection is Closed; actual overshoot, extracted
+  dynamic SOA, and PB-BENCH-004 remain later gates.
+- Input reverse protection: selected Q1 IAUT300N08S5N012ATMA2 80 V MOSFET
+  uses the LM74930-Q1 protected DGATE side. Passive PCB copper plus a thermal
+  pad to the metal enclosure is required; 4.032 W at 40 A, Tj <=150 C, and
+  a complete thermal path <=6.20 K/W at 125 C ambient are the post-layout
+  extraction and PB-BENCH-010 targets.
 - Logic power: LM5164QDDATQ1-class 100 V 1 A buck remains baseline with
   LM5013-Q1-class 100 V fallback; `PB_5V_OUT` remains limited to LB-100 and
   PB-side low-power circuitry, not accessory loads.
@@ -69,6 +74,7 @@ remaining gates.
 - `PB-100-validation-traceability.csv`
 - `PB-100-board-release-blocker-register.csv`
 - `PB-100-board-print-closure-matrix.csv`
+- `PB-100-staged-release-readiness.csv`
 - `PB-100-engineering-blocker-closeout.md`
 - `PB-100-review-release-manifest.csv`
 - `PB-100-schematic-package.md`

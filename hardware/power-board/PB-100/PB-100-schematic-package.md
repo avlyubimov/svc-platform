@@ -5,11 +5,12 @@ Status: Schematic planning package ready for review; not frozen
 This package converts frozen PB-100 requirements into schematic-planning inputs.
 It is not a PCB layout package.
 
-Per ADR-0013, pre-layout closure requires calculations, source evidence,
-package/footprint review inputs, schematic test hooks, and bench procedures.
-Physical PB-BENCH execution that needs an assembled board is deferred to the
-post-prototype validation gate and blocks first motorcycle power and production
-release, not first prototype PCB fabrication.
+Per ADR-0013 and ADR-0017, pre-layout closure requires calculations, source
+evidence, package/footprint review inputs, schematic test hooks, and bench
+procedures and permits only `LAYOUT-ONLY`. Reviewed extraction permits
+`PROTO-ONLY` engineering fabrication. Physical PB-BENCH execution that needs an
+assembled board is deferred to the post-prototype validation gate and blocks
+first motorcycle power, field use, and production release.
 
 ## Governing documents
 
@@ -21,6 +22,7 @@ release, not first prototype PCB fabrication.
 - `docs/adr/ADR-0010-pb-100-power-path-candidate-strategy.md`
 - `docs/adr/ADR-0011-pb-100-low-current-output-stage.md`
 - `docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md`
+- `docs/adr/ADR-0017-pb-100-staged-release-authorization.md`
 - `docs/can/can-safety.md`
 - `docs/production/component-family-shortlist.md`
 - `firmware/configs/hardware/pb-100-capabilities.json`
@@ -45,6 +47,7 @@ release, not first prototype PCB fabrication.
 - `hardware/power-board/PB-100/PB-100-can1-production-dnp-review.csv`
 - `hardware/power-board/PB-100/PB-100-can1-reset-bench-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv`
+- `hardware/power-board/PB-100/PB-100-staged-release-readiness.csv`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-design-calculation.md`
 - `hardware/power-board/PB-100/PB-100-can1-default-disable-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-can1-default-disable-derivation-precheck.csv`
@@ -183,34 +186,34 @@ release, not first prototype PCB fabrication.
   hooks, post-prototype evidence gate, sourcing/symbol synchronization, and
   no-layout manufacturing boundary are tracked in
   `hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`.
-- Input reverse freeze review: LM74700 gate/default-off behavior, selected
-  PG-HSOF-8-1 TOLL and controlled TOLL/LFPAK56E alternatives, protected
-  measurement sequence, HM3 TVS dependency, sourcing gate, and no-layout
+- Input reverse freeze review: LM74930-Q1 DGATE/default-off behavior, selected
+  PG-HSOF-8-1 TOLL Q1 and controlled TOLL/LFPAK56E alternatives, protected
+  measurement sequence, active-cutoff dependency, sourcing gate, and no-layout
   boundary are tracked in
   `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`.
 - Input reverse Q1 freeze checklist: gate clamp/discharge timing, package
   alternates, protected measurement sequence, 40 A thermal/copper/SOA audit,
   assembly sourcing, and no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`.
-- Input reverse Q1 derivation precheck: LM74700-Q1 VCAP/gate-driver behavior,
-  ideal-diode thresholds, MOSFET RDS(on) window, TVS stress, protected
+- Input reverse Q1 derivation precheck: LM74930-Q1 CAP/DGATE behavior,
+  ideal-diode thresholds, MOSFET RDS(on) window, passive thermal-path limit, protected
   measurement sequence, assembly alternates, and no-layout boundary are tracked
   in
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`.
-- Input reverse Q1 closeout precheck: controller source boundary, VCAP/gate
+- Input reverse Q1 closeout precheck: controller source boundary, CAP/DGATE
   default-off behavior, ideal-diode reverse-current behavior, RDS(on) thermal
-  window, selected TOLL and controlled TOLL/LFPAK56E alternatives, TVS
+  window, selected TOLL and controlled TOLL/LFPAK56E alternatives, active-cutoff
   overshoot dependency,
   protected measurement sequence, assembly sourcing, input capture sync, and
   no-layout boundary are tracked in
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`.
-- TVS/load-dump freeze review: active SM8S33AHM3/I HM3 branch, 100 V device
-  margin, rejected 60 V history, selected 80 V MOSFET baseline, 40 V
-  smart-switch ADR boundary, sourcing gate, and no-layout boundary are tracked
+- Load-dump freeze review: LM74930-Q1 hard cutoff, raw-side 150 V Q2,
+  protected-side 80 V Q1, rejected single-SM8S33AHM3/I history, 40 V
+  smart-switch ADR boundary, sourcing gate, and staged release boundary are tracked
   in `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`.
-- TVS overshoot escape checklist: active HM3 source snapshot, rejected 60 V
-  history, selected 80 V MOSFET decision, 100 V downstream boundary, 40 V ADR boundary,
-  schematic-value dependencies, sourcing, and no-layout boundary are tracked in
+- Load-dump overshoot escape checklist: generated cutoff tolerance, Q2
+  transition-energy screen, dynamic-SOA extraction, protected-rail overshoot,
+  repeated-pulse bench evidence, sourcing, and staged release are tracked in
   `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`.
 - TVS overshoot validation precheck: waveform/source impedance,
   `Vstress = Vclamp + Lloop * di/dt`, bench probe and simulation parasitic

@@ -1,14 +1,16 @@
 Net pattern,Domain,Primary sheet,Direction,Default state,Safety rule
 VBAT_RAW,High-current input,input-protection.kicad_sch,Input from harness,Fused by near-battery garage fuse,No PCB layout current geometry before schematic freeze
-INPUT_FET_GATE,Input reverse control,input-protection.kicad_sch,Controller to input MOSFET,Off when controller unpowered,Must remain local until Q1 TOLL pin evidence closes
+INPUT_HGATE,Raw-side cutoff control,input-protection.kicad_sch,LM74930-Q1 to Q2 gate,Off when controller unpowered,Must remain local and preserve the extracted common-source loop
+INPUT_DGATE,Protected-side ideal-diode control,input-protection.kicad_sch,LM74930-Q1 to Q1 gate,Off when controller unpowered,Must remain local until Q1 TOLL pin evidence closes
 INPUT_PROT_EN,Input reverse control,input-protection.kicad_sch,Local enable network,TBD not final,Must close with default enable and service-disable review
-LM74700_VCAP,Input reverse local supply,input-protection.kicad_sch,Local charge-pump network,Capacitor TBD not final,Must close with capacitor value and voltage rating review
-VBAT_REV_PROT,High-current reverse-protected,input-protection.kicad_sch,Internal protected rail,Present after reverse FET,Must feed shunt and protected rail only after 40 A thermal review
+SURGE_CAP,Active-cutoff local supply,input-protection.kicad_sch,LM74930-Q1 charge-pump capacitor network,Capacitor value is a schematic-freeze input,Must close with value voltage rating and placement review
+INPUT_COMMON_SOURCE,High-current switched node,input-protection.kicad_sch,Common-source connection between Q2 and Q1,Floating when both gates are off,Must stay compact and requires post-layout inductance and dynamic-SOA extraction
+VBAT_REV_PROT,High-current reverse-protected,input-protection.kicad_sch,Q1 drain to total-current shunt input,Present after active cutoff and reverse protection,Must not feed downstream loads ahead of the total-current shunt
 IIN_SHUNT_HI,Analog current sense,input-protection.kicad_sch,PB-100 sense,Zero-current baseline,Must use Kelvin sense and stay separate from load current path
 IIN_SHUNT_LO,Analog current sense,input-protection.kicad_sch,PB-100 sense,Zero-current baseline,Must use Kelvin sense and stay separate from load current path
 IIN_MON_A0,Monitor local strap,input-protection.kicad_sch,Local address strap,TBD not final,Must close with I2C address plan
 IIN_MON_A1,Monitor local strap,input-protection.kicad_sch,Local address strap,TBD not final,Must close with I2C address plan
-VBAT_PROT,High-current protected,input-protection.kicad_sch,Internal protected rail,Present after reverse protection,Must remain protected by reverse MOSFET and input TVS strategy
+VBAT_PROT,High-current protected,input-protection.kicad_sch,Internal protected rail after total-current shunt,Present after active cutoff reverse protection and current measurement,Must remain below the 60 V protected-domain limit during load dump
 VBAT_SENSE,Analog telemetry,input-protection.kicad_sch,PB-100 to LB-100,Scaled battery voltage,Must stay in ADC-safe voltage range
 IIN_SENSE,Analog telemetry,input-protection.kicad_sch,PB-100 to LB-100,Zero-current baseline,Must be derived from total input current path
 PB_5V_OUT,Protected logic power,logic-power.kicad_sch,PB-100 to LB-100,Off until buck valid,Must not be confused with accessory power output

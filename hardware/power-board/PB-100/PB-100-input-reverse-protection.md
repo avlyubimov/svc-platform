@@ -1,74 +1,89 @@
-# PB-100 Input Reverse-Protection MOSFET Strategy
+# PB-100 Input Protection Selection
 
-Status: 80 V Q1 selection accepted; PBREL-006 Conditional pending physical
-thermal evidence and PBREL-007 Open under ADR-0016
+Status: Q1 and active surge-stopper pre-layout selection accepted under ADR-0018
 
-## Problem
+## Selected Architecture
 
-The input ideal-diode path must carry the 40 A board budget while surviving the
-active load-dump clamp plus loop overshoot. A single 2.1 mOhm PowerPAK device
-would dissipate about 6.72 W at 40 A with a 2.0 hot-resistance multiplier and
-is rejected. The former 60 V TOLL candidate has only 6.7 V nominal headroom
-above the 53.3 V TVS planning clamp.
+- `Q1`: `IAUT300N08S5N012ATMA2`, selected 80 V TOLL in PG-HSOF-8-1, controlled by
+  LM74930-Q1 DGATE for ideal-diode/reverse-current operation.
+- `Q2`: `IAUTN15S6N025ATMA1`, 150 V, PG-HSOF-8-1 TOLL, controlled by HGATE as
+  the raw-side overvoltage cutoff switch.
+- `U1`: `LM74930Q1RGERQ1`, 24-pin RGE VQFN, hard cutoff with OVCLAMP grounded.
+- `R3/R4/R5`: 42.2 kOhm + 42.2 kOhm / 1.00 kOhm, 1%. Splitting the upper
+  resistor keeps each body below 51 V at the 101 V corner. Generated cutoff is
+  48.99-54.89 V including comparator threshold, resistor tolerance, and input
+  leakage.
+- The load is allowed to disconnect during load dump. The old single
+  `SM8S33AHM3/I` energy-absorption branch is rejected and its D1 footprint is
+  retained DNP only.
 
-## Decision
+Q1 and Q2 use common-source back-to-back orientation. Q2 drain faces
+`VBAT_RAW`; Q2 source and Q1 source meet at `INPUT_COMMON_SOURCE`; Q1 drain
+feeds `VBAT_REV_PROT`, and the total-current shunt then feeds `VBAT_PROT`.
+This keeps Q1 below the maximum 54.89 V protected-node
+target while Q2 withstands the complete 101 V source after output discharge.
 
-Use one `IAUT300N08S5N012ATMA2` 80 V TOLL MOSFET for Q1. The KiCad symbol and
-footprint use pin 1 gate, pins 2 through 8 source, and `Tab` drain.
+## Q1 Passive Thermal Decision
 
-| Strategy | Hot RDS(on) assumption | 40 A estimate | Status |
-|---|---:|---:|---|
-| `IAUT300N08S5N012ATMA2` 80 V TOLL | 2.52 mOhm at 125 C | 4.032 W | Selected |
-| `IAUT300N08S5N014ATMA1` 80 V TOLL | 2.94 mOhm conservative hot planning bound | 4.704 W | Same-footprint controlled alternative A |
-| `BUK7J2R4-80M` 80 V LFPAK56E | Higher resistance than selected part | 7.68 W planning estimate | Non-drop-in alternative B |
+The selected Q1 hot review resistance is 2.52 mOhm. At 40 A:
 
-`IAUTN06S5N008` 60 V TOLL and dual `SIDR626LDP` 60 V PowerPAK calculations
-remain historical evidence. They are not approved Rev.1 assembly substitutions.
+`P = 40^2 * 2.52 mOhm = 4.032 W`
 
-## Operating and lifetime evidence
+Cooling is passive: PCB copper polygons plus a thermal pad to the metal
+enclosure. No fan or other active cooling is selected. The design target is
+`Tj <= 150 degC`; at 125 degC ambient the complete thermal path must satisfy:
 
-- The selected 80 V class remains appropriate against the current 57.60 V
-  generated ISO-corner peak. PBREL-007 remains Open because the TVS fails
-  thermal/energy screening and LM74700 margin is only 2.40 V.
-- If layout and cooling hold the case at 125 C the 4.032 W bound and 0.4 K/W
-  RthJC produce 126.61 C junction. PBREL-006 is Conditional until extraction
-  and PB-BENCH-010 demonstrate that case condition.
-- Manufacturer evidence marks the selected automotive part active/preferred and
-  planned through at least 2038. The project lifetime target remains 10-15 years;
-  order-date lifecycle and authorized-reel continuity are still rechecked.
+`RthetaJA,total <= (150 - 125) / 4.032 = 6.20 K/W`
 
-## Production evidence and risks
+The component selection portion of PBREL-006 is closed. The actual copper,
+solder-void, interface-pad, enclosure, and ambient thermal path is physically
+verified after layout and by PB-BENCH-010 at 40 A.
 
-- The selected part is automotive/AEC-qualified, active/preferred, tape/reel,
-  MSL1, and uses the reviewed PG-HSOF-8-1 TOLL footprint.
-- LCSC/JLC cross-reference does not constitute a live-stock claim. Recheck the
-  authorized reel, assembler quote, DFM, stencil, voiding, and FAI at order date.
-- JLCPCB/PCBWay must confirm TOLL bottom-termination assembly, segmented paste,
-  solder-void acceptance, and inspection process.
-- Alternative A is same-footprint but still needs electrical revalidation;
-  alternative B is non-drop-in and needs controlled pin-map, SOA, thermal,
-  source, and factory review before substitution.
+## Surge and SOA Screening
 
-## Schematic and release requirements
+`PB-100-surge-stopper-evidence.csv` covers all 79/101 V, 0.5/4 ohm, and
+40/400 ms boundary combinations. At the 101 V / 0.5 ohm corner the conservative
+7 us OV delay plus Q2 gate-discharge bound gives 0.0327 J, 15.0x below the Q2
+0.490 J single-pulse avalanche rating. The 150 V Q2 retains 49 V static margin;
+Q1 retains 25.11 V at the worst 54.89 V cutoff.
 
-- Q1 remains `IAUT300N08S5N012ATMA2` with
-  `PB100:PG-HSOF-8-1_TOLL_Infineon` in the Rev.1 schematic and BOM.
-- Source/drain copper must later be sized and validated for at least the 40 A
-  board budget after thermal derating.
-- Input current measurement remains in the protected path used by firmware
-  current-budget enforcement.
-- Promote the selected VCAP, enable, gate-series, discharge, and zener values
-  into the value-bearing sheet before schematic freeze.
-- During layout, prove the plane/polygon/bus path, extracted TVS loop,
-  solder-void controls, and enclosure thermal rise before manufacturing release.
-- Do not create placement, high-current copper, Gerber, drill, or pick-place
-  output from this voltage-class decision alone.
+The calculation is a pre-layout screen, not final dynamic proof. Extracted
+loop inductance, overshoot, Q2 SOA, normal-conduction thermal behavior, and
+enclosure coupling remain post-layout evidence. PB-BENCH-004 remains a
+post-prototype gate.
 
-## Evidence links
+## Alternatives and Risks
 
-- Infineon IAUT300N08S5N012ATMA2 data sheet:
-  <https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf>
-- Infineon IAUT300N08S5N014 product page:
-  <https://www.infineon.com/part/IAUT300N08S5N014>
-- Voltage-class decision: `PB-100-mosfet-voltage-margin-review.md`.
-- Thermal calculation: `PB-100-thermal-estimates.csv`.
+- Q1 alternative A `IAUT300N08S5N014ATMA1` is same-footprint but higher loss.
+- Q1 alternative B `BUK7J2R4-80MX` is non-drop-in and higher loss.
+  `IAUT300N08S5N014ATMA1` and `BUK7J2R4-80MX` are not approved Rev.1 assembly substitutions without controlled review.
+- Q2 alternative A `IAUTN12S5N017ATMA1` has lower loss but insufficient static
+  margin for uncontrolled layout overshoot.
+- Q2 alternative B `IAUTN15S6N038ATMA1` retains 150 V but has higher loss.
+- Active cutoff adds Q2 conduction heat and can interrupt the protected rail.
+  Firmware must treat the interruption as loss of supply, not a recoverable
+  command failure.
+
+Both selected MOSFETs are automotive-qualified, MSL1 TOLL parts with 175 degC
+maximum junction ratings. JLCPCB/PCBWay assembly requires segmented paste,
+voiding/inspection, DFM, and FAI confirmation. LCSC availability and authorized
+reel supply are rechecked at order date. Expected lifetime is 10-15 years with
+controlled alternates and lifecycle monitoring.
+
+## Release Boundary
+
+- PBREL-006 and PBREL-007 pre-layout design gates are closed.
+- Controlled PCB layout still requires normal schematic-freeze and layout-start
+  approval.
+- `PROTO-ONLY` requires post-layout copper, thermal, SOA, and clamp-loop
+  extraction.
+- Production and field use remain `NO-GO` until PB-BENCH-004,
+  PB-BENCH-010, and all normal production gates close.
+- No `.kicad_pcb` or manufacturing output is created by this selection.
+
+## Sources
+
+- <https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf>
+- <https://www.ti.com/lit/ab/snoaaa1/snoaaa1.pdf>
+- <https://www.infineon.com/assets/row/public/documents/10/49/infineon-iaut300n08s5n012-datasheet-en.pdf>
+- <https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn15s6n025-datasheet-en.pdf>

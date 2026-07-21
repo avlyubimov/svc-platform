@@ -13,7 +13,7 @@ def main() -> int:
         for failure in failures:
             print(f"- {failure}")
         return 1
-    print("LB-100/FB-100 schematic validation passed (netlist topology, footprints, ERC).")
+    print("LB-100/FB-100 schematic validation passed (calculations, netlist topology, footprints, ERC).")
     return 0
 
 

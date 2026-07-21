@@ -1,8 +1,9 @@
 Sheet file,Ref,Symbol key,Capture status,Notes
 input-protection.kicad_sch,J1,INPUT_CONNECTOR,Planned,Battery input connector class
-input-protection.kicad_sch,D1,INPUT_TVS,Planned,Input TVS
-input-protection.kicad_sch,U1,INPUT_IDEAL_DIODE,Planned,Reverse-protection controller
-input-protection.kicad_sch,Q1,INPUT_REVERSE_FET,Planned,Input reverse MOSFET TOLL symbol evidence captured
+input-protection.kicad_sch,D1,INPUT_TVS,Planned,Legacy DNP TVS footprint only
+input-protection.kicad_sch,U1,INPUT_IDEAL_DIODE,Planned,LM74930-Q1 active surge-stopper controller
+input-protection.kicad_sch,Q1,INPUT_REVERSE_FET,Planned,Protected 80 V DGATE MOSFET
+input-protection.kicad_sch,Q2,INPUT_SURGE_FET,Planned,Raw-side 150 V HGATE cutoff MOSFET
 input-protection.kicad_sch,RSH1,TOTAL_CURRENT_SHUNT,Planned,Total input current shunt
 input-protection.kicad_sch,U2,TOTAL_CURRENT_MONITOR,Planned,Total input current monitor
 logic-power.kicad_sch,U3,LOGIC_BUCK,Planned,Protected 5 V buck regulator

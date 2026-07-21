@@ -1,8 +1,9 @@
 Ref,Block,Generic function,Preferred component or class,Package direction,Qty basis,Status,Notes
 J1,input-protection,Battery input connector,High-current automotive connector,TBD,1,Garage candidate,Final connector family pending current derating
-D1,input-protection,Input load-dump TVS,Vishay SM8S33AHM3/I,DO-218AC,1,Conditional,Clamp and overshoot margin still require schematic evidence
-U1,input-protection,Ideal-diode reverse controller,LM74700QDBVRQ1,SOT-23-6,1,Candidate,LM74502-Q1 family retained as alternate
-Q1,input-protection,Input reverse MOSFET,IAUT300N08S5N012ATMA2 80 V,PG-HSOF-8-1 TOLL,1,Selected by Product Owner,IAUT300N08S5N014ATMA1 and BUK7J2R4-80M retained as 80 V alternatives
+D1,input-protection,Legacy input TVS footprint,Vishay SM8S33AHM3/I DNP,DO-218AC,1,DNP rejected branch,Not credited as the load-dump solution
+U1,input-protection,Ideal-diode active surge-stopper controller,LM74930Q1RGERQ1,RGE VQFN-24,1,Selected by Product Owner,Hard cutoff at no more than 55 V
+Q1,input-protection,Protected ideal-diode MOSFET,IAUT300N08S5N012ATMA2 80 V,PG-HSOF-8-1 TOLL,1,Selected by Product Owner,Passive cooling and post-layout 6.20 K/W verification
+Q2,input-protection,Raw-side surge cutoff MOSFET,IAUTN15S6N025ATMA1 150 V,PG-HSOF-8-1 TOLL,1,Selected under ADR-0018,Full 101 V input and post-layout dynamic SOA verification
 RSH1,input-protection,Total input current shunt,Bourns CSS4J-4026R-L500F-class 0.5mΩ four-terminal shunt,CSS4J-4026,1,Candidate value,Used by total input current monitor; 30mV at 60A target
 U2,input-protection,Total input current monitor,INA228/INA229 or INA226 class,VSSOP/SOIC,1,Candidate,Must support 0-60A range target
 U3,logic-power,Protected 5V buck regulator,LM5164QDDATQ1,SO PowerPAD-8,1,Preferred candidate,LM5013-Q1 if 1A budget exceeded

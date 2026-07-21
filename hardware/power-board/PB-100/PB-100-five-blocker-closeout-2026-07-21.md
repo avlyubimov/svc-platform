@@ -33,8 +33,10 @@ Conditional by generated `PB-100-input-q1-evidence.csv` and
 part. The 2.52 mOhm hot bound gives 4.032 W at 40 A. A 125 degC case ceiling
 predicts 126.61 degC junction and 48.39 degC margin to the 175 degC absolute
 maximum, but that calculation assumes rather than proves a 125 degC case.
-PBREL-006 remains Conditional until layout copper/thermal extraction and
-PB-BENCH-010 verify the boundary; no trace-only 40 A claim is accepted.
+PBREL-006 remains Conditional overall. Its pre-layout stage is closed and may
+advance this blocker to `LAYOUT-ONLY`; layout copper/thermal extraction must
+close the `PROTO-ONLY` transition and PB-BENCH-010 must close its prototype-
+qualification transition. No trace-only 40 A production claim is accepted.
 
 ## PBREL-007 — TVS/load-dump protection
 
@@ -44,8 +46,10 @@ rejected historical evidence, not a closeout. The replacement model covers
 ISO 16750-2 `79-101 V`, `0.5-4 ohm`, and `40-400 ms`, and calculates TVS
 current, energy, transient thermal impedance, tolerances, and self-heating.
 The current SM8S33AHM3/I candidate fails multiple corners, including the
-101 V / 0.5 ohm / 400 ms hot corner, so a new protection selection and
-PB-BENCH-004 are required before closure.
+101 V / 0.5 ohm / 400 ms hot corner, so PBREL-007 remains `BLOCKED` at its
+pre-layout stage. A passing protection selection permits only `LAYOUT-ONLY`;
+clamp-loop extraction then permits `PROTO-ONLY`, and PB-BENCH-004 closes the
+blocker-specific prototype qualification.
 
 ## PBREL-011 — factory assembly readiness
 
@@ -69,8 +73,10 @@ release gates.
 
 ## Boundary
 
-This historical record does not authorize layout or manufacturing. The
+This historical record does not itself authorize layout or manufacturing. The
 board-release register has two active PBREL rows after corrective review:
-PBREL-006 is Conditional and PBREL-007 is Open. PCB layout remains `NO-GO`.
-No `.kicad_pcb`, Gerber, drill, CPL, fabrication ZIP, or PCBA order package is
-authorized here.
+PBREL-006 is Conditional and PBREL-007 is Open. ADR-0017 and
+`PB-100-staged-release-readiness.csv` remove the process deadlock, but aggregate
+PB authorization remains `BLOCKED` because PBREL-007 has no passing pre-layout
+branch. No `.kicad_pcb`, Gerber, drill, CPL, fabrication ZIP, or PCBA order
+package is authorized by the current state.

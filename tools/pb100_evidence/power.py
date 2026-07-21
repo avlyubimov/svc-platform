@@ -13,7 +13,8 @@ TMR_CHARGE_A = 82e-6
 TMR_TRIP_V = 1.2
 BOOTSTRAP_F = 470e-9
 BOOTSTRAP_ALLOWED_DIP_V = 1.0
-Q1_CASE_ACCEPTANCE_C = 125.0
+Q1_AMBIENT_C = 125.0
+Q1_TARGET_JUNCTION_C = 150.0
 Q1_CONTINUOUS_A = 40.0
 SHORT_CIRCUIT_SHUTDOWN_MAX_S = 5e-6
 
@@ -72,5 +73,5 @@ def q1_conduction_w() -> float:
     return Q1_CONTINUOUS_A**2 * MOSFET.rds_on_hot_ohm
 
 
-def q1_junction_at_case_acceptance_c() -> float:
-    return Q1_CASE_ACCEPTANCE_C + q1_conduction_w() * MOSFET.rth_jc_max_k_per_w
+def q1_max_ambient_to_junction_k_per_w() -> float:
+    return (Q1_TARGET_JUNCTION_C - Q1_AMBIENT_C) / q1_conduction_w()

@@ -88,6 +88,74 @@ class TvsModel:
         return self.loop_inductance_h * self.current_slew_a_per_s
 
 
+@dataclass(frozen=True)
+class SurgeStopper:
+    controller_mpn: str
+    cutoff_mosfet_mpn: str
+    cutoff_mosfet_voltage_v: float
+    cutoff_mosfet_rds_on_max_25c_ohm: float
+    cutoff_mosfet_gate_charge_max_c: float
+    cutoff_mosfet_avalanche_energy_j: float
+    ov_top_ohm: float
+    ov_bottom_ohm: float
+    resistor_tolerance: float
+    ov_threshold_min_v: float
+    ov_threshold_typ_v: float
+    ov_threshold_max_v: float
+    ov_leakage_min_a: float
+    ov_leakage_max_a: float
+    hgate_turnoff_delay_max_s: float
+    hgate_sink_current_min_a: float
+    protected_mosfet_voltage_v: float
+    continuous_current_a: float
+    controller_datasheet: str
+    cutoff_mosfet_datasheet: str
+
+    def cutoff_voltage_v(
+        self,
+        threshold_v: float,
+        top_ohm: float,
+        bottom_ohm: float,
+        leakage_a: float,
+    ) -> float:
+        return threshold_v * (1.0 + top_ohm / bottom_ohm) + leakage_a * top_ohm
+
+    @property
+    def cutoff_nominal_v(self) -> float:
+        return self.cutoff_voltage_v(
+            self.ov_threshold_typ_v,
+            self.ov_top_ohm,
+            self.ov_bottom_ohm,
+            0.0,
+        )
+
+    @property
+    def cutoff_min_v(self) -> float:
+        return self.cutoff_voltage_v(
+            self.ov_threshold_min_v,
+            self.ov_top_ohm * (1.0 - self.resistor_tolerance),
+            self.ov_bottom_ohm * (1.0 + self.resistor_tolerance),
+            self.ov_leakage_min_a,
+        )
+
+    @property
+    def cutoff_max_v(self) -> float:
+        return self.cutoff_voltage_v(
+            self.ov_threshold_max_v,
+            self.ov_top_ohm * (1.0 + self.resistor_tolerance),
+            self.ov_bottom_ohm * (1.0 - self.resistor_tolerance),
+            self.ov_leakage_max_a,
+        )
+
+    @property
+    def gate_discharge_s(self) -> float:
+        return self.cutoff_mosfet_gate_charge_max_c / self.hgate_sink_current_min_a
+
+    @property
+    def conservative_turnoff_s(self) -> float:
+        return self.hgate_turnoff_delay_max_s + self.gate_discharge_s
+
+
 MOSFET = Mosfet(
     mpn="IAUT300N08S5N012",
     orderable_mpn="IAUT300N08S5N012ATMA2",
@@ -209,4 +277,31 @@ TVS = TvsModel(
     mosfet_limit_v=80.0,
     controller_limit_v=100.0,
     datasheet="https://www.vishay.com/docs/98647/sm8s85ahm3.pdf",
+)
+
+
+SURGE_STOPPER = SurgeStopper(
+    controller_mpn="LM74930Q1RGERQ1",
+    cutoff_mosfet_mpn="IAUTN15S6N025ATMA1",
+    cutoff_mosfet_voltage_v=150.0,
+    cutoff_mosfet_rds_on_max_25c_ohm=0.0025,
+    cutoff_mosfet_gate_charge_max_c=139e-9,
+    cutoff_mosfet_avalanche_energy_j=0.490,
+    ov_top_ohm=84_400.0,
+    ov_bottom_ohm=1_000.0,
+    resistor_tolerance=0.01,
+    ov_threshold_min_v=0.585,
+    ov_threshold_typ_v=0.600,
+    ov_threshold_max_v=0.630,
+    ov_leakage_min_a=50e-9,
+    ov_leakage_max_a=200e-9,
+    hgate_turnoff_delay_max_s=7e-6,
+    hgate_sink_current_min_a=0.128,
+    protected_mosfet_voltage_v=80.0,
+    continuous_current_a=40.0,
+    controller_datasheet="https://www.ti.com/lit/ds/symlink/lm74930-q1.pdf",
+    cutoff_mosfet_datasheet=(
+        "https://www.infineon.com/assets/row/public/documents/10/49/"
+        "infineon-iautn15s6n025-datasheet-en.pdf"
+    ),
 )

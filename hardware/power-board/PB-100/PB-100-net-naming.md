@@ -20,10 +20,13 @@ entering the schematic.
 
 | Net | Purpose |
 |---|---|
-| `INPUT_FET_GATE` | Local gate drive from ideal-diode/reverse-protection controller to input MOSFET |
+| `INPUT_HGATE` | Local LM74930-Q1 gate drive for raw-side 150 V cutoff MOSFET Q2 |
+| `INPUT_DGATE` | Local LM74930-Q1 ideal-diode gate drive for protected-side 80 V Q1 |
 | `INPUT_PROT_EN` | Local enable network for the input reverse-protection controller |
-| `LM74700_VCAP` | Local charge-pump capacitor node for the input ideal-diode controller |
-| `VBAT_REV_PROT` | Intermediate node after reverse-protection FET before the final protected rail definition |
+| `SURGE_CAP` | Local LM74930-Q1 charge-pump capacitor node |
+| `INPUT_COMMON_SOURCE` | High-current common-source node between Q2 and Q1 |
+| `INPUT_PROT_FAULT_N` | Active-low fault indication from the input protection controller |
+| `VBAT_REV_PROT` | Intermediate protected node from Q1 drain to total-current shunt input only |
 | `IIN_SHUNT_HI` | High-side Kelvin sense for total input current shunt |
 | `IIN_SHUNT_LO` | Low-side Kelvin sense for total input current shunt |
 | `IIN_MON_A0` | Local total-current monitor address strap |

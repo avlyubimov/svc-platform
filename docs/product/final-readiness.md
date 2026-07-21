@@ -7,6 +7,11 @@ This document defines what “ready” means for the current repository state. I
 authorizes only controlled FB-100 board import. It does not authorize PB-100 or
 LB-100 PCB import, or fabrication/assembly outputs for any board.
 
+Release authorization uses four ordered states from ADR-0017:
+`BLOCKED`, `LAYOUT-ONLY`, `PROTO-ONLY`, and `PRODUCTION-READY`. `PROTO-ONLY`
+permits only marked engineering-prototype fabrication; production and field use
+remain `NO-GO` until all qualification and production gates close.
+
 ## Automated gate
 
 Run from the repository root:
@@ -64,21 +69,25 @@ Current coverage:
 - PB-100 board-print release-status reporting from the schematic-freeze
   checklist, board-release blocker register, KiCad PCB presence, and
   manufacturing output presence.
+- PB-100 staged-release consistency across PBREL-006/PBREL-007 pre-layout,
+  post-layout, prototype-qualification, aggregate readiness, and bench gates.
+- Generated LB-100/FB-100 powered-off evidence recalculating E73 leakage and
+  USB VBUS threshold/removal margins in CI.
 
 ## Current readiness
 
 | Area | Status | Notes |
 |---|---|---|
 | Architecture v1.0 | Ready | Frozen by ADR; PB-100 requirement changes still need ADR |
-| PB-100 requirements | Ready for corrective schematic planning | Baseline plus ADR-0016 ISO load-dump requirement are frozen; schematic freeze remains open |
+| PB-100 requirements | Ready for controlled schematic completion | Baseline plus ADR-0016/ADR-0018 active-cutoff and passive-thermal requirements are frozen; schematic freeze remains open |
 | PB-100 KiCad scaffold | Preliminary capture | Child sheets now contain ERC-clean preliminary capture content and exported netlist coverage; schematic freeze remains open |
-| PB-100 PCB/layout | Blocked by schematic freeze | There are 2 active blockers: `PBREL-006`, `PBREL-007`. Q1 thermal evidence is Conditional until layout extraction and PB-BENCH-010; the current TVS branch fails the ADR-0016 ISO load-dump energy/thermal/margin screen. No PCB import or manufacturing output is authorized |
+| PB-100 PCB/layout | LAYOUT-ONLY authorization; implementation still blocked | There are 0 active PBREL design blockers. PBREL-006 and PBREL-007 are individually `LAYOUT-ONLY`, so aggregate authorization remains `LAYOUT-ONLY`; the Open schematic-freeze and layout-start checklists still prohibit creating `PB-100.kicad_pcb`. Prototype output requires `PROTO-ONLY`; production and field use remain `NO-GO` |
 | LB-100 requirements | Frozen | Baseline is frozen by ADR-0014 and the schematic freeze is Closed |
 | LB-100 KiCad schematic | Reviewed | Deterministic 81-component, 191-net, footprint-bound capture adds typed IC pins/ERC, sourced and decoupled ADC_REF, one-point AGND return, digital USB VBUS detection, direct STM32-to-LTC3212 drive, back-power-safe sensor supplies, and three switched-rail Ioff buffers isolating E73 UART/reset; exported-netlist audit and ERC pass with only the two reviewed cross-board USB CC single-pin warnings |
-| LB-100 PCB/layout | Blocked | There are 0 active blockers (0 active LBREL blockers). Footprint, schematic, and corrected FX18 mechanical gates are closed; the separate signal-integrity and safety layout model remains Open, so no `LB-100.kicad_pcb` or manufacturing output is authorized |
+| LB-100 PCB/layout | BLOCKED | There are 0 active blockers (0 active LBREL blockers). Footprint, schematic, and corrected FX18 mechanical gates are closed; the separate signal-integrity and safety layout model remains Open, so no `LB-100.kicad_pcb` or manufacturing output is authorized |
 | FB-100 requirements | Frozen | Baseline is frozen by ADR-0014 and the schematic freeze is Closed |
 | FB-100 KiCad schematic | Reviewed | Deterministic 44-component, 46-net, footprint-bound capture covers USB-C/ESD/no-back-power VBUS presence with R13 3.9k current limit, R14 15k defined pulldown and C1 100nF, JFB1, ten role-free indicators, direct one-wire RGB, service/reset buttons, and DNP OLED; exported-netlist audit and ERC pass with zero findings |
-| FB-100 PCB/layout | Ready for controlled import | There are 0 active blockers (0 active FBREL blockers). Schematic, footprint, USB/no-back-power, and mechanical gates are closed; no `.kicad_pcb`, Gerber, drill, placement, BOM/CPL, manufacturing ZIP, or PCBA order exists yet |
+| FB-100 PCB/layout | LAYOUT-ONLY | There are 0 active blockers (0 active FBREL blockers). Schematic, footprint, USB/no-back-power, and mechanical gates are closed; controlled board import is authorized but no Gerber, drill, placement, BOM/CPL, manufacturing ZIP, or PCBA order exists yet |
 | Firmware safety core | Host-test ready | Output, overflow-safe delayed battery cutoff, runtime load shedding, stale-current safe-off, thermal derate/cutoff, CAN dropped-edge retry, telemetry, events, saturating diagnostic counters, logging, config, runtime boot, CAN-to-rule bridge, ambient-light rule conditions, ordered rule sets, multi-action rule compilation, rule runtime, and rule paths covered |
 | Configuration format | Host-test ready | JSON schema, canonical rule grammar, rule-action mapping, buffer-atomic rule compilation, PB-100 capability manifest, compiled capability baseline, config store reserved/sequence-wrap handling, config update, and examples are validated |
 | Production package | Draft | `production/board-order/three_board_jlcpcb_order_readiness.csv` tracks all three boards as NO-GO until their layout, fabrication, review, and assembly-output gates close |
@@ -88,9 +97,10 @@ Current coverage:
 - Replace preliminary abstract/class KiCad instances with final schematic
   symbols, reviewed electrical pin types, values, footprints, and MPN-specific
   package evidence.
-- Close every row in
-  `hardware/power-board/PB-100/PB-100-board-release-blocker-register.csv`; any
-  remaining row blocks PCB layout and board release.
+- Close every pre-layout stage in
+  `hardware/power-board/PB-100/PB-100-staged-release-readiness.csv`; overall
+  PBREL rows may remain active for post-layout or prototype evidence without
+  blocking controlled layout.
 - Keep `hardware/power-board/PB-100/PB-100-board-release-local-evidence-closeout.csv`
   synchronized with the latest `make check` result so locally verified
   firmware/schematic evidence is not confused with external bench or sourcing
@@ -100,18 +110,19 @@ Current coverage:
 - Select final critical MPNs and at least two alternatives for each critical
   component family.
 - Recheck JLCPCB/PCBWay assembly availability and package suitability.
-- The planning baseline selects `SM8S33AHM3/I`; MCC `SM8S33A` remains EOL
-  evidence only and Vishay `SM8S33AHE3_A/I` remains NFD evidence only.
-  Schematic freeze still requires live source continuity, DO-218AC assembly,
-  pulse-energy, and actual clamp-loop validation.
+- The planning baseline selects `LM74930Q1RGERQ1` with 150 V
+  `IAUTN15S6N025ATMA1` Q2 and protected-side 80 V
+  `IAUT300N08S5N012ATMA2` Q1. `SM8S33AHM3/I` is retained DNP only.
 - TVS/load-dump evidence now covers the ADR-0016 `79-101 V`, `0.5-4 ohm`, and
   `40-400 ms` envelope with current, energy, transient thermal impedance,
-  tolerance, and self-heating calculations. The current `SM8S33AHM3/I` branch
-  fails multiple corners and reaches only 2.40 V minimum margin to the
-  LM74700-Q1 60 V recommended ceiling; PBREL-007 remains Open.
-- TVS/load-dump freeze review now ties the active SM8S33AHM3/I branch,
-  selected 80 V MOSFET baseline, rejected 60 V history, 100 V device-class
-  paths, 40 V smart-switch ADR boundary, sourcing gate, and
+  tolerance, and self-heating calculations. Those rows preserve the rejected
+  single-TVS failure; ADR-0018 instead selects hard cutoff at `48.99-54.89 V`.
+- ADR-0017 separates PBREL-006/PBREL-007 evidence into pre-layout,
+  post-layout, and prototype-qualification stages. Both design selections are
+  Closed and aggregate authorization is `LAYOUT-ONLY`; board import remains
+  blocked by schematic-freeze/layout-start, and production remains `NO-GO`.
+- Load-dump freeze review now ties LM74930-Q1 hard cutoff, selected 150 V Q2,
+  protected-side 80 V Q1, rejected single-TVS history, 40 V smart-switch ADR boundary, sourcing gate, and
   no-layout boundary into
   `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`.
 - TVS/load-dump overshoot closure now has
@@ -316,9 +327,9 @@ Current coverage:
   selected `IAUT300N08S5N012ATMA2`, the two controlled non-drop-in 80 V alternatives,
   the 40 A board budget, shunt measurement boundary, and assembly-source
   blockers together. Former 60 V calculations are history only.
-- Q1 input reverse freeze review now ties LM74700 default-off behavior,
+- Q1 input reverse freeze review now ties LM74930-Q1 DGATE/default-off behavior,
   selected TOLL and controlled non-drop-in 80 V alternatives, protected
-  measurement sequence, HM3 TVS dependency, sourcing gate, and no-layout
+  measurement sequence, active-cutoff dependency, sourcing gate, and no-layout
   boundary into
   `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`.
 - Q1 input reverse freeze checklist now ties gate clamp/discharge timing,
@@ -326,15 +337,15 @@ Current coverage:
   measurement sequence, 40 A thermal/copper/SOA audit, assembly sourcing, and
   no-layout boundary into
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`.
-- Q1 input reverse derivation precheck now ties LM74700-Q1 VCAP/gate-driver
-  behavior, ideal-diode thresholds, MOSFET RDS(on) window, TVS stress,
+- Q1 input reverse derivation precheck now ties LM74930-Q1 CAP/DGATE behavior,
+  ideal-diode thresholds, MOSFET RDS(on) window, passive thermal-path limit,
   protected measurement sequence, assembly alternates, and no-layout boundary
   to
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`.
-- Q1 input reverse closeout precheck now bridges LM74700-Q1 source boundary,
-  VCAP/gate default-off behavior, ideal-diode reverse-current behavior,
+- Q1 input reverse closeout precheck now bridges LM74930-Q1 source boundary,
+  CAP/DGATE default-off behavior, ideal-diode reverse-current behavior,
   RDS(on) thermal window, TOLL/LFPAK88/PowerPAK alternatives, TVS overshoot
-  dependency, protected measurement sequence, assembly sourcing, capture sync,
+  active-cutoff dependency, protected measurement sequence, assembly sourcing, capture sync,
   and no-layout boundary to
   `hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`.
 - The PB-100 board-current budget now has a cross-artifact trace tying the
@@ -447,6 +458,19 @@ Current coverage:
   role mapping, current budget, or CAN1 safety behavior.
 - Final PB-100, LB-100, and FB-100 schematic review packets archived in the
   repository.
+- For PB-100, every `Pre-layout design` row in
+  `hardware/power-board/PB-100/PB-100-staged-release-readiness.csv` is `Closed`.
+  Post-layout extraction and PB-BENCH rows must not be used to block this
+  `LAYOUT-ONLY` transition.
+
+## Required before engineering-prototype fabrication
+
+- Reviewed PB-100 copper/current/thermal and clamp-loop extraction closes every
+  `Post-layout verification` row and advances aggregate authorization to
+  `PROTO-ONLY`.
+- Prototype Gerber, drill, BOM/CPL, placement, and assembly outputs are clearly
+  marked engineering-prototype-only and are not reused as production release
+  artifacts without a later review.
 
 ## Required before prototype bring-up
 
@@ -459,9 +483,11 @@ Current coverage:
 
 ## No-go conditions
 
-- Any active row in
-  `hardware/power-board/PB-100/PB-100-board-print-closure-matrix.csv`.
-- Any `PB-100.kicad_pcb` or manufacturing output before schematic freeze.
+- Any open PB-100 pre-layout stage before `PB-100.kicad_pcb` creation.
+- Any prototype manufacturing output before `PROTO-ONLY`.
+- Any production or field use before `PRODUCTION-READY`, every applicable
+  PB-100 post-prototype bench row, and the normal production package gates are
+  closed.
 - Any vehicle CAN1 TX enable path without a new ADR and explicit hardware action.
 - Any hard-coded accessory role to physical output mapping in hardware or
   firmware.

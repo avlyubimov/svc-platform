@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import re
 import tempfile
 from pathlib import Path
@@ -36,6 +37,26 @@ def validate(repo_root: Path) -> list[str]:
     generated = run(["python3", "tools/generate_lb_fb_schematics.py", "--check"], cwd=repo_root)
     if generated.returncode:
         failures.append(f"generated schematics are stale: {generated.stdout}{generated.stderr}".strip())
+    evidence = run(["python3", "tools/generate_lb_fb_release_evidence.py", "--check"], cwd=repo_root)
+    if evidence.returncode:
+        failures.append(f"generated powered-off evidence is stale: {evidence.stdout}{evidence.stderr}".strip())
+    else:
+        evidence_path = (
+            repo_root
+            / "hardware/logic-board/LB-100/LB-100-fb-powered-off-calculation-evidence.csv"
+        )
+        with evidence_path.open(newline="", encoding="utf-8") as stream:
+            evidence_rows = {row["Calculation"]: row for row in csv.DictReader(stream)}
+        expected_calculations = {
+            "E73 UART powered-off clamp",
+            "USB VBUS minimum present",
+            "USB VBUS maximum absent",
+            "USB VBUS removal time",
+        }
+        if set(evidence_rows) != expected_calculations:
+            failures.append("powered-off evidence must contain the four reviewed calculations")
+        elif any(row["Result"] != "PASS" for row in evidence_rows.values()):
+            failures.append("powered-off evidence contains a failed electrical margin")
 
     with tempfile.TemporaryDirectory(prefix="svc-board-schematic-") as directory:
         temp = Path(directory)

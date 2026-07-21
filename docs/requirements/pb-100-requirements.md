@@ -28,14 +28,15 @@ vehicle-agnostic and must not encode accessory roles in hardware.
   `Ri = 0.5-4 ohm`, and `td = 40-400 ms` at cold and hot initial junction
   conditions.
 - The final qualification plan must cover ten pulses with 60 s spacing.
-- Evidence must calculate TVS current, power, energy, transient thermal
-  impedance, junction temperature, tolerances, dynamic resistance,
-  temperature coefficient, self-heating, and layout/measurement uncertainty.
-- Every accepted corner must preserve at least `5 V` modeled margin to the
-  LM74700-Q1 60 V recommended ceiling. The 65 V absolute maximum is not a
-  design target.
+- Evidence must calculate cutoff tolerance, source current, switch transition
+  energy, MOSFET dynamic SOA, transient thermal impedance, junction
+  temperature, self-heating, and layout/measurement uncertainty. Any populated
+  suppression device also requires current, power, energy, and thermal proof.
+- The selected Rev.1 branch must disconnect the load at no more than `55 V`;
+  load interruption during load dump is explicitly permitted. Post-layout
+  extraction must keep `VBAT_PROT` below the 60 V protected-domain limit.
 - Passing a peak clamp-voltage check alone does not satisfy the requirement.
-- See ADR-0016.
+- See ADR-0016 and ADR-0018.
 
 ## 3. Generic outputs
 

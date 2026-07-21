@@ -120,7 +120,7 @@ def main() -> int:
         source_footprints = footprint_row.get("Package sources identified", "Missing")
         open_mechanical = mechanical_row.get("Open mechanical items", "Missing")
         print(
-            f"  - {board}: {row['Order state']} | "
+            f"  - {board}: release={row['Release state']} | production_order={row['Order state']} | "
             f"freeze={row['Schematic freeze state']} | "
             f"active_blockers={active_count} | "
             f"layout_planning={layout_state} | "

@@ -7,6 +7,8 @@ import re
 import sys
 from pathlib import Path
 
+from readiness_validation.stages import STATE_RANK, derive_pb_release_state
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PB100_DIR = REPO_ROOT / "hardware" / "power-board" / "PB-100"
@@ -14,6 +16,7 @@ CHECKLIST = PB100_DIR / "PB-100-schematic-freeze-checklist.md"
 BLOCKERS = PB100_DIR / "PB-100-board-release-blocker-register.csv"
 CLOSURE_MATRIX = PB100_DIR / "PB-100-board-print-closure-matrix.csv"
 POST_PROTOTYPE_GATE = PB100_DIR / "PB-100-post-prototype-validation-gate.csv"
+STAGED_READINESS = PB100_DIR / "PB-100-staged-release-readiness.csv"
 LAYOUT_START_CHECKLIST = PB100_DIR / "PB-100-pcb-layout-start-checklist.csv"
 FOOTPRINT_BINDING_STATUS = (
     REPO_ROOT / "production" / "board-order" / "three_board_footprint_binding_status.csv"
@@ -50,12 +53,12 @@ MANUFACTURING_NAME_FRAGMENTS = (
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Report whether PB-100 is ready for PCB layout or board printing."
+        description="Report PB-100 staged layout, prototype, and production authorization."
     )
     parser.add_argument(
         "--fail-on-blocked",
         action="store_true",
-        help="return a non-zero exit code when PB-100 is not board-print ready",
+        help="return a non-zero exit code when PB-100 is not production-ready",
     )
     return parser.parse_args()
 
@@ -106,6 +109,13 @@ def post_prototype_gate_rows() -> list[dict[str, str]]:
     if not POST_PROTOTYPE_GATE.exists():
         return []
     with POST_PROTOTYPE_GATE.open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
+def staged_release_rows() -> list[dict[str, str]]:
+    if not STAGED_READINESS.exists():
+        return []
+    with STAGED_READINESS.open(newline="", encoding="utf-8") as handle:
         return list(csv.DictReader(handle))
 
 
@@ -178,6 +188,7 @@ def main() -> int:
     blockers = release_blockers()
     closure_rows = board_print_closure_rows()
     post_prototype_rows = post_prototype_gate_rows()
+    staged_rows = staged_release_rows()
     layout_rows = layout_start_rows()
     active_gates = [row for row in gates if row["Status"] != "Closed"]
     active_blockers = [row for row in blockers if row["Status"] != "Closed"]
@@ -192,21 +203,28 @@ def main() -> int:
         row for row in open_layout_start_rows if row.get("Gate", "").strip() in {"Footprint binding", "Mechanical envelope"}
     ]
 
-    board_print_ready = (
-        status == "Closed"
+    release_state = derive_pb_release_state(staged_rows, post_prototype_rows)
+    layout_authorized = STATE_RANK[release_state] >= STATE_RANK["LAYOUT-ONLY"]
+    prototype_authorized = STATE_RANK[release_state] >= STATE_RANK["PROTO-ONLY"]
+    production_authorized = release_state == "PRODUCTION-READY"
+    layout_ready = status == "Closed" and not active_gates and layout_authorized
+    board_import_ready = layout_ready and not board_import_blockers
+    production_release_ready = (
+        production_authorized
+        and status == "Closed"
         and not active_gates
         and not active_blockers
         and bool(pcbs)
         and bool(manufacturing)
     )
-    layout_ready = status == "Closed" and not active_gates and not active_blockers
-    board_import_ready = layout_ready and not board_import_blockers
 
     print("PB-100 release status")
+    print(f"  Staged release authorization: {release_state}")
     print(f"  Schematic freeze checklist: {status}")
     print(f"  Layout planning authorization: {'READY' if layout_ready else 'BLOCKED'}")
     print(f"  KiCad board import: {'READY' if board_import_ready else 'BLOCKED'}")
-    print(f"  Board-print package: {'READY' if board_print_ready else 'NO-GO'}")
+    print(f"  Engineering prototype package: {'AUTHORIZED' if prototype_authorized else 'BLOCKED'}")
+    print(f"  Production/field release: {'READY' if production_release_ready else 'NO-GO'}")
     print(f"  Active freeze gates: {len(active_gates)}")
     print(f"  Active release blockers: {len(active_blockers)}")
     print(f"  Open layout-start gates: {len(open_layout_start_rows)}")
@@ -245,7 +263,7 @@ def main() -> int:
         for path in manufacturing:
             print(f"  - {relative(path)}")
 
-    if args.fail_on_blocked and not board_print_ready:
+    if args.fail_on_blocked and not production_release_ready:
         return 1
     return 0
 

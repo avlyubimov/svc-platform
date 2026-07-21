@@ -7,6 +7,12 @@ import re
 from collections import Counter
 from pathlib import Path
 
+from readiness_validation.stages import (
+    RELEASE_STATES,
+    STATE_RANK,
+    derive_pb_release_state,
+)
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PB100_DIR = REPO_ROOT / "hardware" / "power-board" / "PB-100"
@@ -24,6 +30,8 @@ MECHANICAL_ENVELOPE_STATUS = (
     REPO_ROOT / "production" / "board-order" / "three_board_mechanical_envelope_status.csv"
 )
 PB100_FREEZE = PB100_DIR / "PB-100-schematic-freeze-checklist.md"
+PB100_STAGED_READINESS = PB100_DIR / "PB-100-staged-release-readiness.csv"
+PB100_POST_PROTOTYPE = PB100_DIR / "PB-100-post-prototype-validation-gate.csv"
 FX18_MF_OWNERSHIP = PB100_DIR / "PB-100-fx18-mf-contact-ownership-precheck.csv"
 ADR_0014 = REPO_ROOT / "docs" / "adr" / "ADR-0014-lb-fb-baseline-requirements.md"
 
@@ -110,6 +118,7 @@ REQUIRED_BLOCKER_PREFIX = {
 REQUIRED_ORDER_BOARDS = {"PB-100", "LB-100", "FB-100"}
 ORDER_COLUMNS = (
     "Board",
+    "Release state",
     "Board path",
     "Requirements state",
     "Schematic freeze state",
@@ -123,6 +132,7 @@ ORDER_COLUMNS = (
 )
 LAYOUT_START_READINESS_COLUMNS = (
     "Board",
+    "Release state",
     "Freeze state",
     "Layout planning state",
     "KiCad board import state",
@@ -417,13 +427,22 @@ def validate_no_layout_before_freeze(board: str, board_dir: Path, status: str) -
         fail(f"{board} has manufacturing output before schematic freeze: {manufacturing[0].relative_to(REPO_ROOT)}")
 
 
-def validate_no_manufacturing_outputs_before_order(board: str, board_dir: Path) -> None:
+def validate_no_manufacturing_outputs_before_order(
+    board: str, board_dir: Path, release_state: str
+) -> None:
     manufacturing = manufacturing_files(board_dir)
-    if manufacturing:
+    if manufacturing and STATE_RANK[release_state] < STATE_RANK["PROTO-ONLY"]:
         fail(
-            f"{board} has manufacturing output before order review: "
+            f"{board} has manufacturing output before PROTO-ONLY: "
             f"{manufacturing[0].relative_to(REPO_ROOT)}"
         )
+
+
+def current_pb_release_state() -> str:
+    return derive_pb_release_state(
+        validate_csv(PB100_STAGED_READINESS),
+        validate_csv(PB100_POST_PROTOTYPE),
+    )
 
 
 def validate_adr_0014() -> None:
@@ -794,6 +813,7 @@ def validate_order_readiness() -> None:
     if missing_columns:
         fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)} is missing columns: {', '.join(missing_columns)}")
     seen_boards = set()
+    expected_pb_release_state = current_pb_release_state()
     for row_number, row in enumerate(rows, 2):
         board = row["Board"].strip()
         seen_boards.add(board)
@@ -808,19 +828,40 @@ def validate_order_readiness() -> None:
                 f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
                 f"schematic freeze state must match {freeze_state}"
             )
-        if row["Order state"].strip() != "NO-GO":
-            fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: order must remain NO-GO until every board closes")
-        for token in ("No PCB layout", "No fabrication outputs", "No assembly outputs"):
-            if token not in " ".join(row.values()):
-                fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: must keep {token}")
+        release_state = row["Release state"].strip()
+        if release_state not in RELEASE_STATES:
+            fail(
+                f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: invalid Release state {release_state}"
+            )
+        if board == "PB-100" and release_state != expected_pb_release_state:
+            fail(
+                f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"PB-100 release state must be {expected_pb_release_state}"
+            )
+        expected_order_state = "READY" if release_state == "PRODUCTION-READY" else "NO-GO"
+        if row["Order state"].strip() != expected_order_state:
+            fail(
+                f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: order must be {expected_order_state}"
+            )
+        row_text = " ".join(row.values())
+        if release_state == "BLOCKED" and "No PCB layout" not in row_text:
+            fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: BLOCKED must keep No PCB layout")
+        if STATE_RANK[release_state] < STATE_RANK["PROTO-ONLY"]:
+            for token in ("No fabrication outputs", "No assembly outputs"):
+                if token not in row_text:
+                    fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: must keep {token}")
+        elif release_state == "PROTO-ONLY" and "engineering prototype" not in row_text.lower():
+            fail(
+                f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: PROTO-ONLY must mark engineering prototype scope"
+            )
         for token in (
             f"{board}-pcb-layout-start-checklist.csv",
             "footprint binding",
             "mechanical envelope",
-            "do not generate JLCPCB/PCBWay outputs",
         ):
-            if token not in " ".join(row.values()):
+            if token not in row_text:
                 fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: must include {token}")
+        validate_no_manufacturing_outputs_before_order(board, board_path, release_state)
     missing_boards = sorted(REQUIRED_ORDER_BOARDS - seen_boards)
     if missing_boards:
         fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)} is missing boards: {', '.join(missing_boards)}")
@@ -1073,6 +1114,7 @@ def validate_layout_start_readiness() -> None:
     if missing_columns:
         fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)} is missing columns: {', '.join(missing_columns)}")
     seen_boards = set()
+    expected_pb_release_state = current_pb_release_state()
     for row_number, row in enumerate(rows, 2):
         board = row["Board"].strip()
         seen_boards.add(board)
@@ -1084,13 +1126,28 @@ def validate_layout_start_readiness() -> None:
                 f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
                 f"freeze state must match {freeze_state}"
             )
+        release_state = row["Release state"].strip()
+        if release_state not in RELEASE_STATES:
+            fail(
+                f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"invalid Release state {release_state}"
+            )
+        if board == "PB-100" and release_state != expected_pb_release_state:
+            fail(
+                f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"PB-100 release state must be {expected_pb_release_state}"
+            )
         expected_planning_state = "READY" if freeze_state == "Closed" else "BLOCKED"
         if row["Layout planning state"].strip() != expected_planning_state:
             fail(
                 f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
                 f"layout planning must be {expected_planning_state}"
             )
-        expected_import_state = "READY" if board == "FB-100" and freeze_state == "Closed" else "BLOCKED"
+        expected_import_state = (
+            "READY"
+            if freeze_state == "Closed" and STATE_RANK[release_state] >= STATE_RANK["LAYOUT-ONLY"]
+            else "BLOCKED"
+        )
         if row["KiCad board import state"].strip() != expected_import_state:
             fail(
                 f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
@@ -1108,19 +1165,23 @@ def validate_layout_start_readiness() -> None:
             )
         if not row["Assembly/DFM baseline"].startswith("READY"):
             fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: assembly DFM baseline must be READY")
-        if row["Order state"].strip() != "NO-GO":
-            fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: order must remain NO-GO")
+        expected_order_state = "READY" if release_state == "PRODUCTION-READY" else "NO-GO"
+        if row["Order state"].strip() != expected_order_state:
+            fail(
+                f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"order must be {expected_order_state}"
+            )
         row_text = " ".join(row.values())
-        for token in (f"No {board}.kicad_pcb", "manufacturing artifact", f"{board}-pcb-layout-start-checklist.csv"):
+        for token in ("manufacturing artifact", f"{board}-pcb-layout-start-checklist.csv"):
             if token not in row_text:
                 fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: must include {token}")
         current_layout_files = layout_files(board_dir(board))
-        if current_layout_files:
+        if current_layout_files and expected_import_state == "BLOCKED":
             fail(
                 f"{board} has KiCad board import while layout-start checklist is blocked: "
                 f"{current_layout_files[0].relative_to(REPO_ROOT)}"
             )
-        validate_no_manufacturing_outputs_before_order(board, board_dir(board))
+        validate_no_manufacturing_outputs_before_order(board, board_dir(board), release_state)
     missing_boards = sorted(REQUIRED_ORDER_BOARDS - seen_boards)
     if missing_boards:
         fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)} is missing boards: {', '.join(missing_boards)}")

@@ -4,6 +4,14 @@ import csv
 import re
 from pathlib import Path
 
+from .stages import (
+    AUTHORIZATION_AFTER_CLOSE,
+    RELEASE_STATES,
+    STAGES,
+    derive_blocker_authorization,
+    derive_pb_release_state,
+)
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PB100_DIR = REPO_ROOT / "hardware" / "power-board" / "PB-100"
@@ -21,6 +29,9 @@ AGGREGATE_READINESS = (
 )
 FINAL_READINESS = REPO_ROOT / "docs" / "product" / "final-readiness.md"
 ADR_0015 = REPO_ROOT / "docs" / "adr" / "ADR-0015-can1-physical-layer-board-ownership.md"
+ADR_0017 = REPO_ROOT / "docs" / "adr" / "ADR-0017-pb-100-staged-release-authorization.md"
+PB_STAGED_READINESS = PB100_DIR / "PB-100-staged-release-readiness.csv"
+PB_POST_PROTOTYPE = PB100_DIR / "PB-100-post-prototype-validation-gate.csv"
 FOOTPRINT_STATUS = (
     REPO_ROOT / "production" / "board-order" / "three_board_footprint_binding_status.csv"
 )
@@ -40,6 +51,7 @@ ACTIVE_DOCUMENTS = (
     PB100_DIR / "PB-100-board-release-local-evidence-closeout.csv",
     PB100_DIR / "PB-100-current-telemetry-closeout-precheck.csv",
     PB100_DIR / "PB-100-pcb-layout-start-checklist.csv",
+    PB_STAGED_READINESS,
     LB100_DIR / "LB-100-schematic-freeze-checklist.md",
     LB100_DIR / "LB-100-schematic-review-closeout.md",
     LB100_DIR / "LB-100-footprint-binding-progress.csv",
@@ -84,6 +96,15 @@ REQUIRED_FACTS = {
         "zero Open rows",
         "six official plated lands",
         "four GND MF circuits",
+    ),
+    PB_STAGED_READINESS: (
+        "PBREL-006",
+        "PBREL-007",
+        "LAYOUT-ONLY",
+        "PROTO-ONLY",
+        "PRODUCTION-READY",
+        "PB-BENCH-004",
+        "PB-BENCH-010",
     ),
     LB100_DIR / "LB-100-schematic-freeze-checklist.md": (
         "ADR-0015 Accepted",
@@ -175,7 +196,7 @@ def active_blockers() -> dict[str, tuple[str, ...]]:
         active = tuple(
             row["Blocker ID"].strip()
             for row in rows
-            if row["Status"].strip() in {"Open", "Conditional"}
+            if row["Status"].strip() in {"Open", "Conditional", "Blocked"}
         )
         result[board] = active
     return result
@@ -193,6 +214,137 @@ def validate_adr_0015() -> None:
     ):
         if token not in text:
             raise ValidationError(f"{relative(ADR_0015)} must include {token!r}")
+
+
+def validate_adr_0017() -> None:
+    text = read_text(ADR_0017)
+    if "Accepted — Product Owner directed" not in text:
+        raise ValidationError(f"{relative(ADR_0017)} must record Product Owner acceptance")
+    for token in (
+        "BLOCKED",
+        "LAYOUT-ONLY",
+        "PROTO-ONLY",
+        "PRODUCTION-READY",
+        "PB-BENCH-004",
+        "PB-BENCH-010",
+        "No second-developer review is required",
+    ):
+        if token not in text:
+            raise ValidationError(f"{relative(ADR_0017)} must include {token!r}")
+
+
+def validate_staged_release_readiness() -> None:
+    rows = read_csv(PB_STAGED_READINESS)
+    required_columns = {
+        "Blocker ID",
+        "Stage",
+        "Stage status",
+        "Required evidence",
+        "Current evidence",
+        "Authorization after close",
+        "Current blocker authorization",
+        "Blocked scope",
+    }
+    missing_columns = required_columns - set(rows[0])
+    if missing_columns:
+        raise ValidationError(
+            f"{relative(PB_STAGED_READINESS)} is missing columns: "
+            f"{', '.join(sorted(missing_columns))}"
+        )
+
+    rows_by_blocker: dict[str, list[dict[str, str]]] = {}
+    seen_keys: set[tuple[str, str]] = set()
+    for row in rows:
+        blocker_id = row["Blocker ID"].strip()
+        stage = row["Stage"].strip()
+        key = blocker_id, stage
+        if key in seen_keys:
+            raise ValidationError(f"{relative(PB_STAGED_READINESS)} has duplicate {key}")
+        seen_keys.add(key)
+        rows_by_blocker.setdefault(blocker_id, []).append(row)
+        if stage not in STAGES:
+            raise ValidationError(f"{relative(PB_STAGED_READINESS)} has unknown stage {stage!r}")
+        expected_after_close = AUTHORIZATION_AFTER_CLOSE[stage]
+        if row["Authorization after close"].strip() != expected_after_close:
+            raise ValidationError(
+                f"{relative(PB_STAGED_READINESS)}:{blocker_id}/{stage} must advance to "
+                f"{expected_after_close}"
+            )
+        if "production" not in row["Blocked scope"].lower() or "field" not in row["Blocked scope"].lower():
+            raise ValidationError(
+                f"{relative(PB_STAGED_READINESS)}:{blocker_id}/{stage} must preserve production/field restrictions"
+            )
+
+    if set(rows_by_blocker) != {"PBREL-006", "PBREL-007"}:
+        raise ValidationError(f"{relative(PB_STAGED_READINESS)} must stage PBREL-006 and PBREL-007 exactly")
+    for blocker_id, blocker_rows in rows_by_blocker.items():
+        try:
+            authorization = derive_blocker_authorization(blocker_rows)
+        except ValueError as exc:
+            raise ValidationError(
+                f"{relative(PB_STAGED_READINESS)}:{blocker_id}: {exc}"
+            ) from exc
+        reported = {row["Current blocker authorization"].strip() for row in blocker_rows}
+        if reported != {authorization}:
+            raise ValidationError(
+                f"{relative(PB_STAGED_READINESS)}:{blocker_id} must report current authorization {authorization}"
+            )
+
+    required_tokens = {
+        "PBREL-006": (
+            "IAUT300N08S5N012ATMA2",
+            "4.032 W",
+            "150 C",
+            "6.20 K/W",
+            "PB-BENCH-010",
+        ),
+        "PBREL-007": (
+            "LM74930Q1RGERQ1",
+            "IAUTN15S6N025ATMA1",
+            "79-101 V",
+            "0.5-4 ohm",
+            "40-400 ms",
+            "48.99-54.89 V",
+            "0.0327 J",
+            "PB-BENCH-004",
+        ),
+    }
+    for blocker_id, tokens in required_tokens.items():
+        text = " ".join(" ".join(row.values()) for row in rows_by_blocker[blocker_id])
+        for token in tokens:
+            if token not in text:
+                raise ValidationError(
+                    f"{relative(PB_STAGED_READINESS)}:{blocker_id} must include {token!r}"
+                )
+
+    try:
+        pb_release_state = derive_pb_release_state(rows, read_csv(PB_POST_PROTOTYPE))
+    except ValueError as exc:
+        raise ValidationError(f"{relative(PB_STAGED_READINESS)}: {exc}") from exc
+
+    readiness_states: dict[Path, dict[str, str]] = {}
+    for path in AGGREGATE_READINESS:
+        board_states = {
+            row["Board"].strip(): row.get("Release state", "").strip()
+            for row in read_csv(path)
+        }
+        if any(state not in RELEASE_STATES for state in board_states.values()):
+            raise ValidationError(
+                f"{relative(path)} Release state must use only {', '.join(RELEASE_STATES)}"
+            )
+        if board_states.get("PB-100") != pb_release_state:
+            raise ValidationError(
+                f"{relative(path)}:PB-100 must report derived release state {pb_release_state}"
+            )
+        readiness_states[path] = board_states
+    if len({tuple(states.items()) for states in readiness_states.values()}) != 1:
+        raise ValidationError("aggregate readiness CSV files must report identical release states")
+
+    final_text = read_text(FINAL_READINESS)
+    if f"aggregate authorization remains `{pb_release_state}`" not in final_text:
+        raise ValidationError(
+            f"{relative(FINAL_READINESS)} must report aggregate PB-100 authorization {pb_release_state}"
+        )
 
 
 def validate_aggregate_counts(expected: dict[str, tuple[str, ...]]) -> None:
@@ -328,6 +480,8 @@ def validate_no_stale_claims() -> None:
 def validate() -> None:
     expected = active_blockers()
     validate_adr_0015()
+    validate_adr_0017()
+    validate_staged_release_readiness()
     validate_aggregate_counts(expected)
     validate_final_readiness(expected)
     validate_footprint_gate_status()

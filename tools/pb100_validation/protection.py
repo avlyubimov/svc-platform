@@ -87,7 +87,7 @@ def validate_tvs_candidate_consistency() -> None:
         if stale_tvs_source in text:
             fail(f"{name} must not use MCC SM8S33A as the active TVS source")
         if "SM8S33AHM3" not in text:
-            fail(f"{name} must reference the active SM8S33AHM3 candidate")
+            fail(f"{name} must preserve the rejected SM8S33AHM3/DNP trace")
 
 
 def validate_tvs_load_dump_margin_trace() -> None:
@@ -114,7 +114,13 @@ def validate_tvs_load_dump_margin_trace() -> None:
             fail(f"LM74700 load-dump row must include {token}")
     _require_tokens(
         "PB-100-protection-validation.csv",
-        ("57.60V", "2.40V", "TVS thermal survival fails", "PBREL-006 Conditional"),
+        (
+            "48.99-54.89V",
+            "0.0327J",
+            "PBREL-006 design gate Closed",
+            "SM8S33AHM3/I legacy D1",
+            "NOT APPROVED",
+        ),
     )
 
 
@@ -128,11 +134,10 @@ def validate_tvs_load_dump_freeze_review() -> None:
     _require_tokens(
         "PB-100-tvs-load-dump-freeze-review.csv",
         (
-            "SM8S33AHM3/I",
-            "ADR-0016",
-            "energy thermal",
-            "at least 5 V",
-            "PBREL-007 Open",
+            "LM74930Q1RGERQ1",
+            "IAUTN15S6N025ATMA1",
+            "48.99-54.89 V",
+            "PBREL-007 design selection is Closed",
             "PB-100.kicad_pcb",
         ),
     )
@@ -151,8 +156,8 @@ def validate_tvs_overshoot_escape_checklist() -> None:
             "79-101 V",
             "0.5-4 ohm",
             "40-400 ms",
-            "current and energy",
-            "Transient thermal impedance",
+            "Q2 transition energy",
+            "dynamic SOA",
             "ten pulses separated by 60 s",
             "PB-100.kicad_pcb",
         ),
@@ -174,7 +179,7 @@ def validate_tvs_overshoot_validation_precheck() -> None:
         fail("TVS validation must require extracted parasitic inductance")
     _require_tokens(
         "PB-100-tvs-overshoot-validation-precheck.csv",
-        ("16 boundary rows", "Integrate TVS current", "self-heating", "ten pulses", "PB-100.kicad_pcb"),
+        ("16 boundary rows", "Cutoff tolerance", "dynamic SOA", "ten pulses", "PB-100.kicad_pcb"),
     )
 
 
@@ -192,11 +197,12 @@ def validate_tvs_overshoot_closeout_precheck() -> None:
         "PB-100-tvs-overshoot-closeout-precheck.csv",
         (
             "ADR-0016",
-            "at least 5 V",
-            "Peak current power and integrated energy",
-            "Transient thermal impedance",
+            "ADR-0018",
+            "no higher than 55 V",
+            "Worst transition is 0.0327 J",
+            "dynamic SOA",
             "Ten pulses at 60 s",
-            "PBREL-007 Open",
+            "PBREL-007 design selection is Closed",
             "PB-100.kicad_pcb",
         ),
     )

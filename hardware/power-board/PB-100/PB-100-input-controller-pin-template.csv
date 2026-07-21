@@ -1,7 +1,26 @@
 Pin number,Pin name,Signal role,Net pattern,Direction,Default state,Freeze dependency
-1,VCAP,Charge-pump capacitor node,LM74700_VCAP,Local charge-pump network,Capacitor TBD not final,Charge-pump capacitor value and voltage rating close during schematic review
-2,GND,Controller ground,GND,Power reference,Ground reference present,Return strategy closes during schematic review
-3,EN,Controller enable,INPUT_PROT_EN,Local enable network,Enable behavior TBD not final,Default enable policy and service-disable option close during schematic review
-4,CATHODE,Protected-side sense,VBAT_REV_PROT,Controller sense,Valid after reverse FET,Protected-side sense node closes during schematic review
-5,GATE,External MOSFET gate drive,INPUT_FET_GATE,Controller to input MOSFET,Off when controller unpowered,Gate clamp turn-off and Q1 package evidence close during schematic review
-6,ANODE,Raw-side input sense,VBAT_RAW,Controller sense,Tracks fused battery input,Raw-side surge and reverse-polarity stress review closes during schematic review
+1,DGATE,Protected ideal-diode gate,Q1_DGATE,Controller to Q1,Off when controller unpowered,Gate discharge and common-source orientation close during schematic review
+2,A,Ideal-diode anode,INPUT_COMMON_SOURCE,Power-path sense,Follows common-source node,Common-source topology closes during schematic review
+3,SW,Internal sense-switch output,NC_SW,No connect,Left open per datasheet,No-connect marker closes during schematic review
+4,UVLO,Undervoltage input,LM74930_VS,Local configuration,Tied enabled for current revision,Cold-crank policy closes during schematic review
+5,OV,Overvoltage input,LM74930_OV,Local threshold input,48.99-54.89 V cutoff,Divider tolerance and leakage close during schematic review
+6,EN,Controller enable,LM74930_VS,Local configuration,Always enabled when VS is valid,Default enable behavior closes during schematic review
+7,MODE,Reverse blocking mode,LM74930_VS,Local configuration,Reverse-current blocking enabled,MODE strap closes during schematic review
+8,N.C.,No-connect pin,NC_8,No connect,Left open per datasheet,No-connect marker closes during schematic review
+9,TMR,Overcurrent timer,GND,Local configuration,Grounded to disable unused OCP timer,Protection ownership closes during schematic review
+10,IMON,Current monitor output,NC_IMON,No connect,Unused because INA228 owns telemetry,No-connect marker closes during schematic review
+11,ILIM,Overcurrent threshold,GND,Local configuration,Grounded to disable unused OCP,Protection ownership closes during schematic review
+12,FLT,Open-drain fault,INPUT_PROT_FAULT_N,Diagnostic output,Low on OV/UV fault,Diagnostic pull-up ownership closes during schematic review
+13,GND,Controller ground,GND,Power reference,Ground reference present,Return strategy closes during schematic review
+14,HGATE,Raw-side cutoff gate,Q2_HGATE,Controller to Q2,Low during overvoltage,Turnoff and Q2 SOA close during schematic review
+15,OUT,High-side FET source sense,INPUT_COMMON_SOURCE,Power-path sense,Follows common-source node,Common-source topology closes during schematic review
+16,OVCLAMP,Clamp-mode selector,GND,Local configuration,Grounded for hard cutoff,Hard-cutoff mode closes during schematic review
+17,N.C.,No-connect pin,NC_17,No connect,Left open per datasheet,No-connect marker closes during schematic review
+18,ISCP,Short-circuit setting,VBAT_REV_PROT,Local sense,Unused OCP path held at pre-shunt protected node,Protection ownership closes during schematic review
+19,CS-,Current-sense negative,VBAT_REV_PROT,Local sense,Zero differential because INA228 owns telemetry,Protection ownership closes during schematic review
+20,CS+,Current-sense positive,VBAT_REV_PROT,Local sense,Zero differential because INA228 owns telemetry,Protection ownership closes during schematic review
+21,N.C.,No-connect pin,NC_21,No connect,Left open per datasheet,No-connect marker closes during schematic review
+22,VS,Controller supply,LM74930_VS,Local clamped supply,Protected by R6 DZVS1 and CVS1,VS protection closes during schematic review
+23,CAP,Charge-pump output,LM74930_CAP,Local charge-pump node,100 nF to VS,Effective capacitance and placement close during schematic review
+24,C,Ideal-diode cathode,VBAT_REV_PROT,Protected-side sense,Follows Q1 drain before total-current shunt,Q1 drain orientation closes during schematic review
+25,RTN,Exposed thermal pad,NC_RTN,No connect,Isolated from GND per datasheet,Pad isolation and footprint review close during schematic review

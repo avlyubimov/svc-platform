@@ -1,16 +1,23 @@
 Ref,Symbol key,Concrete symbol name,Interface point,Planned net,Direction,Default state,Freeze dependency
 J1,INPUT_CONNECTOR,PB100_INPUT_CONNECTOR_CLASS_PRELIM,Battery positive,VBAT_RAW,Harness to PB-100,Protected by near-battery main fuse,Garage connector current derating closes
 J1,INPUT_CONNECTOR,PB100_INPUT_CONNECTOR_CLASS_PRELIM,Battery return,GND,Harness to PB-100,Return path present,Ground return and harness gauge review closes
-D1,INPUT_TVS,PB100_SM8S33AHM3I,Clamp high side,VBAT_RAW,Clamp to ground,Inactive until transient,TVS clamp and overshoot margin close
-D1,INPUT_TVS,PB100_SM8S33AHM3I,Clamp return,GND,Clamp to ground,Return path present,TVS pulse-current return review closes
-U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Input sense,VBAT_RAW,PB-100 sense,Tracks raw fused battery,Reverse-controller datasheet review closes
-U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Protected sense,VBAT_REV_PROT,PB-100 sense,Valid after reverse path,Reverse-controller threshold and surge review closes
-U1,INPUT_IDEAL_DIODE,PB100_LM74700QDBVRQ1_PRELIM,Reverse FET gate drive,INPUT_FET_GATE,Controller to FET,Off when controller unpowered,Gate clamp and turn-off behavior review closes
-Q1,INPUT_REVERSE_FET,PB100_POWER_NMOS_TOLL_80V,Raw-side source terminal,VBAT_RAW,Power path,IAUT300N08S5N012ATMA2 pins 2-8 source orientation reviewed in schematic,TOLL 40 A SOA copper and thermal review close
-Q1,INPUT_REVERSE_FET,PB100_POWER_NMOS_TOLL_80V,Protected-side Tab drain,VBAT_REV_PROT,Power path,IAUT300N08S5N012ATMA2 Tab drain orientation reviewed in schematic,TOLL 40 A SOA copper and thermal review close
-Q1,INPUT_REVERSE_FET,PB100_POWER_NMOS_TOLL_80V,Gate pin 1,INPUT_FET_GATE,Controller to FET,Off when controller is unpowered,Gate clamp and 40 A thermal review close
+D1,INPUT_TVS,PB100_SM8S33AHM3I,Legacy clamp high side,VBAT_RAW,DNP footprint,Not populated under ADR-0018,Do not credit D1 as load-dump protection
+D1,INPUT_TVS,PB100_SM8S33AHM3I,Legacy clamp return,GND,DNP footprint,Not populated under ADR-0018,Do not credit D1 as load-dump protection
+U1,INPUT_IDEAL_DIODE,PB100_LM74930Q1RGERQ1,Common-source anode sense,INPUT_COMMON_SOURCE,PB-100 sense,Follows Q1/Q2 common source,Common-source topology review closes
+U1,INPUT_IDEAL_DIODE,PB100_LM74930Q1RGERQ1,Protected cathode sense,VBAT_REV_PROT,PB-100 sense,Valid after Q1 before shunt,Protected-node threshold review closes
+U1,INPUT_IDEAL_DIODE,PB100_LM74930Q1RGERQ1,Q1 ideal-diode gate,Q1_DGATE,Controller to Q1,Off when controller unpowered,DGATE turn-off and Q1 package review closes
+U1,INPUT_IDEAL_DIODE,PB100_LM74930Q1RGERQ1,Q2 load-disconnect gate,Q2_HGATE,Controller to Q2,Low during overvoltage,HGATE turn-off and Q2 SOA review closes
+U1,INPUT_IDEAL_DIODE,PB100_LM74930Q1RGERQ1,Overvoltage threshold,LM74930_OV,Divider to controller,Hard cutoff at 48.99-54.89 V,Comparator tolerance and leakage review closes
+U1,INPUT_IDEAL_DIODE,PB100_LM74930Q1RGERQ1,Open-drain fault output,INPUT_PROT_FAULT_N,Controller diagnostic,Low during overvoltage or undervoltage,Diagnostic pull-up ownership review closes
+Q1,INPUT_REVERSE_FET,PB100_POWER_NMOS_TOLL_80V,Common-source terminals,INPUT_COMMON_SOURCE,Power path,IAUT300N08S5N012ATMA2 pins 2-8 source orientation reviewed,TOLL 40 A passive copper and thermal review closes
+Q1,INPUT_REVERSE_FET,PB100_POWER_NMOS_TOLL_80V,Protected-side Tab drain,VBAT_REV_PROT,Power path,IAUT300N08S5N012ATMA2 Tab drain orientation reviewed,TOLL 40 A passive copper and thermal review closes
+Q1,INPUT_REVERSE_FET,PB100_POWER_NMOS_TOLL_80V,Gate pin 1,Q1_DGATE,Controller to Q1,Off when controller is unpowered,Gate discharge and 40 A thermal review closes
+Q2,INPUT_SURGE_FET,PB100_POWER_NMOS_TOLL_150V,Raw-side Tab drain,VBAT_RAW,Power path,IAUTN15S6N025ATMA1 withstands full 101 V source,Raw-side overshoot and dynamic SOA review closes
+Q2,INPUT_SURGE_FET,PB100_POWER_NMOS_TOLL_150V,Common-source terminals,INPUT_COMMON_SOURCE,Power path,IAUTN15S6N025ATMA1 pins 2-8 source orientation reviewed,Common-source copper and thermal review closes
+Q2,INPUT_SURGE_FET,PB100_POWER_NMOS_TOLL_150V,Gate pin 1,Q2_HGATE,Controller to Q2,Low during overvoltage,Turn-off energy and extracted-loop review closes
 RSH1,TOTAL_CURRENT_SHUNT,PB100_INPUT_SHUNT_PRELIM,High-side Kelvin,IIN_SHUNT_HI,Measurement,Zero current baseline,0.5mΩ shunt value and power rating close
 RSH1,TOTAL_CURRENT_SHUNT,PB100_INPUT_SHUNT_PRELIM,Low-side Kelvin,IIN_SHUNT_LO,Measurement,Zero current baseline,0.5mΩ Kelvin routing review close
+RSH1,TOTAL_CURRENT_SHUNT,PB100_INPUT_SHUNT_PRELIM,Protected input,VBAT_REV_PROT,Power path,Follows Q1 protected-side drain,Shunt cannot be bypassed by a global protected-rail label
 RSH1,TOTAL_CURRENT_SHUNT,PB100_INPUT_SHUNT_PRELIM,Protected output,VBAT_PROT,Power path,Feeds protected board rail,0.5mΩ shunt dissipation and copper review close
 U2,TOTAL_CURRENT_MONITOR,PB100_INA228_Q1_PRELIM,Shunt positive sense,IIN_SHUNT_HI,PB-100 sense,ADC/I2C safe,0.5mΩ 0-60 A calibration plan closes
 U2,TOTAL_CURRENT_MONITOR,PB100_INA228_Q1_PRELIM,Shunt negative sense,IIN_SHUNT_LO,PB-100 sense,ADC/I2C safe,0.5mΩ 0-60 A calibration plan closes
