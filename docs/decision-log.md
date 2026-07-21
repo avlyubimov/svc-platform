@@ -3590,3 +3590,31 @@ or PB-100 manufacturing output. Q2Q-010 through Q2Q-015 move to
 `PENDING EMPIRICAL`; Q2Q-016 remains the traceable non-qualifying redirect;
 MyCases continues in parallel. PBREL-007 remains Conditional and aggregate
 PB-100 authorization remains `BLOCKED` until the completed package passes.
+
+## 2026-07-21 — Start controlled Q2-C100 qualification-coupon routing
+
+Decision: implement the dedicated Q2-C100 artifact under the existing
+`QUALIFICATION-COUPON-ONLY` boundary. The correlation build uses exact
+`IAUTN15S6N025ATMA1`, `LM74930QRGERQ1` and
+`IAUT300N08S5N012ATMA2` devices in the accepted common-source topology. HGATE
+is direct to the QDUT gate with no populated or selectable Rg/CdV/dt element.
+The forced build removes UCTRL/QREV by population and uses the same gate/source
+Kelvin interface, preventing a hidden test driver from becoming a product-path
+component.
+
+Decision: select three Würth `786202073` automotive-released 9-pin press-fit
+terminals for RAW, common-source and system-output fixture points, Nexperia
+`BZT52H-B56-Q` for the 56 V CTRL_VS clamp, and two TDK
+`CGA6N3X7R2A225M230AE` 2.2 uF / 100 V automotive MLCCs. The two-capacitor
+margin follows TI's minimum 1 uF VS requirement for the resistor/Zener
+unsuppressed-load-dump topology; measured effective capacitance at 56 V over
+temperature is still mandatory.
+
+Result: the deterministic four-layer, 2.0 mm preliminary PCB routes the outer-
+layer RAW/common/output paths with via stitching, direct HGATE, internal-layer
+DGATE and separate A/OUT Kelvin returns. KiCad 10.0.4 ERC and DRC report zero
+violations and schematic parity differs only by four board mounting holes.
+Exactly 36 low-energy fixture connections remain deliberately open and are
+machine-pinned. Q2E-003 moves from `NOT STARTED` to `IN PROGRESS`; Gerber,
+drill, fabrication, energized testing, PB-100 board import and PB-100 release
+remain prohibited.

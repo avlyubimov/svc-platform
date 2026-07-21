@@ -25,6 +25,9 @@ MECHANICAL_ENVELOPE_STATUS = (
     REPO_ROOT / "production" / "board-order" / "three_board_mechanical_envelope_status.csv"
 )
 KICAD_DIR = PB100_DIR / "kicad"
+QUALIFICATION_COUPON_LAYOUT = (
+    PB100_DIR / "qualification" / "Q2-C100" / "kicad" / "Q2-C100.kicad_pcb"
+)
 
 MANUFACTURING_SUFFIXES = {
     ".drl",
@@ -157,7 +160,11 @@ def open_mechanical_items() -> str:
 
 
 def layout_files() -> list[Path]:
-    return sorted(KICAD_DIR.rglob("*.kicad_pcb"))
+    return sorted(
+        path
+        for path in PB100_DIR.rglob("*.kicad_pcb")
+        if path != QUALIFICATION_COUPON_LAYOUT
+    )
 
 
 def manufacturing_files() -> list[Path]:

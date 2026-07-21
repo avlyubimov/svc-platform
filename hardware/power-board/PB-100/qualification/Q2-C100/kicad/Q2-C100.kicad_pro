@@ -1,0 +1,18 @@
+{
+  "meta": {
+    "filename": "Q2-C100.kicad_pro",
+    "version": 1
+  },
+  "project": {
+    "description": "Q2 empirical qualification coupon; not PB-100 and not for vehicle installation",
+    "name": "Q2-C100"
+  },
+  "schematic": {
+    "plot_directory": "exports/schematic/"
+  },
+  "text_variables": {
+    "BOARD": "Q2-C100",
+    "PROJECT": "SVC",
+    "RELEASE": "QUALIFICATION-COUPON-ONLY"
+  }
+}

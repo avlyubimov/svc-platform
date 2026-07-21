@@ -15,6 +15,9 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 PB100_DIR = REPO_ROOT / "hardware" / "power-board" / "PB-100"
 KICAD_DIR = PB100_DIR / "kicad"
 PRODUCTION_DIR = REPO_ROOT / "production"
+QUALIFICATION_COUPON_LAYOUT_ALLOWLIST = {
+    PB100_DIR / "qualification" / "Q2-C100" / "kicad" / "Q2-C100.kicad_pcb",
+}
 REQUIRED_KICAD_CLI_VERSION = "10.0.4"
 MIN_KICAD_COMPONENTS = 20
 MIN_KICAD_NETS = 20
