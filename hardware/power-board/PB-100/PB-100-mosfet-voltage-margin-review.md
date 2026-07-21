@@ -1,6 +1,6 @@
 # PB-100 80 V MOSFET Voltage-Class Decision
 
-Status: 80 V class accepted; PBREL-006 is individually LAYOUT-ONLY; aggregate PCB layout remains BLOCKED by PBREL-007 and schematic freeze
+Status: Q1 design selection closed; controlled PCB work remains LAYOUT-ONLY pending schematic-freeze authorization
 
 ## Decision
 
@@ -18,16 +18,17 @@ retained but is not selected.
 
 ## Why this component
 
-- 80 V VDS retains useful voltage-class headroom above the current generated
-  57.60 V ISO-corner peak. This does not close TVS energy or LM74700 margin.
+- Q1 is on the protected side of the LM74930-Q1 common-source cutoff pair, so
+  its 80 V rating is screened against the generated 48.99-54.89 V cutoff range;
+  raw 79-101 V load dump is interrupted by the 150 V Q2.
 - Maximum RDS(on) is 1.2 mOhm at 10 V; the conservative hot design bound uses
   2.1x, or 2.52 mOhm.
 - Maximum RthJC is 0.4 K/W, maximum junction temperature is 175 degC, maximum
   gate charge is 231 nC, and the package is 100% avalanche tested.
 - At the 40 A board budget Q1 dissipates 4.032 W at the hot resistance bound.
-  If the case can be held at 125 degC, the junction estimate is 126.61 degC and
-  retains 48.39 degC to the absolute maximum. Layout extraction and
-  PB-BENCH-010 must prove that case condition.
+  At 125 degC ambient and the 150 degC design target, the complete passive path
+  from junction through PCB copper and thermal pad to the metal enclosure must
+  not exceed 6.20 K/W. Layout extraction and PB-BENCH-010 must prove it.
 - One exact package for Q1 and Q101-Q110 reduces stencil, inspection, and
   substitution ambiguity while preserving role-free outputs.
 
@@ -62,19 +63,17 @@ PCBWay kitted/consigned assembly using an authorized-distributor reel. TOLL
 stencil, paste coverage, MSL handling, polarity, solder-void acceptance, and
 first-article inspection must be reconfirmed with the actual assembler quote.
 
-This pre-layout source/process evidence supports the MOSFET choice and the
-power-package portion of PBREL-011. PBREL-006 remains Conditional overall, but
-its pre-layout stage is closed. Copper/thermal extraction controls PROTO-ONLY
-and PB-BENCH-010 controls the blocker-specific production-ready transition.
+This pre-layout source/process evidence closes the PBREL-006 design-selection
+gate and supports the power-package portion of PBREL-011. Copper/thermal
+extraction controls PROTO-ONLY and PB-BENCH-010 controls the blocker-specific
+production-ready transition.
 
 ## Hard escape conditions
 
-- Keep PBREL-007 Open until an ADR-0016 protection branch passes energy thermal
-  tolerance self-heating and 5 V recommended-margin checks.
-- Reject any layout whose extracted D1-to-Q1/controller loop invalidates the
-  accepted protection model.
-- Reopen thermal design if Q1 or an output MOSFET case exceeds 125 degC at its
-  accepted continuous envelope.
+- Reject any layout whose extracted common-source cutoff loop invalidates the
+  accepted LM74930-Q1/Q2 transient model.
+- Reopen thermal design if the extracted or measured full passive Q1 path
+  exceeds 6.20 K/W or Q1 reaches 150 degC at 40 A and 125 degC ambient.
 - Do not substitute any MOSFET from a BOM-only equivalence; repeat electrical,
   footprint, thermal, source, and factory review.
 

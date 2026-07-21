@@ -219,7 +219,9 @@ def validate_symbol_capture_worklist() -> None:
 
         concrete_symbol_name = row["Concrete symbol name"].strip()
         exact_selected_symbols = {
+            "PB100_LM74930Q1RGERQ1",
             "PB100_POWER_NMOS_TOLL_80V",
+            "PB100_POWER_NMOS_TOLL_150V",
             "PB100_SM8S33AHM3I",
         }
         if not concrete_symbol_name.startswith("PB100_") or (
@@ -324,6 +326,13 @@ def validate_symbol_capture_progress() -> None:
         elif symbol_name == "PB100_POWER_NMOS_TOLL_80V":
             if '(property "Footprint" "PB100:PG-HSOF-8-1_TOLL_Infineon"' not in symbol_block:
                 fail("selected 80 V power MOSFET symbol must bind the reviewed TOLL footprint")
+        elif symbol_name == "PB100_POWER_NMOS_TOLL_150V":
+            if '(property "Footprint" "PB100:PG-HSOF-8-1_TOLL_Infineon"' not in symbol_block:
+                fail("selected 150 V surge MOSFET symbol must bind the reviewed TOLL footprint")
+        elif symbol_name == "PB100_LM74930Q1RGERQ1":
+            expected_footprint = 'PB100:VQFN-24_RGE_4x4mm_P0.5mm_EP2.4mm'
+            if f'(property "Footprint" "{expected_footprint}"' not in symbol_block:
+                fail("selected LM74930-Q1 symbol must bind the reviewed RGE footprint")
         elif symbol_name == "PB100_SM8S33AHM3I":
             if '(property "Footprint" "PB100:DO-218AC_Vishay_SM8S"' not in symbol_block:
                 fail("selected SM8S33AHM3/I symbol must bind the reviewed DO-218AC footprint")
@@ -1007,9 +1016,10 @@ def validate_schematic_readiness_dashboard() -> None:
     expected_symbol_status = "Closed" if freeze_closed else "Conditional"
     if symbol_row["Status"].strip() != expected_symbol_status:
         fail(f"Symbol readiness must be {expected_symbol_status} for current schematic freeze state")
-    symbol_close_work = symbol_row["Remaining close work"].lower()
-    if "q1" not in symbol_close_work or "40 a" not in symbol_close_work:
-        fail("Symbol readiness must mention Q1 and 40 A close work")
+    symbol_text = " ".join(symbol_row.values())
+    for token in ("LM74930Q1RGERQ1", "IAUTN15S6N025ATMA1", "IAUT300N08S5N012ATMA2 80 V TOLL"):
+        if token not in symbol_text:
+            fail(f"Symbol readiness must include selected input-power token {token}")
 
     can_row = rows_by_area["CAN1 safety"]
     can_text = " ".join(can_row[column] for column in SCHEMATIC_READINESS_DASHBOARD_COLUMNS).lower()
@@ -1033,17 +1043,10 @@ def validate_schematic_readiness_dashboard() -> None:
         ),
         "Input power design values": (
             "PB-100-board-current-budget-trace.csv",
-            "PB-100-board-current-budget-freeze-review.csv",
-            "PB-100-board-current-budget-design-calculation.md",
-            "PB-100-board-current-budget-value-freeze-checklist.csv",
-            "PB-100-board-current-budget-value-derivation-precheck.csv",
-            "PB-100-input-reverse-package-trace.csv",
-            "PB-100-input-reverse-q1-derivation-precheck.csv",
-            "PB-100-input-reverse-q1-closeout-precheck.csv",
-            "PB-100-tvs-load-dump-margin-trace.csv",
-            "PB-100-tvs-load-dump-freeze-review.csv",
-            "PB-100-tvs-overshoot-escape-checklist.csv",
-            "PB-100-tvs-overshoot-validation-precheck.csv",
+            "PB-100-input-q1-evidence.csv",
+            "PB-100-surge-stopper-evidence.csv",
+            "PB-100-protection-validation.csv",
+            "PB-100-staged-release-readiness.csv",
         ),
         "Logic power design values": (
             "PB-100-logic-power-rail-trace.csv",
@@ -1053,10 +1056,9 @@ def validate_schematic_readiness_dashboard() -> None:
             "PB-100-logic-power-closeout-precheck.csv",
         ),
         "Input protection contract": (
+            "PB-100-input-controller-pin-template.csv",
             "PB-100-input-reverse-package-trace.csv",
-            "PB-100-input-reverse-q1-freeze-checklist.csv",
-            "PB-100-input-reverse-q1-derivation-precheck.csv",
-            "PB-100-input-reverse-q1-closeout-precheck.csv",
+            "PB-100-surge-stopper-evidence.csv",
         ),
         "Current monitor template": (
             "PB-100-current-monitor-pin-template.csv",

@@ -31,9 +31,10 @@ order.
 | Total current shunt | Bourns CSS4J-4026R-L500F-class 0.5 mΩ four-terminal shunt | Bourns CSS4J-4026R-1L00F-class 1.0 mΩ; Isabellenhuette BVN/BAS or equivalent AEC-Q200 four-terminal family | CSS4J-4026 or reviewed power shunt | 0.5 mΩ gives 30 mV at 60 A and 1.8 W; compatible with INA228 ±40.96 mV range candidate |
 | Temperature sensor | TDK NTCGS103JF103FT8-class 10 kΩ AEC-Q200 NTC | Vishay NTCS0402E3 10 kΩ AEC-Q200 150 °C class; Murata NCU18XH103D6SRB-class 10 kΩ 0603 AEC-Q200 150 °C; TI TMP117/TMP112-class digital sensor optional | 0402 preferred for NTC; SOT/DFN only for optional digital sensor | PB-100 uses PCB reference plus two power-zone thermal points; divider values and calibration remain schematic-freeze items |
 | Logic buck regulator | TI LM5164-Q1 | TI LM5013-Q1; TI TPS54360B-Q1/TPS54360-Q1 | SOIC/HSOIC PowerPAD | LM5164-Q1 for 1 A 100 V rail; LM5013-Q1 preferred over 60 V family if more current is needed |
-| Input reverse protection | TI LM74700-Q1/LM74502-Q1 class | ADI/LTC ideal diode controller families | MSOP/SOIC class | Controller family only; MOSFET is tracked separately |
+| Input active cutoff and reverse protection | TI LM74930Q1RGERQ1 selected | TI LM74800-Q1 family; TI LM74900-Q1 family after full cutoff/timing revalidation | VQFN-24 RGE selected | Common-source hard cutoff must remain no higher than 55 V |
+| Raw-side surge cutoff MOSFET | Infineon IAUTN15S6N025ATMA1 150 V TOLL selected | 150 V automotive TOLL family; 150 V automotive LFPAK family after SOA/footprint revalidation | PG-HSOF-8-1 TOLL selected | Generated transition-energy screen passes; extracted dynamic SOA remains post-layout |
 | Input reverse MOSFET | Infineon IAUT300N08S5N012ATMA2 80 V TOLL selected | Infineon IAUT300N08S5N014ATMA1 same-footprint TOLL; Nexperia BUK7J2R4-80MX 80 V LFPAK56E non-drop-in | PG-HSOF-8-1 TOLL selected with segmented paste | Generated 40 A thermal bound and pre-layout sourcing pass; plane/polygon/bus and prototype thermal acceptance remain gates |
-| Input TVS/load dump | Vishay SM8S33AHM3/I active HM3 TVS | Vishay SM8S33AHE3_A/I NFD stock-only; Littelfuse SLD8S33A; Diodes DM8W33AQ-13; Bourns SM8S33A-Q class | DO-218AC/SMC as needed | MCC SM8S33A source is EOL and HE3 is NFD evidence only; final clamp voltage depends on MOSFET and buck ratings |
+| Legacy input TVS | Vishay SM8S33AHM3/I DNP only | Littelfuse SLD8S33A; Diodes DM8W33AQ-13; Bourns SM8S33A-Q retained as rejected comparisons | DO-218AC footprint retained unpopulated | A single TVS is not the approved load-dump solution under ADR-0018 |
 | PB-100/LB-100 board-to-board connector | Hirose FX18-100P-0.8SV10 plus FX18-100S-0.8SV10 selected pair | Samtec Q Strip/high-density mezzanine class; Molex SlimStack 100-position class | 100-position 0.8 mm FX18 official 20 mm stack | Six-land footprints, MF ownership, four-spacer retention, fixture, and pre-layout mechanics are closed; live stock, factory handling, and PB-BENCH-014/015 remain release gates |
 | FRAM | Fujitsu/Infineon MB85 I2C/SPI FRAM | Cypress/Infineon Excelon FRAM | SOIC/TSSOP/DFN | Configuration and black-box storage |
 | RTC | Microchip MCP7940 class | NXP PCF8523/PCF8563; DS3231 class | SOIC/TSSOP/DFN/module | Prefer low-IQ SMD IC over hobby module |
@@ -50,13 +51,14 @@ The current strategy is:
 - All Rev.1 outputs: TPS48110AQDGXRQ1 high-side controller plus selected
   IAUT300N08S5N012ATMA2 80 V PG-HSOF-8-1 TOLL N-MOSFET.
 - Low-current integrated smart switches: deferred alternatives only.
-- Input reverse protection: LM74700QDBVRQ1-class ideal-diode controller.
+- Input active cutoff: LM74930Q1RGERQ1 with common-source external MOSFETs.
+- Raw-side cutoff MOSFET: IAUTN15S6N025ATMA1 150 V TOLL selected for Q2.
 - Input reverse and output MOSFET: IAUT300N08S5N012ATMA2 80 V TOLL selected,
   with IAUT300N08S5N014ATMA1 as the same-footprint controlled alternative and
   BUK7J2R4-80MX 80 V LFPAK56E as a non-drop-in production escape path.
-- Input transient clamp: Vishay SM8S33AHM3/I active HM3 load-dump TVS or
-  reviewed equivalent. MCC SM8S33A is treated as EOL evidence only, and Vishay
-  HE3 is treated as NFD stock-only evidence; neither may be locked.
+- Input transient handling: hard cutoff at no more than 55 V; load disconnect
+  is allowed. SM8S33AHM3/I remains DNP and no single-TVS branch may be credited
+  as the Rev.1 load-dump solution.
 - Total current shunt: 0.5 mΩ four-terminal AEC-Q200 shunt candidate for the
   0-60 A telemetry range. At 60 A the candidate produces 30 mV and about 1.8 W;
   at the 40 A board-budget point it produces 20 mV and about 0.8 W.
@@ -84,7 +86,10 @@ The current strategy is:
   rejected 60 V history, not as a Rev.1 assembly substitute:
   https://www.lcsc.com/product-detail/C3279576.html and
   https://www.vishay.com/docs/77277/sidr626ldp.pdf
-- TI LM74700QDBVRQ1 was listed at LCSC on the snapshot date: https://www.lcsc.com/product-detail/C2941042.html
+- TI LM74930Q1RGERQ1 is the selected active surge-stopper controller:
+  https://www.ti.com/product/LM74930-Q1/part-details/LM74930Q1RGERQ1
+- Infineon IAUTN15S6N025ATMA1 is the selected 150 V raw-side Q2:
+  https://www.infineon.com/assets/row/public/documents/10/49/infineon-iautn15s6n025-datasheet-en.pdf
 - Infineon IAUTN06S5N008 is retained only as rejected 60 V TOLL history:
   https://www.infineon.com/part/IAUTN06S5N008
 - Infineon IAUT300N08S5N012 is the selected 80 V automotive

@@ -1004,11 +1004,11 @@ REQUIRED_INPUT_REVERSE_Q1_CLOSEOUT_PRECHECKS = {
     "Q1-CLS-010",
 }
 REQUIRED_TVS_LOAD_DUMP_FREEZE_REVIEW_ITEMS = {
-    "Active HM3 branch",
-    "100V device margin",
-    "60V MOSFET historical rejection",
-    "80V MOSFET selected baseline",
-    "60V buck alternate boundary",
+    "Active cutoff selection",
+    "Protected-domain voltage margin",
+    "60V historical rejection",
+    "80V protected-side Q1",
+    "150V raw-side Q2",
     "40V smart-switch ADR boundary",
     "OV and input-filter dependencies",
     "Assembly and sourcing gate",

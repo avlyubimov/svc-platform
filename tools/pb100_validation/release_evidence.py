@@ -8,7 +8,10 @@ from .common import PB100_DIR, REPO_ROOT, fail, read_text
 
 
 SELECTED_MOSFET = "IAUT300N08S5N012ATMA2"
+SELECTED_SURGE_FET = "IAUTN15S6N025ATMA1"
+SELECTED_CONTROLLER = "LM74930Q1RGERQ1"
 SELECTED_FOOTPRINT = "PB100:PG-HSOF-8-1_TOLL_Infineon"
+SELECTED_CONTROLLER_FOOTPRINT = "PB100:VQFN-24_RGE_4x4mm_P0.5mm_EP2.4mm"
 FIVE_BLOCKERS = {"PBREL-001", "PBREL-004", "PBREL-006", "PBREL-007", "PBREL-011"}
 
 
@@ -33,7 +36,7 @@ def validate_five_blocker_release_evidence() -> None:
     status_by_id = {row["Blocker ID"]: row["Status"] for row in blocker_rows}
     if set(status_by_id) != {f"PBREL-{number:03d}" for number in range(1, 13)}:
         fail("PB-100 blocker register must contain PBREL-001 through PBREL-012 exactly")
-    expected_active = {"PBREL-006": "Conditional", "PBREL-007": "Open"}
+    expected_active: dict[str, str] = {}
     actual_active = {
         blocker_id: status
         for blocker_id, status in status_by_id.items()
@@ -45,7 +48,7 @@ def validate_five_blocker_release_evidence() -> None:
     for blocker_id in FIVE_BLOCKERS:
         row = next(row for row in blocker_rows if row["Blocker ID"] == blocker_id)
         row_text = " ".join(row.values())
-        if blocker_id not in expected_active and ("pre-layout" not in row_text or "later" not in row_text):
+        if "pre-layout" not in row_text or "later" not in row_text:
             fail(f"{blocker_id} must distinguish closed pre-layout evidence from later physical gates")
 
     output_rows = _rows("PB-100-output-soa-evidence.csv")
@@ -78,7 +81,7 @@ def validate_five_blocker_release_evidence() -> None:
     if actual_corners != expected_corners:
         fail("generated load-dump evidence must cover every ISO 16750-2 design corner")
     if not any(row["Result"] == "FAIL" for row in transient_rows):
-        fail("PBREL-007 must remain open while the selected TVS fails load-dump screening")
+        fail("historical single-TVS evidence must retain its load-dump screening failure")
     for row in transient_rows:
         for field in (
             "Peak TVS current A", "Peak clamp V", "Peak TVS power W", "TVS energy J",
@@ -86,12 +89,40 @@ def validate_five_blocker_release_evidence() -> None:
         ):
             float(row[field])
 
+    surge_rows = _rows("PB-100-surge-stopper-evidence.csv")
+    expected_surge_corners = {
+        (us, ri, duration)
+        for us in {"79", "101"}
+        for ri in {"0.5", "4"}
+        for duration in {"40", "400"}
+    }
+    actual_surge_corners = {
+        (row["Us V"], row["Ri ohm"], row["td ms"])
+        for row in surge_rows
+    }
+    if actual_surge_corners != expected_surge_corners:
+        fail("active surge-stopper evidence must cover every ISO design corner")
+    for row in surge_rows:
+        if row["Result"] != "PASS PRE-LAYOUT" or row["Load response"] != "DISCONNECT":
+            fail("active surge-stopper corners must pass pre-layout by disconnecting the load")
+        if float(row["OV cutoff max V"]) > 55.0:
+            fail("active surge-stopper maximum cutoff must not exceed 55 V")
+        if float(row["Q2 avalanche-energy margin x"]) < 15.0:
+            fail("active surge-stopper Q2 screening margin must remain at least 15x")
+        if float(row["Q1 protected-node margin V"]) < 25.0:
+            fail("active surge-stopper must preserve at least 25 V static margin for Q1")
+
     q1_by_item = {row["Evidence item"]: row for row in _rows("PB-100-input-q1-evidence.csv")}
     if q1_by_item["Exact orderable MPN"]["Value"] != SELECTED_MOSFET:
         fail("generated Q1 evidence must use the selected orderable MOSFET")
-    for item in ("Q1 conduction loss", "Junction at acceptance ceiling", "Junction margin"):
-        if float(q1_by_item[item]["Value"]) <= 0 or q1_by_item[item]["Result"] != "PASS":
-            fail(f"generated Q1 evidence must keep a positive screening result for {item}")
+    if q1_by_item["Q1 conduction loss"]["Value"] != "4.032":
+        fail("generated Q1 evidence must retain the 4.032 W hot loss")
+    if q1_by_item["Cooling architecture"]["Value"] != "Passive PCB copper plus thermal pad to metal enclosure":
+        fail("generated Q1 evidence must select passive PCB/enclosure cooling")
+    if q1_by_item["Target junction ceiling"]["Value"] != "150.0":
+        fail("generated Q1 evidence must use the 150 C design target")
+    if q1_by_item["Maximum full thermal path"]["Value"] != "6.20":
+        fail("generated Q1 evidence must retain the 6.20 K/W post-layout limit")
 
     factory_rows = _rows("PB-100-factory-production-evidence.csv")
     if not factory_rows or any("PASS" not in row["Pre-layout result"] for row in factory_rows):
@@ -104,6 +135,12 @@ def validate_five_blocker_release_evidence() -> None:
         fail("outputs sheet must contain exact selected TOLL value in its local symbol and Q101-Q110")
     if input_sheet.count(f'(property "Value" "{SELECTED_MOSFET}"') != 2:
         fail("input sheet must contain exact selected TOLL value in its local symbol and Q1")
+    if input_sheet.count(f'(property "Value" "{SELECTED_SURGE_FET}"') != 2:
+        fail("input sheet must contain exact selected 150 V TOLL value in its local symbol and Q2")
+    if input_sheet.count(f'(property "Value" "{SELECTED_CONTROLLER}"') != 2:
+        fail("input sheet must contain exact selected LM74930-Q1 value in its local symbol and U1")
+    if f'(property "Footprint" "{SELECTED_CONTROLLER_FOOTPRINT}"' not in input_sheet:
+        fail("input sheet must bind the selected LM74930-Q1 RGE footprint")
     for sheet_name, sheet_text in (("outputs", output_sheet), ("input", input_sheet)):
         if f'(property "Footprint" "{SELECTED_FOOTPRINT}"' not in sheet_text:
             fail(f"{sheet_name} sheet must bind the selected TOLL footprint")
@@ -113,9 +150,10 @@ def validate_five_blocker_release_evidence() -> None:
     for token in (
         '(property "Value" "SM8S33AHM3/I"',
         '(property "Footprint" "PB100:DO-218AC_Vishay_SM8S"',
+        '(dnp yes)',
     ):
         if token not in input_sheet:
-            fail("D1 must be exact and footprint-bound in the input sheet")
+            fail("D1 must be exact, footprint-bound, and DNP in the input sheet")
 
     historical_allowlist = {
         PB100_DIR / "PB-100-five-blocker-closeout-2026-07-21.md",

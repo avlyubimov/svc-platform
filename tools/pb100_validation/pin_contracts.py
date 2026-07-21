@@ -305,16 +305,32 @@ def validate_component_pin_template(
 def validate_input_and_power_pin_templates() -> None:
     validate_component_pin_template(
         "PB-100-input-controller-pin-template.csv",
-        "PB100_LM74700QDBVRQ1_PRELIM",
+        "PB100_LM74930Q1RGERQ1",
         {
-            "LM74700_VCAP",
             "GND",
-            "INPUT_PROT_EN",
+            "INPUT_COMMON_SOURCE",
+            "INPUT_PROT_FAULT_N",
+            "LM74930_CAP",
+            "LM74930_OV",
+            "LM74930_VS",
+            "NC_8",
+            "NC_17",
+            "NC_21",
+            "NC_IMON",
+            "NC_RTN",
+            "NC_SW",
+            "Q1_DGATE",
+            "Q2_HGATE",
             "VBAT_REV_PROT",
-            "INPUT_FET_GATE",
-            "VBAT_RAW",
         },
-        {"VBAT_RAW", "VBAT_REV_PROT", "INPUT_FET_GATE", "INPUT_PROT_EN"},
+        {
+            "GND",
+            "INPUT_COMMON_SOURCE",
+            "LM74930_OV",
+            "Q1_DGATE",
+            "Q2_HGATE",
+            "VBAT_REV_PROT",
+        },
     )
     validate_component_pin_template(
         "PB-100-current-monitor-pin-template.csv",
@@ -369,13 +385,16 @@ def validate_input_protection_pin_contract() -> None:
         csv.DictReader((PB100_DIR / "PB-100-schematic-instance-symbol-map.csv").open(newline="", encoding="utf-8"))
     )
     instance_by_ref = {row["Ref"].strip(): row for row in instance_map_rows}
-    required_refs = {"J1", "D1", "U1", "Q1", "RSH1", "U2"}
+    required_refs = {"J1", "D1", "U1", "Q1", "Q2", "RSH1", "U2"}
     required_nets = {
         "VBAT_RAW",
         "GND",
         "VBAT_PROT",
-        "INPUT_FET_GATE",
-        "VBAT_REV_PROT",
+        "INPUT_COMMON_SOURCE",
+        "INPUT_PROT_FAULT_N",
+        "LM74930_OV",
+        "Q1_DGATE",
+        "Q2_HGATE",
         "IIN_SHUNT_HI",
         "IIN_SHUNT_LO",
         "IIN_SENSE",

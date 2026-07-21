@@ -291,8 +291,23 @@ def validate_staged_release_readiness() -> None:
             )
 
     required_tokens = {
-        "PBREL-006": ("IAUT300N08S5N012ATMA2", "126.61 C", "PB-BENCH-010"),
-        "PBREL-007": ("79-101 V", "0.5-4 ohm", "40-400 ms", "5 V", "PB-BENCH-004"),
+        "PBREL-006": (
+            "IAUT300N08S5N012ATMA2",
+            "4.032 W",
+            "150 C",
+            "6.20 K/W",
+            "PB-BENCH-010",
+        ),
+        "PBREL-007": (
+            "LM74930Q1RGERQ1",
+            "IAUTN15S6N025ATMA1",
+            "79-101 V",
+            "0.5-4 ohm",
+            "40-400 ms",
+            "48.99-54.89 V",
+            "0.0327 J",
+            "PB-BENCH-004",
+        ),
     }
     for blocker_id, tokens in required_tokens.items():
         text = " ".join(" ".join(row.values()) for row in rows_by_blocker[blocker_id])

@@ -5,16 +5,17 @@ from __future__ import annotations
 import csv
 import io
 
-from .model import LOAD_DUMP, MOSFET, TVS
+from .model import LOAD_DUMP, MOSFET, SURGE_STOPPER, TVS
 from .power import (
     BOOTSTRAP_F,
-    Q1_CASE_ACCEPTANCE_C,
+    Q1_AMBIENT_C,
     Q1_CONTINUOUS_A,
+    Q1_TARGET_JUNCTION_C,
     SHORT_CIRCUIT_SHUTDOWN_MAX_S,
     bootstrap_minimum_f,
     output_results,
     q1_conduction_w,
-    q1_junction_at_case_acceptance_c,
+    q1_max_ambient_to_junction_k_per_w,
 )
 from .transient import load_dump_results
 
@@ -53,6 +54,60 @@ def render_transient() -> str:
             result.result,
             basis,
         ])
+    return _csv(rows)
+
+
+def render_surge_stopper() -> str:
+    rows = [[
+        "Us V", "Ri ohm", "td ms", "OV cutoff min V", "OV cutoff nominal V",
+        "OV cutoff max V", "Q2 available current A", "Turn-off bound us",
+        "Conservative Q2 transient energy J", "Q2 avalanche-energy margin x",
+        "Q2 VDS margin V", "Q1 protected-node margin V", "Load response", "Result",
+    ]]
+    for source_voltage_v in LOAD_DUMP.source_voltages_v:
+        for source_resistance_ohm in LOAD_DUMP.source_resistances_ohm:
+            available_current_a = min(
+                SURGE_STOPPER.continuous_current_a,
+                max(
+                    0.0,
+                    (source_voltage_v - SURGE_STOPPER.cutoff_max_v)
+                    / source_resistance_ohm,
+                ),
+            )
+            transient_energy_j = (
+                source_voltage_v
+                * available_current_a
+                * SURGE_STOPPER.conservative_turnoff_s
+            )
+            energy_margin = (
+                SURGE_STOPPER.cutoff_mosfet_avalanche_energy_j / transient_energy_j
+                if transient_energy_j
+                else float("inf")
+            )
+            for duration_s in LOAD_DUMP.durations_s:
+                passed = (
+                    SURGE_STOPPER.cutoff_max_v <= 55.0
+                    and SURGE_STOPPER.cutoff_mosfet_voltage_v > source_voltage_v
+                    and SURGE_STOPPER.protected_mosfet_voltage_v
+                    > SURGE_STOPPER.cutoff_max_v
+                    and energy_margin >= 10.0
+                )
+                rows.append([
+                    f"{source_voltage_v:.0f}",
+                    f"{source_resistance_ohm:g}",
+                    f"{duration_s * 1000:.0f}",
+                    f"{SURGE_STOPPER.cutoff_min_v:.2f}",
+                    f"{SURGE_STOPPER.cutoff_nominal_v:.2f}",
+                    f"{SURGE_STOPPER.cutoff_max_v:.2f}",
+                    f"{available_current_a:.2f}",
+                    f"{SURGE_STOPPER.conservative_turnoff_s * 1e6:.2f}",
+                    f"{transient_energy_j:.4f}",
+                    f"{energy_margin:.1f}",
+                    f"{SURGE_STOPPER.cutoff_mosfet_voltage_v - source_voltage_v:.2f}",
+                    f"{SURGE_STOPPER.protected_mosfet_voltage_v - SURGE_STOPPER.cutoff_max_v:.2f}",
+                    "DISCONNECT",
+                    "PASS PRE-LAYOUT" if passed else "FAIL",
+                ])
     return _csv(rows)
 
 
@@ -110,8 +165,7 @@ def render_output_soa() -> str:
 
 
 def render_q1() -> str:
-    junction = q1_junction_at_case_acceptance_c()
-    margin = MOSFET.max_junction_c - junction
+    maximum_path = q1_max_ambient_to_junction_k_per_w()
     rows = [
         ["Evidence item", "Value", "Unit", "Basis", "Result"],
         ["Selected base MPN", MOSFET.mpn, "", "Infineon active/preferred automotive 80 V TOLL", "PASS"],
@@ -124,10 +178,11 @@ def render_q1() -> str:
         ["Continuous board current", f"{Q1_CONTINUOUS_A:.0f}", "A", "ADR-0008 budget", "INPUT"],
         ["Q1 conduction loss", f"{q1_conduction_w():.3f}", "W", "I^2 x hot RDS(on)", "PASS"],
         ["RthJC max", f"{MOSFET.rth_jc_max_k_per_w:.2f}", "K/W", "Datasheet maximum", "INPUT"],
-        ["Case-temperature acceptance ceiling", f"{Q1_CASE_ACCEPTANCE_C:.1f}", "degC", "Hard post-layout thermal constraint", "INPUT"],
-        ["Junction at acceptance ceiling", f"{junction:.2f}", "degC", "Tcase + loss x RthJC", "PASS"],
-        ["Junction margin", f"{margin:.2f}", "degC", f"{MOSFET.max_junction_c:.0f} C maximum - calculated junction", "PASS"],
-        ["PCB copper condition", "Plane/polygon or reviewed bus path; no trace-only 40 A claim", "", "Layout constraint; PB-BENCH-010 later verifies enclosure rise", "MANDATORY POST-LAYOUT"],
+        ["Cooling architecture", "Passive PCB copper plus thermal pad to metal enclosure", "", "Active cooling is not selected", "PASS PRE-LAYOUT"],
+        ["Ambient design point", f"{Q1_AMBIENT_C:.1f}", "degC", "Worst-case enclosure ambient requirement", "INPUT"],
+        ["Target junction ceiling", f"{Q1_TARGET_JUNCTION_C:.1f}", "degC", f"Design target below {MOSFET.max_junction_c:.0f} C device maximum", "PASS PRE-LAYOUT"],
+        ["Maximum full thermal path", f"{maximum_path:.2f}", "K/W", "(Tj target - ambient) / Q1 conduction loss", "POST-LAYOUT LIMIT"],
+        ["PCB copper condition", "Plane/polygon plus passive enclosure heat path; no trace-only 40 A claim", "", "Layout extraction and PB-BENCH-010 verify the full thermal path", "MANDATORY POST-LAYOUT"],
         ["Source route", "JLC global/preorder/consignment or PCBWay kitted/consigned", "", "No false live-stock claim; order-date recheck required", "PASS PRE-LAYOUT"],
     ]
     return _csv(rows)
@@ -147,6 +202,26 @@ def render_factory() -> str:
             "Recheck lifecycle, reel availability, quote, stencil and FAI at order date",
         ],
         [
+            "U1 active cutoff and Q2 raw-side MOSFET",
+            "LM74930Q1RGERQ1 plus IAUTN15S6N025ATMA1",
+            "VQFN-24 RGE plus PG-HSOF-8-1 TOLL; exposed-pad and segmented-paste review",
+            "LM74800-Q1 family plus 150 V automotive TOLL after full revalidation",
+            "LM74900-Q1 family plus 150 V automotive LFPAK after full revalidation",
+            "SPI exposed-pad/paste coverage; AOI polarity; Q2 voiding and first-article review",
+            "PASS PRE-LAYOUT",
+            "Recheck exact suffix, quote, DFM, extracted SOA and first article before prototype release",
+        ],
+        [
+            "D1 legacy TVS footprint",
+            "SM8S33AHM3/I DNP; not an approved load-dump solution",
+            "DO-218AC footprint retained unpopulated for controlled engineering evidence",
+            "SLD8S33A rejected comparison only",
+            "DM8W33AQ-13 and SM8S33A-Q rejected comparisons only",
+            "Independent BOM no-fit plus AOI/visual first-article verification",
+            "PASS DNP",
+            "Reject any BOM or CPL that populates D1 as the Rev.1 load-dump solution",
+        ],
+        [
             "CAN1 safety links",
             "JP_CAN1 and JP_CAN1_ROUTE DNP/open",
             "0603 DNP plus documented no-fit locations",
@@ -159,7 +234,7 @@ def render_factory() -> str:
         [
             "Factory platform",
             "JLCPCB global/preorder/private-part consignment or PCBWay turnkey/kitted/consigned",
-            "TOLL/VSSOP/DO-218AC/FX18 processes require job-specific DFM",
+            "TOLL/VSSOP/VQFN-24 RGE/DO-218AC DNP/FX18 processes require job-specific DFM",
             "Authorized-distributor reel supplied to assembler",
             "Move assembly platform only after DFM review",
             "Package polarity, MSL, reel/tray orientation, DNP, paste and rework notes",

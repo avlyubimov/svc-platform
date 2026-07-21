@@ -39,11 +39,11 @@ The protected LM74700-Q1 node shall retain at least `5 V` modeled margin to the
 is a destructive boundary, not design margin. Passing the 80 V MOSFET voltage
 class does not close controller or TVS thermal evidence.
 
-The current SM8S33AHM3/I branch is a candidate, not a closed solution. The
-PBREL-007 pre-layout stage is `Blocked` until a selected protection branch
-passes the complete model and its datasheet supports the required energy and
-thermal use. Extracted-loop review and PB-BENCH-004 are separate post-layout
-and prototype-qualification stages under ADR-0017. PBREL-006 retains accepted
+ADR-0018 rejects the current SM8S33AHM3/I branch as the active energy sink and
+selects LM74930-Q1 hard cutoff with a 150 V raw-side MOSFET. The PBREL-007
+pre-layout stage is now closed by generated cutoff and transient-SOA evidence.
+Extracted-loop review and PB-BENCH-004 remain separate post-layout and
+prototype-qualification stages under ADR-0017. PBREL-006 retains accepted
 pre-layout Q1 selection evidence; copper/thermal extraction and PB-BENCH-010
 remain its separate post-layout and prototype-qualification stages.
 

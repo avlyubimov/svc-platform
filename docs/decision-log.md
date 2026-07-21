@@ -3433,3 +3433,19 @@ Decision: make the earlier LB/FB powered-off calculations executable evidence.
 UART powered-off clamp, 3.7231 V minimum USB-present level, 0.1515 V maximum
 USB-absent level, and 3.4389 ms removal time against the retained 3.81 ms bound;
 schematic validation rejects stale or failing generated evidence.
+
+## 2026-07-21 — Select passive Q1 cooling and LM74930-Q1 load-dump cutoff
+
+Decision: accept ADR-0018. Fix Q1 as `IAUT300N08S5N012ATMA2`, 80 V TOLL,
+with passive PCB-copper and metal-enclosure cooling only. At 40 A the generated
+hot-loss bound is 4.032 W; the 125 degC ambient / 150 degC target requires a
+complete thermal path of no more than 6.20 K/W. PBREL-006 closes as a
+design-selection gate while extraction and PB-BENCH-010 remain later stages.
+
+Decision: replace the failed single-SM8S33AHM3/I load-dump branch with
+`LM74930Q1RGERQ1` hard cutoff, 42.2 kOhm + 42.2 kOhm / 1.00 kOhm OV divider, protected 80 V
+Q1 on DGATE, and raw-side `IAUTN15S6N025ATMA1` 150 V Q2 on HGATE. Generated
+evidence gives 48.99-54.89 V cutoff, 0.0327 J worst conservative transition
+energy, 15.0x energy margin, and explicit load disconnection. PBREL-007 closes
+only as a pre-layout design gate; extracted overshoot/SOA and PB-BENCH-004
+remain post-layout/prototype gates. Production and field use remain NO-GO.

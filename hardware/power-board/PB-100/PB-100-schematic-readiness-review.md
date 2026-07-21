@@ -4,9 +4,10 @@ Status: Retracted; corrective schematic freeze is Open
 
 Review date: 2026-07-20
 
-This historical snapshot is superseded by ADR-0016 and the current blocker
-register. PBREL-006 is Conditional and PBREL-007 is Open. ADR-0017 now keeps
-their pre-layout, post-layout, and prototype evidence separate. This document does not authorize PCB layout, Gerbers,
+This historical snapshot is superseded by ADR-0016, ADR-0018, and the current
+blocker register. PBREL-006 and PBREL-007 design selections are Closed and each
+is `LAYOUT-ONLY`; ADR-0017 keeps post-layout and prototype evidence separate.
+This document does not authorize PCB layout, Gerbers,
 drills, pick-place files, BOM/CPL order packages, manufacturing ZIP files,
 fabrication packages, or PCBA orders.
 
@@ -15,17 +16,17 @@ fabrication packages, or PCBA orders.
 - Architecture v1.0 and PB-100 baseline requirements are frozen by ADR.
 - No active PB-100 architecture-planning blockers remain in the freeze
   checklist.
-- The current board-release register has two active blockers. PBREL-006 is
-  individually `LAYOUT-ONLY`; PBREL-007 remains `BLOCKED` because the current
-  ISO load-dump branch fails its pre-layout evidence.
+- The current board-release register has zero active PBREL design blockers.
+  PBREL-006 and PBREL-007 are individually `LAYOUT-ONLY`; board import remains
+  blocked by the separate Open schematic-freeze and layout-start gates.
 - PB-100 schematic freeze is Open; the former closeout is retracted in
   `hardware/power-board/PB-100/PB-100-schematic-review-closeout.md`.
 - ADR-0013 and ADR-0017 separate pre-layout, post-layout, and physical bench
   execution: pre-layout closure permits controlled layout, reviewed extraction
   permits only engineering-prototype fabrication, and assembled-board PB-BENCH
   records gate first motorcycle power and production release.
-- Corrective ADR-0016 evidence records current TVS failures rather than
-  converting fixed numbers into a false pass.
+- ADR-0016 preserves the rejected single-TVS failure evidence; ADR-0018 selects
+  LM74930-Q1 hard cutoff with 150 V Q2 and protected-side 80 V Q1.
 - Physical layout, fabrication, assembly, bench, sourcing-lot, SOA extraction,
   connector derating, and thermal/copper review remain controlled downstream
   work before board-print or production release.

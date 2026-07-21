@@ -696,8 +696,8 @@ def validate_validation_traceability() -> None:
                 fail("TVS/load-dump validation trace must include overshoot escape checklist")
             if "pb-100-tvs-overshoot-validation-precheck.csv" not in row_text:
                 fail("TVS/load-dump validation trace must include overshoot validation precheck")
-            if "selected 80 v" not in row_text or "clamp-loop overshoot" not in row_text:
-                fail("TVS/load-dump validation trace must keep selected 80 V clamp-loop overshoot explicit")
+            if not all(token in row_text for token in ("lm74930-q1", "q2", "dynamic soa", "cutoff")):
+                fail("load-dump validation trace must keep active cutoff and Q2 dynamic SOA explicit")
         if freeze_gate == "Logic power rails":
             if "pb-100-logic-power-freeze-review.csv" not in row_text:
                 fail("Logic power validation trace must include freeze review")

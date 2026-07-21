@@ -226,6 +226,8 @@ def validate_can1_netlist_topology(kicad_cli: str, temp_dir: Path) -> None:
         name = net.get("name", "")
         nets[name] = {(node.get("ref", ""), node.get("pin", "")) for node in net.findall("node")}
 
+    validate_input_power_netlist_topology(components, nets)
+
     exact_nets = {
         "CAN1_TX_ROUTE": {("JPB1", "70"), ("U_CAN1", "2")},
         "CAN1_TX_GATE_OUT": {("U_CAN1", "4"), ("JP_CAN1", "1")},
@@ -324,6 +326,57 @@ def validate_can1_netlist_topology(kicad_cli: str, temp_dir: Path) -> None:
         fail(f"JPB1 MF contacts are tied to forbidden nets: {forbidden_mf_nets}")
 
     print("PB-100 CAN1 and JPB1 MF physical net topology passed")
+
+
+def validate_input_power_netlist_topology(components, nets) -> None:
+    """Keep the active cutoff and total-current shunt in the only load path."""
+    for reference in ("D1", "U1", "Q1", "Q2", "RSH1", "U2", "U3"):
+        if reference not in components:
+            fail(f"input power topology is missing physical component {reference}")
+    if components["D1"].find("./property[@name='dnp']") is None:
+        fail("legacy input TVS D1 must remain physically marked DNP")
+
+    required_nodes = {
+        "VBAT_RAW": {("Q2", "Tab")},
+        "INPUT_COMMON_SOURCE": {
+            *(("Q1", str(pin)) for pin in range(2, 9)),
+            *(("Q2", str(pin)) for pin in range(2, 9)),
+            ("U1", "2"),
+            ("U1", "15"),
+        },
+        "VBAT_REV_PROT": {
+            ("Q1", "Tab"),
+            ("RSH1", "1"),
+            ("U1", "18"),
+            ("U1", "19"),
+            ("U1", "20"),
+            ("U1", "24"),
+        },
+        "VBAT_PROT": {
+            ("RSH1", "2"),
+            ("U2", "8"),
+            ("U3", "2"),
+            ("U101", "20"),
+        },
+        "IIN_SHUNT_IN": {("RSH1", "3"), ("U2", "10")},
+        "IIN_SHUNT_OUT": {("RSH1", "4"), ("U2", "9")},
+    }
+    for net_name, expected_subset in required_nodes.items():
+        missing_nodes = expected_subset - nets.get(net_name, set())
+        if missing_nodes:
+            fail(f"input power net {net_name} is missing {sorted(missing_nodes)}")
+
+    forbidden_nodes = {
+        "VBAT_RAW": {("Q1", "Tab"), ("RSH1", "1"), ("RSH1", "2")},
+        "VBAT_REV_PROT": {("RSH1", "2"), ("U2", "8"), ("U3", "2"), ("U101", "20")},
+        "VBAT_PROT": {("Q1", "Tab"), ("RSH1", "1")},
+    }
+    for net_name, forbidden_subset in forbidden_nodes.items():
+        unexpected_nodes = forbidden_subset & nets.get(net_name, set())
+        if unexpected_nodes:
+            fail(f"input power net {net_name} contains forbidden nodes {sorted(unexpected_nodes)}")
+
+    print("PB-100 active-cutoff and shunt topology passed")
 
 
 def validate_no_layout_artifacts() -> None:

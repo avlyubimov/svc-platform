@@ -53,14 +53,13 @@ approval remain sufficient for these project-owner workflows.
 
 ## Current state
 
-- PBREL-006 pre-layout design is closed for the selected 80 V Q1 and is
-  `LAYOUT-ONLY` by itself; its post-layout extraction and PB-BENCH-010 stages
-  remain blocked.
-- PBREL-007 remains `BLOCKED` because the current TVS branch fails the ADR-0016
-  pre-layout model. It cannot advance to layout until a branch passes every
-  required corner.
-- Aggregate PB-100 authorization therefore remains `BLOCKED` with two active
-  PBREL rows.
+- PBREL-006 pre-layout design is closed for the selected 80 V Q1 and passive
+  thermal target; its post-layout extraction and PB-BENCH-010 remain blocked.
+- PBREL-007 pre-layout design is closed under ADR-0018 for LM74930-Q1 hard
+  cutoff and the 150 V Q2; extracted-loop review and PB-BENCH-004 remain
+  blocked.
+- Both staged blockers are individually `LAYOUT-ONLY`. Normal schematic-freeze
+  and layout-start gates still control whether layout may actually begin.
 - Production and field use remain `NO-GO`.
 
 ## Consequences
