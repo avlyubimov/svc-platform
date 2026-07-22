@@ -1,0 +1,15 @@
+(version 1)
+
+(rule "PB-100 preliminary signal clearance"
+    (constraint clearance (min 0.20mm)))
+
+(rule "PB-100 preliminary signal width"
+    (constraint track_width (min 0.20mm)))
+
+(rule "PB-100 CAN preliminary differential width"
+    (condition "A.NetName == 'CAN1_HARNESS_H' || A.NetName == 'CAN1_HARNESS_L'")
+    (constraint track_width (min 0.20mm) (opt 0.30mm)))
+
+(rule "PB-100 CAN preliminary differential gap"
+    (condition "A.NetName == 'CAN1_HARNESS_H' || A.NetName == 'CAN1_HARNESS_L'")
+    (constraint diff_pair_gap (min 0.20mm) (opt 0.25mm)))

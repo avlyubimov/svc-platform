@@ -1559,7 +1559,7 @@ def validate_kicad_scaffold(board: str, board_dir: Path, status: str) -> None:
     pcbs = layout_files(board_dir)
     if pcbs:
         expected_layout = kicad_dir / f"{board}.kicad_pcb"
-        if board != "FB-100" or pcbs != [expected_layout]:
+        if pcbs != [expected_layout]:
             fail(f"unexpected controlled layout artifact: {pcbs[0].relative_to(REPO_ROOT)}")
         for token in (f"controlled `{board}.kicad_pcb`", "no manufacturing outputs"):
             if token not in readme:

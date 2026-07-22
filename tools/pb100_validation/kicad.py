@@ -11,7 +11,7 @@ from .common import (
     MIN_KICAD_NETS,
     PB100_DIR,
     PRODUCTION_DIR,
-    QUALIFICATION_COUPON_LAYOUT_ALLOWLIST,
+    CONTROLLED_LAYOUT_ALLOWLIST,
     Path,
     REPO_ROOT,
     REQUIRED_KICAD_CLI_VERSION,
@@ -388,7 +388,7 @@ def validate_no_layout_artifacts() -> None:
                 continue
             name = path.name.lower()
             suffix = path.suffix.lower()
-            if path in QUALIFICATION_COUPON_LAYOUT_ALLOWLIST:
+            if path in CONTROLLED_LAYOUT_ALLOWLIST:
                 continue
             if name.endswith(".kicad_pcb-bak") or suffix in DISALLOWED_LAYOUT_SUFFIXES:
                 fail(f"layout/manufacturing artifact is blocked before schematic freeze: {path.relative_to(REPO_ROOT)}")

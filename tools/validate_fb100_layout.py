@@ -16,7 +16,7 @@ FB100_DIR = REPO_ROOT / "hardware" / "front-board" / "FB-100"
 KICAD_DIR = FB100_DIR / "kicad"
 BOARD_PATH = KICAD_DIR / "FB-100.kicad_pcb"
 REQUIRED_KICAD_VERSION = "10.0.4"
-EXPECTED_UNCONNECTED_ITEMS = 103
+EXPECTED_UNCONNECTED_ITEMS = 93
 EXPECTED_LOCAL_OVERRIDES = {"J1", "J2", "JFB1"}
 EXPECTED_BOARD_ONLY_FOOTPRINTS = {"H1", "H2", "H3", "H4"}
 EXPECTED_EDGE_ITEM_UUIDS = {
@@ -88,9 +88,11 @@ def validate_board_milestone() -> None:
             fail(f"FB-100 controlled layout is missing {token}")
     if board_text.count("\n\t(footprint ") != 48:
         fail("FB-100 placement milestone must contain 44 schematic footprints and four mounting holes")
-    for forbidden_token in ("\n\t(segment ", "\n\t(via ", "\n\t(zone "):
+    if board_text.count("\n\t(segment ") != 10:
+        fail("FB-100 routing milestone must contain ten local LED series routes")
+    for forbidden_token in ("\n\t(via ", "\n\t(zone "):
         if forbidden_token in board_text:
-            fail("FB-100 placement milestone must not claim routing or copper-pour completion")
+            fail("FB-100 routing milestone must not claim via or copper-pour completion")
 
 
 def validate_drc() -> None:
@@ -201,8 +203,8 @@ def main() -> int:
     validate_board_milestone()
     validate_drc()
     print(
-        "FB-100 controlled placement validation passed "
-        "(44 schematic footprints, 4 mounting holes, routing intentionally open)."
+        "FB-100 controlled routing validation passed "
+        "(44 schematic footprints, 4 mounting holes, 10 local indicator series routes)."
     )
     return 0
 
