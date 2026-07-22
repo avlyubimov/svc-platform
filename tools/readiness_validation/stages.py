@@ -3,56 +3,47 @@ from __future__ import annotations
 from collections.abc import Iterable, Mapping
 
 
-LEGACY_RELEASE_STATES = (
-    "BLOCKED",
-    "LAYOUT-ONLY",
-    "PROTO-ONLY",
-    "PRODUCTION-READY",
-)
-PB_RELEASE_STATES = (
-    "BLOCKED",
+RELEASE_STATES = (
     "EVT-LAYOUT-AUTHORIZED",
+    "EVT-FAB-REVIEW",
     "EVT-FAB-AUTHORIZED",
     "BENCH-VALIDATION",
     "MOTORCYCLE-VALIDATION",
+    "PRODUCTION-BLOCKED",
     "PRODUCTION-RELEASE",
 )
-RELEASE_STATES = tuple(dict.fromkeys((*LEGACY_RELEASE_STATES, *PB_RELEASE_STATES)))
 STAGES = (
     "EVT layout authorization",
+    "EVT layout complete",
     "EVT pre-fabrication review",
     "EVT build and inspection",
     "Bench validation",
     "Motorcycle validation",
+    "Production qualification",
 )
-AUTHORIZATION_AFTER_CLOSE = dict(zip(STAGES, PB_RELEASE_STATES[1:], strict=True))
-STATE_RANK = {
-    "BLOCKED": 0,
-    "LAYOUT-ONLY": 1,
-    "EVT-LAYOUT-AUTHORIZED": 1,
-    "PROTO-ONLY": 2,
-    "EVT-FAB-AUTHORIZED": 2,
-    "BENCH-VALIDATION": 3,
-    "MOTORCYCLE-VALIDATION": 4,
-    "PRODUCTION-READY": 5,
-    "PRODUCTION-RELEASE": 5,
-}
+AUTHORIZATION_AFTER_CLOSE = dict(zip(STAGES, RELEASE_STATES, strict=True))
+STATE_RANK = {state: rank for rank, state in enumerate(RELEASE_STATES)}
 
 
 def allowed_release_states(board: str) -> tuple[str, ...]:
-    return PB_RELEASE_STATES if board == "PB-100" else LEGACY_RELEASE_STATES
+    del board
+    return RELEASE_STATES
 
 
 def is_layout_authorized(state: str) -> bool:
-    return state in STATE_RANK and STATE_RANK[state] >= 1
+    return state in STATE_RANK
+
+
+def is_fabrication_review(state: str) -> bool:
+    return state in STATE_RANK and STATE_RANK[state] >= STATE_RANK["EVT-FAB-REVIEW"]
 
 
 def is_fabrication_authorized(state: str) -> bool:
-    return state in STATE_RANK and STATE_RANK[state] >= 2
+    return state in STATE_RANK and STATE_RANK[state] >= STATE_RANK["EVT-FAB-AUTHORIZED"]
 
 
 def is_production_authorized(state: str) -> bool:
-    return state in {"PRODUCTION-READY", "PRODUCTION-RELEASE"}
+    return state == "PRODUCTION-RELEASE"
 
 
 def derive_blocker_authorization(rows: Iterable[Mapping[str, str]]) -> str:
@@ -72,14 +63,16 @@ def derive_blocker_authorization(rows: Iterable[Mapping[str, str]]) -> str:
             closed_count += 1
         else:
             found_open = True
-    return PB_RELEASE_STATES[closed_count]
+    if closed_count == 0:
+        raise ValueError("EVT layout authorization must close before a release state can be derived")
+    return RELEASE_STATES[closed_count - 1]
 
 
 def least_authorized(states: Iterable[str]) -> str:
     states = tuple(states)
     if not states:
         raise ValueError("at least one release state is required")
-    unknown = set(states) - set(PB_RELEASE_STATES)
+    unknown = set(states) - set(RELEASE_STATES)
     if unknown:
         raise ValueError(f"unknown release state(s): {', '.join(sorted(unknown))}")
     return min(states, key=STATE_RANK.__getitem__)
@@ -98,5 +91,5 @@ def derive_pb_release_state(
     if state == "PRODUCTION-RELEASE" and any(
         row.get("Status", "").strip() != "Closed" for row in post_prototype_rows
     ):
-        return "BENCH-VALIDATION"
+        return "PRODUCTION-BLOCKED"
     return state

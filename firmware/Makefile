@@ -9,6 +9,7 @@ CONFIG_ACCEPTANCE_TEST := $(BUILD_DIR)/test_config_acceptance
 CONFIG_STORE_TEST := $(BUILD_DIR)/test_config_store
 CONFIG_UPDATE_TEST := $(BUILD_DIR)/test_config_update
 HARDWARE_CAPABILITY_TEST := $(BUILD_DIR)/test_hardware_capability
+MANUAL_FOG_CONTROL_TEST := $(BUILD_DIR)/test_manual_fog_control
 POWER_BUDGET_TEST := $(BUILD_DIR)/test_power_budget
 OUTPUT_MANAGER_TEST := $(BUILD_DIR)/test_output_manager
 BATTERY_SERVICE_TEST := $(BUILD_DIR)/test_battery_service
@@ -77,6 +78,10 @@ HARDWARE_CAPABILITY_SRCS := \
 	services/hardware_capability.c \
 	services/pb100_capability.c \
 	tests/test_hardware_capability.c
+MANUAL_FOG_CONTROL_SRCS := \
+	core/svc_config_defaults.c \
+	services/manual_fog_control.c \
+	tests/test_manual_fog_control.c
 POWER_BUDGET_SRCS := \
 	core/svc_config_defaults.c \
 	services/power_budget.c \
@@ -232,6 +237,7 @@ HOST_TESTS := \
 	$(CONFIG_STORE_TEST) \
 	$(CONFIG_UPDATE_TEST) \
 	$(HARDWARE_CAPABILITY_TEST) \
+	$(MANUAL_FOG_CONTROL_TEST) \
 	$(POWER_BUDGET_TEST) \
 	$(OUTPUT_MANAGER_TEST) \
 	$(BATTERY_SERVICE_TEST) \
@@ -260,6 +266,7 @@ test: $(HOST_TESTS)
 	$(CONFIG_STORE_TEST)
 	$(CONFIG_UPDATE_TEST)
 	$(HARDWARE_CAPABILITY_TEST)
+	$(MANUAL_FOG_CONTROL_TEST)
 	$(POWER_BUDGET_TEST)
 	$(OUTPUT_MANAGER_TEST)
 	$(BATTERY_SERVICE_TEST)
@@ -296,6 +303,9 @@ $(CONFIG_UPDATE_TEST): $(CONFIG_UPDATE_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(HARDWARE_CAPABILITY_TEST): $(HARDWARE_CAPABILITY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
+
+$(MANUAL_FOG_CONTROL_TEST): $(MANUAL_FOG_CONTROL_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
 
 $(POWER_BUDGET_TEST): $(POWER_BUDGET_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)

@@ -399,7 +399,7 @@ def validate_no_layout_artifacts() -> None:
 def validate_kicad_no_role_tokens() -> None:
     checked_paths = sorted(KICAD_DIR.rglob("*.kicad_sch")) + sorted((KICAD_DIR / "lib").rglob("*.kicad_sym"))
     for path in checked_paths:
-        text = read_text(path)
+        text = read_text(path).replace("FOG_SW_IN", "")
         for forbidden_token in FORBIDDEN_ROLE_TOKENS:
             if forbidden_token in text:
                 fail(

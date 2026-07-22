@@ -26,7 +26,7 @@ static void test_enable_role_uses_config_mapping(void)
     const svc_rule_engine_result_t result = svc_rule_engine_apply_action(
         &svc_default_config,
         &manager,
-        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U},
+        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 100U},
         1000U,
         true);
 
@@ -42,14 +42,14 @@ static void test_disable_role_uses_config_mapping(void)
     assert(svc_rule_engine_apply_action(
         &svc_default_config,
         &manager,
-        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U},
+        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 100U},
         1000U,
         true).status == SVC_RULE_ENGINE_OK);
 
     const svc_rule_engine_result_t result = svc_rule_engine_apply_action(
         &svc_default_config,
         &manager,
-        (svc_rule_action_t){SVC_RULE_ACTION_DISABLE_ROLE, OUT_ROLE_FOG_LEFT, 0U},
+        (svc_rule_action_t){SVC_RULE_ACTION_DISABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 0U},
         0U,
         true);
 
@@ -60,13 +60,13 @@ static void test_disable_role_uses_config_mapping(void)
 static void test_ambiguous_role_is_denied(void)
 {
     svc_device_config_t config = svc_default_config;
-    config.outputs[0].role = OUT_ROLE_FOG_LEFT;
+    config.outputs[0].role = OUT_ROLE_FOG_PRIMARY_LEFT;
     svc_output_manager_t manager = initialized_output_manager(&config);
 
     const svc_rule_engine_result_t result = svc_rule_engine_apply_action(
         &config,
         &manager,
-        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U},
+        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 100U},
         1000U,
         true);
 
@@ -83,7 +83,7 @@ static void test_missing_role_is_denied(void)
     const svc_rule_engine_result_t result = svc_rule_engine_apply_action(
         &config,
         &manager,
-        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_DVR, 100U},
+        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_LOW_CURRENT_RESERVE_2, 100U},
         1000U,
         true);
 
@@ -98,7 +98,7 @@ static void test_output_manager_denial_is_reported(void)
     const svc_rule_engine_result_t result = svc_rule_engine_apply_action(
         &svc_default_config,
         &manager,
-        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_CIGARETTE_SOCKET, 100U},
+        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_HIGH_CURRENT_RESERVE, 100U},
         30000U,
         true);
 
@@ -114,7 +114,7 @@ static void test_pwm_role_action_preserves_duty_cycle(void)
     const svc_rule_engine_result_t result = svc_rule_engine_apply_action(
         &svc_default_config,
         &manager,
-        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 40U},
+        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 40U},
         1000U,
         true);
 
@@ -130,7 +130,7 @@ static void test_pwm_role_action_denies_non_pwm_output(void)
     const svc_rule_engine_result_t result = svc_rule_engine_apply_action(
         &svc_default_config,
         &manager,
-        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_CIGARETTE_SOCKET, 40U},
+        (svc_rule_action_t){SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_HIGH_CURRENT_RESERVE, 40U},
         1000U,
         true);
 
@@ -153,7 +153,7 @@ static void test_matching_rule_applies_role_action(void)
     const svc_rule_t rule = {
         .conditions = conditions,
         .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-        .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U}
+        .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 100U}
     };
 
     const svc_rule_engine_result_t result = svc_rule_engine_evaluate_rule(
@@ -181,7 +181,7 @@ static void test_unmatched_rule_is_skipped_without_output_change(void)
     const svc_rule_t rule = {
         .conditions = conditions,
         .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-        .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U}
+        .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 100U}
     };
 
     const svc_rule_engine_result_t result = svc_rule_engine_evaluate_rule(
@@ -226,7 +226,7 @@ static void test_stale_power_telemetry_denies_matching_rule(void)
     const svc_rule_t rule = {
         .conditions = conditions,
         .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-        .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 40U}
+        .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 40U}
     };
 
     svc_telemetry_snapshot_t telemetry = {0};
@@ -264,12 +264,12 @@ static void test_rule_set_applies_multiple_matching_rules(void)
         {
             .conditions = conditions,
             .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U}
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 100U}
         },
         {
             .conditions = conditions,
             .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_RIGHT, 100U}
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_RIGHT, 100U}
         }
     };
 
@@ -309,12 +309,12 @@ static void test_rule_set_skips_unmatched_rules_and_continues(void)
         {
             .conditions = high_beam_conditions,
             .condition_count = sizeof(high_beam_conditions) / sizeof(high_beam_conditions[0]),
-            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U}
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 100U}
         },
         {
             .conditions = engine_conditions,
             .condition_count = sizeof(engine_conditions) / sizeof(engine_conditions[0]),
-            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_CHIGEE, 100U}
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_LOW_CURRENT_RESERVE_1, 100U}
         }
     };
 
@@ -350,17 +350,17 @@ static void test_rule_set_stops_on_first_failed_action(void)
         {
             .conditions = conditions,
             .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U}
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 100U}
         },
         {
             .conditions = conditions,
             .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_CIGARETTE_SOCKET, 40U}
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_HIGH_CURRENT_RESERVE, 40U}
         },
         {
             .conditions = conditions,
             .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_CHIGEE, 100U}
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_LOW_CURRENT_RESERVE_1, 100U}
         }
     };
 
@@ -419,7 +419,7 @@ static void test_rule_set_telemetry_wrapper_denies_stale_matching_rule(void)
         {
             .conditions = conditions,
             .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 40U}
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 40U}
         }
     };
 

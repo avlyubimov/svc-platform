@@ -5,7 +5,7 @@
   },
   "project": {
     "name": "PB-100",
-    "description": "SVC PB-100 Power Board schematic scaffold; PCB layout intentionally blocked"
+    "description": "SVC PB-100 Power Board Rev.1 EVT; layout authorized, production blocked"
   },
   "schematic": {
     "drawing": {

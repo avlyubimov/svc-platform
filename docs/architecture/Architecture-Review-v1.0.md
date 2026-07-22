@@ -67,19 +67,23 @@ PB-100 must provide at least 10 generic protected outputs:
 
 | Output | Reference default role | Target fuse | Target current limit | PWM |
 |---|---|---:|---:|---|
-| OUT1 | USB-C LOBoo | 15 A | 12 A | yes |
-| OUT2 | Cigarette / compressor | 20 A | 18 A | optional |
-| OUT3 | Fog Left | 10 A | 8 A | yes |
-| OUT4 | Fog Right | 10 A | 8 A | yes |
-| OUT5 | CHIGEE / navigation | 5 A | 4 A | yes |
-| OUT6 | Heated Seat Rider | 10 A | 8 A | yes |
-| OUT7 | Heated Seat Passenger | 10 A | 8 A | yes |
-| OUT8 | DVR | 5 A | 4 A | yes |
-| OUT9 | Aux brake / rear light | 5 A | 4 A | yes |
-| OUT10 | Spare | 10 A | 8 A | yes |
+| OUT1 | Cigarette socket / future compressor | 15 A | 12 A | yes |
+| OUT2 | High-current reserve | 20 A | 18 A | optional |
+| OUT3 | Fog primary left | 10 A | 8 A | yes |
+| OUT4 | Fog primary right | 10 A | 8 A | yes |
+| OUT5 | Low-current reserve 1 | 5 A | 4 A | yes |
+| OUT6 | Fog secondary left | 10 A | 8 A | yes |
+| OUT7 | Fog secondary right | 10 A | 8 A | yes |
+| OUT8 | Low-current reserve 2 | 5 A | 4 A | yes |
+| OUT9 | Low-current reserve 3 | 5 A | 4 A | yes |
+| OUT10 | Medium-current reserve | 10 A | 8 A | yes |
 
 Reference default roles are configuration defaults for Vehicle Profile #001 only.
 They are not hardware roles.
+
+ADR-0020 additionally defines the independent `C36_BIDIRECTIONAL` battery
+branch and the protected `FOG_SW_IN` dry-contact request. Neither changes the
+generic OUT1 through OUT10 PCB naming or permits firmware to bypass safe-off.
 
 ## 5. Each output must support
 

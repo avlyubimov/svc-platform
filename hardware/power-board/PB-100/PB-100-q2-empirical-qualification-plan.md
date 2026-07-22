@@ -11,7 +11,7 @@ ADR-0018 and obtains the missing Q2Q-010 through Q2Q-015 evidence by controlled
 measurement. The results will be project-specific empirical qualification;
 they must never be described as an Infineon production maximum.
 
-ADR-0019 removes this coupon from the PB-100 Rev.1 EVT critical path. Q2-C100
+ADR-0020 removes this coupon from the PB-100 Rev.1 EVT critical path. Q2-C100
 is retained unchanged as an optional diagnostic artifact and further design or
 fabrication work is paused unless a reviewed PB-100 failure investigation
 requires isolated Q2 evidence.
@@ -30,9 +30,9 @@ The following temporary state is defined:
 
 When explicitly resumed it permits schematic capture, PCB layout, fabrication and bench use of a
 dedicated Q2 qualification coupon whose only purpose is generating the evidence
-defined here. It does not authorize a `PB-100.kicad_pcb`, PB-100 placement or
-routing, PB-100 manufacturing output, production release or field use. ADR-0019
-separately authorizes PB-100 Rev.1 EVT layout and a later reviewed five-board
+defined here. It does not itself authorize a PB-100 manufacturing package,
+production release or field use. ADR-0020 separately authorizes PB-100 Rev.1
+EVT layout and a later reviewed five-board
 EVT package. Coupon results cannot waive the later PB-100 extracted-loop,
 thermal-path or PB-BENCH-004 production gates.
 
@@ -235,7 +235,7 @@ are not replaced by the Codex review.
 Only after this package passes may Q2Q-010 through Q2Q-015 be changed to
 `PASS EMPIRICAL`, Q2Q-018 be closed, and PBREL-007 advance toward
 `PRODUCTION-RELEASE`. It does not control `EVT-LAYOUT-AUTHORIZED` or
-`EVT-FAB-AUTHORIZED`. MyCases may remain active in parallel; a later qualifying
+`EVT-FAB-REVIEW`, `EVT-FAB-AUTHORIZED`, bench or motorcycle validation. MyCases may remain active in parallel; a later qualifying
 Infineon artifact may supersede or reduce future lot testing only after review.
 
 ## Current State
@@ -249,6 +249,6 @@ the manufacturing package, rated instrument/probe hardware, remaining fixture
 hardware and the complete laboratory safety system remain open. No DUT lot
 population, calibrated setup or test
 result exists yet. Q2Q-010 through Q2Q-015 therefore remain
-`PENDING EMPIRICAL` and PBREL-007 remains `Conditional` for production. ADR-0019
+`PENDING EMPIRICAL` and PBREL-007 remains `Conditional` for production. ADR-0020
 places PB-100 at `EVT-LAYOUT-AUTHORIZED`; Q2-C100 fabrication remains paused
 and production/general field use remain `NO-GO`.

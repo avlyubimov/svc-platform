@@ -283,7 +283,7 @@ def board_graphics() -> list[str]:
         f'\t(gr_rect (start 18 7) (end 46 23) (stroke (width 0.15) (type dash)) (fill none) (layer "Cmts.User") (uuid "{layout_uid("oled-window")}"))',
         f'\t(gr_rect (start 52 6) (end 58 12) (stroke (width 0.15) (type dash)) (fill none) (layer "Cmts.User") (uuid "{layout_uid("service-keepout")}"))',
         f'\t(gr_rect (start 64 6) (end 70 12) (stroke (width 0.15) (type dash)) (fill none) (layer "Cmts.User") (uuid "{layout_uid("reset-keepout")}"))',
-        f'\t(gr_text "FB-100 Rev.1  LAYOUT-ONLY" (at 40 33.5 0) (layer "F.SilkS") (uuid "{layout_uid("board-label")}") (effects (font (size 1.2 1.2) (thickness 0.18))))',
+        f'\t(gr_text "FB-100 REV.1 EVT - NOT FOR PRODUCTION" (at 40 33.5 0) (layer "F.SilkS") (uuid "{layout_uid("board-label")}") (effects (font (size 1.0 1.0) (thickness 0.16))))',
         f'\t(gr_text "USB PANEL KEEPOUT" (at -6 12.5 0) (layer "Cmts.User") (uuid "{layout_uid("usb-label")}") (effects (font (size 1 1) (thickness 0.15))))',
         f'\t(gr_text "FFC BEND KEEPOUT" (at 90 11.5 0) (layer "Cmts.User") (uuid "{layout_uid("ffc-label")}") (effects (font (size 1 1) (thickness 0.15))))',
         f'\t(gr_text "OLED DNP WINDOW" (at 32 15 0) (layer "Cmts.User") (uuid "{layout_uid("oled-label")}") (effects (font (size 1 1) (thickness 0.15))))',

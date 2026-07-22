@@ -52,7 +52,8 @@ KiCad PCB layout or manufacturing outputs.
 
 ## Validation Result
 
-- KiCad XML netlist export: 81 components, 191 nets.
+- KiCad XML netlist export: 83 components, 191 nets, including the PA8
+  `FOG_SW_IN` pull-up and RC filter.
 - ERC: zero errors. The only findings are two reviewed isolated labels for
   `USB_CC1` and `USB_CC2`; those lines intentionally terminate on FB-100 rather
   than an LB component.

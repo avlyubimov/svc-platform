@@ -80,7 +80,7 @@ Pin,Signal,Group,Direction,Requirement,Notes
 79,UART_RX,Expansion,PB-100 to LB-100,Future,Accessory UART route
 80,EXT_ADC1,Expansion,PB-100 to LB-100,Future,External analog input route
 81,EXT_ADC2,Expansion,PB-100 to LB-100,Future,External analog input route
-82,EXT_DIG1,Expansion,PB-100 to LB-100,Future,External digital input route
+82,FOG_SW_IN,Manual control,PB-100 to LB-100,Core,Protected active-low dry-contact request; LB pull-up RC filter debounce and stuck-input diagnostics
 83,EXT_DIG2,Expansion,PB-100 to LB-100,Future,External digital input route
 84,EXT_5V_EN,Expansion,LB-100 to PB-100,Future,External sensor supply enable
 85,SPARE_01,Reserve,Mixed,Future,Reserved

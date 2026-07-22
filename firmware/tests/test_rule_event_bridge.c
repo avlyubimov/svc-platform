@@ -78,7 +78,7 @@ static void test_can_event_updates_state_and_rule_engine_path(void)
     const svc_rule_t rule = {
         .conditions = conditions,
         .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-        .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U}
+        .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 100U}
     };
 
     const svc_rule_engine_result_t rule_result = svc_rule_engine_evaluate_rule(

@@ -57,7 +57,7 @@ static void test_enable_over_budget_is_denied(void)
 static void test_enable_sheds_lower_priority_load_before_denial(void)
 {
     svc_output_manager_t manager = initialized_manager();
-    assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT2, 1000U, true).status == SVC_OUTPUT_MANAGER_OK);
+    assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT6, 1000U, true).status == SVC_OUTPUT_MANAGER_OK);
     assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT9, 19000U, true).status == SVC_OUTPUT_MANAGER_OK);
 
     const svc_output_manager_result_t result = svc_output_manager_request_enable(
@@ -67,8 +67,8 @@ static void test_enable_sheds_lower_priority_load_before_denial(void)
         true);
 
     assert(result.status == SVC_OUTPUT_MANAGER_OK);
-    assert(result.shed_output_mask == mask_for(SVC_OUTPUT_OUT2));
-    assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT2)) == 0U);
+    assert(result.shed_output_mask == mask_for(SVC_OUTPUT_OUT6));
+    assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT6)) == 0U);
     assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT1)) != 0U);
     assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT9)) != 0U);
 }
@@ -255,15 +255,18 @@ static void test_runtime_budget_enforcement_sheds_configured_priority_order(void
         true);
 
     assert(result.status == SVC_OUTPUT_MANAGER_OK);
-    assert(result.shed_output_mask == mask_for(SVC_OUTPUT_OUT2));
-    assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT2)) == 0U);
-    assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT3)) != 0U);
+    assert(result.shed_output_mask == mask_for(SVC_OUTPUT_OUT3));
+    assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT3)) == 0U);
+    assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT2)) != 0U);
     assert((svc_output_manager_active_mask(&manager) & mask_for(SVC_OUTPUT_OUT9)) != 0U);
 }
 
 static void test_thermal_derate_reduces_pwm_and_sheds_non_pwm_low_priority(void)
 {
-    svc_output_manager_t manager = initialized_manager();
+    svc_device_config_t config = svc_default_config;
+    config.outputs[SVC_OUTPUT_OUT2].priority = SVC_PRIORITY_C;
+    svc_output_manager_t manager = {0};
+    assert(svc_output_manager_init(&manager, &config));
     assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT2, 1000U, true).status == SVC_OUTPUT_MANAGER_OK);
     assert(svc_output_manager_request_enable(&manager, SVC_OUTPUT_OUT3, 19000U, true).status == SVC_OUTPUT_MANAGER_OK);
 

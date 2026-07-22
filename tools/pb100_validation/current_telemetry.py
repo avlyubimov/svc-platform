@@ -465,8 +465,12 @@ def validate_current_telemetry_closeout_precheck() -> None:
             "out2" not in row_text or "out10" not in row_text or "external adc/mux" not in row_text
         ):
             fail("current telemetry closeout IMON row must cover output ranges and external ADC/mux escape")
-        if precheck_id == "CUR-CLS-010" and ("no pcb layout" not in row_text or "pb-100.kicad_pcb" not in row_text):
-            fail("current telemetry closeout no-layout row must block PCB layout explicitly")
+        if precheck_id == "CUR-CLS-010" and (
+            "evt-layout-authorized" not in row_text
+            or "evt-fab-authorized" not in row_text
+            or "pb-100.kicad_pcb" not in row_text
+        ):
+            fail("current telemetry closeout boundary must authorize layout and block manufacturing output")
 
     missing_items = sorted(REQUIRED_CURRENT_TELEMETRY_CLOSEOUT_PRECHECKS - rows_by_id.keys())
     if missing_items:
@@ -550,7 +554,8 @@ def validate_current_telemetry_closeout_precheck() -> None:
         "PB-100-symbol-mpn-readiness.csv",
         "telemetry.kicad_sch",
         "CAP-TEL",
-        "No PCB layout",
+        "EVT-LAYOUT-AUTHORIZED",
+        "EVT-FAB-AUTHORIZED",
         "PB-100.kicad_pcb",
         "Gerbers",
         "drills",

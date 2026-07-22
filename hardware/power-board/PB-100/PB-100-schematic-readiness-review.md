@@ -1,25 +1,25 @@
 # PB-100 Schematic Readiness Review
 
-Status: Retracted; corrective schematic freeze is Open
+Status: Historical schematic snapshot; EVT layout authorized by ADR-0020
 
 Review date: 2026-07-20
 
-This historical snapshot is superseded by ADR-0016, ADR-0018, and the current
-blocker register. PBREL-006 is Closed, but PBREL-007 pre-layout is Conditional
-and its aggregate authorization is `BLOCKED`; ADR-0017 keeps post-layout and
-prototype evidence separate.
-This document does not authorize PCB layout, Gerbers,
-drills, pick-place files, BOM/CPL order packages, manufacturing ZIP files,
-fabrication packages, or PCBA orders.
+This historical snapshot is superseded by ADR-0016, ADR-0018, ADR-0020 and the
+current blocker register. PBREL-006 is Closed and PBREL-007 is Conditional only
+for `PRODUCTION-RELEASE`. ADR-0020 separately authorizes PB-100 board import,
+placement and routing. This document does not authorize Gerbers, drills,
+pick-place files, BOM/CPL order packages, manufacturing ZIP files, fabrication
+packages or PCBA orders; those require `EVT-FAB-AUTHORIZED`.
 
 ## Outcome
 
 - Architecture v1.0 and PB-100 baseline requirements are frozen by ADR.
 - No active PB-100 architecture-planning blockers remain in the freeze
   checklist.
-- The current board-release register has one active PBREL blocker: PBREL-007
-  Conditional. PBREL-006 is `LAYOUT-ONLY`, PBREL-007 is `BLOCKED`, and board
-  import is prohibited until its pre-layout trajectory evidence closes.
+- The current board-release register has one active production blocker:
+  PBREL-007 Conditional. PB-100 is `EVT-LAYOUT-AUTHORIZED`; PBREL-007 does not
+  block board import, EVT fabrication after its separate review, bench testing
+  or motorcycle validation.
 - PB-100 schematic freeze is Open; the former closeout is retracted in
   `hardware/power-board/PB-100/PB-100-schematic-review-closeout.md`.
 - ADR-0013 and ADR-0017 separate pre-layout, post-layout, and physical bench
@@ -194,15 +194,17 @@ freeze checklist can close.
 
 ## Allowed next work
 
-- Prepare schematic capture.
-- Prepare or review preliminary KiCad symbols/footprints for selected candidate
-  packages.
+- Create `PB-100.kicad_pcb`, place components and route the full Rev.1 EVT.
+- Add test points, thermocouple locations, alternative DNP sites, replaceable
+  gate resistors and isolation links.
+- Complete the remaining schematic values and routed-board evidence during
+  `EVT-FAB-REVIEW`.
 - Recheck assembly availability for selected and alternate MPNs.
-- Build schematic review notes and calculations.
 
 ## Still blocked
 
-- PCB layout.
-- Gerber generation.
+- Gerber and assembly-package generation until `EVT-FAB-AUTHORIZED`.
+- Production release until successful bench and motorcycle validation, Rev.2
+  disposition and critical retest.
 - PB-100 requirement changes without ADR.
 - Any vehicle-CAN TX enable path without a new ADR and explicit hardware action.

@@ -1,6 +1,6 @@
 # FB-100 Controlled Layout Progress
 
-Status: `LAYOUT-ONLY` — board import and constrained placement started
+Status: `EVT-LAYOUT-AUTHORIZED` — board import and constrained placement started
 
 ## Completed Milestone
 
@@ -45,4 +45,5 @@ Status: `LAYOUT-ONLY` — board import and constrained placement started
 This milestone is a controlled layout artifact only. It does not authorize or
 create Gerbers, drill files, BOM/CPL, pick-and-place, panel files,
 manufacturing ZIPs, fabrication packages, PCBA orders, production release, or
-field use. FB-100 remains `LAYOUT-ONLY` and order state remains `NO-GO`.
+field use. FB-100 remains `EVT-LAYOUT-AUTHORIZED` and order state remains
+`NO-GO` until a separate `EVT-FAB-REVIEW` closes.

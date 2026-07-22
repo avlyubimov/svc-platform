@@ -59,12 +59,12 @@ static void test_parse_positive_pwm_as_enable_action(void)
     svc_rule_action_t action = {0};
 
     const svc_rule_text_status_t status = svc_rule_text_parse_action(
-        "FOG_LEFT.pwm = 100",
+        "FOG_PRIMARY_LEFT.pwm = 100",
         &action);
 
     assert(status == SVC_RULE_TEXT_OK);
     assert(action.type == SVC_RULE_ACTION_ENABLE_ROLE);
-    assert(action.role == OUT_ROLE_FOG_LEFT);
+    assert(action.role == OUT_ROLE_FOG_PRIMARY_LEFT);
     assert(action.pwm_duty_percent == 100U);
 }
 
@@ -73,12 +73,12 @@ static void test_parse_zero_pwm_as_disable_action(void)
     svc_rule_action_t action = {0};
 
     const svc_rule_text_status_t status = svc_rule_text_parse_action(
-        "FOG_LEFT.pwm = 0",
+        "FOG_PRIMARY_LEFT.pwm = 0",
         &action);
 
     assert(status == SVC_RULE_TEXT_OK);
     assert(action.type == SVC_RULE_ACTION_DISABLE_ROLE);
-    assert(action.role == OUT_ROLE_FOG_LEFT);
+    assert(action.role == OUT_ROLE_FOG_PRIMARY_LEFT);
     assert(action.pwm_duty_percent == 0U);
 }
 
@@ -98,7 +98,7 @@ static void test_reject_invalid_pwm_value(void)
     svc_rule_action_t action = {0};
 
     const svc_rule_text_status_t status = svc_rule_text_parse_action(
-        "FOG_LEFT.pwm = 101",
+        "FOG_PRIMARY_LEFT.pwm = 101",
         &action);
 
     assert(status == SVC_RULE_TEXT_INVALID_ACTION_VALUE);
@@ -109,10 +109,10 @@ static void test_reject_noncanonical_pwm_values(void)
     svc_rule_action_t action = {0};
 
     assert(svc_rule_text_parse_action(
-        "FOG_LEFT.pwm = 001",
+        "FOG_PRIMARY_LEFT.pwm = 001",
         &action) == SVC_RULE_TEXT_INVALID_ACTION_VALUE);
     assert(svc_rule_text_parse_action(
-        "FOG_LEFT.pwm = +1",
+        "FOG_PRIMARY_LEFT.pwm = +1",
         &action) == SVC_RULE_TEXT_INVALID_ACTION_VALUE);
 }
 
@@ -128,7 +128,7 @@ static void test_compile_rule_from_text_and_execute(void)
     const svc_rule_text_status_t compile_status = svc_rule_text_compile_rule(
         conditions,
         2U,
-        "FOG_LEFT.pwm = 40",
+        "FOG_PRIMARY_LEFT.pwm = 40",
         condition_buffer,
         2U,
         &rule);
@@ -136,7 +136,7 @@ static void test_compile_rule_from_text_and_execute(void)
     assert(compile_status == SVC_RULE_TEXT_OK);
     assert(rule.condition_count == 2U);
     assert(rule.action.type == SVC_RULE_ACTION_ENABLE_ROLE);
-    assert(rule.action.role == OUT_ROLE_FOG_LEFT);
+    assert(rule.action.role == OUT_ROLE_FOG_PRIMARY_LEFT);
     assert(rule.action.pwm_duty_percent == 40U);
 
     svc_rule_state_t state = {0};
@@ -171,7 +171,7 @@ static void test_compile_rule_rejects_condition_overflow(void)
     const svc_rule_text_status_t compile_status = svc_rule_text_compile_rule(
         conditions,
         2U,
-        "FOG_LEFT.pwm = 40",
+        "FOG_PRIMARY_LEFT.pwm = 40",
         condition_buffer,
         1U,
         &rule);
@@ -194,7 +194,7 @@ static void test_compile_rule_rejects_invalid_condition_without_buffer_write(voi
     const svc_rule_text_status_t compile_status = svc_rule_text_compile_rule(
         conditions,
         2U,
-        "FOG_LEFT.pwm = 40",
+        "FOG_PRIMARY_LEFT.pwm = 40",
         condition_buffer,
         2U,
         &rule);
@@ -214,8 +214,8 @@ static void test_compile_rule_set_from_multiple_actions_and_execute(void)
         "high_beam == true"
     };
     const char *actions[] = {
-        "FOG_LEFT.pwm = 40",
-        "FOG_RIGHT.pwm = 70"
+        "FOG_PRIMARY_LEFT.pwm = 40",
+        "FOG_PRIMARY_RIGHT.pwm = 70"
     };
     svc_rule_condition_t condition_buffer[2] = {0};
     svc_rule_t rules[2] = {0};
@@ -237,7 +237,7 @@ static void test_compile_rule_set_from_multiple_actions_and_execute(void)
     assert(rules[0].conditions == condition_buffer);
     assert(rules[1].conditions == condition_buffer);
     assert(rules[0].condition_count == 2U);
-    assert(rules[1].action.role == OUT_ROLE_FOG_RIGHT);
+    assert(rules[1].action.role == OUT_ROLE_FOG_PRIMARY_RIGHT);
     assert(rules[1].action.pwm_duty_percent == 70U);
 
     svc_rule_state_t state = {0};
@@ -269,8 +269,8 @@ static void test_compile_rule_set_rejects_action_overflow(void)
         "engine_running == true"
     };
     const char *actions[] = {
-        "FOG_LEFT.pwm = 40",
-        "FOG_RIGHT.pwm = 70"
+        "FOG_PRIMARY_LEFT.pwm = 40",
+        "FOG_PRIMARY_RIGHT.pwm = 70"
     };
     svc_rule_condition_t condition_buffer[1] = {0};
     svc_rule_t rules[1] = {0};
@@ -297,15 +297,15 @@ static void test_compile_rule_set_rejects_invalid_action(void)
         "engine_running == true"
     };
     const char *actions[] = {
-        "FOG_LEFT.pwm = 40",
-        "FOG_RIGHT.pwm = 101"
+        "FOG_PRIMARY_LEFT.pwm = 40",
+        "FOG_PRIMARY_RIGHT.pwm = 101"
     };
     svc_rule_condition_t condition_buffer[1] = {0};
     svc_rule_t rules[2] = {0};
     rules[0].condition_count = 99U;
-    rules[0].action.role = OUT_ROLE_CHIGEE;
+    rules[0].action.role = OUT_ROLE_LOW_CURRENT_RESERVE_1;
     rules[1].condition_count = 88U;
-    rules[1].action.role = OUT_ROLE_DVR;
+    rules[1].action.role = OUT_ROLE_LOW_CURRENT_RESERVE_2;
     size_t compiled_rule_count = 99U;
 
     const svc_rule_text_status_t compile_status = svc_rule_text_compile_rule_set(
@@ -322,9 +322,9 @@ static void test_compile_rule_set_rejects_invalid_action(void)
     assert(compile_status == SVC_RULE_TEXT_INVALID_ACTION_VALUE);
     assert(compiled_rule_count == 0U);
     assert(rules[0].condition_count == 99U);
-    assert(rules[0].action.role == OUT_ROLE_CHIGEE);
+    assert(rules[0].action.role == OUT_ROLE_LOW_CURRENT_RESERVE_1);
     assert(rules[1].condition_count == 88U);
-    assert(rules[1].action.role == OUT_ROLE_DVR);
+    assert(rules[1].action.role == OUT_ROLE_LOW_CURRENT_RESERVE_2);
     assert(condition_buffer[0].type == SVC_RULE_CONDITION_ENGINE_RUNNING);
 }
 
@@ -334,8 +334,8 @@ static void test_compile_rule_set_rejects_invalid_action_without_condition_write
         "engine_running == true"
     };
     const char *actions[] = {
-        "FOG_LEFT.pwm = 40",
-        "FOG_RIGHT.pwm = 101"
+        "FOG_PRIMARY_LEFT.pwm = 40",
+        "FOG_PRIMARY_RIGHT.pwm = 101"
     };
     svc_rule_condition_t condition_buffer[1] = {
         {SVC_RULE_CONDITION_AMBIENT_DUSK, true}

@@ -182,7 +182,7 @@ def validate_q2_maximum_bound_qualification() -> None:
         row = empirical_by_id[evidence_id]
         if row["Status"] != "PAUSED DIAGNOSTIC":
             fail(f"{evidence_id} must keep Q2-C100 outside the active PB-100 EVT path")
-        for token in ("Q2-C100", "ADR-0019", "FAB-REVIEW"):
+        for token in ("Q2-C100", "ADR-0020", "FAB-REVIEW", "Does not block PB-100 EVT"):
             if token not in " ".join(row.values()):
                 fail(f"{evidence_id} must retain the paused coupon token {token}")
     for evidence_id in Q2_EMPIRICAL_NOT_STARTED:
@@ -205,7 +205,7 @@ def validate_q2_maximum_bound_qualification() -> None:
     blocker_text = " ".join(blocker.values())
     if blocker["Status"] != "Conditional" or "PB-100-q2-maximum-bound-qualification.csv" not in blocker_text:
         fail("PBREL-007 must remain Conditional and reference the Q2 qualification ledger")
-    for token in ("ADR-0019", "paused optional diagnostic coupon", "EVT-LAYOUT-AUTHORIZED"):
+    for token in ("ADR-0020", "paused optional diagnostic coupon", "EVT-LAYOUT-AUTHORIZED"):
         if token not in blocker_text:
             fail(f"PBREL-007 blocker register must include the EVT route token {token}")
 
@@ -214,8 +214,12 @@ def validate_q2_maximum_bound_qualification() -> None:
         for row in _rows("PB-100-staged-release-readiness.csv")
         if row["Blocker ID"] == "PBREL-007" and row["Stage"] == "EVT layout authorization"
     )
-    if evt_layout["Stage status"] != "Closed" or evt_layout["Current blocker authorization"] != "EVT-LAYOUT-AUTHORIZED":
-        fail("PBREL-007 must authorize EVT layout while production qualification stays open")
-    for token in ("ADR-0019", "production qualification", "controlled EVT layout"):
+    if (
+        evt_layout["Stage status"] != "Closed"
+        or evt_layout["Authorization after close"] != "EVT-LAYOUT-AUTHORIZED"
+        or evt_layout["Current blocker authorization"] != "PRODUCTION-BLOCKED"
+    ):
+        fail("PBREL-007 must allow EVT layout while reporting its production-only block")
+    for token in ("ADR-0020", "PRODUCTION-BLOCKED", "controlled EVT work"):
         if token not in " ".join(evt_layout.values()):
             fail(f"PBREL-007 EVT layout row must retain {token}")

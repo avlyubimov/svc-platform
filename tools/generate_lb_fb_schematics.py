@@ -308,10 +308,11 @@ def build_lb() -> Schematic:
         "BLE UART directions and reset while the E73 rail is off; module-side UART pulls and the reset pull-up "
         "keep every E73 digital pin within its unpowered limit. "
         "ADC_REF is sourced and locally decoupled; AGND returns to GND at one documented zero-ohm point. Reviewed footprint "
-        "binding and mechanical envelope remain governed by LB-100-pcb-layout-start-checklist.csv, "
-        "LB-100-footprint-binding-inventory.csv, and LB-100-mechanical-envelope-inventory.csv. Do not create "
-        "LB-100.kicad_pcb, Gerbers, drills, pick-place, BOM/CPL order package, or manufacturing outputs from this "
-        "schematic. PCB layout and manufacturing outputs remain separate."
+        "FOG_SW_IN is an active-low PA8 request with an LB_3V3_IO pull-up and RC filter; it never directly drives "
+        "an output. Reviewed footprint binding and mechanical envelope remain governed by LB-100-pcb-layout-start-checklist.csv, "
+        "LB-100-footprint-binding-inventory.csv, and LB-100-mechanical-envelope-inventory.csv. ADR-0020 authorizes "
+        "controlled LB-100.kicad_pcb placement and routing. Do not create Gerbers, drills, pick-place, BOM/CPL order "
+        "packages, or manufacturing outputs before EVT-FAB-AUTHORIZED. PCB layout and manufacturing outputs remain separate."
     )
     sch = Schematic("LB-100", "LB-100 Logic Board — Value-Bearing Rev.1", notes)
     jpb = lb_jpb_nets()
@@ -529,6 +530,8 @@ def build_lb() -> Schematic:
         passive("C32", "100nF 6.3V X7R U15", c0603, "RADIO_SENSOR_3V3", "GND"),
         passive("C33", "100nF 6.3V X7R U16", c0603, "RADIO_SENSOR_3V3", "GND"),
         passive("C34", "100nF 6.3V X7R U17", c0603, "RADIO_SENSOR_3V3", "GND"),
+        passive("R23", "10k 1% fog input pull-up", r0603, "LB_3V3_IO", "FOG_SW_IN"),
+        passive("C35", "10nF 50V X7R fog input filter", c0603, "FOG_SW_IN", "GND"),
     ]
     for index in range(15, 28):
         rail = "LB_3V3_MAIN" if index < 22 else "RADIO_SENSOR_3V3" if index < 26 else "MICROSD_3V3"
@@ -548,7 +551,7 @@ def build_fb() -> Schematic:
         "24-pin contract. Reviewed footprint binding and mechanical envelope remain governed by "
         "FB-100-pcb-layout-start-checklist.csv, FB-100-footprint-binding-inventory.csv, and "
         "FB-100-mechanical-envelope-inventory.csv. A controlled FB-100.kicad_pcb placement exists under "
-        "LAYOUT-ONLY authorization. Do not create Gerbers, drills, pick-place, BOM/CPL order packages, or other "
+        "EVT-LAYOUT-AUTHORIZED status. Do not create Gerbers, drills, pick-place, BOM/CPL order packages, or other "
         "manufacturing outputs. PCB layout and manufacturing outputs remain separate."
     )
     sch = Schematic("FB-100", "FB-100 Front Panel — Value-Bearing Rev.1", notes)

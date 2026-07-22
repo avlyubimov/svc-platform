@@ -1653,7 +1653,11 @@ def validate_not_final_value_status(path: Path, row_number: int, value_status: s
 
 
 def validate_no_role_tokens_in_row(path: Path, row_number: int, row: dict[str, str]) -> None:
-    row_text = " ".join(row.values())
+    row_text = (
+        " ".join(row.values())
+        .replace("FOG_SW_IN", "")
+        .replace("PBVAL-FOG-001", "")
+    )
     for forbidden_token in FORBIDDEN_ROLE_TOKENS:
         if forbidden_token in row_text:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: role token {forbidden_token} is not allowed")

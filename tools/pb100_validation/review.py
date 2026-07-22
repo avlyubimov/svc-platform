@@ -424,8 +424,8 @@ def validate_schematic_readiness_review() -> None:
     path = PB100_DIR / "PB-100-schematic-readiness-review.md"
     text = read_text(path)
     lower_text = text.lower()
-    if "does not authorize pcb layout" not in lower_text:
-        fail(f"{path.relative_to(REPO_ROOT)} must explicitly avoid PCB layout authorization")
+    if "evt-layout-authorized" not in lower_text or "does not authorize gerbers" not in lower_text:
+        fail(f"{path.relative_to(REPO_ROOT)} must authorize EVT layout while blocking fabrication output")
     for artifact in sorted(REQUIRED_RELEASE_MANIFEST_ARTIFACTS):
         if artifact not in text:
             fail(f"{path.relative_to(REPO_ROOT)} review packet must include {artifact}")

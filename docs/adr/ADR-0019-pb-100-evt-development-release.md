@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted — Product Owner direction on 2026-07-22
+Accepted, release-state model superseded by ADR-0020 — Product Owner direction
+on 2026-07-22. The five-board allocation, bench-before-motorcycle boundary and
+Rev.1 `NOT FOR PRODUCTION` restrictions remain active.
 
 ## Context
 

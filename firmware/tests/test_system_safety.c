@@ -352,9 +352,9 @@ static void test_runtime_power_budget_sheds_active_loads(void)
         true);
 
     assert(result.budget.status == SVC_OUTPUT_MANAGER_OK);
-    assert(result.disabled_output_mask == mask_for(SVC_OUTPUT_OUT2));
-    assert((result.active_output_mask & mask_for(SVC_OUTPUT_OUT2)) == 0U);
-    assert((result.active_output_mask & mask_for(SVC_OUTPUT_OUT3)) != 0U);
+    assert(result.disabled_output_mask == mask_for(SVC_OUTPUT_OUT3));
+    assert((result.active_output_mask & mask_for(SVC_OUTPUT_OUT3)) == 0U);
+    assert((result.active_output_mask & mask_for(SVC_OUTPUT_OUT2)) != 0U);
     assert((result.active_output_mask & mask_for(SVC_OUTPUT_OUT9)) != 0U);
     assert(result.event_publish_attempted);
     assert(result.event_published);

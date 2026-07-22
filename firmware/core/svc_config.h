@@ -42,6 +42,9 @@
 #define SVC_DEFAULT_THERMAL_STALE_TIMEOUT_MS 1000U
 #define SVC_DEFAULT_THERMAL_PLAUSIBLE_MIN_C -40
 #define SVC_DEFAULT_THERMAL_PLAUSIBLE_MAX_C 150
+#define SVC_DEFAULT_FOG_DEBOUNCE_MS 50U
+#define SVC_DEFAULT_FOG_STUCK_TIMEOUT_MS 30000U
+#define SVC_DEFAULT_FOG_PAIR_DELAY_MS 250U
 
 typedef enum {
     SVC_OUTPUT_OUT1 = 0,
@@ -130,10 +133,22 @@ typedef struct {
 } svc_telemetry_config_t;
 
 typedef struct {
+    bool active_low;
+    uint32_t debounce_ms;
+    uint32_t stuck_timeout_ms;
+    uint32_t pair_delay_ms;
+    bool restore_on_boot;
+    output_role_t primary_roles[2];
+    output_role_t secondary_roles[2];
+    bool output_manager_authority;
+} svc_manual_fog_config_t;
+
+typedef struct {
     svc_battery_config_t battery;
     svc_thermal_zone_config_t thermal[SVC_THERMAL_ZONE_COUNT];
     svc_power_budget_config_t power_budget;
     svc_telemetry_config_t telemetry;
+    svc_manual_fog_config_t manual_fog;
     svc_output_config_t outputs[SVC_OUTPUT_COUNT];
 } svc_device_config_t;
 

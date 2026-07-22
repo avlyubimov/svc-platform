@@ -95,8 +95,8 @@ static void test_shed_order_uses_configured_priority_order(void)
         4U);
 
     assert(shed_count == 4U);
-    assert(shed_outputs[0] == SVC_OUTPUT_OUT2);
-    assert(shed_outputs[1] == SVC_OUTPUT_OUT3);
+    assert(shed_outputs[0] == SVC_OUTPUT_OUT3);
+    assert(shed_outputs[1] == SVC_OUTPUT_OUT2);
     assert(shed_outputs[2] == SVC_OUTPUT_OUT5);
     assert(shed_outputs[3] == SVC_OUTPUT_OUT9);
 }

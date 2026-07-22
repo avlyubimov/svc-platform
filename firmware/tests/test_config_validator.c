@@ -68,6 +68,16 @@ static void test_invalid_telemetry_config_is_rejected(void)
     assert(result.output_index == SVC_CONFIG_OUTPUT_INDEX_NONE);
 }
 
+static void test_manual_fog_cannot_restore_after_boot(void)
+{
+    svc_device_config_t config = svc_default_config;
+    config.manual_fog.restore_on_boot = true;
+
+    const svc_config_validation_result_t result = svc_config_validate_device(&config);
+
+    assert(result.status == SVC_CONFIG_INVALID_MANUAL_CONTROL);
+}
+
 static void test_total_current_plausibility_must_fit_monitor_range(void)
 {
     svc_device_config_t config = svc_default_config;
@@ -160,6 +170,7 @@ int main(void)
     test_invalid_thermal_config_is_rejected();
     test_invalid_power_budget_config_is_rejected();
     test_invalid_telemetry_config_is_rejected();
+    test_manual_fog_cannot_restore_after_boot();
     test_total_current_plausibility_must_fit_monitor_range();
     test_output_current_calibration_is_rejected_when_missing_range();
     test_output_current_plausibility_must_cover_config_limit();

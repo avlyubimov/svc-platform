@@ -2,11 +2,12 @@
 
 ## Status
 
-Accepted — superseded in part by ADR-0019 on 2026-07-22
+Accepted — release-state model superseded by ADR-0019 and ADR-0020 on 2026-07-22
 
-ADR-0019 replaces the four PB-100 release states and three PBREL stages below
-with the EVT development lifecycle. The historical reasoning and the rule that
-bench evidence must not be required before hardware exists remain valid.
+ADR-0019 first replaced the four PB-100 release states. ADR-0020 now supersedes
+that release-state model with the unified seven-state lifecycle used by PB-100,
+LB-100 and FB-100. The historical reasoning and the rule that bench evidence
+must not be required before hardware exists remain valid.
 
 ## Context
 

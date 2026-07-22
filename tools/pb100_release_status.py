@@ -10,6 +10,7 @@ from pathlib import Path
 from readiness_validation.stages import (
     derive_pb_release_state,
     is_fabrication_authorized,
+    is_fabrication_review,
     is_layout_authorized,
     is_production_authorized,
 )
@@ -61,7 +62,7 @@ MANUFACTURING_NAME_FRAGMENTS = (
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Report PB-100 staged layout, prototype, and production authorization."
+        description="Report PB-100 unified EVT and production authorization."
     )
     parser.add_argument(
         "--fail-on-blocked",
@@ -217,6 +218,7 @@ def main() -> int:
 
     release_state = derive_pb_release_state(staged_rows, post_prototype_rows)
     layout_authorized = is_layout_authorized(release_state)
+    fabrication_review = is_fabrication_review(release_state)
     prototype_authorized = is_fabrication_authorized(release_state)
     production_authorized = is_production_authorized(release_state)
     layout_ready = layout_authorized
@@ -235,7 +237,9 @@ def main() -> int:
     print(f"  Schematic freeze checklist: {status}")
     print(f"  Layout planning authorization: {'READY' if layout_ready else 'BLOCKED'}")
     print(f"  KiCad board import: {'READY' if board_import_ready else 'BLOCKED'}")
+    print(f"  EVT fabrication review: {'ACTIVE' if fabrication_review else 'NOT STARTED'}")
     print(f"  Five-board EVT package: {'AUTHORIZED' if prototype_authorized else 'BLOCKED'}")
+    print(f"  Production qualification: {'RELEASED' if production_release_ready else 'BLOCKED'}")
     print(f"  Production/field release: {'READY' if production_release_ready else 'NO-GO'}")
     print(f"  Active freeze gates: {len(active_gates)}")
     print(f"  Active release blockers: {len(active_blockers)}")

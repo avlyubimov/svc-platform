@@ -80,7 +80,7 @@ JPB1,78,UART_TX,Expansion,LB-100 to PB-100,Future,LB_3V3,DNP by default,UART TX,
 JPB1,79,UART_RX,Expansion,PB-100 to LB-100,Future,LB_3V3,DNP by default,UART RX,Accessory UART route
 JPB1,80,EXT_ADC1,Expansion,PB-100 to LB-100,Future,Analog,DNP by default,ADC,External analog input route
 JPB1,81,EXT_ADC2,Expansion,PB-100 to LB-100,Future,Analog,DNP by default,ADC,External analog input route
-JPB1,82,EXT_DIG1,Expansion,PB-100 to LB-100,Future,LB_3V3,DNP by default,GPIO input,External digital input route
+JPB1,82,FOG_SW_IN,Manual control,PB-100 to LB-100,Core,LB_3V3_IO,Active-low dry contact; defaults high on LB,GPIO input,Protected fog-switch request input; Output Manager retains authority
 JPB1,83,EXT_DIG2,Expansion,PB-100 to LB-100,Future,LB_3V3,DNP by default,GPIO input,External digital input route
 JPB1,84,EXT_5V_EN,Expansion,LB-100 to PB-100,Future,LB_3V3,DNP by default,GPIO output,External sensor supply enable
 JPB1,85,SPARE_01,Reserve,Mixed,Future,TBD,NC,TBD,Reserved

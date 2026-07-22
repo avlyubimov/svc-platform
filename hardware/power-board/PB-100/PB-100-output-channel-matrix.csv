@@ -1,11 +1,11 @@
 Output,Reference default role,Class,Target fuse A,Target current limit A,PWM,Default priority,Initial switch direction,Telemetry,Notes
-OUT1,USB-C LOBoo,Medium current,15,12,yes,B,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Configuration default only
-OUT2,Cigarette / compressor,High current,20,18,optional,C,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Review compressor inrush and MOSFET SOA
-OUT3,Fog Left,Medium current,10,8,yes,C,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Configuration default only
-OUT4,Fog Right,Medium current,10,8,yes,C,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Configuration default only
-OUT5,CHIGEE / navigation,Low current,5,4,yes,B,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Configuration default only
-OUT6,Heated Seat Rider,Medium current,10,8,yes,C,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Review heater thermal steady state
-OUT7,Heated Seat Passenger,Medium current,10,8,yes,C,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Review heater thermal steady state
-OUT8,DVR,Low current,5,4,yes,B,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Configuration default only
-OUT9,Aux brake / rear light,Low current,5,4,yes,A,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Safety-relevant role default
-OUT10,Spare,Medium current,10,8,yes,C,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Generic spare channel
+OUT1,Cigarette / compressor,Medium current,15,12,yes,A,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Compressor must remain at or below 10-12 A with separate fuse undervoltage protection and timer
+OUT2,High-current reserve,High current,20,18,optional,A,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Reserved generic output; role assigned by configuration
+OUT3,Fog primary left,Medium current,10,8,yes,B,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,First reference lamp pair; 80 W marking is provisional pending EVT current measurement
+OUT4,Fog primary right,Medium current,10,8,yes,B,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,First reference lamp pair; 80 W marking is provisional pending EVT current measurement
+OUT5,Low-current reserve 1,Low current,5,4,yes,A,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Reserved generic output; role assigned by configuration
+OUT6,Fog secondary left,Medium current,10,8,yes,C,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Second reference lamp pair and first load-shed group; 70 W marking is provisional
+OUT7,Fog secondary right,Medium current,10,8,yes,C,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Second reference lamp pair and first load-shed group; 70 W marking is provisional
+OUT8,Low-current reserve 2,Low current,5,4,yes,A,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Reserved generic output; role assigned by configuration
+OUT9,Low-current reserve 3,Low current,5,4,yes,A,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Reserved generic output; role assigned by configuration
+OUT10,Medium-current reserve,Medium current,10,8,yes,A,TPS48110AQDGXRQ1 plus selected IAUT300N08S5N012ATMA2 80V TOLL N-MOSFET,Current plus fault,Reserved generic output; role assigned by configuration

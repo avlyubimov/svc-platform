@@ -17,7 +17,8 @@ SVC is a modular, open, long-lifecycle vehicle accessory controller. It should c
 
 - **Power Board PB-100**: high-current outputs, protection, fuses, current sensing.
 - **Logic Board LB-100**: MCU, CAN, BLE, SD, RTC, FRAM, sensors.
-- **Front Board FB-100**: USB-C service, status LEDs, service button.
+- **Front Board FB-100**: USB-C service, status LEDs, service/reset controls and
+  optional FOG-button fit review.
 - **Firmware FW**: FreeRTOS-based modular firmware.
 - **SVC Studio**: desktop configurator.
 - **SVC Mobile**: mobile configurator.
@@ -25,13 +26,24 @@ SVC is a modular, open, long-lifecycle vehicle accessory controller. It should c
 
 ## First vehicle use case
 
-BMW R1200GS K25 needs:
-- USB-C LOBoo power
-- cigarette socket / compressor
-- left/right fog lights with lux and CAN-aware logic
-- CHIGEE / navigation power
-- heated seat channels
-- DVR
-- auxiliary brake / rear light
-- spare channel
+BMW R1200GS K25 reference configuration needs:
+- OUT1 cigarette socket and future compressor limited to 10-12 A
+- OUT2 high-current reserve up to 18 A
+- OUT3/OUT4 first auxiliary-lamp pair and OUT6/OUT7 second pair
+- OUT5/OUT8/OUT9 low-current reserves and OUT10 medium-current reserve
+- protected `FOG_SW_IN` handlebar dry-contact request with staged pair start
+- independent near-battery `C36_BIDIRECTIONAL` accessory/rescue-charge branch
 - BMW CAN read-only logging and decoding
+
+The stock headlamp remains on factory wiring. Physical power outputs stay
+generic `OUT1` through `OUT10`; these reference roles are configuration only.
+C36 is not a PB managed output and is not a starter-current source.
+
+## Current hardware lifecycle
+
+- PB-100: `EVT-LAYOUT-AUTHORIZED`.
+- LB-100: `EVT-LAYOUT-AUTHORIZED`.
+- FB-100: `EVT-LAYOUT-AUTHORIZED`; existing placement continues to routing.
+- EVT fabrication: blocked until board-specific `EVT-FAB-REVIEW` closes.
+- Production: blocked until Rev.1 validation, Rev.2 correction, critical retest
+  and Product Owner `PRODUCTION-RELEASE` approval.

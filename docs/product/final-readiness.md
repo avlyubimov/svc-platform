@@ -4,13 +4,13 @@ Status: In progress
 Last updated: 2026-07-22
 
 This document defines what “ready” means for the current repository state. It
-authorizes controlled FB-100 layout and controlled PB-100 Rev.1 EVT board
-import/layout. It does not authorize LB-100 PCB import or fabrication/assembly
+authorizes controlled PB-100 and LB-100 Rev.1 EVT board import/layout and
+continued FB-100 EVT routing. It does not authorize fabrication/assembly
 outputs for any board.
 
-PB-100 release authorization uses ADR-0019:
-`EVT-LAYOUT-AUTHORIZED`, `EVT-FAB-AUTHORIZED`, `BENCH-VALIDATION`,
-`MOTORCYCLE-VALIDATION`, and `PRODUCTION-RELEASE`. Rev.1 remains
+All three boards use the ADR-0020 lifecycle: `EVT-LAYOUT-AUTHORIZED`,
+`EVT-FAB-REVIEW`, `EVT-FAB-AUTHORIZED`, `BENCH-VALIDATION`,
+`MOTORCYCLE-VALIDATION`, `PRODUCTION-BLOCKED`, and `PRODUCTION-RELEASE`. Rev.1 remains
 `NOT FOR PRODUCTION`; production and general field use remain `NO-GO` until
 bench and motorcycle evidence is incorporated into reviewed Rev.2.
 
@@ -74,8 +74,8 @@ Current coverage:
 - PB-100 board-print release-status reporting from the schematic-freeze
   checklist, board-release blocker register, KiCad PCB presence, and
   manufacturing output presence.
-- PB-100 staged-release consistency across PBREL-006/PBREL-007 pre-layout,
-  post-layout, prototype-qualification, aggregate readiness, and bench gates.
+- PB-100 staged-release consistency across the unified seven stages, with
+  PBREL-007 blocking only production qualification.
 - Generated LB-100/FB-100 powered-off evidence recalculating E73 leakage and
   USB VBUS threshold/removal margins in CI.
 
@@ -86,18 +86,18 @@ Current coverage:
 | Architecture v1.0 | Ready | Frozen by ADR; PB-100 requirement changes still need ADR |
 | PB-100 requirements | Ready for controlled schematic completion | Baseline plus ADR-0016/ADR-0018 active-cutoff and passive-thermal requirements are frozen; schematic freeze remains open |
 | PB-100 KiCad scaffold | Preliminary capture | Child sheets now contain ERC-clean preliminary capture content and exported netlist coverage; schematic freeze remains open |
-| PB-100 PCB/layout | EVT-LAYOUT-AUTHORIZED | There is 1 active blocker: `PBREL-007`; it blocks production release rather than controlled EVT layout. ADR-0019 permits controlled full-board import and layout with test points, isolated DNP alternative sites, replaceable gate resistors, isolation links, safe-off controls and `EVT-01` through `EVT-05` serial marking. The aggregate authorization remains `EVT-LAYOUT-AUTHORIZED`. Q2-C100 is retained as a paused diagnostic option and is not an EVT prerequisite. No PB-100 PCB or manufacturing output exists yet. `EVT-FAB-AUTHORIZED` still requires final EVT schematic review, zero DRC/unconnected/parity findings, 40 A electrothermal and clamp-loop extraction, DFM, connector fit and laboratory safety evidence. Production and general field use remain `NO-GO` |
+| PB-100 PCB/layout | EVT-LAYOUT-AUTHORIZED | There is 1 active blocker: `PBREL-007`; ADR-0020 makes it a production-only blocker. Full-board import and layout may start with test points, alternative DNP sites, replaceable gate resistors, isolation links, safe-off controls, Kelvin shunt routing, FOG interface and EVT serial marking. The aggregate authorization remains `EVT-LAYOUT-AUTHORIZED`. Q2-C100 is paused and optional. `EVT-FAB-AUTHORIZED` still requires the separate PB EVT-fab checklist, including zero DRC/unconnected/parity findings, routed 40 A electrothermal and clamp-loop estimates, connector fit, DFM and laboratory safety evidence. Production remains `NO-GO` |
 | LB-100 requirements | Frozen | Baseline is frozen by ADR-0014 and the schematic freeze is Closed |
-| LB-100 KiCad schematic | Reviewed | Deterministic 81-component, 191-net, footprint-bound capture adds typed IC pins/ERC, sourced and decoupled ADC_REF, one-point AGND return, digital USB VBUS detection, direct STM32-to-LTC3212 drive, back-power-safe sensor supplies, and three switched-rail Ioff buffers isolating E73 UART/reset; exported-netlist audit and ERC pass with only the two reviewed cross-board USB CC single-pin warnings |
-| LB-100 PCB/layout | BLOCKED | There are 0 active blockers (0 active LBREL blockers). Footprint, schematic, and corrected FX18 mechanical gates are closed; the separate signal-integrity and safety layout model remains Open, so no `LB-100.kicad_pcb` or manufacturing output is authorized |
+| LB-100 KiCad schematic | Reviewed | Deterministic 83-component, 191-net, footprint-bound capture adds the PA8 `FOG_SW_IN` pull-up/filter, typed IC pins/ERC, sourced and decoupled ADC_REF, one-point AGND return, digital USB VBUS detection, direct STM32-to-LTC3212 drive, back-power-safe sensors, and E73 UART/reset isolation; exported-netlist audit and ERC pass with only the two reviewed cross-board USB CC single-pin warnings |
+| LB-100 PCB/layout | EVT-LAYOUT-AUTHORIZED | There are 0 active blockers (0 active LBREL blockers). Footprint, schematic and corrected FX18 mechanical gates are closed. ADR-0020 moves placement-specific SI/safety closure into EVT-FAB-REVIEW, so controlled `LB-100.kicad_pcb` import and routing may start now; manufacturing outputs remain blocked |
 | FB-100 requirements | Frozen | Baseline is frozen by ADR-0014 and the schematic freeze is Closed |
 | FB-100 KiCad schematic | Reviewed | Deterministic 44-component, 46-net, footprint-bound capture covers USB-C/ESD/no-back-power VBUS presence with R13 3.9k current limit, R14 15k defined pulldown and C1 100nF, JFB1, ten role-free indicators, direct one-wire RGB, service/reset buttons, and DNP OLED; exported-netlist audit and ERC pass with zero findings |
-| FB-100 PCB/layout | LAYOUT-ONLY | There are 0 active blockers (0 active FBREL blockers). The controlled 80 mm x 35 mm board contains all 44 frozen schematic footprints plus four mounting holes; placement DRC and parity are machine-checked, while routing, copper pours, stackup-derived USB impedance, and final layout review remain open. No Gerber, drill, BOM/CPL, pick-place, manufacturing ZIP, or PCBA order exists |
+| FB-100 PCB/layout | EVT-LAYOUT-AUTHORIZED | There are 0 active blockers (0 active FBREL blockers). The controlled 80 mm x 35 mm board contains all 44 frozen schematic footprints plus four mounting holes and is marked EVT not-for-production; routing, copper pours, stackup-derived USB impedance, optional FOG-button fit and final layout review remain open. No Gerber, drill, BOM/CPL, pick-place, manufacturing ZIP, or PCBA order exists |
 | Firmware safety core | Host-test ready | Output, overflow-safe delayed battery cutoff, runtime load shedding, stale-current safe-off, thermal derate/cutoff, CAN dropped-edge retry, telemetry, events, saturating diagnostic counters, logging, config, runtime boot, CAN-to-rule bridge, ambient-light rule conditions, ordered rule sets, multi-action rule compilation, rule runtime, and rule paths covered |
 | Configuration format | Host-test ready | JSON schema, canonical rule grammar, rule-action mapping, buffer-atomic rule compilation, PB-100 capability manifest, compiled capability baseline, config store reserved/sequence-wrap handling, config update, and examples are validated |
 | Production package | Draft | `production/board-order/three_board_jlcpcb_order_readiness.csv` tracks all three boards as NO-GO until their layout, fabrication, review, and assembly-output gates close |
 
-## Required before schematic freeze
+## Required during EVT layout and before EVT fabrication
 
 - Replace preliminary abstract/class KiCad instances with final schematic
   symbols, reviewed electrical pin types, values, footprints, and MPN-specific
@@ -122,11 +122,10 @@ Current coverage:
   `40-400 ms` envelope with current, energy, transient thermal impedance,
   tolerance, and self-heating calculations. Those rows preserve the rejected
   single-TVS failure; ADR-0018 instead selects hard cutoff at `48.99-54.89 V`.
-- ADR-0019 replaces the PB-100 release sequence with EVT layout, EVT
-  fabrication, bench validation, motorcycle validation and production release.
-  PBREL-007 remains Conditional for production pending qualified maximum-bound
-  Q2 evidence, but aggregate authorization is `EVT-LAYOUT-AUTHORIZED` and board
-  import may begin.
+- ADR-0020 establishes the unified seven-state lifecycle for all main boards.
+  PBREL-007 remains Conditional only for production pending qualified
+  maximum-bound Q2 evidence; it does not block PB layout, five-board EVT
+  fabrication after fab review, bench validation or motorcycle validation.
 - Infineon email response `IFX-260721-2228076` / `CRM0032570008656` supplied no
   technical trajectory, model, or FAE statement. It is recorded as
   `RECEIVED NON-QUALIFYING`; the request must be rerouted through MyCases in
