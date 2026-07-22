@@ -14,6 +14,11 @@ All three boards use the ADR-0020 lifecycle: `EVT-LAYOUT-AUTHORIZED`,
 `NOT FOR PRODUCTION`; production and general field use remain `NO-GO` until
 bench and motorcycle evidence is incorporated into reviewed Rev.2.
 
+Current top-side PCB review renders are tracked in
+[`docs/assets/pcb-renders`](../assets/pcb-renders/README.md). They are
+documentation-only snapshots of the current EVT layout and do not change any
+board-order gate.
+
 ## Automated gate
 
 Run from the repository root:
