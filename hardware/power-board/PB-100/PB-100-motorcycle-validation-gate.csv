@@ -1,0 +1,7 @@
+Validation ID,Area,Required unit,Required evidence,Prohibited shortcut,Blocks,Status
+PB-MOTO-001,Bench handoff,EVT-04,All applicable PB-BENCH rows closed plus documented undamaged-state inspection,Using EVT-03 or any destructively stressed board,MOTORCYCLE-VALIDATION,BLOCKED
+PB-MOTO-002,Cranking and alternator,EVT-04,Input output reset power-good and temperature record across cold and hot engine starts,Intentional load-dump generation on the motorcycle,PRODUCTION-RELEASE,BLOCKED
+PB-MOTO-003,Real loads,EVT-04,Reviewed staged accessory-load record with current voltage fault and thermal telemetry,Applying uncontrolled overload short circuit or destructive fault on the motorcycle,PRODUCTION-RELEASE,BLOCKED
+PB-MOTO-004,CAN1 safety,EVT-04,CAN analyzer record proving listen-only behavior and physical TX-disabled status,Populating or bypassing the CAN1 TX DNP/open links,PRODUCTION-RELEASE,BLOCKED
+PB-MOTO-005,Vibration and temperature,EVT-04,Connector retention intermittent-fault enclosure and board-temperature record over representative riding conditions,Treating a short ride without logged temperatures and inspection as qualification,PRODUCTION-RELEASE,BLOCKED
+PB-MOTO-006,Rev.2 disposition,EVT-04,Every Rev.1 schematic layout assembly bench and motorcycle finding dispositioned into a reviewed Rev.2 package,Releasing Rev.1 or waiving unresolved findings,PRODUCTION-RELEASE,BLOCKED

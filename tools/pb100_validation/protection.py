@@ -119,6 +119,8 @@ def validate_tvs_load_dump_margin_trace() -> None:
             "2.08x provisional hot SOA margin",
             "150 C initial Tj",
             "59.52V protected-node peak budget",
+            "CONDITIONAL PRODUCTION",
+            "EVT-LAYOUT-AUTHORIZED",
             "PBREL-006 design gate Closed",
             "SM8S33AHM3/I legacy D1",
             "NOT APPROVED",
@@ -140,8 +142,9 @@ def validate_tvs_load_dump_freeze_review() -> None:
             "IAUTN15S6N025ATMA1",
             "48.99-54.89 V",
             "59.52 V peak budget",
-            "PBREL-007 pre-layout stage remains Conditional",
-            "PB-100.kicad_pcb",
+            "PBREL-007 production qualification remains Conditional",
+            "EVT-LAYOUT-AUTHORIZED",
+            "EVT-FAB-AUTHORIZED",
         ),
     )
 
@@ -209,7 +212,8 @@ def validate_tvs_overshoot_closeout_precheck() -> None:
             "protected-node peak budget is 59.52 V",
             "dynamic SOA",
             "Ten pulses at 60 s",
-            "PBREL-007 pre-layout stage remains Conditional",
-            "PB-100.kicad_pcb",
+            "PBREL-007 production qualification remains Conditional",
+            "EVT-LAYOUT-AUTHORIZED",
+            "EVT-FAB-AUTHORIZED",
         ),
     )

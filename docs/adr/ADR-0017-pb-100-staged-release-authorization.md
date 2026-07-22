@@ -2,7 +2,11 @@
 
 ## Status
 
-Accepted — Product Owner directed the release-gate correction on 2026-07-21
+Accepted — superseded in part by ADR-0019 on 2026-07-22
+
+ADR-0019 replaces the four PB-100 release states and three PBREL stages below
+with the EVT development lifecycle. The historical reasoning and the rule that
+bench evidence must not be required before hardware exists remain valid.
 
 ## Context
 

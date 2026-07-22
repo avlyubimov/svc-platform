@@ -181,7 +181,7 @@ def render_surge_stopper() -> str:
                         "DISCONNECT",
                         "PASS" if protected_node_passed else "FAIL",
                         "PASS" if soa_screen_passed else "FAIL",
-                        "CONDITIONAL PRE-LAYOUT" if soa_screen_passed else "FAIL",
+                        "CONDITIONAL PRODUCTION" if soa_screen_passed else "FAIL",
                         basis,
                     ])
     return _csv(rows)
@@ -233,9 +233,9 @@ def render_q2() -> str:
         ["Protected-node margin to 80 V Q1", f"{protected_margin_v:.2f}", "V", "Selected protected MOSFET rating minus worst protected-node peak budget", "PROVISIONAL PASS"],
         ["Hot-corner SOA current limit", f"{hot_soa_limit_a:.2f}", "A", "Conservative 101 V / 1 us curve bound derated from 25 C to the 150 C initial junction", "PROVISIONAL"],
         ["Hot-corner SOA margin", f"{hot_soa_margin:.2f}", "x", "Temperature-derated current limit divided by 40 A", "PROVISIONAL PASS"],
-        ["Repeated-pulse condition", f"{LOAD_DUMP.pulse_count} pulses / {LOAD_DUMP.pulse_interval_s:.0f} s spacing", "", "Generated corners include 150 C initial junction after steady 40 A preload", "CONDITIONAL PRE-LAYOUT"],
-        ["Pre-layout gate status", "Conditional", "", "Qgd/Qgs are not guaranteed at the 101 V / 40 A corner and graph-derived SOA needs a qualified maximum-bound trajectory", "BLOCKED"],
-        ["Physical verification boundary", "Extracted copper thermal interface enclosure and common-source overshoot", "", "Post-layout evidence and PB-BENCH-004 must verify dynamic SOA and recovery", "MANDATORY POST-LAYOUT"],
+        ["Repeated-pulse condition", f"{LOAD_DUMP.pulse_count} pulses / {LOAD_DUMP.pulse_interval_s:.0f} s spacing", "", "Generated corners include 150 C initial junction after steady 40 A preload", "CONDITIONAL PRODUCTION"],
+        ["Production qualification status", "Conditional", "", "Qgd/Qgs are not guaranteed at the 101 V / 40 A corner and graph-derived SOA needs a qualified maximum-bound trajectory", "EVT-LAYOUT-AUTHORIZED / PRODUCTION BLOCKED"],
+        ["Physical verification boundary", "Extracted copper thermal interface enclosure and common-source overshoot", "", "EVT pre-fab review and PB-BENCH-004 must verify dynamic SOA and recovery", "MANDATORY EVT PRE-FAB AND BENCH"],
     ]
     return _csv(rows)
 

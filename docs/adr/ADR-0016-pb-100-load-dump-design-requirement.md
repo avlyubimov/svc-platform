@@ -1,6 +1,6 @@
 # ADR-0016: PB-100 Load-Dump Design Requirement
 
-Status: Accepted
+Status: Accepted — release authorization superseded in part by ADR-0019
 
 Date: 2026-07-21
 
@@ -55,11 +55,12 @@ remain its separate post-layout and prototype-qualification stages.
 - TVS arrays, staged suppression, higher-power parts, or controller isolation
   may be compared without removing required capabilities; any architecture
   change still needs Product Owner approval and another ADR.
-- No `PB-100.kicad_pcb` may be created before the pre-layout and normal
-  layout-start gates close. No engineering-prototype Gerber/BOM package may be
-  created before post-layout verification reaches `PROTO-ONLY`. Production and
-  field release remain prohibited until prototype qualification and the normal
-  production gates close.
+- ADR-0019 authorizes controlled Rev.1 EVT layout and a five-board EVT package
+  after routed-board DRC and pre-fab review even while PBREL-007 remains
+  Conditional. The load-dump evidence in this ADR blocks
+  `PRODUCTION-RELEASE`, not `EVT-LAYOUT-AUTHORIZED` or a reviewed
+  `EVT-FAB-AUTHORIZED` package. Production and general field release remain
+  prohibited until bench, motorcycle, Rev.2 and normal production gates close.
 
 ## Evidence
 

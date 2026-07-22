@@ -7,7 +7,12 @@ import re
 import sys
 from pathlib import Path
 
-from readiness_validation.stages import STATE_RANK, derive_pb_release_state
+from readiness_validation.stages import (
+    derive_pb_release_state,
+    is_fabrication_authorized,
+    is_layout_authorized,
+    is_production_authorized,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -211,10 +216,10 @@ def main() -> int:
     ]
 
     release_state = derive_pb_release_state(staged_rows, post_prototype_rows)
-    layout_authorized = STATE_RANK[release_state] >= STATE_RANK["LAYOUT-ONLY"]
-    prototype_authorized = STATE_RANK[release_state] >= STATE_RANK["PROTO-ONLY"]
-    production_authorized = release_state == "PRODUCTION-READY"
-    layout_ready = status == "Closed" and not active_gates and layout_authorized
+    layout_authorized = is_layout_authorized(release_state)
+    prototype_authorized = is_fabrication_authorized(release_state)
+    production_authorized = is_production_authorized(release_state)
+    layout_ready = layout_authorized
     board_import_ready = layout_ready and not board_import_blockers
     production_release_ready = (
         production_authorized
@@ -230,7 +235,7 @@ def main() -> int:
     print(f"  Schematic freeze checklist: {status}")
     print(f"  Layout planning authorization: {'READY' if layout_ready else 'BLOCKED'}")
     print(f"  KiCad board import: {'READY' if board_import_ready else 'BLOCKED'}")
-    print(f"  Engineering prototype package: {'AUTHORIZED' if prototype_authorized else 'BLOCKED'}")
+    print(f"  Five-board EVT package: {'AUTHORIZED' if prototype_authorized else 'BLOCKED'}")
     print(f"  Production/field release: {'READY' if production_release_ready else 'NO-GO'}")
     print(f"  Active freeze gates: {len(active_gates)}")
     print(f"  Active release blockers: {len(active_blockers)}")

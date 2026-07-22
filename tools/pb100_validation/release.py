@@ -62,6 +62,54 @@ def validate_staged_release_readiness() -> None:
                 )
 
 
+def validate_evt_prototype_plan() -> None:
+    plan_path = PB100_DIR / "PB-100-evt-prototype-plan.md"
+    plan = read_text(plan_path)
+    for token in (
+        "EVT-LAYOUT-AUTHORIZED / FABRICATION NOT YET AUTHORIZED",
+        "PB-100 REV.1 EVT — NOT FOR PRODUCTION",
+        "EVT-01",
+        "EVT-05",
+        "VDS",
+        "VGS",
+        "5 A, 10 A, 20 A and 40 A",
+        "Never install on motorcycle",
+        "Rev.2",
+        "Q2-C100",
+        "paused diagnostic option",
+    ):
+        if token not in plan:
+            fail(f"{plan_path.relative_to(REPO_ROOT)} must include {token}")
+
+    allocation_path = PB100_DIR / "PB-100-evt-unit-allocation.csv"
+    validate_csv(allocation_path)
+    allocation = list(csv.DictReader(allocation_path.open(newline="", encoding="utf-8")))
+    by_unit = {row["Unit"].strip(): row for row in allocation}
+    expected_units = {f"EVT-{number:02d}" for number in range(1, 6)}
+    if set(by_unit) != expected_units or len(allocation) != len(expected_units):
+        fail(f"{allocation_path.relative_to(REPO_ROOT)} must assign EVT-01 through EVT-05 exactly")
+    if any(row["Status"].strip() != "PLANNED" for row in allocation):
+        fail(f"{allocation_path.relative_to(REPO_ROOT)} must keep units PLANNED before fabrication")
+    if by_unit["EVT-03"]["Motorcycle eligible"].strip() != "No" or "Never install" not in by_unit["EVT-03"]["Disposition rule"]:
+        fail("EVT-03 must remain excluded from motorcycle use after fault and surge tests")
+    if by_unit["EVT-04"]["Motorcycle eligible"].strip() != "Yes":
+        fail("EVT-04 must remain the dedicated motorcycle-validation unit")
+
+    motorcycle_path = PB100_DIR / "PB-100-motorcycle-validation-gate.csv"
+    validate_csv(motorcycle_path)
+    motorcycle = list(csv.DictReader(motorcycle_path.open(newline="", encoding="utf-8")))
+    by_id = {row["Validation ID"].strip(): row for row in motorcycle}
+    expected_ids = {f"PB-MOTO-{number:03d}" for number in range(1, 7)}
+    if set(by_id) != expected_ids or len(motorcycle) != len(expected_ids):
+        fail(f"{motorcycle_path.relative_to(REPO_ROOT)} must contain PB-MOTO-001 through PB-MOTO-006")
+    if any(row["Status"].strip() != "BLOCKED" for row in motorcycle):
+        fail(f"{motorcycle_path.relative_to(REPO_ROOT)} must remain BLOCKED before bench validation")
+    motorcycle_text = " ".join(" ".join(row.values()) for row in motorcycle)
+    for token in ("EVT-04", "Intentional load-dump", "CAN1", "Rev.2", "PRODUCTION-RELEASE"):
+        if token not in motorcycle_text:
+            fail(f"{motorcycle_path.relative_to(REPO_ROOT)} must include {token}")
+
+
 def freeze_checklist_rows_by_gate() -> dict[str, dict[str, str]]:
     text = read_text(PB100_DIR / "PB-100-schematic-freeze-checklist.md")
     rows_by_gate: dict[str, dict[str, str]] = {}
@@ -758,7 +806,7 @@ def validate_board_release_blocker_register() -> None:
         if "block" not in layout_impact or "layout" not in layout_impact:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Layout impact must define the layout boundary")
         if blocker_id in STAGED_BLOCKERS:
-            for token in ("layout-only", "production", "field"):
+            for token in ("evt-layout-authorized", "production", "field"):
                 if token not in layout_impact:
                     fail(
                         f"{path.relative_to(REPO_ROOT)}:{row_number}: staged Layout impact must include {token}"
@@ -844,7 +892,7 @@ def validate_board_print_closure_matrix() -> None:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Board-print blocked action must be explicit")
         blocked_action = row["Board-print blocked action"].lower()
         required_tokens = (
-            ("proto-only", "production", "field", "gerbers", "drills", "pick-place", "manufacturing zip")
+            ("evt-fab-authorized", "production", "field", "gerbers", "drills", "pick-place", "manufacturing zip")
             if blocker_id in STAGED_BLOCKERS
             else ("pb-100.kicad_pcb", "gerbers", "drills", "pick-place", "manufacturing zip")
         )

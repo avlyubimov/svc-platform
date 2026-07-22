@@ -1,6 +1,6 @@
 # PB-100 KiCad Project
 
-Status: Schematic freeze closed; layout-start preparation open; no PCB layout
+Status: `EVT-LAYOUT-AUTHORIZED`; board import may begin; fabrication blocked
 
 This directory contains the preliminary KiCad project for PB-100.
 
@@ -18,11 +18,12 @@ This directory contains the preliminary KiCad project for PB-100.
   or garage-installed schematic elements.
 - `lib/PB100.pretty/`: empty preliminary local footprint library.
 
-There is intentionally no `PB-100.kicad_pcb` file. Schematic freeze is closed,
-but KiCad board import remains blocked until
-`../PB-100-pcb-layout-start-checklist.csv` closes footprint binding and
-mechanical envelope gates. Gerber, drill, pick-and-place, placement, BOM/CPL,
-and zipped manufacturing outputs remain blocked by repository validation.
+There is not yet a `PB-100.kicad_pcb` file. ADR-0019 now permits controlled
+board import, placement, routing, copper pours and extraction while the final
+EVT schematic review remains open. Gerber, drill, pick-and-place, BOM/CPL and
+zipped manufacturing outputs remain blocked until
+`EVT-FAB-AUTHORIZED` after DRC, parity, 40 A electrothermal/clamp-loop review,
+DFM, connector fit and laboratory safety review.
 
 ## Source documents
 
@@ -70,8 +71,8 @@ and zipped manufacturing outputs remain blocked by repository validation.
 
 ## Next KiCad work
 
-1. Review `../PB-100-pcb-layout-start-checklist.csv` and close footprint
-   binding plus mechanical envelope gates.
+1. Review `../PB-100-pcb-layout-start-checklist.csv`, ADR-0019 and
+   `../PB-100-evt-prototype-plan.md`.
 2. Open `PB-100.kicad_pro` in KiCad.
 3. Let KiCad normalize project settings if needed.
 4. Review linked child schematic sheets listed in
@@ -82,10 +83,11 @@ and zipped manufacturing outputs remain blocked by repository validation.
 6. Replace abstract class instances with final electrical symbols, values, and
    footprints only after package drawings, pinouts, SOA, and sourcing gates are
    checked.
-7. Create `PB-100.kicad_pcb` only after footprint binding and mechanical
-   envelope gates close.
+7. Create `PB-100.kicad_pcb` under `EVT-LAYOUT-AUTHORIZED` and include every
+   mandated test point, DNP alternative site, replaceable gate element,
+   isolation link, safe-off provision and EVT serial field.
 8. Do not create Gerbers, drills, pick-place, BOM/CPL, manufacturing ZIP files,
-   fabrication packages, or PCBA orders until layout review closes.
+   fabrication packages or PCBA orders until `EVT-FAB-AUTHORIZED`.
 
 ## Validation
 

@@ -1,7 +1,11 @@
 # ADR-0013: Split PB-100 pre-layout closure from post-prototype validation
 
 ## Status
-Accepted
+Accepted — PB-100 release authorization superseded in part by ADR-0019
+
+ADR-0019 permits controlled PB-100 Rev.1 EVT layout before every production
+qualification item closes and requires the routed-board pre-fab review before
+the five-board EVT order. The evidence-class split in this ADR remains active.
 
 ## Context
 Some PB-100 checks need an assembled board or board stack. Examples include

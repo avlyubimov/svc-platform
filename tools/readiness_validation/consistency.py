@@ -6,8 +6,8 @@ from pathlib import Path
 
 from .stages import (
     AUTHORIZATION_AFTER_CLOSE,
-    RELEASE_STATES,
     STAGES,
+    allowed_release_states,
     derive_blocker_authorization,
     derive_pb_release_state,
 )
@@ -30,6 +30,7 @@ AGGREGATE_READINESS = (
 FINAL_READINESS = REPO_ROOT / "docs" / "product" / "final-readiness.md"
 ADR_0015 = REPO_ROOT / "docs" / "adr" / "ADR-0015-can1-physical-layer-board-ownership.md"
 ADR_0017 = REPO_ROOT / "docs" / "adr" / "ADR-0017-pb-100-staged-release-authorization.md"
+ADR_0019 = REPO_ROOT / "docs" / "adr" / "ADR-0019-pb-100-evt-development-release.md"
 PB_STAGED_READINESS = PB100_DIR / "PB-100-staged-release-readiness.csv"
 PB_POST_PROTOTYPE = PB100_DIR / "PB-100-post-prototype-validation-gate.csv"
 FOOTPRINT_STATUS = (
@@ -100,9 +101,11 @@ REQUIRED_FACTS = {
     PB_STAGED_READINESS: (
         "PBREL-006",
         "PBREL-007",
-        "LAYOUT-ONLY",
-        "PROTO-ONLY",
-        "PRODUCTION-READY",
+        "EVT-LAYOUT-AUTHORIZED",
+        "EVT-FAB-AUTHORIZED",
+        "BENCH-VALIDATION",
+        "MOTORCYCLE-VALIDATION",
+        "PRODUCTION-RELEASE",
         "PB-BENCH-004",
         "PB-BENCH-010",
     ),
@@ -218,8 +221,8 @@ def validate_adr_0015() -> None:
 
 def validate_adr_0017() -> None:
     text = read_text(ADR_0017)
-    if "Accepted — Product Owner directed" not in text:
-        raise ValidationError(f"{relative(ADR_0017)} must record Product Owner acceptance")
+    if "superseded in part by ADR-0019" not in text:
+        raise ValidationError(f"{relative(ADR_0017)} must record ADR-0019 supersession")
     for token in (
         "BLOCKED",
         "LAYOUT-ONLY",
@@ -231,6 +234,26 @@ def validate_adr_0017() -> None:
     ):
         if token not in text:
             raise ValidationError(f"{relative(ADR_0017)} must include {token!r}")
+
+
+def validate_adr_0019() -> None:
+    text = read_text(ADR_0019)
+    for token in (
+        "Accepted — Product Owner direction on 2026-07-22",
+        "EVT-LAYOUT-AUTHORIZED",
+        "EVT-FAB-AUTHORIZED",
+        "BENCH-VALIDATION",
+        "MOTORCYCLE-VALIDATION",
+        "PRODUCTION-RELEASE",
+        "PB-100 REV.1 EVT — NOT FOR PRODUCTION",
+        "exactly five",
+        "Q2-C100",
+        "paused",
+        "Rev.2",
+        "CAN1 TX",
+    ):
+        if token not in text:
+            raise ValidationError(f"{relative(ADR_0019)} must include {token!r}")
 
 
 def validate_staged_release_readiness() -> None:
@@ -333,10 +356,11 @@ def validate_staged_release_readiness() -> None:
             row["Board"].strip(): row.get("Release state", "").strip()
             for row in read_csv(path)
         }
-        if any(state not in RELEASE_STATES for state in board_states.values()):
-            raise ValidationError(
-                f"{relative(path)} Release state must use only {', '.join(RELEASE_STATES)}"
-            )
+        for board, state in board_states.items():
+            if state not in allowed_release_states(board):
+                raise ValidationError(
+                    f"{relative(path)}:{board} has invalid Release state {state!r}"
+                )
         if board_states.get("PB-100") != pb_release_state:
             raise ValidationError(
                 f"{relative(path)}:PB-100 must report derived release state {pb_release_state}"
@@ -486,6 +510,7 @@ def validate() -> None:
     expected = active_blockers()
     validate_adr_0015()
     validate_adr_0017()
+    validate_adr_0019()
     validate_staged_release_readiness()
     validate_aggregate_counts(expected)
     validate_final_readiness(expected)
