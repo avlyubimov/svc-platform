@@ -87,6 +87,11 @@ def validate_input_power_design_values() -> None:
             for token in ("four-terminal", "0.5m", "60a", "30mv", "1.8w", "40a", "0.8w"):
                 if token not in row_text:
                     fail(f"input shunt design row must preserve {token} assumption")
+        if design_item == "Charge-pump capacitor":
+            row_text = " ".join(row.values())
+            for token in ("CGA6N3X7R2A225M230AE", "2.2uF", "100V", "Ceff >=1uF", "56V"):
+                if token not in row_text:
+                    fail(f"LM74930 VS storage row must preserve {token}")
 
     missing_items = sorted(REQUIRED_INPUT_POWER_ITEMS - seen_items)
     if missing_items:

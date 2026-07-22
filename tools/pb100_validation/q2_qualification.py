@@ -18,7 +18,8 @@ Q2_QUALIFICATION_INPUTS = {
 }
 Q2_QUALIFICATION_PENDING = {f"Q2Q-{number:03d}" for number in range(10, 16)}
 Q2_EMPIRICAL_PLAN_PASSED = {"Q2E-001", "Q2E-002"}
-Q2_EMPIRICAL_NOT_STARTED = {f"Q2E-{number:03d}" for number in range(3, 14)}
+Q2_EMPIRICAL_IN_PROGRESS = {"Q2E-003"}
+Q2_EMPIRICAL_NOT_STARTED = {f"Q2E-{number:03d}" for number in range(4, 14)}
 
 
 def _rows(name: str) -> list[dict[str, str]]:
@@ -161,19 +162,27 @@ def validate_q2_maximum_bound_qualification() -> None:
             "no more than 5%",
             "0.10 V",
             "PASS EMPIRICAL",
-            "no coupon design",
+            "controlled Q2-C100 schematic",
+            "zero unconnected items",
         ),
         "Q2 empirical qualification plan",
     )
 
     empirical_rows = _rows("PB-100-q2-empirical-qualification-readiness.csv")
     empirical_by_id = {row["Evidence ID"]: row for row in empirical_rows}
-    expected_empirical_ids = Q2_EMPIRICAL_PLAN_PASSED | Q2_EMPIRICAL_NOT_STARTED | {"Q2E-014"}
+    expected_empirical_ids = Q2_EMPIRICAL_PLAN_PASSED | Q2_EMPIRICAL_IN_PROGRESS | Q2_EMPIRICAL_NOT_STARTED | {"Q2E-014"}
     if len(empirical_by_id) != len(empirical_rows) or set(empirical_by_id) != expected_empirical_ids:
         fail("Q2 empirical readiness ledger must contain Q2E-001 through Q2E-014 exactly")
     for evidence_id in Q2_EMPIRICAL_PLAN_PASSED:
         if empirical_by_id[evidence_id]["Status"] != "PASS PLAN":
             fail(f"{evidence_id} must record the approved plan input")
+    for evidence_id in Q2_EMPIRICAL_IN_PROGRESS:
+        row = empirical_by_id[evidence_id]
+        if row["Status"] != "IN PROGRESS":
+            fail(f"{evidence_id} must distinguish controlled routing from completed coupon evidence")
+        for token in ("Q2-C100", "zero unconnected items", "FAB-REVIEW"):
+            if token not in " ".join(row.values()):
+                fail(f"{evidence_id} must retain the controlled coupon milestone token {token}")
     for evidence_id in Q2_EMPIRICAL_NOT_STARTED:
         if empirical_by_id[evidence_id]["Status"] != "NOT STARTED":
             fail(f"{evidence_id} cannot pass before coupon or bench evidence exists")

@@ -3590,3 +3590,114 @@ or PB-100 manufacturing output. Q2Q-010 through Q2Q-015 move to
 `PENDING EMPIRICAL`; Q2Q-016 remains the traceable non-qualifying redirect;
 MyCases continues in parallel. PBREL-007 remains Conditional and aggregate
 PB-100 authorization remains `BLOCKED` until the completed package passes.
+
+## 2026-07-21 — Start controlled Q2-C100 qualification-coupon routing
+
+Decision: implement the dedicated Q2-C100 artifact under the existing
+`QUALIFICATION-COUPON-ONLY` boundary. The correlation build uses exact
+`IAUTN15S6N025ATMA1`, `LM74930QRGERQ1` and
+`IAUT300N08S5N012ATMA2` devices in the accepted common-source topology. HGATE
+is direct to the QDUT gate with no populated or selectable Rg/CdV/dt element.
+The forced build removes UCTRL/QREV by population and uses the same gate/source
+Kelvin interface, preventing a hidden test driver from becoming a product-path
+component.
+
+Decision: select three Würth `786202073` automotive-released 9-pin press-fit
+terminals for RAW, common-source and system-output fixture points, Nexperia
+`BZT52H-B56-Q` for the 56 V CTRL_VS clamp, and two TDK
+`CGA6N3X7R2A225M230AE` 2.2 uF / 100 V automotive MLCCs. The two-capacitor
+margin follows TI's minimum 1 uF VS requirement for the resistor/Zener
+unsuppressed-load-dump topology; measured effective capacitance at 56 V over
+temperature is still mandatory.
+
+Result: the deterministic four-layer, 2.0 mm preliminary PCB routes the outer-
+layer RAW/common/output paths with via stitching, direct HGATE, internal-layer
+DGATE and separate A/OUT Kelvin returns. KiCad 10.0.4 ERC and DRC report zero
+violations and schematic parity differs only by four board mounting holes.
+Exactly 36 low-energy fixture connections remain deliberately open and are
+machine-pinned. Q2E-003 moves from `NOT STARTED` to `IN PROGRESS`; Gerber,
+drill, fabrication, energized testing, PB-100 board import and PB-100 release
+remain prohibited.
+
+## 2026-07-21 — Complete Q2-C100 pad-to-pad electrical routing
+
+Decision: route every remaining Q2-C100 pad-to-pad controller-support, probe
+and fixture connection without changing the accepted QDUT/UCTRL topology or
+adding a gate-path selector. Preserve explicit traces instead of introducing
+an unreviewed plane: Q2_HGATE remains F.Cu-only, QREV_DGATE and protected-side
+sense use In1.Cu, source Kelvin uses In2.Cu, and the high-current RAW/common/
+output spines remain duplicated on both outer layers with stitched vias.
+
+Decision: enlarge ROV1 and ROV2 from 0603 to 1206 lands. The two 42.2 kOhm
+upper-divider elements split the 101 V raw-side working voltage; 1206 gives a
+more credible working-voltage/pulse starting point and enough geometry for the
+2.0 mm RAW_101V clearance outside the reviewed body. Exact AEC-Q200 MPN,
+temperature/tolerance, continuous working-voltage and pulse evidence still
+close at `FAB-REVIEW`; ROV3 remains 0603 on the low-side node.
+
+Result: KiCad 10.0.4 reports ERC 0, DRC 0 and zero unconnected items. Schematic
+parity differs only by intentional board-only H1-H4. CI now independently pins
+the routed-net set, four-layer routing boundary, 0.20 mm minimum track floor,
+direct HGATE layer, internal Kelvin/sense layers, outer power-spine widths,
+power-via geometry and the 2.0 mm RAW clearance rule.
+
+This closes only the electrical-routing subtask of Q2E-003. `FAB-REVIEW`, exact
+fixture/probe sourcing, thermal/current-density and loop extraction, laboratory
+safety, DUT lots, correlation, measurements and independent review remain
+open. Q2Q-010 through Q2Q-015 stay `PENDING EMPIRICAL`; PBREL-007 remains
+`Conditional`; coupon fabrication/energized use and PB-100 layout remain
+blocked.
+
+## 2026-07-21 — Strengthen Q2-C100 current fanout and add pre-FAB screens
+
+Decision: remove the serial 0.8 mm source-row bottleneck from both Q2-C100 TOLL
+devices. Connect every physical source land with its own 0.8 mm spoke into a
+4.0 mm collection bus, widen the common-source outer-layer spine to 6.0 mm,
+widen the RAW and SYSTEM_OUT single-layer package necks to 6.5 mm and 8.0 mm,
+and use two five-via 1.2/0.6 mm transfer rows on each side of the common-source
+spine. The previous geometry could place the full 40 A through one 0.8 mm
+serial neck and was therefore not credible for FAB review.
+
+Decision: commit generated cross-section/resistance/loss and loop-bound
+arithmetic rather than calling zero DRC a current-capacity result. At 150 degC
+copper the five straight correlation corridors have a 1.9033 mOhm / 3.0453 W
+lower bound before source fanout, vias, package lands, contacts and fixture.
+The 101 V to 120 V waveform window combined with the provisional 0.41 us
+current-fall bound gives an absolute 194.75 nH ceiling before uncertainty and
+other overshoot. Supplier stackup, electrothermal field solution and complete
+fixture extraction remain mandatory.
+
+Decision: bind RVS/ROV to exact AEC-Q200 Vishay CRCW-HP primary MPNs with
+Bourns CRS-Q/CMP-Q independent alternatives. Bind CCAP to exact TDK
+`CGA3E2X7R1H104K080AE` 100 nF / 50 V soft-termination AEC-Q200 with Murata
+`GCJ188R71H104KA12D` as the independent alternative. RVS startup pulse,
+Zener-tolerance and local-temperature derating are not closed by MPN selection.
+
+Result: generated KiCad remains the controlled Q2-C100 coupon only. The new
+geometry and calculations are pinned by CI; thermal, field-solver, supplier
+DFM, fixture/probe sourcing, capacitance, safety and independent review remain
+open. Coupon fabrication/energized use and PB-100 layout remain blocked.
+
+## 2026-07-21 — Bind Q2-C100 board fixture interfaces without closing safety
+
+Decision: replace the generic 2.54 mm JHEAT/JTEMP/JDRIVE placeholders with
+exact Molex Micro-Fit 3.0 vertical TH board headers `436500228`, `436500328`
+and `436500428`. Use matching `436450208/0308/0408` receptacles, 18 AWG gold
+`430300039` heater contacts and 20-24 AWG gold `430300002` signal contacts.
+The two-, three- and four-position harnesses cannot fully cross-mate; JTEMP
+position 3 remains physically empty and is not assigned as a guard or shield.
+
+Decision: replace the generic TH probe loops with exact Harwin `S1751-46R`
+SMT test points and their published 3.45 x 1.85 mm land. This selects only the
+board attachment hardware. Harwin publishes neither a working-voltage nor a
+measurement-bandwidth rating for the test point, so the rated 101 V/100 MHz
+probe chain, loading, adapters, deskew and enclosure procedure remain open.
+
+Result: the generated footprints now carry the official Molex 3.00 mm signal
+pitch, signal-hole and polarizing-peg geometry plus a square pin-1 pad. Molex
+recommends a 1.57 mm board for the selected headers while Q2-C100 is 2.0 mm;
+the 3.18 mm tails do not prove seating or solder acceptance. Supplier DFM and
+a physical fit sample remain mandatory. The connector and test-point MPN
+selection therefore reduces fixture-source ambiguity but does not close
+`FAB-REVIEW`, touch safety or Q2E-003. Coupon fabrication/energized use and
+PB-100 layout remain blocked.

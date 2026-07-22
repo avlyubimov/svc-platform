@@ -1,0 +1,12 @@
+Reference,Function,CORRELATION-A population,FORCED-B population,Invariant / disposition
+QDUT,Exact qualification DUT,IAUTN15S6N025ATMA1,IAUTN15S6N025ATMA1,Exact orderable DUT only
+UCTRL,Application-controller correlation,LM74930QRGERQ1,DNP,Forced-B must not expose an unpowered controller HGATE pin to the external driver
+QREV,Protected-side ideal-diode correlation,IAUT300N08S5N012ATMA2,DNP,Forced-B load connects at JCOMMON
+JRAW,Raw-drain power terminal,786202073,786202073,101 V maximum fixture setting
+JCOMMON,Common-source power terminal,No external load connection,External 40 A load connection,May be used as Kelvin sense in Correlation-A
+JOUT,System-output power terminal,External 40 A load connection,No external load connection,Requires populated QREV
+JDRIVE,Gate/source Kelvin fixture interface,Probe only,External reviewed driver,No simultaneous external drive with populated UCTRL
+RVS/DZVS/CVS1/CVS2/CCAP,Controller supply network,Populate,DNP,CTRL_VS network belongs to controller correlation only
+ROV1/ROV2/ROV3,Hard-cutoff OV network,Populate,DNP,Correlation-A uses the exact 42.2k+42.2k/1.00k divider
+JHEAT,Isolated case-heater interface,Populate,Populate,No electrical connection to DUT terminals
+JTEMP,Isolated TSEP interface,Populate,Populate,Per-DUT 25/125/150 degC calibration required

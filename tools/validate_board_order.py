@@ -58,6 +58,9 @@ MANUFACTURING_NAME_FRAGMENTS = (
     "pickplace",
     "placement",
 )
+QUALIFICATION_COUPON_LAYOUT = (
+    PB100_DIR / "qualification" / "Q2-C100" / "kicad" / "Q2-C100.kicad_pcb"
+)
 
 FREEZE_CHECKLISTS = {
     "LB-100": LB100_DIR / "LB-100-schematic-freeze-checklist.md",
@@ -415,7 +418,11 @@ def manufacturing_files(board_dir: Path) -> list[Path]:
 
 
 def layout_files(board_dir: Path) -> list[Path]:
-    return sorted(board_dir.rglob("*.kicad_pcb"))
+    return sorted(
+        path
+        for path in board_dir.rglob("*.kicad_pcb")
+        if path != QUALIFICATION_COUPON_LAYOUT
+    )
 
 
 def validate_no_layout_before_freeze(board: str, board_dir: Path, status: str) -> None:
