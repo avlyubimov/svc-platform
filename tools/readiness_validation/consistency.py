@@ -32,6 +32,7 @@ ADR_0015 = REPO_ROOT / "docs" / "adr" / "ADR-0015-can1-physical-layer-board-owne
 ADR_0017 = REPO_ROOT / "docs" / "adr" / "ADR-0017-pb-100-staged-release-authorization.md"
 ADR_0019 = REPO_ROOT / "docs" / "adr" / "ADR-0019-pb-100-evt-development-release.md"
 ADR_0020 = REPO_ROOT / "docs" / "adr" / "ADR-0020-platform-evt-development-and-reference-loads.md"
+ADR_0021 = REPO_ROOT / "docs" / "adr" / "ADR-0021-fog-switch-common-and-protection-ownership.md"
 PB_STAGED_READINESS = PB100_DIR / "PB-100-staged-release-readiness.csv"
 PB_POST_PROTOTYPE = PB100_DIR / "PB-100-post-prototype-validation-gate.csv"
 EVT_FAB_READINESS = REPO_ROOT / "production" / "board-order" / "three_board_evt_fab_readiness.csv"
@@ -62,6 +63,7 @@ ACTIVE_DOCUMENTS = (
     PB100_DIR / "PB-100-pcb-layout-start-checklist.csv",
     PB_STAGED_READINESS,
     ADR_0020,
+    ADR_0021,
     EVT_FAB_READINESS,
     PRODUCTION_BLOCKERS,
     *EVT_FAB_CHECKLISTS.values(),
@@ -128,7 +130,7 @@ REQUIRED_FACTS = {
         "six official plated",
         "four GND MF circuits",
         "zero active LBREL blockers",
-        "100 components",
+        "99 components",
         "199 electrical nets",
     ),
     LB100_DIR / "LB-100-schematic-review-closeout.md": (
@@ -290,6 +292,24 @@ def validate_adr_0020() -> None:
     ):
         if token not in text:
             raise ValidationError(f"{relative(ADR_0020)} must include {token!r}")
+
+
+def validate_adr_0021() -> None:
+    text = read_text(ADR_0021)
+    for token in (
+        "Accepted — Product Owner corrective direction on 2026-07-22",
+        "SW_COMMON",
+        "PB-100 owns the cable-entry connector termination",
+        "D_FOG1",
+        "R_FOG_GND",
+        "R_FOG_12V",
+        "F_FOG_12V",
+        "PA8 remains `FOG_A_SW_IN_MCU`",
+        "PA9 remains `FOG_B_SW_IN_MCU`",
+        "EVT-FAB-AUTHORIZED",
+    ):
+        if token not in text:
+            raise ValidationError(f"{relative(ADR_0021)} must include {token!r}")
 
 
 def validate_staged_release_readiness() -> None:
@@ -588,6 +608,7 @@ def validate() -> None:
     validate_adr_0017()
     validate_adr_0019()
     validate_adr_0020()
+    validate_adr_0021()
     validate_staged_release_readiness()
     validate_aggregate_counts(expected)
     validate_evt_fab_and_production_boundaries()

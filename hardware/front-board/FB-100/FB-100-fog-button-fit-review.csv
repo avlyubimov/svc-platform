@@ -1,4 +1,4 @@
 Check ID,Scope,Current state,Decision,Required evidence,Impact
-FB-FOG-001,Primary control,Closed,External weather-protected three-wire handlebar switch provides independent FOG_A_SW_IN and FOG_B_SW_IN contacts with SW_GND common,PB-100-fog-switch-interface.md,Does not alter FB-100 layout authorization
+FB-FOG-001,Primary control,Closed,External weather-protected three-wire handlebar switch provides independent FOG_A_SW_IN and FOG_B_SW_IN contacts with unverified SW_COMMON,PB-100-fog-switch-interface.md,Does not alter FB-100 layout authorization
 FB-FOG-002,Optional FB buttons,Open,Add independent FOG A and FOG B controls only if actuator panel and enclosure fit without outline change,Updated UI mechanical drawing actuator clearance and schematic/PCB parity,Review during layout; omit optional buttons if they do not fit
 FB-FOG-003,Existing buttons,Closed,SERVICE and RESET are not normal fog controls,ADR-0020 and firmware configuration review,No reuse permitted

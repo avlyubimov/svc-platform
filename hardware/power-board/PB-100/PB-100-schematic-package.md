@@ -41,6 +41,8 @@ first motorcycle power, field use, and production release.
 - `production/bom/pb100_sourcing_evidence_snapshot.csv`
 - `hardware/power-board/PB-100/PB-100-garage-install-sourcing-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-garage-install-closeout-precheck.csv`
+- `hardware/power-board/PB-100/PB-100-fog-switch-interface.md`
+- `docs/adr/ADR-0021-fog-switch-common-and-protection-ownership.md`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv`
 - `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`

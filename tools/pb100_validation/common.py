@@ -846,6 +846,9 @@ CAPTURE_TRACE_ARTIFACTS_BY_WORK_ITEM = {
         "PB-100-can1-default-disable-derivation-precheck.csv",
         "PB-100-can1-default-disable-closeout-precheck.csv",
     ),
+    "CAP-FOG": (
+        "PB-100-fog-switch-interface.md",
+    ),
 }
 REVIEW_RELEASE_MANIFEST_COLUMNS = (
     "Artifact",
@@ -1481,6 +1484,7 @@ REQUIRED_CAPTURE_WORK_ITEMS = {
     "CAP-TEL",
     "CAP-B2B",
     "CAP-CAN1",
+    "CAP-FOG",
     "CAP-TP",
 }
 ALLOWED_CAPTURE_STATUSES = {
@@ -1489,6 +1493,7 @@ ALLOWED_CAPTURE_STATUSES = {
     "Planned capture",
     "Blocked pending symbol",
     "Review-defined",
+    "Value-bearing EVT capture",
 }
 REQUIRED_RELEASE_MANIFEST_ARTIFACTS = {
     "docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md",
@@ -1661,6 +1666,8 @@ def validate_no_role_tokens_in_row(path: Path, row_number: int, row: dict[str, s
         .replace("PBVAL-FOG-001", "")
     )
     for forbidden_token in FORBIDDEN_ROLE_TOKENS:
+        if forbidden_token == "FOG" and row.get("Work item", "").strip() == "CAP-FOG":
+            continue
         if forbidden_token in row_text:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: role token {forbidden_token} is not allowed")
 

@@ -57,7 +57,6 @@ PLACEMENTS = {
     "U17": Placement(78.0, 39.0, 90),
     "U18": Placement(33.0, 58.0, 90),
     "U19": Placement(30.0, 65.0, 90),
-    "D18": Placement(15.0, 62.0, 90),
     "D19": Placement(23.0, 58.0, 90),
     "D20": Placement(20.0, 65.0, 90),
     "Q18": Placement(28.0, 58.0, 90),

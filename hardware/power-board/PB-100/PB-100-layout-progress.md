@@ -8,21 +8,22 @@ Status: `EVT-LAYOUT-AUTHORIZED` — partial schematic import and placement exist
   reviewed 150 mm x 90 mm outline, four local M3 holes and four shared M2.5
   PB/LB stack holes.
 - Imported and placed every schematic component that currently has a reviewed
-  Footprint property: 28 parts covering Q1/Q2/U1, Q101..Q110, JPB1 and the
-  complete PB-owned CAN1 physical/default-disable population.
+  Footprint property: 33 parts covering Q1/Q2/U1, Q101..Q110, JPB1, the
+  complete PB-owned CAN1 physical/default-disable population and the protected
+  three-wire FOG cable entry.
 - Applied battery-entry, OUT1/OUT2, OUT3..OUT10, fuse-service and CAN/service
   placement zones plus explicit Rev.1 EVT and partial-import markings.
-- Routed only the already complete low-current CAN1 safety island: nine
-  `CAN1_*` nets use 84 segments and eight through vias recorded in
-  `kicad/PB-100-can-routing.csv`. CI rejects any non-CAN net in this partial
-  routing manifest.
+- Routed the already complete low-current CAN1 safety island and the protected
+  FOG cable entry: 110 segments and 14 through vias are recorded in
+  `kicad/PB-100-can-routing.csv` and `kicad/PB-100-fog-entry-routing.csv`.
+  `D_FOG1` is placed beside `JFOG1`; `R_FOG_GND` is the default `SW_COMMON`
+  selection and `R_FOG_12V` plus `F_FOG_12V` remain DNP.
 - Preserved C36 as the off-board, separately fused `VBAT_RAW`
   `C36_BIDIRECTIONAL` branch outside OUT1..OUT10 and `IIN_SENSE`.
 - Added deterministic generation and CI validation. KiCad reports no copper
   shorts, track crossings, clearance violations, edge violations, courtyard
-  overlaps or mounting-hole conflicts in the routed CAN subset. Open
-  connectivity is reduced from 142 to 126 without creating provisional power
-  copper.
+  overlaps or mounting-hole conflicts in the routed CAN/FOG subset. Open
+  connectivity is 127 without creating provisional power copper.
 
 ## EVT-FAB Blockers
 

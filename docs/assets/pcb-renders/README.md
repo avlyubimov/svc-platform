@@ -1,14 +1,14 @@
 # Rev.1 EVT PCB Renders
 
-These top- and bottom-side KiCad renders document the current
-`EVT-LAYOUT-AUTHORIZED` layout state. They are review aids only and do not
-authorize fabrication, assembly, ordering, or production use.
+These top- and bottom-side KiCad renders document the current `EVT-LAYOUT-AUTHORIZED`
+layout state. They are review aids only and do not authorize fabrication,
+assembly, ordering, or production use.
 
 | Board | Top | Bottom | Captured state |
 |---|---|---|---|
 | FB-100 | [top](FB-100-rev1-evt-top.png) | [bottom](FB-100-rev1-evt-bottom.png) | Connectivity-complete routing; fab-review items remain open |
 | LB-100 | [top](LB-100-rev1-evt-top.png) | [bottom](LB-100-rev1-evt-bottom.png) | First routing iteration; open connections and fab-review items remain |
-| PB-100 | [CAN1 top](PB-100-rev1-evt-can1-top.png) | [CAN1 bottom](PB-100-rev1-evt-can1-bottom.png) | Partial PCB with only the CAN1 safety island routed; power routing is not present |
+| PB-100 | [CAN1/FOG top](PB-100-rev1-evt-can1-top.png) | [CAN1/FOG bottom](PB-100-rev1-evt-can1-bottom.png) | Partial PCB with the CAN1 safety island and protected FOG cable entry routed; power routing is not present |
 
 The images were generated on 2026-07-22 from the tracked `.kicad_pcb` files
 with KiCad CLI 10.0.4. Regenerate them from the repository root with:

@@ -14,9 +14,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BOARD_PATH = ROOT / "hardware" / "logic-board" / "LB-100" / "kicad" / "LB-100.kicad_pcb"
 REQUIRED_KICAD_VERSION = "10.0.4"
-EXPECTED_UNCONNECTED_ITEMS = 55
-EXPECTED_SEGMENTS = 1860
-EXPECTED_VIAS = 172
+EXPECTED_UNCONNECTED_ITEMS = 53
+EXPECTED_SEGMENTS = 1869
+EXPECTED_VIAS = 176
 BOARD_ONLY_FOOTPRINTS = {f"H{index}" for index in range(1, 9)}
 ALLOWED_VIOLATIONS = Counter(
     {
@@ -26,7 +26,7 @@ ALLOWED_VIOLATIONS = Counter(
         "padstack": 2,
         "silk_edge_clearance": 2,
         "silk_overlap": 10,
-        "silk_over_copper": 25,
+        "silk_over_copper": 22,
         "nonmirrored_text_on_back_layer": 1,
         "diff_pair_uncoupled_length_too_long": 1,
     }
@@ -80,8 +80,8 @@ def validate_board_milestone() -> None:
     ):
         if token not in board_text:
             fail(f"LB-100 controlled layout is missing {token}")
-    if board_text.count("\n\t(footprint ") != 108:
-        fail("LB-100 placement must contain 100 schematic footprints and eight mounting holes")
+    if board_text.count("\n\t(footprint ") != 107:
+        fail("LB-100 placement must contain 99 schematic footprints and eight mounting holes")
     if board_text.count("\n\t(segment ") != EXPECTED_SEGMENTS:
         fail(f"LB-100 routing milestone must contain {EXPECTED_SEGMENTS} segments")
     if board_text.count("\n\t(via ") != EXPECTED_VIAS:
@@ -162,7 +162,7 @@ def main() -> int:
     validate_drc()
     print(
         "LB-100 controlled routing validation passed "
-        f"(100 schematic footprints, 8 mounting holes, {EXPECTED_SEGMENTS} segments, "
+        f"(99 schematic footprints, 8 mounting holes, {EXPECTED_SEGMENTS} segments, "
         f"{EXPECTED_VIAS} vias, {EXPECTED_UNCONNECTED_ITEMS} connections open; "
         "no shorts, crossings, or copper-clearance violations)."
     )

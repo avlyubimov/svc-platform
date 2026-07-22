@@ -140,7 +140,6 @@ def validate_lb(netlist: Netlist, library_dir: Path) -> list[str]:
     require_component(netlist, "R20", "100k 1% MCU UART idle pull-up", "LB100:R_C_0603_1608Metric", failures)
     require_component(netlist, "R21", "100k 1% reset default assert", "LB100:R_C_0603_1608Metric", failures)
     require_component(netlist, "R22", "100k 1% MCU UART idle pull-up", "LB100:R_C_0603_1608Metric", failures)
-    require_component(netlist, "D18", "ESD2CANFD24DBZRQ1", "LB100:SOT-23-3_DBZ_TI", failures)
     for ref in ("D19", "D20"):
         require_component(netlist, ref, "BZT52H-B4V3-Q", "LB100:SOD-123F_L2.6-W1.6", failures)
     require_component(netlist, "R23", "4.7k 1% FOG_A dry-contact series", "LB100:R_C_0603_1608Metric", failures)
@@ -151,13 +150,13 @@ def validate_lb(netlist: Netlist, library_dir: Path) -> list[str]:
     require_component(netlist, "C36", "47nF 50V X7R FOG_B filter", "LB100:R_C_0603_1608Metric", failures)
     require_net(netlist, "LB_3V3_MAIN", {("R20", "1"), ("R22", "1")}, failures, exact=False)
     require_net(netlist, "LB_3V3_IO", {("R26", "1"), ("R30", "1"), ("U18", "5"), ("U19", "5")}, failures, exact=False)
-    require_net(netlist, "FOG_A_SW_IN", {("JPB1", "82"), ("D18", "1"), ("R23", "1"), ("R24", "1")}, failures)
-    require_net(netlist, "FOG_B_SW_IN", {("JPB1", "83"), ("D18", "2"), ("R27", "1"), ("R28", "1")}, failures)
+    require_net(netlist, "FOG_A_SW_IN", {("JPB1", "82"), ("R23", "1"), ("R24", "1")}, failures)
+    require_net(netlist, "FOG_B_SW_IN", {("JPB1", "83"), ("R27", "1"), ("R28", "1")}, failures)
     require_net(netlist, "FOG_A_FILTERED", {("R23", "2"), ("R26", "2"), ("C35", "1"), ("D19", "1"), ("Q18", "3"), ("U18", "2")}, failures)
     require_net(netlist, "FOG_B_FILTERED", {("R27", "2"), ("R30", "2"), ("C36", "1"), ("D20", "1"), ("Q19", "3"), ("U19", "2")}, failures)
     require_net(netlist, "FOG_A_SW_IN_MCU", {("U1", "67"), ("U18", "4")}, failures)
     require_net(netlist, "FOG_B_SW_IN_MCU", {("U1", "68"), ("U19", "4")}, failures)
-    require_net(netlist, "GND", {("D18", "3"), ("C35", "2"), ("C36", "2"), ("D19", "2"), ("D20", "2"), ("U18", "3"), ("U19", "3")}, failures, exact=False)
+    require_net(netlist, "GND", {("C35", "2"), ("C36", "2"), ("D19", "2"), ("D20", "2"), ("U18", "3"), ("U19", "3")}, failures, exact=False)
 
     mf_pins = {
         ("JPB1", "MF_A_PIN1_51_END"),

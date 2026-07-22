@@ -4,7 +4,7 @@ PB-EVT-FAB-002,Connectivity and rules,Open,Zero DRC unconnected and schematic-bo
 PB-EVT-FAB-003,40 A copper and vias,Open,Routed input return fuse connector MOSFET via and plane current-density temperature-rise and margin estimates,Do not order EVT boards
 PB-EVT-FAB-004,Shunt and telemetry,Open,Kelvin 0.5 mOhm shunt INA228 I2C IIN_SENSE and ten ADC-safe RC-filtered IMON paths reviewed,Do not order EVT boards
 PB-EVT-FAB-005,Protection loop,Open,Routed LM74930 Q1 Q2 gate-resistor TVS and return-loop parasitic estimate plus test-point and thermocouple access review,Do not order EVT boards
-PB-EVT-FAB-006,Connector and dual FOG interface,Open,Micro-Fit 2.0 mm board fit disposition plus sealed DTM04-3P/DTM06-3S pin order SW_GND FOG_A_SW_IN FOG_B_SW_IN offline button measurement and independent ESD EMI series clamp return-path review,Do not order EVT boards or finalize external loom
+PB-EVT-FAB-006,Connector and dual FOG interface,Open,Micro-Fit 2.0 mm board fit disposition plus sealed DTM04-3P/DTM06-3S pin order SW_COMMON FOG_A_SW_IN FOG_B_SW_IN offline button measurement mutually exclusive GND/SW_12V_FUSED common population and PB cable-entry D_FOG1 pulse/return-path review,Do not order EVT boards or finalize external loom
 PB-EVT-FAB-007,Safety and instrumentation,Open,Current limit main fuse discharge emergency stop remote operation rated probes instruments and controlled surge fixture accepted,Do not energize or order the EVT package
 PB-EVT-FAB-008,Manufacturability,Open,JLCPCB or PCBWay stackup DFM assembly inspection DNP and five-unit serial-package review,Do not set EVT-FAB-AUTHORIZED
 PB-EVT-FAB-009,Review authority,Open,Codex technical review and Product Owner approval recorded; no second developer required,Do not set EVT-FAB-AUTHORIZED

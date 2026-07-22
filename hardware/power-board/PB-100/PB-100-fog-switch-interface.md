@@ -17,21 +17,26 @@ Use a sealed TE Connectivity DEUTSCH DTM three-position pair
 
 | Contact | Signal | Function |
 |---:|---|---|
-| 1 | `SW_GND` | Assumed common dry-contact return |
+| 1 | `SW_COMMON` | Unverified common; assembly-selectable `GND` or `SW_12V_FUSED` |
 | 2 | `FOG_A_SW_IN` | User request for configured pair A, reference OUT3/OUT4 |
 | 3 | `FOG_B_SW_IN` | User request for configured pair B, reference OUT6/OUT7 |
 
-PB-100 carries `FOG_A_SW_IN` on JPB1 pin 82 and `FOG_B_SW_IN` on pin 83.
+The sealed DTM pair terminates through a short enclosure pigtail on PB-100
+`JFOG1`. PB-100 carries `FOG_A_SW_IN` on JPB1 pin 82 and `FOG_B_SW_IN` on pin 83.
 LB-100 binds the protected logic outputs to STM32H563 PA8 and PA9 respectively.
 Neither external wire reaches an MCU pin directly.
 
-## Selected protection circuit
+## Selected ESD/EMI protection circuit
 
-The two channels are electrically independent after the shared dual raw-line
-ESD/EMI protector:
+The two channels are electrically independent after the shared PB-side primary
+cable-entry protector:
 
-- `D18`: TI `ESD2CANFD24DBZRQ1`, AEC-Q101, SOT-23, ±24 V working voltage,
+- PB `D_FOG1`: TI `ESD2CANFD24DBZRQ1`, AEC-Q101, SOT-23, ±24 V working voltage,
   ISO 10605 automotive ESD protection and 3.5 A 8/20 us surge capability.
+- PB `R_FOG_GND`: default zero-ohm link from `SW_COMMON` to `GND`.
+- PB `R_FOG_12V` and `F_FOG_12V`: mutually exclusive DNP link and
+  `nanoASMDC010F` 0.10 A/60 V automotive PPTC source from `VBAT_PROT` to
+  `SW_12V_FUSED` for a measured active-high switch only.
 - `R23`/`R27`: individual 4.7 kOhm 1% dry-contact series resistors.
 - `R26`/`R30`: individual 47 kOhm 1% pull-ups to `LB_3V3_IO`.
 - `C35`/`C36`: individual 47 nF X7R filters.
@@ -46,7 +51,7 @@ ESD/EMI protector:
 With a closed dry contact, the worst nominal divider level is
 `3.3 V * 4.7 kOhm / (47 kOhm + 4.7 kOhm) = 0.30 V`. The input time constants
 are approximately 0.22 ms when pulled low and 2.21 ms when released; the 50 ms
-firmware debounce is intentionally dominant. At the 37 V representative D18
+firmware debounce is intentionally dominant. At the 37 V representative D_FOG1
 clamp point, the 4.7 kOhm resistor limits the 4.3 V clamp current to about
 6.9 mA and the zener dissipation to about 30 mW. These calculations do not
 replace routed-board ISO pulse and ground-return review at `EVT-FAB-REVIEW`.
@@ -67,8 +72,8 @@ protected transistor path may be populated without changing the PCB.
 
 | Variant | Fit | DNP | Electrical result |
 |---|---|---|---|
-| `FOG_DRY_CONTACT` default | R23, R27 | R24, R25, R28, R29, Q18, Q19 | Each contact closes its raw input to `SW_GND`; open wire is OFF |
-| `FOG_12V_ACTIVE_HIGH` alternate | R24, R25, R28, R29, Q18, Q19 | R23, R27 | 12 V drives a `BC847BQ-7-F`; its collector creates the same active-low filtered logic |
+| `FOG_DRY_CONTACT` default | PB D_FOG1/R_FOG_GND; LB R23/R27 | PB R_FOG_12V/F_FOG_12V; LB R24/R25/R28/R29/Q18/Q19 | Each contact closes its raw input through `SW_COMMON` to `GND`; open wire is OFF |
+| `FOG_12V_ACTIVE_HIGH` alternate | PB D_FOG1/R_FOG_12V/F_FOG_12V; LB R24/R25/R28/R29/Q18/Q19 | PB R_FOG_GND; LB R23/R27 | `SW_COMMON` receives `SW_12V_FUSED`; 12 V drives a `BC847BQ-7-F`, whose collector creates the same active-low filtered logic |
 
 The 12 V option uses 47 kOhm base resistors and 100 kOhm base-emitter
 pull-downs. At 12 V, base current is approximately 0.24 mA while collector
@@ -78,7 +83,8 @@ collector rating for its specified 8/20 us condition. A 12 V switch must use a
 fused, reviewed vehicle source; this option is not authorization to connect an
 unknown illuminated switch.
 
-Do not fit `R23` with `R24/R25/Q18`, or `R27` with `R28/R29/Q19`. The selected
+Do not fit PB `R_FOG_GND` together with `R_FOG_12V`, fit `R23` with
+`R24/R25/Q18`, or fit `R27` with `R28/R29/Q19`. The selected
 variant must be recorded in the assembly BOM and inspected before power. The
 two channels may not use undocumented mixed variants.
 
