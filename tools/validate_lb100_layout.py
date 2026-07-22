@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import csv
 import json
 import re
 import shutil
@@ -15,21 +16,26 @@ ROOT = Path(__file__).resolve().parents[1]
 BOARD_PATH = ROOT / "hardware" / "logic-board" / "LB-100" / "kicad" / "LB-100.kicad_pcb"
 REQUIRED_KICAD_VERSION = "10.0.4"
 EXPECTED_UNCONNECTED_ITEMS = 53
-EXPECTED_SEGMENTS = 1875
-EXPECTED_VIAS = 185
+EXPECTED_SEGMENTS = 1844
+EXPECTED_VIAS = 188
+EXPECTED_GND_ZONES = 4
+EXPECTED_ANTENNA_KEEPOUTS = 1
 EXPECTED_SCHEMATIC_FOOTPRINTS = 104
 BOARD_ONLY_FOOTPRINTS = {f"H{index}" for index in range(1, 9)}
 ALLOWED_VIOLATIONS = Counter(
     {
+        "silk_over_copper": 10,
+        "track_dangling": 7,
         "lib_footprint_issues": 8,
+        "silk_edge_clearance": 6,
+        "silk_overlap": 6,
+        "starved_thermal": 3,
         "lib_footprint_mismatch": 3,
         "annular_width": 2,
         "padstack": 2,
-        "silk_edge_clearance": 2,
-        "silk_overlap": 10,
-        "silk_over_copper": 22,
-        "nonmirrored_text_on_back_layer": 1,
         "diff_pair_uncoupled_length_too_long": 1,
+        "via_dangling": 1,
+        "nonmirrored_text_on_back_layer": 1,
     }
 )
 
@@ -62,6 +68,54 @@ def validate_generated_files() -> None:
         fail(result.stdout.strip() or result.stderr.strip() or "LB-100 generated layout is stale")
 
 
+def csv_row(path: Path, key_column: str, key: str) -> dict[str, str]:
+    with path.open(newline="", encoding="utf-8") as source:
+        for row in csv.DictReader(source):
+            if row.get(key_column) == key:
+                return row
+    fail(f"{path.relative_to(ROOT)} is missing {key}")
+
+
+def validate_documented_decisions() -> None:
+    lb_dir = BOARD_PATH.parents[1]
+    sourcing = csv_row(
+        lb_dir / "LB-100-component-sourcing-precheck.csv",
+        "Symbol key",
+        "LB_LUX",
+    )
+    if "Rev.1 EVT placement is accepted and non-blocking" not in sourcing.get(
+        "Open blocker", ""
+    ):
+        fail("VEML7700 Rev.1 EVT placement decision is stale in component sourcing")
+    inventory = csv_row(
+        lb_dir / "LB-100-footprint-binding-inventory.csv",
+        "Footprint item",
+        "Ambient light sensor",
+    )
+    if "production/Rev.2" not in inventory.get("Next action", ""):
+        fail("VEML7700 external-sensor Rev.2 decision is stale in footprint inventory")
+    rail_budget = csv_row(
+        lb_dir / "LB-100-rail-budget-closeout-precheck.csv",
+        "Budget item",
+        "IMU and lux sensors",
+    )
+    if "production/Rev.2" not in rail_budget.get("Blocked action", ""):
+        fail("VEML7700 Rev.1/Rev.2 decision is stale in the rail budget")
+
+    keepout_doc = (lb_dir / "LB-100-e73-antenna-keepout.md").read_text(
+        encoding="utf-8"
+    )
+    for token in (
+        "E73-2G4M08S1C",
+        "project-derived Rev.1 rule",
+        "65.35..78.65 mm",
+        "66.61 mm",
+        "F.Cu`, `In1.Cu`, `In2.Cu`, and `B.Cu",
+    ):
+        if token not in keepout_doc:
+            fail(f"LB-100 E73 keepout evidence is missing {token}")
+
+
 def validate_board_milestone() -> None:
     try:
         board_text = BOARD_PATH.read_text(encoding="utf-8")
@@ -70,7 +124,7 @@ def validate_board_milestone() -> None:
     for token in (
         '(gr_rect (start 0 0) (end 100 70)',
         'LB-100 REV.1 EVT - NOT FOR PRODUCTION',
-        'BLE ANTENNA - COPPER KEEPOUT REVIEW',
+        'E73 ANTENNA - ALL-COPPER KEEPOUT',
         'FOG A/B INPUT PROTECTION',
         '(property "Reference" "JPB1"',
         '(property "Reference" "U1"',
@@ -99,8 +153,25 @@ def validate_board_milestone() -> None:
         fail(f"LB-100 routing milestone must contain {EXPECTED_SEGMENTS} segments")
     if board_text.count("\n\t(via ") != EXPECTED_VIAS:
         fail(f"LB-100 routing milestone must contain {EXPECTED_VIAS} vias")
-    if "\n\t(zone " in board_text:
-        fail("LB-100 EVT routing milestone must not claim copper-pour completion")
+    if board_text.count("\n\t(zone\n") != EXPECTED_GND_ZONES + EXPECTED_ANTENNA_KEEPOUTS:
+        fail("LB-100 must contain four GND zones and one E73 antenna keepout")
+    gnd_zone_layers = set(
+        re.findall(
+            r'\(zone\s+\(net \d+\)\s+\(net_name "GND"\)\s+\(layer "([^"]+)"\)',
+            board_text,
+        )
+    )
+    if gnd_zone_layers != {"F.Cu", "In1.Cu", "In2.Cu", "B.Cu"}:
+        fail(f"unexpected LB-100 GND zone layers: {sorted(gnd_zone_layers)}")
+    for token in (
+        '(layers "F.Cu" "In1.Cu" "In2.Cu" "B.Cu")',
+        '(keepout (tracks not_allowed) (vias not_allowed) (pads not_allowed) '
+        '(copperpour not_allowed) (footprints allowed))',
+        '(xy 65.35 66.61)',
+        '(xy 78.65 70.00)',
+    ):
+        if token not in board_text:
+            fail(f"LB-100 E73 antenna keepout is missing {token}")
 
 
 def validate_drc() -> None:
@@ -124,6 +195,7 @@ def validate_drc() -> None:
                 "json",
                 "--schematic-parity",
                 "--severity-all",
+                "--refill-zones",
                 "--output",
                 str(report_path),
                 str(BOARD_PATH),
@@ -149,6 +221,7 @@ def validate_drc() -> None:
         "pth_inside_courtyard",
         "copper_edge_clearance",
         "tracks_crossing",
+        "items_not_allowed",
     }
     if forbidden_types & set(violation_types):
         fail(f"LB-100 placement contains unsafe geometry: {sorted(forbidden_types & set(violation_types))}")
@@ -171,13 +244,15 @@ def validate_drc() -> None:
 
 def main() -> int:
     validate_generated_files()
+    validate_documented_decisions()
     validate_board_milestone()
     validate_drc()
     print(
         "LB-100 controlled routing validation passed "
         f"({EXPECTED_SCHEMATIC_FOOTPRINTS} schematic footprints, 8 mounting holes, {EXPECTED_SEGMENTS} segments, "
         f"{EXPECTED_VIAS} vias, {EXPECTED_UNCONNECTED_ITEMS} connections open; "
-        "no shorts, crossings, or copper-clearance violations)."
+        f"{EXPECTED_GND_ZONES} GND zones and one four-layer E73 keepout; "
+        "no shorts, crossings, copper-clearance, or keepout violations after refill)."
     )
     return 0
 

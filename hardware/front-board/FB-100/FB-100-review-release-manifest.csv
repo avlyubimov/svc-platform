@@ -16,6 +16,7 @@ hardware/logic-board/LB-100/LB-100-requirements.md,Interface,LB-100 host interfa
 docs/production/component-family-shortlist.md,Production,Initial component families,Required,Document reviewed,Ready
 hardware/front-board/FB-100/FB-100-interface-pinout-closeout.csv,Interface,JFB1 24-pin FFC pinout closeout,Required,validate_board_order,Ready
 hardware/front-board/FB-100/FB-100-usb-service-closeout-precheck.csv,USB,USB service no-back-power closeout,Required,validate_board_order,Ready
+hardware/front-board/FB-100/FB-100-usb-dfm-review-2026-07-22.md,USB,Controlled impedance precheck return-via and JFB1 orientation review,Required,validate_fb100_layout,Conditional
 hardware/front-board/FB-100/FB-100-ui-control-closeout-precheck.csv,UI,Role-free UI controls closeout,Required,validate_board_order,Ready
 hardware/front-board/FB-100/FB-100-mechanical-envelope-precheck.csv,Mechanical,Mechanical envelope closeout,Required,validate_board_order,Ready
 hardware/front-board/FB-100/FB-100-component-decision-record.md,Engineering,FB active component decision record,Required,validate_board_schematics,Closed

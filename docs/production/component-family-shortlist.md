@@ -39,7 +39,7 @@ order.
 | FRAM | Fujitsu/Infineon MB85 I2C/SPI FRAM | Cypress/Infineon Excelon FRAM | SOIC/TSSOP/DFN | Configuration and black-box storage |
 | RTC | Microchip MCP7940 class | NXP PCF8523/PCF8563; DS3231 class | SOIC/TSSOP/DFN/module | Prefer low-IQ SMD IC over hobby module |
 | IMU | Bosch BMI270/BMI323 | TDK ICM-42688 class | LGA | Optional for Rev.1 if layout risk is high |
-| Ambient light | Vishay VEML7700 | TI OPT3001 | SMD optical | Placement and window design required |
+| Ambient light | Vishay VEML7700 | TI OPT3001 | SMD optical | Rev.1 LB placement accepted for EVT; external/window placement moves to production/Rev.2 |
 
 ## PB-100 power-path candidates
 

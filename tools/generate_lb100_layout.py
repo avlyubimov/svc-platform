@@ -49,7 +49,9 @@ PLACEMENTS = {
     "U4": Placement(28.0, 10.0, 90),
     "U5": Placement(42.0, 10.0, 90),
     "U6": Placement(56.0, 10.0, 90),
-    "U7": Placement(70.5, 62.0, 90),
+    # Antenna end faces the +Y board edge. Ebyte drawing: terminal 3.97 mm
+    # of the 13 x 18 mm module is the ceramic-antenna end.
+    "U7": Placement(72.0, 59.0, 0),
     "U8": Placement(68.0, 27.0, 90),
     "U9": Placement(69.0, 42.0, 90),
     "U10": Placement(65.0, 35.0, 90),
@@ -85,7 +87,7 @@ PLACEMENTS = {
     "R6": Placement(56.0, 54.0),
     "R7": Placement(59.0, 54.0),
     "R8": Placement(62.0, 54.0),
-    "R9": Placement(80.0, 52.0),
+    "R9": Placement(82.0, 63.0),
     "R10": Placement(78.0, 14.0),
     "R11": Placement(78.0, 17.0),
     "R12": Placement(78.0, 20.0),
@@ -107,9 +109,9 @@ PLACEMENTS = {
     "R18": Placement(88.0, 49.0),
     "R19": Placement(92.0, 49.0),
     "R20": Placement(68.0, 49.0, 90),
-    "R21": Placement(68.0, 52.0, 90),
+    "R21": Placement(61.0, 64.0),
     "R22": Placement(50.0, 55.0, 90),
-    "C32": Placement(76.0, 52.0),
+    "C32": Placement(80.0, 52.0),
     "C33": Placement(96.0, 53.0),
     "C34": Placement(88.0, 62.0),
     "R23": Placement(44.0, 58.0),
@@ -254,7 +256,7 @@ def board_graphics() -> list[str]:
         ("mcu-zone", 28, 18, 58, 48, "Cmts.User", "dash"),
         ("power-zone", 10, 22, 30, 48, "Cmts.User", "dash"),
         ("microsd-zone", 82, 8, 100, 28, "Cmts.User", "dash"),
-        ("ble-zone", 72, 48, 100, 70, "Cmts.User", "dash"),
+        ("ble-zone", 65.3, 52, 81.5, 70, "Cmts.User", "dash"),
         ("imu-zone", 58, 28, 72, 42, "Cmts.User", "dash"),
         ("lux-zone", 60, 55, 74, 65, "Cmts.User", "dash"),
         ("service-zone", 20, 0, 80, 12, "Cmts.User", "dash"),
@@ -266,13 +268,64 @@ def board_graphics() -> list[str]:
     graphics.extend(
         [
             f'\t(gr_text "LB-100 REV.1 EVT - NOT FOR PRODUCTION" (at 30 68 0) (layer "F.SilkS") (uuid "{layout_uid("board-label")}") (effects (font (size 1 1) (thickness 0.16))))',
-            f'\t(gr_text "BLE ANTENNA - COPPER KEEPOUT REVIEW" (at 86 66 0) (layer "Cmts.User") (uuid "{layout_uid("ble-label")}") (effects (font (size 0.7 0.7) (thickness 0.12))))',
+            f'\t(gr_text "E73 ANTENNA - ALL-COPPER KEEPOUT" (at 72 68 0) (layer "Cmts.User") (uuid "{layout_uid("ble-label")}") (effects (font (size 0.7 0.7) (thickness 0.12))))',
             f'\t(gr_text "MICROSD ACCESS" (at 91 7 0) (layer "Cmts.User") (uuid "{layout_uid("sd-label")}") (effects (font (size 0.8 0.8) (thickness 0.12))))',
             f'\t(gr_text "SERVICE / EXPANSION" (at 50 2 0) (layer "Cmts.User") (uuid "{layout_uid("service-label")}") (effects (font (size 0.8 0.8) (thickness 0.12))))',
             f'\t(gr_text "FOG A/B INPUT PROTECTION" (at 74 67 0) (layer "F.SilkS") (uuid "{layout_uid("fog-label")}") (effects (font (size 0.8 0.8) (thickness 0.12))))',
         ]
     )
     return graphics
+
+
+def ground_zones(net_codes: dict[str, int]) -> list[str]:
+    zones = []
+    for layer in ("F.Cu", "In1.Cu", "In2.Cu", "B.Cu"):
+        zones.append(
+            f'''\t(zone
+\t\t(net {net_codes["GND"]})
+\t\t(net_name "GND")
+\t\t(layer "{layer}")
+\t\t(uuid "{layout_uid("zone", layer, "GND")}")
+\t\t(hatch edge 0.5)
+\t\t(connect_pads (clearance 0.2))
+\t\t(min_thickness 0.15)
+\t\t(fill yes (thermal_gap 0.2) (thermal_bridge_width 0.3))
+\t\t(polygon
+\t\t\t(pts
+\t\t\t\t(xy 0.5 0.5)
+\t\t\t\t(xy 99.5 0.5)
+\t\t\t\t(xy 99.5 69.5)
+\t\t\t\t(xy 0.5 69.5)
+\t\t\t)
+\t\t)
+\t)'''
+        )
+    return zones
+
+
+def e73_antenna_keepout() -> str:
+    # U7 is at (72, 59), 0 degrees. Pad 1/43 copper ends at local y=7.46;
+    # the no-copper boundary starts 0.15 mm beyond it and covers the ceramic
+    # antenna end to the board edge. The X bounds include 0.15 mm tolerance.
+    return f'''\t(zone
+\t\t(net 0)
+\t\t(net_name "")
+\t\t(layers "F.Cu" "In1.Cu" "In2.Cu" "B.Cu")
+\t\t(uuid "{layout_uid("e73", "antenna", "keepout")}")
+\t\t(hatch edge 0.5)
+\t\t(connect_pads (clearance 0))
+\t\t(min_thickness 0.15)
+\t\t(keepout (tracks not_allowed) (vias not_allowed) (pads not_allowed) (copperpour not_allowed) (footprints allowed))
+\t\t(fill yes (thermal_gap 0.2) (thermal_bridge_width 0.3))
+\t\t(polygon
+\t\t\t(pts
+\t\t\t\t(xy 65.35 66.61)
+\t\t\t\t(xy 78.65 66.61)
+\t\t\t\t(xy 78.65 70.00)
+\t\t\t\t(xy 65.35 70.00)
+\t\t\t)
+\t\t)
+\t)'''
 
 
 def routed_copper(net_codes: dict[str, int]) -> list[str]:
@@ -355,6 +408,8 @@ def render_board() -> str:
     ):
         lines.append(mounting_hole(reference, x_mm, y_mm, shared))
     lines.extend(routed_copper(net_codes))
+    lines.extend(ground_zones(net_codes))
+    lines.append(e73_antenna_keepout())
     lines.extend(board_graphics())
     lines.append(")")
     return "\n".join(lines) + "\n"

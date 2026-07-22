@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "can_log.h"
+#include "can_log_queue.h"
 
 #define SVC_CAN_LOG_RECORD_SIZE 40U
 #define SVC_CAN_LOG_RECORD_FORMAT_VERSION 1U
@@ -46,7 +46,7 @@ void svc_can_log_persistence_init(
 
 svc_can_log_persist_status_t svc_can_log_persist_can1(
     svc_can_log_persistence_t *persistence,
-    svc_can_log_t *log,
+    svc_can1_log_queue_t *queue,
     size_t max_records,
     size_t *persisted_records);
 

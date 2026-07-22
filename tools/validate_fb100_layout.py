@@ -21,11 +21,16 @@ BOARD_PATH = KICAD_DIR / "FB-100.kicad_pcb"
 REQUIRED_KICAD_VERSION = "10.0.4"
 EXPECTED_UNCONNECTED_ITEMS = 0
 EXPECTED_SEGMENTS = 457
-EXPECTED_VIAS = 45
+EXPECTED_VIAS = 48
 EXPECTED_ZONES = 4
 EXPECTED_LOCAL_OVERRIDES = {"J1", "JFB1"}
 EXPECTED_BOARD_ONLY_FOOTPRINTS = {"H1", "H2", "H3", "H4"}
 MAX_USB_DATA_SKEW_MM = 0.10
+USB_TRACE_WIDTH_MM = 0.154
+USB_TRACE_GAP_MM = 0.2032
+USB_REFERENCE_HEIGHT_MM = 0.0994
+USB_OUTER_COPPER_MM = 0.035
+USB_PREPREG_ER = 4.1
 
 
 def fail(message: str) -> None:
@@ -122,10 +127,15 @@ def validate_board_milestone() -> None:
 def validate_usb_geometry() -> None:
     lengths: dict[str, float] = {}
     controlled_segments: dict[str, dict[str, str]] = {}
+    ground_vias: list[tuple[float, float]] = []
     with (KICAD_DIR / "FB-100-routing.csv").open(
         newline="", encoding="utf-8"
     ) as routing_file:
         for row in csv.DictReader(routing_file):
+            if row["kind"] == "via" and row["net"] == "GND":
+                ground_vias.append(
+                    (float(row["start_x_mm"]), float(row["start_y_mm"]))
+                )
             if row["kind"] != "segment":
                 continue
             start_x = float(row["start_x_mm"])
@@ -144,7 +154,9 @@ def validate_usb_geometry() -> None:
     if set(controlled_segments) != {"USB_D_P", "USB_D_N"}:
         fail("FB-100 must have one long controlled B.Cu segment per USB polarity")
     for net_name, row in controlled_segments.items():
-        if not math.isclose(float(row["width_mm"]), 0.154, abs_tol=0.0005):
+        if not math.isclose(
+            float(row["width_mm"]), USB_TRACE_WIDTH_MM, abs_tol=0.0005
+        ):
             fail(f"{net_name} controlled segment is not 0.154 mm wide")
         if not math.isclose(
             float(row["start_y_mm"]), float(row["end_y_mm"]), abs_tol=1e-9
@@ -154,12 +166,46 @@ def validate_usb_geometry() -> None:
         float(controlled_segments["USB_D_P"]["start_y_mm"])
         - float(controlled_segments["USB_D_N"]["start_y_mm"])
     )
-    edge_gap = center_spacing - 0.154
-    if not math.isclose(edge_gap, 0.2032, abs_tol=0.0005):
+    edge_gap = center_spacing - USB_TRACE_WIDTH_MM
+    if not math.isclose(edge_gap, USB_TRACE_GAP_MM, abs_tol=0.0005):
         fail(f"FB-100 USB controlled edge gap changed to {edge_gap:.4f} mm")
     skew = abs(lengths["USB_D_P"] - lengths["USB_D_N"])
     if skew > MAX_USB_DATA_SKEW_MM:
         fail(f"FB-100 USB routed skew {skew:.4f} mm exceeds {MAX_USB_DATA_SKEW_MM:.2f} mm")
+
+    # IPC-style edge-coupled microstrip estimate used only as a regression
+    # guard. Supplier field-solver confirmation remains an EVT fab-review gate.
+    z0 = 87.0 / math.sqrt(USB_PREPREG_ER + 1.41) * math.log(
+        5.98 * USB_REFERENCE_HEIGHT_MM
+        / (0.8 * USB_TRACE_WIDTH_MM + USB_OUTER_COPPER_MM)
+    )
+    estimated_differential_ohms = 2.0 * z0 * (
+        1.0
+        - 0.48
+        * math.exp(-0.96 * USB_TRACE_GAP_MM / USB_REFERENCE_HEIGHT_MM)
+    )
+    if not 85.0 <= estimated_differential_ohms <= 100.0:
+        fail(
+            "FB-100 analytical USB impedance precheck changed to "
+            f"{estimated_differential_ohms:.1f} ohm"
+        )
+
+    transition_centres = (
+        (3.5, 17.75),
+        (13.5, 3.5),
+        (69.0, 3.0),
+        (73.0, 12.875),
+    )
+    for centre in transition_centres:
+        nearest_ground_via = min(
+            math.hypot(centre[0] - via[0], centre[1] - via[1])
+            for via in ground_vias
+        )
+        if nearest_ground_via > 4.0:
+            fail(
+                "FB-100 USB reference transition lacks a GND via within 4 mm "
+                f"at {centre}"
+            )
 
 
 def validate_drc() -> None:

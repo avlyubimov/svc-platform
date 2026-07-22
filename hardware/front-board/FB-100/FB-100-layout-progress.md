@@ -20,15 +20,17 @@ Status: `EVT-LAYOUT-AUTHORIZED` — connectivity routing complete; fab review op
 - Repositioned the USB ESD/passive cluster and RGB driver support parts to
   provide manufacturable fan-out without changing the outline, optical grid,
   USB panel datum, FFC datum, or mounting holes.
-- Routed every electrical connection with 457 straight segments and 45
+- Routed every electrical connection with 457 straight segments and 48
   through vias, then added one filled GND zone per copper layer. The routing is
   stored in `kicad/FB-100-routing.csv` and remains deterministic under CI
   regeneration.
-- KiCad 10.0.4 reports zero unconnected items, shorts, track crossings, and
-  copper-clearance violations. The remaining findings are explicitly open
-  fab-review work: USB differential gap/uncoupled length, five courtyard
-  overlaps, three silkscreen clips, the USB shell/route edge-entry exceptions,
-  and generated local connector overrides.
+- KiCad 10.0.4 reports zero unconnected items and zero DRC violations after
+  refill. A separate raw library audit accepts only the generated J1/JFB1
+  transforms. Three additional GND vias bound USB reference-layer transitions.
+- Locked the committed USB analytical precheck at 0.154 mm width, 0.2032 mm
+  edge gap, 0.0151 mm routed skew and approximately 91.5 ohm differential on
+  the selected 0.0994 mm 3313 reference spacing. Supplier field-solver
+  confirmation is still required.
 - Schematic parity is exact apart from H1-H4, which are board-only mechanical
   mounting holes.
 
@@ -36,19 +38,14 @@ Status: `EVT-LAYOUT-AUTHORIZED` — connectivity routing complete; fab review op
 
 - Review JFB1 mating-side/reverse FFC orientation against the future LB-100
   placement before any prototype package is authorized.
-- Route USB-C to D1 and D1 to JFB1 as a continuous referenced differential
-  pair with no avoidable stubs, at most 1.0 mm length mismatch, and stackup-
-  derived impedance confirmation.
-- Tune the routed USB pair for the selected stackup, continuous reference,
-  gap, impedance and length match; the current autorouted pair is connectivity
-  complete but intentionally not impedance-qualified.
-- Resolve the five courtyard overlaps and three silkscreen clips without
-  changing the frozen mechanical datums.
+- Submit the selected 1.6 mm/3313 stack, width and spacing to the actual PCB
+  supplier impedance calculator/field solver; the analytical precheck is not
+  manufacturing acceptance.
 - Review the routed CC, VBUS detect-only, RGB, buttons, OLED-DNP, indicator,
   power, ground, shield and ESD return paths together with the four filled GND
   zones; revise zone keepouts if the USB/no-back-power review requires it.
-- Complete placement clearance, silkscreen, courtyard, assembly-orientation,
-  DFM, and final DRC review.
+- Complete enclosure, cable, assembly-orientation and supplier DFM review; the
+  current KiCad DRC, courtyard and silkscreen check is clean.
 
 ## Release Boundary
 
