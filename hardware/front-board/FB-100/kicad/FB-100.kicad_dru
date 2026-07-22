@@ -10,11 +10,21 @@
     (condition "A.NetName == 'USB_D_P' || A.NetName == 'USB_D_N' || A.NetName == 'USB_D_P_CONN' || A.NetName == 'USB_D_N_CONN'")
     (constraint track_width (min 0.15mm) (opt 0.20mm) (max 0.30mm)))
 
-(rule "FB-100 USB differential gap"
+(rule "FB-100 USB 90-ohm pair width on B.Cu"
+    (layer "B.Cu")
     (condition "A.NetName == 'USB_D_P' || A.NetName == 'USB_D_N'")
-    (constraint diff_pair_gap (min 0.15mm) (opt 0.20mm) (max 0.30mm))
-    (constraint diff_pair_uncoupled (max 1.00mm)))
+    (constraint track_width (min 0.150mm) (opt 0.154mm) (max 0.158mm)))
+
+(rule "FB-100 USB differential gap"
+    (layer "B.Cu")
+    (condition "A.NetName == 'USB_D_P' || A.NetName == 'USB_D_N'")
+    (constraint diff_pair_gap (min 0.190mm) (opt 0.203mm) (max 0.350mm))
+    (constraint diff_pair_uncoupled (max 8.00mm)))
 
 (rule "FB-100 USB-C locator-hole clearance"
     (condition "A.Reference == 'J1' && B.Reference == 'J1'")
     (constraint hole_clearance (min 0.00mm)))
+
+(rule "FB-100 USB shell edge entry"
+    (condition "A.NetName == 'USB_SHIELD' || B.NetName == 'USB_SHIELD'")
+    (constraint edge_clearance (min -0.50mm)))

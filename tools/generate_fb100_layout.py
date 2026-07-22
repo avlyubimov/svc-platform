@@ -36,15 +36,15 @@ PLACEMENTS = {
     "D1": Placement(10.50, 17.50, 90),
     "R11": Placement(10.00, 11.50, 90),
     "R12": Placement(13.00, 11.50, 90),
-    "R13": Placement(14.00, 15.00),
-    "R14": Placement(16.00, 15.00),
-    "C1": Placement(17.00, 18.00),
+    "R13": Placement(14.00, 15.00, 90),
+    "R14": Placement(16.00, 15.00, 90),
+    "C1": Placement(15.00, 18.50, 90),
     "R15": Placement(3.00, 24.50),
     "C2": Placement(6.00, 24.50),
     "D2": Placement(12.00, 26.00),
     "U1": Placement(16.00, 26.00, 180),
-    "C3": Placement(22.00, 31.00, 90),
-    "C4": Placement(8.00, 28.00, 90),
+    "C3": Placement(22.00, 29.00, 90),
+    "C4": Placement(9.50, 28.00, 90),
     "C5": Placement(20.00, 28.50, 90),
     "R16": Placement(19.00, 23.00, 90),
     "J2": Placement(18.50, 9.00),
@@ -227,7 +227,11 @@ def render_footprint(component: Component, placement: Placement, net_codes: dict
         if re.search(r'\(attr\s+', text):
             text = re.sub(
                 r'\(attr\s+([^\)]*)\)',
-                lambda match: f'(attr {match.group(1).strip()} dnp)',
+                lambda match: (
+                    f'(attr {match.group(1).strip()})'
+                    if "dnp" in match.group(1).split()
+                    else f'(attr {match.group(1).strip()} dnp)'
+                ),
                 text,
                 count=1,
             )
@@ -295,10 +299,12 @@ def board_graphics() -> list[str]:
     ]
     for index in range(1, 11):
         channel_x_mm = 15.0 + index * 5.0
+        label_x_mm = channel_x_mm - 1.8 if index == 1 else channel_x_mm
+        label_y_mm = 28.7 if index == 1 else 29.7
         graphics.extend(
             [
                 f'\t(gr_circle (center {channel_x_mm:.2f} 26) (end {channel_x_mm + 3:.2f} 26) (stroke (width 0.12) (type dash)) (fill none) (layer "Cmts.User") (uuid "{layout_uid("optical", index)}"))',
-                f'\t(gr_text "CH{index}" (at {channel_x_mm:.2f} 29.7 0) (layer "F.SilkS") (uuid "{layout_uid("channel-label", index)}") (effects (font (size 0.8 0.8) (thickness 0.12))))',
+                f'\t(gr_text "CH{index}" (at {label_x_mm:.2f} {label_y_mm:.2f} 0) (layer "F.SilkS") (uuid "{layout_uid("channel-label", index)}") (effects (font (size 0.8 0.8) (thickness 0.12))))',
             ]
         )
     graphics.append(
@@ -351,6 +357,32 @@ def routed_copper(net_codes: dict[str, int]) -> list[str]:
     return copper
 
 
+def ground_zones(net_codes: dict[str, int]) -> list[str]:
+    zones = []
+    for layer in ("F.Cu", "In1.Cu", "In2.Cu", "B.Cu"):
+        zones.append(
+            f'''\t(zone
+\t\t(net {net_codes["GND"]})
+\t\t(net_name "GND")
+\t\t(layer "{layer}")
+\t\t(uuid "{layout_uid("zone", layer, "GND")}")
+\t\t(hatch edge 0.5)
+\t\t(connect_pads (clearance 0.2))
+\t\t(min_thickness 0.15)
+\t\t(fill yes (thermal_gap 0.2) (thermal_bridge_width 0.3))
+\t\t(polygon
+\t\t\t(pts
+\t\t\t\t(xy 0.5 0.5)
+\t\t\t\t(xy 79.5 0.5)
+\t\t\t\t(xy 79.5 34.5)
+\t\t\t\t(xy 0.5 34.5)
+\t\t\t)
+\t\t)
+\t)'''
+        )
+    return zones
+
+
 def render_board() -> str:
     schematic = build_fb()
     components = {component.ref: component for component in schematic.components}
@@ -379,7 +411,9 @@ def render_board() -> str:
         '\t(paper "A4")',
         "\t(layers",
         '\t\t(0 "F.Cu" signal)',
-        '\t\t(2 "B.Cu" signal)',
+        '\t\t(2 "In1.Cu" signal)',
+        '\t\t(4 "In2.Cu" power)',
+        '\t\t(6 "B.Cu" signal)',
         '\t\t(5 "F.SilkS" user "f.silkscreen")',
         '\t\t(7 "B.SilkS" user "b.silkscreen")',
         '\t\t(25 "Edge.Cuts" user)',
@@ -388,6 +422,23 @@ def render_board() -> str:
         '\t\t(29 "B.CrtYd" user "B.Courtyard")',
         "\t)",
         "\t(setup",
+        "\t\t(stackup",
+        '\t\t\t(layer "F.SilkS" (type "Top Silk Screen") (color "White"))',
+        '\t\t\t(layer "F.Paste" (type "Top Solder Paste"))',
+        '\t\t\t(layer "F.Mask" (type "Top Solder Mask") (color "Green") (thickness 0.01))',
+        '\t\t\t(layer "F.Cu" (type "copper") (thickness 0.035))',
+        '\t\t\t(layer "dielectric 1" (type "prepreg") (thickness 0.0994) (material "3313 RC57%") (epsilon_r 4.1) (loss_tangent 0.02))',
+        '\t\t\t(layer "In1.Cu" (type "copper") (thickness 0.0152))',
+        '\t\t\t(layer "dielectric 2" (type "core") (thickness 1.265) (material "FR4") (epsilon_r 4.6) (loss_tangent 0.02))',
+        '\t\t\t(layer "In2.Cu" (type "copper") (thickness 0.0152))',
+        '\t\t\t(layer "dielectric 3" (type "prepreg") (thickness 0.0994) (material "3313 RC57%") (epsilon_r 4.1) (loss_tangent 0.02))',
+        '\t\t\t(layer "B.Cu" (type "copper") (thickness 0.035))',
+        '\t\t\t(layer "B.Mask" (type "Bottom Solder Mask") (color "Green") (thickness 0.01))',
+        '\t\t\t(layer "B.Paste" (type "Bottom Solder Paste"))',
+        '\t\t\t(layer "B.SilkS" (type "Bottom Silk Screen") (color "White"))',
+        '\t\t\t(copper_finish "ENIG")',
+        "\t\t\t(dielectric_constraints yes)",
+        "\t\t)",
         "\t\t(pad_to_mask_clearance 0)",
         "\t\t(allow_soldermask_bridges_in_footprints no)",
         "\t\t(tenting (front yes) (back yes))",
@@ -410,6 +461,7 @@ def render_board() -> str:
     ):
         lines.append(mounting_hole(reference, x_mm, y_mm))
     lines.extend(routed_copper(net_codes))
+    lines.extend(ground_zones(net_codes))
     lines.extend(board_graphics())
     lines.append(")")
     return "\n".join(lines) + "\n"
@@ -428,14 +480,24 @@ def render_rules() -> str:
     (condition "A.NetName == 'USB_D_P' || A.NetName == 'USB_D_N' || A.NetName == 'USB_D_P_CONN' || A.NetName == 'USB_D_N_CONN'")
     (constraint track_width (min 0.15mm) (opt 0.20mm) (max 0.30mm)))
 
-(rule "FB-100 USB differential gap"
+(rule "FB-100 USB 90-ohm pair width on B.Cu"
+    (layer "B.Cu")
     (condition "A.NetName == 'USB_D_P' || A.NetName == 'USB_D_N'")
-    (constraint diff_pair_gap (min 0.15mm) (opt 0.20mm) (max 0.30mm))
-    (constraint diff_pair_uncoupled (max 1.00mm)))
+    (constraint track_width (min 0.150mm) (opt 0.154mm) (max 0.158mm)))
+
+(rule "FB-100 USB differential gap"
+    (layer "B.Cu")
+    (condition "A.NetName == 'USB_D_P' || A.NetName == 'USB_D_N'")
+    (constraint diff_pair_gap (min 0.190mm) (opt 0.203mm) (max 0.350mm))
+    (constraint diff_pair_uncoupled (max 8.00mm)))
 
 (rule "FB-100 USB-C locator-hole clearance"
     (condition "A.Reference == 'J1' && B.Reference == 'J1'")
     (constraint hole_clearance (min 0.00mm)))
+
+(rule "FB-100 USB shell edge entry"
+    (condition "A.NetName == 'USB_SHIELD' || B.NetName == 'USB_SHIELD'")
+    (constraint edge_clearance (min -0.50mm)))
 """
 
 
