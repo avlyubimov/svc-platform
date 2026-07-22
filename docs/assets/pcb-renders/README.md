@@ -1,8 +1,8 @@
 # Rev.1 EVT PCB Renders
 
-These top-side KiCad renders document the current `EVT-LAYOUT-AUTHORIZED`
-layout state. They are review aids only and do not authorize fabrication,
-assembly, ordering, or production use.
+These top- and bottom-side KiCad renders document the current
+`EVT-LAYOUT-AUTHORIZED` layout state. They are review aids only and do not
+authorize fabrication, assembly, ordering, or production use.
 
 | Board | Top | Bottom | Captured state |
 |---|---|---|---|
