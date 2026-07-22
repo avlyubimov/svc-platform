@@ -82,6 +82,8 @@ The schematic review packet consists of:
 - `hardware/power-board/PB-100/PB-100-b2b-interface-freeze-checklist.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-interface-closeout-precheck.csv`
 - `hardware/power-board/PB-100/PB-100-b2b-lb100-pin-binding-precheck.md`
+- `hardware/power-board/PB-100/PB-100-fog-switch-interface.md`
+- `docs/adr/ADR-0021-fog-switch-common-and-protection-ownership.md`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable.md`
 - `hardware/power-board/PB-100/PB-100-can1-tx-disable-trace.csv`
 - `hardware/power-board/PB-100/PB-100-can1-safety-verification.csv`

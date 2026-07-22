@@ -14,9 +14,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BOARD_PATH = ROOT / "hardware" / "power-board" / "PB-100" / "kicad" / "PB-100.kicad_pcb"
 REQUIRED_KICAD_VERSION = "10.0.4"
-EXPECTED_UNCONNECTED_ITEMS = 126
-EXPECTED_SEGMENTS = 84
-EXPECTED_VIAS = 8
+EXPECTED_UNCONNECTED_ITEMS = 127
+EXPECTED_SEGMENTS = 110
+EXPECTED_VIAS = 14
 BOARD_ONLY_FOOTPRINTS = {f"H{index}" for index in range(1, 9)}
 
 
@@ -67,10 +67,10 @@ def validate_board_milestone() -> None:
     ):
         if token not in board_text:
             fail(f"PB-100 controlled layout is missing {token}")
-    if board_text.count("\n\t(footprint ") != 36:
-        fail("PB-100 import must contain 28 footprint-bound schematic parts and eight mounting holes")
+    if board_text.count("\n\t(footprint ") != 41:
+        fail("PB-100 import must contain 33 footprint-bound schematic parts and eight mounting holes")
     if board_text.count("\n\t(segment ") != EXPECTED_SEGMENTS:
-        fail(f"PB-100 CAN1 routing milestone must contain {EXPECTED_SEGMENTS} segments")
+        fail(f"PB-100 CAN1 and FOG-entry routing milestone must contain {EXPECTED_SEGMENTS} segments")
     if board_text.count("\n\t(via ") != EXPECTED_VIAS:
         fail(f"PB-100 CAN1 routing milestone must contain {EXPECTED_VIAS} vias")
     if "\n\t(zone " in board_text:
@@ -111,7 +111,7 @@ def validate_drc() -> None:
         report = json.loads(report_path.read_text(encoding="utf-8"))
 
     violation_types = Counter(finding.get("type") for finding in report.get("violations", []))
-    if violation_types != Counter({"silk_over_copper": 11, "lib_footprint_issues": 8}):
+    if violation_types != Counter({"silk_over_copper": 14, "lib_footprint_issues": 8}):
         fail(f"unexpected PB-100 placement DRC findings: {dict(violation_types)}")
     if len(report.get("unconnected_items", [])) != EXPECTED_UNCONNECTED_ITEMS:
         fail("PB-100 unconnected count changed before complete schematic import and power routing")
@@ -135,7 +135,7 @@ def main() -> int:
     validate_drc()
     print(
         "PB-100 controlled partial import validation passed "
-        f"(28 footprint-bound parts, 8 mounting holes, CAN1 safety island routed with "
+        f"(33 footprint-bound parts, 8 mounting holes, CAN1 safety island and protected FOG entry routed with "
         f"{EXPECTED_SEGMENTS} segments and {EXPECTED_VIAS} vias; 46 missing footprints "
         "and all power routing remain fab blockers)."
     )

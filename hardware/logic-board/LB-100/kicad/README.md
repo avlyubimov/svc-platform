@@ -5,10 +5,10 @@ Status: `EVT-LAYOUT-AUTHORIZED`; controlled placement and first routing iteratio
 This directory contains the reviewed value-bearing LB-100 KiCad schematic and
 project-local symbol/footprint libraries.
 
-The controlled `LB-100.kicad_pcb` contains all 100 value-bearing schematic
+The controlled `LB-100.kicad_pcb` contains all 99 value-bearing schematic
 footprints, four shared stack holes, four local mounting holes, the reviewed
 100 mm x 70 mm outline and functional placement zones. The deterministic route
-manifest contains 1,860 segments and 172 vias, leaving 55 connections open with
+manifest contains 1,869 segments and 176 vias, leaving 53 connections open with
 no shorts, crossings, or copper-clearance violations. It is not a
 fabrication-ready board. ADR-0020 authorizes continued routing. Signal-integrity and safety constraints in
 `../LB-100-pcb-layout-start-checklist.csv` must close during

@@ -4,6 +4,9 @@
 
 Accepted — final Product Owner direction on 2026-07-22
 
+Fog-switch contact-1 naming and primary-protection ownership are amended by
+ADR-0021. All other decisions in this ADR remain active.
+
 ## Context
 
 The project must obtain board-level electrical, thermal, EMC, mechanical and
@@ -131,12 +134,17 @@ recorded on EVT hardware.
 ### Dual manual fog-light requests
 
 Amended by final Product Owner direction on 2026-07-22: replace the single
-request with `FOG_A_SW_IN`, `FOG_B_SW_IN` and common `SW_GND` for the owner's
+request with `FOG_A_SW_IN`, `FOG_B_SW_IN` and configurable common `SW_COMMON` for the owner's
 unverified double three-wire handlebar switch. JPB1 pins 82/83 bind through two
 independent protected LB paths to STM32H563 PA8/PA9. A sealed three-position
-DTM harness connector uses contact 1 `SW_GND`, contact 2 `FOG_A_SW_IN` and
+DTM harness connector uses contact 1 `SW_COMMON`, contact 2 `FOG_A_SW_IN` and
 contact 3 `FOG_B_SW_IN`; wire colors remain unassigned until offline
 multimeter measurement.
+
+Per ADR-0021 the default dry-contact assembly links `SW_COMMON` to `GND`; the
+mutually exclusive measured 12 V assembly links it to `SW_12V_FUSED`. PB-100
+owns the primary cable-entry suppressor, while LB-100 owns the independent
+series/RC/clamp/Schmitt logic paths.
 
 Each input has its own pull-up, series impedance, RC filter, voltage clamp,
 automotive Schmitt buffer, debounce and stuck-input diagnostic. The default

@@ -7,7 +7,7 @@ Connectors,Deutsch DT 2-pin sets,OUT3-OUT10 outputs with size 16 13A contact cla
 Connectors,Deutsch output connector sets,DTP class for OUT1/OUT2 and DT class for OUT3-OUT10,10,Garage,Core,Aggregate PB-100 output connector BOM mapping row
 Connectors,Deutsch DTM 4-pin sets,CAN/service,2,Garage,Core,CAN/inputs
 Connectors,Deutsch DTM 8-pin set,External inputs,1,Garage,Should,Buttons/ADC/pulse
-Connectors,Deutsch DTM 3-pin fog-switch set,TE DTM04-3P plus DTM06-3S with WM-3P WM-3S and matched size-20 contacts,1,Garage,Core,Pin 1 SW_GND pin 2 FOG_A_SW_IN pin 3 FOG_B_SW_IN; do not assign wire colors or finalize loom before offline switch measurement
+Connectors,Deutsch DTM 3-pin fog-switch set,TE DTM04-3P plus DTM06-3S with WM-3P WM-3S and matched size-20 contacts,1,Garage,Core,Pin 1 SW_COMMON pin 2 FOG_A_SW_IN pin 3 FOG_B_SW_IN; dry-contact common goes to GND and measured active-high common goes to SW_12V_FUSED; do not assign wire colors or finalize loom before offline switch measurement
 Tooling,Deutsch solid-contact crimp tool,HDT-48-00-class tool for size 12 size 16 and size 20 solid contacts,1,Garage,Core,Required before ordering partial DTP DT DTM kits; insertion/removal tool remains separate
 Fuses,Mini/ATO blade fuses,5/10/15/20A kit,1,Garage,Core,Per channel
 Fuses,Per-output fuse holders,MINI/ATO blade holder or enclosure fuse block class,10,Garage,Core,Final holder style depends on enclosure

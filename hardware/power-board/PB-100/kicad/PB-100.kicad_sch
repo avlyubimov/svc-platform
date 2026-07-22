@@ -6,16 +6,16 @@
   (title_block
     (title "PB-100 Power Board")
     (date "2026-06-30")
-    (rev "schematic-scaffold")
+    (rev "rev1-evt-layout")
     (company "SVC Platform")
     (comment 9 "Work queue: CAP-TOP. Top-level scaffold follows PB-100-schematic-capture-work-queue.csv.")
-    (comment 1 "Schematic scaffold only. PCB layout is blocked until schematic freeze.")
+    (comment 1 "EVT layout is authorized; fabrication remains blocked pending routed review.")
     (comment 2 "Follow ../PB-100-schematic-capture-plan.md and ../PB-100-net-naming.md.")
     (comment 3 "CAN1 TX remains DNP/open and hardware-disabled by default.")
     (comment 4 "Outputs are generic OUT1..OUT10; roles are configuration-only.")
   )
   (lib_symbols)
-  (text "PB-100 schematic scaffold only.\n\nDo not create PCB layout from this project until PB-100 schematic freeze is closed.\n\nPrimary inputs:\n- ../PB-100-schematic-capture-plan.md\n- ../PB-100-schematic-instance-plan.csv\n- ../PB-100-net-naming.md\n- ../PB-100-schematic-freeze-checklist.md\n- ../PB-100-kicad-sheet-manifest.csv"
+  (text "PB-100 Rev.1 EVT schematic capture.\n\nPlacement and routing are authorized under ADR-0020/ADR-0021. Manufacturing output remains blocked until EVT-FAB-AUTHORIZED.\n\nPrimary inputs:\n- ../PB-100-schematic-capture-plan.md\n- ../PB-100-schematic-instance-plan.csv\n- ../PB-100-net-naming.md\n- ../PB-100-schematic-freeze-checklist.md\n- ../PB-100-kicad-sheet-manifest.csv"
     (at 30 35 0)
     (effects
       (font
@@ -25,7 +25,7 @@
     )
     (uuid "2ad5c5cd-c3fc-4f7f-a924-8602c73b75bb")
   )
-  (text "Blocked in this scaffold:\n- PCB layout\n- Gerber generation\n- CAN1 TX enable path\n- Accessory role names in hardware nets"
+  (text "Current boundary:\n- EVT layout authorized\n- Gerber and ordering blocked\n- CAN1 TX enable path blocked\n- Accessory role names forbidden in hardware nets"
     (at 30 95 0)
     (effects
       (font
@@ -237,6 +237,36 @@
     )
     (property "Sheetfile" "sheets/can1-safety.kicad_sch"
       (at 145 186.59 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+    )
+  )
+  (sheet
+    (at 205 165)
+    (size 50 20)
+    (stroke
+      (width 0.1524)
+      (type solid)
+    )
+    (fill
+      (color 0 0 0 0.0000)
+    )
+    (uuid "970d666f-97e3-57b5-8c9a-923fd26fe3b7")
+    (property "Sheetname" "fog-switch-entry"
+      (at 205 163.73 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left bottom)
+      )
+    )
+    (property "Sheetfile" "sheets/fog-switch-entry.kicad_sch"
+      (at 205 186.59 0)
       (effects
         (font
           (size 1.27 1.27)

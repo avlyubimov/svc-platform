@@ -312,7 +312,7 @@
       "additionalProperties": false,
       "properties": {
         "input_signal": {"const": "FOG_A_SW_IN"},
-        "return_signal": {"const": "SW_GND"},
+        "return_signal": {"const": "SW_COMMON"},
         "behavior": {"enum": ["momentary_toggle", "maintained"]},
         "active_low": {"const": true},
         "debounce_ms": {"type": "integer", "minimum": 1},
@@ -333,7 +333,7 @@
       "additionalProperties": false,
       "properties": {
         "input_signal": {"const": "FOG_B_SW_IN"},
-        "return_signal": {"const": "SW_GND"},
+        "return_signal": {"const": "SW_COMMON"},
         "behavior": {"enum": ["momentary_toggle", "maintained"]},
         "active_low": {"const": true},
         "debounce_ms": {"type": "integer", "minimum": 1},

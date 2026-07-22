@@ -252,7 +252,7 @@
     "fog": {
       "pair_a": {
         "input_signal": "FOG_A_SW_IN",
-        "return_signal": "SW_GND",
+        "return_signal": "SW_COMMON",
         "behavior": "momentary_toggle",
         "active_low": true,
         "debounce_ms": 50,
@@ -265,7 +265,7 @@
       },
       "pair_b": {
         "input_signal": "FOG_B_SW_IN",
-        "return_signal": "SW_GND",
+        "return_signal": "SW_COMMON",
         "behavior": "momentary_toggle",
         "active_low": true,
         "debounce_ms": 50,

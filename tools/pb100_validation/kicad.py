@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sys
+
 from .common import (
     DISALLOWED_LAYOUT_NAME_FRAGMENTS,
     DISALLOWED_LAYOUT_SUFFIXES,
@@ -28,6 +30,19 @@ from .common import (
 
 
 def validate_kicad_scaffold() -> None:
+    generated_fog = subprocess.run(
+        [
+            sys.executable,
+            str(REPO_ROOT / "tools" / "generate_pb100_fog_entry_schematic.py"),
+            "--check",
+        ],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if generated_fog.returncode:
+        fail(generated_fog.stdout.strip() or generated_fog.stderr.strip() or "PB fog entry schematic is stale")
     json.loads(read_text(KICAD_DIR / "PB-100.kicad_pro"))
     for schematic_path in sorted(KICAD_DIR.rglob("*.kicad_sch")):
         validate_s_expression_balance(schematic_path)
@@ -228,6 +243,7 @@ def validate_can1_netlist_topology(kicad_cli: str, temp_dir: Path) -> None:
         nets[name] = {(node.get("ref", ""), node.get("pin", "")) for node in net.findall("node")}
 
     validate_input_power_netlist_topology(components, nets)
+    validate_fog_entry_netlist_topology(components, nets)
 
     exact_nets = {
         "CAN1_TX_ROUTE": {("JPB1", "70"), ("U_CAN1", "2")},
@@ -380,6 +396,53 @@ def validate_input_power_netlist_topology(components, nets) -> None:
     print("PB-100 active-cutoff and shunt topology passed")
 
 
+def validate_fog_entry_netlist_topology(components, nets) -> None:
+    """Keep the primary transient boundary on PB and common variants exclusive."""
+    expected_components = {
+        "JFOG1": ("SEALED_DTM_3WAY_PIGTAIL_ENTRY", "PB100:FOG_PIGTAIL_1x03_P3.50mm"),
+        "D_FOG1": ("ESD2CANFD24DBZRQ1", "PB100:SOT-23-3_DBZ_TI"),
+        "R_FOG_GND": ("0R FOG dry-contact common DEFAULT", "PB100:R0603_DNP_LINK_1608Metric"),
+        "R_FOG_12V": ("0R FOG 12V common DNP", "PB100:R0603_DNP_LINK_1608Metric"),
+        "F_FOG_12V": ("nanoASMDC010F 0.10A 60V DNP", "PB100:PPTC_1206_3216Metric"),
+    }
+    for reference, (expected_value, expected_footprint) in expected_components.items():
+        component = components.get(reference)
+        if component is None:
+            fail(f"fog cable-entry topology is missing physical component {reference}")
+        value = component.findtext("value", default="").strip()
+        footprint = component.findtext("footprint", default="").strip()
+        if value != expected_value or footprint != expected_footprint:
+            fail(
+                f"fog cable-entry component {reference} is {value!r}/{footprint!r}; "
+                f"expected {expected_value!r}/{expected_footprint!r}"
+            )
+    if components["R_FOG_GND"].find("./property[@name='dnp']") is not None:
+        fail("default dry-contact common link R_FOG_GND must be populated")
+    for reference in ("R_FOG_12V", "F_FOG_12V"):
+        if components[reference].find("./property[@name='dnp']") is None:
+            fail(f"{reference} must remain DNP until the physical switch is measured")
+
+    exact_nets = {
+        "SW_COMMON": {("JFOG1", "1"), ("R_FOG_GND", "1"), ("R_FOG_12V", "1")},
+        "FOG_A_SW_IN": {("JFOG1", "2"), ("D_FOG1", "1"), ("JPB1", "82")},
+        "FOG_B_SW_IN": {("JFOG1", "3"), ("D_FOG1", "2"), ("JPB1", "83")},
+        "SW_12V_FUSED": {("F_FOG_12V", "2"), ("R_FOG_12V", "2")},
+    }
+    for net_name, expected_nodes in exact_nets.items():
+        actual_nodes = nets.get(net_name, set())
+        if actual_nodes != expected_nodes:
+            fail(
+                f"fog cable-entry net {net_name} has nodes {sorted(actual_nodes)}; "
+                f"expected {sorted(expected_nodes)}"
+            )
+    required_ground = {("D_FOG1", "3"), ("R_FOG_GND", "2")}
+    if not required_ground <= nets.get("GND", set()):
+        fail("PB fog primary protector and default common link must return to local GND")
+    if ("F_FOG_12V", "1") not in nets.get("VBAT_PROT", set()):
+        fail("optional fog common fuse must source only from protected VBAT_PROT")
+    print("PB-100 fog cable-entry primary-protection topology passed")
+
+
 def validate_no_layout_artifacts() -> None:
     search_roots = (PB100_DIR, PRODUCTION_DIR)
     for search_root in search_roots:
@@ -398,6 +461,10 @@ def validate_no_layout_artifacts() -> None:
 
 def validate_kicad_no_role_tokens() -> None:
     checked_paths = sorted(KICAD_DIR.rglob("*.kicad_sch")) + sorted((KICAD_DIR / "lib").rglob("*.kicad_sym"))
+    approved_fog_input_paths = {
+        KICAD_DIR / "sheets" / "fog-switch-entry.kicad_sch",
+        KICAD_DIR / "lib" / "PB100.kicad_sym",
+    }
     for path in checked_paths:
         text = (
             read_text(path)
@@ -405,6 +472,8 @@ def validate_kicad_no_role_tokens() -> None:
             .replace("FOG_B_SW_IN", "")
         )
         for forbidden_token in FORBIDDEN_ROLE_TOKENS:
+            if forbidden_token == "FOG" and path in approved_fog_input_paths:
+                continue
             if forbidden_token in text:
                 fail(
                     f"accessory role token `{forbidden_token}` appears in KiCad artifact: "

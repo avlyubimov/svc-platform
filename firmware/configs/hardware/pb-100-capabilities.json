@@ -23,7 +23,7 @@
   "manual_request_inputs": [
     {
       "signal": "FOG_A_SW_IN",
-      "return_signal": "SW_GND",
+      "return_signal": "SW_COMMON",
       "active_low": true,
       "filtered": true,
       "mcu_gpio": "PA8",
@@ -34,7 +34,7 @@
     },
     {
       "signal": "FOG_B_SW_IN",
-      "return_signal": "SW_GND",
+      "return_signal": "SW_COMMON",
       "active_low": true,
       "filtered": true,
       "mcu_gpio": "PA9",

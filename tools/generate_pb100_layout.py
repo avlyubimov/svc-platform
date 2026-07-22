@@ -33,6 +33,7 @@ FOOTPRINT_DIR = KICAD_DIR / "lib" / "PB100.pretty"
 BOARD_PATH = KICAD_DIR / "PB-100.kicad_pcb"
 RULES_PATH = KICAD_DIR / "PB-100.kicad_dru"
 ROUTING_PATH = KICAD_DIR / "PB-100-can-routing.csv"
+FOG_ROUTING_PATH = KICAD_DIR / "PB-100-fog-entry-routing.csv"
 LAYOUT_UUID_NS = uuid.UUID("da7a3cb6-cb16-4a92-9c70-18496b0ccff1")
 
 
@@ -42,6 +43,11 @@ PLACEMENTS = {
     "Q2": Placement(25.0, 57.0, 90),
     "U1": Placement(35.0, 50.0, 90),
     "JPB1": Placement(75.0, 45.0),
+    "JFOG1": Placement(4.0, 20.0, 270),
+    "D_FOG1": Placement(10.0, 25.5, 270),
+    "R_FOG_GND": Placement(9.0, 31.0, 90),
+    "R_FOG_12V": Placement(13.0, 31.0, 90),
+    "F_FOG_12V": Placement(17.0, 31.0, 90),
     "Q101": Placement(50.0, 20.0, 90),
     "Q102": Placement(100.0, 20.0, 90),
     "Q103": Placement(17.0, 70.0, 90),
@@ -279,36 +285,50 @@ def board_graphics() -> list[str]:
     return graphics
 
 
-def routed_can_copper(net_codes: dict[str, int]) -> list[str]:
+def routed_evt_copper(net_codes: dict[str, int]) -> list[str]:
     copper = []
-    with ROUTING_PATH.open(newline="", encoding="utf-8") as routing_file:
-        for index, row in enumerate(csv.DictReader(routing_file), 1):
-            net_name = row["net"]
-            if not net_name.startswith("CAN1_"):
-                raise ValueError(f"PB partial routing may contain only CAN1 nets: {net_name}")
-            if net_name not in net_codes:
-                raise ValueError(f"routing manifest references unknown net {net_name}")
-            route_uuid = layout_uid(
-                "can-route",
-                index,
-                *(row[column] for column in row),
-            )
-            if row["kind"] == "segment":
-                copper.append(
-                    f'\t(segment (start {row["start_x_mm"]} {row["start_y_mm"]}) '
-                    f'(end {row["end_x_mm"]} {row["end_y_mm"]}) '
-                    f'(width {row["width_mm"]}) (layer "{row["layer"]}") '
-                    f'(net {net_codes[net_name]}) (uuid "{route_uuid}"))'
+    route_sets = (
+        (ROUTING_PATH, lambda net_name: net_name.startswith("CAN1_")),
+        (
+            FOG_ROUTING_PATH,
+            lambda net_name: net_name
+            in {"FOG_A_SW_IN", "FOG_B_SW_IN", "SW_COMMON", "SW_12V_FUSED", "VBAT_PROT", "GND"},
+        ),
+    )
+    route_index = 0
+    for route_path, net_allowed in route_sets:
+        with route_path.open(newline="", encoding="utf-8") as routing_file:
+            for index, row in enumerate(csv.DictReader(routing_file), 1):
+                net_name = row["net"]
+                if not net_allowed(net_name):
+                    raise ValueError(
+                        f"PB routing manifest {route_path.name} contains forbidden net: {net_name}"
+                    )
+                if net_name not in net_codes:
+                    raise ValueError(f"routing manifest references unknown net {net_name}")
+                route_index += 1
+                route_uuid = layout_uid(
+                    "evt-route",
+                    route_index,
+                    route_path.name,
+                    *(row[column] for column in row),
                 )
-            elif row["kind"] == "via":
-                copper.append(
-                    f'\t(via (at {row["start_x_mm"]} {row["start_y_mm"]}) '
-                    f'(size {row["diameter_mm"]}) (drill {row["drill_mm"]}) '
-                    f'(layers "{row["start_layer"]}" "{row["end_layer"]}") '
-                    f'(net {net_codes[net_name]}) (uuid "{route_uuid}"))'
-                )
-            else:
-                raise ValueError(f'unknown routing manifest kind {row["kind"]}')
+                if row["kind"] == "segment":
+                    copper.append(
+                        f'\t(segment (start {row["start_x_mm"]} {row["start_y_mm"]}) '
+                        f'(end {row["end_x_mm"]} {row["end_y_mm"]}) '
+                        f'(width {row["width_mm"]}) (layer "{row["layer"]}") '
+                        f'(net {net_codes[net_name]}) (uuid "{route_uuid}"))'
+                    )
+                elif row["kind"] == "via":
+                    copper.append(
+                        f'\t(via (at {row["start_x_mm"]} {row["start_y_mm"]}) '
+                        f'(size {row["diameter_mm"]}) (drill {row["drill_mm"]}) '
+                        f'(layers "{row["start_layer"]}" "{row["end_layer"]}") '
+                        f'(net {net_codes[net_name]}) (uuid "{route_uuid}"))'
+                    )
+                else:
+                    raise ValueError(f'unknown routing manifest kind {row["kind"]}')
     return copper
 
 
@@ -365,7 +385,7 @@ def render_board() -> str:
         ("H8", 110.0, 65.0, 2.7, 3.5, "STACK M2.5 NPTH"),
     ):
         lines.append(mounting_hole(reference, x_mm, y_mm, diameter_mm, radius_mm, label))
-    lines.extend(routed_can_copper(net_codes))
+    lines.extend(routed_evt_copper(net_codes))
     lines.extend(board_graphics())
     lines.append(")")
     return "\n".join(lines) + "\n"

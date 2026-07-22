@@ -308,8 +308,8 @@ def build_lb() -> Schematic:
         "BLE UART directions and reset while the E73 rail is off; module-side UART pulls and the reset pull-up "
         "keep every E73 digital pin within its unpowered limit. "
         "ADC_REF is sourced and locally decoupled; AGND returns to GND at one documented zero-ohm point. Reviewed footprint "
-        "FOG_A_SW_IN and FOG_B_SW_IN are independent protected requests on PA8 and PA9. Each path has raw-line "
-        "automotive ESD suppression, a dry-contact series path, a pull-up, RC filtering, a 4.3 V clamp and an "
+        "FOG_A_SW_IN and FOG_B_SW_IN are independent protected requests on PA8 and PA9. PB-100 owns the "
+        "primary cable-entry suppressor; each LB path has a dry-contact series path, a pull-up, RC filtering, a 4.3 V clamp and an "
         "automotive Schmitt buffer; mutually exclusive DNP transistor paths support a measured 12 V switch variant. "
         "Neither input directly drives an output. Reviewed footprint binding and mechanical envelope remain governed by LB-100-pcb-layout-start-checklist.csv, "
         "LB-100-footprint-binding-inventory.csv, and LB-100-mechanical-envelope-inventory.csv. ADR-0020 authorizes "
@@ -497,10 +497,6 @@ def build_lb() -> Schematic:
             ("3", "GND", "GND", "power_in"), ("4", "Y", mcu_net, "output"),
             ("5", "VCC", "LB_3V3_IO", "power_in"),
         ]))
-    sch.add(c("D18", "ESD2CANFD24DBZRQ1", "LB100:SOT-23-3_DBZ_TI", "https://www.ti.com/lit/ds/symlink/esd2can24-q1.pdf", [
-        ("1", "IO1", "FOG_A_SW_IN", "passive"), ("2", "IO2", "FOG_B_SW_IN", "passive"),
-        ("3", "GND", "GND", "power_in"),
-    ]))
     for ref, filtered_net in (("D19", "FOG_A_FILTERED"), ("D20", "FOG_B_FILTERED")):
         sch.add(c(ref, "BZT52H-B4V3-Q", "LB100:SOD-123F_L2.6-W1.6", "https://assets.nexperia.com/documents/data-sheet/BZT52H-Q_SER.pdf", [
             ("1", "K", filtered_net, "passive"), ("2", "A", "GND", "passive"),

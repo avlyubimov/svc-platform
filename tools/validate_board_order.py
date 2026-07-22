@@ -4,6 +4,9 @@ from __future__ import annotations
 import csv
 import json
 import re
+import shutil
+import subprocess
+import tempfile
 from collections import Counter
 from pathlib import Path
 
@@ -21,6 +24,11 @@ PB100_DIR = REPO_ROOT / "hardware" / "power-board" / "PB-100"
 LB100_DIR = REPO_ROOT / "hardware" / "logic-board" / "LB-100"
 FB100_DIR = REPO_ROOT / "hardware" / "front-board" / "FB-100"
 ORDER_READINESS = REPO_ROOT / "production" / "board-order" / "three_board_jlcpcb_order_readiness.csv"
+BOARD_LAYOUTS = {
+    "PB-100": PB100_DIR / "kicad" / "PB-100.kicad_pcb",
+    "LB-100": LB100_DIR / "kicad" / "LB-100.kicad_pcb",
+    "FB-100": FB100_DIR / "kicad" / "FB-100.kicad_pcb",
+}
 LAYOUT_RULES = REPO_ROOT / "production" / "board-order" / "three_board_layout_rules.md"
 LAYOUT_START_READINESS = (
     REPO_ROOT / "production" / "board-order" / "three_board_layout_start_readiness.csv"
@@ -888,10 +896,97 @@ def validate_order_readiness() -> None:
         ):
             if token not in row_text:
                 fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: must include {token}")
+        validate_order_layout_state(board, row_number, row)
         validate_no_manufacturing_outputs_before_order(board, board_path, release_state)
     missing_boards = sorted(REQUIRED_ORDER_BOARDS - seen_boards)
     if missing_boards:
         fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)} is missing boards: {', '.join(missing_boards)}")
+
+
+def validate_order_layout_state(board: str, row_number: int, row: dict[str, str]) -> None:
+    board_path = BOARD_LAYOUTS[board]
+    try:
+        board_text = board_path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: missing {board_path.relative_to(REPO_ROOT)}")
+
+    kicad_cli = shutil.which("kicad-cli")
+    if kicad_cli is None:
+        fail("kicad-cli is required to validate board-order PCB layout state")
+    with tempfile.TemporaryDirectory(prefix=f"svc-{board.lower()}-order-state-") as temp_dir:
+        report_path = Path(temp_dir) / "drc.json"
+        result = subprocess.run(
+            [
+                kicad_cli,
+                "pcb",
+                "drc",
+                "--format",
+                "json",
+                "--schematic-parity",
+                "--severity-all",
+                "--output",
+                str(report_path),
+                str(board_path),
+            ],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if result.returncode:
+            details = result.stdout.strip() or result.stderr.strip() or "unknown KiCad error"
+            fail(f"could not inspect {board} PCB layout state: {details}")
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+
+    total_footprints = board_text.count("\n\t(footprint ")
+    segments = board_text.count("\n\t(segment ")
+    vias = board_text.count("\n\t(via ")
+    zones = board_text.count("\n\t(zone ")
+    unconnected = len(report.get("unconnected_items", []))
+    parity_types = Counter(
+        finding.get("type") for finding in report.get("schematic_parity", [])
+    )
+    schematic_footprints = total_footprints - parity_types["extra_footprint"]
+    missing_footprints = parity_types["missing_footprint"]
+    layout_state = row["PCB layout state"]
+
+    required_patterns = (
+        (rf"\b{schematic_footprints}\b[^.;]*footprint", "schematic footprint count"),
+        (rf"\b{segments}\b segments?", "segment count"),
+        (rf"\b{vias}\b vias?", "via count"),
+    )
+    for pattern, label in required_patterns:
+        if re.search(pattern, layout_state, flags=re.IGNORECASE) is None:
+            fail(
+                f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"PCB layout state does not match actual {board} {label}"
+            )
+    if unconnected:
+        if re.search(rf"\b{unconnected}\b (?:open )?connections?", layout_state, flags=re.IGNORECASE) is None:
+            fail(
+                f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
+                f"PCB layout state must report {unconnected} open connections"
+            )
+    elif "zero unconnected" not in layout_state.lower():
+        fail(
+            f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
+            "PCB layout state must report zero unconnected items"
+        )
+    if missing_footprints and re.search(
+        rf"\b{missing_footprints}\b footprints?", layout_state, flags=re.IGNORECASE
+    ) is None:
+        fail(
+            f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
+            f"PCB layout state must report {missing_footprints} missing footprints"
+        )
+
+    if is_fabrication_authorized(row["Release state"].strip()):
+        violations = report.get("violations", [])
+        disallowed_parity = parity_types - Counter({"extra_footprint": parity_types["extra_footprint"]})
+        if violations or unconnected or disallowed_parity or zones == 0:
+            fail(
+                f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: {board} cannot be "
+                "EVT-FAB-AUTHORIZED before DRC, connectivity, schematic parity, and copper pours close"
+            )
 
 
 def validate_layout_rules() -> None:

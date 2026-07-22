@@ -3817,3 +3817,27 @@ partial-board backlog from 142 to 126; all 40 A copper remains open. USB tuning,
 reference planes, placement/silkscreen cleanup, complete PB import, DRC/parity,
 DFM and Product Owner review still block `EVT-FAB-AUTHORIZED`. No fabrication or
 assembly outputs were created.
+
+## 2026-07-22 — Correct fog common and primary-protection ownership
+
+Decision: ADR-0021 supersedes the assumed `SW_GND` pin name from the earlier
+dual-fog entry. Contact 1 is now `SW_COMMON`. The default dry-contact assembly
+fits `R_FOG_GND` to `GND`; the mutually exclusive active-high variant removes
+that link and fits `R_FOG_12V` plus DNP `F_FOG_12V` to `SW_12V_FUSED`. Wire
+colors and the final loom remain blocked until offline switch measurement.
+
+Decision: PB-100 owns `JFOG1` and primary two-line `D_FOG1` protection because
+the handlebar cable enters PB before crossing JPB1. LB-100 retains independent
+series/RC/clamp/Schmitt secondary conditioning and STM32 PA8/PA9 ownership; the
+former LB `D18` raw-line protector is removed. Official TI and Littelfuse
+evidence supports the selected 24 V AEC-Q101 suppressor and the optional 0.10 A,
+60 V automotive PPTC ratings, subject to routed pulse and return-path review.
+
+Result: PB-100 now places 33 schematic footprints and routes CAN1 plus the
+protected FOG entry with 110 segments and 14 vias; 46 footprints, six U1 parity
+findings, 127 connections and all 40 A copper remain open. LB-100 now has 99
+schematic footprints, 1,869 segments, 176 vias and 53 open connections; both
+raw FOG paths reach JPB1 while `FOG_B_SW_IN_MCU` remains open. CI now derives
+footprint, segment, via, unconnected and parity facts from each actual
+`.kicad_pcb` and rejects stale JLCPCB readiness claims. All three boards remain
+`EVT-LAYOUT-AUTHORIZED`; no manufacturing output or order is authorized.

@@ -659,7 +659,7 @@ def validate_reference_controls(config: dict[str, Any]) -> None:
     expected_fog = {
         "pair_a": {
             "input_signal": "FOG_A_SW_IN",
-            "return_signal": "SW_GND",
+            "return_signal": "SW_COMMON",
             "behavior": "momentary_toggle",
             "active_low": True,
             "debounce_ms": 50,
@@ -669,7 +669,7 @@ def validate_reference_controls(config: dict[str, Any]) -> None:
         },
         "pair_b": {
             "input_signal": "FOG_B_SW_IN",
-            "return_signal": "SW_GND",
+            "return_signal": "SW_COMMON",
             "behavior": "momentary_toggle",
             "active_low": True,
             "debounce_ms": 50,
@@ -767,7 +767,7 @@ def validate_reference_hardware_contracts(config: dict[str, Any]) -> None:
         fail("LB-100 must bind FOG_A_SW_IN/FOG_B_SW_IN to PA8/PA9")
 
     fog_text = read_text(PB100_FOG_INTERFACE_PATH)
-    for token in ("FOG_A_SW_IN", "FOG_B_SW_IN", "SW_GND", "dry-contact", "ESD/EMI", "Output Manager"):
+    for token in ("FOG_A_SW_IN", "FOG_B_SW_IN", "SW_COMMON", "dry-contact", "ESD/EMI", "Output Manager"):
         if token not in fog_text:
             fail(f"PB-100 fog interface must include {token}")
     c36_text = read_text(PB100_C36_PATH)
@@ -1036,7 +1036,7 @@ def validate_pb100_capabilities(config: dict[str, Any]) -> dict[str, Any]:
     if manual_inputs != [
         {
             "signal": "FOG_A_SW_IN",
-            "return_signal": "SW_GND",
+            "return_signal": "SW_COMMON",
             "active_low": True,
             "filtered": True,
             "mcu_gpio": "PA8",
@@ -1047,7 +1047,7 @@ def validate_pb100_capabilities(config: dict[str, Any]) -> dict[str, Any]:
         },
         {
             "signal": "FOG_B_SW_IN",
-            "return_signal": "SW_GND",
+            "return_signal": "SW_COMMON",
             "active_low": True,
             "filtered": True,
             "mcu_gpio": "PA9",

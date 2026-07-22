@@ -780,7 +780,7 @@ def validate_kicad_sheet_manifest() -> None:
         )
 
     allowed_kinds = {"top", "child"}
-    allowed_statuses = {"Scaffold", "Template scaffold"}
+    allowed_statuses = {"Scaffold", "Template scaffold", "Value-bearing EVT capture"}
     for row_number, row in enumerate(rows, 2):
         sheet_file = row["Sheet file"].strip()
         sheet_kind = row["Sheet kind"].strip()
