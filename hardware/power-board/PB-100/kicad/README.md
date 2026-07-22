@@ -18,9 +18,17 @@ This directory contains the preliminary KiCad project for PB-100.
   or garage-installed schematic elements.
 - `lib/PB100.pretty/`: empty preliminary local footprint library.
 
-There is not yet a `PB-100.kicad_pcb` file. ADR-0019 now permits controlled
-board import, placement, routing, copper pours and extraction while the final
-EVT schematic review remains open. Gerber, drill, pick-and-place, BOM/CPL and
+The controlled `PB-100.kicad_pcb` is now a partial board-import milestone. It
+places all 28 schematic components that currently have reviewed Footprint
+properties, the eight mechanical holes, functional zones and the 150 mm x
+90 mm outline. It intentionally reports 46 missing footprints and six U1
+unconnected-pin parity findings because the preliminary schematic has not yet
+promoted every power-stage passive, terminal and exact package. It contains no
+routing or copper pours and cannot enter fabrication review in this state.
+
+ADR-0019 and ADR-0020 permit controlled board import, placement, routing,
+copper pours and extraction while the final EVT schematic review remains open.
+There are no manufacturing outputs; Gerber, drill, pick-and-place, BOM/CPL and
 zipped manufacturing outputs remain blocked until
 `EVT-FAB-AUTHORIZED` after DRC, parity, 40 A electrothermal/clamp-loop review,
 DFM, connector fit and laboratory safety review.
@@ -83,9 +91,10 @@ DFM, connector fit and laboratory safety review.
 6. Replace abstract class instances with final electrical symbols, values, and
    footprints only after package drawings, pinouts, SOA, and sourcing gates are
    checked.
-7. Create `PB-100.kicad_pcb` under `EVT-LAYOUT-AUTHORIZED` and include every
-   mandated test point, DNP alternative site, replaceable gate element,
-   isolation link, safe-off provision and EVT serial field.
+7. Continue the controlled `PB-100.kicad_pcb` import by promoting the missing
+   output-stage passives, terminals, test points, DNP alternative sites,
+   replaceable gate elements, isolation links, safe-off provisions and EVT
+   serial field before routing is declared complete.
 8. Do not create Gerbers, drills, pick-place, BOM/CPL, manufacturing ZIP files,
    fabrication packages or PCBA orders until `EVT-FAB-AUTHORIZED`.
 
@@ -95,6 +104,7 @@ Run from repository root:
 
 ```bash
 python3 tools/validate_pb100.py
+python3 tools/validate_pb100_layout.py
 ```
 
 The validator intentionally fails if manufacturing artifacts appear before

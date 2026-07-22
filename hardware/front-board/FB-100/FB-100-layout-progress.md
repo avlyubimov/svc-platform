@@ -19,7 +19,9 @@ Status: `EVT-LAYOUT-AUTHORIZED` — board import and constrained placement start
   pair rules in `kicad/FB-100.kicad_dru`.
 - Added deterministic generation and CI validation. KiCad 10.0.4 reports no
   placement shorts, accidental clearance violations, or courtyard overlaps.
-- The placement milestone intentionally retains 103 unrouted connectivity
+- Routed the ten local `CH_LED_n_A` resistor-to-indicator connections with
+  0.25 mm front-copper tracks; USB and shared buses remain deliberately open.
+- The current milestone intentionally retains 93 unrouted connectivity
   findings. The only accepted DRC geometry exceptions are the two USB-C shell
   stakes entering the X=0 board edge; the only connector-library warnings are
   the generated local overrides for J1, J2, and JFB1.
@@ -33,7 +35,7 @@ Status: `EVT-LAYOUT-AUTHORIZED` — board import and constrained placement start
 - Route USB-C to D1 and D1 to JFB1 as a continuous referenced differential
   pair with no avoidable stubs, at most 1.0 mm length mismatch, and stackup-
   derived impedance confirmation.
-- Route CC, VBUS detect-only, RGB, buttons, OLED-DNP, indicators, power, and
+- Route CC, VBUS detect-only, RGB, buttons, OLED-DNP, indicator buses, power, and
   ground; add the reviewed shield/ESD return and ground reference strategy.
 - Add ground pours only after the USB return paths and no-back-power topology
   have been reviewed in the routed board.

@@ -283,7 +283,7 @@ def board_graphics() -> list[str]:
         f'\t(gr_rect (start 18 7) (end 46 23) (stroke (width 0.15) (type dash)) (fill none) (layer "Cmts.User") (uuid "{layout_uid("oled-window")}"))',
         f'\t(gr_rect (start 52 6) (end 58 12) (stroke (width 0.15) (type dash)) (fill none) (layer "Cmts.User") (uuid "{layout_uid("service-keepout")}"))',
         f'\t(gr_rect (start 64 6) (end 70 12) (stroke (width 0.15) (type dash)) (fill none) (layer "Cmts.User") (uuid "{layout_uid("reset-keepout")}"))',
-        f'\t(gr_text "FB-100 REV.1 EVT - NOT FOR PRODUCTION" (at 40 33.5 0) (layer "F.SilkS") (uuid "{layout_uid("board-label")}") (effects (font (size 1.0 1.0) (thickness 0.16))))',
+        f'\t(gr_text "FB-100 REV.1 EVT - NOT FOR PRODUCTION" (at 40 2.0 0) (layer "F.SilkS") (uuid "{layout_uid("board-label")}") (effects (font (size 1.0 1.0) (thickness 0.16))))',
         f'\t(gr_text "USB PANEL KEEPOUT" (at -6 12.5 0) (layer "Cmts.User") (uuid "{layout_uid("usb-label")}") (effects (font (size 1 1) (thickness 0.15))))',
         f'\t(gr_text "FFC BEND KEEPOUT" (at 90 11.5 0) (layer "Cmts.User") (uuid "{layout_uid("ffc-label")}") (effects (font (size 1 1) (thickness 0.15))))',
         f'\t(gr_text "OLED DNP WINDOW" (at 32 15 0) (layer "Cmts.User") (uuid "{layout_uid("oled-label")}") (effects (font (size 1 1) (thickness 0.15))))',
@@ -303,6 +303,19 @@ def board_graphics() -> list[str]:
         f'\t(gr_circle (center 12 26) (end 15 26) (stroke (width 0.12) (type dash)) (fill none) (layer "Cmts.User") (uuid "{layout_uid("status-optical")}"))'
     )
     return graphics
+
+
+def routed_indicator_segments(net_codes: dict[str, int]) -> list[str]:
+    segments = []
+    for index in range(1, 11):
+        channel_x_mm = 15.0 + index * 5.0
+        segments.append(
+            f'\t(segment (start {channel_x_mm + 0.8:.2f} 31.50) '
+            f'(end {channel_x_mm + 1.05:.2f} 26.00) (width 0.25) '
+            f'(layer "F.Cu") (net {net_codes[f"CH_LED_{index}_A"]}) '
+            f'(uuid "{layout_uid("segment", f"CH_LED_{index}_A")}"))'
+        )
+    return segments
 
 
 def render_board() -> str:
@@ -363,6 +376,7 @@ def render_board() -> str:
         ("H4", 75.0, 30.0),
     ):
         lines.append(mounting_hole(reference, x_mm, y_mm))
+    lines.extend(routed_indicator_segments(net_codes))
     lines.extend(board_graphics())
     lines.append(")")
     return "\n".join(lines) + "\n"

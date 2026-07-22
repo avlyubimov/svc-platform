@@ -1,15 +1,23 @@
 # LB-100 KiCad Project
 
-Status: `EVT-LAYOUT-AUTHORIZED`; no PCB layout exists yet
+Status: `EVT-LAYOUT-AUTHORIZED`; controlled placement exists; routing open
 
 This directory contains the reviewed value-bearing LB-100 KiCad schematic and
 project-local symbol/footprint libraries.
 
-There is currently no `LB-100.kicad_pcb` file. ADR-0020 authorizes its controlled
-creation, placement and routing. Signal-integrity and safety constraints in
+The controlled `LB-100.kicad_pcb` contains all 83 value-bearing schematic
+footprints, four shared stack holes, four local mounting holes, the reviewed
+100 mm x 70 mm outline and functional placement zones. It is a deterministic
+placement milestone, not a routed or fabrication-ready board. ADR-0020 authorizes
+continued placement and routing. Signal-integrity and safety constraints in
 `../LB-100-pcb-layout-start-checklist.csv` must close during
-`EVT-FAB-REVIEW`. Gerbers, drills, pick-place files, BOM/CPL order packages and
+`EVT-FAB-REVIEW`. There are no manufacturing outputs; Gerbers, drills,
+pick-place files, BOM/CPL order packages and
 zipped manufacturing outputs remain blocked until `EVT-FAB-AUTHORIZED`.
+
+Validation: `python3 tools/validate_lb100_layout.py` checks deterministic
+generation, exact schematic parity, four-layer placement, the 83+8 footprint
+count, absence of routing and absence of copper/clearance/courtyard collisions.
 
 ## Source Documents
 

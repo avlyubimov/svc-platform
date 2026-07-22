@@ -3760,3 +3760,21 @@ all marked `NOT FOR PRODUCTION`. Bench validation precedes motorcycle testing;
 Rev.2 correction and critical retest precede Product Owner production approval.
 Codex technical review plus Product Owner approval satisfies review authority;
 no second developer is required.
+
+## 2026-07-22 — Start controlled PB/LB layout and continue FB routing
+
+Decision: create deterministic four-layer board-import milestones for PB-100
+and LB-100 under `EVT-LAYOUT-AUTHORIZED`, and extend FB-100 only with local
+low-speed indicator routing. No manufacturing output is created or authorized.
+
+Result: LB-100 now places all 83 schematic components, four local holes and four
+shared stack holes on the 100 mm x 70 mm outline. KiCad reports no copper,
+clearance, edge, courtyard or mounting-hole collision; 349 connections and the
+SI/RF/ADC/I2C review remain open. PB-100 now places the 28 components that have
+actual schematic Footprint properties plus eight holes on the 150 mm x 90 mm
+outline. Its explicit 46 missing footprints, six U1 parity findings and 142
+unconnected items prove that it is a partial import and cannot enter fab review.
+FB-100 now routes the ten local `CH_LED_n_A` series connections and retains 93
+open connections. PBREL-007 remains production-only, and all three boards remain
+blocked from Gerber generation and prototype ordering pending their separate
+`EVT-FAB-REVIEW` closeout and Product Owner authorization.
