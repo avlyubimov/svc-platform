@@ -54,7 +54,10 @@ def validate_documents() -> None:
     require_tokens(
         COUPON / "README.md",
         (
-            "ELECTRICAL ROUTING COMPLETE / FABRICATION BLOCKED",
+            "PAUSED DIAGNOSTIC COUPON / FABRICATION BLOCKED",
+            "ADR-0020 separately",
+            "coupon fabrication is not a prerequisite",
+            "Further coupon development is paused",
             "zero unconnected items",
             "CORRELATION-A",
             "FORCED-B",

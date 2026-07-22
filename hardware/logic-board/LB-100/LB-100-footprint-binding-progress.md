@@ -40,11 +40,12 @@ power or production.
 ## Still Open
 
 No LB-100 footprint inventory rows remain open. Schematic symbol promotion and
-the mechanical envelope gate are closed. KiCad board import is still blocked by
-the separate signal-integrity and safety layout model.
+the mechanical envelope gate are closed. ADR-0020 authorizes controlled KiCad
+board import, placement and routing. Signal-integrity and safety evidence remains
+mandatory at `EVT-FAB-REVIEW` before any prototype manufacturing output.
 
 ## Boundary
 
 LB-100 now has 18 source-identified/bound footprint classes, 0 open footprint
-items, and 2 no-footprint-required ownership boundaries. KiCad board import
-remains blocked only by the signal-integrity and safety layout gate.
+items, and 2 no-footprint-required ownership boundaries. Current release state is
+`EVT-LAYOUT-AUTHORIZED`; production remains blocked.

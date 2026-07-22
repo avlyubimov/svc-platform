@@ -74,7 +74,7 @@ def validate_board_milestone() -> None:
 
     required_tokens = (
         '(gr_rect (start 0 0) (end 80 35)',
-        'FB-100 Rev.1  LAYOUT-ONLY',
+        'FB-100 REV.1 EVT - NOT FOR PRODUCTION',
         'USB PANEL KEEPOUT',
         'FFC BEND KEEPOUT',
         'OLED DNP WINDOW',

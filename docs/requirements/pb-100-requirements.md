@@ -44,19 +44,25 @@ PB-100 must provide at least 10 generic protected outputs.
 
 | Output | Reference default role | Target fuse | Target current limit | PWM |
 |---|---|---:|---:|---|
-| OUT1 | USB-C LOBoo | 15 A | 12 A | yes |
-| OUT2 | Cigarette / compressor | 20 A | 18 A | optional |
-| OUT3 | Fog Left | 10 A | 8 A | yes |
-| OUT4 | Fog Right | 10 A | 8 A | yes |
-| OUT5 | CHIGEE / navigation | 5 A | 4 A | yes |
-| OUT6 | Heated Seat Rider | 10 A | 8 A | yes |
-| OUT7 | Heated Seat Passenger | 10 A | 8 A | yes |
-| OUT8 | DVR | 5 A | 4 A | yes |
-| OUT9 | Aux brake / rear light | 5 A | 4 A | yes |
-| OUT10 | Spare | 10 A | 8 A | yes |
+| OUT1 | Cigarette socket / future compressor | 15 A | 12 A | yes |
+| OUT2 | High-current reserve | 20 A | 18 A | optional |
+| OUT3 | Fog primary left | 10 A | 8 A | yes |
+| OUT4 | Fog primary right | 10 A | 8 A | yes |
+| OUT5 | Low-current reserve 1 | 5 A | 4 A | yes |
+| OUT6 | Fog secondary left | 10 A | 8 A | yes |
+| OUT7 | Fog secondary right | 10 A | 8 A | yes |
+| OUT8 | Low-current reserve 2 | 5 A | 4 A | yes |
+| OUT9 | Low-current reserve 3 | 5 A | 4 A | yes |
+| OUT10 | Medium-current reserve | 10 A | 8 A | yes |
 
 Reference default roles are initial configuration defaults for BMW K25 Vehicle
 Profile #001. Physical outputs remain generic.
+
+The stock headlamp remains on factory wiring. The LOBOO C36 is the separate
+`C36_BIDIRECTIONAL` battery branch defined by ADR-0020 and is not OUT1 through
+OUT10. The four auxiliary-lamp nameplate values are provisional until EVT
+measurement. `FOG_SW_IN` is a configurable user request; Output Manager retains
+all budget, voltage, telemetry, thermal and fault authority.
 
 The reference fuse ratings total 100 A and the reference current limits total
 82 A. This is intentionally higher than the board-level continuous-current
@@ -86,6 +92,10 @@ Each output must support:
 - Firmware must refuse startup or shed lower-priority loads when the configured
   board-level budget would be exceeded.
 - Total input current measurement is required for budget enforcement.
+- `IIN_SENSE`, rather than only the sum of channel IMON readings, enforces the
+  40 A managed-board budget.
+- Mutually exclusive loads are evaluated through the configured operating-mode
+  matrix and are not treated as simultaneously permitted.
 
 ## 6. Thermal and diagnostics
 

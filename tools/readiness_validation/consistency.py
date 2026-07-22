@@ -31,8 +31,16 @@ FINAL_READINESS = REPO_ROOT / "docs" / "product" / "final-readiness.md"
 ADR_0015 = REPO_ROOT / "docs" / "adr" / "ADR-0015-can1-physical-layer-board-ownership.md"
 ADR_0017 = REPO_ROOT / "docs" / "adr" / "ADR-0017-pb-100-staged-release-authorization.md"
 ADR_0019 = REPO_ROOT / "docs" / "adr" / "ADR-0019-pb-100-evt-development-release.md"
+ADR_0020 = REPO_ROOT / "docs" / "adr" / "ADR-0020-platform-evt-development-and-reference-loads.md"
 PB_STAGED_READINESS = PB100_DIR / "PB-100-staged-release-readiness.csv"
 PB_POST_PROTOTYPE = PB100_DIR / "PB-100-post-prototype-validation-gate.csv"
+EVT_FAB_READINESS = REPO_ROOT / "production" / "board-order" / "three_board_evt_fab_readiness.csv"
+PRODUCTION_BLOCKERS = REPO_ROOT / "production" / "board-order" / "three_board_production_blockers.csv"
+EVT_FAB_CHECKLISTS = {
+    "PB-100": PB100_DIR / "PB-100-evt-fab-review-checklist.csv",
+    "LB-100": LB100_DIR / "LB-100-evt-fab-review-checklist.csv",
+    "FB-100": FB100_DIR / "FB-100-evt-fab-review-checklist.csv",
+}
 FOOTPRINT_STATUS = (
     REPO_ROOT / "production" / "board-order" / "three_board_footprint_binding_status.csv"
 )
@@ -53,6 +61,10 @@ ACTIVE_DOCUMENTS = (
     PB100_DIR / "PB-100-current-telemetry-closeout-precheck.csv",
     PB100_DIR / "PB-100-pcb-layout-start-checklist.csv",
     PB_STAGED_READINESS,
+    ADR_0020,
+    EVT_FAB_READINESS,
+    PRODUCTION_BLOCKERS,
+    *EVT_FAB_CHECKLISTS.values(),
     LB100_DIR / "LB-100-schematic-freeze-checklist.md",
     LB100_DIR / "LB-100-schematic-review-closeout.md",
     LB100_DIR / "LB-100-footprint-binding-progress.csv",
@@ -102,9 +114,11 @@ REQUIRED_FACTS = {
         "PBREL-006",
         "PBREL-007",
         "EVT-LAYOUT-AUTHORIZED",
+        "EVT-FAB-REVIEW",
         "EVT-FAB-AUTHORIZED",
         "BENCH-VALIDATION",
         "MOTORCYCLE-VALIDATION",
+        "PRODUCTION-BLOCKED",
         "PRODUCTION-RELEASE",
         "PB-BENCH-004",
         "PB-BENCH-010",
@@ -114,7 +128,7 @@ REQUIRED_FACTS = {
         "six official plated",
         "four GND MF circuits",
         "zero active LBREL blockers",
-        "81 components",
+        "83 components",
         "191 electrical nets",
     ),
     LB100_DIR / "LB-100-schematic-review-closeout.md": (
@@ -221,8 +235,8 @@ def validate_adr_0015() -> None:
 
 def validate_adr_0017() -> None:
     text = read_text(ADR_0017)
-    if "superseded in part by ADR-0019" not in text:
-        raise ValidationError(f"{relative(ADR_0017)} must record ADR-0019 supersession")
+    if "superseded by ADR-0019 and ADR-0020" not in text:
+        raise ValidationError(f"{relative(ADR_0017)} must record ADR-0019/ADR-0020 supersession")
     for token in (
         "BLOCKED",
         "LAYOUT-ONLY",
@@ -239,7 +253,7 @@ def validate_adr_0017() -> None:
 def validate_adr_0019() -> None:
     text = read_text(ADR_0019)
     for token in (
-        "Accepted — Product Owner direction on 2026-07-22",
+        "release-state model superseded by ADR-0020",
         "EVT-LAYOUT-AUTHORIZED",
         "EVT-FAB-AUTHORIZED",
         "BENCH-VALIDATION",
@@ -254,6 +268,27 @@ def validate_adr_0019() -> None:
     ):
         if token not in text:
             raise ValidationError(f"{relative(ADR_0019)} must include {token!r}")
+
+
+def validate_adr_0020() -> None:
+    text = read_text(ADR_0020)
+    for token in (
+        "Accepted — final Product Owner direction on 2026-07-22",
+        "EVT-LAYOUT-AUTHORIZED",
+        "EVT-FAB-REVIEW",
+        "EVT-FAB-AUTHORIZED",
+        "BENCH-VALIDATION",
+        "MOTORCYCLE-VALIDATION",
+        "PRODUCTION-BLOCKED",
+        "PRODUCTION-RELEASE",
+        "PBREL-007 is a production-release blocker only",
+        "Q2-C100 remains a paused diagnostic coupon",
+        "FOG_SW_IN",
+        "C36_BIDIRECTIONAL",
+        "A second human developer is not required",
+    ):
+        if token not in text:
+            raise ValidationError(f"{relative(ADR_0020)} must include {token!r}")
 
 
 def validate_staged_release_readiness() -> None:
@@ -398,6 +433,46 @@ def validate_aggregate_counts(expected: dict[str, tuple[str, ...]]) -> None:
                 )
 
 
+def validate_evt_fab_and_production_boundaries() -> None:
+    aggregate_states = {
+        row["Board"].strip(): row["Release state"].strip()
+        for row in read_csv(AGGREGATE_READINESS[1])
+    }
+    fab_rows = {row["Board"].strip(): row for row in read_csv(EVT_FAB_READINESS)}
+    if set(fab_rows) != set(aggregate_states):
+        raise ValidationError(f"{relative(EVT_FAB_READINESS)} must contain all three boards exactly")
+    for board, state in aggregate_states.items():
+        row = fab_rows[board]
+        if row["Current state"].strip() != state:
+            raise ValidationError(f"{relative(EVT_FAB_READINESS)}:{board} must report {state}")
+        if row["EVT batch size"].strip() != "5":
+            raise ValidationError(f"{relative(EVT_FAB_READINESS)}:{board} EVT batch must be five")
+        marking = row["EVT marking"].strip()
+        if board not in marking or "NOT FOR PRODUCTION" not in marking:
+            raise ValidationError(f"{relative(EVT_FAB_READINESS)}:{board} needs EVT marking")
+    if "PBREL-007" in fab_rows["PB-100"]["EVT-FAB blockers"]:
+        raise ValidationError("PBREL-007 must not appear as a PB-100 EVT-FAB blocker")
+
+    for board, path in EVT_FAB_CHECKLISTS.items():
+        rows = read_csv(path)
+        if any(row.get("Status", "").strip() != "Open" for row in rows):
+            raise ValidationError(f"{relative(path)} must remain open before routed fab review")
+        text = " ".join(" ".join(row.values()) for row in rows)
+        for token in ("DRC", "EVT-FAB-AUTHORIZED", "Product Owner", "no second developer required"):
+            if token not in text:
+                raise ValidationError(f"{relative(path)} must include {token!r}")
+        if board == "PB-100" and "PBREL-007" in text:
+            raise ValidationError(f"{relative(path)} must not make PBREL-007 an EVT-FAB gate")
+
+    production_rows = read_csv(PRODUCTION_BLOCKERS)
+    if any(row.get("Status", "").strip() != "Blocked" for row in production_rows):
+        raise ValidationError(f"{relative(PRODUCTION_BLOCKERS)} must keep production blockers Blocked")
+    production_text = " ".join(" ".join(row.values()) for row in production_rows)
+    for token in ("PBREL-007", "Rev.2", "Product Owner", "PB-100", "LB-100", "FB-100"):
+        if token not in production_text:
+            raise ValidationError(f"{relative(PRODUCTION_BLOCKERS)} must include {token!r}")
+
+
 def validate_final_readiness(expected: dict[str, tuple[str, ...]]) -> None:
     text = read_text(FINAL_READINESS)
     for board, blocker_ids in expected.items():
@@ -511,8 +586,10 @@ def validate() -> None:
     validate_adr_0015()
     validate_adr_0017()
     validate_adr_0019()
+    validate_adr_0020()
     validate_staged_release_readiness()
     validate_aggregate_counts(expected)
+    validate_evt_fab_and_production_boundaries()
     validate_final_readiness(expected)
     validate_footprint_gate_status()
     validate_required_facts()

@@ -43,6 +43,11 @@ POWER_BUDGET_PATH = REPO_ROOT / "firmware" / "services" / "power_budget.h"
 PB100_OUTPUT_MATRIX_PATH = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-output-channel-matrix.csv"
 PB100_CURRENT_TELEMETRY_PATH = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-current-telemetry-map.csv"
 PB100_THERMAL_TELEMETRY_PATH = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-thermal-telemetry-map.csv"
+PB100_MODE_MATRIX_PATH = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-reference-load-mode-matrix.csv"
+PB100_FOG_INTERFACE_PATH = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-fog-switch-interface.md"
+PB100_C36_PATH = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-c36-bidirectional-branch.md"
+PB100_B2B_MAP_PATH = REPO_ROOT / "hardware" / "power-board" / "PB-100" / "PB-100-b2b-pin-map.csv"
+LB100_PIN_BINDING_PATH = REPO_ROOT / "hardware" / "logic-board" / "LB-100" / "LB-100-stm32h563-pin-binding-precheck.csv"
 FORBIDDEN_HARDWARE_CAPABILITY_ROLE_TOKENS = (
     "USB",
     "FOG",
@@ -648,6 +653,115 @@ def validate_outputs(config: dict[str, Any], allowed_roles: set[str]) -> None:
             fail(f"outputs[{index}] does not match C default: {actual_output} != {expected_output}")
 
 
+def validate_reference_controls(config: dict[str, Any]) -> None:
+    manual_controls = require_dict(config, "manual_controls")
+    fog = require_dict(manual_controls, "fog")
+    expected_fog = {
+        "input_signal": "FOG_SW_IN",
+        "return_signal": "SW_GND",
+        "active_low": True,
+        "debounce_ms": 50,
+        "stuck_timeout_ms": 30000,
+        "pair_delay_ms": 250,
+        "restore_on_boot": False,
+        "primary_roles": ["FOG_PRIMARY_LEFT", "FOG_PRIMARY_RIGHT"],
+        "secondary_roles": ["FOG_SECONDARY_LEFT", "FOG_SECONDARY_RIGHT"],
+        "output_manager_authority": True,
+    }
+    if fog != expected_fog:
+        fail(f"manual_controls.fog mismatch: {fog} != {expected_fog}")
+
+    mode_rows = require_list(config, "operating_modes")
+    modes: dict[str, list[str]] = {}
+    for index, row in enumerate(mode_rows):
+        if not isinstance(row, dict) or set(row) != {"id", "allowed_roles"}:
+            fail(f"operating_modes[{index}] must contain id and allowed_roles only")
+        mode_id = row.get("id")
+        allowed = row.get("allowed_roles")
+        if not isinstance(mode_id, str) or not isinstance(allowed, list):
+            fail(f"operating_modes[{index}] has invalid id or allowed_roles")
+        if mode_id in modes:
+            fail(f"duplicate operating mode {mode_id}")
+        modes[mode_id] = allowed
+    expected_modes = {
+        "DAY": [
+            "HIGH_CURRENT_RESERVE",
+            "LOW_CURRENT_RESERVE_1",
+            "LOW_CURRENT_RESERVE_2",
+            "LOW_CURRENT_RESERVE_3",
+            "MEDIUM_CURRENT_RESERVE",
+        ],
+        "NIGHT": [
+            "FOG_PRIMARY_LEFT",
+            "FOG_PRIMARY_RIGHT",
+            "FOG_SECONDARY_LEFT",
+            "FOG_SECONDARY_RIGHT",
+            "HIGH_CURRENT_RESERVE",
+            "LOW_CURRENT_RESERVE_1",
+            "LOW_CURRENT_RESERVE_2",
+            "LOW_CURRENT_RESERVE_3",
+            "MEDIUM_CURRENT_RESERVE",
+        ],
+        "SERVICE_COMPRESSOR": ["CIGARETTE_COMPRESSOR"],
+        "C36_RESCUE_CHARGE": [],
+        "ENGINE_OFF": [],
+    }
+    if modes != expected_modes:
+        fail(f"operating mode matrix mismatch: {modes} != {expected_modes}")
+
+    external_capabilities = require_dict(config, "external_capabilities")
+    c36 = require_dict(external_capabilities, "C36_BIDIRECTIONAL")
+    expected_c36 = {
+        "managed_output": False,
+        "counted_in_pb_current": False,
+        "requires_mcu": False,
+        "direct_battery_branch": True,
+        "dedicated_near_battery_fuse": True,
+        "starter_current_source": False,
+    }
+    if c36 != expected_c36:
+        fail(f"external_capabilities.C36_BIDIRECTIONAL mismatch: {c36} != {expected_c36}")
+
+
+def validate_reference_hardware_contracts(config: dict[str, Any]) -> None:
+    mode_rows = load_csv_dicts(PB100_MODE_MATRIX_PATH)
+    if [row.get("Mode", "").strip() for row in mode_rows] != [
+        "DAY",
+        "NIGHT",
+        "SERVICE_COMPRESSOR",
+        "C36_RESCUE_CHARGE",
+        "ENGINE_OFF",
+    ]:
+        fail("PB-100 reference load-mode matrix must contain the five ordered modes")
+    configured_modes = [row.get("id") for row in require_list(config, "operating_modes")]
+    if configured_modes != [row["Mode"].strip() for row in mode_rows]:
+        fail("firmware operating modes must match PB-100 reference load-mode matrix")
+
+    b2b_rows = load_csv_dicts(PB100_B2B_MAP_PATH)
+    fog_b2b = [row for row in b2b_rows if row.get("Net", "").strip() == "FOG_SW_IN"]
+    if len(fog_b2b) != 1 or fog_b2b[0].get("Pin", "").strip() != "82":
+        fail("PB-100 must carry FOG_SW_IN on JPB1 pin 82")
+    lb_rows = load_csv_dicts(LB100_PIN_BINDING_PATH)
+    fog_lb = [row for row in lb_rows if row.get("Net", "").strip() == "FOG_SW_IN"]
+    if len(fog_lb) != 1 or fog_lb[0].get("STM32H563VITx LQFP100 pin", "").strip() != "PA8":
+        fail("LB-100 must bind FOG_SW_IN to PA8")
+
+    fog_text = read_text(PB100_FOG_INTERFACE_PATH)
+    for token in ("FOG_SW_IN", "SW_GND", "dry-contact", "ESD/EMI", "Output Manager"):
+        if token not in fog_text:
+            fail(f"PB-100 fog interface must include {token}")
+    c36_text = read_text(PB100_C36_PATH)
+    for token in (
+        "C36_BIDIRECTIONAL",
+        "VBAT_RAW",
+        "dedicated",
+        "PB-100, LB-100 and the MCU off",
+        "not a starter-current source",
+    ):
+        if token not in c36_text:
+            fail(f"PB-100 C36 contract must include {token}")
+
+
 def load_csv_dicts(path: Path) -> list[dict[str, str]]:
     try:
         return list(csv.DictReader(path.open(newline="", encoding="utf-8")))
@@ -656,7 +770,7 @@ def load_csv_dicts(path: Path) -> list[dict[str, str]]:
 
 
 def validate_no_role_tokens_in_capabilities(capabilities: dict[str, Any]) -> None:
-    text = json.dumps(capabilities, sort_keys=True)
+    text = json.dumps(capabilities, sort_keys=True).replace("FOG_SW_IN", "")
     for token in FORBIDDEN_HARDWARE_CAPABILITY_ROLE_TOKENS:
         if token in text:
             fail(f"hardware capabilities must not contain accessory role token: {token}")
@@ -898,6 +1012,32 @@ def validate_pb100_capabilities(config: dict[str, Any]) -> dict[str, Any]:
     if can1.get("disabled_status_signal") != "CAN1_TX_DISABLED_STATUS":
         fail("PB-100 capabilities CAN1 disabled status signal mismatch")
 
+    manual_inputs = capabilities.get("manual_request_inputs")
+    if manual_inputs != [
+        {
+            "signal": "FOG_SW_IN",
+            "return_signal": "SW_GND",
+            "active_low": True,
+            "filtered": True,
+            "direct_output_control": False,
+            "safe_default": "off",
+        }
+    ]:
+        fail("PB-100 capabilities manual request input mismatch")
+    external_paths = capabilities.get("external_power_paths")
+    if external_paths != [
+        {
+            "class": "C36_BIDIRECTIONAL",
+            "managed_output": False,
+            "counted_in_pb_current": False,
+            "requires_mcu": False,
+            "direct_battery_branch": True,
+            "dedicated_near_battery_fuse": True,
+            "starter_current_source": False,
+        }
+    ]:
+        fail("PB-100 capabilities C36_BIDIRECTIONAL path mismatch")
+
     matrix_rows = load_csv_dicts(PB100_OUTPUT_MATRIX_PATH)
     matrix_by_output = {row["Output"].strip(): row for row in matrix_rows}
     outputs = capabilities.get("outputs")
@@ -945,6 +1085,20 @@ def validate_pb100_capabilities(config: dict[str, Any]) -> dict[str, Any]:
         fail("PB-100 capabilities thermal_signals must match thermal telemetry map")
     if board_signals != ["VBAT_SENSE", "PB_PWR_GOOD", "PB_FAULT", "PB_ID_ADC"]:
         fail("PB-100 capabilities board_signals mismatch")
+    if telemetry.get("budget_source") != "IIN_SENSE":
+        fail("PB-100 capabilities must enforce the board budget from IIN_SENSE")
+    if telemetry.get("channel_sum_is_diagnostic_only") is not True:
+        fail("PB-100 capabilities must keep channel sum diagnostic-only")
+    if telemetry.get("safe_off_on_missing_stale_or_implausible") is not True:
+        fail("PB-100 capabilities must require telemetry safe-off")
+    if telemetry.get("required_diagnostics") != [
+        "open_load",
+        "overload",
+        "short_circuit",
+        "current_log",
+        "trip_reason",
+    ]:
+        fail("PB-100 capabilities telemetry diagnostics mismatch")
     return capabilities
 
 
@@ -1015,6 +1169,8 @@ def main() -> int:
     validate_power_budget(config, defines)
     validate_telemetry(config, defines)
     validate_outputs(config, allowed_roles)
+    validate_reference_controls(config)
+    validate_reference_hardware_contracts(config)
     capabilities = validate_pb100_capabilities(config)
     validate_hardware_capability_service(capabilities)
     validate_rules(config, allowed_roles)

@@ -3731,3 +3731,32 @@ forbidden on the motorcycle. PBREL-007 and the Q2 maximum-bound evidence now
 block `PRODUCTION-RELEASE`, not controlled EVT layout. Q2-C100 is retained as a
 paused diagnostic option. Rev.1 cannot become production hardware; all findings
 must be reviewed into Rev.2 before production release is considered.
+
+## 2026-07-22 — Unify EVT lifecycle and accept reference load architecture
+
+Decision: accept ADR-0020 and use one seven-state lifecycle for PB-100, LB-100
+and FB-100. All three boards are `EVT-LAYOUT-AUTHORIZED`; fabrication remains
+separately blocked until each routed design passes `EVT-FAB-REVIEW` and receives
+`EVT-FAB-AUTHORIZED`. PBREL-007 blocks only `PRODUCTION-RELEASE`. Q2-C100 is a
+paused optional diagnostic coupon and is not a PB-100 EVT prerequisite.
+
+Decision: preserve the 40 A PB-100 continuous target, 50 A main-fuse target and
+0-60 A total-current telemetry without claiming 60 A continuous operation.
+OUT1 through OUT10 remain generic, with the BMW K25 reference profile assigning
+OUT1 to the 10-12 A socket/compressor, OUT3/OUT4 and OUT6/OUT7 to two auxiliary-
+lamp pairs, and all other listed channels to unique reserve roles. Priority C
+sheds the second lamp pair first, priority B the first pair next and priority A
+the remaining managed outputs.
+
+Decision: add protected active-low `FOG_SW_IN`/`SW_GND` manual control with LB
+PA8 filtering, debounce, stuck-input detection, boot-off behavior and delayed
+second-pair request. Output Manager retains authority. Preserve LOBOO C36 as the
+independent `C36_BIDIRECTIONAL` near-battery fused branch outside OUT1 through
+OUT10 and `IIN_SENSE`; it works with PB/LB/MCU off and is not a starter source.
+
+Result: layout may start immediately for PB-100 and LB-100 and continue for
+FB-100. The first fabrication batch remains five EVT boards per required board,
+all marked `NOT FOR PRODUCTION`. Bench validation precedes motorcycle testing;
+Rev.2 correction and critical retest precede Product Owner production approval.
+Codex technical review plus Product Owner approval satisfies review authority;
+no second developer is required.

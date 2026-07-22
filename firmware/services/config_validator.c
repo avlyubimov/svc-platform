@@ -87,6 +87,33 @@ bool svc_output_role_is_valid(output_role_t role)
     return role >= OUT_ROLE_NONE && role < OUT_ROLE_COUNT;
 }
 
+static bool svc_manual_fog_config_is_valid(const svc_manual_fog_config_t *fog)
+{
+    if (fog == NULL || !fog->active_low || fog->debounce_ms == 0U ||
+        fog->stuck_timeout_ms <= fog->debounce_ms || fog->pair_delay_ms == 0U ||
+        fog->restore_on_boot || !fog->output_manager_authority) {
+        return false;
+    }
+
+    const output_role_t roles[] = {
+        fog->primary_roles[0],
+        fog->primary_roles[1],
+        fog->secondary_roles[0],
+        fog->secondary_roles[1]
+    };
+    for (size_t role_index = 0U; role_index < 4U; ++role_index) {
+        if (!svc_output_role_is_valid(roles[role_index]) || roles[role_index] == OUT_ROLE_NONE) {
+            return false;
+        }
+        for (size_t other_index = role_index + 1U; other_index < 4U; ++other_index) {
+            if (roles[role_index] == roles[other_index]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 svc_config_validation_result_t svc_config_validate_device(const svc_device_config_t *config)
 {
     if (config == NULL) {
@@ -107,6 +134,9 @@ svc_config_validation_result_t svc_config_validate_device(const svc_device_confi
             config->outputs,
             config->thermal)) {
         return make_result(SVC_CONFIG_INVALID_TELEMETRY, SVC_CONFIG_OUTPUT_INDEX_NONE);
+    }
+    if (!svc_manual_fog_config_is_valid(&config->manual_fog)) {
+        return make_result(SVC_CONFIG_INVALID_MANUAL_CONTROL, SVC_CONFIG_OUTPUT_INDEX_NONE);
     }
 
     for (size_t output_index = 0U; output_index < SVC_OUTPUT_COUNT; ++output_index) {

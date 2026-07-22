@@ -1,0 +1,9 @@
+Board,Blocker,Status,Why production is blocked,Required production-release evidence
+PB-100,PBREL-007,Blocked,Qualified maximum-bound Q2 turnoff evidence is not closed,Accepted full-board Q2 VDS VGS current temperature and SOA evidence across required bounds
+PB-100,Rev.1 qualification,Blocked,Rev.1 EVT bench and motorcycle measurements do not exist,Stored waveforms currents temperatures fault logs and signed bench/motorcycle reports
+PB-100,Rev.2 corrective release,Blocked,Rev.1 findings have not been dispositioned into a corrected revision,Reviewed Rev.2 plus repeated critical electrical thermal fault and vehicle tests
+LB-100,Rev.1 qualification,Blocked,ADC I2C safe-boot communication storage and environmental behavior are not measured on hardware,Stored calibration fault startup EMC thermal vibration and motorcycle evidence
+LB-100,Rev.2 corrective release,Blocked,Rev.1 findings have not been dispositioned into a corrected revision,Reviewed Rev.2 plus repeated critical tests and Product Owner approval
+FB-100,Rev.1 qualification,Blocked,USB UI cable mechanical environmental and motorcycle behavior are not measured on hardware,Stored USB UI current thermal vibration ingress and vehicle evidence
+FB-100,Rev.2 corrective release,Blocked,Rev.1 findings have not been dispositioned into a corrected revision,Reviewed Rev.2 plus repeated critical tests and Product Owner approval
+Platform,Production package,Blocked,Production DFM sourcing FAI traceability and final review are not closed,Production package checks Codex technical review and Product Owner PRODUCTION-RELEASE approval

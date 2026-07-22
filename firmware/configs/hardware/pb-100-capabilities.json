@@ -20,6 +20,27 @@
       "disabled_status_signal": "CAN1_TX_DISABLED_STATUS"
     }
   },
+  "manual_request_inputs": [
+    {
+      "signal": "FOG_SW_IN",
+      "return_signal": "SW_GND",
+      "active_low": true,
+      "filtered": true,
+      "direct_output_control": false,
+      "safe_default": "off"
+    }
+  ],
+  "external_power_paths": [
+    {
+      "class": "C36_BIDIRECTIONAL",
+      "managed_output": false,
+      "counted_in_pb_current": false,
+      "requires_mcu": false,
+      "direct_battery_branch": true,
+      "dedicated_near_battery_fuse": true,
+      "starter_current_source": false
+    }
+  ],
   "outputs": [
     {
       "id": "OUT1",
@@ -153,6 +174,16 @@
     }
   ],
   "telemetry": {
+    "budget_source": "IIN_SENSE",
+    "channel_sum_is_diagnostic_only": true,
+    "safe_off_on_missing_stale_or_implausible": true,
+    "required_diagnostics": [
+      "open_load",
+      "overload",
+      "short_circuit",
+      "current_log",
+      "trip_reason"
+    ],
     "current_signals": [
       "OUT1_IMON",
       "OUT2_IMON",

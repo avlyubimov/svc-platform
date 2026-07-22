@@ -3,16 +3,17 @@
 ## Phase boundary
 
 PB-100 bench tests that require an assembled board are EVT validation gates.
-Per ADR-0019, controlled layout begins at `EVT-LAYOUT-AUTHORIZED`; reviewed
-DRC, parity, electrothermal/clamp-loop extraction, DFM and safety evidence permit
-a five-board package at `EVT-FAB-AUTHORIZED`. Build inspection permits
+Per ADR-0020, all three boards may enter controlled layout at
+`EVT-LAYOUT-AUTHORIZED`; completed routing then enters `EVT-FAB-REVIEW`.
+Reviewed DRC, parity, electrothermal/clamp-loop extraction, DFM and safety
+evidence permit a five-board package at `EVT-FAB-AUTHORIZED`. Build inspection permits
 `BENCH-VALIDATION`; physical bench records then gate
 `MOTORCYCLE-VALIDATION` and production remains closed until reviewed Rev.2.
 This flow preserves the validation intent of
 `docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md` and the
 staged evidence model of
-`docs/adr/ADR-0017-pb-100-staged-release-authorization.md`; ADR-0019 changes
-which release boundary those gates block.
+`docs/adr/ADR-0017-pb-100-staged-release-authorization.md`; ADR-0020 controls
+which release boundary those gates block. PBREL-007 blocks only production.
 
 ## Bench test before motorcycle
 
@@ -46,13 +47,22 @@ reserved for motorcycle validation after its nondestructive bench pass.
 
 1. Inspect DNP populations, polarity, isolation links and shorts.
 2. Current-limited bring-up with all outputs disabled.
-3. Controlled 5 A, 10 A, 20 A and 40 A load steps.
-4. Record MOSFET, copper, via, shunt, connector and enclosure temperatures.
-5. Verify telemetry, current limit, fuse, short-circuit and safe shutdown.
-6. Run controlled overvoltage/load disconnect while recording synchronized
+3. Verify each output and calibrate `OUT1_IMON` through `OUT10_IMON`.
+4. Measure the four real auxiliary lamps and verify open-load, overload and
+   short-circuit diagnosis with logged trip reasons.
+5. Controlled 10 A, 20 A, 30 A and 40 A total-current load steps.
+6. Calibrate INA228 and compare summed channel current with `IIN_SENSE`.
+7. Verify `FOG_SW_IN` toggle, boot-off, stuck-input handling, immediate group
+   off and delayed OUT3/OUT4 then OUT6/OUT7 start.
+8. Verify OUT1 socket/compressor safeguards and both external C36 current
+   directions; C36 uses an external clamp or shunt and remains unmanaged.
+9. Verify mode masks, undervoltage response and shedding order: second fog pair,
+   first fog pair, remaining managed outputs, then all outputs.
+10. Record MOSFET, copper, via, shunt, connector and enclosure temperatures.
+11. Run controlled overvoltage/load disconnect while recording synchronized
    `VBAT_RAW`, protected output, Q1/Q2 `VDS`, Q1/Q2 `VGS`, current and
    temperature.
-7. Repeat inspection and parametric checks after abnormal-stress testing.
+12. Repeat inspection and parametric checks after abnormal-stress testing.
 
 ## PB-100 bench validation matrix
 
@@ -73,6 +83,10 @@ reserved for motorcycle validation after its nondestructive bench pass.
 | PB-BENCH-013 | CAN2 expansion | Exercise CAN2 on bench only | CAN2 can transmit without affecting CAN1 listen-only policy |
 | PB-BENCH-014 | B2B interface | Check `JPB1` control, fault, telemetry, ID, and reserve pins against the pin map | Pin behavior matches `PB-100-b2b-pin-map.csv` |
 | PB-BENCH-015 | Vibration inspection | Inspect fuses, connectors, and harness strain relief after vibration exposure | No intermittent power, signal, or connector fault is observed |
+| PB-BENCH-016 | Manual FOG request | Exercise short press, repeat press, boot/reset, stuck switch, invalid configuration, fault and undervoltage | Request boots off; OUT3/OUT4 start first, OUT6/OUT7 start after configured delay, manual off disables both pairs, and no safety gate is bypassed |
+| PB-BENCH-017 | Reference lamp currents | Measure each nominal 80 W and 70 W auxiliary lamp on its configured output | Actual steady and inrush current are stored and remain inside channel/fuse/SOA limits |
+| PB-BENCH-018 | C36 bidirectional branch | Measure accessory-source and battery-charge directions with PB/LB both on and off using external current measurement | Both vendor-defined directions work through the separately fused branch; no current is attributed to `IIN_SENSE`; C36 is not used for starter current |
+| PB-BENCH-019 | Operating modes and shedding | Exercise DAY NIGHT SERVICE_COMPRESSOR C36_RESCUE_CHARGE ENGINE_OFF and increasing generator deficit | Mutually exclusive loads are never admitted together; second fog pair sheds first, then first pair, then other managed outputs, and critical undervoltage disables OUT1 through OUT10 |
 
 ## Repository validation
 
@@ -117,8 +131,9 @@ when the Event Bus is full.
 Rule Event Bridge tests verify condition events drain into rule state, CAN-derived
 events can reach rule evaluation, and non-rule events remain available for safety
 dispatch.
-Rule condition and rule text tests verify ambient day/dusk/night events and
-conditions for fog-light logic.
+Manual FOG control tests verify boot-off, debounce, stuck-input safe-off,
+toggle behavior, safety denial and delayed second-pair requests. Rule condition
+and rule text tests continue to verify the generic configuration grammar.
 Rule Engine rule-set tests verify ordered multi-rule execution, skipped-rule
 accounting, stop-on-first-failure behavior, and stale-telemetry denial through
 the Output Manager budget path.
@@ -228,12 +243,17 @@ Do not intentionally generate load dump, short circuit, overcurrent or another
 destructive corner on the motorcycle. Use only an undamaged board that has
 passed the required bench evidence.
 
-1. Install `EVT-04` with only low-current loads.
-2. Verify no CAN errors.
-3. Verify cranking and alternator behavior.
-4. Verify ACC behavior and low-voltage shutdown.
-5. Add real loads in reviewed steps.
-6. Record connector retention, vibration and enclosure temperatures.
-7. Log CAN without transmitting and confirm the physical CAN1 TX-disabled
+1. Record battery voltage without additional loads, then install undamaged
+   bench-passed `EVT-04`.
+2. Verify DAY with auxiliary lamps off and no CAN errors.
+3. Verify manual FOG toggle, NIGHT and each lamp pair separately.
+4. Verify C36 powering an accessory and charging the battery from the approved
+   power bank according to the C36 manufacturer procedure.
+5. Verify cranking, idle and manual-defined control RPM while recording battery
+   voltage and generator load.
+6. Add only mode-permitted real loads in reviewed steps; test the compressor
+   only after its purchase and current/fuse review.
+7. Record board, wire and connector temperatures, vibration and fault logs.
+8. Log CAN without transmitting and confirm the physical CAN1 TX-disabled
    status.
-8. Disposition every Rev.1 finding into the Rev.2 review package.
+9. Disposition every Rev.1 finding into the Rev.2 review package.

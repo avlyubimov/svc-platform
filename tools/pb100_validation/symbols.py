@@ -1006,11 +1006,13 @@ def validate_schematic_readiness_dashboard() -> None:
     if rows_by_area["PB-100 requirements"]["Status"].strip() != "Closed":
         fail("PB-100 requirements must remain Closed in schematic readiness dashboard")
     freeze_closed = freeze_checklist_status() == "Closed"
-    expected_layout_status = "Ready" if freeze_closed else "Blocked"
+    expected_layout_status = "Ready"
     if rows_by_area["Layout authorization"]["Status"].strip() != expected_layout_status:
-        fail(f"Layout authorization must be {expected_layout_status} for current schematic freeze state")
-    if "schematic freeze" not in rows_by_area["Layout authorization"]["Remaining close work"].lower():
-        fail("Layout authorization close work must reference schematic freeze")
+        fail("Layout authorization must be Ready under ADR-0020")
+    layout_text = " ".join(rows_by_area["Layout authorization"].values())
+    for token in ("EVT-LAYOUT-AUTHORIZED", "EVT-FAB-REVIEW"):
+        if token not in layout_text:
+            fail(f"Layout authorization must preserve the ADR-0020 {token} boundary")
 
     symbol_row = rows_by_area["Symbol readiness"]
     expected_symbol_status = "Closed" if freeze_closed else "Conditional"

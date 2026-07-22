@@ -6,7 +6,8 @@ The JPB1 pair, 20 mm stack, four-spacer retention pattern, assembly fixture,
 mating inspection, and six official plated lands with four GND MF circuits are
 closed in the PB/LB paired-stack closeout. Actual stack and vibration records
 remain post-prototype PB-BENCH-014/015 evidence under ADR-0013. LB-100 board
-import remains blocked by its signal-integrity layout-model gate.
+import, placement and routing are authorized by ADR-0020. Signal-integrity and
+safety evidence must close during `EVT-FAB-REVIEW` before prototype fabrication.
 Review date: 2026-07-20
 
 This closeout converts the LB-100 pre-layout mechanical envelope into reviewed
@@ -45,8 +46,7 @@ with the PB-100 stack or future enclosure serviceability.
 ## Recommended Solution
 
 Use `LB-100-mechanical-layout-inputs.csv` as the LB-100 mechanical source for
-the first controlled KiCad board import after the remaining signal-integrity
-and symbol-promotion gates close:
+the first controlled KiCad board import under `EVT-LAYOUT-AUTHORIZED`:
 
 - Board outline: `100.0 mm x 70.0 mm`.
 - Mounting: four `2.7 mm` finished NPTH M2.5 clearance holes at
@@ -131,6 +131,7 @@ and symbol-promotion gates close:
 
 ## Boundary
 
-LB-100 mechanical envelope is closed as a layout input only. KiCad board import
-remains blocked by the open LB-100 signal-integrity and safety layout model.
-JLCPCB/PCBWay order state remains `NO-GO`.
+LB-100 mechanical envelope is closed as a layout input. KiCad board import,
+placement and routing are authorized. The signal-integrity and safety layout
+model remains an `EVT-FAB-REVIEW` closeout item, while JLCPCB/PCBWay order state
+remains `NO-GO` until `EVT-FAB-AUTHORIZED`.

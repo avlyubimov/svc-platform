@@ -65,12 +65,12 @@ static void test_can_event_runtime_enables_matching_rule_set(void)
         {
             .conditions = conditions,
             .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 40U}
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 40U}
         },
         {
             .conditions = conditions,
             .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_RIGHT, 40U}
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_RIGHT, 40U}
         }
     };
 
@@ -115,7 +115,7 @@ static void test_fault_dispatch_runs_before_rule_actions(void)
         {
             .conditions = conditions,
             .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 100U}
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 100U}
         }
     };
 
@@ -156,7 +156,7 @@ static void test_telemetry_wrapper_denies_stale_matching_rule(void)
         {
             .conditions = conditions,
             .condition_count = sizeof(conditions) / sizeof(conditions[0]),
-            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_LEFT, 40U}
+            .action = {SVC_RULE_ACTION_ENABLE_ROLE, OUT_ROLE_FOG_PRIMARY_LEFT, 40U}
         }
     };
     svc_telemetry_snapshot_t telemetry = {0};

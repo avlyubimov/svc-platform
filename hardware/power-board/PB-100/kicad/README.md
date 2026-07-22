@@ -117,8 +117,10 @@ abstract instances with reviewed final pin electrical types, values, footprints,
 and MPN selections.
 
 KiCad schematic and symbol files are also checked for accessory-role tokens such
-as `FOG`, `USB`, `SEAT`, `CHIGEE`, `DVR`, and `BRAKE`. PB-100 artifacts must use
-generic `OUT1`..`OUT10` naming only.
+as `FOG`, `USB`, `SEAT`, `CHIGEE`, `DVR`, and `BRAKE`. PB-100 output artifacts
+must use generic `OUT1`..`OUT10` naming only. The protected manual-request input
+`FOG_SW_IN` is the sole explicit exception; it does not assign a role to an
+output and cannot bypass Output Manager authorization.
 
 Rows in `PB-100-symbol-capture-worklist.csv` that say `preliminary symbol
 created` are checked against `lib/PB100.kicad_sym`; those symbols must stay

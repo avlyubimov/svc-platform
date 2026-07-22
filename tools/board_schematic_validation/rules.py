@@ -138,7 +138,12 @@ def validate_lb(netlist: Netlist, library_dir: Path) -> list[str]:
     require_component(netlist, "R20", "100k 1% MCU UART idle pull-up", "LB100:R_C_0603_1608Metric", failures)
     require_component(netlist, "R21", "100k 1% reset default assert", "LB100:R_C_0603_1608Metric", failures)
     require_component(netlist, "R22", "100k 1% MCU UART idle pull-up", "LB100:R_C_0603_1608Metric", failures)
+    require_component(netlist, "R23", "10k 1% fog input pull-up", "LB100:R_C_0603_1608Metric", failures)
+    require_component(netlist, "C35", "10nF 50V X7R fog input filter", "LB100:R_C_0603_1608Metric", failures)
     require_net(netlist, "LB_3V3_MAIN", {("R20", "1"), ("R22", "1")}, failures, exact=False)
+    require_net(netlist, "LB_3V3_IO", {("R23", "1")}, failures, exact=False)
+    require_net(netlist, "FOG_SW_IN", {("JPB1", "82"), ("U1", "67"), ("R23", "2"), ("C35", "1")}, failures)
+    require_net(netlist, "GND", {("C35", "2")}, failures, exact=False)
 
     mf_pins = {
         ("JPB1", "MF_A_PIN1_51_END"),

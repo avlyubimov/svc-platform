@@ -9,7 +9,10 @@
     "thermal",
     "power_budget",
     "telemetry",
-    "outputs"
+    "outputs",
+    "manual_controls",
+    "operating_modes",
+    "external_capabilities"
   ],
   "additionalProperties": false,
   "properties": {
@@ -164,6 +167,64 @@
         "$ref": "#/$defs/output"
       }
     },
+    "manual_controls": {
+      "type": "object",
+      "required": ["fog"],
+      "additionalProperties": false,
+      "properties": {
+        "fog": {
+          "type": "object",
+          "required": ["input_signal", "return_signal", "active_low", "debounce_ms", "stuck_timeout_ms", "pair_delay_ms", "restore_on_boot", "primary_roles", "secondary_roles", "output_manager_authority"],
+          "additionalProperties": false,
+          "properties": {
+            "input_signal": {"const": "FOG_SW_IN"},
+            "return_signal": {"const": "SW_GND"},
+            "active_low": {"const": true},
+            "debounce_ms": {"type": "integer", "minimum": 1},
+            "stuck_timeout_ms": {"type": "integer", "minimum": 1000},
+            "pair_delay_ms": {"type": "integer", "minimum": 1},
+            "restore_on_boot": {"const": false},
+            "primary_roles": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/outputRole"}},
+            "secondary_roles": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/outputRole"}},
+            "output_manager_authority": {"const": true}
+          }
+        }
+      }
+    },
+    "operating_modes": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["id", "allowed_roles"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"enum": ["DAY", "NIGHT", "SERVICE_COMPRESSOR", "C36_RESCUE_CHARGE", "ENGINE_OFF"]},
+          "allowed_roles": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/outputRole"}}
+        }
+      }
+    },
+    "external_capabilities": {
+      "type": "object",
+      "required": ["C36_BIDIRECTIONAL"],
+      "additionalProperties": false,
+      "properties": {
+        "C36_BIDIRECTIONAL": {
+          "type": "object",
+          "required": ["managed_output", "counted_in_pb_current", "requires_mcu", "direct_battery_branch", "dedicated_near_battery_fuse", "starter_current_source"],
+          "additionalProperties": false,
+          "properties": {
+            "managed_output": {"const": false},
+            "counted_in_pb_current": {"const": false},
+            "requires_mcu": {"const": false},
+            "direct_battery_branch": {"const": true},
+            "dedicated_near_battery_fuse": {"const": true},
+            "starter_current_source": {"const": false}
+          }
+        }
+      }
+    },
     "fog_logic": {
       "type": "object",
       "additionalProperties": false,
@@ -238,7 +299,17 @@
         "HEATED_SEAT_PASSENGER",
         "DVR",
         "AUX_BRAKE",
-        "SPARE"
+        "SPARE",
+        "CIGARETTE_COMPRESSOR",
+        "HIGH_CURRENT_RESERVE",
+        "FOG_PRIMARY_LEFT",
+        "FOG_PRIMARY_RIGHT",
+        "LOW_CURRENT_RESERVE_1",
+        "FOG_SECONDARY_LEFT",
+        "FOG_SECONDARY_RIGHT",
+        "LOW_CURRENT_RESERVE_2",
+        "LOW_CURRENT_RESERVE_3",
+        "MEDIUM_CURRENT_RESERVE"
       ]
     },
     "output": {
@@ -458,7 +529,7 @@
           "items": {
             "type": "string",
             "minLength": 1,
-            "pattern": "^(USB|CIGARETTE_SOCKET|FOG_LEFT|FOG_RIGHT|CHIGEE|HEATED_SEAT_RIDER|HEATED_SEAT_PASSENGER|DVR|AUX_BRAKE|SPARE)\\.pwm = (100|[1-9]?[0-9])$"
+            "pattern": "^(USB|CIGARETTE_SOCKET|FOG_LEFT|FOG_RIGHT|CHIGEE|HEATED_SEAT_RIDER|HEATED_SEAT_PASSENGER|DVR|AUX_BRAKE|SPARE|CIGARETTE_COMPRESSOR|HIGH_CURRENT_RESERVE|FOG_PRIMARY_LEFT|FOG_PRIMARY_RIGHT|LOW_CURRENT_RESERVE_1|FOG_SECONDARY_LEFT|FOG_SECONDARY_RIGHT|LOW_CURRENT_RESERVE_2|LOW_CURRENT_RESERVE_3|MEDIUM_CURRENT_RESERVE)\\.pwm = (100|[1-9]?[0-9])$"
           }
         }
       }

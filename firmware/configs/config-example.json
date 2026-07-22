@@ -169,47 +169,47 @@
   "outputs": [
     {
       "id": "OUT1",
-      "role": "USB",
+      "role": "CIGARETTE_COMPRESSOR",
       "fuse_a": 15,
       "current_limit_a": 12,
       "pwm": true,
-      "priority": "B"
+      "priority": "A"
     },
     {
       "id": "OUT2",
-      "role": "CIGARETTE_SOCKET",
+      "role": "HIGH_CURRENT_RESERVE",
       "fuse_a": 20,
       "current_limit_a": 18,
       "pwm": false,
-      "priority": "C"
+      "priority": "A"
     },
     {
       "id": "OUT3",
-      "role": "FOG_LEFT",
+      "role": "FOG_PRIMARY_LEFT",
       "fuse_a": 10,
       "current_limit_a": 8,
-      "pwm": true,
-      "priority": "C"
-    },
-    {
-      "id": "OUT4",
-      "role": "FOG_RIGHT",
-      "fuse_a": 10,
-      "current_limit_a": 8,
-      "pwm": true,
-      "priority": "C"
-    },
-    {
-      "id": "OUT5",
-      "role": "CHIGEE",
-      "fuse_a": 5,
-      "current_limit_a": 4,
       "pwm": true,
       "priority": "B"
     },
     {
+      "id": "OUT4",
+      "role": "FOG_PRIMARY_RIGHT",
+      "fuse_a": 10,
+      "current_limit_a": 8,
+      "pwm": true,
+      "priority": "B"
+    },
+    {
+      "id": "OUT5",
+      "role": "LOW_CURRENT_RESERVE_1",
+      "fuse_a": 5,
+      "current_limit_a": 4,
+      "pwm": true,
+      "priority": "A"
+    },
+    {
       "id": "OUT6",
-      "role": "HEATED_SEAT_RIDER",
+      "role": "FOG_SECONDARY_LEFT",
       "fuse_a": 10,
       "current_limit_a": 8,
       "pwm": true,
@@ -217,7 +217,7 @@
     },
     {
       "id": "OUT7",
-      "role": "HEATED_SEAT_PASSENGER",
+      "role": "FOG_SECONDARY_RIGHT",
       "fuse_a": 10,
       "current_limit_a": 8,
       "pwm": true,
@@ -225,15 +225,15 @@
     },
     {
       "id": "OUT8",
-      "role": "DVR",
+      "role": "LOW_CURRENT_RESERVE_2",
       "fuse_a": 5,
       "current_limit_a": 4,
       "pwm": true,
-      "priority": "B"
+      "priority": "A"
     },
     {
       "id": "OUT9",
-      "role": "AUX_BRAKE",
+      "role": "LOW_CURRENT_RESERVE_3",
       "fuse_a": 5,
       "current_limit_a": 4,
       "pwm": true,
@@ -241,78 +241,82 @@
     },
     {
       "id": "OUT10",
-      "role": "SPARE",
+      "role": "MEDIUM_CURRENT_RESERVE",
       "fuse_a": 10,
       "current_limit_a": 8,
       "pwm": true,
-      "priority": "C"
+      "priority": "A"
     }
   ],
-  "fog_logic": {
-    "day_lux": 10000,
-    "dusk_lux": 3000,
-    "night_lux": 1000,
-    "day_pwm": 0,
-    "dusk_pwm": 40,
-    "night_pwm": 70,
-    "high_beam_pwm": 100
-  },
-  "rules": [
-    {
-      "name": "Fog day off",
-      "if": [
-        "engine_running == true",
-        "ambient_day == true",
-        "high_beam == false"
+  "manual_controls": {
+    "fog": {
+      "input_signal": "FOG_SW_IN",
+      "return_signal": "SW_GND",
+      "active_low": true,
+      "debounce_ms": 50,
+      "stuck_timeout_ms": 30000,
+      "pair_delay_ms": 250,
+      "restore_on_boot": false,
+      "primary_roles": [
+        "FOG_PRIMARY_LEFT",
+        "FOG_PRIMARY_RIGHT"
       ],
-      "then": [
-        "FOG_LEFT.pwm = 0",
-        "FOG_RIGHT.pwm = 0"
-      ]
-    },
-    {
-      "name": "Fog dusk running",
-      "if": [
-        "engine_running == true",
-        "ambient_dusk == true",
-        "high_beam == false"
+      "secondary_roles": [
+        "FOG_SECONDARY_LEFT",
+        "FOG_SECONDARY_RIGHT"
       ],
-      "then": [
-        "FOG_LEFT.pwm = 40",
-        "FOG_RIGHT.pwm = 40"
-      ]
-    },
-    {
-      "name": "Fog night running",
-      "if": [
-        "engine_running == true",
-        "ambient_night == true",
-        "high_beam == false"
-      ],
-      "then": [
-        "FOG_LEFT.pwm = 70",
-        "FOG_RIGHT.pwm = 70"
-      ]
-    },
-    {
-      "name": "Fog high beam",
-      "if": [
-        "engine_running == true",
-        "high_beam == true"
-      ],
-      "then": [
-        "FOG_LEFT.pwm = 100",
-        "FOG_RIGHT.pwm = 100"
-      ]
-    },
-    {
-      "name": "Left indicator fog cut",
-      "if": [
-        "left_indicator == true"
-      ],
-      "then": [
-        "FOG_LEFT.pwm = 0"
-      ]
+      "output_manager_authority": true
     }
-  ]
+  },
+  "operating_modes": [
+    {
+      "id": "DAY",
+      "allowed_roles": [
+        "HIGH_CURRENT_RESERVE",
+        "LOW_CURRENT_RESERVE_1",
+        "LOW_CURRENT_RESERVE_2",
+        "LOW_CURRENT_RESERVE_3",
+        "MEDIUM_CURRENT_RESERVE"
+      ]
+    },
+    {
+      "id": "NIGHT",
+      "allowed_roles": [
+        "FOG_PRIMARY_LEFT",
+        "FOG_PRIMARY_RIGHT",
+        "FOG_SECONDARY_LEFT",
+        "FOG_SECONDARY_RIGHT",
+        "HIGH_CURRENT_RESERVE",
+        "LOW_CURRENT_RESERVE_1",
+        "LOW_CURRENT_RESERVE_2",
+        "LOW_CURRENT_RESERVE_3",
+        "MEDIUM_CURRENT_RESERVE"
+      ]
+    },
+    {
+      "id": "SERVICE_COMPRESSOR",
+      "allowed_roles": [
+        "CIGARETTE_COMPRESSOR"
+      ]
+    },
+    {
+      "id": "C36_RESCUE_CHARGE",
+      "allowed_roles": []
+    },
+    {
+      "id": "ENGINE_OFF",
+      "allowed_roles": []
+    }
+  ],
+  "external_capabilities": {
+    "C36_BIDIRECTIONAL": {
+      "managed_output": false,
+      "counted_in_pb_current": false,
+      "requires_mcu": false,
+      "direct_battery_branch": true,
+      "dedicated_near_battery_fuse": true,
+      "starter_current_source": false
+    }
+  },
+  "rules": []
 }

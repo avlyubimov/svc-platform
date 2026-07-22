@@ -45,8 +45,16 @@ remain in configuration rather than firmware constants, that current JSON rule
 strings fit the limited firmware rule text grammar, that
 every `then[]` has at least one action, that rule actions resolve to one
 configured role mapping, and that partial PWM actions target PWM-capable outputs.
-The example fog-light rules use the ambient day/dusk/night conditions supported
-by firmware rather than hard-coding physical output channels.
+The BMW K25 example now uses the `manual_controls.fog` request contract and a
+five-mode allowed-role matrix. `FOG_SW_IN` never selects physical outputs
+directly: configured fog roles resolve through Output Manager. Boot restore is
+forbidden, OUT3/OUT4 precede OUT6/OUT7 by a configurable delay, and safety
+denials clear the request.
+
+`external_capabilities.C36_BIDIRECTIONAL` records the unmanaged direct-battery
+branch. It is excluded from PB current accounting, requires no MCU and is never
+represented as a controllable output. Its state can influence user warnings but
+not a firmware claim that the branch was disconnected.
 
 Configuration persistence is defined by `firmware/services/config-store.md`.
 Persisted records are versioned, checksummed, and selected from two slots before
@@ -62,8 +70,9 @@ Hardware capabilities are separate from vehicle role mapping. PB-100 capabilitie
 are tracked in `firmware/configs/hardware/pb-100-capabilities.json`.
 
 The manifest describes generic `OUT1`..`OUT10` electrical capability, telemetry,
-power-budget limits, and CAN1 safety defaults. It must not contain accessory role
-names. `tools/validate_config.py` checks it against the PB-100 output matrix,
+power-budget limits, CAN1 safety defaults, the named manual-request electrical
+input and the external C36 path. It must not assign accessory roles to outputs.
+`tools/validate_config.py` checks it against the PB-100 output matrix,
 current/thermal telemetry maps, `config-example.json`, and the CAN1 DNP/open
 read-only policy.
 

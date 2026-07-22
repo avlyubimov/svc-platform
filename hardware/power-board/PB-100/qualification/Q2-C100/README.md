@@ -1,10 +1,13 @@
 # Q2-C100 Qualification Coupon
 
-Status: `ELECTRICAL ROUTING COMPLETE / FABRICATION BLOCKED`
+Status: `PAUSED DIAGNOSTIC COUPON / FABRICATION BLOCKED`
 
-Q2-C100 is the dedicated laboratory coupon authorized by
+Q2-C100 is the optional diagnostic laboratory coupon described by
 `PB-100-q2-empirical-qualification-plan.md`. It is not PB-100, is not a vehicle
-assembly and does not authorize `PB-100.kicad_pcb`.
+assembly and does not itself authorize `PB-100.kicad_pcb`; ADR-0020 separately
+authorizes the full PB-100 Rev.1 EVT layout and its own controlled fab review.
+Further coupon development is paused and coupon fabrication is not a prerequisite
+for PB-100 EVT layout, fabrication or validation.
 
 The committed KiCad milestone contains:
 

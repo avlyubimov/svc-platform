@@ -24,6 +24,15 @@ letting feature code bypass the Output Manager.
 - Treat invalid or stale thermal telemetry as cutoff.
 - Keep outputs off after recovery; recovery permits future requests but does not
   restore prior output state automatically.
+- Accept `FOG_SW_IN` only through `manual_fog_control`; debounce, stuck-input,
+  boot-off and pair-delay processing produce requests rather than direct GPIO
+  control. Invalid configuration, a fault or denied voltage clears the request.
+- Preserve shedding order from configuration: the secondary fog pair uses
+  priority C, the primary pair priority B and remaining reference loads priority
+  A. A critical voltage condition still disables every managed output.
+- Treat `C36_BIDIRECTIONAL` as an external unmanaged branch. Firmware may warn
+  about low battery or inadequate generator margin but cannot claim to disable
+  C36.
 
 ## Fail-safe behavior
 
@@ -35,6 +44,9 @@ available, the coordinator still disables active outputs.
 - `firmware/services/system_safety.h`
 - `firmware/services/system_safety.c`
 - `firmware/tests/test_system_safety.c`
+- `firmware/services/manual_fog_control.h`
+- `firmware/services/manual_fog_control.c`
+- `firmware/tests/test_manual_fog_control.c`
 
 Startup sequencing is handled by:
 

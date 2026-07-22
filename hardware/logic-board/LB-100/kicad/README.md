@@ -1,16 +1,15 @@
 # LB-100 KiCad Project
 
-Status: Schematic freeze closed; layout-start preparation open; no PCB layout
+Status: `EVT-LAYOUT-AUTHORIZED`; no PCB layout exists yet
 
 This directory contains the reviewed value-bearing LB-100 KiCad schematic and
 project-local symbol/footprint libraries.
 
-There is intentionally no `LB-100.kicad_pcb` file. Schematic freeze is closed,
-but KiCad board import remains blocked until the signal-integrity and safety
-layout-model row in `../LB-100-pcb-layout-start-checklist.csv` closes. Gerbers,
-drills, pick-place files, BOM/CPL order
-packages, and zipped manufacturing outputs remain blocked until layout review
-and order evidence close.
+There is currently no `LB-100.kicad_pcb` file. ADR-0020 authorizes its controlled
+creation, placement and routing. Signal-integrity and safety constraints in
+`../LB-100-pcb-layout-start-checklist.csv` must close during
+`EVT-FAB-REVIEW`. Gerbers, drills, pick-place files, BOM/CPL order packages and
+zipped manufacturing outputs remain blocked until `EVT-FAB-AUTHORIZED`.
 
 ## Source Documents
 

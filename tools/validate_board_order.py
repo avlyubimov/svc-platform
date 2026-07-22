@@ -430,11 +430,9 @@ def layout_files(board_dir: Path) -> list[Path]:
 def validate_no_layout_before_freeze(board: str, board_dir: Path, status: str) -> None:
     pcbs = layout_files(board_dir)
     manufacturing = manufacturing_files(board_dir)
-    release_state = current_pb_release_state() if board == "PB-100" else "BLOCKED"
-    layout_allowed = status == "Closed" or (
-        board == "PB-100" and is_layout_authorized(release_state)
-    )
-    fabrication_allowed = board == "PB-100" and is_fabrication_authorized(release_state)
+    release_state = current_board_release_state(board)
+    layout_allowed = status == "Closed" or is_layout_authorized(release_state)
+    fabrication_allowed = is_fabrication_authorized(release_state)
     if not layout_allowed and pcbs:
         fail(f"{board} has PCB layout before schematic freeze: {pcbs[0].relative_to(REPO_ROOT)}")
     if not fabrication_allowed and status != "Closed" and manufacturing:
@@ -457,6 +455,15 @@ def current_pb_release_state() -> str:
         validate_csv(PB100_STAGED_READINESS),
         validate_csv(PB100_POST_PROTOTYPE),
     )
+
+
+def current_board_release_state(board: str) -> str:
+    if board == "PB-100":
+        return current_pb_release_state()
+    for row in validate_csv(LAYOUT_START_READINESS):
+        if row.get("Board", "").strip() == board:
+            return row.get("Release state", "").strip()
+    fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)} is missing {board}")
 
 
 def validate_adr_0014() -> None:
@@ -538,7 +545,7 @@ def validate_blocker_register(board: str, path: Path) -> None:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: closed blocker must explain closed evidence")
         impact = row["Layout impact"].lower()
         if "layout" not in impact:
-            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Layout impact must block layout")
+            fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: Layout impact must describe layout disposition")
         if row["Status"].strip() != "Closed" and "block" not in impact:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: active Layout impact must block layout")
 
@@ -852,14 +859,18 @@ def validate_order_readiness() -> None:
                 f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
                 f"PB-100 release state must be {expected_pb_release_state}"
             )
-        expected_order_state = "READY" if is_production_authorized(release_state) else "NO-GO"
+        expected_order_state = (
+            "READY"
+            if is_production_authorized(release_state)
+            else "EVT-READY"
+            if is_fabrication_authorized(release_state)
+            else "NO-GO"
+        )
         if row["Order state"].strip() != expected_order_state:
             fail(
                 f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: order must be {expected_order_state}"
             )
         row_text = " ".join(row.values())
-        if release_state == "BLOCKED" and "No PCB layout" not in row_text:
-            fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: BLOCKED must keep No PCB layout")
         if not is_fabrication_authorized(release_state):
             for token in ("No fabrication outputs", "No assembly outputs"):
                 if token not in row_text:
@@ -1155,7 +1166,7 @@ def validate_layout_start_readiness() -> None:
             )
         expected_planning_state = (
             "READY"
-            if freeze_state == "Closed" or (board == "PB-100" and is_layout_authorized(release_state))
+            if freeze_state == "Closed" or is_layout_authorized(release_state)
             else "BLOCKED"
         )
         if row["Layout planning state"].strip() != expected_planning_state:
@@ -1166,7 +1177,7 @@ def validate_layout_start_readiness() -> None:
         expected_import_state = (
             "READY"
             if is_layout_authorized(release_state)
-            and (freeze_state == "Closed" or board == "PB-100")
+            and (freeze_state == "Closed" or is_layout_authorized(release_state))
             else "BLOCKED"
         )
         if row["KiCad board import state"].strip() != expected_import_state:
@@ -1186,7 +1197,13 @@ def validate_layout_start_readiness() -> None:
             )
         if not row["Assembly/DFM baseline"].startswith("READY"):
             fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: assembly DFM baseline must be READY")
-        expected_order_state = "READY" if is_production_authorized(release_state) else "NO-GO"
+        expected_order_state = (
+            "READY"
+            if is_production_authorized(release_state)
+            else "EVT-READY"
+            if is_fabrication_authorized(release_state)
+            else "NO-GO"
+        )
         if row["Order state"].strip() != expected_order_state:
             fail(
                 f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
@@ -1396,7 +1413,7 @@ def validate_footprint_binding_status() -> None:
                 f"source-identified count {source_identified_items} does not match inventory count "
                 f"{expected_source_identified_items}"
             )
-        expected_state = "READY" if board == "FB-100" else "BLOCKED"
+        expected_state = "READY" if is_layout_authorized(current_board_release_state(board)) else "BLOCKED"
         if row["Board import state"].strip() != expected_state:
             fail(
                 f"{FOOTPRINT_BINDING_STATUS.relative_to(REPO_ROOT)}:{row_number}: "
@@ -1493,7 +1510,7 @@ def validate_mechanical_envelope_status() -> None:
                 f"{MECHANICAL_ENVELOPE_STATUS.relative_to(REPO_ROOT)}:{row_number}: "
                 f"open item count {open_items} does not match inventory count {inventory_counts[board]}"
             )
-        expected_state = "READY" if board == "FB-100" else "BLOCKED"
+        expected_state = "READY" if is_layout_authorized(current_board_release_state(board)) else "BLOCKED"
         if row["Board import state"].strip() != expected_state:
             fail(
                 f"{MECHANICAL_ENVELOPE_STATUS.relative_to(REPO_ROOT)}:{row_number}: "

@@ -1,0 +1,8 @@
+Check ID,Scope,Status,Required evidence,Blocked action
+LB-EVT-FAB-001,Full-board implementation,Open,Complete routed LB-100.kicad_pcb matching the frozen schematic,Do not generate fabrication outputs
+LB-EVT-FAB-002,Connectivity and rules,Open,Zero DRC unconnected and schematic-board parity findings with reviewed waivers only,Do not generate fabrication outputs
+LB-EVT-FAB-003,Analog telemetry,Open,OUT1_IMON through OUT10_IMON ADC paths ADC_REF AGND VBAT_SENSE and IIN_SENSE placement routing and sampling review,Do not order EVT boards
+LB-EVT-FAB-004,Digital telemetry and control,Open,INA228 I2C address pull-up interrupt and FOG_SW_IN PA8 pull-up RC filter debounce/stuck-input contract review,Do not order EVT boards
+LB-EVT-FAB-005,Safe boot and communications,Open,All OUTn controls safe at boot plus CAN USB SD clock BLE sensor and service signal-integrity review,Do not order EVT boards
+LB-EVT-FAB-006,Manufacturability,Open,JLCPCB or PCBWay stackup DFM assembly inspection DNP and five-unit serial-package review,Do not set EVT-FAB-AUTHORIZED
+LB-EVT-FAB-007,Review authority,Open,Codex technical review and Product Owner approval recorded; no second developer required,Do not set EVT-FAB-AUTHORIZED

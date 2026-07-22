@@ -525,7 +525,7 @@ def validate_b2b_resource_binding() -> None:
         "CAN1 safety crossing": set(str(pin) for pin in range(67, 71)),
         "CAN2 expansion route": set(str(pin) for pin in range(71, 73)),
         "LIN RS485 and UART expansion": set(str(pin) for pin in range(73, 80)),
-        "External ADC digital and 5V enable": set(str(pin) for pin in range(80, 85)),
+        "External ADC manual control and 5V enable": set(str(pin) for pin in range(80, 85)),
         "Spare reserve pins": set(str(pin) for pin in range(85, 101)),
     }
     required_tokens = {
@@ -538,6 +538,7 @@ def validate_b2b_resource_binding() -> None:
         "CAN1 safety crossing": ("CAN1_TX_ROUTE", "DNP/open", "FDCAN", "future-ADR"),
         "CAN2 expansion route": ("CAN2_RX_ROUTE", "CAN2_TX_ROUTE", "FDCAN"),
         "LIN RS485 and UART expansion": ("LIN_TX", "RS485_DE", "UART"),
+        "External ADC manual control and 5V enable": ("FOG_SW_IN", "PA8", "protected GPIO"),
         "Spare reserve pins": ("SPARE_01..SPARE_16", "reserve"),
     }
 
@@ -560,7 +561,11 @@ def validate_b2b_resource_binding() -> None:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: unexpected pin set for {item}")
         covered_pins.update(row_pins)
         row_text = " ".join(row.values())
-        if "No exact STM32H5" not in row_text and "No MCU pin assignment" not in row_text:
+        if (
+            item != "External ADC manual control and 5V enable"
+            and "No exact STM32H5" not in row_text
+            and "No MCU pin assignment" not in row_text
+        ):
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: must avoid exact STM32H5 pin assignment")
         for token in required_tokens.get(item, ()):
             if token not in row_text:
@@ -596,10 +601,24 @@ def validate_validation_traceability() -> None:
             f"{', '.join(missing_columns)}"
         )
 
-    tracked_gates = set(pbrel_id_by_gate())
+    supplemental_gates = {
+        "Manual fog request",
+        "C36 bidirectional branch",
+        "Reference operating modes",
+    }
+    tracked_gates = set(pbrel_id_by_gate()) | supplemental_gates
     seen_test_ids = set()
     gates_with_tests: dict[str, list[dict[str, str]]] = {gate: [] for gate in tracked_gates}
-    allowed_phases = {"Schematic review", "Schematic plus bench", "Production review"}
+    allowed_phases = {
+        "Schematic review",
+        "Schematic plus bench",
+        "Layout plus bench",
+        "Layout bench and production qualification",
+        "Schematic layout firmware and bench",
+        "Harness review plus bench and motorcycle",
+        "Configuration firmware bench and motorcycle",
+        "Production review",
+    }
     for row_number, row in enumerate(rows, 2):
         test_id = row["Test ID"].strip()
         freeze_gate = row["Freeze gate"].strip()
@@ -727,6 +746,18 @@ def validate_validation_traceability() -> None:
                 fail("Garage assembly validation trace must include garage install sourcing precheck")
             if "pb-100-garage-install-closeout-precheck.csv" not in row_text:
                 fail("Garage assembly validation trace must include garage install closeout precheck")
+        if freeze_gate == "Manual fog request" and not all(
+            token in row_text for token in ("fog_sw_in", "output manager", "out3/out4", "out6/out7")
+        ):
+            fail("Manual fog validation trace must preserve request authority and ordered pairs")
+        if freeze_gate == "C36 bidirectional branch" and not all(
+            token in row_text for token in ("c36", "iin_sense", "starter-current")
+        ):
+            fail("C36 validation trace must preserve its independent bidirectional boundary")
+        if freeze_gate == "Reference operating modes" and not all(
+            token in row_text for token in ("day", "night", "service_compressor", "priority shedding")
+        ):
+            fail("Reference-mode validation trace must preserve the load matrix and shedding order")
         gates_with_tests[freeze_gate].append(row)
 
     required_primary_artifacts = {

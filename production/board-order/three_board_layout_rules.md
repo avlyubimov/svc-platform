@@ -77,10 +77,11 @@ files, fabrication packages, or PCBA orders.
 
 ## Output Boundary
 
-The next allowed work follows each board's release state. `LAYOUT-ONLY` permits
-controlled KiCad board creation and review. `PROTO-ONLY` permits marked
-engineering-prototype Gerbers, drills, BOM/CPL, placement, assembly, and order
-outputs after post-layout extraction. `PRODUCTION-READY` plus the normal
-production package gates is required for production and field release.
-Manufacturing outputs remain blocked in `BLOCKED` and `LAYOUT-ONLY`; prototype
-outputs must never be represented as production-ready evidence.
+The next allowed work follows ADR-0020. `EVT-LAYOUT-AUTHORIZED` permits
+controlled KiCad board creation and routing. `EVT-FAB-REVIEW` records completed
+routing while DRC, parity, safety and DFM are reviewed. Only
+`EVT-FAB-AUTHORIZED` permits clearly marked EVT Gerbers, drills, BOM/CPL,
+placement, assembly and limited prototype orders. `PRODUCTION-RELEASE` plus
+the normal production package gates is required for production. Manufacturing outputs remain blocked
+before `EVT-FAB-AUTHORIZED`; EVT outputs must never be
+represented as production-ready evidence.

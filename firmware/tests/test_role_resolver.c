@@ -7,7 +7,7 @@ static void test_default_config_resolves_role_to_output(void)
 {
     const svc_role_resolver_result_t result = svc_role_resolver_find_output(
         &svc_default_config,
-        OUT_ROLE_FOG_LEFT);
+        OUT_ROLE_FOG_PRIMARY_LEFT);
 
     assert(result.status == SVC_ROLE_RESOLVER_OK);
     assert(result.output_id == SVC_OUTPUT_OUT3);
@@ -27,14 +27,14 @@ static void test_missing_role_is_reported(void)
 {
     svc_device_config_t config = svc_default_config;
     for (size_t output_index = 0U; output_index < SVC_OUTPUT_COUNT; ++output_index) {
-        if (config.outputs[output_index].role == OUT_ROLE_DVR) {
+        if (config.outputs[output_index].role == OUT_ROLE_LOW_CURRENT_RESERVE_2) {
             config.outputs[output_index].role = OUT_ROLE_SPARE;
         }
     }
 
     const svc_role_resolver_result_t result = svc_role_resolver_find_output(
         &config,
-        OUT_ROLE_DVR);
+        OUT_ROLE_LOW_CURRENT_RESERVE_2);
 
     assert(result.status == SVC_ROLE_RESOLVER_NOT_FOUND);
     assert(result.match_count == 0U);
@@ -43,11 +43,11 @@ static void test_missing_role_is_reported(void)
 static void test_ambiguous_role_is_reported(void)
 {
     svc_device_config_t config = svc_default_config;
-    config.outputs[0].role = OUT_ROLE_FOG_LEFT;
+    config.outputs[0].role = OUT_ROLE_FOG_PRIMARY_LEFT;
 
     const svc_role_resolver_result_t result = svc_role_resolver_find_output(
         &config,
-        OUT_ROLE_FOG_LEFT);
+        OUT_ROLE_FOG_PRIMARY_LEFT);
 
     assert(result.status == SVC_ROLE_RESOLVER_AMBIGUOUS);
     assert(result.match_count == 2U);
@@ -60,7 +60,7 @@ static void test_invalid_config_is_reported(void)
 
     const svc_role_resolver_result_t result = svc_role_resolver_find_output(
         &config,
-        OUT_ROLE_USB);
+        OUT_ROLE_HIGH_CURRENT_RESERVE);
 
     assert(result.status == SVC_ROLE_RESOLVER_INVALID_CONFIG);
 }
