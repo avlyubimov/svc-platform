@@ -95,14 +95,14 @@ void svc_can_log_persistence_init(
 
 svc_can_log_persist_status_t svc_can_log_persist_can1(
     svc_can_log_persistence_t *persistence,
-    svc_can_log_t *log,
+    svc_can1_log_queue_t *queue,
     size_t max_records,
     size_t *persisted_records)
 {
     if (persisted_records != NULL) {
         *persisted_records = 0U;
     }
-    if (persistence == NULL || log == NULL) {
+    if (persistence == NULL || queue == NULL) {
         return SVC_CAN_LOG_PERSIST_INVALID_ARGUMENT;
     }
     if (persistence->backend.write == NULL || persistence->backend.sync == NULL) {
@@ -112,17 +112,8 @@ svc_can_log_persist_status_t svc_can_log_persist_can1(
         return SVC_CAN_LOG_PERSIST_NO_DATA;
     }
 
-    size_t selected[SVC_CAN_LOG_CAPACITY] = {0U};
-    size_t selected_count = 0U;
-    const size_t limit = max_records < SVC_CAN_LOG_CAPACITY
-        ? max_records
-        : SVC_CAN_LOG_CAPACITY;
-    for (size_t index = 0U; index < svc_can_log_count(log) && selected_count < limit; ++index) {
-        svc_can_frame_t frame = {0};
-        if (svc_can_log_get(log, index, &frame) && frame.port == SVC_CAN_PORT_CAN1_VEHICLE) {
-            selected[selected_count++] = index;
-        }
-    }
+    const size_t queued_count = svc_can1_log_queue_count(queue);
+    const size_t selected_count = max_records < queued_count ? max_records : queued_count;
     if (selected_count == 0U) {
         return SVC_CAN_LOG_PERSIST_NO_DATA;
     }
@@ -130,7 +121,7 @@ svc_can_log_persist_status_t svc_can_log_persist_can1(
     for (size_t output_index = 0U; output_index < selected_count; ++output_index) {
         svc_can_frame_t frame = {0};
         uint8_t record[SVC_CAN_LOG_RECORD_SIZE] = {0U};
-        if (!svc_can_log_get(log, selected[output_index], &frame)) {
+        if (!svc_can1_log_queue_peek(queue, output_index, &frame)) {
             return SVC_CAN_LOG_PERSIST_INVALID_ARGUMENT;
         }
         encode_record(&frame, persistence->next_sequence + output_index, record);
@@ -147,10 +138,8 @@ svc_can_log_persist_status_t svc_can_log_persist_can1(
         return SVC_CAN_LOG_PERSIST_SYNC_FAILED;
     }
 
-    for (size_t index = selected_count; index > 0U; --index) {
-        if (!svc_can_log_remove(log, selected[index - 1U])) {
-            return SVC_CAN_LOG_PERSIST_INVALID_ARGUMENT;
-        }
+    if (!svc_can1_log_queue_consume(queue, selected_count)) {
+        return SVC_CAN_LOG_PERSIST_INVALID_ARGUMENT;
     }
     persistence->next_sequence += selected_count;
     for (size_t index = 0U; index < selected_count; ++index) {

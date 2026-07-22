@@ -141,6 +141,13 @@ Configuration update tests verify unsafe or hardware-incompatible configurations
 are not prepared for persistence.
 CAN RX log tests verify CAN1/CAN2 receive-only frame capture, invalid-frame
 rejection, ring-buffer overwrite accounting, and saturating diagnostic counters.
+They also verify that the CAN1 ISR feeds a separate always-lock-free SPSC
+queue, that saturation drops only the new persistence copy, and that frames
+arriving during a slow append/sync cannot replace or reorder the logger task's
+pending batch. FatFs-adapter tests cover the CRC-protected session header and
+40-byte records, preallocation, size-based rotation, reopening the latest
+rotated session, and truncation of torn or corrupt tails. The target STM32
+SDMMC/SPI `diskio` binding remains a hardware-integration test gate.
 CAN decode tests verify received frames publish internal state-change events
 through the Event Bus without repeating unchanged states, and retry dropped edges
 when the Event Bus is full.

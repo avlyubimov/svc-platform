@@ -8,9 +8,10 @@ project-local symbol/footprint libraries.
 The controlled `FB-100.kicad_pcb` placement and routing are generated from the frozen
 44-component schematic and project-local footprints. Mechanical-envelope and
 USB/no-back-power inputs are applied. The route manifest contains 457 segments,
-45 vias and four filled GND zones with zero DRC or unconnected findings.
-Filled-zone/return-path review, stackup-specific USB tuning,
-courtyard/silkscreen cleanup and final fab review remain open. There are no
+48 vias and four filled GND zones with zero refilled DRC or unconnected findings.
+USB stack geometry, analytical impedance/skew and transition return-via checks
+are automated. Supplier field-solver confirmation, physical JFB1 cable/latch
+fit, enclosure integration and final assembly DFM remain open. There are no
 manufacturing outputs: Gerbers, drills, pick-place files, BOM/CPL order
 packages, zipped fabrication packages, and board orders remain blocked until
 the later prototype/production gates close.

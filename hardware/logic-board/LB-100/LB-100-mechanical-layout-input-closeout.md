@@ -57,8 +57,9 @@ the first controlled KiCad board import under `EVT-LAYOUT-AUTHORIZED`:
 - Power rails: PB_5V_OUT entry and LB_3V3 conversion near JPB1 with no-back-power
   separation from service USB.
 - microSD: right-edge card access with local ESD and card-detect clearance.
-- BLE: top-right edge antenna keepout with copper and enclosure RF clearance
-  deferred to selected module datasheet rules.
+- BLE: U7 at `(72,59)` with the ceramic antenna facing the `+Y` edge and the
+  project-derived four-copper-layer keepout documented in
+  `LB-100-e73-antenna-keepout.md`.
 - Sensors: documented board axes plus quiet IMU and lux/aperture zones.
 - Expansion/service: generic DNP/service keepouts while CAN1_TX_ROUTE remains
   DNP/open by default.
@@ -92,8 +93,9 @@ the first controlled KiCad board import under `EVT-LAYOUT-AUTHORIZED`:
   PB-BENCH-014/015 rather than treated as pre-layout evidence.
 - CAN, USB, SD, clock, BLE antenna, and sensor placement/routing constraints
   remain open in the signal-integrity and safety layout model.
-- BLE module keepout and enclosure RF material must be verified against the
-  selected module datasheet and later RF inspection.
+- The E73 manual does not publish a numeric host-PCB keepout. The implemented
+  boundary is derived from its official terminal geometry and must be checked
+  with the final enclosure and EVT range measurements.
 - Missing optional hardware must remain a capability-unavailable state in
   firmware rather than a board-specific firmware fork.
 

@@ -121,7 +121,10 @@ CAN_SAFETY_SRCS := \
 	tests/test_can_safety.c
 CAN_LOG_SRCS := \
 	services/can_log.c \
+	services/can_log_fatfs.c \
+	services/can_log_queue.c \
 	services/can_log_persistence.c \
+	services/can_log_task.c \
 	tests/test_can_log.c
 CAN_DECODE_SRCS := \
 	services/can_decode.c \

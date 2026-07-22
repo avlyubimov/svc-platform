@@ -3867,3 +3867,60 @@ rejected because the congested MCU/JPB1 fan-out needs local re-placement and a
 clean DRC result. FB-100 remains fully routed, PB-100 remains a truthful partial
 import pending its unresolved footprint bindings, and no manufacturing output
 or order is authorized.
+
+## 2026-07-22 — Separate persistent CAN1 capture from the diagnostic ring
+
+Decision: retain the 32-frame overwrite ring only for recent RAM diagnostics
+and introduce a separate always-lock-free single-producer/single-consumer CAN1
+queue. The receive ISR owns only the queue head, copies a bounded frame and
+never calls storage. One logger task owns the tail and advances it only after a
+bounded batch has been appended and synced. Queue saturation drops the new
+persistence copy rather than overwriting a frame being written.
+
+Decision: add a platform-injected FatFs/microSD adapter with a CRC-protected
+64-byte session header, 40-byte CRC-protected records, directory selection of
+the latest rotated session, preallocation, size-based rotation and startup
+truncation of partial or corrupt tails. A failed sync may leave a duplicate
+sequence, so offline readers deduplicate it. The actual STM32 SDMMC/SPI
+`diskio` binding remains mandatory before motorcycle logging tests.
+
+Result: host tests inject ISR frames during slow storage writes, prove that new
+frames cannot replace the committed batch, verify full-queue drops, header and
+record CRC, rotation across reboot, preallocation and torn-tail recovery. The
+service still exposes no CAN transmit API and does not delay PCB fabrication.
+
+## 2026-07-22 — Implement E73 keepout and accept Rev.1 optical placement
+
+Decision: place E73 U7 at `(72,59)` with its ceramic antenna facing the `+Y`
+edge. Forbid tracks, vias, pads and pours on all four copper layers within
+`X65.35..78.65/Y66.61..70.00`. The boundary is project-derived from the
+official Ebyte terminal drawing plus 0.15 mm land clearance because the vendor
+manual does not publish a numeric host-PCB keepout. It is not represented as a
+manufacturer-certified RF rule; enclosure metal clearance and EVT range remain
+open.
+
+Decision: keep VEML7700 on LB-100 Rev.1 and accept its current placement for
+EVT without treating the future enclosure aperture as a fabrication blocker.
+Measure usefulness on EVT. Move the sensor externally only in production/Rev.2.
+
+Result: LB-100 now carries four deterministic GND-zone intents plus the exact
+multilayer E73 rule area. Local DRC-guided recovery routes restore CH_LED_8,
+PB_I2C_SDA, LB_3V3_MAIN, BLE_RESET_N_MCU and the moved U15 UART_TX without
+crossing the keepout. The resulting 1,844-segment/188-via board has 63 source
+connections before refill and 53 after refill. KiCad refill reports no short,
+crossing, clearance or keepout violation; the backlog remains an EVT fab
+blocker.
+
+## 2026-07-22 — Close FB-100 connectivity DRC and USB analytical precheck
+
+Decision: retain the selected 1.6 mm four-layer 3313 stack model and lock the
+long USB pair to 0.154 mm width, 0.2032 mm edge gap and at most 0.10 mm total
+skew. Add GND return vias at `(2.2,17.75)`, `(11.8,3.5)` and `(66.5,5.5)` so
+each grouped reference-layer transition has a ground via within 4 mm.
+
+Result: FB-100 has 457 segments, 48 vias, four GND zones, zero unconnected items
+and zero refilled DRC violations. Routed skew is 0.0151 mm and the documented
+IPC-style precheck is approximately 91.5 ohm differential. Supplier field-
+solver/order confirmation, physical FFC contact-side and latch fit, enclosure
+USB-shell fit and assembly DFM remain open; no manufacturing output is
+authorized.

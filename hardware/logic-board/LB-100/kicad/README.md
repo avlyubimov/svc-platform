@@ -8,8 +8,10 @@ project-local symbol/footprint libraries.
 The controlled `LB-100.kicad_pcb` contains all 104 value-bearing schematic
 footprints, four shared stack holes, four local mounting holes, the reviewed
 100 mm x 70 mm outline and functional placement zones. The deterministic route
-manifest contains 1,875 segments and 185 vias, leaving 53 connections open with
-no shorts, crossings, or copper-clearance violations. It is not a
+manifest currently contains 1,844 segments and 188 vias, leaving 63 source
+connections open before refill and 53 after refill with no shorts, crossings,
+copper-clearance or E73 keepout violations. Four GND-zone intents and the exact
+four-copper-layer antenna rule area are present. It is not a
 fabrication-ready board. Five non-assembly top-side pads provide E73 SWDIO,
 SWDCLK, reset, switched target reference and GND recovery access. ADR-0020
 authorizes continued routing. Signal-integrity and safety constraints in
@@ -20,8 +22,8 @@ zipped manufacturing outputs remain blocked until `EVT-FAB-AUTHORIZED`.
 
 Validation: `python3 tools/validate_lb100_layout.py` checks deterministic
 generation, exact schematic parity, four-layer placement, the 104+8 footprint
-count, the explicit 53-connection routing backlog and absence of unsafe
-copper/clearance/courtyard collisions.
+count, both pre/post-refill routing facts, VEML7700 Rev.1 disposition, E73 rule
+geometry and absence of unsafe copper/clearance/keepout collisions.
 
 ## Source Documents
 

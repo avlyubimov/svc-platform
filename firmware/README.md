@@ -52,9 +52,10 @@ Current host tests cover:
 - Event Log fixed-size diagnostic ring buffer with overwrite/drop accounting
   that saturates instead of wrapping the diagnostic drop counter.
 - CAN1 listen-only TX denial and CAN2 expansion TX allowance.
-- CAN RX Log fixed-size receive-only frame capture for CAN1/CAN2 with
-  saturating diagnostic counters and bounded, CRC-protected CAN1 persistence
-  batches for a platform microSD/FAT append/sync backend.
+- CAN RX Log fixed-size receive-only diagnostics plus a separate ISR-to-logger
+  CAN1 queue, 40-byte CRC-protected records, FatFs session headers,
+  preallocation, rotation and torn-tail recovery. The target STM32 disk-I/O
+  binding remains required before motorcycle logging tests.
 - CAN Event Decode from received frames to internal Event Bus state-change
   events without output control.
 - CAN Event Decode dropped-edge retry behavior when the Event Bus is full.
