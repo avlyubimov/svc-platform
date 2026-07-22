@@ -89,17 +89,26 @@ bool svc_output_role_is_valid(output_role_t role)
 
 static bool svc_manual_fog_config_is_valid(const svc_manual_fog_config_t *fog)
 {
-    if (fog == NULL || !fog->active_low || fog->debounce_ms == 0U ||
-        fog->stuck_timeout_ms <= fog->debounce_ms || fog->pair_delay_ms == 0U ||
-        fog->restore_on_boot || !fog->output_manager_authority) {
+    if (fog == NULL || fog->restore_on_boot || !fog->output_manager_authority) {
         return false;
     }
 
+    const svc_manual_fog_input_config_t *inputs[] = {&fog->pair_a, &fog->pair_b};
+    for (size_t input_index = 0U; input_index < 2U; ++input_index) {
+        const svc_manual_fog_input_config_t *input = inputs[input_index];
+        if (!input->active_low || input->debounce_ms == 0U ||
+            input->stuck_timeout_ms <= input->debounce_ms || input->channel_delay_ms == 0U ||
+            (input->behavior != SVC_MANUAL_INPUT_MOMENTARY_TOGGLE &&
+             input->behavior != SVC_MANUAL_INPUT_MAINTAINED)) {
+            return false;
+        }
+    }
+
     const output_role_t roles[] = {
-        fog->primary_roles[0],
-        fog->primary_roles[1],
-        fog->secondary_roles[0],
-        fog->secondary_roles[1]
+        fog->pair_a.roles[0],
+        fog->pair_a.roles[1],
+        fog->pair_b.roles[0],
+        fog->pair_b.roles[1]
     };
     for (size_t role_index = 0U; role_index < 4U; ++role_index) {
         if (!svc_output_role_is_valid(roles[role_index]) || roles[role_index] == OUT_ROLE_NONE) {

@@ -82,7 +82,7 @@ Reference default roles are configuration defaults for Vehicle Profile #001 only
 They are not hardware roles.
 
 ADR-0020 additionally defines the independent `C36_BIDIRECTIONAL` battery
-branch and the protected `FOG_SW_IN` dry-contact request. Neither changes the
+branch and the protected `FOG_A_SW_IN`/`FOG_B_SW_IN` manual requests. Neither changes the
 generic OUT1 through OUT10 PCB naming or permits firmware to bypass safe-off.
 
 ## 5. Each output must support

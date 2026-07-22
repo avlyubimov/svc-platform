@@ -128,8 +128,8 @@ REQUIRED_FACTS = {
         "six official plated",
         "four GND MF circuits",
         "zero active LBREL blockers",
-        "83 components",
-        "191 electrical nets",
+        "100 components",
+        "199 electrical nets",
     ),
     LB100_DIR / "LB-100-schematic-review-closeout.md": (
         "ADR-0015 Accepted",
@@ -283,7 +283,8 @@ def validate_adr_0020() -> None:
         "PRODUCTION-RELEASE",
         "PBREL-007 is a production-release blocker only",
         "Q2-C100 remains a paused diagnostic coupon",
-        "FOG_SW_IN",
+        "FOG_A_SW_IN",
+        "FOG_B_SW_IN",
         "C36_BIDIRECTIONAL",
         "A second human developer is not required",
     ):

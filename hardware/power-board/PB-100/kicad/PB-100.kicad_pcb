@@ -35,8 +35,8 @@
 	(net 14 "EXT_5V_EN")
 	(net 15 "EXT_ADC1")
 	(net 16 "EXT_ADC2")
-	(net 17 "EXT_DIG2")
-	(net 18 "FOG_SW_IN")
+	(net 17 "FOG_A_SW_IN")
+	(net 18 "FOG_B_SW_IN")
 	(net 19 "GND")
 	(net 20 "IIN_SENSE")
 	(net 21 "INPUT_COMMON_SOURCE")
@@ -2655,8 +2655,8 @@
 			(roundrect_rratio 0.200)
 			(uuid "55613e37-af62-59ba-8af8-f3527ee70716")
 
-			(net 18 "FOG_SW_IN")
-			(pinfunction "FOG_SW_IN")
+			(net 17 "FOG_A_SW_IN")
+			(pinfunction "FOG_A_SW_IN")
 			(pintype "passive")
 		)
 		(pad "32" smd roundrect
@@ -2677,8 +2677,8 @@
 			(roundrect_rratio 0.200)
 			(uuid "0125dddd-3eb1-5959-9eea-f54089cff024")
 
-			(net 17 "EXT_DIG2")
-			(pinfunction "EXT_DIG2")
+			(net 18 "FOG_B_SW_IN")
+			(pinfunction "FOG_B_SW_IN")
 			(pintype "passive")
 		)
 		(pad "33" smd roundrect

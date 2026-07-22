@@ -3778,3 +3778,25 @@ FB-100 now routes the ten local `CH_LED_n_A` series connections and retains 93
 open connections. PBREL-007 remains production-only, and all three boards remain
 blocked from Gerber generation and prototype ordering pending their separate
 `EVT-FAB-REVIEW` closeout and Product Owner authorization.
+
+## 2026-07-22 — Split fog control into two protected manual inputs
+
+Decision: amend ADR-0020 for the owner-supplied double three-wire switch. Use
+`FOG_A_SW_IN` on JPB1.82/STM32 PA8 and `FOG_B_SW_IN` on JPB1.83/STM32 PA9 with
+`SW_GND` as the assumed common. A requests the configured OUT3/OUT4 reference
+pair and B requests OUT6/OUT7; both may be active, each pair stages its two
+channels independently, and Output Manager remains authoritative.
+
+Decision: implement independent 4.7 kOhm series, 47 kOhm pull-up, 47 nF RC,
+4.3 V AEC-Q101 clamp and AEC-Q100 Schmitt-buffer paths after a shared dual
+automotive raw-line protector. Keep an active-low dry-contact default and
+mutually exclusive DNP `BC847BQ` paths for a measured 12 V active-high switch.
+Select a garage-owned sealed DTM three-position connector with pin order
+`SW_GND`, `FOG_A_SW_IN`, `FOG_B_SW_IN`. Do not assign colors or finalize the
+loom until offline continuity, resistance and diode-mode measurements are
+recorded.
+
+Result: PB-100, LB-100 and FB-100 remain `EVT-LAYOUT-AUTHORIZED`. No
+manufacturing artifact or order is authorized. Routed-board DRC, pulse/return
+review, connector confirmation, BOM variant selection and switch measurement
+remain `EVT-FAB-REVIEW` blockers; production qualification remains unchanged.

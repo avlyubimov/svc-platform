@@ -73,12 +73,14 @@ def validate_lb(netlist: Netlist, library_dir: Path) -> list[str]:
     require_component(netlist, "U1", "STM32H563VIT6", "LB100:LQFP-100_L14.0-W14.0-P0.50-LS16.0-BL", failures)
     require_component(netlist, "U3", "TCA9539QPWRQ1", "LB100:TSSOP-24_4.4x7.8mm_P0.65mm", failures)
     require_component(netlist, "U14", "SN74LVC1G17QDBVRQ1", "LB100:SOT-25_L3.0-W1.6-P0.95-LS2.8-TL", failures)
+    for ref in ("U18", "U19"):
+        require_component(netlist, ref, "SN74LVC1G17QDBVRQ1", "LB100:SOT-25_L3.0-W1.6-P0.95-LS2.8-TL", failures)
     for ref in ("U15", "U16", "U17"):
         require_component(netlist, ref, "SN74LVC1G125QDBVRQ1", "LB100:SOT-25_L3.0-W1.6-P0.95-LS2.8-TL", failures)
     require_component(netlist, "JPB1", "FX18-100S-0.8SV10", "LB100:FX18-100S-0.8SV10_Hirose", failures)
     require_component(netlist, "JFB1", "AFC07-S24ECA-00", "LB100:FPC-SMD_AFC07-S24ECA-00", failures)
 
-    for ref in ("U4", "U5", "U6", "JBT1"):
+    for ref in ("U4", "U5", "U6", "JBT1", "Q18", "Q19", "R24", "R25", "R28", "R29"):
         require(netlist.components.get(ref) is not None and netlist.components[ref].dnp, f"{ref}: must remain DNP", failures)
 
     safety_nets = {
@@ -138,12 +140,24 @@ def validate_lb(netlist: Netlist, library_dir: Path) -> list[str]:
     require_component(netlist, "R20", "100k 1% MCU UART idle pull-up", "LB100:R_C_0603_1608Metric", failures)
     require_component(netlist, "R21", "100k 1% reset default assert", "LB100:R_C_0603_1608Metric", failures)
     require_component(netlist, "R22", "100k 1% MCU UART idle pull-up", "LB100:R_C_0603_1608Metric", failures)
-    require_component(netlist, "R23", "10k 1% fog input pull-up", "LB100:R_C_0603_1608Metric", failures)
-    require_component(netlist, "C35", "10nF 50V X7R fog input filter", "LB100:R_C_0603_1608Metric", failures)
+    require_component(netlist, "D18", "ESD2CANFD24DBZRQ1", "LB100:SOT-23-3_DBZ_TI", failures)
+    for ref in ("D19", "D20"):
+        require_component(netlist, ref, "BZT52H-B4V3-Q", "LB100:SOD-123F_L2.6-W1.6", failures)
+    require_component(netlist, "R23", "4.7k 1% FOG_A dry-contact series", "LB100:R_C_0603_1608Metric", failures)
+    require_component(netlist, "R26", "47k 1% FOG_A pull-up", "LB100:R_C_0603_1608Metric", failures)
+    require_component(netlist, "R27", "4.7k 1% FOG_B dry-contact series", "LB100:R_C_0603_1608Metric", failures)
+    require_component(netlist, "R30", "47k 1% FOG_B pull-up", "LB100:R_C_0603_1608Metric", failures)
+    require_component(netlist, "C35", "47nF 50V X7R FOG_A filter", "LB100:R_C_0603_1608Metric", failures)
+    require_component(netlist, "C36", "47nF 50V X7R FOG_B filter", "LB100:R_C_0603_1608Metric", failures)
     require_net(netlist, "LB_3V3_MAIN", {("R20", "1"), ("R22", "1")}, failures, exact=False)
-    require_net(netlist, "LB_3V3_IO", {("R23", "1")}, failures, exact=False)
-    require_net(netlist, "FOG_SW_IN", {("JPB1", "82"), ("U1", "67"), ("R23", "2"), ("C35", "1")}, failures)
-    require_net(netlist, "GND", {("C35", "2")}, failures, exact=False)
+    require_net(netlist, "LB_3V3_IO", {("R26", "1"), ("R30", "1"), ("U18", "5"), ("U19", "5")}, failures, exact=False)
+    require_net(netlist, "FOG_A_SW_IN", {("JPB1", "82"), ("D18", "1"), ("R23", "1"), ("R24", "1")}, failures)
+    require_net(netlist, "FOG_B_SW_IN", {("JPB1", "83"), ("D18", "2"), ("R27", "1"), ("R28", "1")}, failures)
+    require_net(netlist, "FOG_A_FILTERED", {("R23", "2"), ("R26", "2"), ("C35", "1"), ("D19", "1"), ("Q18", "3"), ("U18", "2")}, failures)
+    require_net(netlist, "FOG_B_FILTERED", {("R27", "2"), ("R30", "2"), ("C36", "1"), ("D20", "1"), ("Q19", "3"), ("U19", "2")}, failures)
+    require_net(netlist, "FOG_A_SW_IN_MCU", {("U1", "67"), ("U18", "4")}, failures)
+    require_net(netlist, "FOG_B_SW_IN_MCU", {("U1", "68"), ("U19", "4")}, failures)
+    require_net(netlist, "GND", {("D18", "3"), ("C35", "2"), ("C36", "2"), ("D19", "2"), ("D20", "2"), ("U18", "3"), ("U19", "3")}, failures, exact=False)
 
     mf_pins = {
         ("JPB1", "MF_A_PIN1_51_END"),

@@ -45,11 +45,11 @@ remain in configuration rather than firmware constants, that current JSON rule
 strings fit the limited firmware rule text grammar, that
 every `then[]` has at least one action, that rule actions resolve to one
 configured role mapping, and that partial PWM actions target PWM-capable outputs.
-The BMW K25 example now uses the `manual_controls.fog` request contract and a
-five-mode allowed-role matrix. `FOG_SW_IN` never selects physical outputs
-directly: configured fog roles resolve through Output Manager. Boot restore is
-forbidden, OUT3/OUT4 precede OUT6/OUT7 by a configurable delay, and safety
-denials clear the request.
+The BMW K25 example uses two independent `manual_controls.fog` request inputs
+and a five-mode allowed-role matrix. `FOG_A_SW_IN` and `FOG_B_SW_IN` never
+select physical outputs directly: each configured pair of fog roles resolves
+through Output Manager. Boot restore is forbidden, the two channels within each
+pair start with a configurable delay, and safety denials clear both requests.
 
 `external_capabilities.C36_BIDIRECTIONAL` records the unmanaged direct-battery
 branch. It is excluded from PB current accounting, requires no MCU and is never

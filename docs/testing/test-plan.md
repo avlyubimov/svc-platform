@@ -52,8 +52,10 @@ reserved for motorcycle validation after its nondestructive bench pass.
    short-circuit diagnosis with logged trip reasons.
 5. Controlled 10 A, 20 A, 30 A and 40 A total-current load steps.
 6. Calibrate INA228 and compare summed channel current with `IIN_SENSE`.
-7. Verify `FOG_SW_IN` toggle, boot-off, stuck-input handling, immediate group
-   off and delayed OUT3/OUT4 then OUT6/OUT7 start.
+7. Verify `FOG_A_SW_IN` and `FOG_B_SW_IN` independently in both configurable
+   behaviors: boot/reset-off, simultaneous requests, contact bounce, isolated
+   stuck-input diagnosis, immediate pair-off and delayed channel start inside
+   OUT3/OUT4 and OUT6/OUT7.
 8. Verify OUT1 socket/compressor safeguards and both external C36 current
    directions; C36 uses an external clamp or shunt and remains unmanaged.
 9. Verify mode masks, undervoltage response and shedding order: second fog pair,
@@ -83,10 +85,24 @@ reserved for motorcycle validation after its nondestructive bench pass.
 | PB-BENCH-013 | CAN2 expansion | Exercise CAN2 on bench only | CAN2 can transmit without affecting CAN1 listen-only policy |
 | PB-BENCH-014 | B2B interface | Check `JPB1` control, fault, telemetry, ID, and reserve pins against the pin map | Pin behavior matches `PB-100-b2b-pin-map.csv` |
 | PB-BENCH-015 | Vibration inspection | Inspect fuses, connectors, and harness strain relief after vibration exposure | No intermittent power, signal, or connector fault is observed |
-| PB-BENCH-016 | Manual FOG request | Exercise short press, repeat press, boot/reset, stuck switch, invalid configuration, fault and undervoltage | Request boots off; OUT3/OUT4 start first, OUT6/OUT7 start after configured delay, manual off disables both pairs, and no safety gate is bypassed |
+| PB-BENCH-016 | Dual manual FOG requests | Exercise A-only, B-only, both inputs, simultaneous press, short/repeat press, maintained position, contact bounce, boot/reset, one stuck input, invalid configuration, undervoltage, overcurrent and thermal fault | Requests boot off; A controls only OUT3/OUT4; B controls only OUT6/OUT7; each pair sequences its two channels independently; pair-off is immediate; one stuck input does not block the other; safety denial clears both requests and no safety gate is bypassed |
 | PB-BENCH-017 | Reference lamp currents | Measure each nominal 80 W and 70 W auxiliary lamp on its configured output | Actual steady and inrush current are stored and remain inside channel/fuse/SOA limits |
 | PB-BENCH-018 | C36 bidirectional branch | Measure accessory-source and battery-charge directions with PB/LB both on and off using external current measurement | Both vendor-defined directions work through the separately fused branch; no current is attributed to `IIN_SENSE`; C36 is not used for starter current |
 | PB-BENCH-019 | Operating modes and shedding | Exercise DAY NIGHT SERVICE_COMPRESSOR C36_RESCUE_CHARGE ENGINE_OFF and increasing generator deficit | Mutually exclusive loads are never admitted together; second fog pair sheds first, then first pair, then other managed outputs, and critical undervoltage disables OUT1 through OUT10 |
+
+### Three-wire button identification
+
+Perform this check with the switch disconnected from the motorcycle and from
+PB-100/LB-100. Do not finalize the external harness until the record is complete.
+
+1. Find the common conductor by continuity testing.
+2. Verify common-to-each-remaining-conductor closure separately.
+3. Record resistance in every pressed and released state.
+4. Use diode mode to identify LEDs or other internal electronics.
+5. Record wire colours, the complete state table and all measurements without
+   assigning colour-based pin names beforehand.
+6. Select exactly one assembly variant per input: active-low dry contact or the
+   protected 12 V DNP option. Never populate incompatible variants together.
 
 ## Repository validation
 

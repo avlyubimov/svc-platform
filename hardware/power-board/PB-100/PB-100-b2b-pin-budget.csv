@@ -80,8 +80,8 @@ Pin,Signal,Group,Direction,Requirement,Notes
 79,UART_RX,Expansion,PB-100 to LB-100,Future,Accessory UART route
 80,EXT_ADC1,Expansion,PB-100 to LB-100,Future,External analog input route
 81,EXT_ADC2,Expansion,PB-100 to LB-100,Future,External analog input route
-82,FOG_SW_IN,Manual control,PB-100 to LB-100,Core,Protected active-low dry-contact request; LB pull-up RC filter debounce and stuck-input diagnostics
-83,EXT_DIG2,Expansion,PB-100 to LB-100,Future,External digital input route
+82,FOG_A_SW_IN,Manual control A,PB-100 to LB-100,Core,Independent protected request for configured first fog pair; PA8 after LB clamp and Schmitt buffer
+83,FOG_B_SW_IN,Manual control B,PB-100 to LB-100,Core,Independent protected request for configured second fog pair; PA9 after LB clamp and Schmitt buffer
 84,EXT_5V_EN,Expansion,LB-100 to PB-100,Future,External sensor supply enable
 85,SPARE_01,Reserve,Mixed,Future,Reserved
 86,SPARE_02,Reserve,Mixed,Future,Reserved
