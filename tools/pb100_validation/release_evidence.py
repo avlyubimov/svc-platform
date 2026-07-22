@@ -48,8 +48,14 @@ def validate_five_blocker_release_evidence() -> None:
     for blocker_id in FIVE_BLOCKERS:
         row = next(row for row in blocker_rows if row["Blocker ID"] == blocker_id)
         row_text = " ".join(row.values())
-        if "pre-layout" not in row_text or "later" not in row_text:
-            fail(f"{blocker_id} must distinguish closed pre-layout evidence from later physical gates")
+        required_tokens = (
+            ("EVT-LAYOUT-AUTHORIZED", "EVT", "production")
+            if blocker_id in {"PBREL-006", "PBREL-007"}
+            else ("pre-layout", "later")
+        )
+        for token in required_tokens:
+            if token not in row_text:
+                fail(f"{blocker_id} must distinguish current evidence from later physical gates using {token}")
 
     output_rows = _rows("PB-100-output-soa-evidence.csv")
     if len(output_rows) != 6 or any(row["Result"] != "PASS" for row in output_rows):
@@ -113,7 +119,7 @@ def validate_five_blocker_release_evidence() -> None:
     if actual_surge_corners != expected_surge_corners:
         fail("active surge-stopper evidence must cover every ISO and Q2 thermal-state corner")
     for row in surge_rows:
-        if row["SOA screen"] != "PASS" or row["Result"] != "CONDITIONAL PRE-LAYOUT":
+        if row["SOA screen"] != "PASS" or row["Result"] != "CONDITIONAL PRODUCTION":
             fail("active surge-stopper corners must remain conditional despite the provisional SOA screen")
         if row["Load response"] != "DISCONNECT":
             fail("active surge-stopper corners must disconnect the load")
@@ -191,8 +197,10 @@ def validate_five_blocker_release_evidence() -> None:
         fail("generated Q2 evidence must retain the 20.48 V protected-node margin")
     if q2_by_item["Hot-corner SOA margin"]["Value"] != "2.08":
         fail("generated Q2 evidence must retain the provisional 2.08x hot SOA screen")
-    if q2_by_item["Pre-layout gate status"]["Value"] != "Conditional":
-        fail("generated Q2 evidence must keep PBREL-007 pre-layout conditional")
+    if q2_by_item["Production qualification status"]["Value"] != "Conditional":
+        fail("generated Q2 evidence must keep PBREL-007 production qualification conditional")
+    if q2_by_item["Production qualification status"]["Result"] != "EVT-LAYOUT-AUTHORIZED / PRODUCTION BLOCKED":
+        fail("generated Q2 evidence must authorize EVT layout without opening production")
 
     q1_by_item = {row["Evidence item"]: row for row in _rows("PB-100-input-q1-evidence.csv")}
     if q1_by_item["Exact orderable MPN"]["Value"] != SELECTED_MOSFET:

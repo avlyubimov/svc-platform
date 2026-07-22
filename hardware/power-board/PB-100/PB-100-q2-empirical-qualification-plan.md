@@ -1,6 +1,6 @@
 # PB-100 Q2 Empirical Qualification Plan
 
-Status: `APPROVED ROUTE FOR ENGINEERING EXECUTION / RESULTS PENDING`
+Status: `PAUSED DIAGNOSTIC OPTION / RESULTS PENDING`
 
 Date: 2026-07-21
 
@@ -10,6 +10,11 @@ This plan retains `IAUTN15S6N025ATMA1` as the raw-side 150 V Q2 selected by
 ADR-0018 and obtains the missing Q2Q-010 through Q2Q-015 evidence by controlled
 measurement. The results will be project-specific empirical qualification;
 they must never be described as an Infineon production maximum.
+
+ADR-0019 removes this coupon from the PB-100 Rev.1 EVT critical path. Q2-C100
+is retained unchanged as an optional diagnostic artifact and further design or
+fabrication work is paused unless a reviewed PB-100 failure investigation
+requires isolated Q2 evidence.
 
 The Product Owner allowed replacement only if a replacement closes the
 evidence gap, otherwise physical qualification of the selected device. The
@@ -23,12 +28,13 @@ The following temporary state is defined:
 
 `QUALIFICATION-COUPON-ONLY`
 
-It permits schematic capture, PCB layout, fabrication and bench use of a
+When explicitly resumed it permits schematic capture, PCB layout, fabrication and bench use of a
 dedicated Q2 qualification coupon whose only purpose is generating the evidence
 defined here. It does not authorize a `PB-100.kicad_pcb`, PB-100 placement or
-routing, PB-100 manufacturing output, a product prototype, production release,
-or field use. Coupon results cannot waive the later PB-100 extracted-loop,
-thermal-path or PB-BENCH-004 gates.
+routing, PB-100 manufacturing output, production release or field use. ADR-0019
+separately authorizes PB-100 Rev.1 EVT layout and a later reviewed five-board
+EVT package. Coupon results cannot waive the later PB-100 extracted-loop,
+thermal-path or PB-BENCH-004 production gates.
 
 ## Frozen Qualification Corner
 
@@ -213,16 +219,28 @@ Owner approval followed by a new qualification population.
 - Per-event result CSV plus worst-case overlay and SOA calculation.
 - Incoming and post-stress parametric data.
 - Deviation, interruption and failure-analysis records.
-- Independent review sign-off and Product Owner acceptance.
+- Documented Codex independent technical review sign-off and Product Owner
+  acceptance; no second developer is required.
+
+### Independent Technical Review Authority
+
+For `Q2E-012`, a documented Codex review of the committed evidence package is
+the required independent technical review for this owner-operated project. The
+review record must cover the setup, calibration, lot trace, raw-data integrity,
+analysis script, result reproducibility, deviations and acceptance criteria
+before Product Owner acceptance. No second developer or external reviewer is
+required. Machine validation and Product Owner acceptance remain mandatory and
+are not replaced by the Codex review.
 
 Only after this package passes may Q2Q-010 through Q2Q-015 be changed to
-`PASS EMPIRICAL`, Q2Q-018 be closed, and PBREL-007 pre-layout authorize
-`LAYOUT-ONLY`. MyCases remains active in parallel; a later qualifying Infineon
-artifact may supersede or reduce future lot testing only after review.
+`PASS EMPIRICAL`, Q2Q-018 be closed, and PBREL-007 advance toward
+`PRODUCTION-RELEASE`. It does not control `EVT-LAYOUT-AUTHORIZED` or
+`EVT-FAB-AUTHORIZED`. MyCases may remain active in parallel; a later qualifying
+Infineon artifact may supersede or reduce future lot testing only after review.
 
 ## Current State
 
-The controlled Q2-C100 schematic, preliminary four-layer PCB, complete pad-to-
+The paused Q2-C100 diagnostic schematic, preliminary four-layer PCB, complete pad-to-
 pad electrical routing, BOM, assembly variants, probe interfaces and
 fabrication gate now exist under `qualification/Q2-C100`. KiCad 10.0.4 ERC and
 board DRC have zero violations and zero unconnected items. Exact board headers
@@ -231,5 +249,6 @@ the manufacturing package, rated instrument/probe hardware, remaining fixture
 hardware and the complete laboratory safety system remain open. No DUT lot
 population, calibrated setup or test
 result exists yet. Q2Q-010 through Q2Q-015 therefore remain
-`PENDING EMPIRICAL`, PBREL-007 remains `Conditional`, aggregate PB-100 remains
-`BLOCKED`, and production/field use remain `NO-GO`.
+`PENDING EMPIRICAL` and PBREL-007 remains `Conditional` for production. ADR-0019
+places PB-100 at `EVT-LAYOUT-AUTHORIZED`; Q2-C100 fabrication remains paused
+and production/general field use remain `NO-GO`.

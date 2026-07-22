@@ -1,6 +1,6 @@
 # ADR-0018: PB-100 Active Surge Stopper and Passive Q1 Cooling
 
-Status: Accepted — Product Owner direction on 2026-07-21
+Status: Accepted — release authorization superseded in part by ADR-0019
 
 ## Context
 
@@ -83,17 +83,17 @@ ambient and a 150 degC design target, the complete Q2 ambient-to-junction path
 must be no worse than 3.47 K/W. Q2 has 49 V static VDS margin to the 101 V
 source; protected Q1 has the separate 20.48 V pre-layout peak-budget margin.
 
-The hot-corner screen does not close PBREL-007 pre-layout. Infineon marks the
+The hot-corner screen does not close PBREL-007 production qualification.
+Infineon marks the
 Qgd/Qgs values as design-specified rather than production-tested and specifies
 them at 75 V / 123 A, not the 101 V / 40 A cutoff corner; the SOA bound is also
 digitized from a typical graph. A qualified maximum-bound gate-discharge model
 or vendor-supported trajectory covering both VDS rise and ID fall is required
-before `LAYOUT-ONLY`. Until then
-PBREL-007 pre-layout is Conditional and aggregate authorization is `BLOCKED`.
-After pre-layout closure, extracted loop inductance, switching overshoot, Q2
-dynamic SOA, copper/current density, both MOSFET thermal paths, and enclosure
-coupling remain mandatory post-layout evidence. PB-BENCH-004 and PB-BENCH-010
-remain mandatory after an engineering prototype exists.
+before `PRODUCTION-RELEASE`. ADR-0019 authorizes controlled Rev.1 EVT layout
+and later a reviewed five-board EVT fabrication package while PBREL-007 remains
+Conditional. Extracted loop inductance, switching overshoot, Q2 dynamic SOA,
+copper/current density, both MOSFET thermal paths, enclosure coupling,
+PB-BENCH-004 and PB-BENCH-010 remain mandatory evidence.
 
 ### Q2 maximum-bound qualification route
 
@@ -127,14 +127,15 @@ production-covered paired hot trajectory, so the selected engineering route is
 to retain `IAUTN15S6N025ATMA1` and execute
 `PB-100-q2-empirical-qualification-plan.md` while MyCases proceeds in parallel.
 
-The empirical plan requires five separate characterization DUTs followed by
+The paused diagnostic empirical plan requires five separate characterization DUTs followed by
 thirty new qualification DUTs from at least three independent lot/date codes,
 synchronized 200 MHz-class VDS/ID/VGS acquisition, measured 150 degC initial
 Tj, ten events per qualification DUT at 60 s spacing, explicit uncertainty and
-1.25x guardband, post-stress parametrics and independent review. It remains
-project-specific evidence and must not be described as a manufacturer maximum.
-Only a dedicated qualification coupon is authorized before the results pass;
-PB-100 board import remains prohibited.
+1.25x guardband, post-stress parametrics and documented Codex independent
+technical review before Product Owner acceptance. It remains project-specific
+evidence and must not be described as a manufacturer maximum. Q2-C100 is
+retained as an optional diagnostic coupon, but further coupon development is
+paused by ADR-0019 and it is not a prerequisite for PB-100 Rev.1 EVT work.
 
 ## Production and Lifetime
 
@@ -147,13 +148,14 @@ remains 10-15 years, subject to controlled alternates and lifecycle recheck.
 
 ## Consequences
 
-- PBREL-006 is closed as a design-selection blocker. PBREL-007 pre-layout
-  remains Conditional and aggregate authorization is `BLOCKED`.
-- No `.kicad_pcb` or manufacturing package is created by this decision.
-- `PROTO-ONLY` remains blocked until post-layout extraction is reviewed.
+- PBREL-006 is closed as a design-selection blocker. PBREL-007 production
+  qualification remains Conditional.
+- ADR-0019 advances PB-100 to `EVT-LAYOUT-AUTHORIZED`; fabrication remains
+  blocked until the routed-board EVT pre-fab gate closes.
 - Production and field use remain `NO-GO` until prototype qualification and all
   normal production gates close.
-- No second developer is required.
+- For `Q2E-012`, documented Codex review is the independent technical review;
+  no second developer is required.
 
 ## Evidence
 

@@ -18,7 +18,7 @@ Q2_QUALIFICATION_INPUTS = {
 }
 Q2_QUALIFICATION_PENDING = {f"Q2Q-{number:03d}" for number in range(10, 16)}
 Q2_EMPIRICAL_PLAN_PASSED = {"Q2E-001", "Q2E-002"}
-Q2_EMPIRICAL_IN_PROGRESS = {"Q2E-003"}
+Q2_EMPIRICAL_PAUSED = {"Q2E-003"}
 Q2_EMPIRICAL_NOT_STARTED = {f"Q2E-{number:03d}" for number in range(4, 14)}
 
 
@@ -65,11 +65,11 @@ def validate_q2_maximum_bound_qualification() -> None:
         fail("Q2Q-016 must distinguish a redirect response from qualification evidence")
     if rows_by_id["Q2Q-017"]["Status"] != "PARALLEL REROUTE REQUIRED":
         fail("Q2 vendor request must remain a parallel Infineon MyCases route")
-    expected_decision = "BLOCKED until Q2Q-010 through Q2Q-015 are PASS VENDOR or PASS EMPIRICAL"
+    expected_decision = "PRODUCTION-RELEASE BLOCKED until Q2Q-010 through Q2Q-015 are PASS VENDOR or PASS EMPIRICAL"
     if rows_by_id["Q2Q-018"]["Required bound"] != expected_decision:
         fail("Q2 qualification decision must accept only completed vendor or empirical trajectory evidence")
     if rows_by_id["Q2Q-018"]["Status"] != "BLOCKED":
-        fail("Q2 pre-layout qualification must remain BLOCKED while empirical evidence is pending")
+        fail("Q2 production qualification must remain BLOCKED while empirical evidence is pending")
 
     request = read_text(PB100_DIR / "PB-100-q2-vendor-support-request.md")
     _require_tokens(
@@ -139,7 +139,7 @@ def validate_q2_maximum_bound_qualification() -> None:
     _require_tokens(
         plan,
         (
-            "APPROVED ROUTE FOR ENGINEERING EXECUTION / RESULTS PENDING",
+            "PAUSED DIAGNOSTIC OPTION / RESULTS PENDING",
             "QUALIFICATION-COUPON-ONLY",
             "101 V",
             "40 A",
@@ -161,8 +161,10 @@ def validate_q2_maximum_bound_qualification() -> None:
             "1.5x",
             "no more than 5%",
             "0.10 V",
+            "Codex independent technical review",
+            "no second developer is required",
             "PASS EMPIRICAL",
-            "controlled Q2-C100 schematic",
+            "EVT-LAYOUT-AUTHORIZED",
             "zero unconnected items",
         ),
         "Q2 empirical qualification plan",
@@ -170,25 +172,30 @@ def validate_q2_maximum_bound_qualification() -> None:
 
     empirical_rows = _rows("PB-100-q2-empirical-qualification-readiness.csv")
     empirical_by_id = {row["Evidence ID"]: row for row in empirical_rows}
-    expected_empirical_ids = Q2_EMPIRICAL_PLAN_PASSED | Q2_EMPIRICAL_IN_PROGRESS | Q2_EMPIRICAL_NOT_STARTED | {"Q2E-014"}
+    expected_empirical_ids = Q2_EMPIRICAL_PLAN_PASSED | Q2_EMPIRICAL_PAUSED | Q2_EMPIRICAL_NOT_STARTED | {"Q2E-014"}
     if len(empirical_by_id) != len(empirical_rows) or set(empirical_by_id) != expected_empirical_ids:
         fail("Q2 empirical readiness ledger must contain Q2E-001 through Q2E-014 exactly")
     for evidence_id in Q2_EMPIRICAL_PLAN_PASSED:
         if empirical_by_id[evidence_id]["Status"] != "PASS PLAN":
             fail(f"{evidence_id} must record the approved plan input")
-    for evidence_id in Q2_EMPIRICAL_IN_PROGRESS:
+    for evidence_id in Q2_EMPIRICAL_PAUSED:
         row = empirical_by_id[evidence_id]
-        if row["Status"] != "IN PROGRESS":
-            fail(f"{evidence_id} must distinguish controlled routing from completed coupon evidence")
-        for token in ("Q2-C100", "zero unconnected items", "FAB-REVIEW"):
+        if row["Status"] != "PAUSED DIAGNOSTIC":
+            fail(f"{evidence_id} must keep Q2-C100 outside the active PB-100 EVT path")
+        for token in ("Q2-C100", "ADR-0019", "FAB-REVIEW"):
             if token not in " ".join(row.values()):
-                fail(f"{evidence_id} must retain the controlled coupon milestone token {token}")
+                fail(f"{evidence_id} must retain the paused coupon token {token}")
     for evidence_id in Q2_EMPIRICAL_NOT_STARTED:
         if empirical_by_id[evidence_id]["Status"] != "NOT STARTED":
             fail(f"{evidence_id} cannot pass before coupon or bench evidence exists")
+    q2e012 = empirical_by_id["Q2E-012"]
+    q2e012_text = " ".join(q2e012.values())
+    for token in ("Codex", "independent technical review", "no second developer is required"):
+        if token not in q2e012_text:
+            fail(f"Q2E-012 must preserve the accepted review-authority token {token}")
     q2e014 = empirical_by_id["Q2E-014"]
-    if q2e014["Status"] != "BLOCKED" or "No PB-100 board import" not in q2e014["Authorization effect"]:
-        fail("Q2E-014 must retain the blocked PB-100 board-import boundary")
+    if q2e014["Status"] != "BLOCKED" or "Blocks PRODUCTION-RELEASE" not in q2e014["Authorization effect"]:
+        fail("Q2E-014 must block production without blocking PB-100 EVT work")
 
     blocker = next(
         row
@@ -198,16 +205,17 @@ def validate_q2_maximum_bound_qualification() -> None:
     blocker_text = " ".join(blocker.values())
     if blocker["Status"] != "Conditional" or "PB-100-q2-maximum-bound-qualification.csv" not in blocker_text:
         fail("PBREL-007 must remain Conditional and reference the Q2 qualification ledger")
-    for token in ("PB-100-q2-empirical-qualification-plan.md", "QUALIFICATION-COUPON-ONLY"):
+    for token in ("ADR-0019", "paused optional diagnostic coupon", "EVT-LAYOUT-AUTHORIZED"):
         if token not in blocker_text:
-            fail(f"PBREL-007 blocker register must include the empirical route token {token}")
+            fail(f"PBREL-007 blocker register must include the EVT route token {token}")
 
-    pre_layout = next(
+    evt_layout = next(
         row
         for row in _rows("PB-100-staged-release-readiness.csv")
-        if row["Blocker ID"] == "PBREL-007" and row["Stage"] == "Pre-layout design"
+        if row["Blocker ID"] == "PBREL-007" and row["Stage"] == "EVT layout authorization"
     )
-    if pre_layout["Stage status"] != "Conditional" or pre_layout["Current blocker authorization"] != "BLOCKED":
-        fail("PBREL-007 pre-layout must remain Conditional with BLOCKED authorization")
-    if "QUALIFICATION-COUPON-ONLY" not in " ".join(pre_layout.values()):
-        fail("PBREL-007 staged readiness must distinguish coupon work from PB-100 layout")
+    if evt_layout["Stage status"] != "Closed" or evt_layout["Current blocker authorization"] != "EVT-LAYOUT-AUTHORIZED":
+        fail("PBREL-007 must authorize EVT layout while production qualification stays open")
+    for token in ("ADR-0019", "production qualification", "controlled EVT layout"):
+        if token not in " ".join(evt_layout.values()):
+            fail(f"PBREL-007 EVT layout row must retain {token}")

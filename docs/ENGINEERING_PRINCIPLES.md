@@ -34,12 +34,13 @@ work. Codex must not independently change architecture.
 - Do not simplify architecture for convenience.
 - Do not replace generic outputs with dedicated functions.
 - Do not bind hardware to BMW-specific logic.
-- Do not start PCB layout before all pre-layout engineering gates are closed.
-  Post-layout extraction and prototype-bench gates remain active under
-  ADR-0017 without creating a layout deadlock.
-- Do not create KiCad PCB layout, Gerbers, drills, pick-place files, BOM/CPL
-  order packages, manufacturing ZIPs, or PCBA order artifacts before schematic
-  freeze authorizes them.
+- Start PCB layout only when the board-specific ADR release state authorizes it.
+  For PB-100, ADR-0019 permits controlled Rev.1 EVT layout while production
+  qualification remains open.
+- Create EVT Gerbers, drills, pick-place files, BOM/CPL order packages,
+  manufacturing ZIPs, or PCBA order artifacts only after the board-specific
+  EVT pre-fabrication gate authorizes them. Keep EVT and production artifacts
+  segregated.
 - Preserve backward compatibility unless the Product Owner explicitly approves
   an ADR-backed change.
 
@@ -109,13 +110,17 @@ instead of falsifying pre-layout closure.
 
 ## Manufacturing Rules
 
-- Schematic freeze must precede PCB layout.
+- Final production schematic freeze must precede production layout release.
+  ADR-authorized EVT layout may proceed earlier to generate routed-board
+  evidence, but EVT fabrication still requires final value review for the EVT
+  population.
 - PCB layout must precede fabrication and assembly output generation.
 - BOM, CPL, pick-place, Gerber, drill, and manufacturing ZIP outputs are release
   artifacts, not planning artifacts.
-- Engineering-prototype release artifacts are allowed only at `PROTO-ONLY` and
-  must remain segregated from production output. Production and field release
-  require `PRODUCTION-READY` plus the normal production gates.
+- PB-100 engineering-prototype artifacts are allowed only at
+  `EVT-FAB-AUTHORIZED` and must remain segregated from production output.
+  PB-100 production requires `PRODUCTION-RELEASE`; legacy board flows retain
+  their accepted board-specific authorization names.
 - JLCPCB/PCBWay compatibility must be checked for selected parts and meaningful
   alternatives before BOM lock.
 - Package-specific handling, orientation, DNP/open inspection, and rework risks

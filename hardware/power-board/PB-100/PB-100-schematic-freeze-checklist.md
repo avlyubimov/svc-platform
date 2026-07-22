@@ -2,24 +2,26 @@
 
 Status: Open
 
-This checklist closes PB-100 schematic planning for PCB-layout start. It does
-not authorize Gerbers, drills, pick-place, BOM/CPL order packages, manufacturing
-ZIP files, fabrication packages, or PCBA orders.
+This checklist closes the PB-100 Rev.1 EVT population for fabrication and the
+later production schematic baseline. ADR-0019 separately authorizes controlled
+PB-100 board import and layout while this checklist remains Open. It does not
+authorize Gerbers, drills, pick-place, BOM/CPL order packages, manufacturing
+ZIP files, fabrication packages, PCBA orders, motorcycle use or production.
 
 ## Completion rule
 
-PB-100 schematic freeze is allowed only when every required gate is `Closed`.
+PB-100 EVT fabrication freeze is allowed only when every required gate is
+`Closed` and the routed-board pre-fab review passes. Controlled layout is
+allowed at `EVT-LAYOUT-AUTHORIZED` before that point.
 Any change to PB-100 output count, protection model, role-mapping model,
 board-level current budget, or CAN1 safety behavior requires a new ADR before
 this checklist can close.
 
-ADR-0013 and ADR-0017 split pre-layout, post-layout, and prototype validation.
-Schematic freeze and `LAYOUT-ONLY` require calculations, simulations where
-applicable, source evidence, schematic hooks, package/footprint review inputs,
-and bench procedures. Reviewed copper/current/thermal/clamp-loop extraction is
-then required for `PROTO-ONLY`. Physical PB-BENCH execution that requires an
-assembled PB-100 board blocks first motorcycle power, field use, and production
-release, not controlled layout or the engineering-prototype fabrication step.
+ADR-0019 supersedes the PB-100 authorization portion of ADR-0017. Controlled
+layout starts at `EVT-LAYOUT-AUTHORIZED`; final EVT schematic review plus routed
+copper/current/thermal/clamp-loop extraction and pre-fab review are required for
+`EVT-FAB-AUTHORIZED`. Physical PB-BENCH execution blocks motorcycle validation
+and production release rather than layout or the reviewed EVT fabrication step.
 
 ## Status values
 
@@ -42,7 +44,7 @@ release, not controlled layout or the engineering-prototype fabrication step.
 | High/medium output stage | Conditional | `docs/adr/ADR-0010-pb-100-power-path-candidate-strategy.md`, `hardware/power-board/PB-100/PB-100-high-medium-output-baseline-trace.csv`, `hardware/power-board/PB-100/PB-100-high-medium-output-freeze-review.csv`, `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`, `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`, `hardware/power-board/PB-100/PB-100-output-stage-closeout-precheck.csv`, `hardware/power-board/PB-100/PB-100-output-soa-evidence.csv`, `hardware/power-board/PB-100/PB-100-output-stage-design-values.csv`, `hardware/power-board/PB-100/PB-100-out2-soa.md` | Generated thresholds, fuse-compatible SOA, exact 80 V TOLL and local clamp selection pass; promote the accepted passives and DCL101-DCL110 into the value-bearing sheets before freeze |
 | Low-current output stage | Closed | `docs/adr/ADR-0011-pb-100-low-current-output-stage.md`, `hardware/power-board/PB-100/PB-100-preliminary-validation.md`, `hardware/power-board/PB-100/PB-100-low-current-output-baseline-trace.csv`, `hardware/power-board/PB-100/PB-100-low-current-output-freeze-review.csv`, `hardware/power-board/PB-100/PB-100-output-stage-value-freeze-checklist.csv`, `hardware/power-board/PB-100/PB-100-output-stage-value-derivation-precheck.csv`, `hardware/power-board/PB-100/PB-100-output-stage-closeout-precheck.csv`, `hardware/power-board/PB-100/PB-100-schematic-review-closeout.md` | OUT5/OUT8/OUT9 external-controller implementation and output closeout precheck are validated without a direct 40 V smart-switch rail |
 | Input reverse protection | Conditional | `docs/adr/ADR-0018-pb-100-active-surge-stopper-and-passive-q1-cooling.md`, `hardware/power-board/PB-100/PB-100-input-reverse-package-trace.csv`, `hardware/power-board/PB-100/PB-100-input-reverse-freeze-review.csv`, `hardware/power-board/PB-100/PB-100-input-reverse-q1-freeze-checklist.csv`, `hardware/power-board/PB-100/PB-100-input-reverse-q1-derivation-precheck.csv`, `hardware/power-board/PB-100/PB-100-input-reverse-q1-closeout-precheck.csv`, `hardware/power-board/PB-100/PB-100-input-reverse-protection.md`, `hardware/power-board/PB-100/PB-100-input-q1-evidence.csv`, `hardware/power-board/PB-100/PB-100-staged-release-readiness.csv`, `hardware/power-board/PB-100/kicad/sheets/input-protection.kicad_sch` | PBREL-006 design selection is Closed for IAUT300N08S5N012ATMA2 and passive <=6.20 K/W thermal target; close this schematic gate after LM74930-Q1 gate/peripheral values are promoted and reviewed. Extraction and PB-BENCH-010 remain later gates |
-| TVS/load-dump protection | Conditional | `docs/adr/ADR-0016-pb-100-load-dump-design-requirement.md`, `docs/adr/ADR-0018-pb-100-active-surge-stopper-and-passive-q1-cooling.md`, `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`, `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`, `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`, `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`, `hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv`, `hardware/power-board/PB-100/PB-100-surge-stopper-evidence.csv`, `hardware/power-board/PB-100/PB-100-input-q2-evidence.csv`, `hardware/power-board/PB-100/PB-100-protection-validation.csv`, `hardware/power-board/PB-100/PB-100-staged-release-readiness.csv`, `hardware/power-board/PB-100/kicad/sheets/input-protection.kicad_sch` | PBREL-007 pre-layout remains Conditional for LM74930-Q1 hard cutoff <=55 V and 150 V Q2; 48 rows include 5-10 ms rise time and 150 C initial Tj; they separate 7 us fully-enhanced deglitch from the complete provisional 0.72 us VDS-rise/ID-fall envelope and calculate a 59.52 V protected-node peak budget. The 2.08x graph-derived screen does not authorize layout until a qualified maximum-bound trajectory exists; extracted-loop review and PB-BENCH-004 remain later gates |
+| TVS/load-dump protection | Conditional | `docs/adr/ADR-0016-pb-100-load-dump-design-requirement.md`, `docs/adr/ADR-0018-pb-100-active-surge-stopper-and-passive-q1-cooling.md`, `docs/adr/ADR-0019-pb-100-evt-development-release.md`, `hardware/power-board/PB-100/PB-100-tvs-load-dump-margin-trace.csv`, `hardware/power-board/PB-100/PB-100-tvs-load-dump-freeze-review.csv`, `hardware/power-board/PB-100/PB-100-tvs-overshoot-escape-checklist.csv`, `hardware/power-board/PB-100/PB-100-tvs-overshoot-validation-precheck.csv`, `hardware/power-board/PB-100/PB-100-tvs-overshoot-closeout-precheck.csv`, `hardware/power-board/PB-100/PB-100-surge-stopper-evidence.csv`, `hardware/power-board/PB-100/PB-100-input-q2-evidence.csv`, `hardware/power-board/PB-100/PB-100-protection-validation.csv`, `hardware/power-board/PB-100/PB-100-staged-release-readiness.csv`, `hardware/power-board/PB-100/kicad/sheets/input-protection.kicad_sch` | PBREL-007 production qualification remains Conditional for LM74930-Q1 hard cutoff <=55 V and 150 V Q2; the provisional 0.72 us envelope and 2.08x screen do not close production. ADR-0019 authorizes EVT layout; routed-loop extraction and safety review control EVT fabrication while PB-BENCH-004 Q2 qualification motorcycle validation and Rev.2 control production release |
 | Logic power rails | Closed | `hardware/power-board/PB-100/PB-100-logic-power-rail-trace.csv`, `hardware/power-board/PB-100/PB-100-logic-power-freeze-review.csv`, `hardware/power-board/PB-100/PB-100-logic-power-value-freeze-checklist.csv`, `hardware/power-board/PB-100/PB-100-logic-power-value-derivation-precheck.csv`, `hardware/power-board/PB-100/PB-100-logic-power-closeout-precheck.csv`, `hardware/power-board/PB-100/PB-100-power-path-candidates.csv`, `hardware/power-board/PB-100/PB-100-logic-power-rails.md`, `hardware/power-board/PB-100/PB-100-logic-power-budget.csv`, `hardware/power-board/PB-100/PB-100-schematic-review-closeout.md` | Buck and post-regulator strategy plus closeout precheck covers cold crank, load dump, telemetry, and LB-100 supply requirements |
 | Current telemetry | Closed | `docs/requirements/pb-100-requirements.md`, `hardware/power-board/PB-100/PB-100-current-telemetry.md`, `hardware/power-board/PB-100/PB-100-current-telemetry-trace.csv`, `hardware/power-board/PB-100/PB-100-current-telemetry-freeze-review.csv`, `hardware/power-board/PB-100/PB-100-current-telemetry-design-calculation.md`, `hardware/power-board/PB-100/PB-100-current-telemetry-value-freeze-checklist.csv`, `hardware/power-board/PB-100/PB-100-current-telemetry-value-derivation-precheck.csv`, `hardware/power-board/PB-100/PB-100-current-telemetry-closeout-precheck.csv`, `hardware/power-board/PB-100/PB-100-current-telemetry-map.csv`, `hardware/power-board/PB-100/PB-100-schematic-review-closeout.md` | Per-output current and total input current measurement ranges are selected and closeout precheck is mapped to LB-100 |
 | Thermal telemetry | Closed | `docs/requirements/pb-100-requirements.md`, `hardware/power-board/PB-100/PB-100-thermal-telemetry.md`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-trace.csv`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-freeze-review.csv`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-design-calculation.md`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-freeze-checklist.csv`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-value-derivation-precheck.csv`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-closeout-precheck.csv`, `hardware/power-board/PB-100/PB-100-thermal-telemetry-map.csv`, `hardware/power-board/PB-100/PB-100-schematic-review-closeout.md` | PCB and power-zone temperature sensing strategy plus closeout precheck are selected and mapped to LB-100 |
@@ -52,10 +54,10 @@ release, not controlled layout or the engineering-prototype fabrication step.
 
 ## Active blockers
 
-Architecture remains frozen and the PBREL register has zero active design
-blockers. PBREL-006 is `LAYOUT-ONLY`, but PBREL-007 pre-layout is Conditional
-and aggregate authorization is `BLOCKED`, while
-separate schematic implementation gates remain active in this checklist.
+Architecture remains frozen and the PBREL register has zero active architecture
+blockers. PBREL-007 remains Conditional for production while ADR-0019 sets the
+aggregate authorization to `EVT-LAYOUT-AUTHORIZED`. Separate schematic
+implementation gates remain active for the EVT fabrication package.
 The earlier `hardware/power-board/PB-100/PB-100-schematic-review-closeout.md`
 is retracted. The 80 V MOSFET class and official FX18 MF/TH land geometry are
 now captured and the corrected FX18 input is closed. ADR-0018 fixes passive Q1
@@ -63,11 +65,10 @@ cooling and replaces the rejected single-SM8S33AHM3/I branch with LM74930-Q1
 hard cutoff and a 150 V raw-side Q2.
 ADR-0015 Accepted assigns the CAN1 physical layer to PB-100, and the exported
 PB netlist proves that transceiver TXD is driven only by `CAN1_TXD_SAFE` while
-RXD returns only on `CAN1_RX_ROUTE`. PCB layout and manufacturing output remain
-blocked in the current state by controlled surge-stopper/passive promotion,
-final value-bearing schematic review,
-Product Owner freeze approval, and the layout-start checklist—not by
-post-layout extraction or pre-hardware bench prerequisites.
+RXD returns only on `CAN1_RX_ROUTE`. PCB layout is authorized now.
+Manufacturing output remains blocked by final value-bearing EVT schematic
+review, routed-board DRC/extraction, DFM, safety review and Product Owner
+approval—not by pre-hardware bench prerequisites.
 
 ## Resolved blockers
 

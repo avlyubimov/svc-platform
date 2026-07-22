@@ -1,0 +1,6 @@
+Unit,Primary role,Energized scope,Motorcycle eligible,Disposition rule,Status
+EVT-01,Primary bring-up,Current-limited low-voltage startup safe-default and interface debug,No,Retain as bring-up reference unless a documented reassignment is approved,PLANNED
+EVT-02,Current and thermal,Controlled 5A 10A 20A and 40A steps with MOSFET copper via connector shunt and enclosure temperature measurement,No,Retain as thermal/current reference unless post-test inspection approves controlled reuse,PLANNED
+EVT-03,Fault and surge,Overcurrent short-circuit fuse and controlled overvoltage/load-disconnect tests,No,Never install on motorcycle after limit destructive or abnormal-stress testing,PLANNED
+EVT-04,Motorcycle validation,Only bench-passed non-destructive motorcycle cranking alternator real-load vibration and temperature tests,Yes,Keep free of destructive bench tests before and after vehicle assignment,PLANNED
+EVT-05,Reserve and control,Unstressed control sample spare and approved component-variant experiments,Conditional,May replace EVT-04 only after full bench pass and documented undamaged-state review,PLANNED

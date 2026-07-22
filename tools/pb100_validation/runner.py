@@ -49,6 +49,7 @@ CHECKS = (
     release.validate_engineering_blocker_closeout,
     release.validate_schematic_review_closeout,
     release.validate_staged_release_readiness,
+    release.validate_evt_prototype_plan,
     release.validate_board_release_blocker_register,
     release.validate_board_print_closure_matrix,
     q2_qualification.validate_q2_maximum_bound_qualification,

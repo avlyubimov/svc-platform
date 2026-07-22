@@ -8,9 +8,11 @@ from collections import Counter
 from pathlib import Path
 
 from readiness_validation.stages import (
-    RELEASE_STATES,
-    STATE_RANK,
+    allowed_release_states,
     derive_pb_release_state,
+    is_fabrication_authorized,
+    is_layout_authorized,
+    is_production_authorized,
 )
 
 
@@ -428,9 +430,14 @@ def layout_files(board_dir: Path) -> list[Path]:
 def validate_no_layout_before_freeze(board: str, board_dir: Path, status: str) -> None:
     pcbs = layout_files(board_dir)
     manufacturing = manufacturing_files(board_dir)
-    if status != "Closed" and pcbs:
+    release_state = current_pb_release_state() if board == "PB-100" else "BLOCKED"
+    layout_allowed = status == "Closed" or (
+        board == "PB-100" and is_layout_authorized(release_state)
+    )
+    fabrication_allowed = board == "PB-100" and is_fabrication_authorized(release_state)
+    if not layout_allowed and pcbs:
         fail(f"{board} has PCB layout before schematic freeze: {pcbs[0].relative_to(REPO_ROOT)}")
-    if status != "Closed" and manufacturing:
+    if not fabrication_allowed and status != "Closed" and manufacturing:
         fail(f"{board} has manufacturing output before schematic freeze: {manufacturing[0].relative_to(REPO_ROOT)}")
 
 
@@ -438,9 +445,9 @@ def validate_no_manufacturing_outputs_before_order(
     board: str, board_dir: Path, release_state: str
 ) -> None:
     manufacturing = manufacturing_files(board_dir)
-    if manufacturing and STATE_RANK[release_state] < STATE_RANK["PROTO-ONLY"]:
+    if manufacturing and not is_fabrication_authorized(release_state):
         fail(
-            f"{board} has manufacturing output before PROTO-ONLY: "
+            f"{board} has manufacturing output before prototype fabrication authorization: "
             f"{manufacturing[0].relative_to(REPO_ROOT)}"
         )
 
@@ -836,7 +843,7 @@ def validate_order_readiness() -> None:
                 f"schematic freeze state must match {freeze_state}"
             )
         release_state = row["Release state"].strip()
-        if release_state not in RELEASE_STATES:
+        if release_state not in allowed_release_states(board):
             fail(
                 f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: invalid Release state {release_state}"
             )
@@ -845,7 +852,7 @@ def validate_order_readiness() -> None:
                 f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
                 f"PB-100 release state must be {expected_pb_release_state}"
             )
-        expected_order_state = "READY" if release_state == "PRODUCTION-READY" else "NO-GO"
+        expected_order_state = "READY" if is_production_authorized(release_state) else "NO-GO"
         if row["Order state"].strip() != expected_order_state:
             fail(
                 f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: order must be {expected_order_state}"
@@ -853,13 +860,15 @@ def validate_order_readiness() -> None:
         row_text = " ".join(row.values())
         if release_state == "BLOCKED" and "No PCB layout" not in row_text:
             fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: BLOCKED must keep No PCB layout")
-        if STATE_RANK[release_state] < STATE_RANK["PROTO-ONLY"]:
+        if not is_fabrication_authorized(release_state):
             for token in ("No fabrication outputs", "No assembly outputs"):
                 if token not in row_text:
                     fail(f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: must keep {token}")
-        elif release_state == "PROTO-ONLY" and "engineering prototype" not in row_text.lower():
+        elif not is_production_authorized(release_state) and not any(
+            token in row_text.lower() for token in ("engineering prototype", "evt")
+        ):
             fail(
-                f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: PROTO-ONLY must mark engineering prototype scope"
+                f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: prototype state must mark engineering prototype or EVT scope"
             )
         for token in (
             f"{board}-pcb-layout-start-checklist.csv",
@@ -1134,7 +1143,7 @@ def validate_layout_start_readiness() -> None:
                 f"freeze state must match {freeze_state}"
             )
         release_state = row["Release state"].strip()
-        if release_state not in RELEASE_STATES:
+        if release_state not in allowed_release_states(board):
             fail(
                 f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
                 f"invalid Release state {release_state}"
@@ -1144,7 +1153,11 @@ def validate_layout_start_readiness() -> None:
                 f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
                 f"PB-100 release state must be {expected_pb_release_state}"
             )
-        expected_planning_state = "READY" if freeze_state == "Closed" else "BLOCKED"
+        expected_planning_state = (
+            "READY"
+            if freeze_state == "Closed" or (board == "PB-100" and is_layout_authorized(release_state))
+            else "BLOCKED"
+        )
         if row["Layout planning state"].strip() != expected_planning_state:
             fail(
                 f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "
@@ -1152,7 +1165,8 @@ def validate_layout_start_readiness() -> None:
             )
         expected_import_state = (
             "READY"
-            if freeze_state == "Closed" and STATE_RANK[release_state] >= STATE_RANK["LAYOUT-ONLY"]
+            if is_layout_authorized(release_state)
+            and (freeze_state == "Closed" or board == "PB-100")
             else "BLOCKED"
         )
         if row["KiCad board import state"].strip() != expected_import_state:
@@ -1172,7 +1186,7 @@ def validate_layout_start_readiness() -> None:
             )
         if not row["Assembly/DFM baseline"].startswith("READY"):
             fail(f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: assembly DFM baseline must be READY")
-        expected_order_state = "READY" if release_state == "PRODUCTION-READY" else "NO-GO"
+        expected_order_state = "READY" if is_production_authorized(release_state) else "NO-GO"
         if row["Order state"].strip() != expected_order_state:
             fail(
                 f"{LAYOUT_START_READINESS.relative_to(REPO_ROOT)}:{row_number}: "

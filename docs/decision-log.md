@@ -3701,3 +3701,33 @@ a physical fit sample remain mandatory. The connector and test-point MPN
 selection therefore reduces fixture-source ambiguity but does not close
 `FAB-REVIEW`, touch safety or Q2E-003. Coupon fabrication/energized use and
 PB-100 layout remain blocked.
+
+## 2026-07-22 — Clarify Q2E-012 independent technical review authority
+
+Decision: a documented Codex review of the committed Q2 empirical evidence
+package satisfies the `Q2E-012` independent technical review requirement before
+Product Owner acceptance. The review record must cover the setup, calibration,
+lot trace, raw-data integrity, analysis script, result reproducibility,
+deviations and acceptance criteria. No second developer or external reviewer
+is required.
+
+This is an organizational clarification of the already accepted ADR-0017 and
+ADR-0018 review authority. It does not reduce the evidence package, replace
+machine validation or Product Owner acceptance, close `Q2E-012`, authorize
+coupon fabrication or energized use, or change PBREL-007 from `Conditional`.
+
+## 2026-07-22 — Authorize controlled PB-100 Rev.1 EVT development
+
+Decision: accept ADR-0019 and move PB-100 to `EVT-LAYOUT-AUTHORIZED` without
+declaring schematic freeze or production readiness closed. A separate reviewed
+pre-fabrication gate may authorize exactly five Rev.1 EVT boards marked
+`PB-100 REV.1 EVT — NOT FOR PRODUCTION`. Those boards have fixed roles
+`EVT-01` through `EVT-05`, including a dedicated destructive-test unit and an
+undamaged motorcycle-validation unit.
+
+Bench validation remains mandatory before motorcycle validation. Intentional
+load dump, short circuit, overcurrent and other destructive corners remain
+forbidden on the motorcycle. PBREL-007 and the Q2 maximum-bound evidence now
+block `PRODUCTION-RELEASE`, not controlled EVT layout. Q2-C100 is retained as a
+paused diagnostic option. Rev.1 cannot become production hardware; all findings
+must be reviewed into Rev.2 before production release is considered.

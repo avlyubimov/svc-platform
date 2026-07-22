@@ -2,13 +2,17 @@
 
 ## Phase boundary
 
-PB-100 bench tests that require an assembled PB-100 board are post-prototype
-validation gates. Per
-`docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md` and
-`docs/adr/ADR-0017-pb-100-staged-release-authorization.md`, schematic freeze
-and `LAYOUT-ONLY` require the test plan, test hooks, calculations, simulations,
-and source evidence. Reviewed post-layout extraction permits `PROTO-ONLY`;
-physical bench records then gate production and field release.
+PB-100 bench tests that require an assembled board are EVT validation gates.
+Per ADR-0019, controlled layout begins at `EVT-LAYOUT-AUTHORIZED`; reviewed
+DRC, parity, electrothermal/clamp-loop extraction, DFM and safety evidence permit
+a five-board package at `EVT-FAB-AUTHORIZED`. Build inspection permits
+`BENCH-VALIDATION`; physical bench records then gate
+`MOTORCYCLE-VALIDATION` and production remains closed until reviewed Rev.2.
+This flow preserves the validation intent of
+`docs/adr/ADR-0013-pb-100-prelayout-vs-postprototype-validation.md` and the
+staged evidence model of
+`docs/adr/ADR-0017-pb-100-staged-release-authorization.md`; ADR-0019 changes
+which release boundary those gates block.
 
 ## Bench test before motorcycle
 
@@ -30,8 +34,25 @@ post-prototype validation gate in
 `hardware/power-board/PB-100/PB-100-post-prototype-validation-gate.csv` is
 complete.
 
-PBREL-006/PBREL-007 transition sequencing is tracked in
+PBREL-006/PBREL-007 EVT transition sequencing is tracked in
 `hardware/power-board/PB-100/PB-100-staged-release-readiness.csv`.
+
+Unit roles are fixed by
+`hardware/power-board/PB-100/PB-100-evt-unit-allocation.csv`. `EVT-03` receives
+fault/surge testing and must never be installed on the motorcycle. `EVT-04` is
+reserved for motorcycle validation after its nondestructive bench pass.
+
+### Ordered EVT bench sequence
+
+1. Inspect DNP populations, polarity, isolation links and shorts.
+2. Current-limited bring-up with all outputs disabled.
+3. Controlled 5 A, 10 A, 20 A and 40 A load steps.
+4. Record MOSFET, copper, via, shunt, connector and enclosure temperatures.
+5. Verify telemetry, current limit, fuse, short-circuit and safe shutdown.
+6. Run controlled overvoltage/load disconnect while recording synchronized
+   `VBAT_RAW`, protected output, Q1/Q2 `VDS`, Q1/Q2 `VGS`, current and
+   temperature.
+7. Repeat inspection and parametric checks after abnormal-stress testing.
 
 ## PB-100 bench validation matrix
 
@@ -203,10 +224,16 @@ ordered rule execution, and stale-telemetry denial in one processing step.
 
 ## Motorcycle test
 
-1. Install with only low-current loads.
+Do not intentionally generate load dump, short circuit, overcurrent or another
+destructive corner on the motorcycle. Use only an undamaged board that has
+passed the required bench evidence.
+
+1. Install `EVT-04` with only low-current loads.
 2. Verify no CAN errors.
-3. Verify ACC behavior.
-4. Verify low-voltage shutdown.
-5. Add fog lights.
-6. Add CHIGEE/nav.
-7. Log CAN without transmitting.
+3. Verify cranking and alternator behavior.
+4. Verify ACC behavior and low-voltage shutdown.
+5. Add real loads in reviewed steps.
+6. Record connector retention, vibration and enclosure temperatures.
+7. Log CAN without transmitting and confirm the physical CAN1 TX-disabled
+   status.
+8. Disposition every Rev.1 finding into the Rev.2 review package.
