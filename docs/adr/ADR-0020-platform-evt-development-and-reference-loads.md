@@ -15,8 +15,8 @@ preconditions for creating that hardware.
 
 The BMW K25 reference configuration also needs correction. The LOBOO C36 is a
 bidirectional battery accessory, not a normal one-way PB-100 output. Four
-additional lamps require a dedicated manual request input and controlled
-two-pair sequencing. The physical outputs must nevertheless remain generic
+additional lamps require two independent manual request inputs and controlled
+per-pair sequencing. The physical outputs must nevertheless remain generic
 `OUT1` through `OUT10`; vehicle roles remain configuration data.
 
 This ADR changes the accepted release process and reference configuration. It
@@ -128,21 +128,38 @@ The stock motorcycle headlamp remains on the factory wiring and is not a
 PB-100 load. Nameplate lamp wattages are planning data only; actual current is
 recorded on EVT hardware.
 
-### Manual fog-light request
+### Dual manual fog-light requests
 
-Add `FOG_SW_IN` with a dry-contact return `SW_GND`. The primary control is a
-separate weather-protected handlebar switch that carries only a signal. The
-interface requires ESD/EMI protection, RC filtering, debounce and stuck-button
-diagnostics. `SERVICE` and `RESET` are not normal fog controls. FB-100 may gain
-an optional `FOG` button only if the existing mechanical envelope permits it;
-otherwise the handlebar connector remains primary.
+Amended by final Product Owner direction on 2026-07-22: replace the single
+request with `FOG_A_SW_IN`, `FOG_B_SW_IN` and common `SW_GND` for the owner's
+unverified double three-wire handlebar switch. JPB1 pins 82/83 bind through two
+independent protected LB paths to STM32H563 PA8/PA9. A sealed three-position
+DTM harness connector uses contact 1 `SW_GND`, contact 2 `FOG_A_SW_IN` and
+contact 3 `FOG_B_SW_IN`; wire colors remain unassigned until offline
+multimeter measurement.
 
-A short valid press toggles a user request. Boot, reset, invalid configuration
-or fault clears the request and both lamp pairs remain off. Enabling sequences
-OUT3/OUT4 first and OUT6/OUT7 after a configurable delay. Manual off disables
-all four immediately. `FOG_SW_IN` never drives an output directly: Output
-Manager resolves configured roles and retains current, undervoltage, thermal,
-fault, telemetry and safe-off authority.
+Each input has its own pull-up, series impedance, RC filter, voltage clamp,
+automotive Schmitt buffer, debounce and stuck-input diagnostic. The default
+assembly is an active-low dry contact. Mutually exclusive DNP components retain
+a protected 12 V active-high transistor option if measurement proves the
+switch contains electronics or illumination. No external wire connects
+directly to an MCU input, and incompatible variants may not be populated
+together.
+
+Input A independently requests the configured OUT3/OUT4 reference pair; input
+B independently requests the configured OUT6/OUT7 reference pair. The two
+requests may coexist. Each pair sequences its two channels with a configurable
+delay and disables both channels immediately after a valid off command. Each
+input supports `momentary_toggle` and `maintained`; the unverified default is
+`momentary_toggle`. Boot, reset, invalid configuration or safety denial clears
+requests and requires a held input to return OFF before rearming. A fault or
+stuck contact on one input does not suppress the other input's state machine.
+
+The switches create requests only. Output Manager resolves configured roles
+and retains current, undervoltage, thermal, telemetry, fault and safe-off
+authority. Load shedding removes the OUT6/OUT7 reference pair before OUT3/OUT4.
+`SERVICE` and `RESET` are not normal fog controls, and the stock headlamp stays
+on the factory loom.
 
 ### C36 bidirectional branch
 
@@ -195,7 +212,7 @@ installed on the motorcycle.
 
 Bench validation covers ERC/DRC/parity/unconnected checks, current-limited
 bring-up, safe-off, all outputs, real lamp currents, ten IMON calibrations,
-INA228 calibration, channel-sum versus input-current comparison, FOG input and
+INA228 calibration, channel-sum versus input-current comparison, both FOG inputs and
 pair sequencing, undervoltage/fault shutdown, OUT1 socket, both C36 directions,
 10/20/30/40 A thermal points, short/overload/overvoltage and priority shedding.
 
@@ -261,6 +278,6 @@ bench evidence, raw data, reproducibility or final Product Owner approval.
 - EVT manufacturing remains separately gated by `EVT-FAB-REVIEW`.
 - Q2-C100 no longer controls the PB-100 prototype schedule.
 - C36 remains bidirectional and outside the managed PB output current.
-- Four auxiliary lamps receive a dedicated, safe, configurable manual request.
+- Four auxiliary lamps receive two independent, safe, configurable manual requests.
 - Production remains blocked until Rev.2 correction, critical retest and Product
   Owner approval.

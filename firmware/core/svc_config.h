@@ -44,7 +44,7 @@
 #define SVC_DEFAULT_THERMAL_PLAUSIBLE_MAX_C 150
 #define SVC_DEFAULT_FOG_DEBOUNCE_MS 50U
 #define SVC_DEFAULT_FOG_STUCK_TIMEOUT_MS 30000U
-#define SVC_DEFAULT_FOG_PAIR_DELAY_MS 250U
+#define SVC_DEFAULT_FOG_CHANNEL_DELAY_MS 150U
 
 typedef enum {
     SVC_OUTPUT_OUT1 = 0,
@@ -133,13 +133,21 @@ typedef struct {
 } svc_telemetry_config_t;
 
 typedef struct {
+    enum {
+        SVC_MANUAL_INPUT_MOMENTARY_TOGGLE = 0,
+        SVC_MANUAL_INPUT_MAINTAINED
+    } behavior;
     bool active_low;
     uint32_t debounce_ms;
     uint32_t stuck_timeout_ms;
-    uint32_t pair_delay_ms;
+    uint32_t channel_delay_ms;
+    output_role_t roles[2];
+} svc_manual_fog_input_config_t;
+
+typedef struct {
+    svc_manual_fog_input_config_t pair_a;
+    svc_manual_fog_input_config_t pair_b;
     bool restore_on_boot;
-    output_role_t primary_roles[2];
-    output_role_t secondary_roles[2];
     bool output_manager_authority;
 } svc_manual_fog_config_t;
 

@@ -61,7 +61,8 @@ Profile #001. Physical outputs remain generic.
 The stock headlamp remains on factory wiring. The LOBOO C36 is the separate
 `C36_BIDIRECTIONAL` battery branch defined by ADR-0020 and is not OUT1 through
 OUT10. The four auxiliary-lamp nameplate values are provisional until EVT
-measurement. `FOG_SW_IN` is a configurable user request; Output Manager retains
+measurement. `FOG_A_SW_IN` and `FOG_B_SW_IN` are independent configurable user
+requests for the reference OUT3/OUT4 and OUT6/OUT7 pairs; Output Manager retains
 all budget, voltage, telemetry, thermal and fault authority.
 
 The reference fuse ratings total 100 A and the reference current limits total

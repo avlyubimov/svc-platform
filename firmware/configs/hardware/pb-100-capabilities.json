@@ -22,10 +22,24 @@
   },
   "manual_request_inputs": [
     {
-      "signal": "FOG_SW_IN",
+      "signal": "FOG_A_SW_IN",
       "return_signal": "SW_GND",
       "active_low": true,
       "filtered": true,
+      "mcu_gpio": "PA8",
+      "buffered": true,
+      "default_behavior": "momentary_toggle",
+      "direct_output_control": false,
+      "safe_default": "off"
+    },
+    {
+      "signal": "FOG_B_SW_IN",
+      "return_signal": "SW_GND",
+      "active_low": true,
+      "filtered": true,
+      "mcu_gpio": "PA9",
+      "buffered": true,
+      "default_behavior": "momentary_toggle",
       "direct_output_control": false,
       "safe_default": "off"
     }

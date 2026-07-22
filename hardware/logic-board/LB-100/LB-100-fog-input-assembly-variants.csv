@@ -1,0 +1,5 @@
+Variant,Channel,Populate,DNP,Input expectation,Release rule
+FOG_DRY_CONTACT,A,R23 R26 C35 C37 D18 D19 U18,R24 R25 Q18,Contact closes FOG_A_SW_IN to SW_GND; active-low; open wire OFF,Default only until offline switch measurement records contact topology
+FOG_DRY_CONTACT,B,R27 R30 C36 C38 D18 D20 U19,R28 R29 Q19,Contact closes FOG_B_SW_IN to SW_GND; active-low; open wire OFF,Default only until offline switch measurement records contact topology
+FOG_12V_ACTIVE_HIGH,A,R24 R25 R26 C35 C37 D18 D19 Q18 U18,R23,Measured electronic switch produces protected 12 V when active,Requires measured state table fused source pulse review and BOM selection before EVT-FAB-AUTHORIZED
+FOG_12V_ACTIVE_HIGH,B,R28 R29 R30 C36 C38 D18 D20 Q19 U19,R27,Measured electronic switch produces protected 12 V when active,Requires measured state table fused source pulse review and BOM selection before EVT-FAB-AUTHORIZED

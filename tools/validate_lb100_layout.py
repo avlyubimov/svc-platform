@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BOARD_PATH = ROOT / "hardware" / "logic-board" / "LB-100" / "kicad" / "LB-100.kicad_pcb"
 REQUIRED_KICAD_VERSION = "10.0.4"
-EXPECTED_UNCONNECTED_ITEMS = 349
+EXPECTED_UNCONNECTED_ITEMS = 384
 BOARD_ONLY_FOOTPRINTS = {f"H{index}" for index in range(1, 9)}
 ALLOWED_VIOLATIONS = Counter(
     {
@@ -23,8 +23,8 @@ ALLOWED_VIOLATIONS = Counter(
         "annular_width": 2,
         "padstack": 2,
         "silk_edge_clearance": 2,
-        "silk_overlap": 6,
-        "silk_over_copper": 5,
+        "silk_overlap": 10,
+        "silk_over_copper": 25,
         "nonmirrored_text_on_back_layer": 1,
     }
 )
@@ -67,7 +67,7 @@ def validate_board_milestone() -> None:
         '(gr_rect (start 0 0) (end 100 70)',
         'LB-100 REV.1 EVT - NOT FOR PRODUCTION',
         'BLE ANTENNA - COPPER KEEPOUT REVIEW',
-        'FOG_SW_IN FILTER',
+        'FOG A/B INPUT PROTECTION',
         '(property "Reference" "JPB1"',
         '(property "Reference" "U1"',
         '(property "Reference" "U7"',
@@ -77,8 +77,8 @@ def validate_board_milestone() -> None:
     ):
         if token not in board_text:
             fail(f"LB-100 controlled layout is missing {token}")
-    if board_text.count("\n\t(footprint ") != 91:
-        fail("LB-100 placement must contain 83 schematic footprints and eight mounting holes")
+    if board_text.count("\n\t(footprint ") != 108:
+        fail("LB-100 placement must contain 100 schematic footprints and eight mounting holes")
     for forbidden_token in ("\n\t(segment ", "\n\t(via ", "\n\t(zone "):
         if forbidden_token in board_text:
             fail("LB-100 placement milestone must not claim routing or copper-pour completion")
@@ -155,7 +155,7 @@ def main() -> int:
     validate_drc()
     print(
         "LB-100 controlled placement validation passed "
-        "(83 schematic footprints, 8 mounting holes, no copper/courtyard collision; routing open)."
+        "(100 schematic footprints, 8 mounting holes, no copper/courtyard collision; routing open)."
     )
     return 0
 

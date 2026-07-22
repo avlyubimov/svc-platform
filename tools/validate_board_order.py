@@ -613,7 +613,7 @@ def validate_sourcing_precheck(path: Path, required_tokens: tuple[str, ...]) -> 
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid assembly owner")
         if row["Status"].strip() not in {"Conditional", "Ready", "Frozen"}:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: invalid sourcing status")
-        if row["Evidence date"].strip() not in {"2026-07-20", "2026-07-21"}:
+        if row["Evidence date"].strip() not in {"2026-07-20", "2026-07-21", "2026-07-22"}:
             fail(f"{path.relative_to(REPO_ROOT)}:{row_number}: evidence date must match the current review cycle")
         for column in ("Primary source", "Secondary source"):
             if not row[column].strip().startswith(("https://", "http://")):

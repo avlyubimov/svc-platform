@@ -1656,7 +1656,8 @@ def validate_not_final_value_status(path: Path, row_number: int, value_status: s
 def validate_no_role_tokens_in_row(path: Path, row_number: int, row: dict[str, str]) -> None:
     row_text = (
         " ".join(row.values())
-        .replace("FOG_SW_IN", "")
+        .replace("FOG_A_SW_IN", "")
+        .replace("FOG_B_SW_IN", "")
         .replace("PBVAL-FOG-001", "")
     )
     for forbidden_token in FORBIDDEN_ROLE_TOKENS:

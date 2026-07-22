@@ -2,6 +2,6 @@ Check ID,Scope,Status,Required evidence,Blocked action
 FB-EVT-FAB-001,Routing and pours,Open,Complete all FB-100 routes and reviewed ground pours without changing the mechanical outline,Do not generate fabrication outputs
 FB-EVT-FAB-002,Connectivity and rules,Open,Zero DRC unconnected and schematic-board parity findings with reviewed waivers only,Do not generate fabrication outputs
 FB-EVT-FAB-003,USB and cable,Open,Stackup-derived USB impedance length matching ESD return shield strategy and JFB1 orientation review,Do not order EVT boards
-FB-EVT-FAB-004,FOG control fit,Open,Document whether optional FB FOG button fits; retain external handlebar switch as primary if it does not,Do not add an unreviewed outline or actuator change
+FB-EVT-FAB-004,FOG indication/fit,Open,Document whether FB can indicate both fog-pair states; any optional single FB FOG button cannot replace the two independent external handlebar contacts,Do not add an unreviewed outline actuator or single-button functional shortcut
 FB-EVT-FAB-005,Manufacturability,Open,JLCPCB or PCBWay stackup DFM assembly inspection DNP and five-unit serial-package review,Do not set EVT-FAB-AUTHORIZED
 FB-EVT-FAB-006,Review authority,Open,Codex technical review and Product Owner approval recorded; no second developer required,Do not set EVT-FAB-AUTHORIZED

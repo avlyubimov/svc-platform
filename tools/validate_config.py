@@ -657,15 +657,27 @@ def validate_reference_controls(config: dict[str, Any]) -> None:
     manual_controls = require_dict(config, "manual_controls")
     fog = require_dict(manual_controls, "fog")
     expected_fog = {
-        "input_signal": "FOG_SW_IN",
-        "return_signal": "SW_GND",
-        "active_low": True,
-        "debounce_ms": 50,
-        "stuck_timeout_ms": 30000,
-        "pair_delay_ms": 250,
+        "pair_a": {
+            "input_signal": "FOG_A_SW_IN",
+            "return_signal": "SW_GND",
+            "behavior": "momentary_toggle",
+            "active_low": True,
+            "debounce_ms": 50,
+            "stuck_timeout_ms": 30000,
+            "channel_delay_ms": 150,
+            "roles": ["FOG_PRIMARY_LEFT", "FOG_PRIMARY_RIGHT"],
+        },
+        "pair_b": {
+            "input_signal": "FOG_B_SW_IN",
+            "return_signal": "SW_GND",
+            "behavior": "momentary_toggle",
+            "active_low": True,
+            "debounce_ms": 50,
+            "stuck_timeout_ms": 30000,
+            "channel_delay_ms": 150,
+            "roles": ["FOG_SECONDARY_LEFT", "FOG_SECONDARY_RIGHT"],
+        },
         "restore_on_boot": False,
-        "primary_roles": ["FOG_PRIMARY_LEFT", "FOG_PRIMARY_RIGHT"],
-        "secondary_roles": ["FOG_SECONDARY_LEFT", "FOG_SECONDARY_RIGHT"],
         "output_manager_authority": True,
     }
     if fog != expected_fog:
@@ -738,16 +750,24 @@ def validate_reference_hardware_contracts(config: dict[str, Any]) -> None:
         fail("firmware operating modes must match PB-100 reference load-mode matrix")
 
     b2b_rows = load_csv_dicts(PB100_B2B_MAP_PATH)
-    fog_b2b = [row for row in b2b_rows if row.get("Net", "").strip() == "FOG_SW_IN"]
-    if len(fog_b2b) != 1 or fog_b2b[0].get("Pin", "").strip() != "82":
-        fail("PB-100 must carry FOG_SW_IN on JPB1 pin 82")
+    fog_b2b = {
+        row.get("Net", "").strip(): row.get("Pin", "").strip()
+        for row in b2b_rows
+        if row.get("Net", "").strip() in {"FOG_A_SW_IN", "FOG_B_SW_IN"}
+    }
+    if fog_b2b != {"FOG_A_SW_IN": "82", "FOG_B_SW_IN": "83"}:
+        fail("PB-100 must carry FOG_A_SW_IN/FOG_B_SW_IN on JPB1 pins 82/83")
     lb_rows = load_csv_dicts(LB100_PIN_BINDING_PATH)
-    fog_lb = [row for row in lb_rows if row.get("Net", "").strip() == "FOG_SW_IN"]
-    if len(fog_lb) != 1 or fog_lb[0].get("STM32H563VITx LQFP100 pin", "").strip() != "PA8":
-        fail("LB-100 must bind FOG_SW_IN to PA8")
+    fog_lb = {
+        row.get("Net", "").strip(): row.get("STM32H563VITx LQFP100 pin", "").strip()
+        for row in lb_rows
+        if row.get("Net", "").strip() in {"FOG_A_SW_IN", "FOG_B_SW_IN"}
+    }
+    if fog_lb != {"FOG_A_SW_IN": "PA8", "FOG_B_SW_IN": "PA9"}:
+        fail("LB-100 must bind FOG_A_SW_IN/FOG_B_SW_IN to PA8/PA9")
 
     fog_text = read_text(PB100_FOG_INTERFACE_PATH)
-    for token in ("FOG_SW_IN", "SW_GND", "dry-contact", "ESD/EMI", "Output Manager"):
+    for token in ("FOG_A_SW_IN", "FOG_B_SW_IN", "SW_GND", "dry-contact", "ESD/EMI", "Output Manager"):
         if token not in fog_text:
             fail(f"PB-100 fog interface must include {token}")
     c36_text = read_text(PB100_C36_PATH)
@@ -770,7 +790,7 @@ def load_csv_dicts(path: Path) -> list[dict[str, str]]:
 
 
 def validate_no_role_tokens_in_capabilities(capabilities: dict[str, Any]) -> None:
-    text = json.dumps(capabilities, sort_keys=True).replace("FOG_SW_IN", "")
+    text = json.dumps(capabilities, sort_keys=True).replace("FOG_A_SW_IN", "").replace("FOG_B_SW_IN", "")
     for token in FORBIDDEN_HARDWARE_CAPABILITY_ROLE_TOKENS:
         if token in text:
             fail(f"hardware capabilities must not contain accessory role token: {token}")
@@ -1015,10 +1035,24 @@ def validate_pb100_capabilities(config: dict[str, Any]) -> dict[str, Any]:
     manual_inputs = capabilities.get("manual_request_inputs")
     if manual_inputs != [
         {
-            "signal": "FOG_SW_IN",
+            "signal": "FOG_A_SW_IN",
             "return_signal": "SW_GND",
             "active_low": True,
             "filtered": True,
+            "mcu_gpio": "PA8",
+            "buffered": True,
+            "default_behavior": "momentary_toggle",
+            "direct_output_control": False,
+            "safe_default": "off",
+        },
+        {
+            "signal": "FOG_B_SW_IN",
+            "return_signal": "SW_GND",
+            "active_low": True,
+            "filtered": True,
+            "mcu_gpio": "PA9",
+            "buffered": True,
+            "default_behavior": "momentary_toggle",
             "direct_output_control": False,
             "safe_default": "off",
         }

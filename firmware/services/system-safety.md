@@ -24,9 +24,11 @@ letting feature code bypass the Output Manager.
 - Treat invalid or stale thermal telemetry as cutoff.
 - Keep outputs off after recovery; recovery permits future requests but does not
   restore prior output state automatically.
-- Accept `FOG_SW_IN` only through `manual_fog_control`; debounce, stuck-input,
-  boot-off and pair-delay processing produce requests rather than direct GPIO
-  control. Invalid configuration, a fault or denied voltage clears the request.
+- Accept `FOG_A_SW_IN` and `FOG_B_SW_IN` only through
+  `manual_fog_control`; each input has independent debounce, stuck-input,
+  boot-off and pair-delay processing and produces a request rather than direct
+  GPIO control. Invalid configuration, a fault or denied voltage clears both
+  requests.
 - Preserve shedding order from configuration: the secondary fog pair uses
   priority C, the primary pair priority B and remaining reference loads priority
   A. A critical voltage condition still disables every managed output.

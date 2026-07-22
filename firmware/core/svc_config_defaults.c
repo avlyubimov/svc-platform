@@ -135,13 +135,23 @@ const svc_device_config_t svc_default_config = {
         }
     },
     .manual_fog = {
-        .active_low = true,
-        .debounce_ms = SVC_DEFAULT_FOG_DEBOUNCE_MS,
-        .stuck_timeout_ms = SVC_DEFAULT_FOG_STUCK_TIMEOUT_MS,
-        .pair_delay_ms = SVC_DEFAULT_FOG_PAIR_DELAY_MS,
+        .pair_a = {
+            .behavior = SVC_MANUAL_INPUT_MOMENTARY_TOGGLE,
+            .active_low = true,
+            .debounce_ms = SVC_DEFAULT_FOG_DEBOUNCE_MS,
+            .stuck_timeout_ms = SVC_DEFAULT_FOG_STUCK_TIMEOUT_MS,
+            .channel_delay_ms = SVC_DEFAULT_FOG_CHANNEL_DELAY_MS,
+            .roles = {OUT_ROLE_FOG_PRIMARY_LEFT, OUT_ROLE_FOG_PRIMARY_RIGHT}
+        },
+        .pair_b = {
+            .behavior = SVC_MANUAL_INPUT_MOMENTARY_TOGGLE,
+            .active_low = true,
+            .debounce_ms = SVC_DEFAULT_FOG_DEBOUNCE_MS,
+            .stuck_timeout_ms = SVC_DEFAULT_FOG_STUCK_TIMEOUT_MS,
+            .channel_delay_ms = SVC_DEFAULT_FOG_CHANNEL_DELAY_MS,
+            .roles = {OUT_ROLE_FOG_SECONDARY_LEFT, OUT_ROLE_FOG_SECONDARY_RIGHT}
+        },
         .restore_on_boot = false,
-        .primary_roles = {OUT_ROLE_FOG_PRIMARY_LEFT, OUT_ROLE_FOG_PRIMARY_RIGHT},
-        .secondary_roles = {OUT_ROLE_FOG_SECONDARY_LEFT, OUT_ROLE_FOG_SECONDARY_RIGHT},
         .output_manager_authority = true
     },
     .outputs = {

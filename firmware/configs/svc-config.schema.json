@@ -174,18 +174,12 @@
       "properties": {
         "fog": {
           "type": "object",
-          "required": ["input_signal", "return_signal", "active_low", "debounce_ms", "stuck_timeout_ms", "pair_delay_ms", "restore_on_boot", "primary_roles", "secondary_roles", "output_manager_authority"],
+          "required": ["pair_a", "pair_b", "restore_on_boot", "output_manager_authority"],
           "additionalProperties": false,
           "properties": {
-            "input_signal": {"const": "FOG_SW_IN"},
-            "return_signal": {"const": "SW_GND"},
-            "active_low": {"const": true},
-            "debounce_ms": {"type": "integer", "minimum": 1},
-            "stuck_timeout_ms": {"type": "integer", "minimum": 1000},
-            "pair_delay_ms": {"type": "integer", "minimum": 1},
+            "pair_a": {"$ref": "#/$defs/fogManualInputA"},
+            "pair_b": {"$ref": "#/$defs/fogManualInputB"},
             "restore_on_boot": {"const": false},
-            "primary_roles": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/outputRole"}},
-            "secondary_roles": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/outputRole"}},
             "output_manager_authority": {"const": true}
           }
         }
@@ -311,6 +305,48 @@
         "LOW_CURRENT_RESERVE_3",
         "MEDIUM_CURRENT_RESERVE"
       ]
+    },
+    "fogManualInputA": {
+      "type": "object",
+      "required": ["input_signal", "return_signal", "behavior", "active_low", "debounce_ms", "stuck_timeout_ms", "channel_delay_ms", "roles"],
+      "additionalProperties": false,
+      "properties": {
+        "input_signal": {"const": "FOG_A_SW_IN"},
+        "return_signal": {"const": "SW_GND"},
+        "behavior": {"enum": ["momentary_toggle", "maintained"]},
+        "active_low": {"const": true},
+        "debounce_ms": {"type": "integer", "minimum": 1},
+        "stuck_timeout_ms": {"type": "integer", "minimum": 1000},
+        "channel_delay_ms": {"type": "integer", "minimum": 1},
+        "roles": {
+          "type": "array",
+          "prefixItems": [{"const": "FOG_PRIMARY_LEFT"}, {"const": "FOG_PRIMARY_RIGHT"}],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    },
+    "fogManualInputB": {
+      "type": "object",
+      "required": ["input_signal", "return_signal", "behavior", "active_low", "debounce_ms", "stuck_timeout_ms", "channel_delay_ms", "roles"],
+      "additionalProperties": false,
+      "properties": {
+        "input_signal": {"const": "FOG_B_SW_IN"},
+        "return_signal": {"const": "SW_GND"},
+        "behavior": {"enum": ["momentary_toggle", "maintained"]},
+        "active_low": {"const": true},
+        "debounce_ms": {"type": "integer", "minimum": 1},
+        "stuck_timeout_ms": {"type": "integer", "minimum": 1000},
+        "channel_delay_ms": {"type": "integer", "minimum": 1},
+        "roles": {
+          "type": "array",
+          "prefixItems": [{"const": "FOG_SECONDARY_LEFT"}, {"const": "FOG_SECONDARY_RIGHT"}],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
     },
     "output": {
       "type": "object",

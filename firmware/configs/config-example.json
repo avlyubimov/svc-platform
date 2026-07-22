@@ -250,21 +250,33 @@
   ],
   "manual_controls": {
     "fog": {
-      "input_signal": "FOG_SW_IN",
-      "return_signal": "SW_GND",
-      "active_low": true,
-      "debounce_ms": 50,
-      "stuck_timeout_ms": 30000,
-      "pair_delay_ms": 250,
+      "pair_a": {
+        "input_signal": "FOG_A_SW_IN",
+        "return_signal": "SW_GND",
+        "behavior": "momentary_toggle",
+        "active_low": true,
+        "debounce_ms": 50,
+        "stuck_timeout_ms": 30000,
+        "channel_delay_ms": 150,
+        "roles": [
+          "FOG_PRIMARY_LEFT",
+          "FOG_PRIMARY_RIGHT"
+        ]
+      },
+      "pair_b": {
+        "input_signal": "FOG_B_SW_IN",
+        "return_signal": "SW_GND",
+        "behavior": "momentary_toggle",
+        "active_low": true,
+        "debounce_ms": 50,
+        "stuck_timeout_ms": 30000,
+        "channel_delay_ms": 150,
+        "roles": [
+          "FOG_SECONDARY_LEFT",
+          "FOG_SECONDARY_RIGHT"
+        ]
+      },
       "restore_on_boot": false,
-      "primary_roles": [
-        "FOG_PRIMARY_LEFT",
-        "FOG_PRIMARY_RIGHT"
-      ],
-      "secondary_roles": [
-        "FOG_SECONDARY_LEFT",
-        "FOG_SECONDARY_RIGHT"
-      ],
       "output_manager_authority": true
     }
   },

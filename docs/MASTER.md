@@ -31,7 +31,7 @@ BMW R1200GS K25 reference configuration needs:
 - OUT2 high-current reserve up to 18 A
 - OUT3/OUT4 first auxiliary-lamp pair and OUT6/OUT7 second pair
 - OUT5/OUT8/OUT9 low-current reserves and OUT10 medium-current reserve
-- protected `FOG_SW_IN` handlebar dry-contact request with staged pair start
+- protected `FOG_A_SW_IN`/`FOG_B_SW_IN` double handlebar requests with staged channel start per pair
 - independent near-battery `C36_BIDIRECTIONAL` accessory/rescue-charge branch
 - BMW CAN read-only logging and decoding
 

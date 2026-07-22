@@ -36,7 +36,7 @@ crossing, and no-layout boundary explicit.
 | CAN1 safety crossing | 67-70 | `CAN1_TX_DISABLE_CMD`, `CAN1_TX_DISABLED_STATUS`, `CAN1_RX_ROUTE`, `CAN1_TX_ROUTE` | 2 GPIOs plus FDCAN RX; FDCAN TX remains future/DNP | Keep CAN1 TX DNP/open and future-ADR gated |
 | Future CAN2 route | 71-72 | `CAN2_RX_ROUTE`, `CAN2_TX_ROUTE` | Reserved FDCAN RX/TX | Keep expansion DNP until accepted |
 | Future serial expansion | 73-79 | `LIN_TX`, `LIN_RX`, `RS485_DE`, `RS485_RX`, `RS485_TX`, `UART_TX`, `UART_RX` | Reserved UART resources plus direction GPIO | Keep DNP/reserved until accepted |
-| External/manual IO | 80-84 | `EXT_ADC1`, `EXT_ADC2`, `FOG_SW_IN`, `EXT_DIG2`, `EXT_5V_EN` | PA8 protected GPIO input for `FOG_SW_IN`; remaining ADC/GPIO reserve | Keep unused positions DNP/reserved; preserve active-low safe default |
+| External/manual IO | 80-84 | `EXT_ADC1`, `EXT_ADC2`, `FOG_A_SW_IN`, `FOG_B_SW_IN`, `EXT_5V_EN` | PA8 and PA9 protected GPIO inputs through U18/U19; ADC and 5 V enable allocations unchanged | Preserve independent active-low safe defaults and mutually exclusive dry/12 V assembly variants |
 
 ## LB-100 internal reservations
 

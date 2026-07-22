@@ -308,8 +308,10 @@ def build_lb() -> Schematic:
         "BLE UART directions and reset while the E73 rail is off; module-side UART pulls and the reset pull-up "
         "keep every E73 digital pin within its unpowered limit. "
         "ADC_REF is sourced and locally decoupled; AGND returns to GND at one documented zero-ohm point. Reviewed footprint "
-        "FOG_SW_IN is an active-low PA8 request with an LB_3V3_IO pull-up and RC filter; it never directly drives "
-        "an output. Reviewed footprint binding and mechanical envelope remain governed by LB-100-pcb-layout-start-checklist.csv, "
+        "FOG_A_SW_IN and FOG_B_SW_IN are independent protected requests on PA8 and PA9. Each path has raw-line "
+        "automotive ESD suppression, a dry-contact series path, a pull-up, RC filtering, a 4.3 V clamp and an "
+        "automotive Schmitt buffer; mutually exclusive DNP transistor paths support a measured 12 V switch variant. "
+        "Neither input directly drives an output. Reviewed footprint binding and mechanical envelope remain governed by LB-100-pcb-layout-start-checklist.csv, "
         "LB-100-footprint-binding-inventory.csv, and LB-100-mechanical-envelope-inventory.csv. ADR-0020 authorizes "
         "controlled LB-100.kicad_pcb placement and routing. Do not create Gerbers, drills, pick-place, BOM/CPL order "
         "packages, or manufacturing outputs before EVT-FAB-AUTHORIZED. PCB layout and manufacturing outputs remain separate."
@@ -322,7 +324,8 @@ def build_lb() -> Schematic:
         for row in csv.DictReader(handle):
             if row["Package position"].isdigit():
                 position = int(row["Package position"])
-                mcu_nets[position] = row["Net"]
+                net = row["Net"]
+                mcu_nets[position] = f"{net}_MCU" if net in {"FOG_A_SW_IN", "FOG_B_SW_IN"} else net
                 evidence = f'{row["Peripheral or pin evidence"]} {row["Default or population rule"]}'.lower()
                 if "analog input" in evidence or "gpio input" in evidence or "interrupt input" in evidence:
                     mcu_types[position] = "input"
@@ -483,6 +486,34 @@ def build_lb() -> Schematic:
             ("5", "VCC", "RADIO_SENSOR_3V3", "power_in"),
         ]))
 
+    fog_buffer_footprint = "LB100:SOT-25_L3.0-W1.6-P0.95-LS2.8-TL"
+    fog_buffer_datasheet = "https://www.ti.com/lit/ds/symlink/sn74lvc1g17-q1.pdf"
+    for ref, filtered_net, mcu_net in (
+        ("U18", "FOG_A_FILTERED", "FOG_A_SW_IN_MCU"),
+        ("U19", "FOG_B_FILTERED", "FOG_B_SW_IN_MCU"),
+    ):
+        sch.add(c(ref, "SN74LVC1G17QDBVRQ1", fog_buffer_footprint, fog_buffer_datasheet, [
+            ("1", "NC", None, "no_connect"), ("2", "A", filtered_net, "input"),
+            ("3", "GND", "GND", "power_in"), ("4", "Y", mcu_net, "output"),
+            ("5", "VCC", "LB_3V3_IO", "power_in"),
+        ]))
+    sch.add(c("D18", "ESD2CANFD24DBZRQ1", "LB100:SOT-23-3_DBZ_TI", "https://www.ti.com/lit/ds/symlink/esd2can24-q1.pdf", [
+        ("1", "IO1", "FOG_A_SW_IN", "passive"), ("2", "IO2", "FOG_B_SW_IN", "passive"),
+        ("3", "GND", "GND", "power_in"),
+    ]))
+    for ref, filtered_net in (("D19", "FOG_A_FILTERED"), ("D20", "FOG_B_FILTERED")):
+        sch.add(c(ref, "BZT52H-B4V3-Q", "LB100:SOD-123F_L2.6-W1.6", "https://assets.nexperia.com/documents/data-sheet/BZT52H-Q_SER.pdf", [
+            ("1", "K", filtered_net, "passive"), ("2", "A", "GND", "passive"),
+        ]))
+    for ref, base_net, filtered_net in (
+        ("Q18", "FOG_A_12V_BASE", "FOG_A_FILTERED"),
+        ("Q19", "FOG_B_12V_BASE", "FOG_B_FILTERED"),
+    ):
+        sch.add(c(ref, "BC847BQ-7-F 12V OPTION", "LB100:SOT-23-3_DBZ_TI", "https://www.diodes.com/datasheet/download/BC846AQ-BC848CQ.pdf", [
+            ("1", "B", base_net, "input"), ("2", "E", "GND", "power_in"),
+            ("3", "C", filtered_net, "open_collector"),
+        ], dnp=True))
+
     r0603 = "LB100:R_C_0603_1608Metric"
     c0603 = r0603
     passives = [
@@ -530,8 +561,18 @@ def build_lb() -> Schematic:
         passive("C32", "100nF 6.3V X7R U15", c0603, "RADIO_SENSOR_3V3", "GND"),
         passive("C33", "100nF 6.3V X7R U16", c0603, "RADIO_SENSOR_3V3", "GND"),
         passive("C34", "100nF 6.3V X7R U17", c0603, "RADIO_SENSOR_3V3", "GND"),
-        passive("R23", "10k 1% fog input pull-up", r0603, "LB_3V3_IO", "FOG_SW_IN"),
-        passive("C35", "10nF 50V X7R fog input filter", c0603, "FOG_SW_IN", "GND"),
+        passive("R23", "4.7k 1% FOG_A dry-contact series", r0603, "FOG_A_SW_IN", "FOG_A_FILTERED"),
+        c("R24", "47k 1% FOG_A 12V base DNP", r0603, "", [("1", "1", "FOG_A_SW_IN", "passive"), ("2", "2", "FOG_A_12V_BASE", "passive")], dnp=True),
+        c("R25", "100k 1% FOG_A base pull-down DNP", r0603, "", [("1", "1", "FOG_A_12V_BASE", "passive"), ("2", "2", "GND", "passive")], dnp=True),
+        passive("R26", "47k 1% FOG_A pull-up", r0603, "LB_3V3_IO", "FOG_A_FILTERED"),
+        passive("R27", "4.7k 1% FOG_B dry-contact series", r0603, "FOG_B_SW_IN", "FOG_B_FILTERED"),
+        c("R28", "47k 1% FOG_B 12V base DNP", r0603, "", [("1", "1", "FOG_B_SW_IN", "passive"), ("2", "2", "FOG_B_12V_BASE", "passive")], dnp=True),
+        c("R29", "100k 1% FOG_B base pull-down DNP", r0603, "", [("1", "1", "FOG_B_12V_BASE", "passive"), ("2", "2", "GND", "passive")], dnp=True),
+        passive("R30", "47k 1% FOG_B pull-up", r0603, "LB_3V3_IO", "FOG_B_FILTERED"),
+        passive("C35", "47nF 50V X7R FOG_A filter", c0603, "FOG_A_FILTERED", "GND"),
+        passive("C36", "47nF 50V X7R FOG_B filter", c0603, "FOG_B_FILTERED", "GND"),
+        passive("C37", "100nF 6.3V X7R U18", c0603, "LB_3V3_IO", "GND"),
+        passive("C38", "100nF 6.3V X7R U19", c0603, "LB_3V3_IO", "GND"),
     ]
     for index in range(15, 28):
         rail = "LB_3V3_MAIN" if index < 22 else "RADIO_SENSOR_3V3" if index < 26 else "MICROSD_3V3"
