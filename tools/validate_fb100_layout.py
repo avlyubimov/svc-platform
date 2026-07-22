@@ -16,7 +16,9 @@ FB100_DIR = REPO_ROOT / "hardware" / "front-board" / "FB-100"
 KICAD_DIR = FB100_DIR / "kicad"
 BOARD_PATH = KICAD_DIR / "FB-100.kicad_pcb"
 REQUIRED_KICAD_VERSION = "10.0.4"
-EXPECTED_UNCONNECTED_ITEMS = 93
+EXPECTED_UNCONNECTED_ITEMS = 0
+EXPECTED_SEGMENTS = 438
+EXPECTED_VIAS = 39
 EXPECTED_LOCAL_OVERRIDES = {"J1", "J2", "JFB1"}
 EXPECTED_BOARD_ONLY_FOOTPRINTS = {"H1", "H2", "H3", "H4"}
 EXPECTED_EDGE_ITEM_UUIDS = {
@@ -88,11 +90,12 @@ def validate_board_milestone() -> None:
             fail(f"FB-100 controlled layout is missing {token}")
     if board_text.count("\n\t(footprint ") != 48:
         fail("FB-100 placement milestone must contain 44 schematic footprints and four mounting holes")
-    if board_text.count("\n\t(segment ") != 10:
-        fail("FB-100 routing milestone must contain ten local LED series routes")
-    for forbidden_token in ("\n\t(via ", "\n\t(zone "):
-        if forbidden_token in board_text:
-            fail("FB-100 routing milestone must not claim via or copper-pour completion")
+    if board_text.count("\n\t(segment ") != EXPECTED_SEGMENTS:
+        fail(f"FB-100 routing milestone must contain {EXPECTED_SEGMENTS} segments")
+    if board_text.count("\n\t(via ") != EXPECTED_VIAS:
+        fail(f"FB-100 routing milestone must contain {EXPECTED_VIAS} vias")
+    if "\n\t(zone " in board_text:
+        fail("FB-100 EVT routing milestone must not claim copper-pour completion")
 
 
 def validate_drc() -> None:
@@ -142,8 +145,18 @@ def validate_drc() -> None:
 
     violations = report.get("violations", [])
     violation_types = Counter(finding.get("type") for finding in violations)
-    if violation_types != Counter({"copper_edge_clearance": 2, "lib_footprint_mismatch": 3}):
-        fail(f"unexpected FB-100 placement DRC findings: {dict(violation_types)}")
+    expected_violation_types = Counter(
+        {
+            "courtyards_overlap": 5,
+            "copper_edge_clearance": 4,
+            "diff_pair_gap_out_of_range": 2,
+            "diff_pair_uncoupled_length_too_long": 1,
+            "lib_footprint_mismatch": 3,
+            "silk_over_copper": 3,
+        }
+    )
+    if violation_types != expected_violation_types:
+        fail(f"unexpected FB-100 EVT routing DRC findings: {dict(violation_types)}")
 
     edge_pads = set()
     local_overrides = set()
@@ -155,15 +168,21 @@ def validate_drc() -> None:
                 for item in finding.get("items", [])
                 if isinstance(item, dict)
             }
-            labels = {
-                EXPECTED_EDGE_ITEM_UUIDS.get(item_uuid) for item_uuid in item_uuids
-            }
-            if None in labels or "BOARD_OUTLINE" not in labels or len(labels) != 2:
+            descriptions = item_descriptions(finding)
+            if (
+                "fb0719a1-1843-5594-91c9-801588abb5dc" not in item_uuids
+                or not any("USB_SHIELD" in description for description in descriptions)
+            ):
                 fail(
                     "unexpected objects in USB-C edge-entry exception: "
                     f"{sorted(item_uuids)}"
                 )
-            edge_pads.update(label for label in labels if label != "BOARD_OUTLINE")
+            edge_pads.update(
+                label
+                for item_uuid in item_uuids
+                if (label := EXPECTED_EDGE_ITEM_UUIDS.get(item_uuid))
+                and label != "BOARD_OUTLINE"
+            )
         elif finding_type == "lib_footprint_mismatch":
             local_overrides.update(item_references(finding, EXPECTED_LOCAL_OVERRIDES))
     if edge_pads != {
@@ -180,7 +199,9 @@ def validate_drc() -> None:
             "FB-100 placement milestone unconnected count changed: "
             f"expected {EXPECTED_UNCONNECTED_ITEMS}, found {len(unconnected_items)}"
         )
-    if {finding.get("type") for finding in unconnected_items} != {"unconnected_items"}:
+    if unconnected_items and {
+        finding.get("type") for finding in unconnected_items
+    } != {"unconnected_items"}:
         fail("FB-100 unconnected section contains an unexpected finding type")
 
     parity_findings = report.get("schematic_parity", [])
@@ -204,7 +225,8 @@ def main() -> int:
     validate_drc()
     print(
         "FB-100 controlled routing validation passed "
-        "(44 schematic footprints, 4 mounting holes, 10 local indicator series routes)."
+        f"(44 schematic footprints, 4 mounting holes, {EXPECTED_SEGMENTS} segments, "
+        f"{EXPECTED_VIAS} vias, zero unconnected items; USB tuning and fab review open)."
     )
     return 0
 

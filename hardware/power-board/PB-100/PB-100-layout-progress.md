@@ -12,11 +12,17 @@ Status: `EVT-LAYOUT-AUTHORIZED` — partial schematic import and placement exist
   complete PB-owned CAN1 physical/default-disable population.
 - Applied battery-entry, OUT1/OUT2, OUT3..OUT10, fuse-service and CAN/service
   placement zones plus explicit Rev.1 EVT and partial-import markings.
+- Routed only the already complete low-current CAN1 safety island: nine
+  `CAN1_*` nets use 84 segments and eight through vias recorded in
+  `kicad/PB-100-can-routing.csv`. CI rejects any non-CAN net in this partial
+  routing manifest.
 - Preserved C36 as the off-board, separately fused `VBAT_RAW`
   `C36_BIDIRECTIONAL` branch outside OUT1..OUT10 and `IIN_SENSE`.
 - Added deterministic generation and CI validation. KiCad reports no copper
-  shorts, clearance violations, edge violations, courtyard overlaps or
-  mounting-hole conflicts in the placed subset.
+  shorts, track crossings, clearance violations, edge violations, courtyard
+  overlaps or mounting-hole conflicts in the routed CAN subset. Open
+  connectivity is reduced from 142 to 126 without creating provisional power
+  copper.
 
 ## EVT-FAB Blockers
 
@@ -24,8 +30,8 @@ Status: `EVT-LAYOUT-AUTHORIZED` — partial schematic import and placement exist
   the schematic, including the selected output-controller passives/clamps,
   shunt/INA228, logic buck, thermal sensors, test points and harness transition
   provisions. Resolve the six U1 unconnected-pin parity findings.
-- Re-import for zero schematic parity findings, then finish placement, routing,
-  power copper, Kelvin shunt, vias, replaceable gate elements, DNP alternatives,
+- Re-import for zero schematic parity findings, then finish placement, signal
+  routing, 40 A power copper, Kelvin shunt, power vias, replaceable gate elements, DNP alternatives,
   isolation/safe-off hooks, thermocouple sites and EVT serial field.
 - Close zero DRC/unconnected/parity, 40 A electrothermal, Q1/Q2 clamp-loop
   parasitic, connector fit, probe/safety fixture, supplier DFM and Product Owner

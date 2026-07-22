@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import re
 import uuid
 from pathlib import Path
@@ -27,6 +28,7 @@ KICAD_DIR = LB_DIR / "kicad"
 FOOTPRINT_DIR = KICAD_DIR / "lib" / "LB100.pretty"
 BOARD_PATH = KICAD_DIR / "LB-100.kicad_pcb"
 RULES_PATH = KICAD_DIR / "LB-100.kicad_dru"
+ROUTING_PATH = KICAD_DIR / "LB-100-routing.csv"
 LAYOUT_UUID_NS = uuid.UUID("cbd021d0-d8ce-4de8-a290-5a8fcaa1db00")
 
 
@@ -269,6 +271,37 @@ def board_graphics() -> list[str]:
     return graphics
 
 
+def routed_copper(net_codes: dict[str, int]) -> list[str]:
+    copper = []
+    with ROUTING_PATH.open(newline="", encoding="utf-8") as routing_file:
+        for index, row in enumerate(csv.DictReader(routing_file), 1):
+            net_name = row["net"]
+            if net_name not in net_codes:
+                raise ValueError(f"routing manifest references unknown net {net_name}")
+            route_uuid = layout_uid(
+                "route",
+                index,
+                *(row[column] for column in row),
+            )
+            if row["kind"] == "segment":
+                copper.append(
+                    f'\t(segment (start {row["start_x_mm"]} {row["start_y_mm"]}) '
+                    f'(end {row["end_x_mm"]} {row["end_y_mm"]}) '
+                    f'(width {row["width_mm"]}) (layer "{row["layer"]}") '
+                    f'(net {net_codes[net_name]}) (uuid "{route_uuid}"))'
+                )
+            elif row["kind"] == "via":
+                copper.append(
+                    f'\t(via (at {row["start_x_mm"]} {row["start_y_mm"]}) '
+                    f'(size {row["diameter_mm"]}) (drill {row["drill_mm"]}) '
+                    f'(layers "{row["start_layer"]}" "{row["end_layer"]}") '
+                    f'(net {net_codes[net_name]}) (uuid "{route_uuid}"))'
+                )
+            else:
+                raise ValueError(f'unknown routing manifest kind {row["kind"]}')
+    return copper
+
+
 def render_board() -> str:
     schematic = build_lb()
     components = {component.ref: component for component in schematic.components}
@@ -317,6 +350,7 @@ def render_board() -> str:
         ("H8", 85.0, 55.0, True),
     ):
         lines.append(mounting_hole(reference, x_mm, y_mm, shared))
+    lines.extend(routed_copper(net_codes))
     lines.extend(board_graphics())
     lines.append(")")
     return "\n".join(lines) + "\n"

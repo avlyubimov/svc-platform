@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import re
 import uuid
 from dataclasses import dataclass
@@ -18,6 +19,7 @@ KICAD_DIR = FB_DIR / "kicad"
 FOOTPRINT_DIR = KICAD_DIR / "lib" / "FB100.pretty"
 BOARD_PATH = KICAD_DIR / "FB-100.kicad_pcb"
 RULES_PATH = KICAD_DIR / "FB-100.kicad_dru"
+ROUTING_PATH = KICAD_DIR / "FB-100-routing.csv"
 LAYOUT_UUID_NS = uuid.UUID("69d2789f-f372-48ba-b4ad-9142061f7a18")
 
 
@@ -31,20 +33,20 @@ class Placement:
 
 PLACEMENTS = {
     "J1": Placement(2.37, 17.50, -90),
-    "D1": Placement(7.50, 17.50, 90),
+    "D1": Placement(10.50, 17.50, 90),
     "R11": Placement(10.00, 11.50, 90),
     "R12": Placement(13.00, 11.50, 90),
-    "R13": Placement(10.50, 15.00),
-    "R14": Placement(13.50, 15.00),
-    "C1": Placement(13.50, 18.00),
+    "R13": Placement(14.00, 15.00),
+    "R14": Placement(16.00, 15.00),
+    "C1": Placement(17.00, 18.00),
     "R15": Placement(3.00, 24.50),
     "C2": Placement(6.00, 24.50),
     "D2": Placement(12.00, 26.00),
-    "U1": Placement(12.00, 21.50),
-    "C3": Placement(15.50, 20.50, 90),
-    "C4": Placement(7.00, 20.50, 90),
-    "C5": Placement(15.50, 23.50, 90),
-    "R16": Placement(9.00, 23.00, 90),
+    "U1": Placement(16.00, 26.00, 180),
+    "C3": Placement(22.00, 31.00, 90),
+    "C4": Placement(8.00, 28.00, 90),
+    "C5": Placement(20.00, 28.50, 90),
+    "R16": Placement(19.00, 23.00, 90),
     "J2": Placement(18.50, 9.00),
     "R19": Placement(22.00, 9.00),
     "SW1": Placement(55.00, 9.00),
@@ -318,6 +320,37 @@ def routed_indicator_segments(net_codes: dict[str, int]) -> list[str]:
     return segments
 
 
+def routed_copper(net_codes: dict[str, int]) -> list[str]:
+    copper = []
+    with ROUTING_PATH.open(newline="", encoding="utf-8") as routing_file:
+        for index, row in enumerate(csv.DictReader(routing_file), 1):
+            net_name = row["net"]
+            if net_name not in net_codes:
+                raise ValueError(f"routing manifest references unknown net {net_name}")
+            route_uuid = layout_uid(
+                "route",
+                index,
+                *(row[column] for column in row),
+            )
+            if row["kind"] == "segment":
+                copper.append(
+                    f'\t(segment (start {row["start_x_mm"]} {row["start_y_mm"]}) '
+                    f'(end {row["end_x_mm"]} {row["end_y_mm"]}) '
+                    f'(width {row["width_mm"]}) (layer "{row["layer"]}") '
+                    f'(net {net_codes[net_name]}) (uuid "{route_uuid}"))'
+                )
+            elif row["kind"] == "via":
+                copper.append(
+                    f'\t(via (at {row["start_x_mm"]} {row["start_y_mm"]}) '
+                    f'(size {row["diameter_mm"]}) (drill {row["drill_mm"]}) '
+                    f'(layers "F.Cu" "B.Cu") (net {net_codes[net_name]}) '
+                    f'(uuid "{route_uuid}"))'
+                )
+            else:
+                raise ValueError(f'unknown routing manifest kind {row["kind"]}')
+    return copper
+
+
 def render_board() -> str:
     schematic = build_fb()
     components = {component.ref: component for component in schematic.components}
@@ -376,7 +409,7 @@ def render_board() -> str:
         ("H4", 75.0, 30.0),
     ):
         lines.append(mounting_hole(reference, x_mm, y_mm))
-    lines.extend(routed_indicator_segments(net_codes))
+    lines.extend(routed_copper(net_codes))
     lines.extend(board_graphics())
     lines.append(")")
     return "\n".join(lines) + "\n"

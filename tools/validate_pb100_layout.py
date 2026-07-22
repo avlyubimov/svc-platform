@@ -14,7 +14,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BOARD_PATH = ROOT / "hardware" / "power-board" / "PB-100" / "kicad" / "PB-100.kicad_pcb"
 REQUIRED_KICAD_VERSION = "10.0.4"
-EXPECTED_UNCONNECTED_ITEMS = 142
+EXPECTED_UNCONNECTED_ITEMS = 126
+EXPECTED_SEGMENTS = 84
+EXPECTED_VIAS = 8
 BOARD_ONLY_FOOTPRINTS = {f"H{index}" for index in range(1, 9)}
 
 
@@ -67,9 +69,12 @@ def validate_board_milestone() -> None:
             fail(f"PB-100 controlled layout is missing {token}")
     if board_text.count("\n\t(footprint ") != 36:
         fail("PB-100 import must contain 28 footprint-bound schematic parts and eight mounting holes")
-    for forbidden_token in ("\n\t(segment ", "\n\t(via ", "\n\t(zone "):
-        if forbidden_token in board_text:
-            fail("PB-100 partial import must not claim routing or copper-pour completion")
+    if board_text.count("\n\t(segment ") != EXPECTED_SEGMENTS:
+        fail(f"PB-100 CAN1 routing milestone must contain {EXPECTED_SEGMENTS} segments")
+    if board_text.count("\n\t(via ") != EXPECTED_VIAS:
+        fail(f"PB-100 CAN1 routing milestone must contain {EXPECTED_VIAS} vias")
+    if "\n\t(zone " in board_text:
+        fail("PB-100 partial import must not claim copper-pour completion")
 
 
 def validate_drc() -> None:
@@ -109,7 +114,7 @@ def validate_drc() -> None:
     if violation_types != Counter({"silk_over_copper": 11, "lib_footprint_issues": 8}):
         fail(f"unexpected PB-100 placement DRC findings: {dict(violation_types)}")
     if len(report.get("unconnected_items", [])) != EXPECTED_UNCONNECTED_ITEMS:
-        fail("PB-100 unconnected count changed before complete schematic import and routing")
+        fail("PB-100 unconnected count changed before complete schematic import and power routing")
 
     parity = report.get("schematic_parity", [])
     parity_types = Counter(finding.get("type") for finding in parity)
@@ -130,7 +135,9 @@ def main() -> int:
     validate_drc()
     print(
         "PB-100 controlled partial import validation passed "
-        "(28 footprint-bound parts, 8 mounting holes; 46 missing footprints and routing remain fab blockers)."
+        f"(28 footprint-bound parts, 8 mounting holes, CAN1 safety island routed with "
+        f"{EXPECTED_SEGMENTS} segments and {EXPECTED_VIAS} vias; 46 missing footprints "
+        "and all power routing remain fab blockers)."
     )
     return 0
 
