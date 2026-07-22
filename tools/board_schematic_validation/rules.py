@@ -79,6 +79,14 @@ def validate_lb(netlist: Netlist, library_dir: Path) -> list[str]:
         require_component(netlist, ref, "SN74LVC1G125QDBVRQ1", "LB100:SOT-25_L3.0-W1.6-P0.95-LS2.8-TL", failures)
     require_component(netlist, "JPB1", "FX18-100S-0.8SV10", "LB100:FX18-100S-0.8SV10_Hirose", failures)
     require_component(netlist, "JFB1", "AFC07-S24ECA-00", "LB100:FPC-SMD_AFC07-S24ECA-00", failures)
+    for ref, value in (
+        ("TP1", "E73_SWDIO"),
+        ("TP2", "E73_SWDCLK"),
+        ("TP3", "BLE_RESET_N"),
+        ("TP4", "RADIO_SENSOR_3V3"),
+        ("TP5", "GND"),
+    ):
+        require_component(netlist, ref, value, "LB100:TestPoint_SMD_1.2mm", failures)
 
     for ref in ("U4", "U5", "U6", "JBT1", "Q18", "Q19", "R24", "R25", "R28", "R29"):
         require(netlist.components.get(ref) is not None and netlist.components[ref].dnp, f"{ref}: must remain DNP", failures)
@@ -114,6 +122,7 @@ def validate_lb(netlist: Netlist, library_dir: Path) -> list[str]:
         {
             ("U7", "19"), ("U10", "8"), ("U15", "5"), ("U16", "5"),
             ("U17", "5"), ("R9", "1"), ("R18", "2"), ("R19", "2"),
+            ("TP4", "1"),
         },
         failures,
         exact=False,
@@ -123,13 +132,16 @@ def validate_lb(netlist: Netlist, library_dir: Path) -> list[str]:
     require_net(netlist, "BLE_UART_TX_MODULE", {("U7", "20"), ("U16", "2"), ("R19", "1")}, failures)
     require_net(netlist, "UART_RX", {("JPB1", "79"), ("U1", "79"), ("U16", "4"), ("R20", "2")}, failures)
     require_net(netlist, "BLE_RESET_N_MCU", {("R21", "1"), ("U1", "97"), ("U17", "2")}, failures)
-    require_net(netlist, "BLE_RESET_N", {("U7", "26"), ("U17", "4"), ("R9", "2")}, failures)
+    require_net(netlist, "BLE_RESET_N", {("U7", "26"), ("U17", "4"), ("R9", "2"), ("TP3", "1")}, failures)
+    require_net(netlist, "E73_SWDIO", {("U7", "37"), ("TP1", "1")}, failures)
+    require_net(netlist, "E73_SWDCLK", {("U7", "39"), ("TP2", "1")}, failures)
     require_net(
         netlist,
         "GND",
         {
             ("U15", "1"), ("U15", "3"), ("U16", "1"), ("U16", "3"),
             ("U17", "1"), ("U17", "3"), ("R21", "2"),
+            ("TP5", "1"),
         },
         failures,
         exact=False,

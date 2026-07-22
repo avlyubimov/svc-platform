@@ -306,7 +306,8 @@ def build_lb() -> Schematic:
         "SN74LVC1G17-Q1 digital detector with a defined raw-input pulldown and cannot back-power PB_5V_OUT, "
         "LB_3V3_MAIN, or LB_3V3_IO. Three RADIO_SENSOR_3V3-powered SN74LVC1G125-Q1 buffers isolate both "
         "BLE UART directions and reset while the E73 rail is off; module-side UART pulls and the reset pull-up "
-        "keep every E73 digital pin within its unpowered limit. "
+        "keep every E73 digital pin within its unpowered limit. Dedicated top-side test pads expose the module's "
+        "own SWDIO, SWDCLK, reset, switched 3.3 V reference, and GND for first programming and recovery. "
         "ADC_REF is sourced and locally decoupled; AGND returns to GND at one documented zero-ohm point. Reviewed footprint "
         "FOG_A_SW_IN and FOG_B_SW_IN are independent protected requests on PA8 and PA9. PB-100 owns the "
         "primary cable-entry suppressor; each LB path has a dry-contact series path, a pull-up, RC filtering, a 4.3 V clamp and an "
@@ -424,8 +425,24 @@ def build_lb() -> Schematic:
         22: "BLE_UART_RX_MODULE",
         24: "GND",
         26: "BLE_RESET_N",
+        37: "E73_SWDIO",
+        39: "E73_SWDCLK",
     }
-    sch.add(c("U7", "E73-2G4M08S1C", "LB100:WIRELM-SMD_E73-2G4M08S1C", "https://www.ebyte.com/product/444.html", [(str(index), name, e73_nets.get(index)) for index, name in enumerate(e73_names, 1)]))
+    sch.add(c(
+        "U7",
+        "E73-2G4M08S1C",
+        "LB100:WIRELM-SMD_E73-2G4M08S1C",
+        "https://www.ebyte.com/product/444.html",
+        [
+            (
+                str(index),
+                name,
+                e73_nets.get(index),
+                "bidirectional" if index == 37 else "input" if index in {26, 39} else default_electrical_type("U7", name),
+            )
+            for index, name in enumerate(e73_names, 1)
+        ],
+    ))
     sch.add(c("U8", "FM24CL64B-GTR", "LB100:SOIC-8_L4.9-W3.9-P1.27-LS6.0-BL", "https://www.infineon.com/assets/row/public/documents/10/57/infineon-fm24cl64b-64-kbit-8-k-8-serial-i2c-automotive-f-ram-datasheet-additionaltechnicalinformation-en.pdf", [
         ("1", "A0", "GND"), ("2", "A1", "GND"), ("3", "A2", "GND"), ("4", "VSS", "GND"),
         ("5", "SDA", "PB_I2C_SDA"), ("6", "SCL", "PB_I2C_SCL"), ("7", "WP", "GND"), ("8", "VDD", "LB_3V3_MAIN"),
@@ -462,6 +479,21 @@ def build_lb() -> Schematic:
         ("1", "VTREF", "LB_3V3_MAIN"), ("2", "SWDIO", "SWDIO"), ("3", "GND", "GND"),
         ("4", "SWCLK", "SWCLK"), ("5", "GND", "GND"), ("6", "SWO", "PB_SPI_SCK"),
     ]))
+    for ref, value, net in (
+        ("TP1", "E73_SWDIO", "E73_SWDIO"),
+        ("TP2", "E73_SWDCLK", "E73_SWDCLK"),
+        ("TP3", "BLE_RESET_N", "BLE_RESET_N"),
+        ("TP4", "RADIO_SENSOR_3V3", "RADIO_SENSOR_3V3"),
+        ("TP5", "GND", "GND"),
+    ):
+        sch.add(c(
+            ref,
+            value,
+            "LB100:TestPoint_SMD_1.2mm",
+            "../LB-100-e73-recovery-interface.md",
+            [("1", value, net, "passive")],
+            in_bom=False,
+        ))
     sch.add(c("Y1", "ABM8AIG-25.000MHZ-12-2Z-T3", "LB100:Crystal_SMD_3225-4Pin", "https://abracon.com/Resonators/ABM8AIG.pdf", [
         ("1", "XIN", "MCU_HSE_IN"), ("2", "GND1", "GND"), ("3", "XOUT", "MCU_HSE_OUT"), ("4", "GND2", "GND"),
     ]))

@@ -6,12 +6,14 @@ assembly, ordering, or production use.
 
 | Board | Top | Bottom | Captured state |
 |---|---|---|---|
-| FB-100 | [top](FB-100-rev1-evt-top.png) | [bottom](FB-100-rev1-evt-bottom.png) | Connectivity-complete routing; fab-review items remain open |
-| LB-100 | [top](LB-100-rev1-evt-top.png) | [bottom](LB-100-rev1-evt-bottom.png) | First routing iteration; open connections and fab-review items remain |
+| FB-100 | [top](FB-100-rev1-evt-top.png) | [bottom](FB-100-rev1-evt-bottom.png) | Four-layer connectivity-complete routing with stackup-derived USB pair and GND zones; fab review and supplier DFM remain open |
+| LB-100 | [top](LB-100-rev1-evt-top.png) | [bottom](LB-100-rev1-evt-bottom.png) | First routing iteration with five routed E73 recovery pads; 53 open connections and fab-review items remain |
 | PB-100 | [CAN1/FOG top](PB-100-rev1-evt-can1-top.png) | [CAN1/FOG bottom](PB-100-rev1-evt-can1-bottom.png) | Partial PCB with the CAN1 safety island and protected FOG cable entry routed; power routing is not present |
 
 The images were generated on 2026-07-22 from the tracked `.kicad_pcb` files
-with KiCad CLI 10.0.4. Regenerate them from the repository root with:
+with KiCad CLI 10.0.4. KiCad renders the FB-100 GND zones from the tracked zone
+definitions; the tracked board is not modified only for rendering. Regenerate
+the board renders from the repository root with:
 
 ```bash
 mkdir -p docs/assets/pcb-renders

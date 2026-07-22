@@ -45,6 +45,8 @@ bool svc_can_log_get(
     size_t index,
     svc_can_frame_t *frame);
 
+bool svc_can_log_remove(svc_can_log_t *log, size_t index);
+
 size_t svc_can_log_count(const svc_can_log_t *log);
 uint32_t svc_can_log_dropped_count(const svc_can_log_t *log);
 uint32_t svc_can_log_port_count(const svc_can_log_t *log, svc_can_port_t port);

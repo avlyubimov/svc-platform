@@ -4,7 +4,7 @@ Status: Closed for schematic freeze
 Review date: 2026-07-21
 
 This closeout freezes the LB-100 Rev.1 value-bearing schematic inputs. The
-deterministic KiCad sheet contains 81 component instances, 191 exported nets,
+deterministic KiCad sheet contains 104 component instances, 199 exported nets,
 project-local symbols, and non-empty project-local Footprint properties.
 ADR-0015 Accepted assigns the CAN1 physical layer to PB-100 while LB-100
 retains STM32 FDCAN and read-only firmware policy. It does not create or approve
@@ -28,6 +28,7 @@ KiCad PCB layout or manufacturing outputs.
   transmit-capable expansion bus.
 - Services: USB service, BLE, microSD, RTC, FRAM, back-power-safe IMU/lux
   supplies, U15-U17 switched-domain Ioff isolation on E73 UART/reset,
+  dedicated E73 SWDIO/SWDCLK/reset/target-reference/GND recovery pads,
   TCA9539-Q1 slow UI expansion, direct STM32 PD7 LTC3212 control,
   LIN/RS485 DNP reserve, SWD, clocks, BOOT0, reset, and buttons are captured.
 - Assembly: factory-owned MCU, regulators, transceivers, BLE, storage, sensors,
@@ -52,7 +53,7 @@ KiCad PCB layout or manufacturing outputs.
 
 ## Validation Result
 
-- KiCad XML netlist export: 99 components, 199 nets, including independent
+- KiCad XML netlist export: 104 components, 199 nets, including independent
   PA8 `FOG_A_SW_IN` and PA9 `FOG_B_SW_IN` ESD, selectable front end, RC,
   clamp and Schmitt-buffer chains.
 - ERC: zero errors. The only findings are two reviewed isolated labels for
@@ -60,15 +61,17 @@ KiCad PCB layout or manufacturing outputs.
   than an LB component.
 - Topology: CAN1 safety routes, JPB1 MF GND, STM32 USB/SWD, digital VBUS
   presence, ADC_REF/AGND, direct LTC3212 timing, back-power-safe sensor rails,
-  E73 UART/reset powered-off isolation, JFB1 UI mapping, every footprint file,
+  E73 UART/reset powered-off isolation and module recovery access, JFB1 UI
+  mapping, every footprint file,
   and every symbol-to-pad set pass.
 - Electrical types: every reviewed IC has non-passive functional pin types and
   at least one `power_in`; the focused validator rejects an all-passive library.
 
 ## Remaining Non-Freeze Work
 
-- PCB placement, routing, stack-up, impedance, mounting, fabrication outputs,
-  assembly outputs, and JLCPCB/PCBWay order files are separate post-freeze work.
+- PCB placement and controlled routing are in progress under ADR-0020;
+  stack-up/impedance closeout, fabrication outputs, assembly outputs, and
+  JLCPCB/PCBWay order files remain separate post-freeze work.
 - Exact values and footprints are now generator- and validator-locked; changes
   require regenerating the sheets and passing the exported-netlist audit.
 - Any change to MCU family, CAN1 read-only policy, PB-100 JPB1 contract,

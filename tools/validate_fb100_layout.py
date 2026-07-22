@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import csv
 import json
+import math
+import os
 import re
 import shutil
 import subprocess
@@ -17,15 +20,12 @@ KICAD_DIR = FB100_DIR / "kicad"
 BOARD_PATH = KICAD_DIR / "FB-100.kicad_pcb"
 REQUIRED_KICAD_VERSION = "10.0.4"
 EXPECTED_UNCONNECTED_ITEMS = 0
-EXPECTED_SEGMENTS = 438
-EXPECTED_VIAS = 39
-EXPECTED_LOCAL_OVERRIDES = {"J1", "J2", "JFB1"}
+EXPECTED_SEGMENTS = 457
+EXPECTED_VIAS = 45
+EXPECTED_ZONES = 4
+EXPECTED_LOCAL_OVERRIDES = {"J1", "JFB1"}
 EXPECTED_BOARD_ONLY_FOOTPRINTS = {"H1", "H2", "H3", "H4"}
-EXPECTED_EDGE_ITEM_UUIDS = {
-    "fb0719a1-1843-5594-91c9-801588abb5dc": "BOARD_OUTLINE",
-    "2130a68b-ae92-520a-b8f3-3a1de6853de5": "J1_PAD_3_USB_SHIELD",
-    "0b390b2f-9137-5ce3-8b57-77e787288b2e": "J1_PAD_4_USB_SHIELD",
-}
+MAX_USB_DATA_SKEW_MM = 0.10
 
 
 def fail(message: str) -> None:
@@ -84,6 +84,9 @@ def validate_board_milestone() -> None:
         '(property "Reference" "JFB1"',
         '(property "Reference" "H1"',
         '(property "Reference" "H4"',
+        '(layer "dielectric 1" (type "prepreg") (thickness 0.0994) (material "3313 RC57%") (epsilon_r 4.1)',
+        '(layer "dielectric 2" (type "core") (thickness 1.265) (material "FR4") (epsilon_r 4.6)',
+        '(copper_finish "ENIG")',
     )
     for token in required_tokens:
         if token not in board_text:
@@ -94,8 +97,69 @@ def validate_board_milestone() -> None:
         fail(f"FB-100 routing milestone must contain {EXPECTED_SEGMENTS} segments")
     if board_text.count("\n\t(via ") != EXPECTED_VIAS:
         fail(f"FB-100 routing milestone must contain {EXPECTED_VIAS} vias")
-    if "\n\t(zone " in board_text:
-        fail("FB-100 EVT routing milestone must not claim copper-pour completion")
+    if board_text.count("\n\t(zone\n") != EXPECTED_ZONES:
+        fail(f"FB-100 layout must contain {EXPECTED_ZONES} GND zones")
+    zone_layers = set(
+        re.findall(
+            r'\(zone\s+\(net \d+\)\s+\(net_name "GND"\)\s+\(layer "([^"]+)"\)',
+            board_text,
+        )
+    )
+    if zone_layers != {"F.Cu", "In1.Cu", "In2.Cu", "B.Cu"}:
+        fail(f"unexpected FB-100 GND zone layers: {sorted(zone_layers)}")
+
+    project = json.loads((KICAD_DIR / "FB-100.kicad_pro").read_text(encoding="utf-8"))
+    mismatch_severity = (
+        project.get("board", {})
+        .get("design_settings", {})
+        .get("rule_severities", {})
+        .get("lib_footprint_mismatch")
+    )
+    if mismatch_severity != "ignore":
+        fail("FB-100 generated connector transforms must be audited by CI, not UI warnings")
+
+
+def validate_usb_geometry() -> None:
+    lengths: dict[str, float] = {}
+    controlled_segments: dict[str, dict[str, str]] = {}
+    with (KICAD_DIR / "FB-100-routing.csv").open(
+        newline="", encoding="utf-8"
+    ) as routing_file:
+        for row in csv.DictReader(routing_file):
+            if row["kind"] != "segment":
+                continue
+            start_x = float(row["start_x_mm"])
+            start_y = float(row["start_y_mm"])
+            end_x = float(row["end_x_mm"])
+            end_y = float(row["end_y_mm"])
+            length = math.hypot(end_x - start_x, end_y - start_y)
+            lengths[row["net"]] = lengths.get(row["net"], 0.0) + length
+            if (
+                row["net"] in {"USB_D_P", "USB_D_N"}
+                and row["layer"] == "B.Cu"
+                and length > 50.0
+            ):
+                controlled_segments[row["net"]] = row
+
+    if set(controlled_segments) != {"USB_D_P", "USB_D_N"}:
+        fail("FB-100 must have one long controlled B.Cu segment per USB polarity")
+    for net_name, row in controlled_segments.items():
+        if not math.isclose(float(row["width_mm"]), 0.154, abs_tol=0.0005):
+            fail(f"{net_name} controlled segment is not 0.154 mm wide")
+        if not math.isclose(
+            float(row["start_y_mm"]), float(row["end_y_mm"]), abs_tol=1e-9
+        ):
+            fail(f"{net_name} controlled segment must remain horizontal")
+    center_spacing = abs(
+        float(controlled_segments["USB_D_P"]["start_y_mm"])
+        - float(controlled_segments["USB_D_N"]["start_y_mm"])
+    )
+    edge_gap = center_spacing - 0.154
+    if not math.isclose(edge_gap, 0.2032, abs_tol=0.0005):
+        fail(f"FB-100 USB controlled edge gap changed to {edge_gap:.4f} mm")
+    skew = abs(lengths["USB_D_P"] - lengths["USB_D_N"])
+    if skew > MAX_USB_DATA_SKEW_MM:
+        fail(f"FB-100 USB routed skew {skew:.4f} mm exceeds {MAX_USB_DATA_SKEW_MM:.2f} mm")
 
 
 def validate_drc() -> None:
@@ -124,7 +188,7 @@ def validate_drc() -> None:
                 "--format",
                 "json",
                 "--schematic-parity",
-                "--severity-all",
+                "--refill-zones",
                 "--output",
                 str(report_path),
                 str(BOARD_PATH),
@@ -144,54 +208,11 @@ def validate_drc() -> None:
             fail(f"invalid FB-100 DRC report: {error}")
 
     violations = report.get("violations", [])
-    violation_types = Counter(finding.get("type") for finding in violations)
-    expected_violation_types = Counter(
-        {
-            "courtyards_overlap": 5,
-            "copper_edge_clearance": 4,
-            "diff_pair_gap_out_of_range": 2,
-            "diff_pair_uncoupled_length_too_long": 1,
-            "lib_footprint_mismatch": 3,
-            "silk_over_copper": 3,
-        }
-    )
-    if violation_types != expected_violation_types:
-        fail(f"unexpected FB-100 EVT routing DRC findings: {dict(violation_types)}")
-
-    edge_pads = set()
-    local_overrides = set()
-    for finding in violations:
-        finding_type = finding.get("type")
-        if finding_type == "copper_edge_clearance":
-            item_uuids = {
-                str(item.get("uuid", ""))
-                for item in finding.get("items", [])
-                if isinstance(item, dict)
-            }
-            descriptions = item_descriptions(finding)
-            if (
-                "fb0719a1-1843-5594-91c9-801588abb5dc" not in item_uuids
-                or not any("USB_SHIELD" in description for description in descriptions)
-            ):
-                fail(
-                    "unexpected objects in USB-C edge-entry exception: "
-                    f"{sorted(item_uuids)}"
-                )
-            edge_pads.update(
-                label
-                for item_uuid in item_uuids
-                if (label := EXPECTED_EDGE_ITEM_UUIDS.get(item_uuid))
-                and label != "BOARD_OUTLINE"
-            )
-        elif finding_type == "lib_footprint_mismatch":
-            local_overrides.update(item_references(finding, EXPECTED_LOCAL_OVERRIDES))
-    if edge_pads != {
-        "J1_PAD_3_USB_SHIELD",
-        "J1_PAD_4_USB_SHIELD",
-    }:
-        fail(f"unexpected USB-C edge-entry findings: {sorted(edge_pads)}")
-    if local_overrides != EXPECTED_LOCAL_OVERRIDES:
-        fail(f"unexpected generated connector overrides: {sorted(local_overrides)}")
+    if violations:
+        fail(
+            "FB-100 default DRC must be clean after zone refill: "
+            f"{dict(Counter(finding.get('type') for finding in violations))}"
+        )
 
     unconnected_items = report.get("unconnected_items", [])
     if len(unconnected_items) != EXPECTED_UNCONNECTED_ITEMS:
@@ -218,15 +239,58 @@ def validate_drc() -> None:
     if parity_footprints != EXPECTED_BOARD_ONLY_FOOTPRINTS:
         fail(f"unexpected FB-100 board-only footprints: {sorted(parity_footprints)}")
 
+    with tempfile.TemporaryDirectory(prefix="svc-fb100-library-audit-") as audit_dir:
+        audit_path = Path(audit_dir)
+        shutil.copy2(BOARD_PATH, audit_path / BOARD_PATH.name)
+        shutil.copy2(KICAD_DIR / "FB-100.kicad_dru", audit_path / "FB-100.kicad_dru")
+        shutil.copy2(KICAD_DIR / "fp-lib-table", audit_path / "fp-lib-table")
+        os.symlink(KICAD_DIR / "lib", audit_path / "lib", target_is_directory=True)
+        audit_report_path = audit_path / "FB-100-library-audit.json"
+        audit_result = subprocess.run(
+            [
+                kicad_cli,
+                "pcb",
+                "drc",
+                "--format",
+                "json",
+                "--refill-zones",
+                "--severity-all",
+                "--output",
+                str(audit_report_path),
+                str(audit_path / BOARD_PATH.name),
+            ],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if audit_result.returncode:
+            fail(f"KiCad could not audit FB-100 connector transforms: {audit_result.stderr.strip()}")
+        audit_report = json.loads(audit_report_path.read_text(encoding="utf-8"))
+    audit_violations = audit_report.get("violations", [])
+    if Counter(finding.get("type") for finding in audit_violations) != Counter(
+        {"lib_footprint_mismatch": len(EXPECTED_LOCAL_OVERRIDES)}
+    ):
+        fail("FB-100 raw library audit contains unexpected findings")
+    local_overrides = set().union(
+        *(
+            item_references(finding, EXPECTED_LOCAL_OVERRIDES)
+            for finding in audit_violations
+        )
+    )
+    if local_overrides != EXPECTED_LOCAL_OVERRIDES:
+        fail(f"unexpected generated connector transforms: {sorted(local_overrides)}")
+
 
 def main() -> int:
     validate_generated_files()
     validate_board_milestone()
+    validate_usb_geometry()
     validate_drc()
     print(
         "FB-100 controlled routing validation passed "
         f"(44 schematic footprints, 4 mounting holes, {EXPECTED_SEGMENTS} segments, "
-        f"{EXPECTED_VIAS} vias, zero unconnected items; USB tuning and fab review open)."
+        f"{EXPECTED_VIAS} vias, {EXPECTED_ZONES} GND zones, zero DRC and unconnected; "
+        "fab review remains open)."
     )
     return 0
 

@@ -3841,3 +3841,29 @@ raw FOG paths reach JPB1 while `FOG_B_SW_IN_MCU` remains open. CI now derives
 footprint, segment, via, unconnected and parity facts from each actual
 `.kicad_pcb` and rejects stale JLCPCB readiness claims. All three boards remain
 `EVT-LAYOUT-AUTHORIZED`; no manufacturing output or order is authorized.
+
+## 2026-07-22 — Add E73 SWD recovery and persistent CAN1 log boundary
+
+Decision: expose the E73 module's own `SWDIO`, `SWDCLK`, `BLE_RESET_N`,
+`RADIO_SENSOR_3V3` target reference and GND on five accessible non-assembly
+top-side LB-100 test pads. UART remains a runtime service interface and is not
+accepted as a replacement for first programming or recovery. The fixture must
+not source the switched target-reference pad or drive module signals while the
+radio rail is off.
+
+Decision: retain ISR-safe CAN capture in the fixed RAM ring and add a
+backend-injected persistence service that serializes receive-only CAN1 frames
+to fixed 40-byte little-endian records with sequence, timestamp and CRC-32.
+Only a successful append plus sync removes a CAN1 frame; write/sync failure
+retains it, and CAN2 frames are never persisted by this service. The platform
+microSD/FAT mount and file adapter remains an explicit integration task before
+motorcycle testing and does not block the PCB because the TF-015 hardware is
+already captured.
+
+Result: the LB-100 netlist now has 104 components and 199 nets. Its controlled
+layout has 1,875 segments and 185 vias; the five recovery pads are routed and
+53 unrelated connections remain open. A trial autoroute of that backlog was
+rejected because the congested MCU/JPB1 fan-out needs local re-placement and a
+clean DRC result. FB-100 remains fully routed, PB-100 remains a truthful partial
+import pending its unresolved footprint bindings, and no manufacturing output
+or order is authorized.
