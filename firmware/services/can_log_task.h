@@ -15,10 +15,12 @@ typedef enum {
 
 typedef struct {
     svc_can1_log_queue_t *queue;
+    svc_can_log_fatfs_t *adapter;
     svc_can_log_persistence_t persistence;
     size_t batch_records;
     uint32_t successful_batch_count;
     uint32_t retry_count;
+    uint32_t storage_restart_count;
 } svc_can_log_task_t;
 
 bool svc_can_log_task_init(
@@ -31,3 +33,7 @@ bool svc_can_log_task_init(
 svc_can_log_task_status_t svc_can_log_task_run_once(
     svc_can_log_task_t *task,
     size_t *persisted_records);
+
+/* Called by the logger task after card reinsertion/backoff, never by an ISR. */
+svc_can_log_fatfs_status_t svc_can_log_task_restart_storage(
+    svc_can_log_task_t *task);

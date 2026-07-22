@@ -144,10 +144,13 @@ rejection, ring-buffer overwrite accounting, and saturating diagnostic counters.
 They also verify that the CAN1 ISR feeds a separate always-lock-free SPSC
 queue, that saturation drops only the new persistence copy, and that frames
 arriving during a slow append/sync cannot replace or reorder the logger task's
-pending batch. FatFs-adapter tests cover the CRC-protected session header and
-40-byte records, preallocation, size-based rotation, reopening the latest
-rotated session, and truncation of torn or corrupt tails. The target STM32
-SDMMC/SPI `diskio` binding remains a hardware-integration test gate.
+pending batch. FatFs-adapter tests cover the identity-bearing 128-byte v2
+session header and 44-byte/64-bit-microsecond records, preallocation,
+size-based rotation, independent close attempts after sync failure, explicit
+card restart/reopen, reopening the latest rotated session, format rollover
+without overwriting v1 data, and truncation of torn or corrupt tails. The
+target STM32 SDMMC/SPI `diskio` binding remains a hardware-integration test
+gate.
 CAN decode tests verify received frames publish internal state-change events
 through the Event Bus without repeating unchanged states, and retry dropped edges
 when the Event Bus is full.

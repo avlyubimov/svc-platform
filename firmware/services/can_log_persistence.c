@@ -3,7 +3,7 @@
 #include <string.h>
 
 #define SVC_CAN_LOG_RECORD_TYPE_RX 1U
-#define SVC_CAN_LOG_RECORD_CRC_OFFSET 36U
+#define SVC_CAN_LOG_RECORD_CRC_OFFSET 40U
 
 static void increment_counter(uint32_t *counter)
 {
@@ -72,10 +72,10 @@ static void encode_record(
     record[6] = (uint8_t)frame->port;
     record[7] = frame->extended_id ? 1U : 0U;
     put_u64(&record[8], sequence);
-    put_u32(&record[16], frame->timestamp_ms);
-    put_u32(&record[20], frame->id);
-    record[24] = frame->dlc;
-    memcpy(&record[25], frame->data, frame->dlc);
+    put_u64(&record[16], frame->timestamp_us);
+    put_u32(&record[24], frame->id);
+    record[28] = frame->dlc;
+    memcpy(&record[29], frame->data, frame->dlc);
     put_u32(&record[SVC_CAN_LOG_RECORD_CRC_OFFSET], crc32(record, SVC_CAN_LOG_RECORD_CRC_OFFSET));
 }
 
@@ -161,7 +161,7 @@ bool svc_can_log_record_decode(
         record[4] != SVC_CAN_LOG_RECORD_FORMAT_VERSION ||
         record[5] != SVC_CAN_LOG_RECORD_TYPE_RX ||
         record[6] != (uint8_t)SVC_CAN_PORT_CAN1_VEHICLE ||
-        record[24] > SVC_CAN_FRAME_MAX_DATA_LEN ||
+        record[28] > SVC_CAN_FRAME_MAX_DATA_LEN ||
         get_u32(&record[SVC_CAN_LOG_RECORD_CRC_OFFSET]) != crc32(record, SVC_CAN_LOG_RECORD_CRC_OFFSET)) {
         return false;
     }
@@ -169,11 +169,11 @@ bool svc_can_log_record_decode(
     *sequence = get_u64(&record[8]);
     *frame = (svc_can_frame_t){
         .port = SVC_CAN_PORT_CAN1_VEHICLE,
-        .id = get_u32(&record[20]),
-        .dlc = record[24],
-        .timestamp_ms = get_u32(&record[16]),
+        .id = get_u32(&record[24]),
+        .dlc = record[28],
+        .timestamp_us = get_u64(&record[16]),
         .extended_id = (record[7] & 1U) != 0U,
     };
-    memcpy(frame->data, &record[25], frame->dlc);
+    memcpy(frame->data, &record[29], frame->dlc);
     return true;
 }

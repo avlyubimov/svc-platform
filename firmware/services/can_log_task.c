@@ -21,6 +21,7 @@ bool svc_can_log_task_init(
     }
     *task = (svc_can_log_task_t){
         .queue = queue,
+        .adapter = adapter,
         .batch_records = batch_records,
     };
     svc_can_log_persistence_init(
@@ -54,4 +55,24 @@ svc_can_log_task_status_t svc_can_log_task_run_once(
     }
     increment_counter(&task->retry_count);
     return SVC_CAN_LOG_TASK_RETRY_LATER;
+}
+
+svc_can_log_fatfs_status_t svc_can_log_task_restart_storage(
+    svc_can_log_task_t *task)
+{
+    if (task == NULL || task->adapter == NULL || task->queue == NULL) {
+        return SVC_CAN_LOG_FATFS_INVALID_ARGUMENT;
+    }
+    const svc_can_log_fatfs_status_t status = svc_can_log_fatfs_restart(
+        task->adapter,
+        task->persistence.next_sequence);
+    if (status != SVC_CAN_LOG_FATFS_OK) {
+        return status;
+    }
+    svc_can_log_persistence_init(
+        &task->persistence,
+        svc_can_log_fatfs_backend(task->adapter),
+        task->adapter->next_sequence);
+    increment_counter(&task->storage_restart_count);
+    return SVC_CAN_LOG_FATFS_OK;
 }

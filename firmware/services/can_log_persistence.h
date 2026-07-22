@@ -6,8 +6,8 @@
 
 #include "can_log_queue.h"
 
-#define SVC_CAN_LOG_RECORD_SIZE 40U
-#define SVC_CAN_LOG_RECORD_FORMAT_VERSION 1U
+#define SVC_CAN_LOG_RECORD_SIZE 44U
+#define SVC_CAN_LOG_RECORD_FORMAT_VERSION 2U
 
 typedef size_t (*svc_can_log_storage_write_fn)(
     void *context,

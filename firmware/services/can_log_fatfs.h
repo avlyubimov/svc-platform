@@ -6,8 +6,19 @@
 
 #include "can_log_persistence.h"
 
-#define SVC_CAN_LOG_SESSION_HEADER_SIZE 64U
-#define SVC_CAN_LOG_SESSION_FORMAT_VERSION 1U
+#define SVC_CAN_LOG_SESSION_HEADER_SIZE 128U
+#define SVC_CAN_LOG_SESSION_FORMAT_VERSION 2U
+#define SVC_CAN_LOG_HARDWARE_VERSION_SIZE 16U
+#define SVC_CAN_LOG_FIRMWARE_VERSION_SIZE 24U
+#define SVC_CAN_LOG_BOARD_SERIAL_SIZE 24U
+
+typedef enum {
+    SVC_CAN_LOG_SESSION_REASON_BOOT = 1,
+    SVC_CAN_LOG_SESSION_REASON_IGNITION_WAKE,
+    SVC_CAN_LOG_SESSION_REASON_MANUAL,
+    SVC_CAN_LOG_SESSION_REASON_STORAGE_RECOVERY,
+    SVC_CAN_LOG_SESSION_REASON_DIAGNOSTIC
+} svc_can_log_session_reason_t;
 
 /*
  * Thin port over FatFs/microSD primitives. The platform binding maps these
@@ -40,9 +51,14 @@ typedef struct {
 
 typedef struct {
     uint32_t session_id;
-    uint64_t started_ms;
+    uint64_t started_us;
     uint64_t rotation_bytes;
     uint64_t preallocation_bytes;
+    uint32_t can_bitrate;
+    svc_can_log_session_reason_t session_reason;
+    char hardware_version[SVC_CAN_LOG_HARDWARE_VERSION_SIZE];
+    char firmware_version[SVC_CAN_LOG_FIRMWARE_VERSION_SIZE];
+    char board_serial[SVC_CAN_LOG_BOARD_SERIAL_SIZE];
 } svc_can_log_fatfs_config_t;
 
 typedef enum {
@@ -66,7 +82,12 @@ typedef struct {
     uint32_t recovered_record_count;
     uint32_t rotation_count;
     uint32_t recovery_truncate_count;
+    uint32_t format_rollover_count;
+    uint32_t restart_count;
+    uint32_t sync_failure_count;
+    uint32_t close_failure_count;
     bool active;
+    bool handle_open;
 } svc_can_log_fatfs_t;
 
 svc_can_log_fatfs_status_t svc_can_log_fatfs_start(
@@ -78,3 +99,7 @@ svc_can_log_fatfs_status_t svc_can_log_fatfs_start(
 svc_can_log_storage_backend_t svc_can_log_fatfs_backend(svc_can_log_fatfs_t *adapter);
 
 bool svc_can_log_fatfs_stop(svc_can_log_fatfs_t *adapter);
+
+svc_can_log_fatfs_status_t svc_can_log_fatfs_restart(
+    svc_can_log_fatfs_t *adapter,
+    uint64_t initial_sequence);

@@ -28,6 +28,8 @@ typedef struct {
     size_t close_count;
     size_t truncate_count;
     size_t preallocate_count;
+    bool fail_next_sync;
+    bool fail_next_close;
 } fat_mock_t;
 
 static bool fat_mount(void *context)
@@ -112,6 +114,10 @@ static bool fat_sync(void *context)
 {
     fat_mock_t *fat = context;
     ++fat->sync_count;
+    if (fat->fail_next_sync) {
+        fat->fail_next_sync = false;
+        return false;
+    }
     return fat->current != NULL;
 }
 
@@ -141,6 +147,10 @@ static bool fat_close(void *context)
 {
     fat_mock_t *fat = context;
     ++fat->close_count;
+    if (fat->fail_next_close) {
+        fat->fail_next_close = false;
+        return false;
+    }
     fat->current = NULL;
     return true;
 }
@@ -158,6 +168,23 @@ static svc_can_log_fatfs_port_t fat_port_for(fat_mock_t *fat)
         .preallocate = fat_preallocate,
         .truncate = fat_truncate,
         .close = fat_close,
+    };
+}
+
+static svc_can_log_fatfs_config_t fat_config(
+    uint32_t session_id,
+    uint64_t rotation_bytes)
+{
+    return (svc_can_log_fatfs_config_t){
+        .session_id = session_id,
+        .started_us = 1234567890123ULL,
+        .rotation_bytes = rotation_bytes,
+        .preallocation_bytes = rotation_bytes,
+        .can_bitrate = 500000U,
+        .session_reason = SVC_CAN_LOG_SESSION_REASON_IGNITION_WAKE,
+        .hardware_version = "LB-100-REV1",
+        .firmware_version = "0.4.0-dev",
+        .board_serial = "LB1-EVT-00001",
     };
 }
 
@@ -222,7 +249,7 @@ static svc_can_frame_t frame_for(
         .id = id,
         .dlc = 2U,
         .data = {first_byte, (uint8_t)(first_byte + 1U)},
-        .timestamp_ms = id,
+        .timestamp_us = 0x100000000ULL + id,
         .extended_id = false
     };
 }
@@ -378,6 +405,7 @@ static void test_persists_can1_queue_without_mutating_diagnostic_log(void)
     assert(sequence == 1000U);
     assert(decoded.id == first.id);
     assert(decoded.data[0] == 0xA0U);
+    assert(decoded.timestamp_us == first.timestamp_us);
     assert(svc_can_log_record_decode(&storage.bytes[SVC_CAN_LOG_RECORD_SIZE], &decoded, &sequence));
     assert(sequence == 1001U);
     assert(decoded.id == second.id);
@@ -525,12 +553,9 @@ static void test_fatfs_adapter_writes_header_preallocates_and_rotates(void)
 {
     fat_mock_t fat = {0};
     svc_can_log_fatfs_t adapter = {0};
-    const svc_can_log_fatfs_config_t config = {
-        .session_id = 7U,
-        .started_ms = 123456U,
-        .rotation_bytes = SVC_CAN_LOG_SESSION_HEADER_SIZE + 2U * SVC_CAN_LOG_RECORD_SIZE,
-        .preallocation_bytes = SVC_CAN_LOG_SESSION_HEADER_SIZE + 2U * SVC_CAN_LOG_RECORD_SIZE,
-    };
+    const svc_can_log_fatfs_config_t config = fat_config(
+        7U,
+        SVC_CAN_LOG_SESSION_HEADER_SIZE + 2U * SVC_CAN_LOG_RECORD_SIZE);
     assert(svc_can_log_fatfs_start(
                &adapter,
                fat_port_for(&fat),
@@ -538,6 +563,12 @@ static void test_fatfs_adapter_writes_header_preallocates_and_rotates(void)
                100U) == SVC_CAN_LOG_FATFS_OK);
     assert(fat.files[0].size == SVC_CAN_LOG_SESSION_HEADER_SIZE);
     assert(memcmp(fat.files[0].bytes, "SVCS", 4U) == 0);
+    assert(fat.files[0].bytes[4] == SVC_CAN_LOG_SESSION_FORMAT_VERSION);
+    assert(fat.files[0].bytes[5] ==
+        (uint8_t)SVC_CAN_LOG_SESSION_REASON_IGNITION_WAKE);
+    assert(memcmp(&fat.files[0].bytes[44], "LB-100-REV1", 11U) == 0);
+    assert(memcmp(&fat.files[0].bytes[60], "0.4.0-dev", 9U) == 0);
+    assert(memcmp(&fat.files[0].bytes[84], "LB1-EVT-00001", 13U) == 0);
     assert(fat.files[0].reserved_size == config.preallocation_bytes);
 
     svc_can1_log_queue_t queue = {0};
@@ -579,12 +610,7 @@ static void test_fatfs_adapter_recovers_torn_tail_after_power_loss(void)
 {
     fat_mock_t fat = {0};
     svc_can_log_fatfs_t first_boot = {0};
-    const svc_can_log_fatfs_config_t config = {
-        .session_id = 21U,
-        .started_ms = 888U,
-        .rotation_bytes = 400U,
-        .preallocation_bytes = 400U,
-    };
+    const svc_can_log_fatfs_config_t config = fat_config(21U, 400U);
     assert(svc_can_log_fatfs_start(
                &first_boot,
                fat_port_for(&fat),
@@ -607,7 +633,8 @@ static void test_fatfs_adapter_recovers_torn_tail_after_power_loss(void)
         first_boot.next_sequence);
     assert(svc_can_log_persist_can1(&persistence, &queue, 2U, NULL) == SVC_CAN_LOG_PERSIST_OK);
 
-    const uint8_t torn_record[7] = {'S', 'V', 'C', 'L', 1U, 1U, 0U};
+    const uint8_t torn_record[7] = {
+        'S', 'V', 'C', 'L', SVC_CAN_LOG_RECORD_FORMAT_VERSION, 1U, 0U};
     assert(fat_append(&fat, torn_record, sizeof(torn_record)) == sizeof(torn_record));
     fat.current = NULL; /* Simulated reset: no orderly sync/close. */
 
@@ -630,12 +657,7 @@ static void test_logger_task_owns_queue_consumption(void)
 {
     fat_mock_t fat = {0};
     svc_can_log_fatfs_t adapter = {0};
-    const svc_can_log_fatfs_config_t config = {
-        .session_id = 30U,
-        .started_ms = 999U,
-        .rotation_bytes = 400U,
-        .preallocation_bytes = 400U,
-    };
+    const svc_can_log_fatfs_config_t config = fat_config(30U, 400U);
     assert(svc_can_log_fatfs_start(
                &adapter,
                fat_port_for(&fat),
@@ -654,6 +676,176 @@ static void test_logger_task_owns_queue_consumption(void)
     assert(persisted == 1U);
     assert(task.successful_batch_count == 1U);
     assert(svc_can1_log_queue_count(&queue) == 0U);
+    assert(svc_can_log_fatfs_stop(&adapter));
+}
+
+static void test_stop_closes_even_when_sync_fails(void)
+{
+    fat_mock_t fat = {0};
+    svc_can_log_fatfs_t adapter = {0};
+    const svc_can_log_fatfs_config_t config = fat_config(40U, 400U);
+    assert(svc_can_log_fatfs_start(
+               &adapter,
+               fat_port_for(&fat),
+               config,
+               0U) == SVC_CAN_LOG_FATFS_OK);
+
+    fat.fail_next_sync = true;
+    assert(!svc_can_log_fatfs_stop(&adapter));
+    assert(fat.sync_count == 2U); /* Header sync plus stop sync. */
+    assert(fat.close_count == 1U);
+    assert(fat.current == NULL);
+    assert(adapter.sync_failure_count == 1U);
+    assert(!adapter.active);
+    assert(!adapter.handle_open);
+}
+
+static void test_session_identity_fields_are_mandatory(void)
+{
+    fat_mock_t fat = {0};
+    svc_can_log_fatfs_t adapter = {0};
+    svc_can_log_fatfs_config_t config = fat_config(45U, 400U);
+    config.board_serial[0] = '\0';
+    assert(svc_can_log_fatfs_start(
+               &adapter,
+               fat_port_for(&fat),
+               config,
+               0U) == SVC_CAN_LOG_FATFS_INVALID_ARGUMENT);
+    assert(fat.mount_count == 0U);
+    assert(!adapter.active);
+}
+
+static void test_rotation_closes_even_when_sync_fails(void)
+{
+    fat_mock_t fat = {0};
+    svc_can_log_fatfs_t adapter = {0};
+    const svc_can_log_fatfs_config_t config = fat_config(
+        50U,
+        SVC_CAN_LOG_SESSION_HEADER_SIZE + SVC_CAN_LOG_RECORD_SIZE);
+    assert(svc_can_log_fatfs_start(
+               &adapter,
+               fat_port_for(&fat),
+               config,
+               10U) == SVC_CAN_LOG_FATFS_OK);
+
+    svc_can1_log_queue_t queue = {0};
+    svc_can1_log_queue_init(&queue);
+    const svc_can_frame_t first = frame_for(
+        SVC_CAN_PORT_CAN1_VEHICLE,
+        0x501U,
+        1U);
+    const svc_can_frame_t second = frame_for(
+        SVC_CAN_PORT_CAN1_VEHICLE,
+        0x502U,
+        2U);
+    assert(svc_can1_log_queue_push_isr(&queue, &first) ==
+        SVC_CAN1_LOG_QUEUE_OK);
+    assert(svc_can1_log_queue_push_isr(&queue, &second) ==
+        SVC_CAN1_LOG_QUEUE_OK);
+    svc_can_log_persistence_t persistence = {0};
+    svc_can_log_persistence_init(
+        &persistence,
+        svc_can_log_fatfs_backend(&adapter),
+        10U);
+    fat.fail_next_sync = true;
+    assert(svc_can_log_persist_can1(&persistence, &queue, 2U, NULL) ==
+        SVC_CAN_LOG_PERSIST_WRITE_FAILED);
+    assert(fat.close_count == 1U);
+    assert(fat.current == NULL);
+    assert(!adapter.active);
+    assert(!adapter.handle_open);
+    assert(svc_can1_log_queue_count(&queue) == 2U);
+}
+
+static void test_logger_restarts_and_reopens_after_card_failure(void)
+{
+    fat_mock_t fat = {0};
+    svc_can_log_fatfs_t adapter = {0};
+    const svc_can_log_fatfs_config_t config = fat_config(60U, 400U);
+    assert(svc_can_log_fatfs_start(
+               &adapter,
+               fat_port_for(&fat),
+               config,
+               100U) == SVC_CAN_LOG_FATFS_OK);
+    svc_can1_log_queue_t queue = {0};
+    svc_can1_log_queue_init(&queue);
+    svc_can_log_task_t task = {0};
+    assert(svc_can_log_task_init(&task, &queue, &adapter, 4U));
+    const svc_can_frame_t frame = frame_for(
+        SVC_CAN_PORT_CAN1_VEHICLE,
+        0x601U,
+        6U);
+    assert(svc_can1_log_queue_push_isr(&queue, &frame) ==
+        SVC_CAN1_LOG_QUEUE_OK);
+
+    fat.fail_next_sync = true;
+    assert(svc_can_log_task_run_once(&task, NULL) ==
+        SVC_CAN_LOG_TASK_RETRY_LATER);
+    assert(!adapter.active);
+    assert(adapter.handle_open);
+    assert(svc_can1_log_queue_count(&queue) == 1U);
+
+    assert(svc_can_log_task_restart_storage(&task) == SVC_CAN_LOG_FATFS_OK);
+    assert(adapter.active);
+    assert(adapter.restart_count == 1U);
+    assert(task.storage_restart_count == 1U);
+    assert(task.persistence.next_sequence == 101U);
+    assert(fat.mount_count == 2U);
+    assert(fat.open_count == 2U);
+    assert(fat.close_count == 1U);
+
+    assert(svc_can_log_task_run_once(&task, NULL) ==
+        SVC_CAN_LOG_TASK_FLUSHED);
+    assert(svc_can1_log_queue_count(&queue) == 0U);
+    assert(task.persistence.next_sequence == 102U);
+    assert(svc_can_log_fatfs_stop(&adapter));
+}
+
+static void test_restart_retries_a_failed_close_before_reopen(void)
+{
+    fat_mock_t fat = {0};
+    svc_can_log_fatfs_t adapter = {0};
+    const svc_can_log_fatfs_config_t config = fat_config(70U, 400U);
+    assert(svc_can_log_fatfs_start(
+               &adapter,
+               fat_port_for(&fat),
+               config,
+               0U) == SVC_CAN_LOG_FATFS_OK);
+    fat.fail_next_close = true;
+    assert(!svc_can_log_fatfs_stop(&adapter));
+    assert(adapter.handle_open);
+    assert(adapter.close_failure_count == 1U);
+
+    assert(svc_can_log_fatfs_restart(&adapter, 0U) ==
+        SVC_CAN_LOG_FATFS_OK);
+    assert(adapter.active);
+    assert(adapter.restart_count == 1U);
+    assert(adapter.close_failure_count == 1U);
+    assert(fat.close_count == 2U);
+    assert(svc_can_log_fatfs_stop(&adapter));
+}
+
+static void test_old_or_mismatched_header_rolls_to_new_session(void)
+{
+    fat_mock_t fat = {0};
+    fat.files[0].exists = true;
+    fat.files[0].session_id = 80U;
+    fat.files[0].size = 64U;
+    memcpy(fat.files[0].bytes, "SVCS", 4U);
+    fat.files[0].bytes[4] = 1U;
+
+    svc_can_log_fatfs_t adapter = {0};
+    const svc_can_log_fatfs_config_t config = fat_config(80U, 400U);
+    assert(svc_can_log_fatfs_start(
+               &adapter,
+               fat_port_for(&fat),
+               config,
+               900U) == SVC_CAN_LOG_FATFS_OK);
+    assert(adapter.active_session_id == 81U);
+    assert(adapter.format_rollover_count == 1U);
+    assert(fat.files[0].size == 64U);
+    assert(fat.files[1].size == SVC_CAN_LOG_SESSION_HEADER_SIZE);
+    assert(fat.files[1].bytes[4] == SVC_CAN_LOG_SESSION_FORMAT_VERSION);
     assert(svc_can_log_fatfs_stop(&adapter));
 }
 
@@ -676,5 +868,11 @@ int main(void)
     test_fatfs_adapter_writes_header_preallocates_and_rotates();
     test_fatfs_adapter_recovers_torn_tail_after_power_loss();
     test_logger_task_owns_queue_consumption();
+    test_stop_closes_even_when_sync_fails();
+    test_session_identity_fields_are_mandatory();
+    test_rotation_closes_even_when_sync_fails();
+    test_logger_restarts_and_reopens_after_card_failure();
+    test_restart_retries_a_failed_close_before_reopen();
+    test_old_or_mismatched_header_rolls_to_new_session();
     return 0;
 }
