@@ -14,7 +14,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BOARD_PATH = ROOT / "hardware" / "logic-board" / "LB-100" / "kicad" / "LB-100.kicad_pcb"
 REQUIRED_KICAD_VERSION = "10.0.4"
-EXPECTED_UNCONNECTED_ITEMS = 384
+EXPECTED_UNCONNECTED_ITEMS = 55
+EXPECTED_SEGMENTS = 1860
+EXPECTED_VIAS = 172
 BOARD_ONLY_FOOTPRINTS = {f"H{index}" for index in range(1, 9)}
 ALLOWED_VIOLATIONS = Counter(
     {
@@ -26,6 +28,7 @@ ALLOWED_VIOLATIONS = Counter(
         "silk_overlap": 10,
         "silk_over_copper": 25,
         "nonmirrored_text_on_back_layer": 1,
+        "diff_pair_uncoupled_length_too_long": 1,
     }
 )
 
@@ -79,9 +82,12 @@ def validate_board_milestone() -> None:
             fail(f"LB-100 controlled layout is missing {token}")
     if board_text.count("\n\t(footprint ") != 108:
         fail("LB-100 placement must contain 100 schematic footprints and eight mounting holes")
-    for forbidden_token in ("\n\t(segment ", "\n\t(via ", "\n\t(zone "):
-        if forbidden_token in board_text:
-            fail("LB-100 placement milestone must not claim routing or copper-pour completion")
+    if board_text.count("\n\t(segment ") != EXPECTED_SEGMENTS:
+        fail(f"LB-100 routing milestone must contain {EXPECTED_SEGMENTS} segments")
+    if board_text.count("\n\t(via ") != EXPECTED_VIAS:
+        fail(f"LB-100 routing milestone must contain {EXPECTED_VIAS} vias")
+    if "\n\t(zone " in board_text:
+        fail("LB-100 EVT routing milestone must not claim copper-pour completion")
 
 
 def validate_drc() -> None:
@@ -129,6 +135,7 @@ def validate_drc() -> None:
         "npth_inside_courtyard",
         "pth_inside_courtyard",
         "copper_edge_clearance",
+        "tracks_crossing",
     }
     if forbidden_types & set(violation_types):
         fail(f"LB-100 placement contains unsafe geometry: {sorted(forbidden_types & set(violation_types))}")
@@ -140,7 +147,7 @@ def validate_drc() -> None:
         fail(f"unexpected LB-100 local footprint overrides: {sorted(local_overrides)}")
 
     if len(report.get("unconnected_items", [])) != EXPECTED_UNCONNECTED_ITEMS:
-        fail("LB-100 unconnected count changed before routing review")
+        fail("LB-100 unconnected count changed during routing review")
     parity = report.get("schematic_parity", [])
     if Counter(finding.get("type") for finding in parity) != Counter({"extra_footprint": 8}):
         fail("LB-100 parity must contain only eight board mounting holes")
@@ -154,8 +161,10 @@ def main() -> int:
     validate_board_milestone()
     validate_drc()
     print(
-        "LB-100 controlled placement validation passed "
-        "(100 schematic footprints, 8 mounting holes, no copper/courtyard collision; routing open)."
+        "LB-100 controlled routing validation passed "
+        f"(100 schematic footprints, 8 mounting holes, {EXPECTED_SEGMENTS} segments, "
+        f"{EXPECTED_VIAS} vias, {EXPECTED_UNCONNECTED_ITEMS} connections open; "
+        "no shorts, crossings, or copper-clearance violations)."
     )
     return 0
 

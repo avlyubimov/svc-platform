@@ -1,14 +1,16 @@
 # FB-100 KiCad Project
 
-Status: Schematic freeze closed; controlled placement in progress; routing open
+Status: `EVT-LAYOUT-AUTHORIZED`; connectivity routing complete; fab review open
 
 This directory contains the reviewed value-bearing FB-100 KiCad schematic and
 project-local symbol/footprint libraries.
 
-The controlled `FB-100.kicad_pcb` placement is generated from the frozen
+The controlled `FB-100.kicad_pcb` placement and routing are generated from the frozen
 44-component schematic and project-local footprints. Mechanical-envelope and
-USB/no-back-power inputs are applied, while routing, copper pours, stackup-
-specific USB impedance work, and final silkscreen remain open. There are no
+USB/no-back-power inputs are applied. The route manifest contains 438 segments
+and 39 vias with zero unconnected items, shorts, crossings, or copper-clearance
+violations. Copper pours, stackup-specific USB tuning, courtyard/silkscreen
+cleanup and final fab review remain open. There are no
 manufacturing outputs: Gerbers, drills, pick-place files, BOM/CPL order
 packages, zipped fabrication packages, and board orders remain blocked until
 the later prototype/production gates close.
