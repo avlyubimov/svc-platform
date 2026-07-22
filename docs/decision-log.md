@@ -3924,3 +3924,28 @@ IPC-style precheck is approximately 91.5 ohm differential. Supplier field-
 solver/order confirmation, physical FFC contact-side and latch fit, enclosure
 USB-shell fit and assembly DFM remain open; no manufacturing output is
 authorized.
+
+## 2026-07-22 — Revise CAN log format before freeze and harden card recovery
+
+Decision: advance the not-yet-frozen CAN storage format to v2. Use fixed
+44-byte `SVCL` records with a 64-bit microsecond timestamp and CRC-32. Use a
+fixed 128-byte `SVCS` header containing session ID/reason, microsecond start
+time, initial sequence, record size, rotation limit, CAN bitrate, hardware
+version, firmware version, board serial and CRC. Required identity fields are
+bounded fixed strings suitable for embedded use. A v1, corrupt or
+metadata-mismatched latest header is preserved and followed by a new session
+ID rather than overwritten or mixed with v2 records.
+
+Decision: never use boolean short-circuiting for filesystem cleanup. Stop and
+rotation attempt `sync` and `close` independently and report their combined
+result. A storage sync failure marks the adapter inactive without consuming
+the SPSC queue. The logger-task recovery path then attempts stale-handle close,
+remounts, reopens the latest session, scans/truncates the tail, derives the next
+sequence from recovered media and only then retries queued frames.
+
+Result: host tests cover stop/rotation sync failure, failed close followed by
+restart, media recovery with an unconsumed frame, v1 rollover, header identity,
+64-bit timestamps and existing torn-tail/rotation behavior. AddressSanitizer
+and UndefinedBehaviorSanitizer pass. The STM32 FatFs `diskio` binding remains
+open before motorcycle logging tests. No hardware architecture or CAN1
+read-only policy changes.

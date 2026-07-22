@@ -25,7 +25,7 @@ static svc_can_frame_t high_beam_frame(uint8_t byte_value)
         .id = 0x123U,
         .dlc = 1U,
         .data = {byte_value},
-        .timestamp_ms = 100U,
+        .timestamp_us = 100000U,
         .extended_id = false
     };
 }

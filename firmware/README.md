@@ -53,9 +53,10 @@ Current host tests cover:
   that saturates instead of wrapping the diagnostic drop counter.
 - CAN1 listen-only TX denial and CAN2 expansion TX allowance.
 - CAN RX Log fixed-size receive-only diagnostics plus a separate ISR-to-logger
-  CAN1 queue, 40-byte CRC-protected records, FatFs session headers,
-  preallocation, rotation and torn-tail recovery. The target STM32 disk-I/O
-  binding remains required before motorcycle logging tests.
+  CAN1 queue, 44-byte v2 CRC records with 64-bit microsecond timestamps,
+  identity-bearing 128-byte FatFs session headers, independent sync/close,
+  restart/reopen, preallocation, rotation and torn-tail recovery. The target
+  STM32 disk-I/O binding remains required before motorcycle logging tests.
 - CAN Event Decode from received frames to internal Event Bus state-change
   events without output control.
 - CAN Event Decode dropped-edge retry behavior when the Event Bus is full.

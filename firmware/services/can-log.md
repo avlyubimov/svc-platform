@@ -32,14 +32,19 @@ while the card is accessed.
 
 ## Record format
 
-`can_log_persistence.c` converts each queued CAN1 RX frame into a fixed 40-byte
-little-endian `SVCL` record. The record contains format/type bytes, a 64-bit
-sequence, timestamp, CAN identifier, DLC, eight zero-padded data bytes and a
-CRC-32 over the first 36 bytes.
+`can_log_persistence.c` converts each queued CAN1 RX frame into a fixed 44-byte
+little-endian `SVCL` v2 record. The record contains format/type bytes, a 64-bit
+sequence, a 64-bit microsecond timestamp, CAN identifier, DLC, eight
+zero-padded data bytes, three reserved bytes and a CRC-32 over the first 40
+bytes. The v1 40-byte/millisecond record is intentionally not appended to a v2
+file.
 
-A failed sync can leave a duplicate retried sequence and a power loss can leave
-a partial record. Recovery rejects partial or bad-CRC tails. Offline readers
-must also deduplicate equal sequence numbers.
+A failed sync leaves the frame queued. If the unsynced record survived, restart
+recovers its sequence and the queued retry can produce the same CAN frame under
+the next sequence; if it did not survive, the original sequence is reused. A
+power loss can also leave a partial record. Recovery rejects partial or bad-CRC
+tails. The storage contract is therefore at-least-once; offline readers that
+need event uniqueness deduplicate by sequence plus frame timestamp/ID/data.
 
 ## FatFs session adapter
 
@@ -47,8 +52,12 @@ must also deduplicate equal sequence numbers.
 platform port maps to `f_mount`, directory scan, `f_open`, positioned read,
 append/write, `f_sync`, `f_expand`, truncate and close operations.
 
-Each file begins with a fixed 64-byte `SVCS` header containing format version,
-session ID, start time, initial sequence, record size, rotation limit and CRC.
+Each file begins with a fixed 128-byte `SVCS` v2 header containing format
+version, session ID, session reason, 64-bit microsecond start time, initial
+sequence, record size, rotation limit, CAN bitrate, hardware version, firmware
+version, board serial and CRC. These identity fields are mandatory; an invalid
+or v1/mismatched latest header is preserved and followed by a new session ID
+instead of being overwritten or appended with incompatible records.
 The adapter:
 
 - scans for and reopens the highest session ID at or above the configured
@@ -56,8 +65,12 @@ The adapter:
 - preallocates the configured extent without changing logical file length;
 - rotates before a record would exceed the configured byte limit;
 - scans records after restart, restores the next sequence and truncates a torn
-  or corrupt tail to the last valid 40-byte boundary;
-- syncs and closes explicitly during an orderly stop.
+  or corrupt tail to the last valid 44-byte boundary;
+- attempts `sync` and `close` independently during stop and rotation, so a
+  failed sync never suppresses the close attempt;
+- exposes a logger-task-only restart path that closes any stale handle,
+  remounts, reopens/recovers the latest file and resets persistence sequencing
+  from recovered media state before queued frames are retried.
 
 The repository implements and host-tests this adapter contract, session format,
 rotation and recovery. The target-specific STM32 SDMMC/SPI `diskio` and FatFs

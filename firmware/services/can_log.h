@@ -21,7 +21,7 @@ typedef struct {
     uint32_t id;
     uint8_t dlc;
     uint8_t data[SVC_CAN_FRAME_MAX_DATA_LEN];
-    uint32_t timestamp_ms;
+    uint64_t timestamp_us;
     bool extended_id;
 } svc_can_frame_t;
 
