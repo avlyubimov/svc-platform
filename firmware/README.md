@@ -53,7 +53,8 @@ Current host tests cover:
   that saturates instead of wrapping the diagnostic drop counter.
 - CAN1 listen-only TX denial and CAN2 expansion TX allowance.
 - CAN RX Log fixed-size receive-only frame capture for CAN1/CAN2 with
-  saturating diagnostic counters.
+  saturating diagnostic counters and bounded, CRC-protected CAN1 persistence
+  batches for a platform microSD/FAT append/sync backend.
 - CAN Event Decode from received frames to internal Event Bus state-change
   events without output control.
 - CAN Event Decode dropped-edge retry behavior when the Event Bus is full.

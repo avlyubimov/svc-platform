@@ -130,7 +130,7 @@ REQUIRED_FACTS = {
         "six official plated",
         "four GND MF circuits",
         "zero active LBREL blockers",
-        "99 components",
+        "104 components",
         "199 electrical nets",
     ),
     LB100_DIR / "LB-100-schematic-review-closeout.md": (

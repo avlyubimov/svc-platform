@@ -20,9 +20,10 @@ Status: `EVT-LAYOUT-AUTHORIZED` — connectivity routing complete; fab review op
 - Repositioned the USB ESD/passive cluster and RGB driver support parts to
   provide manufacturable fan-out without changing the outline, optical grid,
   USB panel datum, FFC datum, or mounting holes.
-- Routed every electrical connection with 438 straight segments and 39
-  through vias. The routing is stored in `kicad/FB-100-routing.csv` and remains
-  deterministic under CI regeneration.
+- Routed every electrical connection with 457 straight segments and 45
+  through vias, then added one filled GND zone per copper layer. The routing is
+  stored in `kicad/FB-100-routing.csv` and remains deterministic under CI
+  regeneration.
 - KiCad 10.0.4 reports zero unconnected items, shorts, track crossings, and
   copper-clearance violations. The remaining findings are explicitly open
   fab-review work: USB differential gap/uncoupled length, five courtyard
@@ -44,9 +45,8 @@ Status: `EVT-LAYOUT-AUTHORIZED` — connectivity routing complete; fab review op
 - Resolve the five courtyard overlaps and three silkscreen clips without
   changing the frozen mechanical datums.
 - Review the routed CC, VBUS detect-only, RGB, buttons, OLED-DNP, indicator,
-  power, ground, shield and ESD return paths before pours are added.
-- Add ground pours only after the USB return paths and no-back-power topology
-  have been reviewed in the routed board.
+  power, ground, shield and ESD return paths together with the four filled GND
+  zones; revise zone keepouts if the USB/no-back-power review requires it.
 - Complete placement clearance, silkscreen, courtyard, assembly-orientation,
   DFM, and final DRC review.
 

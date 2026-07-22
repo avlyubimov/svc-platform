@@ -15,8 +15,9 @@ ROOT = Path(__file__).resolve().parents[1]
 BOARD_PATH = ROOT / "hardware" / "logic-board" / "LB-100" / "kicad" / "LB-100.kicad_pcb"
 REQUIRED_KICAD_VERSION = "10.0.4"
 EXPECTED_UNCONNECTED_ITEMS = 53
-EXPECTED_SEGMENTS = 1869
-EXPECTED_VIAS = 176
+EXPECTED_SEGMENTS = 1875
+EXPECTED_VIAS = 185
+EXPECTED_SCHEMATIC_FOOTPRINTS = 104
 BOARD_ONLY_FOOTPRINTS = {f"H{index}" for index in range(1, 9)}
 ALLOWED_VIOLATIONS = Counter(
     {
@@ -74,14 +75,26 @@ def validate_board_milestone() -> None:
         '(property "Reference" "JPB1"',
         '(property "Reference" "U1"',
         '(property "Reference" "U7"',
+        '(property "Reference" "TP1"',
+        '(property "Reference" "TP2"',
+        '(property "Reference" "TP3"',
+        '(property "Reference" "TP4"',
+        '(property "Reference" "TP5"',
+        '(net 25 "E73_SWDCLK")',
+        '(net 26 "E73_SWDIO")',
         '(property "Reference" "H8"',
         '(2 "In1.Cu" power)',
         '(4 "In2.Cu" power)',
     ):
         if token not in board_text:
             fail(f"LB-100 controlled layout is missing {token}")
-    if board_text.count("\n\t(footprint ") != 107:
-        fail("LB-100 placement must contain 99 schematic footprints and eight mounting holes")
+    if board_text.count("\n\t(footprint ") != EXPECTED_SCHEMATIC_FOOTPRINTS + 8:
+        fail(
+            "LB-100 placement must contain "
+            f"{EXPECTED_SCHEMATIC_FOOTPRINTS} schematic footprints and eight mounting holes"
+        )
+    if board_text.count('(attr smd exclude_from_pos_files exclude_from_bom)') != 5:
+        fail("LB-100 must expose exactly five non-assembly E73 recovery test pads")
     if board_text.count("\n\t(segment ") != EXPECTED_SEGMENTS:
         fail(f"LB-100 routing milestone must contain {EXPECTED_SEGMENTS} segments")
     if board_text.count("\n\t(via ") != EXPECTED_VIAS:
@@ -162,7 +175,7 @@ def main() -> int:
     validate_drc()
     print(
         "LB-100 controlled routing validation passed "
-        f"(99 schematic footprints, 8 mounting holes, {EXPECTED_SEGMENTS} segments, "
+        f"({EXPECTED_SCHEMATIC_FOOTPRINTS} schematic footprints, 8 mounting holes, {EXPECTED_SEGMENTS} segments, "
         f"{EXPECTED_VIAS} vias, {EXPECTED_UNCONNECTED_ITEMS} connections open; "
         "no shorts, crossings, or copper-clearance violations)."
     )

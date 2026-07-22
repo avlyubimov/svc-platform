@@ -76,6 +76,21 @@ bool svc_can_log_get(
     return true;
 }
 
+bool svc_can_log_remove(svc_can_log_t *log, size_t index)
+{
+    if (log == NULL || index >= log->count) {
+        return false;
+    }
+
+    for (size_t current = index; current + 1U < log->count; ++current) {
+        const size_t destination = (log->start + current) % SVC_CAN_LOG_CAPACITY;
+        const size_t source = (log->start + current + 1U) % SVC_CAN_LOG_CAPACITY;
+        log->frames[destination] = log->frames[source];
+    }
+    --log->count;
+    return true;
+}
+
 size_t svc_can_log_count(const svc_can_log_t *log)
 {
     return log == NULL ? 0U : log->count;
