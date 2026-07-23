@@ -1,0 +1,17 @@
+{
+  "id": "hyundai",
+  "name": "Hyundai",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#002C5E",
+  "simpleIconSlug": "hyundai",
+  "source": "https://www.hyundai.com",
+  "simpleIcons": {
+    "slug": "hyundai",
+    "title": "Hyundai",
+    "source": "https://www.hyundai.com",
+    "guidelines": null,
+    "license": null
+  }
+}

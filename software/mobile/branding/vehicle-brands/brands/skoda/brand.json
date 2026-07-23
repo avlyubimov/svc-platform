@@ -1,0 +1,17 @@
+{
+  "id": "skoda",
+  "name": "ŠKODA",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#0E3A2F",
+  "simpleIconSlug": "skoda",
+  "source": "https://www.skoda-auto.com",
+  "simpleIcons": {
+    "slug": "skoda",
+    "title": "ŠKODA",
+    "source": "https://www.skoda-connect.com",
+    "guidelines": null,
+    "license": null
+  }
+}

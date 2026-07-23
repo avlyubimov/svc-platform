@@ -2,15 +2,28 @@ package com.avlyubimov.svc.mobile
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class StartupBrandingTests {
     @Test
-    fun manufacturerLogoIsRequiredButWordmarkIsOptional() {
-        val catalogWithLogo = catalog { it == "local/personal/logo.svg" }
-        assertEquals("personal-profile", catalogWithLogo.resolve("personal-profile").id)
+    fun vehicleProfileUsesCatalogPreferredLogoAndTextName() {
+        val preferred = "vehicle-brands/brands/test-brand/period-logo.svg"
+        val catalog = catalog { it == preferred || it.startsWith("svc/") }
+        val resolved = catalog.resolve("personal-profile")
 
-        val catalogWithoutLogo = catalog { it.startsWith("svc/") }
-        assertEquals("svc-fallback", catalogWithoutLogo.resolve("personal-profile").id)
+        assertEquals("personal-profile", resolved.id)
+        assertEquals(preferred, resolved.logoAsset)
+        assertEquals("Test Manufacturer", resolved.manufacturerDisplayName)
+        assertEquals("#123456", resolved.accentColor)
+        assertNull(resolved.wordmarkAsset)
+    }
+
+    @Test
+    fun missingVehicleLogoUsesSvcFallback() {
+        assertEquals(
+            "svc-fallback",
+            catalog { it.startsWith("svc/") }.resolve("personal-profile").id,
+        )
     }
 
     @Test
@@ -50,41 +63,61 @@ class StartupBrandingTests {
         val configurations = mapOf(
             "personal-profile.json" to profile(
                 id = "personal-profile",
-                logo = "local/personal/logo.svg",
-                wordmark = "local/personal/wordmark.svg",
+                brandId = "test-brand",
+                assets = "",
             ),
             "svc-fallback.json" to profile(
                 id = "svc-fallback",
-                logo = "svc/logo.svg",
-                wordmark = "svc/wordmark.svg",
+                brandId = "svc",
+                assets = """
+                    ,
+                    "assets": {
+                      "logo": "svc/svg/emblem.svg",
+                      "wordmark": "svc/svg/wordmark.svg"
+                    }
+                """.trimIndent(),
             ),
         )
         return MobileBrandCatalog.decode(
             indexJson = index,
             configurationJson = configurations::getValue,
+            vehicleCatalogJson = """
+                {
+                  "schemaVersion": 1,
+                  "simpleIconsVersion": "test",
+                  "brands": [
+                    {
+                      "id": "test-brand",
+                      "name": "Test Manufacturer",
+                      "categories": ["motorcycle"],
+                      "accentColor": "#123456",
+                      "source": "https://example.test",
+                      "preferredAsset": "period-logo.svg"
+                    }
+                  ]
+                }
+            """.trimIndent(),
             assetExists = assetExists,
         )
     }
 
-    private fun profile(id: String, logo: String, wordmark: String): String = """
+    private fun profile(id: String, brandId: String, assets: String): String = """
         {
           "schemaVersion": 1,
           "id": "$id",
           "displayName": "$id",
+          "brandId": "$brandId",
           "theme": "test-theme",
           "manufacturer": "Test",
-          "model": "Test",
-          "generation": "Test",
+          "model": "Test Model",
+          "generation": "Test Generation",
           "year": 2026,
           "manufacturerWordmark": "TEST",
-          "vehicleModel": "TEST",
-          "vehicleGeneration": "TEST",
+          "vehicleModel": "TEST MODEL",
+          "vehicleGeneration": "TEST GENERATION · 2026",
           "brandTagline": "TEST",
-          "accentColor": "#1C69D4",
-          "assets": {
-            "logo": "$logo",
-            "wordmark": "$wordmark"
-          }
+          "accentColor": "#1C69D4"
+          $assets
         }
     """.trimIndent()
 }

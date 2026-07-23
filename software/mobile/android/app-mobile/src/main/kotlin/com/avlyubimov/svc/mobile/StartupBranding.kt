@@ -45,17 +45,18 @@ internal data class MobileBrandPack(
     val schemaVersion: Int,
     val id: String,
     val displayName: String,
+    val brandId: String,
     val theme: String,
-    val manufacturer: String,
+    val manufacturer: String? = null,
     val model: String,
     val generation: String,
     val year: Int,
-    val manufacturerWordmark: String,
+    val manufacturerWordmark: String? = null,
     val vehicleModel: String,
     val vehicleGeneration: String,
     val brandTagline: String,
     val accentColor: String,
-    val assets: MobileBrandAssets,
+    val assets: MobileBrandAssets? = null,
 )
 
 @Serializable
@@ -72,29 +73,104 @@ private data class MobileBrandCatalogDocument(
     val profiles: List<MobileBrandCatalogEntry>,
 )
 
+@Serializable
+internal data class MobileVehicleBrand(
+    val id: String,
+    val name: String,
+    val categories: List<String>,
+    val accentColor: String,
+    val source: String,
+    val preferredAsset: String? = null,
+)
+
+@Serializable
+private data class MobileVehicleBrandCatalog(
+    val schemaVersion: Int,
+    val simpleIconsVersion: String,
+    val brands: List<MobileVehicleBrand>,
+)
+
+internal data class ResolvedMobileBrandPack(
+    val id: String,
+    val logoAsset: String?,
+    val wordmarkAsset: String?,
+    val manufacturerDisplayName: String,
+    val vehicleModel: String,
+    val vehicleGeneration: String,
+    val brandTagline: String,
+    val accentColor: String,
+)
+
 internal class MobileBrandCatalog private constructor(
     val defaultProfileId: String,
     val fallbackProfileId: String,
     val profiles: List<MobileBrandPack>,
+    vehicleBrands: List<MobileVehicleBrand>,
     private val assetExists: (String) -> Boolean,
 ) {
     private val definitions = profiles.associateBy(MobileBrandPack::id)
+    private val vehicleDefinitions = vehicleBrands.associateBy(MobileVehicleBrand::id)
 
-    fun resolve(requestedProfileId: String): MobileBrandPack {
+    fun resolve(requestedProfileId: String): ResolvedMobileBrandPack {
         val fallback = definitions[fallbackProfileId] ?: emergencyProfile
         val requested = definitions[requestedProfileId] ?: fallback
-        return if (assetExists(requested.assets.logo)) requested else fallback
+        if (requested.brandId != "svc") {
+            val brand = vehicleDefinitions[requested.brandId]
+            if (brand != null) {
+                val standardLogo = vehicleBrandAsset(brand.id, "logo-on-dark.svg")
+                val preferredLogo = brand.preferredAsset
+                    ?.let { vehicleBrandAsset(brand.id, it) }
+                    ?.takeIf(assetExists)
+                val logo = preferredLogo ?: standardLogo.takeIf(assetExists)
+                if (logo != null) {
+                    return ResolvedMobileBrandPack(
+                        id = requested.id,
+                        logoAsset = logo,
+                        wordmarkAsset = requested.assets?.wordmark?.takeIf(assetExists),
+                        manufacturerDisplayName = brand.name,
+                        vehicleModel = requested.vehicleModel,
+                        vehicleGeneration = requested.vehicleGeneration,
+                        brandTagline = requested.brandTagline,
+                        accentColor = brand.accentColor,
+                    )
+                }
+            }
+        }
+        return resolveSvc(fallback)
     }
+
+    private fun resolveSvc(definition: MobileBrandPack): ResolvedMobileBrandPack =
+        ResolvedMobileBrandPack(
+            id = definition.id,
+            logoAsset = definition.assets?.logo?.takeIf(assetExists),
+            wordmarkAsset = definition.assets?.wordmark?.takeIf(assetExists),
+            manufacturerDisplayName = definition.manufacturerWordmark
+                ?: definition.manufacturer
+                ?: "SVC",
+            vehicleModel = definition.vehicleModel,
+            vehicleGeneration = definition.vehicleGeneration,
+            brandTagline = definition.brandTagline,
+            accentColor = definition.accentColor,
+        )
+
+    private fun vehicleBrandAsset(brandId: String, fileName: String): String =
+        "vehicle-brands/brands/$brandId/$fileName"
 
     companion object {
         private val json = Json {
             ignoreUnknownKeys = false
+        }
+        private val vehicleJson = Json {
+            ignoreUnknownKeys = true
         }
 
         fun load(context: Context): MobileBrandCatalog = runCatching {
             decode(
                 indexJson = context.readBrandAsset("brand-pack-index-v1.json"),
                 configurationJson = { context.readBrandAsset(it) },
+                vehicleCatalogJson = context.readBrandAsset(
+                    "vehicle-brands/vehicle-brands-v1.json",
+                ),
                 assetExists = { context.hasBrandAsset(it) },
             )
         }.getOrElse { emergency }
@@ -102,6 +178,7 @@ internal class MobileBrandCatalog private constructor(
         internal fun decode(
             indexJson: String,
             configurationJson: (String) -> String,
+            vehicleCatalogJson: String,
             assetExists: (String) -> Boolean,
         ): MobileBrandCatalog {
             val document = json.decodeFromString<MobileBrandCatalogDocument>(indexJson)
@@ -117,10 +194,25 @@ internal class MobileBrandCatalog private constructor(
             require(profiles.map(MobileBrandPack::id).distinct().size == profiles.size)
             require(profiles.any { it.id == document.defaultProfileId })
             require(profiles.any { it.id == document.fallbackProfileId })
+            val vehicleCatalog = vehicleJson.decodeFromString<MobileVehicleBrandCatalog>(
+                vehicleCatalogJson,
+            )
+            require(vehicleCatalog.schemaVersion == 1)
+            require(
+                vehicleCatalog.brands.map(MobileVehicleBrand::id).distinct().size ==
+                    vehicleCatalog.brands.size,
+            )
+            require(
+                profiles.all { profile ->
+                    profile.brandId == "svc" ||
+                        vehicleCatalog.brands.any { it.id == profile.brandId }
+                },
+            )
             return MobileBrandCatalog(
                 defaultProfileId = document.defaultProfileId,
                 fallbackProfileId = document.fallbackProfileId,
                 profiles = profiles,
+                vehicleBrands = vehicleCatalog.brands,
                 assetExists = assetExists,
             )
         }
@@ -129,6 +221,7 @@ internal class MobileBrandCatalog private constructor(
             schemaVersion = 1,
             id = "emergency-svc",
             displayName = "SVC",
+            brandId = "svc",
             theme = "svc-dark",
             manufacturer = "SVC",
             model = "Mobile",
@@ -146,6 +239,7 @@ internal class MobileBrandCatalog private constructor(
             defaultProfileId = emergencyProfile.id,
             fallbackProfileId = emergencyProfile.id,
             profiles = listOf(emergencyProfile),
+            vehicleBrands = emptyList(),
             assetExists = { false },
         )
     }
@@ -241,7 +335,7 @@ internal class AppearancePreferences(
         values.edit().putString("lastSelectedScreen", name).apply()
     }
 
-    fun brandPack(): MobileBrandPack = catalog.resolve(profileId)
+    fun brandPack(): ResolvedMobileBrandPack = catalog.resolve(profileId)
 }
 
 internal fun systemReduceMotion(context: Context): Boolean =
@@ -255,7 +349,7 @@ internal fun systemReduceMotion(context: Context): Boolean =
 
 @Composable
 internal fun StartupAnimation(
-    brandPack: MobileBrandPack,
+    brandPack: ResolvedMobileBrandPack,
     timeline: MobileStartupTimeline,
     enabled: Boolean,
     reduceMotion: Boolean,
@@ -281,7 +375,7 @@ internal fun StartupAnimation(
 
 @Composable
 private fun StartupVisual(
-    brandPack: MobileBrandPack,
+    brandPack: ResolvedMobileBrandPack,
     timeline: MobileStartupTimeline,
     progress: Float,
 ) {
@@ -342,16 +436,16 @@ private fun StartupVisual(
                 }
             }
             Spacer(Modifier.height(15.dp))
-            if (brandPack.assets.wordmark != null) {
+            if (brandPack.wordmarkAsset != null) {
                 LocalSvgAsset(
-                    brandPack.assets.wordmark,
+                    brandPack.wordmarkAsset,
                     Modifier
                         .size(width = 210.dp, height = 28.dp)
                         .alpha(identity * (1f - transition)),
                 )
             } else {
                 Text(
-                    brandPack.manufacturerWordmark,
+                    brandPack.manufacturerDisplayName,
                     color = MobileColors.PrimaryText,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -405,9 +499,9 @@ private fun StartupVisual(
 }
 
 @Composable
-private fun BrandLogo(brandPack: MobileBrandPack, modifier: Modifier) {
-    if (brandPack.assets.logo.isNotEmpty()) {
-        LocalSvgAsset(brandPack.assets.logo, modifier)
+private fun BrandLogo(brandPack: ResolvedMobileBrandPack, modifier: Modifier) {
+    if (brandPack.logoAsset != null) {
+        LocalSvgAsset(brandPack.logoAsset, modifier)
     } else {
         Box(modifier, contentAlignment = Alignment.Center) {
             Canvas(Modifier.fillMaxSize()) {

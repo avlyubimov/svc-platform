@@ -19,30 +19,34 @@ projected-display action controls a physical power channel.
 
 The phone apps load the common profile catalog from
 `branding/brand-pack-index-v1.json` and the 2100 ms startup contract from
-`branding/startup-animation-v1.json` at runtime. Brand text, color, asset paths,
-profile choices, and phase timing are not duplicated in Swift or Kotlin. The
-default personal profile is `bmw-r1200gs-k25-personal` with theme
-`svc-boxer-blue`. It restores the last available primary screen and falls back
-to Dashboard for first launch or an unknown stored destination.
+`branding/startup-animation-v1.json` at runtime. Manufacturer metadata and
+artwork resolve from `branding/vehicle-brands/vehicle-brands-v1.json` by stable
+`brandId`; `brandId`, `model`, `generation`, and `year` remain separate profile
+fields. Brand text, color, asset paths, profile choices, and phase timing are
+not duplicated in Swift or Kotlin.
 
-Owner-provided BMW resources are never downloaded or committed:
-
-```text
-software/mobile/branding/local/bmw-r1200gs-k25-personal/logo.svg
-software/mobile/branding/local/bmw-r1200gs-k25-personal/wordmark.svg
-```
-
-`logo.svg` is required for BMW presentation; `wordmark.svg` is optional and
-falls back to the configured `BMW MOTORRAD` text. If the logo is absent, the
-apps show the committed SVC mark, `SMART VEHICLE CONTROLLER`, and
-`ENGINEERED FOR THE RIDE`. Preview the result from
+The default personal profile is `bmw-r1200gs-k25-personal` with theme
+`svc-boxer-blue`. Its preferred asset is the period-correct
+`brands/bmw/bmw-roundel-1997-2020.svg`. Other profiles use
+`logo-on-dark.svg` on the standard dark startup surface. Manufacturer
+wordmarks are optional and fall back to the catalog display name as text. If a
+profile or required logo is unavailable, the apps show the committed SVC mark,
+`SMART VEHICLE CONTROLLER`, and `ENGINEERED FOR THE RIDE`. No brand artwork is
+downloaded at runtime. Preview the result from
 `Settings → Appearance → Preview Startup Animation`.
 
 The public application identity is always SVC. The phone launcher, App
 Store/Google Play package, CarPlay, and Android Auto use the committed SVC app
-icon sourced from `branding/svc/app-icon.svg`. Manufacturer assets appear only
-inside the selected post-launch profile animation. The OS launch surface stays
-neutral black and never presents BMW branding.
+icon sourced from `branding/svc/svg/svc-app-icon.svg` and its platform exports.
+Manufacturer assets appear only inside the selected post-launch phone profile
+animation. The OS launch surface stays neutral black and never presents BMW
+branding.
+
+The vehicle catalog preserves `THIRD_PARTY_NOTICES.md`, its pinned Simple Icons
+license/disclaimer, per-brand source URLs, and the original/derived SVG
+variants. Run protocol validation after adding a brand; it requires every
+catalog entry to contain `brand.json`, `logo-source.svg`, `logo-on-dark.svg`,
+`logo-on-light.svg`, and `logo-accent.svg`, and parses every SVG as XML.
 
 Profile/theme loading, mock BLE restoration, telemetry refresh, and screen
 restoration start in parallel. The animation never waits for BLE; Dashboard

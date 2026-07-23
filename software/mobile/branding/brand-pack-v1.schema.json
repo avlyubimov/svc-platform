@@ -8,22 +8,21 @@
     "schemaVersion",
     "id",
     "displayName",
+    "brandId",
     "theme",
-    "manufacturer",
     "model",
     "generation",
     "year",
-    "manufacturerWordmark",
     "vehicleModel",
     "vehicleGeneration",
     "brandTagline",
-    "accentColor",
-    "assets"
+    "accentColor"
   ],
   "properties": {
     "schemaVersion": { "const": 1 },
     "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$" },
     "displayName": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "brandId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$" },
     "theme": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$" },
     "manufacturer": { "type": "string", "minLength": 1, "maxLength": 40 },
     "model": { "type": "string", "minLength": 1, "maxLength": 40 },
@@ -41,11 +40,11 @@
       "properties": {
         "logo": {
           "type": "string",
-          "pattern": "^(svc|local)/[A-Za-z0-9._/-]+\\.svg$"
+          "pattern": "^(svc|local|vehicle-brands)/[A-Za-z0-9._/-]+\\.svg$"
         },
         "wordmark": {
           "type": "string",
-          "pattern": "^(svc|local)/[A-Za-z0-9._/-]+\\.svg$"
+          "pattern": "^(svc|local|vehicle-brands)/[A-Za-z0-9._/-]+\\.svg$"
         }
       }
     }

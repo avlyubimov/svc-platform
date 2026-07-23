@@ -1,0 +1,19 @@
+{
+  "id": "bmw",
+  "name": "BMW",
+  "categories": [
+    "motorcycle",
+    "car"
+  ],
+  "accentColor": "#0066B1",
+  "simpleIconSlug": "bmw",
+  "source": "https://bmw.com",
+  "preferredAsset": "bmw-roundel-1997-2020.svg",
+  "simpleIcons": {
+    "slug": "bmw",
+    "title": "BMW",
+    "source": "https://bmw.com",
+    "guidelines": null,
+    "license": null
+  }
+}

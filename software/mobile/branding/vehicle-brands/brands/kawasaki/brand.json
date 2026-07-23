@@ -1,0 +1,10 @@
+{
+  "id": "kawasaki",
+  "name": "Kawasaki",
+  "categories": [
+    "motorcycle"
+  ],
+  "accentColor": "#E60012",
+  "commonsFile": "Kawasaki_Motors_logo.svg",
+  "source": "https://commons.wikimedia.org/wiki/File:Kawasaki_Motors_logo.svg"
+}

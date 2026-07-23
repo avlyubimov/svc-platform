@@ -10,10 +10,14 @@ Modules:
 - `core-update` — OTA admission and transfer state;
 - `core-mock` — mock device repository.
 
-The phone target adds `software/mobile/branding/local` as an ignored asset
-source. Its startup uses one linear `Animatable` timeline, an always-dark
-surface, system animator-scale detection, and the same 2100/500 ms timing as
-iOS. Appearance settings provide profile/fallback selection and replay.
+The phone target packages the shared vehicle-brand catalog, SVC artwork, and
+the ignored `software/mobile/branding/local` source for future owner-only
+custom packs. Profiles resolve manufacturers by stable `brandId`, use
+`logo-on-dark.svg` unless a preferred asset is declared, and fall back to the
+catalog display name when no wordmark exists. Startup uses one linear
+`Animatable` timeline, an always-dark surface, system animator-scale detection,
+and the same 2100/500 ms timing as iOS. Appearance settings provide
+profile/fallback selection and replay.
 
 ## Build and test
 

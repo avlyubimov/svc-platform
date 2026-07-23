@@ -2,8 +2,11 @@ from .branding import (
     BrandCatalog,
     BrandPack,
     StartupTimeline,
+    VehicleBrand,
+    VehicleBrandCatalog,
     load_brand_catalog,
     load_startup_timeline,
+    load_vehicle_brand_catalog,
     restore_primary_screen,
     startup_duration_ms,
 )
@@ -56,8 +59,11 @@ __all__ = [
     "BrandCatalog",
     "BrandPack",
     "StartupTimeline",
+    "VehicleBrand",
+    "VehicleBrandCatalog",
     "load_brand_catalog",
     "load_startup_timeline",
+    "load_vehicle_brand_catalog",
     "restore_primary_screen",
     "startup_duration_ms",
 ]

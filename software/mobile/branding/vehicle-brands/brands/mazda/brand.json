@@ -1,0 +1,17 @@
+{
+  "id": "mazda",
+  "name": "Mazda",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#101010",
+  "simpleIconSlug": "mazda",
+  "source": "https://www.mazda.com",
+  "simpleIcons": {
+    "slug": "mazda",
+    "title": "Mazda",
+    "source": "https://www.mazda.com/en/about/profile/library/",
+    "guidelines": null,
+    "license": null
+  }
+}

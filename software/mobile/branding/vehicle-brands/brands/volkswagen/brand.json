@@ -1,0 +1,17 @@
+{
+  "id": "volkswagen",
+  "name": "Volkswagen",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#151F5D",
+  "simpleIconSlug": "volkswagen",
+  "source": "https://www.volkswagen.com",
+  "simpleIcons": {
+    "slug": "volkswagen",
+    "title": "Volkswagen",
+    "source": "https://www.vw.com",
+    "guidelines": null,
+    "license": null
+  }
+}

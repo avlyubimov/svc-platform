@@ -1,0 +1,13 @@
+{
+  "id": "triumph",
+  "name": "Triumph",
+  "categories": [
+    "motorcycle"
+  ],
+  "accentColor": "#FFFFFF",
+  "recolorFrom": [
+    "#010202"
+  ],
+  "commonsFile": "Logo_Triumph.svg",
+  "source": "https://commons.wikimedia.org/wiki/File:Logo_Triumph.svg"
+}

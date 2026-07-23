@@ -1,0 +1,13 @@
+{
+  "id": "mercedes-benz",
+  "name": "Mercedes-Benz",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#B7BDC5",
+  "recolorFrom": [
+    "#000"
+  ],
+  "commonsFile": "Mercedes-Benz_Star_(1969-1986,_2025-).svg",
+  "source": "https://commons.wikimedia.org/wiki/File:Mercedes-Benz_Star_(1969-1986,_2025-).svg"
+}

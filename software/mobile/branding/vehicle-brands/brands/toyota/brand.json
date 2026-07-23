@@ -1,0 +1,17 @@
+{
+  "id": "toyota",
+  "name": "Toyota",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#EB0A1E",
+  "simpleIconSlug": "toyota",
+  "source": "https://www.toyota.com/brandguidelines/",
+  "simpleIcons": {
+    "slug": "toyota",
+    "title": "Toyota",
+    "source": "https://www.toyota.com/brandguidelines/logo/",
+    "guidelines": "https://www.toyota.com/brandguidelines/",
+    "license": null
+  }
+}

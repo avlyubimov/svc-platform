@@ -7,12 +7,17 @@ Date: 2026-07-23
 
 SVC Mobile uses a platform-neutral BrandPack contract for phone-only startup
 presentation. The personal reference pack is `bmw-r1200gs-k25-personal` with
-the `svc-boxer-blue` theme. Both clients load the same runtime JSON catalog,
-BrandPack definitions, asset paths, and timeline. Adding a profile does not
-require duplicated Swift and Kotlin constants. A missing owner-provided BMW
-logo selects the committed generic SVC fallback; an optional missing wordmark
-uses the configured text. Owner-provided resources are never downloaded or
-committed.
+the `svc-boxer-blue` theme. Both clients load the same runtime profile catalog,
+vehicle-brand catalog, asset paths, and timeline. Profiles keep `brandId`,
+`model`, `generation`, and `year` as separate fields and resolve manufacturers
+through the stable IDs in `vehicle-brands-v1.json`. Adding a profile or brand
+does not require duplicated Swift and Kotlin constants.
+
+The standard dark startup uses `logo-on-dark.svg`. A catalog may nominate a
+`preferredAsset`; the 2007 BMW K25 profile uses the 1997–2020 roundel. A
+wordmark or combination mark is optional and falls back to the catalog display
+name as text. A missing profile or required logo selects the committed generic
+SVC fallback. Neither client downloads brand resources at runtime.
 
 The application, phone launcher, CarPlay, and Android Auto identity is always
 SVC. Manufacturer marks are limited to the selected post-launch phone
@@ -31,8 +36,14 @@ phone startup animation.
 ## Consequences
 
 Brand identity remains configuration rather than vehicle-specific BLE, OTA,
-CAN, or safety code. BMW trademarks and other licensed assets remain local to
-the owner's build. The committed SVC assets provide a deterministic fallback
-and application icon. The common timing and semantic fields can support Honda,
-Yamaha, KTM, Ducati, Volkswagen, Toyota, and generic profiles without changing
-mobile source code or device protocols.
+CAN, or safety code. The committed SVC pack provides the deterministic
+fallback, launcher/store artwork, and projected-display identity. The
+manufacturer catalog provides optional phone presentation only.
+
+Every catalog entry carries its source metadata and standard SVG variants.
+Third-party notices, upstream license/disclaimer files, and per-brand source
+URLs remain committed with the assets. Packaging a manufacturer mark does not
+grant trademark rights, so public-store redistribution requires a separate
+rights review. The common timing and semantic fields support additional
+motorcycle and automotive profiles without changing mobile source code or
+device protocols.

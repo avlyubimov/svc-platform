@@ -1,0 +1,17 @@
+{
+  "id": "yamaha-motor",
+  "name": "Yamaha Motor",
+  "categories": [
+    "motorcycle"
+  ],
+  "accentColor": "#E60012",
+  "simpleIconSlug": "yamahamotorcorporation",
+  "source": "https://global.yamaha-motor.com",
+  "simpleIcons": {
+    "slug": "yamahamotorcorporation",
+    "title": "Yamaha Motor Corporation",
+    "source": "https://commons.wikimedia.org/wiki/File:Yamaha_Motor_Logo_(full).svg",
+    "guidelines": null,
+    "license": null
+  }
+}
