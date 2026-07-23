@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "protocolVersion": 1,
+  "requestId": "2e6fb85a-d4f9-4072-b9ab-302ddba911ce",
+  "timestamp": "2026-07-23T10:00:00Z",
+  "sessionId": "mock-confirmed-session",
+  "command": "prepareFirmwareInstall",
+  "confirmationRequired": true,
+  "userConfirmed": true,
+  "payload": {
+    "target": "stm32-main",
+    "releaseVersion": "0.1.0"
+  }
+}

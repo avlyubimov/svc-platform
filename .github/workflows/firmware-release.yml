@@ -1,0 +1,117 @@
+name: Firmware Draft Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_run_id:
+        description: Run containing a manually reviewed firmware-candidates artifact
+        required: true
+        type: string
+      release_version:
+        description: Semantic release version
+        required: true
+        type: string
+      channel:
+        description: Release channel
+        required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+          - beta
+          - stable
+      publish_draft:
+        description: Create a draft GitHub Release
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SVC_PRODUCTION_SIGNING_KEY: ${{ secrets.SVC_PRODUCTION_SIGNING_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install schema validator
+        run: pip install -r tools/mobile_protocol_validation/requirements.txt
+      - name: Download manually selected candidates
+        run: |
+          gh run download "${{ inputs.artifact_run_id }}" \
+            --name firmware-candidates \
+            --dir incoming
+          test -f incoming/stm32-main.signed.bin
+          test -f incoming/e73-radio.signed.bin
+      - name: Require production secret before publication
+        if: ${{ inputs.publish_draft }}
+        run: |
+          test -n "$SVC_PRODUCTION_SIGNING_KEY" || {
+            echo "Draft publication requires SVC_PRODUCTION_SIGNING_KEY."
+            exit 1
+          }
+      - name: Sign candidates
+        if: ${{ env.SVC_PRODUCTION_SIGNING_KEY != '' }}
+        run: |
+          mkdir -p signatures
+          printf '%s' "$SVC_PRODUCTION_SIGNING_KEY" > "$RUNNER_TEMP/svc-signing-key.pem"
+          chmod 600 "$RUNNER_TEMP/svc-signing-key.pem"
+          openssl dgst -sha256 \
+            -sign "$RUNNER_TEMP/svc-signing-key.pem" \
+            -out signatures/stm32-main.sig \
+            incoming/stm32-main.signed.bin
+          openssl dgst -sha256 \
+            -sign "$RUNNER_TEMP/svc-signing-key.pem" \
+            -out signatures/e73-radio.sig \
+            incoming/e73-radio.signed.bin
+          rm -f "$RUNNER_TEMP/svc-signing-key.pem"
+      - name: Package signed release
+        if: ${{ env.SVC_PRODUCTION_SIGNING_KEY != '' }}
+        run: |
+          python3 tools/package_firmware_release.py \
+            --release-version "${{ inputs.release_version }}" \
+            --channel "${{ inputs.channel }}" \
+            --stm32 incoming/stm32-main.signed.bin \
+            --e73 incoming/e73-radio.signed.bin \
+            --signature-directory signatures \
+            --output dist/firmware
+      - name: Package unsigned review artifacts
+        if: ${{ env.SVC_PRODUCTION_SIGNING_KEY == '' }}
+        run: |
+          python3 tools/package_firmware_release.py \
+            --release-version "${{ inputs.release_version }}" \
+            --channel "${{ inputs.channel }}" \
+            --stm32 incoming/stm32-main.signed.bin \
+            --e73 incoming/e73-radio.signed.bin \
+            --output dist/firmware
+      - name: Validate manifest and SHA-256
+        run: |
+          python3 tools/validate_mobile_protocol.py \
+            --manifest dist/firmware/firmware-manifest.json
+          (cd dist/firmware && sha256sum --check SHA256SUMS)
+      - name: Validate publication signatures
+        if: ${{ inputs.publish_draft }}
+        run: |
+          python3 tools/validate_mobile_protocol.py \
+            --release \
+            --manifest dist/firmware/firmware-manifest.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: firmware-release-${{ inputs.release_version }}
+          path: dist/firmware/
+      - name: Create manual draft release
+        if: ${{ inputs.publish_draft }}
+        run: |
+          gh release create "v${{ inputs.release_version }}" \
+            dist/firmware/* \
+            --draft \
+            --target "${{ github.sha }}" \
+            --title "SVC ${{ inputs.release_version }}" \
+            --notes "Manual draft. Hardware validation and Product Owner approval remain required."

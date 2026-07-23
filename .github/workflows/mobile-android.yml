@@ -1,0 +1,34 @@
+name: Android Mobile
+
+on:
+  push:
+    paths:
+      - "software/mobile/android/**"
+      - "software/mobile/mock-data/**"
+      - ".github/workflows/mobile-android.yml"
+  pull_request:
+    paths:
+      - "software/mobile/android/**"
+      - "software/mobile/mock-data/**"
+      - ".github/workflows/mobile-android.yml"
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK
+        run: sdkmanager "platforms;android-36" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.11.1"
+      - name: Build phone and projected app
+        run: |
+          gradle -p software/mobile/android \
+            :app-mobile:assembleDebug \
+            test

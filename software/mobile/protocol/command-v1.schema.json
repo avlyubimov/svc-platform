@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://svc-platform.example/schema/command-v1.schema.json",
+  "title": "SVC command v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "protocolVersion",
+    "requestId",
+    "timestamp",
+    "command",
+    "confirmationRequired",
+    "userConfirmed",
+    "payload"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "protocolVersion": { "const": 1 },
+    "requestId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sessionId": {
+      "type": ["string", "null"],
+      "maxLength": 128
+    },
+    "command": {
+      "enum": [
+        "readDevice",
+        "readTelemetry",
+        "readDiagnostics",
+        "readConfiguration",
+        "stageConfiguration",
+        "stageCalibration",
+        "readEventLog",
+        "beginFirmwareTransfer",
+        "resumeFirmwareTransfer",
+        "prepareFirmwareInstall",
+        "installFirmware",
+        "abortFirmwareTransfer"
+      ]
+    },
+    "confirmationRequired": { "type": "boolean" },
+    "userConfirmed": { "type": "boolean" },
+    "payload": { "type": "object" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "command": {
+            "enum": [
+              "stageConfiguration",
+              "stageCalibration",
+              "beginFirmwareTransfer",
+              "resumeFirmwareTransfer",
+              "prepareFirmwareInstall",
+              "installFirmware",
+              "abortFirmwareTransfer"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": ["sessionId"],
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "confirmationRequired": { "const": true },
+          "userConfirmed": { "const": true }
+        }
+      }
+    }
+  ]
+}

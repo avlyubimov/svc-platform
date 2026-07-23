@@ -1,0 +1,33 @@
+name: STM32 Update Scaffold
+
+on:
+  push:
+    paths:
+      - "firmware/bootloader/stm32h5/**"
+      - "firmware/update/**"
+      - ".github/workflows/firmware-stm32.yml"
+  pull_request:
+    paths:
+      - "firmware/bootloader/stm32h5/**"
+      - "firmware/update/**"
+      - ".github/workflows/firmware-stm32.yml"
+
+jobs:
+  host-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: |
+          cmake \
+            -S firmware/bootloader/stm32h5 \
+            -B build/stm32-update \
+            -G Ninja
+      - name: Build
+        run: cmake --build build/stm32-update
+      - name: Test update port
+        run: ctest --test-dir build/stm32-update --output-on-failure
+      - name: Enforce non-deployable scaffold boundary
+        run: |
+          test ! -e build/stm32-update/svc-stm32-main.signed.bin
+          echo "Target OEMiRoT image remains hardware-integration dependent."

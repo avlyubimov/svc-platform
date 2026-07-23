@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://svc-platform.example/schema/telemetry-v1.schema.json",
+  "title": "SVC telemetry v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "protocolVersion",
+    "deviceId",
+    "sequence",
+    "timestamp",
+    "batteryVoltage",
+    "totalCurrent",
+    "channels",
+    "powerZoneTemperatures",
+    "ambientLight",
+    "accelerometer",
+    "gyroscope",
+    "leanAngle",
+    "vehicle",
+    "can1",
+    "storage",
+    "versions",
+    "warnings"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "protocolVersion": { "type": "integer", "minimum": 1 },
+    "deviceId": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "sequence": { "type": "integer", "minimum": 0 },
+    "timestamp": { "$ref": "#/$defs/timestamp" },
+    "batteryVoltage": { "$ref": "#/$defs/numberMeasurement" },
+    "totalCurrent": { "$ref": "#/$defs/numberMeasurement" },
+    "channels": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": { "$ref": "#/$defs/channel" }
+    },
+    "powerZoneTemperatures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "allOf": [
+          { "$ref": "#/$defs/numberMeasurement" },
+          {
+            "type": "object",
+            "required": ["id"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,31}$" }
+            }
+          }
+        ]
+      }
+    },
+    "ambientLight": { "$ref": "#/$defs/numberMeasurement" },
+    "accelerometer": { "$ref": "#/$defs/vector3" },
+    "gyroscope": { "$ref": "#/$defs/vector3" },
+    "leanAngle": { "$ref": "#/$defs/numberMeasurement" },
+    "vehicle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "speed",
+        "engineRpm",
+        "engineTemperature",
+        "instantFuelConsumption",
+        "averageFuelConsumption",
+        "fuelLevel",
+        "ambientTemperature"
+      ],
+      "properties": {
+        "speed": { "$ref": "#/$defs/numberMeasurement" },
+        "engineRpm": { "$ref": "#/$defs/numberMeasurement" },
+        "engineTemperature": { "$ref": "#/$defs/numberMeasurement" },
+        "instantFuelConsumption": { "$ref": "#/$defs/numberMeasurement" },
+        "averageFuelConsumption": { "$ref": "#/$defs/numberMeasurement" },
+        "fuelLevel": { "$ref": "#/$defs/numberMeasurement" },
+        "ambientTemperature": { "$ref": "#/$defs/numberMeasurement" }
+      }
+    },
+    "can1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "rxFrames", "droppedFrames", "lastFrameTimestamp"],
+      "properties": {
+        "state": { "$ref": "#/$defs/stringMeasurement" },
+        "rxFrames": { "$ref": "#/$defs/numberMeasurement" },
+        "droppedFrames": { "$ref": "#/$defs/numberMeasurement" },
+        "lastFrameTimestamp": { "$ref": "#/$defs/stringMeasurement" }
+      }
+    },
+    "storage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sdCardState", "canLoggerState", "freeBytes"],
+      "properties": {
+        "sdCardState": { "$ref": "#/$defs/stringMeasurement" },
+        "canLoggerState": { "$ref": "#/$defs/stringMeasurement" },
+        "freeBytes": { "$ref": "#/$defs/numberMeasurement" }
+      }
+    },
+    "versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stm32", "e73", "protocol"],
+      "properties": {
+        "stm32": { "$ref": "#/$defs/stringMeasurement" },
+        "e73": { "$ref": "#/$defs/stringMeasurement" },
+        "protocol": { "$ref": "#/$defs/stringMeasurement" }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "message", "timestamp", "active"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[a-z0-9_]{1,64}$" },
+          "severity": { "enum": ["info", "warning", "critical"] },
+          "message": { "type": "string", "maxLength": 160 },
+          "timestamp": { "$ref": "#/$defs/timestamp" },
+          "active": { "type": "boolean" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["unit", "timestamp", "valid", "stale", "source", "quality"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,31}$" },
+        "unit": { "type": "string", "minLength": 1, "maxLength": 24 },
+        "timestamp": { "$ref": "#/$defs/timestamp" },
+        "valid": { "type": "boolean" },
+        "stale": { "type": "boolean" },
+        "source": {
+          "enum": ["adc", "can1", "imu", "sensor", "output-manager", "storage", "firmware", "derived"]
+        },
+        "quality": {
+          "enum": ["good", "degraded", "invalid", "unavailable"]
+        }
+      }
+    },
+    "numberMeasurement": {
+      "unevaluatedProperties": false,
+      "allOf": [
+        { "$ref": "#/$defs/metadata" },
+        {
+          "type": "object",
+          "required": ["value"],
+          "properties": {
+            "value": { "type": ["number", "null"] }
+          }
+        }
+      ]
+    },
+    "stringMeasurement": {
+      "unevaluatedProperties": false,
+      "allOf": [
+        { "$ref": "#/$defs/metadata" },
+        {
+          "type": "object",
+          "required": ["value"],
+          "properties": {
+            "value": { "type": ["string", "null"] }
+          }
+        }
+      ]
+    },
+    "channel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "current", "state", "fault"],
+      "properties": {
+        "id": { "enum": ["OUT1", "OUT2", "OUT3", "OUT4", "OUT5", "OUT6", "OUT7", "OUT8", "OUT9", "OUT10"] },
+        "current": { "$ref": "#/$defs/numberMeasurement" },
+        "state": { "$ref": "#/$defs/stringMeasurement" },
+        "fault": { "$ref": "#/$defs/stringMeasurement" }
+      }
+    },
+    "vector3": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": { "$ref": "#/$defs/numberMeasurement" },
+        "y": { "$ref": "#/$defs/numberMeasurement" },
+        "z": { "$ref": "#/$defs/numberMeasurement" }
+      }
+    }
+  }
+}

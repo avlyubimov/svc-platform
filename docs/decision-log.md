@@ -1,5 +1,27 @@
 # Decision Log
 
+## 2026-07-23 — Phone-mediated BLE connectivity and signed OTA
+
+Decision: accept ADR-0022. SVC Mobile runs on iPhone or Android, downloads
+GitHub release artifacts over HTTPS, and transfers them through authenticated
+BLE to E73. E73 forwards STM32 candidates over framed UART. The current LB-100
+has no Wi-Fi and cannot access GitHub directly.
+
+Decision: treat CHIGEE AIO-6 as a CarPlay/Android Auto projection host only.
+Projected surfaces are experimental, information-only, expose neither OTA nor
+power-output control, and do not assume Apple entitlement or Google category
+approval. Automatic selection of SVC on reconnect is not guaranteed.
+
+Decision: use MCUboot/MCUmgr for the E73 direction and ST OEMiRoT for
+STM32H563. Both targets verify signed candidates, use trial boot and confirmation,
+and roll back on failure. SWD remains the hardware recovery path for each target;
+E73 is not an STM32 recovery programmer.
+
+Result: mobile, protocol, mock, CI, and host-test scaffolds may proceed without
+changing PB-100, LB-100, FB-100, generic-output mapping, CAN1 read-only policy,
+or Output Manager ownership. Production keys and automatic updates remain
+prohibited.
+
 ## 2026-06-30 — Project start
 
 SVC Platform started from BMW R1200GS K25 OEM+ accessory power project.

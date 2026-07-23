@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "releaseVersion": "0.1.0",
+  "channel": "dev",
+  "minimumMobileVersion": "0.1.0",
+  "components": [
+    {
+      "target": "stm32-main",
+      "version": "0.1.0",
+      "hardware": ["LB-100-REV1"],
+      "protocolVersion": 1,
+      "file": "svc-stm32-main-0.1.0.signed.bin",
+      "size": 0,
+      "sha256": "placeholder",
+      "signature": "TEST-SIGNATURE-NOT-FOR-PRODUCTION",
+      "minimumBootloader": "0.1.0"
+    },
+    {
+      "target": "e73-radio",
+      "version": "0.1.0",
+      "hardware": ["LB-100-REV1"],
+      "protocolVersion": 1,
+      "file": "svc-e73-radio-0.1.0.signed.bin",
+      "size": 0,
+      "sha256": "placeholder",
+      "signature": "TEST-SIGNATURE-NOT-FOR-PRODUCTION",
+      "minimumBootloader": "0.1.0"
+    }
+  ]
+}
