@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -17,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,7 +40,9 @@ import com.avlyubimov.svc.core.model.ChannelTelemetry
 import com.avlyubimov.svc.core.model.DeviceRepository
 import com.avlyubimov.svc.core.model.DiscoveredDevice
 import com.avlyubimov.svc.core.model.Measurement
+import com.avlyubimov.svc.core.model.RideThemeMode
 import com.avlyubimov.svc.core.model.TelemetrySnapshot
+import com.avlyubimov.svc.core.model.VehiclePerformanceProfile
 import com.avlyubimov.svc.core.update.OtaPolicy
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
@@ -60,8 +65,14 @@ private enum class Screen(val title: String) {
 fun SVCMobileApp(repository: DeviceRepository) {
     val context = LocalContext.current
     val brandCatalog = remember { MobileBrandCatalog.load(context) }
+    val performanceCatalog = remember {
+        MobileVehiclePerformanceCatalog.load(context)
+    }
     val startupTimeline = remember { MobileStartupTimeline.load(context) }
     val appearance = remember { AppearancePreferences(context, brandCatalog) }
+    val ridePreferences = remember {
+        RidePreferences(context, performanceCatalog)
+    }
     val device by repository.snapshot.collectAsStateWithLifecycle()
     var selectedScreen by remember {
         mutableStateOf<Screen?>(
@@ -76,8 +87,16 @@ fun SVCMobileApp(repository: DeviceRepository) {
     var showStartup by remember { mutableStateOf(true) }
     var startupReplayKey by remember { mutableStateOf(0) }
     var appearanceRevision by remember { mutableStateOf(0) }
+    var rideRevision by remember { mutableStateOf(0) }
     val coroutineScope = rememberCoroutineScope()
     val brandPack = remember(appearanceRevision) { appearance.brandPack() }
+    val vehicleProfile = remember(rideRevision) {
+        ridePreferences.vehicleProfile()
+    }
+    val rideThemeMode = remember(rideRevision) { ridePreferences.themeMode }
+    val rideThemeThresholds = remember(rideRevision) {
+        ridePreferences.themeThresholds()
+    }
     val criticalWarning = device.telemetry.warnings.firstOrNull {
         it.active && it.severity.equals("critical", ignoreCase = true)
     }
@@ -109,12 +128,18 @@ fun SVCMobileApp(repository: DeviceRepository) {
             topBar = {
                 TopAppBar(
                     title = {
-                        Text(selectedScreen?.title ?: "SVC Mobile")
+                        Text(
+                            if (selectedScreen == Screen.DASHBOARD) {
+                                "SVC Ride"
+                            } else {
+                                selectedScreen?.title ?: "SVC Mobile"
+                            },
+                        )
                     },
                     navigationIcon = {
                         if (selectedScreen != null) {
                             TextButton(onClick = { selectedScreen = null }) {
-                                Text("Back")
+                                Text("Menu")
                             }
                         }
                     },
@@ -162,10 +187,16 @@ fun SVCMobileApp(repository: DeviceRepository) {
                             }
                         },
                     )
-                    Screen.DASHBOARD -> DashboardScreen(
-                        device.telemetry,
-                        isConnecting,
-                        modifier,
+                    Screen.DASHBOARD -> RideDashboardScreen(
+                        telemetry = device.telemetry,
+                        connectionState = device.connectionState,
+                        isConnecting = isConnecting,
+                        profile = vehicleProfile,
+                        themeMode = rideThemeMode,
+                        themeThresholds = rideThemeThresholds,
+                        reduceMotion = appearance.reduceMotionOverride ||
+                            systemReduceMotion(context),
+                        modifier = modifier,
                     )
                     Screen.CHANNELS -> ChannelsScreen(device.telemetry.channels, modifier)
                     Screen.DIAGNOSTICS -> DiagnosticsScreen(device.telemetry, modifier)
@@ -184,9 +215,12 @@ fun SVCMobileApp(repository: DeviceRepository) {
                     Screen.SETTINGS -> SettingsScreen(
                         preferences = appearance,
                         profiles = brandCatalog.profiles,
+                        ridePreferences = ridePreferences,
+                        vehicleProfiles = performanceCatalog.profiles,
                         usingFallback = brandPack.id != appearance.profileId,
                         modifier = modifier,
-                        onChanged = { appearanceRevision += 1 },
+                        onAppearanceChanged = { appearanceRevision += 1 },
+                        onRideChanged = { rideRevision += 1 },
                         onPreview = {
                             startupReplayKey += 1
                             showStartup = true
@@ -285,24 +319,6 @@ private fun PairingScreen(
 }
 
 @Composable
-private fun DashboardScreen(
-    telemetry: TelemetrySnapshot,
-    isConnecting: Boolean,
-    modifier: Modifier,
-) {
-    StringListScreen(
-        (if (isConnecting) listOf("Connecting to SVC") else emptyList()) + listOf(
-            "Battery: ${telemetry.batteryVoltage.display()}",
-            "Total current: ${telemetry.totalCurrent.display()}",
-            "Speed: ${telemetry.vehicle.speed.display()}",
-            "Engine RPM: ${telemetry.vehicle.engineRpm.display()}",
-            "Lean: ${telemetry.leanAngle.display()}",
-        ),
-        modifier,
-    )
-}
-
-@Composable
 private fun ChannelsScreen(channels: List<ChannelTelemetry>, modifier: Modifier) {
     LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         items(channels) { channel ->
@@ -388,15 +404,27 @@ private fun FirmwareScreen(
 private fun SettingsScreen(
     preferences: AppearancePreferences,
     profiles: List<MobileBrandPack>,
+    ridePreferences: RidePreferences,
+    vehicleProfiles: List<VehiclePerformanceProfile>,
     usingFallback: Boolean,
     modifier: Modifier,
-    onChanged: () -> Unit,
+    onAppearanceChanged: () -> Unit,
+    onRideChanged: () -> Unit,
     onPreview: () -> Unit,
 ) {
     var selectedProfile by remember { mutableStateOf(preferences.profileId) }
+    var selectedVehicleProfile by remember {
+        mutableStateOf(ridePreferences.vehicleProfileId)
+    }
+    var selectedTheme by remember { mutableStateOf(ridePreferences.themeMode) }
+    var nightEnterLux by remember { mutableStateOf(ridePreferences.nightEnterLux) }
+    var dayEnterLux by remember { mutableStateOf(ridePreferences.dayEnterLux) }
     var animationEnabled by remember { mutableStateOf(preferences.animationEnabled) }
     var reduceMotion by remember { mutableStateOf(preferences.reduceMotionOverride) }
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(14.dp)) {
+    Column(
+        modifier.verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
         Text("Appearance", style = MaterialTheme.typography.titleLarge)
         profiles.forEach { profile ->
             Row(
@@ -409,7 +437,7 @@ private fun SettingsScreen(
                     onClick = {
                         selectedProfile = profile.id
                         preferences.profileId = profile.id
-                        onChanged()
+                        onAppearanceChanged()
                     },
                 )
             }
@@ -443,7 +471,79 @@ private fun SettingsScreen(
                 color = MobileColors.SecondaryText,
             )
         }
-        Text("Calibration remains staged; no hardware value is changed.")
+        Text("Ride dashboard", style = MaterialTheme.typography.titleLarge)
+        vehicleProfiles.forEach { profile ->
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(profile.displayName)
+                RadioButton(
+                    selected = selectedVehicleProfile == profile.id,
+                    onClick = {
+                        selectedVehicleProfile = profile.id
+                        ridePreferences.vehicleProfileId = profile.id
+                        onRideChanged()
+                    },
+                )
+            }
+        }
+        Text("Theme", style = MaterialTheme.typography.titleMedium)
+        RideThemeMode.entries.forEach { mode ->
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    when (mode) {
+                        RideThemeMode.DAY -> "SVC Day"
+                        RideThemeMode.NIGHT -> "SVC Night"
+                        RideThemeMode.AUTOMATIC -> "Automatic"
+                    },
+                )
+                RadioButton(
+                    selected = selectedTheme == mode,
+                    onClick = {
+                        selectedTheme = mode
+                        ridePreferences.themeMode = mode
+                        onRideChanged()
+                    },
+                )
+            }
+        }
+        Text("Night below ${nightEnterLux.toInt()} lux")
+        Slider(
+            value = nightEnterLux.toFloat(),
+            onValueChange = {
+                nightEnterLux = it.toDouble()
+                ridePreferences.nightEnterLux = nightEnterLux
+                onRideChanged()
+            },
+            valueRange = 50f..500f,
+        )
+        Text("Day above ${dayEnterLux.toInt()} lux")
+        Slider(
+            value = dayEnterLux.toFloat(),
+            onValueChange = {
+                dayEnterLux = it.toDouble()
+                ridePreferences.dayEnterLux = dayEnterLux
+                onRideChanged()
+            },
+            valueRange = 300f..1_200f,
+        )
+        Text("Motorcycle level calibration", style = MaterialTheme.typography.titleMedium)
+        Button(
+            onClick = {},
+            enabled = false,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text("Calibrate motorcycle level")
+        }
+        Text(
+            "Calibration requires confirmed 0 km/h and Dashboard Demo Mode. " +
+                "No BLE calibration command is available.",
+            color = MobileColors.SecondaryText,
+        )
     }
 }
 

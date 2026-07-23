@@ -71,11 +71,29 @@ mock-backed until hardware validation closes the applicable safety gates.
 The images above use only the project-owned SVC identity.
 Vehicle-manufacturer artwork is not part of this repository presentation.
 
+### SVC Ride Dashboard
+
+<p align="center">
+  <img
+    src="software/mobile/docs/screenshots/svc-ride-dashboard-v1-landscape.png"
+    alt="SVC Ride Dashboard v1 with mock telemetry and SVC-only visual identity"
+    width="900"
+  >
+</p>
+
+Dashboard v1 is implemented for the SwiftUI and Jetpack Compose phone targets.
+It uses separate versioned vehicle-performance profiles, explicit telemetry
+quality states, profile-driven tachometer zones, SVC-estimated lean, Day/Night
+themes, Reduce Motion, and adaptive landscape/portrait layouts. Missing CAN
+signals remain `—`; gear is not inferred from speed and RPM. CarPlay and
+Android Auto retain a separate, reduced information-only template.
+
 - [Mobile overview and local build commands](software/mobile/README.md)
 - [iOS application](software/mobile/ios/SVCMobile/README.md)
 - [Android application](software/mobile/android/README.md)
 - [Firmware update trust boundary](docs/architecture/firmware-update.md)
 - [SVC identity assets](software/mobile/branding/svc/README.md)
+- [Ride Dashboard implementation boundary](software/mobile/docs/ride-dashboard-roadmap.md)
 
 ## Validation
 

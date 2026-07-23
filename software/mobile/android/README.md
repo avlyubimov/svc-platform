@@ -19,6 +19,13 @@ catalog display name when no wordmark exists. Startup uses one linear
 and the same 2100/500 ms timing as iOS. Appearance settings provide
 profile/fallback selection and replay.
 
+The phone Dashboard is a Jetpack Compose SVC Ride layout with landscape-first
+and portrait arrangements. It loads the shared technical profile separately
+from branding, maps all telemetry through explicit quality states, leaves
+telemetry-v1 gear unavailable, and supports profile-driven tachometer zones,
+SVC-estimated lean, Day/Night ambient-light hysteresis, and Reduce Motion.
+Compose previews use SVC-only sample identity.
+
 ## Build and test
 
 ```bash
@@ -28,7 +35,9 @@ gradle :app-mobile:assembleDebug test
 The debug phone APK contains the merged Android Auto service. Enable Android
 Auto developer mode and unknown sources, install the APK, and run Google's
 Desktop Head Unit. The service declares the experimental IoT category and shows
-information-only templates.
+information-only templates. The template is not the graphical phone dashboard;
+it contains only speed, gear, battery, SVC current, main warning, and connection
+state.
 
 Successful DHU execution does not guarantee Google Play eligibility. IoT
 category fit, templated-app requirements, driver-distraction rules, and current

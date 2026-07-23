@@ -12,6 +12,13 @@ catalog display name when no wordmark exists. The ignored
 owner-only custom packs. The Appearance screen provides profile selection,
 animation disable, reduced-motion preview, and replay.
 
+The SwiftUI SVC Ride Dashboard uses the shared technical vehicle profile
+independently from BrandPack selection. It provides adaptive landscape/portrait
+layouts, profile-driven tachometer zones, explicit telemetry quality states,
+SVC-estimated lean, automatic Day/Night hysteresis, and Reduce Motion. Gear
+remains `—` under telemetry v1 and no value is inferred from speed/RPM. SwiftUI
+previews use SVC-owned presentation without manufacturer artwork.
+
 ## Generate and test
 
 ```bash
@@ -42,6 +49,8 @@ After Apple approves an applicable category:
 7. add the CarPlay scene role to the target Info configuration;
 8. test with Xcode Simulator using `I/O > External Displays > CarPlay`.
 
-The experimental template is information-only. It contains no channel control
-and no firmware update action. Apple approval is not assumed, and CarPlay cannot
-be forced to open SVC automatically after every host reconnect.
+The experimental template is information-only and reduced to speed, gear,
+battery, SVC current, main warning, and connection state. It contains no full
+graphical dashboard, channel control, or firmware update action. Apple approval
+is not assumed, and CarPlay cannot be forced to open SVC automatically after
+every host reconnect.
