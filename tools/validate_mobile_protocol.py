@@ -9,6 +9,7 @@ from mobile_protocol_validation import (
     load_firmware_manifest,
     load_telemetry,
     load_vehicle_brand_catalog,
+    load_vehicle_performance_catalog,
     validate_all_action_pins,
     validate_release_workflow,
 )
@@ -16,6 +17,7 @@ from mobile_protocol_validation import (
 ROOT = Path(__file__).resolve().parents[1]
 PROTOCOL = ROOT / "software" / "mobile" / "protocol"
 BRANDING = ROOT / "software" / "mobile" / "branding"
+VEHICLE_PROFILES = ROOT / "software" / "mobile" / "vehicle-profiles"
 
 
 def main() -> int:
@@ -102,11 +104,47 @@ def main() -> int:
         if index_errors:
             raise SystemExit(f"{index_path}: {index_errors[0].message}")
 
+        vehicle_profile_schema = json.loads(
+            (VEHICLE_PROFILES / "vehicle-profile-v1.schema.json").read_text()
+        )
+        vehicle_profile_index_schema = json.loads(
+            (
+                VEHICLE_PROFILES / "vehicle-profile-index-v1.schema.json"
+            ).read_text()
+        )
+        Draft202012Validator.check_schema(vehicle_profile_schema)
+        Draft202012Validator.check_schema(vehicle_profile_index_schema)
+        vehicle_profile_validator = Draft202012Validator(vehicle_profile_schema)
+        for profile_path in (
+            VEHICLE_PROFILES / "bmw-r1200gs-k25-2007.json",
+            VEHICLE_PROFILES / "generic-motorcycle.json",
+        ):
+            errors = list(
+                vehicle_profile_validator.iter_errors(
+                    json.loads(profile_path.read_text())
+                )
+            )
+            if errors:
+                raise SystemExit(f"{profile_path}: {errors[0].message}")
+        profile_index_path = (
+            VEHICLE_PROFILES / "vehicle-profile-index-v1.json"
+        )
+        profile_index_errors = list(
+            Draft202012Validator(vehicle_profile_index_schema).iter_errors(
+                json.loads(profile_index_path.read_text())
+            )
+        )
+        if profile_index_errors:
+            raise SystemExit(
+                f"{profile_index_path}: {profile_index_errors[0].message}"
+            )
+
     from mobile_protocol_validation import load_startup_timeline
 
     load_vehicle_brand_catalog(BRANDING)
     load_brand_catalog(BRANDING)
     load_startup_timeline(BRANDING / "startup-animation-v1.json")
+    load_vehicle_performance_catalog(VEHICLE_PROFILES, repo_root=ROOT)
 
     print("mobile protocol validation passed")
     return 0

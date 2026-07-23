@@ -34,6 +34,11 @@ from .ota_release import (
     validate_tag_version_channel,
     verify_detached,
 )
+from .vehicle_profiles import (
+    VehiclePerformanceCatalog,
+    VehiclePerformanceProfile,
+    load_vehicle_performance_catalog,
+)
 
 __all__ = [
     "ArtifactValidationError",
@@ -66,4 +71,7 @@ __all__ = [
     "load_vehicle_brand_catalog",
     "restore_primary_screen",
     "startup_duration_ms",
+    "VehiclePerformanceCatalog",
+    "VehiclePerformanceProfile",
+    "load_vehicle_performance_catalog",
 ]

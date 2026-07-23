@@ -4107,3 +4107,21 @@ brand constants. Automated validation requires the per-brand metadata and four
 standard SVG variants, parses every SVG as XML, verifies the SVC pack
 checksums, and confirms that platform launcher assets are exported from the SVC
 pack. BLE, OTA, CAN, Output Manager, and safety behavior remain unchanged.
+
+## 2026-07-23 — Separate vehicle performance profiles from mobile branding
+
+Decision: add a shared versioned vehicle performance catalog for phone
+dashboard limits and reference values. BrandPacks continue to own presentation
+only. The BMW R1200GS K25 2007 profile defines the approved 0–9000 rpm scale,
+7000 rpm warning boundary, 7800 rpm red-zone boundary, idle band, six-speed
+gearbox, fuel capacity/reserve, and ice threshold. The unknown rev limiter is
+null and must not be drawn.
+
+Decision: make Generic Motorcycle a no-assumption fallback. Unknown engine,
+gearbox, fuel, year, tachometer, warning-zone, and red-zone values stay null
+instead of receiving plausible-looking defaults.
+
+Result: validators enforce profile identity, references, year/fuel consistency,
+tachometer ordering, scale bounds, and the no-limits fallback. This
+configuration does not confirm CAN signals and changes no hardware, firmware,
+wire protocol, or safety behavior.
