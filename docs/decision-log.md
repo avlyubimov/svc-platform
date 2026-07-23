@@ -4125,3 +4125,26 @@ Result: validators enforce profile identity, references, year/fuel consistency,
 tachometer ordering, scale bounds, and the no-limits fallback. This
 configuration does not confirm CAN signals and changes no hardware, firmware,
 wire protocol, or safety behavior.
+
+## 2026-07-23 — Add the phone-only SVC Ride Dashboard v1
+
+Decision: implement one shared presentation contract in SwiftUI and Jetpack
+Compose while keeping platform-native rendering. Landscape is primary and
+portrait is adaptive. Performance limits come only from the versioned vehicle
+profile; BrandPacks remain presentation-only. Telemetry maps through explicit
+valid, stale, degraded, invalid and unavailable states. Stale/invalid/missing
+values render as dashes, and telemetry v1 gear remains unavailable rather than
+being inferred.
+
+Decision: use the Product Owner-approved 0–9000 rpm scale and 7000/7800 zone
+boundaries with 80 rpm display-color hysteresis. The visual arc may animate for
+180 ms, but the numeric RPM is not delayed. `telemetry.leanAngle` is labelled
+as an SVC estimate, becomes degraded without calibration, and records left/right
+trip maxima with reset gated by confirmed zero speed. Day/Night switching uses
+ambient-light hysteresis; Reduce Motion removes dashboard animation duration.
+
+Result: the full graphical dashboard is phone-only. CarPlay and Android Auto
+retain reduced SVC information templates and no longer show invented mock
+values. Demo scenarios, protocol v2, real BLE telemetry and verified BMW CAN
+signals are documented as separate pull requests. This change adds no CAN IDs
+to a decoder, no channel control, and no hardware or firmware behavior.

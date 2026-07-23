@@ -5,6 +5,15 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
+val generatedVehicleProfileAssets =
+    layout.buildDirectory.dir("generated/vehicle-profile-assets")
+val syncVehicleProfileAssets by tasks.registering(Sync::class) {
+    from("../../vehicle-profiles") {
+        include("*.json")
+    }
+    into(generatedVehicleProfileAssets.map { it.dir("vehicle-profiles") })
+}
+
 android {
     namespace = "com.avlyubimov.svc.mobile"
     compileSdk = 36
@@ -22,7 +31,10 @@ android {
     }
 
     sourceSets {
-        getByName("main").assets.srcDir("../../branding")
+        getByName("main").assets.srcDirs(
+            "../../branding",
+            generatedVehicleProfileAssets,
+        )
     }
 
     compileOptions {
@@ -33,6 +45,10 @@ android {
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
+}
+
+tasks.named("preBuild").configure {
+    dependsOn(syncVehicleProfileAssets)
 }
 
 dependencies {

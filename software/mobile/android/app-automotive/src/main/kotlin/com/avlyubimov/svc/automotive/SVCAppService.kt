@@ -31,17 +31,12 @@ private class StatusScreen(
 ) : Screen(carContext) {
     override fun onGetTemplate(): Template {
         val rows = listOf(
-            "Battery" to "12.7 V",
-            "Total current" to "8.4 A",
-            "Speed" to "0 km/h",
-            "Engine RPM" to "0 rpm",
-            "Engine temperature" to "Unavailable",
-            "Fuel consumption" to "Unavailable",
-            "Ambient temperature" to "Unavailable",
-            "Ambient light" to "820 lux",
-            "Lean angle" to "0.8°",
-            "Warnings" to "SD card missing",
-            "Channels" to "OUT1..OUT10 status only",
+            "Speed" to "—",
+            "Gear" to "—",
+            "Battery" to "—",
+            "SVC current" to "—",
+            "Main warning" to "Connection required",
+            "Connection" to "Unavailable",
         )
         val list = ItemList.Builder()
         rows.forEach { (title, value) ->
@@ -53,7 +48,7 @@ private class StatusScreen(
             )
         }
         return ListTemplate.Builder()
-            .setTitle("BMW R1200GS · SVC")
+            .setTitle("SVC Ride")
             .setSingleList(list.build())
             .build()
     }

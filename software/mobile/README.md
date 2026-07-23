@@ -22,6 +22,43 @@ dashboard scales and reference values; unknown values remain explicit `null`.
 The Generic Motorcycle fallback intentionally defines no red zone or engine
 limits.
 
+## SVC Ride Dashboard v1
+
+The phone targets contain the same adaptive dashboard contract in SwiftUI and
+Jetpack Compose. Landscape is primary; portrait rearranges the same information
+without changing its meaning. The dashboard provides:
+
+- central speed and explicit gear presentation (`N`, `1`–`6`, `BETWEEN`, `—`);
+- profile-driven tachometer scale, warning/red zones, 80 rpm color hysteresis,
+  smooth arc motion, and an unsmoothed numeric RPM value;
+- SVC-estimated lean angle with left/right trip maxima and stationary-only
+  reset;
+- engine temperature, fuel, battery voltage, total SVC current, BLE/CAN state,
+  and the highest-priority active warning;
+- separate `SVC Day`, `SVC Night`, and ambient-light `Automatic` themes with
+  configurable 250/650 lux hysteresis defaults;
+- system Reduce Motion support and shared 180/300 ms motion tokens.
+
+Every value passes through `valid`, `stale`, `degraded`, `invalid`, or
+`unavailable` presentation state. Stale, invalid, and unavailable measurements
+render as `—`, never as zero. The current telemetry v1 contract has no gear
+measurement, so normal mock operation intentionally renders `GEAR —`. Lean is
+marked degraded until mounting calibration exists; calibration remains disabled
+outside the future Demo Mode.
+
+<p align="center">
+  <img
+    src="docs/screenshots/svc-ride-dashboard-v1-landscape.png"
+    alt="SVC Ride Dashboard v1 using mock telemetry and only SVC visual identity"
+    width="900"
+  >
+</p>
+
+The screenshot contains no vehicle-manufacturer artwork. Full graphics are
+phone-only. The experimental CarPlay/Android Auto templates expose only speed,
+gear, battery, SVC current, main warning, and connection state and currently
+render unavailable values rather than invented telemetry.
+
 ## Startup and personal branding
 
 The phone apps load the common profile catalog from
@@ -65,6 +102,10 @@ No POST statuses or fabricated `OK` values appear in startup.
 The animation is phone-only. CarPlay and Android Auto retain host-controlled
 launch transitions and show only the SVC app identity, profile name, permitted
 accent, and informational templates.
+
+Future Dashboard Demo Mode, telemetry protocol v2, real BLE telemetry, and
+verified BMW K25 CAN signals are intentionally separate changes. See
+[`docs/ride-dashboard-roadmap.md`](docs/ride-dashboard-roadmap.md).
 
 ## GitHub Releases client
 

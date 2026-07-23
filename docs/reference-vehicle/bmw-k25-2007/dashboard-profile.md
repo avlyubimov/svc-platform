@@ -43,3 +43,32 @@ zero or a fabricated healthy state.
 
 The dashboard may use `telemetry.leanAngle` only as an SVC-estimated angle. It
 must not present that value as an OEM BMW measurement.
+
+## Dashboard v1 implementation
+
+The SwiftUI and Jetpack Compose phone targets load this technical profile
+independently from the selected BrandPack. Both implementations:
+
+- render a 0–9000 rpm arc with boundaries at 7000 and 7800 rpm;
+- use 80 rpm display-color hysteresis while keeping the numeric RPM current;
+- omit any rev-limiter/cut-off marker;
+- render speed/RPM/gear and all other missing signals as `—`;
+- keep gear explicitly unavailable under telemetry v1 instead of estimating it;
+- label `telemetry.leanAngle` as `SVC LEAN`, mark it degraded before
+  calibration, and allow trip-maximum reset only at confirmed zero speed;
+- keep level calibration disabled until the separate Demo Mode change;
+- reserve calibration data for a mounting transform and zero offset; a future
+  estimator must fuse accelerometer and gyroscope evidence and must not treat
+  one accelerometer sample as a finished lean angle;
+- use the public SVC visual identity without manufacturer marks.
+
+The application does not add CAN identifiers, write CAN frames, or change any
+hardware/firmware behavior.
+
+## Deferred delivery sequence
+
+Dashboard Demo Mode, telemetry protocol v2, selectable real BLE repositories,
+and verified BMW dashboard signals remain separate pull requests. The expected
+signal and compatibility contracts are recorded in
+`software/mobile/docs/ride-dashboard-roadmap.md`; they are not represented as
+working integration in Dashboard v1.

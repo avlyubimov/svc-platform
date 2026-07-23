@@ -16,6 +16,12 @@ targets:
       - path: Sources
       - path: ../../mock-data/device-v1.json
         buildPhase: resources
+      - path: ../../vehicle-profiles/vehicle-profile-index-v1.json
+        buildPhase: resources
+      - path: ../../vehicle-profiles/bmw-r1200gs-k25-2007.json
+        buildPhase: resources
+      - path: ../../vehicle-profiles/generic-motorcycle.json
+        buildPhase: resources
       - path: ../../branding/brand-pack-index-v1.json
         buildPhase: resources
       - path: ../../branding/bmw-r1200gs-k25-personal.json
@@ -53,6 +59,12 @@ targets:
     sources:
       - path: Tests
       - path: ../../mock-data/device-v1.json
+        buildPhase: resources
+      - path: ../../vehicle-profiles/vehicle-profile-index-v1.json
+        buildPhase: resources
+      - path: ../../vehicle-profiles/bmw-r1200gs-k25-2007.json
+        buildPhase: resources
+      - path: ../../vehicle-profiles/generic-motorcycle.json
         buildPhase: resources
       - path: ../../protocol/examples/firmware-manifest.dev.json
         buildPhase: resources

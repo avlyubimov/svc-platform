@@ -3,6 +3,7 @@ import SwiftUI
 struct RootView: View {
     @ObservedObject var viewModel: AppViewModel
     @StateObject private var appearance = AppearanceStore()
+    @StateObject private var ridePreferences = RidePreferences()
     @State private var selectedScreen: PrimaryScreen = .dashboard
     @State private var showStartup = true
     @State private var replayToken = UUID()
@@ -30,6 +31,8 @@ struct RootView: View {
                                 NavigationLink("Settings") {
                                     SettingsView(
                                         appearance: appearance,
+                                        ridePreferences: ridePreferences,
+                                        telemetry: viewModel.device.telemetry,
                                         previewStartup: previewStartup
                                     )
                                 }
@@ -76,7 +79,11 @@ struct RootView: View {
         case .dashboard:
             DashboardView(
                 telemetry: viewModel.device.telemetry,
-                isConnecting: viewModel.isConnecting
+                connectionState: viewModel.device.connectionState,
+                isConnecting: viewModel.isConnecting,
+                profile: ridePreferences.vehicleProfile,
+                themeMode: ridePreferences.themeMode,
+                themeThresholds: ridePreferences.themeThresholds
             )
         case .channels:
             ChannelsView(channels: viewModel.device.telemetry.channels)
