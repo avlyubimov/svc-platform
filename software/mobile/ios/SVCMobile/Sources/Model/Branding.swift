@@ -162,12 +162,12 @@ struct BrandCatalog {
                     == vehicleBrandDocument.brands.count,
                 profiles.contains(where: { $0.id == document.defaultProfileId }),
                 profiles.contains(where: { $0.id == document.fallbackProfileId }),
-                profiles.allSatisfy { profile in
+                profiles.allSatisfy({ profile in
                     profile.brandId == "svc"
                         || vehicleBrandDocument.brands.contains { brand in
                             brand.id == profile.brandId
                         }
-                }
+                })
             else {
                 throw BrandCatalogError.missingRequiredProfile
             }
