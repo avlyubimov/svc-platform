@@ -1,40 +1,44 @@
 # LB-100 KiCad Project
 
-Status: `EVT-LAYOUT-AUTHORIZED`; controlled placement and first routing iteration exist
+Status: `EVT-FAB-REVIEW`; connectivity-complete six-layer Rev.1 EVT layout
 
-This directory contains the reviewed value-bearing LB-100 KiCad schematic and
-project-local symbol/footprint libraries.
+This directory contains the reviewed value-bearing LB-100 schematic,
+project-local libraries and deterministically generated PCB.
 
-The controlled `LB-100.kicad_pcb` contains all 104 value-bearing schematic
-footprints, four shared stack holes, four local mounting holes, the reviewed
-100 mm x 70 mm outline and functional placement zones. The deterministic route
-manifest currently contains 1,844 segments and 188 vias, leaving 63 source
-connections open before refill and 53 after refill with no shorts, crossings,
-copper-clearance or E73 keepout violations. Four GND-zone intents and the exact
-four-copper-layer antenna rule area are present. It is not a
-fabrication-ready board. Five non-assembly top-side pads provide E73 SWDIO,
-SWDCLK, reset, switched target reference and GND recovery access. ADR-0020
-authorizes continued routing. Signal-integrity and safety constraints in
-`../LB-100-pcb-layout-start-checklist.csv` must close during
-`EVT-FAB-REVIEW`. There are no manufacturing outputs; Gerbers, drills,
-pick-place files, BOM/CPL order packages and
-zipped manufacturing outputs remain blocked until `EVT-FAB-AUTHORIZED`.
+The controlled `LB-100.kicad_pcb` contains all 104 schematic footprints, eight mounting
+holes, the 100 mm x 70 mm outline, 2,274 routed segments, 409 standard
+0.50/0.30 mm through vias and four GND zones. KiCad 10.0.4 refill DRC reports
+zero errors and zero unconnected items; parity contains only H1-H8. Five
+non-assembly pads provide E73 SWDIO, SWDCLK, reset, switched target reference
+and GND recovery access.
 
-Validation: `python3 tools/validate_lb100_layout.py` checks deterministic
-generation, exact schematic parity, four-layer placement, the 104+8 footprint
-count, both pre/post-refill routing facts, VEML7700 Rev.1 disposition, E73 rule
-geometry and absence of unsafe copper/clearance/keepout collisions.
+The six-layer stack model is JLCPCB `JLC06161H-3313`. In2.Cu and In4.Cu are
+solid GND reference planes, In1.Cu and In3.Cu carry signals, and the E73 rule
+area covers every copper layer. The routing manifest is the source for board
+generation; do not hand-edit generated copper.
 
-## Source Documents
+Validation with KiCad 10.0.4:
 
-- `../LB-100-requirements.md`
-- `../LB-100-power-budget-precheck.md`
-- `../LB-100-schematic-freeze-checklist.md`
+```sh
+python3 tools/validate_lb100_layout.py
+```
+
+The validator checks deterministic generation, schematic parity, route/via
+counts, standard through-via construction, reference-plane exclusivity, USB
+geometry and analytical impedance regression, VEML7700 disposition, the
+six-layer E73 keepout and the exact reviewed non-electrical warning set.
+
+Any EVT fabrication package must remain LB-only, marked
+`LB-100 REV.1 EVT - NOT FOR PRODUCTION`, and must pass the supplier stackup,
+impedance and DFM preflight before payment. PB-100 and the combined three-board
+order remain `NO-GO`. Authorized LB manufacturing outputs are segregated under
+`../manufacturing/evt-rev1/`; no assembly outputs are authorized.
+
+## Source documents
+
+- `../LB-100-layout-progress.md`
+- `../LB-100-evt-fab-review-2026-07-22.md`
+- `../LB-100-e73-antenna-keepout.md`
 - `../LB-100-pcb-layout-start-checklist.csv`
-- `../LB-100-footprint-binding-inventory.csv`
-- `../LB-100-mechanical-envelope-inventory.csv`
-- `../LB-100-board-release-blocker-register.csv`
-- `../../../../production/board-order/three_board_footprint_binding_status.csv`
-- `../../../../production/board-order/three_board_mechanical_envelope_status.csv`
-- `../../../power-board/PB-100/PB-100-b2b-pin-map.csv`
+- `../../../../production/board-order/three_board_layout_rules.md`
 - `../../../../docs/adr/ADR-0014-lb-fb-baseline-requirements.md`

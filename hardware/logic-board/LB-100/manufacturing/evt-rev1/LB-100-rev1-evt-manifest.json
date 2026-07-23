@@ -1,0 +1,29 @@
+{
+  "archive_files": {
+    "LB-100-B_Cu.gbl": "10bf58d9ed5e6809dc34c62815703a9edcc153dc1eea6b2940b30ad32586827f",
+    "LB-100-B_Mask.gbs": "c3b53960c8ef0c6cea5526c7c307dade517449530117745450d625d92ee8dc73",
+    "LB-100-Edge_Cuts.gm1": "dd4c66ef6dc7520d909cae8e0af367dbeb274e1916d40e8f62ef246d1dec1903",
+    "LB-100-F_Cu.gtl": "a7d325c87508287a0127d0a295d62fac4f7756ab13f1fc36a9b825602e99cc69",
+    "LB-100-F_Mask.gts": "bfff02cdc6ff9f1b1fa2ad6e1eb81f9083fe60184023c97994fc8b4babc3899b",
+    "LB-100-In1_Cu.g1": "d5553b1bcdc3a4e6fe9dbb1e14ced78e6bb1219e6a011b558f15011d02e38436",
+    "LB-100-In2_Cu.g2": "19fff9c85c0dca47807a09745917c9a038a47f11dd96521a49036e7b90cd91ab",
+    "LB-100-In3_Cu.g3": "7335a55e416895d55ac12eb12b940bf457bdeef272e3fc60cc45363ee3fbad7a",
+    "LB-100-In4_Cu.g4": "cfa208cb2b0b17131c6a3acb3b2d8391c97fcc535ee0daf1f88b28eecb614ba4",
+    "LB-100-NPTH.drl": "7d06ea83d73cff5ff46b089209b67a8c248a0d9bae653a591d8e73ec4e0177c6",
+    "LB-100-PTH.drl": "a4a0540d6f4c69f5bd632176d7002ddc47128b4f2306f834b38d9d31ecc5c3f1",
+    "LB-100-b_silkscreen.gbo": "ec0e236391922cacfa35608afc927bafdfa284134f36d9afd3bbebd23a5c5fed",
+    "LB-100-f_silkscreen.gto": "40f4bace1f9009b70bf4d6d05e64db78ce3cb897c73eb50c5dbc609a85dedee6",
+    "LB-100-job.gbrjob": "4d8bddb6dab9f93ffd94e629a08b0e42bcca54ceb6ff341711795de20ff730fd",
+    "LB-100-rev1-evt-NOT-FOR-PRODUCTION.txt": "e4ea07435bf595a61cef697820be7951f251b8b244e3b318056fd0f62df581d1"
+  },
+  "board": "LB-100",
+  "kicad_cli": "10.0.4",
+  "published_files": {
+    "LB-100-drl-report.txt": "c529f20a7cf570f4c727c405170d97f64d5dff8fce4f29acfd271985025480ea",
+    "LB-100-rev1-evt-NOT-FOR-PRODUCTION.txt": "e4ea07435bf595a61cef697820be7951f251b8b244e3b318056fd0f62df581d1",
+    "LB-100-rev1-evt-gerber-drill.zip": "d5f7f9ca8964695a14c4a69efff589d7958e02efd1c69b7773cadd30b4417376"
+  },
+  "revision": "REV.1 EVT",
+  "scope": "five bare PCBs; not for production",
+  "stackup": "JLC06161H-3313"
+}

@@ -1,0 +1,13 @@
+LB-100 REV.1 EVT - NOT FOR PRODUCTION
+
+Release scope: five bare PCBs for bench bring-up and measurements only.
+Stack: JLCPCB JLC06161H-3313, 6 layers, 1.6 mm, ENIG.
+Copper: 1 oz outer, 0.5 oz inner per the selected stack construction.
+Drill: separate plated and non-plated Excellon files, millimetres.
+USB: request 90 ohm differential control; do not alter routing without review.
+
+Before payment, run supplier DFM and confirm the exact stack, 100 x 70 mm
+outline, all six copper layers, PTH/NPTH split and USB impedance request.
+Reject automatic layer reduction, drill substitution, rerouting or geometry
+changes. This archive is not a BOM/CPL, stencil, PCBA, PB-100, motorcycle or
+production release.
