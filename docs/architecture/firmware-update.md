@@ -6,10 +6,11 @@ GitHub and the phone transport release artifacts; they are not the root of
 device trust. Each target verifies its own candidate before installation.
 
 ```text
-GitHub draft/release
+GitHub Release (future, after target signing is ready)
   firmware-manifest.json
-  signed E73 image
-  signed STM32 image
+  E73 MCUboot-signed image
+  STM32 OEMiRoT-signed image
+  detached release signatures
             |
             | HTTPS, manifest/hash checks
             v
@@ -35,15 +36,55 @@ Every component identifies:
 - compatible hardware revisions;
 - required protocol version;
 - file name and byte length;
-- SHA-256 digest and detached signature;
+- SHA-256 digest;
+- native image format (`mcuboot-signed`, `oemirot-signed`, or
+  non-installable `review-raw`);
+- detached release-signature asset, size, SHA-256, algorithm, and key ID;
 - minimum bootloader version.
 
 The mobile parser rejects unknown schema versions, duplicate targets, path-like
 filenames, incompatible hardware, protocol mismatch, invalid size, wrong digest,
-invalid signature, or an insufficient bootloader. Dev fixtures may use explicit
-placeholder signatures. Release mode rejects every placeholder.
+invalid signature, an image that claims installability without the required
+native target format, or an insufficient bootloader. Dev fixtures may use
+explicit placeholder digests. Release validation rejects every placeholder.
 
 Production signing keys are never generated or stored in this repository.
+
+## Release workflow scaffold
+
+`.github/workflows/firmware-release.yml` is currently review-only. It never
+creates a GitHub Release and emits components with `installable=false` and
+`imageFormat=review-raw`. The allowlisted
+`.github/workflows/firmware-candidates.yml` producer remains intentionally
+absent until the E73 target build and STM32 OEMiRoT build produce genuine
+target images.
+
+Before signing, the workflow validates strict channel-specific SemVer and tag
+mapping:
+
+- stable: `0.1.0` -> `svc-v0.1.0`;
+- beta: `0.1.0-beta.1` -> `svc-v0.1.0-beta.1`;
+- dev/test: `0.1.0-test.1` -> `svc-v0.1.0-test.1`.
+
+The candidate run must be a successful same-repository run of the allowlisted
+workflow, must not originate from a fork, and its commit must be reachable from
+`master`. Both candidate files require GitHub artifact attestations tied to
+that workflow and source commit.
+
+The `sign-review` job uses the protected `firmware-production` environment.
+Only its signing step receives `OTA_PROD_SIGNING_KEY_B64` and
+`OTA_PROD_SIGNING_KEY_PASSWORD`. The encrypted RSA private key stays outside
+the repository. `OTA_PROD_PUBLIC_KEY_SHA256` is a non-secret protected
+environment variable used to pin the derived public-key identity. Signing uses
+detached RSA-PSS/SHA-256 signatures and immediately verifies each signature
+with the derived public key before packaging.
+
+Detached release signatures do not replace native target signing:
+
+- E73 installability requires an MCUboot-signed image;
+- STM32 installability requires an OEMiRoT-signed image;
+- a raw or host-only binary is a review payload and is never named
+  `signed.bin`.
 
 ## BLE transfer
 
@@ -138,6 +179,7 @@ The phone displays these reasons, but only the device authorizes installation.
 - A rollback never restores or rewrites user configuration.
 - Dangerous commands require an authenticated confirmed session.
 - CarPlay and Android Auto cannot request install.
+- Review packages cannot request install or BLE transfer.
 
 ## Source evidence
 
@@ -151,3 +193,9 @@ The phone displays these reasons, but only the device authorizes installation.
   https://www.st.com/en/microcontrollers-microprocessors/stm32h563ii.html
 - STM32H563 OEMiRoT:
   https://wiki.st.com/stm32mcu/wiki/Security:How_to_start_with_STM32CubeMX_OEMiRoT_Boot_path_on_STM32H563
+- GitHub Releases REST API:
+  https://docs.github.com/en/rest/releases/releases
+- GitHub artifact attestations:
+  https://docs.github.com/en/actions/concepts/security/artifact-attestations
+- GitHub Actions script-injection guidance:
+  https://docs.github.com/en/actions/concepts/security/script-injections

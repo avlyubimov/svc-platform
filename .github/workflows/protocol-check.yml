@@ -7,7 +7,10 @@ on:
       - "software/mobile/mock-data/**"
       - "tools/mobile_protocol_validation/**"
       - "tools/validate_mobile_protocol.py"
+      - "tools/validate_ota_release.py"
+      - "tools/sign_firmware_review.py"
       - "tools/package_firmware_release.py"
+      - ".github/workflows/*.yml"
       - ".github/workflows/protocol-check.yml"
   pull_request:
     paths:
@@ -15,15 +18,18 @@ on:
       - "software/mobile/mock-data/**"
       - "tools/mobile_protocol_validation/**"
       - "tools/validate_mobile_protocol.py"
+      - "tools/validate_ota_release.py"
+      - "tools/sign_firmware_review.py"
       - "tools/package_firmware_release.py"
+      - ".github/workflows/*.yml"
       - ".github/workflows/protocol-check.yml"
 
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.12"
           cache: pip

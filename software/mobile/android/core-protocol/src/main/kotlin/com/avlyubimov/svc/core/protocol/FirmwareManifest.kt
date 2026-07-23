@@ -8,6 +8,7 @@ import kotlinx.serialization.json.Json
 data class FirmwareManifest(
     val schemaVersion: Int,
     val releaseVersion: String,
+    val releaseTag: String,
     val channel: String,
     val minimumMobileVersion: String,
     val components: List<FirmwareComponent>,
@@ -30,9 +31,21 @@ data class FirmwareManifest(
         if (compareSemanticVersions(bootloaderVersion, component.minimumBootloader) < 0) {
             throw ManifestCompatibilityException("bootloader too old")
         }
+        if (!component.installable) {
+            throw ManifestCompatibilityException("review image is not installable")
+        }
         return component
     }
 }
+
+@Serializable
+data class FirmwareReleaseSignature(
+    val algorithm: String,
+    val file: String,
+    val size: Long,
+    val sha256: String,
+    val keyId: String,
+)
 
 @Serializable
 data class FirmwareComponent(
@@ -43,12 +56,14 @@ data class FirmwareComponent(
     val file: String,
     val size: Long,
     val sha256: String,
-    val signature: String,
+    val imageFormat: String,
+    val installable: Boolean,
+    val releaseSignature: FirmwareReleaseSignature,
     val minimumBootloader: String,
 )
 
 fun interface SignatureVerifier {
-    fun verify(component: FirmwareComponent, bytes: ByteArray): Boolean
+    fun verify(keyId: String, bytes: ByteArray, signature: ByteArray): Boolean
 }
 
 class FirmwareManifestParser(
@@ -57,6 +72,9 @@ class FirmwareManifestParser(
     fun parse(value: String): FirmwareManifest {
         val manifest = json.decodeFromString<FirmwareManifest>(value)
         require(manifest.schemaVersion == 1) { "unsupported schema" }
+        require(manifest.releaseTag == "svc-v${manifest.releaseVersion}") {
+            "release tag mismatch"
+        }
         require(manifest.components.isNotEmpty()) { "components are empty" }
         require(manifest.components.map { it.target }.distinct().size == manifest.components.size) {
             "duplicate target"
@@ -69,6 +87,19 @@ class FirmwareManifestParser(
                 "file must be a basename"
             }
             require(it.size >= 0) { "negative size" }
+            require(it.releaseSignature.algorithm == "rsa-pss-sha256") {
+                "unsupported release signature"
+            }
+            require(it.releaseSignature.size > 0) { "empty release signature" }
+            if (it.installable) {
+                val expectedFormat = when (it.target) {
+                    "e73-radio" -> "mcuboot-signed"
+                    else -> "oemirot-signed"
+                }
+                require(it.imageFormat == expectedFormat) {
+                    "installable image has the wrong native signature format"
+                }
+            }
         }
         return manifest
     }
@@ -77,6 +108,7 @@ class FirmwareManifestParser(
 fun validateArtifact(
     component: FirmwareComponent,
     bytes: ByteArray,
+    releaseSignature: ByteArray,
     signatureVerifier: SignatureVerifier,
 ) {
     require(component.size == bytes.size.toLong()) { "size mismatch" }
@@ -84,7 +116,22 @@ fun validateArtifact(
         .digest(bytes)
         .joinToString("") { "%02x".format(it) }
     require(component.sha256 == digest) { "SHA-256 mismatch" }
-    require(signatureVerifier.verify(component, bytes)) { "signature invalid" }
+    require(component.releaseSignature.size == releaseSignature.size.toLong()) {
+        "release signature size mismatch"
+    }
+    val signatureDigest = MessageDigest.getInstance("SHA-256")
+        .digest(releaseSignature)
+        .joinToString("") { "%02x".format(it) }
+    require(component.releaseSignature.sha256 == signatureDigest) {
+        "release signature SHA-256 mismatch"
+    }
+    require(
+        signatureVerifier.verify(
+            component.releaseSignature.keyId,
+            bytes,
+            releaseSignature,
+        )
+    ) { "signature invalid" }
 }
 
 class ManifestCompatibilityException(message: String) : IllegalArgumentException(message)

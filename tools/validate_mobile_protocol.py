@@ -4,7 +4,12 @@ import argparse
 import json
 from pathlib import Path
 
-from mobile_protocol_validation import load_firmware_manifest, load_telemetry
+from mobile_protocol_validation import (
+    load_firmware_manifest,
+    load_telemetry,
+    validate_all_action_pins,
+    validate_release_workflow,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 PROTOCOL = ROOT / "software" / "mobile" / "protocol"
@@ -37,6 +42,10 @@ def main() -> int:
     command_path = PROTOCOL / "examples" / "command-install-denied.json"
     load_telemetry(telemetry_path)
     load_firmware_manifest(args.manifest, release_mode=args.release)
+    validate_release_workflow(
+        ROOT / ".github" / "workflows" / "firmware-release.yml"
+    )
+    validate_all_action_pins(ROOT / ".github" / "workflows")
 
     try:
         from jsonschema import Draft202012Validator, FormatChecker

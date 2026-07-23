@@ -35,7 +35,8 @@ tests. The same command runs in GitHub Actions on push and pull request.
 Current host checks cover PB-100 schematic-planning artifacts, config/schema
 consistency, output safety, battery cutoff, CAN1 TX denial, event dispatch,
 role-based rules, PWM duty-cycle ownership, mobile protocol fixtures, resumable
-update transfer, OTA admission, trial boot, and rollback.
+update transfer, OTA admission, trial boot, rollback, release-input injection,
+candidate provenance, action pinning, and detached-signature verification.
 
 ## Repository structure
 

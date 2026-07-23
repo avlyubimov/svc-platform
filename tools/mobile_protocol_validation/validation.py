@@ -8,10 +8,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable
 
+from .ota_release import SIGNATURE_ALGORITHM, validate_tag_version_channel
+
 SEMVER_PATTERN = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?$")
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 HARDWARE_PATTERN = re.compile(r"^[A-Z0-9][A-Z0-9._-]{0,31}$")
 FILENAME_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+KEY_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 CHANNEL_IDS = tuple(f"OUT{index}" for index in range(1, 11))
 TARGETS = {"stm32-main", "e73-radio"}
 SOURCES = {
@@ -44,6 +47,15 @@ class ArtifactValidationError(ValueError):
 
 
 @dataclass(frozen=True)
+class ReleaseSignature:
+    algorithm: str
+    file: str
+    size: int
+    sha256: str
+    key_id: str
+
+
+@dataclass(frozen=True)
 class FirmwareComponent:
     target: str
     version: str
@@ -52,7 +64,9 @@ class FirmwareComponent:
     file: str
     size: int
     sha256: str
-    signature: str
+    image_format: str
+    installable: bool
+    release_signature: ReleaseSignature
     minimum_bootloader: str
 
 
@@ -60,6 +74,7 @@ class FirmwareComponent:
 class FirmwareManifest:
     schema_version: int
     release_version: str
+    release_tag: str
     channel: str
     minimum_mobile_version: str
     components: tuple[FirmwareComponent, ...]
@@ -85,6 +100,8 @@ class FirmwareManifest:
             raise CompatibilityError(
                 f"protocol mismatch: device={protocol_version}, manifest={component.protocol_version}"
             )
+        if not component.installable:
+            raise CompatibilityError(f"{target} review image is not installable")
         if _version_tuple(bootloader_version) < _version_tuple(
             component.minimum_bootloader
         ):
@@ -274,6 +291,7 @@ def load_firmware_manifest(path: Path, release_mode: bool = False) -> FirmwareMa
             {
                 "schemaVersion",
                 "releaseVersion",
+                "releaseTag",
                 "channel",
                 "minimumMobileVersion",
                 "components",
@@ -286,6 +304,11 @@ def load_firmware_manifest(path: Path, release_mode: bool = False) -> FirmwareMa
             raise ValueError("releaseVersion is not semantic version")
         if raw["channel"] not in {"dev", "beta", "stable"}:
             raise ValueError("unsupported release channel")
+        validate_tag_version_channel(
+            raw["releaseTag"],
+            raw["releaseVersion"],
+            raw["channel"],
+        )
         if not SEMVER_PATTERN.fullmatch(raw["minimumMobileVersion"]):
             raise ValueError("minimumMobileVersion is not semantic version")
         if not isinstance(raw["components"], list) or not raw["components"]:
@@ -305,7 +328,9 @@ def load_firmware_manifest(path: Path, release_mode: bool = False) -> FirmwareMa
                     "file",
                     "size",
                     "sha256",
-                    "signature",
+                    "imageFormat",
+                    "installable",
+                    "releaseSignature",
                     "minimumBootloader",
                 },
                 f"components[{index}]",
@@ -318,6 +343,8 @@ def load_firmware_manifest(path: Path, release_mode: bool = False) -> FirmwareMa
             targets.add(target)
             if not SEMVER_PATTERN.fullmatch(component["version"]):
                 raise ValueError(f"{target} version is invalid")
+            if component["version"] != raw["releaseVersion"]:
+                raise ValueError(f"{target} version does not match releaseVersion")
             hardware = component["hardware"]
             if (
                 not isinstance(hardware, list)
@@ -344,14 +371,59 @@ def load_firmware_manifest(path: Path, release_mode: bool = False) -> FirmwareMa
             digest = component["sha256"]
             if digest != "placeholder" and not SHA256_PATTERN.fullmatch(digest):
                 raise ValueError(f"{target} sha256 is invalid")
-            signature = component["signature"]
-            if not isinstance(signature, str) or not signature:
-                raise ValueError(f"{target} signature is missing")
+            image_format = component["imageFormat"]
+            if image_format not in {
+                "review-raw",
+                "mcuboot-signed",
+                "oemirot-signed",
+            }:
+                raise ValueError(f"{target} imageFormat is invalid")
+            installable = component["installable"]
+            if not isinstance(installable, bool):
+                raise ValueError(f"{target} installable must be boolean")
+            expected_native_format = {
+                "e73-radio": "mcuboot-signed",
+                "stm32-main": "oemirot-signed",
+            }[target]
+            if installable and image_format != expected_native_format:
+                raise ValueError(
+                    f"{target} is installable without {expected_native_format}"
+                )
+            if image_format == "review-raw" and installable:
+                raise ValueError(f"{target} review image cannot be installable")
+
+            raw_signature = _require_object(
+                component["releaseSignature"],
+                f"{target}.releaseSignature",
+            )
+            _require_keys(
+                raw_signature,
+                {"algorithm", "file", "size", "sha256", "keyId"},
+                f"{target}.releaseSignature",
+            )
+            if raw_signature["algorithm"] != SIGNATURE_ALGORITHM:
+                raise ValueError(f"{target} release signature algorithm is invalid")
+            signature_file = raw_signature["file"]
+            if (
+                not isinstance(signature_file, str)
+                or not FILENAME_PATTERN.fullmatch(signature_file)
+                or signature_file == filename
+            ):
+                raise ValueError(f"{target} release signature file is invalid")
+            signature_size = raw_signature["size"]
+            if not isinstance(signature_size, int) or signature_size <= 0:
+                raise ValueError(f"{target} release signature size is invalid")
+            signature_digest = raw_signature["sha256"]
+            if (
+                signature_digest != "placeholder"
+                and not SHA256_PATTERN.fullmatch(signature_digest)
+            ):
+                raise ValueError(f"{target} release signature sha256 is invalid")
+            key_id = raw_signature["keyId"]
+            if not isinstance(key_id, str) or not KEY_ID_PATTERN.fullmatch(key_id):
+                raise ValueError(f"{target} release signature keyId is invalid")
             if release_mode and (
-                digest == "placeholder"
-                or "NOT-FOR-PRODUCTION" in signature
-                or "SIGNATURE-DISABLED" in signature
-                or "placeholder" in signature.lower()
+                digest == "placeholder" or signature_digest == "placeholder"
             ):
                 raise ValueError(f"{target} contains a test placeholder")
             if not SEMVER_PATTERN.fullmatch(component["minimumBootloader"]):
@@ -365,13 +437,22 @@ def load_firmware_manifest(path: Path, release_mode: bool = False) -> FirmwareMa
                     file=filename,
                     size=size,
                     sha256=digest,
-                    signature=signature,
+                    image_format=image_format,
+                    installable=installable,
+                    release_signature=ReleaseSignature(
+                        algorithm=raw_signature["algorithm"],
+                        file=signature_file,
+                        size=signature_size,
+                        sha256=signature_digest,
+                        key_id=key_id,
+                    ),
                     minimum_bootloader=component["minimumBootloader"],
                 )
             )
         return FirmwareManifest(
             schema_version=raw["schemaVersion"],
             release_version=raw["releaseVersion"],
+            release_tag=raw["releaseTag"],
             channel=raw["channel"],
             minimum_mobile_version=raw["minimumMobileVersion"],
             components=tuple(components),
@@ -383,7 +464,8 @@ def load_firmware_manifest(path: Path, release_mode: bool = False) -> FirmwareMa
 def validate_artifact(
     component: FirmwareComponent,
     data: bytes,
-    verify_signature: Callable[[FirmwareComponent, bytes], bool],
+    release_signature: bytes,
+    verify_signature: Callable[[FirmwareComponent, bytes, bytes], bool],
 ) -> None:
     if component.size != len(data):
         raise ArtifactValidationError(
@@ -394,5 +476,16 @@ def validate_artifact(
         raise ArtifactValidationError(
             f"SHA-256 mismatch: manifest={component.sha256}, actual={digest}"
         )
-    if not verify_signature(component, data):
+    if component.release_signature.size != len(release_signature):
+        raise ArtifactValidationError(
+            "release signature size mismatch: "
+            f"manifest={component.release_signature.size}, actual={len(release_signature)}"
+        )
+    signature_digest = hashlib.sha256(release_signature).hexdigest()
+    if component.release_signature.sha256 != signature_digest:
+        raise ArtifactValidationError(
+            "release signature SHA-256 mismatch: "
+            f"manifest={component.release_signature.sha256}, actual={signature_digest}"
+        )
+    if not verify_signature(component, data, release_signature):
         raise ArtifactValidationError("signature invalid")

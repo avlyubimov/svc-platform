@@ -1,14 +1,14 @@
-name: Firmware Draft Release
+name: Firmware Review Package
 
 on:
   workflow_dispatch:
     inputs:
       artifact_run_id:
-        description: Run containing a manually reviewed firmware-candidates artifact
+        description: Successful allowlisted firmware-candidate workflow run
         required: true
         type: string
       release_version:
-        description: Semantic release version
+        description: Strict channel-compatible semantic version
         required: true
         type: string
       channel:
@@ -20,98 +20,143 @@ on:
           - dev
           - beta
           - stable
-      publish_draft:
-        description: Create a draft GitHub Release
-        required: true
-        default: false
-        type: boolean
 
 permissions:
-  actions: read
   contents: write
+  actions: read
+  id-token: write
+  attestations: write
 
 jobs:
-  package:
+  validate-candidate:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ github.token }}
-      SVC_PRODUCTION_SIGNING_KEY: ${{ secrets.SVC_PRODUCTION_SIGNING_KEY }}
+    outputs:
+      artifact_run_id: ${{ steps.release-inputs.outputs.artifact_run_id }}
+      release_version: ${{ steps.release-inputs.outputs.release_version }}
+      release_tag: ${{ steps.release-inputs.outputs.release_tag }}
+      channel: ${{ steps.release-inputs.outputs.channel }}
+      head_sha: ${{ steps.candidate-run.outputs.head_sha }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.12"
-      - name: Install schema validator
+      - name: Install release validators
         run: pip install -r tools/mobile_protocol_validation/requirements.txt
-      - name: Download manually selected candidates
+      - name: Validate workflow-dispatch inputs
+        id: release-inputs
+        env:
+          INPUT_RELEASE_VERSION: ${{ inputs.release_version }}
+          INPUT_ARTIFACT_RUN_ID: ${{ inputs.artifact_run_id }}
+          INPUT_CHANNEL: ${{ inputs.channel }}
         run: |
-          gh run download "${{ inputs.artifact_run_id }}" \
+          python3 tools/validate_ota_release.py inputs \
+            --release-version "$INPUT_RELEASE_VERSION" \
+            --artifact-run-id "$INPUT_ARTIFACT_RUN_ID" \
+            --channel "$INPUT_CHANNEL" \
+            --github-output "$GITHUB_OUTPUT"
+      - name: Validate candidate run identity
+        id: candidate-run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_ARTIFACT_RUN_ID: ${{ steps.release-inputs.outputs.artifact_run_id }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+        run: |
+          gh api \
+            "/repos/$EXPECTED_REPOSITORY/actions/runs/$INPUT_ARTIFACT_RUN_ID" \
+            > "$RUNNER_TEMP/candidate-run.json"
+          python3 tools/validate_ota_release.py candidate \
+            --metadata "$RUNNER_TEMP/candidate-run.json" \
+            --artifact-run-id "$INPUT_ARTIFACT_RUN_ID" \
+            --repository "$EXPECTED_REPOSITORY" \
+            --github-output "$GITHUB_OUTPUT"
+      - name: Require candidate commit on master history
+        env:
+          CANDIDATE_HEAD_SHA: ${{ steps.candidate-run.outputs.head_sha }}
+        run: |
+          git fetch --no-tags origin master:refs/remotes/origin/master
+          git merge-base --is-ancestor \
+            "$CANDIDATE_HEAD_SHA" \
+            refs/remotes/origin/master
+      - name: Download allowlisted candidate artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_ARTIFACT_RUN_ID: ${{ steps.release-inputs.outputs.artifact_run_id }}
+        run: |
+          gh run download "$INPUT_ARTIFACT_RUN_ID" \
             --name firmware-candidates \
             --dir incoming
-          test -f incoming/stm32-main.signed.bin
-          test -f incoming/e73-radio.signed.bin
-      - name: Require production secret before publication
-        if: ${{ inputs.publish_draft }}
+          test -f incoming/stm32-main.bin
+          test -f incoming/e73-radio.bin
+          test "$(find incoming -type f | wc -l)" -eq 2
+          test -z "$(find incoming -type f -name '*.signed.bin' -print -quit)"
+      - name: Verify candidate artifact attestations
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_HEAD_SHA: ${{ steps.candidate-run.outputs.head_sha }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
         run: |
-          test -n "$SVC_PRODUCTION_SIGNING_KEY" || {
-            echo "Draft publication requires SVC_PRODUCTION_SIGNING_KEY."
-            exit 1
-          }
-      - name: Sign candidates
-        if: ${{ env.SVC_PRODUCTION_SIGNING_KEY != '' }}
+          for candidate in incoming/stm32-main.bin incoming/e73-radio.bin; do
+            gh attestation verify "$candidate" \
+              --repo "$EXPECTED_REPOSITORY" \
+              --signer-workflow "$EXPECTED_REPOSITORY/.github/workflows/firmware-candidates.yml" \
+              --source-digest "$CANDIDATE_HEAD_SHA" \
+              --deny-self-hosted-runners
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: verified-firmware-candidates
+          path: incoming/
+          if-no-files-found: error
+          retention-days: 1
+
+  sign-review:
+    needs: validate-candidate
+    runs-on: ubuntu-latest
+    environment: firmware-production
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: verified-firmware-candidates
+          path: incoming
+      - name: Install release validators
+        run: pip install -r tools/mobile_protocol_validation/requirements.txt
+      - name: Create and verify detached review signatures
+        env:
+          OTA_PROD_SIGNING_KEY_B64: ${{ secrets.OTA_PROD_SIGNING_KEY_B64 }}
+          OTA_PROD_SIGNING_KEY_PASSWORD: ${{ secrets.OTA_PROD_SIGNING_KEY_PASSWORD }}
+          OTA_PROD_PUBLIC_KEY_SHA256: ${{ vars.OTA_PROD_PUBLIC_KEY_SHA256 }}
+          RELEASE_VERSION: ${{ needs.validate-candidate.outputs.release_version }}
+          RELEASE_CHANNEL: ${{ needs.validate-candidate.outputs.channel }}
         run: |
-          mkdir -p signatures
-          printf '%s' "$SVC_PRODUCTION_SIGNING_KEY" > "$RUNNER_TEMP/svc-signing-key.pem"
-          chmod 600 "$RUNNER_TEMP/svc-signing-key.pem"
-          openssl dgst -sha256 \
-            -sign "$RUNNER_TEMP/svc-signing-key.pem" \
-            -out signatures/stm32-main.sig \
-            incoming/stm32-main.signed.bin
-          openssl dgst -sha256 \
-            -sign "$RUNNER_TEMP/svc-signing-key.pem" \
-            -out signatures/e73-radio.sig \
-            incoming/e73-radio.signed.bin
-          rm -f "$RUNNER_TEMP/svc-signing-key.pem"
-      - name: Package signed release
-        if: ${{ env.SVC_PRODUCTION_SIGNING_KEY != '' }}
-        run: |
-          python3 tools/package_firmware_release.py \
-            --release-version "${{ inputs.release_version }}" \
-            --channel "${{ inputs.channel }}" \
-            --stm32 incoming/stm32-main.signed.bin \
-            --e73 incoming/e73-radio.signed.bin \
-            --signature-directory signatures \
+          python3 tools/sign_firmware_review.py \
+            --release-version "$RELEASE_VERSION" \
+            --channel "$RELEASE_CHANNEL" \
+            --stm32 incoming/stm32-main.bin \
+            --e73 incoming/e73-radio.bin \
+            --expected-public-key-sha256 "$OTA_PROD_PUBLIC_KEY_SHA256" \
             --output dist/firmware
-      - name: Package unsigned review artifacts
-        if: ${{ env.SVC_PRODUCTION_SIGNING_KEY == '' }}
-        run: |
-          python3 tools/package_firmware_release.py \
-            --release-version "${{ inputs.release_version }}" \
-            --channel "${{ inputs.channel }}" \
-            --stm32 incoming/stm32-main.signed.bin \
-            --e73 incoming/e73-radio.signed.bin \
-            --output dist/firmware
-      - name: Validate manifest and SHA-256
-        run: |
-          python3 tools/validate_mobile_protocol.py \
-            --manifest dist/firmware/firmware-manifest.json
-          (cd dist/firmware && sha256sum --check SHA256SUMS)
-      - name: Validate publication signatures
-        if: ${{ inputs.publish_draft }}
+      - name: Validate review package
         run: |
           python3 tools/validate_mobile_protocol.py \
             --release \
             --manifest dist/firmware/firmware-manifest.json
-      - uses: actions/upload-artifact@v4
+          (cd dist/firmware && sha256sum --check SHA256SUMS)
+      - name: Attest review package
+        uses: actions/attest-build-provenance@43d14bc2b83dec42d39ecae14e916627a18bb661 # v3
         with:
-          name: firmware-release-${{ inputs.release_version }}
+          subject-path: dist/firmware/*
+          show-summary: false
+      - name: Upload non-installable review package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: firmware-review-${{ needs.validate-candidate.outputs.release_tag }}
           path: dist/firmware/
-      - name: Create manual draft release
-        if: ${{ inputs.publish_draft }}
-        run: |
-          gh release create "v${{ inputs.release_version }}" \
-            dist/firmware/* \
-            --draft \
-            --target "${{ github.sha }}" \
-            --title "SVC ${{ inputs.release_version }}" \
-            --notes "Manual draft. Hardware validation and Product Owner approval remain required."
+          if-no-files-found: error
+          retention-days: 7

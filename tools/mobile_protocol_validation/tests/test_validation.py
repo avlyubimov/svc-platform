@@ -75,6 +75,11 @@ class ValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(CompatibilityError, "hardware mismatch"):
             manifest.component_for("stm32-main", "LB-100-REV2", 1, "0.1.0")
 
+    def test_rejects_non_installable_review_component(self) -> None:
+        manifest = load_firmware_manifest(MANIFEST)
+        with self.assertRaisesRegex(CompatibilityError, "not installable"):
+            manifest.component_for("stm32-main", "LB-100-REV1", 1, "0.1.0")
+
     def test_rejects_duplicate_component_target(self) -> None:
         raw = json.loads(MANIFEST.read_text())
         raw["components"][1]["target"] = "stm32-main"
@@ -90,33 +95,60 @@ class ValidationTests(unittest.TestCase):
         data = b"signed candidate"
         raw["components"][0]["size"] = len(data)
         raw["components"][0]["sha256"] = "0" * 64
+        signature = b"test signature"
+        raw["components"][0]["releaseSignature"]["size"] = len(signature)
+        raw["components"][0]["releaseSignature"]["sha256"] = hashlib.sha256(
+            signature
+        ).hexdigest()
         manifest = load_firmware_manifest(self.write_json(raw))
         component = manifest.components[0]
         with self.assertRaisesRegex(ArtifactValidationError, "SHA-256 mismatch"):
-            validate_artifact(component, data, lambda _component, _data: True)
+            validate_artifact(
+                component,
+                data,
+                signature,
+                lambda _component, _data, _signature: True,
+            )
 
     def test_rejects_invalid_signature(self) -> None:
         raw = json.loads(MANIFEST.read_text())
         data = b"signed candidate"
         raw["components"][0]["size"] = len(data)
         raw["components"][0]["sha256"] = hashlib.sha256(data).hexdigest()
+        signature = b"test signature"
+        raw["components"][0]["releaseSignature"]["size"] = len(signature)
+        raw["components"][0]["releaseSignature"]["sha256"] = hashlib.sha256(
+            signature
+        ).hexdigest()
         manifest = load_firmware_manifest(self.write_json(raw))
         component = manifest.components[0]
         with self.assertRaisesRegex(ArtifactValidationError, "signature invalid"):
-            validate_artifact(component, data, lambda _component, _data: False)
+            validate_artifact(
+                component,
+                data,
+                signature,
+                lambda _component, _data, _signature: False,
+            )
 
     def test_accepts_valid_artifact_with_injected_verifier(self) -> None:
         raw = copy.deepcopy(json.loads(MANIFEST.read_text()))
         data = b"signed candidate"
         raw["components"][0]["size"] = len(data)
         raw["components"][0]["sha256"] = hashlib.sha256(data).hexdigest()
+        signature = b"test signature"
+        raw["components"][0]["releaseSignature"]["size"] = len(signature)
+        raw["components"][0]["releaseSignature"]["sha256"] = hashlib.sha256(
+            signature
+        ).hexdigest()
         manifest = load_firmware_manifest(self.write_json(raw))
         validate_artifact(
             manifest.components[0],
             data,
-            lambda component, candidate: (
-                component.signature == "TEST-SIGNATURE-NOT-FOR-PRODUCTION"
+            signature,
+            lambda component, candidate, detached_signature: (
+                component.release_signature.key_id == "TEST_KEY_NOT_FOR_PRODUCTION"
                 and candidate == data
+                and detached_signature == signature
             ),
         )
 

@@ -1,29 +1,46 @@
 {
   "schemaVersion": 1,
-  "releaseVersion": "0.1.0",
+  "releaseVersion": "0.1.0-test.1",
+  "releaseTag": "svc-v0.1.0-test.1",
   "channel": "dev",
   "minimumMobileVersion": "0.1.0",
   "components": [
     {
       "target": "stm32-main",
-      "version": "0.1.0",
+      "version": "0.1.0-test.1",
       "hardware": ["LB-100-REV1"],
       "protocolVersion": 1,
-      "file": "svc-stm32-main-0.1.0.signed.bin",
+      "file": "svc-stm32-main-0.1.0-test.1.review.bin",
       "size": 0,
       "sha256": "placeholder",
-      "signature": "TEST-SIGNATURE-NOT-FOR-PRODUCTION",
+      "imageFormat": "review-raw",
+      "installable": false,
+      "releaseSignature": {
+        "algorithm": "rsa-pss-sha256",
+        "file": "svc-stm32-main-0.1.0-test.1.review.bin.release.sig",
+        "size": 384,
+        "sha256": "placeholder",
+        "keyId": "TEST_KEY_NOT_FOR_PRODUCTION"
+      },
       "minimumBootloader": "0.1.0"
     },
     {
       "target": "e73-radio",
-      "version": "0.1.0",
+      "version": "0.1.0-test.1",
       "hardware": ["LB-100-REV1"],
       "protocolVersion": 1,
-      "file": "svc-e73-radio-0.1.0.signed.bin",
+      "file": "svc-e73-radio-0.1.0-test.1.review.bin",
       "size": 0,
       "sha256": "placeholder",
-      "signature": "TEST-SIGNATURE-NOT-FOR-PRODUCTION",
+      "imageFormat": "review-raw",
+      "installable": false,
+      "releaseSignature": {
+        "algorithm": "rsa-pss-sha256",
+        "file": "svc-e73-radio-0.1.0-test.1.review.bin.release.sig",
+        "size": 384,
+        "sha256": "placeholder",
+        "keyId": "TEST_KEY_NOT_FOR_PRODUCTION"
+      },
       "minimumBootloader": "0.1.0"
     }
   ]

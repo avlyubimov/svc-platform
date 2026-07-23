@@ -8,6 +8,20 @@ from .validation import (
     load_telemetry,
     validate_artifact,
 )
+from .ota_release import (
+    ALLOWED_CANDIDATE_WORKFLOW,
+    OTAReleaseError,
+    load_private_key_from_environment,
+    public_key_fingerprint,
+    require_expected_public_key_fingerprint,
+    sign_detached,
+    validate_all_action_pins,
+    validate_candidate_run_metadata,
+    validate_release_inputs,
+    validate_release_workflow,
+    validate_tag_version_channel,
+    verify_detached,
+)
 
 __all__ = [
     "ArtifactValidationError",
@@ -18,4 +32,16 @@ __all__ = [
     "load_firmware_manifest",
     "load_telemetry",
     "validate_artifact",
+    "ALLOWED_CANDIDATE_WORKFLOW",
+    "OTAReleaseError",
+    "load_private_key_from_environment",
+    "public_key_fingerprint",
+    "require_expected_public_key_fingerprint",
+    "sign_detached",
+    "validate_all_action_pins",
+    "validate_candidate_run_metadata",
+    "validate_release_inputs",
+    "validate_release_workflow",
+    "validate_tag_version_channel",
+    "verify_detached",
 ]
