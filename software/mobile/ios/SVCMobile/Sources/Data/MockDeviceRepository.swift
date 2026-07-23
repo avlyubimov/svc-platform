@@ -110,7 +110,7 @@ final class MockDeviceRepository: DeviceRepository {
             versions: FirmwareVersions(
                 stm32: unavailableString,
                 e73: unavailableString,
-                protocol: unavailableString
+                protocolVersion: unavailableString
             ),
             warnings: []
         )

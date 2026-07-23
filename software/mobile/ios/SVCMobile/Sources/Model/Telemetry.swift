@@ -82,7 +82,13 @@ struct StorageStatus: Codable, Equatable {
 struct FirmwareVersions: Codable, Equatable {
     let stm32: Measurement<String>
     let e73: Measurement<String>
-    let protocol: Measurement<String>
+    let protocolVersion: Measurement<String>
+
+    enum CodingKeys: String, CodingKey {
+        case stm32
+        case e73
+        case protocolVersion = "protocol"
+    }
 }
 
 struct DeviceWarning: Codable, Equatable, Identifiable {
