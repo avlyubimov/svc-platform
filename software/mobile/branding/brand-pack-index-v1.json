@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "defaultProfileId": "bmw-r1200gs-k25-personal",
+  "fallbackProfileId": "generic-automotive",
+  "profiles": [
+    {
+      "id": "bmw-r1200gs-k25-personal",
+      "configuration": "bmw-r1200gs-k25-personal.json"
+    },
+    {
+      "id": "generic-automotive",
+      "configuration": "generic-automotive.json"
+    }
+  ]
+}

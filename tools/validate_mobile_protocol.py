@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from mobile_protocol_validation import (
+    load_brand_catalog,
     load_firmware_manifest,
     load_telemetry,
     validate_all_action_pins,
@@ -78,7 +79,11 @@ def main() -> int:
         brand_schema = json.loads(
             (BRANDING / "brand-pack-v1.schema.json").read_text()
         )
+        brand_index_schema = json.loads(
+            (BRANDING / "brand-pack-index-v1.schema.json").read_text()
+        )
         Draft202012Validator.check_schema(brand_schema)
+        Draft202012Validator.check_schema(brand_index_schema)
         brand_validator = Draft202012Validator(brand_schema)
         for brand_path in (
             BRANDING / "bmw-r1200gs-k25-personal.json",
@@ -87,9 +92,18 @@ def main() -> int:
             errors = list(brand_validator.iter_errors(json.loads(brand_path.read_text())))
             if errors:
                 raise SystemExit(f"{brand_path}: {errors[0].message}")
+        index_path = BRANDING / "brand-pack-index-v1.json"
+        index_errors = list(
+            Draft202012Validator(brand_index_schema).iter_errors(
+                json.loads(index_path.read_text())
+            )
+        )
+        if index_errors:
+            raise SystemExit(f"{index_path}: {index_errors[0].message}")
 
     from mobile_protocol_validation import load_startup_timeline
 
+    load_brand_catalog(BRANDING)
     load_startup_timeline(BRANDING / "startup-animation-v1.json")
 
     print("mobile protocol validation passed")

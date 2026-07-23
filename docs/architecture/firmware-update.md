@@ -79,6 +79,14 @@ environment variable used to pin the derived public-key identity. Signing uses
 detached RSA-PSS/SHA-256 signatures and immediately verifies each signature
 with the derived public key before packaging.
 
+The workflow grants no top-level token permissions. Candidate validation gets
+only `actions: read`, `attestations: read`, and `contents: read`; protected
+review signing adds only `id-token: write` and `attestations: write`. The
+signing job is hard-blocked unless `github.ref == 'refs/heads/master'`.
+Repository settings must keep
+`firmware-production` on a custom deployment-branch policy that allows only
+`master`.
+
 Detached release signatures do not replace native target signing:
 
 - E73 installability requires an MCUboot-signed image;

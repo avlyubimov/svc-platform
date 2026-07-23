@@ -17,23 +17,32 @@ projected-display action controls a physical power channel.
 
 ## Startup and personal branding
 
-The phone apps use the common 2100 ms startup contract in
-`branding/startup-animation-v1.json`. The default personal profile is
-`bmw-r1200gs-k25-personal` with theme `svc-boxer-blue`. It restores the last
-available primary screen and falls back to Dashboard for first launch or an
-unknown stored destination.
+The phone apps load the common profile catalog from
+`branding/brand-pack-index-v1.json` and the 2100 ms startup contract from
+`branding/startup-animation-v1.json` at runtime. Brand text, color, asset paths,
+profile choices, and phase timing are not duplicated in Swift or Kotlin. The
+default personal profile is `bmw-r1200gs-k25-personal` with theme
+`svc-boxer-blue`. It restores the last available primary screen and falls back
+to Dashboard for first launch or an unknown stored destination.
 
 Owner-provided BMW resources are never downloaded or committed:
 
 ```text
-software/mobile/branding/local/bmw-roundel.svg
-software/mobile/branding/local/bmw-motorrad-wordmark.svg
+software/mobile/branding/local/bmw-r1200gs-k25-personal/logo.svg
+software/mobile/branding/local/bmw-r1200gs-k25-personal/wordmark.svg
 ```
 
-Both files are required for BMW presentation. If either is absent, the apps
-show the SVC mark, `SMART VEHICLE CONTROLLER`, and
+`logo.svg` is required for BMW presentation; `wordmark.svg` is optional and
+falls back to the configured `BMW MOTORRAD` text. If the logo is absent, the
+apps show the committed SVC mark, `SMART VEHICLE CONTROLLER`, and
 `ENGINEERED FOR THE RIDE`. Preview the result from
 `Settings → Appearance → Preview Startup Animation`.
+
+The public application identity is always SVC. The phone launcher, App
+Store/Google Play package, CarPlay, and Android Auto use the committed SVC app
+icon sourced from `branding/svc/app-icon.svg`. Manufacturer assets appear only
+inside the selected post-launch profile animation. The OS launch surface stays
+neutral black and never presents BMW branding.
 
 Profile/theme loading, mock BLE restoration, telemetry refresh, and screen
 restoration start in parallel. The animation never waits for BLE; Dashboard

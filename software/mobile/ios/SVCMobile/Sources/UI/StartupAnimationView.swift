@@ -3,6 +3,7 @@ import WebKit
 
 struct StartupAnimationView: View {
     let brandPack: BrandPack
+    let timeline: StartupTimeline
     let animationEnabled: Bool
     let reduceMotion: Bool
     let critical: Bool
@@ -13,7 +14,7 @@ struct StartupAnimationView: View {
     @State private var startedAt = Date()
 
     private var duration: TimeInterval {
-        StartupTiming.durationSeconds(
+        timeline.durationSeconds(
             animationEnabled: animationEnabled,
             reduceMotion: reduceMotion || systemReduceMotion,
             critical: critical
@@ -26,7 +27,11 @@ struct StartupAnimationView: View {
             let progress = animationEnabled
                 ? min(max(elapsed / duration, 0), 1)
                 : 1
-            StartupVisual(brandPack: brandPack, progress: progress)
+            StartupVisual(
+                brandPack: brandPack,
+                timeline: timeline,
+                progress: progress
+            )
         }
         .ignoresSafeArea()
         .id(replayToken)
@@ -44,12 +49,25 @@ struct StartupAnimationView: View {
 
 private struct StartupVisual: View {
     let brandPack: BrandPack
+    let timeline: StartupTimeline
     let progress: Double
 
-    private var logoPhase: Double { phase(progress, 0.12, 0.33) }
-    private var identityPhase: Double { phase(progress, 0.33, 0.57) }
-    private var taglinePhase: Double { phase(progress, 0.57, 0.76) }
-    private var transitionPhase: Double { phase(progress, 0.76, 1) }
+    private var screenOnEnd: Double {
+        timeline.progress(milliseconds: timeline.phases.screenOnEndMs)
+    }
+    private var logoEnd: Double {
+        timeline.progress(milliseconds: timeline.phases.logoEndMs)
+    }
+    private var identityEnd: Double {
+        timeline.progress(milliseconds: timeline.phases.identityEndMs)
+    }
+    private var taglineEnd: Double {
+        timeline.progress(milliseconds: timeline.phases.taglineEndMs)
+    }
+    private var logoPhase: Double { phase(progress, screenOnEnd, logoEnd) }
+    private var identityPhase: Double { phase(progress, logoEnd, identityEnd) }
+    private var taglinePhase: Double { phase(progress, identityEnd, taglineEnd) }
+    private var transitionPhase: Double { phase(progress, taglineEnd, 1) }
 
     var body: some View {
         ZStack {
@@ -61,7 +79,7 @@ private struct StartupVisual: View {
                 startRadius: 0,
                 endRadius: 220
             )
-            .opacity(phase(progress, 0, 0.16) * (1 - transitionPhase))
+            .opacity(phase(progress, 0, screenOnEnd) * (1 - transitionPhase))
 
             VStack(spacing: 15) {
                 BrandLogoView(brandPack: brandPack)
@@ -80,8 +98,8 @@ private struct StartupVisual: View {
                             )
                             .rotationEffect(.degrees(-30))
                             .opacity(
-                                phase(progress, 0.20, 0.24)
-                                    * (1 - phase(progress, 0.24, 0.29))
+                                phase(logoPhase, 0.38, 0.48)
+                                    * (1 - phase(logoPhase, 0.48, 0.72))
                             )
                     }
 

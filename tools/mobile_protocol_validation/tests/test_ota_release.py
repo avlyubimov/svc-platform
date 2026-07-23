@@ -227,6 +227,39 @@ class OTAReleaseTests(unittest.TestCase):
         with self.assertRaisesRegex(OTAReleaseError, "environment"):
             validate_release_workflow(temporary_path)
 
+    def test_release_workflow_rejects_broad_permissions(self) -> None:
+        broad_permissions = RELEASE_WORKFLOW.read_text().replace(
+            "permissions: {}\n",
+            "permissions:\n  contents: write\n",
+            1,
+        )
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            suffix=".yml",
+            delete=False,
+        ) as temporary:
+            temporary.write(broad_permissions)
+            temporary_path = Path(temporary.name)
+        self.addCleanup(temporary_path.unlink)
+        with self.assertRaisesRegex(OTAReleaseError, "top-level permissions"):
+            validate_release_workflow(temporary_path)
+
+    def test_release_workflow_requires_master_signing_guard(self) -> None:
+        without_master_guard = RELEASE_WORKFLOW.read_text().replace(
+            "    if: github.ref == 'refs/heads/master'\n",
+            "",
+        )
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            suffix=".yml",
+            delete=False,
+        ) as temporary:
+            temporary.write(without_master_guard)
+            temporary_path = Path(temporary.name)
+        self.addCleanup(temporary_path.unlink)
+        with self.assertRaisesRegex(OTAReleaseError, "restricted to master"):
+            validate_release_workflow(temporary_path)
+
     def test_no_private_key_is_committed(self) -> None:
         private_key_marker = "BEGIN " + "PRIVATE KEY"
         for path in ROOT.rglob("*"):

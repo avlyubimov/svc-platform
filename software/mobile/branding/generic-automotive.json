@@ -1,15 +1,19 @@
 {
   "schemaVersion": 1,
   "id": "generic-automotive",
+  "displayName": "Generic Automotive",
   "theme": "svc-boxer-blue",
   "manufacturer": "SVC",
   "model": "Smart Vehicle Controller",
   "generation": "Generic Automotive",
   "year": 2026,
-  "brandLogo": "svc",
   "manufacturerWordmark": "SMART VEHICLE CONTROLLER",
   "vehicleModel": "SVC",
   "vehicleGeneration": "GENERIC AUTOMOTIVE",
   "brandTagline": "ENGINEERED FOR THE RIDE",
-  "accentColor": "#1C69D4"
+  "accentColor": "#1C69D4",
+  "assets": {
+    "logo": "svc/logo.svg",
+    "wordmark": "svc/wordmark.svg"
+  }
 }

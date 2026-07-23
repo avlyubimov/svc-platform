@@ -10,17 +10,16 @@ struct SettingsView: View {
         Form {
             Section("Appearance") {
                 Picker("Vehicle profile", selection: $appearance.profileId) {
-                    Text("BMW R1200GS K25 · 2007")
-                        .tag("bmw-r1200gs-k25-personal")
-                    Text("Generic Automotive")
-                        .tag("generic-automotive")
+                    ForEach(appearance.availableProfiles) { profile in
+                        Text(profile.displayName)
+                            .tag(profile.id)
+                    }
                 }
                 Toggle("Startup animation", isOn: $appearance.animationEnabled)
                 Toggle("Reduce Motion preview", isOn: $appearance.forceReduceMotion)
                 Button("Preview Startup Animation", action: previewStartup)
-                if appearance.brandPack.id == "generic-automotive",
-                   appearance.profileId == "bmw-r1200gs-k25-personal" {
-                    Text("BMW assets are absent. SVC fallback branding is active.")
+                if appearance.brandPack.usesFallback {
+                    Text("Selected manufacturer logo is absent. SVC fallback branding is active.")
                         .font(.footnote)
                         .foregroundStyle(SVCTheme.secondaryText)
                 }

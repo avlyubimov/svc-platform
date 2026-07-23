@@ -1,7 +1,10 @@
 from .branding import (
+    BrandCatalog,
+    BrandPack,
+    StartupTimeline,
+    load_brand_catalog,
     load_startup_timeline,
     restore_primary_screen,
-    selected_brand_pack,
     startup_duration_ms,
 )
 from .validation import (
@@ -50,8 +53,11 @@ __all__ = [
     "validate_release_workflow",
     "validate_tag_version_channel",
     "verify_detached",
+    "BrandCatalog",
+    "BrandPack",
+    "StartupTimeline",
+    "load_brand_catalog",
     "load_startup_timeline",
     "restore_primary_screen",
-    "selected_brand_pack",
     "startup_duration_ms",
 ]

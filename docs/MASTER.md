@@ -41,9 +41,12 @@ C36 is not a PB managed output and is not a starter-current source.
 
 ## Current hardware lifecycle
 
-- PB-100: `EVT-LAYOUT-AUTHORIZED`.
-- LB-100: `EVT-LAYOUT-AUTHORIZED`.
-- FB-100: `EVT-LAYOUT-AUTHORIZED`; existing placement continues to routing.
-- EVT fabrication: blocked until board-specific `EVT-FAB-REVIEW` closes.
+- PB-100: `EVT-LAYOUT-AUTHORIZED`; fabrication remains blocked.
+- LB-100: `EVT-FAB-AUTHORIZED` for one segregated five-piece bare-PCB Rev.1
+  EVT batch only.
+- FB-100: `EVT-LAYOUT-AUTHORIZED`; routing is complete but
+  `EVT-FAB-REVIEW` remains open.
+- Combined three-board fabrication/assembly: blocked until PB-100 and FB-100
+  independently reach `EVT-FAB-AUTHORIZED`.
 - Production: blocked until Rev.1 validation, Rev.2 correction, critical retest
   and Product Owner `PRODUCTION-RELEASE` approval.

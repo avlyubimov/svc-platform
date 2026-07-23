@@ -206,23 +206,34 @@ def validate_release_workflow(path: Path) -> None:
     workflow = yaml.safe_load(workflow_text)
     if not isinstance(workflow, dict):
         raise OTAReleaseError("release workflow must be a mapping")
-    permissions = workflow.get("permissions")
-    expected_permissions = {
-        "contents": "write",
-        "actions": "read",
-        "id-token": "write",
-        "attestations": "write",
-    }
-    if permissions != expected_permissions:
-        raise OTAReleaseError("release workflow permissions are incomplete")
+    if workflow.get("permissions") != {}:
+        raise OTAReleaseError("release workflow top-level permissions must be empty")
     jobs = workflow.get("jobs")
     if not isinstance(jobs, dict):
         raise OTAReleaseError("release workflow jobs are missing")
+    validation_job = jobs.get("validate-candidate")
+    if not isinstance(validation_job, dict):
+        raise OTAReleaseError("validate-candidate job is missing")
+    if validation_job.get("permissions") != {
+        "actions": "read",
+        "attestations": "read",
+        "contents": "read",
+    }:
+        raise OTAReleaseError("validate-candidate permissions are not least privilege")
     signing_job = jobs.get("sign-review")
     if not isinstance(signing_job, dict):
         raise OTAReleaseError("sign-review job is missing")
+    if signing_job.get("if") != "github.ref == 'refs/heads/master'":
+        raise OTAReleaseError("sign-review job must be restricted to master")
     if signing_job.get("environment") != "firmware-production":
         raise OTAReleaseError("sign-review job requires firmware-production environment")
+    if signing_job.get("permissions") != {
+        "actions": "read",
+        "attestations": "write",
+        "contents": "read",
+        "id-token": "write",
+    }:
+        raise OTAReleaseError("sign-review permissions are not least privilege")
     if "env" in signing_job:
         raise OTAReleaseError("sign-review job must not expose secrets through job env")
 

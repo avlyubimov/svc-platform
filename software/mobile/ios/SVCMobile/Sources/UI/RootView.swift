@@ -51,6 +51,7 @@ struct RootView: View {
             if showStartup {
                 StartupAnimationView(
                     brandPack: appearance.brandPack,
+                    timeline: appearance.startupTimeline,
                     animationEnabled: appearance.animationEnabled,
                     reduceMotion: appearance.forceReduceMotion,
                     critical: criticalWarning != nil,

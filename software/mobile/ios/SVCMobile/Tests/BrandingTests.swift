@@ -3,12 +3,13 @@ import XCTest
 
 final class BrandingTests: XCTestCase {
     func testMissingBMWAssetsUseSVCFallback() {
-        let pack = BrandPack.resolved(
-            profileId: "bmw-r1200gs-k25-personal",
-            bundle: Bundle(for: Self.self)
-        )
+        let bundle = Bundle(for: Self.self)
+        let catalog = BrandCatalog.load(bundle: bundle)
+        let pack = catalog.resolve(profileId: catalog.defaultProfileId)
+        XCTAssertEqual(catalog.profiles.count, 2)
         XCTAssertEqual(pack.id, "generic-automotive")
-        XCTAssertEqual(pack.brandTagline, "ENGINEERED FOR THE RIDE")
+        XCTAssertTrue(pack.usesFallback)
+        XCTAssertNotNil(pack.logoResource)
     }
 
     func testLastScreenRestorationAndSafeFallback() throws {
@@ -24,8 +25,9 @@ final class BrandingTests: XCTestCase {
     }
 
     func testMotionAndCriticalDurations() {
+        let timeline = StartupTimeline.load(bundle: Bundle(for: Self.self))
         XCTAssertEqual(
-            StartupTiming.durationSeconds(
+            timeline.durationSeconds(
                 animationEnabled: true,
                 reduceMotion: false,
                 critical: false
@@ -33,7 +35,7 @@ final class BrandingTests: XCTestCase {
             2.1
         )
         XCTAssertEqual(
-            StartupTiming.durationSeconds(
+            timeline.durationSeconds(
                 animationEnabled: true,
                 reduceMotion: true,
                 critical: false
@@ -41,7 +43,7 @@ final class BrandingTests: XCTestCase {
             0.5
         )
         XCTAssertEqual(
-            StartupTiming.durationSeconds(
+            timeline.durationSeconds(
                 animationEnabled: true,
                 reduceMotion: false,
                 critical: true
@@ -49,7 +51,7 @@ final class BrandingTests: XCTestCase {
             0.5
         )
         XCTAssertEqual(
-            StartupTiming.durationSeconds(
+            timeline.durationSeconds(
                 animationEnabled: false,
                 reduceMotion: false,
                 critical: false
