@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "software/mobile/android/**"
+      - "software/mobile/branding/**"
       - "software/mobile/mock-data/**"
       - ".github/workflows/mobile-android.yml"
   pull_request:
     paths:
       - "software/mobile/android/**"
+      - "software/mobile/branding/**"
       - "software/mobile/mock-data/**"
       - ".github/workflows/mobile-android.yml"
 

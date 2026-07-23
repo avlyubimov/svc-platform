@@ -15,6 +15,37 @@ mock-data/  Hardware-free application data
 Both phone applications start with `MockDeviceRepository`. No mobile or
 projected-display action controls a physical power channel.
 
+## Startup and personal branding
+
+The phone apps use the common 2100 ms startup contract in
+`branding/startup-animation-v1.json`. The default personal profile is
+`bmw-r1200gs-k25-personal` with theme `svc-boxer-blue`. It restores the last
+available primary screen and falls back to Dashboard for first launch or an
+unknown stored destination.
+
+Owner-provided BMW resources are never downloaded or committed:
+
+```text
+software/mobile/branding/local/bmw-roundel.svg
+software/mobile/branding/local/bmw-motorrad-wordmark.svg
+```
+
+Both files are required for BMW presentation. If either is absent, the apps
+show the SVC mark, `SMART VEHICLE CONTROLLER`, and
+`ENGINEERED FOR THE RIDE`. Preview the result from
+`Settings → Appearance → Preview Startup Animation`.
+
+Profile/theme loading, mock BLE restoration, telemetry refresh, and screen
+restoration start in parallel. The animation never waits for BLE; Dashboard
+shows `Connecting to SVC` until restoration completes. Critical warnings use a
+500 ms startup and render as a red card after it. Reduced motion also uses a
+500 ms fade, while disabled animation enters the selected screen immediately.
+No POST statuses or fabricated `OK` values appear in startup.
+
+The animation is phone-only. CarPlay and Android Auto retain host-controlled
+launch transitions and show only the SVC app identity, profile name, permitted
+accent, and informational templates.
+
 ## GitHub Releases client
 
 The iOS and Android data layers include an unauthenticated client for this

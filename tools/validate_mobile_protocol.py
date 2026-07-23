@@ -13,6 +13,7 @@ from mobile_protocol_validation import (
 
 ROOT = Path(__file__).resolve().parents[1]
 PROTOCOL = ROOT / "software" / "mobile" / "protocol"
+BRANDING = ROOT / "software" / "mobile" / "branding"
 
 
 def main() -> int:
@@ -73,6 +74,23 @@ def main() -> int:
                 first = errors[0]
                 path = ".".join(str(part) for part in first.absolute_path)
                 raise SystemExit(f"{fixture_path}:{path}: {first.message}")
+
+        brand_schema = json.loads(
+            (BRANDING / "brand-pack-v1.schema.json").read_text()
+        )
+        Draft202012Validator.check_schema(brand_schema)
+        brand_validator = Draft202012Validator(brand_schema)
+        for brand_path in (
+            BRANDING / "bmw-r1200gs-k25-personal.json",
+            BRANDING / "generic-automotive.json",
+        ):
+            errors = list(brand_validator.iter_errors(json.loads(brand_path.read_text())))
+            if errors:
+                raise SystemExit(f"{brand_path}: {errors[0].message}")
+
+    from mobile_protocol_validation import load_startup_timeline
+
+    load_startup_timeline(BRANDING / "startup-animation-v1.json")
 
     print("mobile protocol validation passed")
     return 0

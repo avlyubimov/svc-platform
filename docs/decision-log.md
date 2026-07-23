@@ -4046,3 +4046,13 @@ signatures with an injected public key. Firmware installation and BLE transfer
 remain mock-only. The allowlisted firmware-candidate producer, native target
 signing, production public-key provisioning and hardware validation remain
 explicit blockers.
+
+## 2026-07-23 — Add phone-only BrandPacks and deterministic startup
+
+Decision: use a common mobile BrandPack contract and a 2100 ms phone startup
+timeline. The BMW R1200GS K25 personal pack is selected only when both ignored
+owner-provided SVG assets are present; otherwise the apps use SVC fallback
+branding. Startup diagnostics run in parallel, never report fabricated `OK`
+states, and never delay the dashboard for BLE. CarPlay and Android Auto retain
+host-controlled launch behavior. This is presentation and local-navigation
+state only; BLE, OTA, CAN, Output Manager, and safety architecture are unchanged.

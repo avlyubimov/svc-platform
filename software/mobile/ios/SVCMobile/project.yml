@@ -16,10 +16,14 @@ targets:
       - path: Sources
       - path: ../../mock-data/device-v1.json
         buildPhase: resources
+      - path: ../../branding/local
+        type: folder
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.avlyubimov.svc.mobile
         GENERATE_INFOPLIST_FILE: true
+        INFOPLIST_KEY_UILaunchStoryboardName: LaunchScreen
         INFOPLIST_KEY_CFBundleDisplayName: SVC Mobile
         INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription: SVC Mobile uses Bluetooth to read SVC telemetry and transfer confirmed firmware updates.
         INFOPLIST_KEY_NSLocalNetworkUsageDescription: Reserved for development diagnostics; SVC device connectivity uses Bluetooth.

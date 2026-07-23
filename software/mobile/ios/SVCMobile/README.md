@@ -3,6 +3,12 @@
 The default target is a SwiftUI phone application backed by
 `MockDeviceRepository`. CoreBluetooth is isolated behind `BLETransport`.
 
+The startup animation uses `TimelineView` at a 60 Hz cadence over an opaque
+`#050505` surface. Place personal SVG resources in
+`software/mobile/branding/local`; XcodeGen bundles the ignored folder. The
+Appearance screen provides profile selection, animation disable, reduced-motion
+preview, and replay.
+
 ## Generate and test
 
 ```bash

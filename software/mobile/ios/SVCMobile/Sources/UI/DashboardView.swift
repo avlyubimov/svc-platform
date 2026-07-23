@@ -2,9 +2,15 @@ import SwiftUI
 
 struct DashboardView: View {
     let telemetry: TelemetrySnapshot
+    var isConnecting = false
 
     var body: some View {
         List {
+            if isConnecting {
+                Label("Connecting to SVC", systemImage: "antenna.radiowaves.left.and.right")
+                    .font(.footnote)
+                    .foregroundStyle(SVCTheme.secondaryText)
+            }
             MeasurementRow(
                 title: "Battery",
                 value: telemetry.batteryVoltage.displayValue
@@ -26,6 +32,8 @@ struct DashboardView: View {
                 value: telemetry.leanAngle.displayValue
             )
         }
+        .scrollContentBackground(.hidden)
+        .background(SVCTheme.background)
         .navigationTitle("Dashboard")
     }
 }
@@ -36,6 +44,7 @@ struct MeasurementRow: View {
 
     var body: some View {
         LabeledContent(title, value: value)
+            .monospacedDigit()
     }
 }
 

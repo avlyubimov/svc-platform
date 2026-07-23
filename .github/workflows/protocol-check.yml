@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "software/mobile/protocol/**"
+      - "software/mobile/branding/**"
       - "software/mobile/mock-data/**"
       - "tools/mobile_protocol_validation/**"
       - "tools/validate_mobile_protocol.py"
@@ -15,6 +16,7 @@ on:
   pull_request:
     paths:
       - "software/mobile/protocol/**"
+      - "software/mobile/branding/**"
       - "software/mobile/mock-data/**"
       - "tools/mobile_protocol_validation/**"
       - "tools/validate_mobile_protocol.py"

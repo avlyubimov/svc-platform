@@ -22,7 +22,7 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
         ]
         items.forEach { $0.isEnabled = false }
         let template = CPListTemplate(
-            title: "SVC Status",
+            title: "BMW R1200GS · SVC",
             sections: [CPListSection(items: items)]
         )
         interfaceController.setRootTemplate(template, animated: false)
