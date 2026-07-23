@@ -14,8 +14,8 @@ targets:
     platform: iOS
     sources:
       - path: Sources
-    resources:
       - path: ../../mock-data/device-v1.json
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.avlyubimov.svc.mobile
@@ -33,9 +33,10 @@ targets:
     platform: iOS
     sources:
       - path: Tests
-    resources:
       - path: ../../mock-data/device-v1.json
+        buildPhase: resources
       - path: ../../protocol/examples/firmware-manifest.dev.json
+        buildPhase: resources
     dependencies:
       - target: SVCMobile
     settings:

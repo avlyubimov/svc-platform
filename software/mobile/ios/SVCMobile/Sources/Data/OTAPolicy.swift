@@ -16,7 +16,7 @@ enum OTAPolicy {
             reasons.append("critical_fault")
         }
         if !telemetry.batteryVoltage.isUsable ||
-            telemetry.batteryVoltage.value.map { !(11.8...14.8).contains($0) } != false {
+            telemetry.batteryVoltage.value.map({ (11.8...14.8).contains($0) }) != true {
             reasons.append("battery_out_of_range")
         }
         if telemetry.powerZoneTemperatures.contains(
