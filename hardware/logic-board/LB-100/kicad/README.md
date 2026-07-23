@@ -1,6 +1,6 @@
 # LB-100 KiCad Project
 
-Status: `EVT-FAB-REVIEW`; connectivity-complete six-layer Rev.1 EVT layout
+Status: `EVT-FAB-AUTHORIZED`; connectivity-complete six-layer Rev.1 EVT layout
 
 This directory contains the reviewed value-bearing LB-100 schematic,
 project-local libraries and deterministically generated PCB.

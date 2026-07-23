@@ -1,12 +1,14 @@
 # Final Readiness
 
 Status: In progress  
-Last updated: 2026-07-22
+Last updated: 2026-07-23
 
 This document defines what “ready” means for the current repository state. It
 authorizes controlled PB-100 and LB-100 Rev.1 EVT board import/layout and
-continued FB-100 EVT routing. It does not authorize fabrication/assembly
-outputs for any board.
+continued FB-100 EVT routing. It additionally authorizes one segregated
+five-piece bare-PCB LB-100 Rev.1 EVT package. It does not authorize LB-100
+assembly, PB-100/FB-100 fabrication or assembly, or a combined three-board
+order.
 
 All three boards use the ADR-0020 lifecycle: `EVT-LAYOUT-AUTHORIZED`,
 `EVT-FAB-REVIEW`, `EVT-FAB-AUTHORIZED`, `BENCH-VALIDATION`,

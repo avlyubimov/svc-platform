@@ -16,6 +16,17 @@ targets:
       - path: Sources
       - path: ../../mock-data/device-v1.json
         buildPhase: resources
+      - path: ../../branding/brand-pack-index-v1.json
+        buildPhase: resources
+      - path: ../../branding/bmw-r1200gs-k25-personal.json
+        buildPhase: resources
+      - path: ../../branding/generic-automotive.json
+        buildPhase: resources
+      - path: ../../branding/startup-animation-v1.json
+        buildPhase: resources
+      - path: ../../branding/svc
+        type: folder
+        buildPhase: resources
       - path: ../../branding/local
         type: folder
         buildPhase: resources
@@ -27,6 +38,7 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: SVC Mobile
         INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription: SVC Mobile uses Bluetooth to read SVC telemetry and transfer confirmed firmware updates.
         INFOPLIST_KEY_NSLocalNetworkUsageDescription: Reserved for development diagnostics; SVC device connectivity uses Bluetooth.
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         SUPPORTS_MACCATALYST: false
         SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited)"
     scheme:
@@ -40,6 +52,20 @@ targets:
       - path: ../../mock-data/device-v1.json
         buildPhase: resources
       - path: ../../protocol/examples/firmware-manifest.dev.json
+        buildPhase: resources
+      - path: ../../branding/brand-pack-index-v1.json
+        buildPhase: resources
+      - path: ../../branding/bmw-r1200gs-k25-personal.json
+        buildPhase: resources
+      - path: ../../branding/generic-automotive.json
+        buildPhase: resources
+      - path: ../../branding/startup-animation-v1.json
+        buildPhase: resources
+      - path: ../../branding/svc
+        type: folder
+        buildPhase: resources
+      - path: ../../branding/local
+        type: folder
         buildPhase: resources
     dependencies:
       - target: SVCMobile

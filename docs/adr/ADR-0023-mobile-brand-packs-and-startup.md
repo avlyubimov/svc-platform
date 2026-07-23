@@ -7,8 +7,17 @@ Date: 2026-07-23
 
 SVC Mobile uses a platform-neutral BrandPack contract for phone-only startup
 presentation. The personal reference pack is `bmw-r1200gs-k25-personal` with
-the `svc-boxer-blue` theme. Missing owner-provided BMW SVG resources select the
-generic SVC fallback; resources are never downloaded or committed.
+the `svc-boxer-blue` theme. Both clients load the same runtime JSON catalog,
+BrandPack definitions, asset paths, and timeline. Adding a profile does not
+require duplicated Swift and Kotlin constants. A missing owner-provided BMW
+logo selects the committed generic SVC fallback; an optional missing wordmark
+uses the configured text. Owner-provided resources are never downloaded or
+committed.
+
+The application, phone launcher, CarPlay, and Android Auto identity is always
+SVC. Manufacturer marks are limited to the selected post-launch phone
+presentation and never replace the SVC app icon or the neutral system launch
+surface.
 
 The normal timeline is 2100 ms and contains only screen-on glow, identity,
 vehicle, tagline, and a continuous dashboard reveal. Diagnostics run in
@@ -23,6 +32,7 @@ phone startup animation.
 
 Brand identity remains configuration rather than vehicle-specific BLE, OTA,
 CAN, or safety code. BMW trademarks and other licensed assets remain local to
-the owner's build. The common timing and semantic fields can support Honda,
+the owner's build. The committed SVC assets provide a deterministic fallback
+and application icon. The common timing and semantic fields can support Honda,
 Yamaha, KTM, Ducati, Volkswagen, Toyota, and generic profiles without changing
-device protocols.
+mobile source code or device protocols.

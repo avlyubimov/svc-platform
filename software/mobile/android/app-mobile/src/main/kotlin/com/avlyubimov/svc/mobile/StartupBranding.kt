@@ -26,47 +26,204 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import kotlinx.coroutines.delay
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
+@Serializable
+internal data class MobileBrandAssets(
+    val logo: String,
+    val wordmark: String? = null,
+)
+
+@Serializable
 internal data class MobileBrandPack(
+    val schemaVersion: Int,
     val id: String,
+    val displayName: String,
     val theme: String,
     val manufacturer: String,
     val model: String,
     val generation: String,
     val year: Int,
-    val logoAsset: String?,
-    val wordmarkAsset: String?,
     val manufacturerWordmark: String,
     val vehicleModel: String,
     val vehicleGeneration: String,
     val brandTagline: String,
+    val accentColor: String,
+    val assets: MobileBrandAssets,
 )
+
+@Serializable
+private data class MobileBrandCatalogEntry(
+    val id: String,
+    val configuration: String,
+)
+
+@Serializable
+private data class MobileBrandCatalogDocument(
+    val schemaVersion: Int,
+    val defaultProfileId: String,
+    val fallbackProfileId: String,
+    val profiles: List<MobileBrandCatalogEntry>,
+)
+
+internal class MobileBrandCatalog private constructor(
+    val defaultProfileId: String,
+    val fallbackProfileId: String,
+    val profiles: List<MobileBrandPack>,
+    private val assetExists: (String) -> Boolean,
+) {
+    private val definitions = profiles.associateBy(MobileBrandPack::id)
+
+    fun resolve(requestedProfileId: String): MobileBrandPack {
+        val fallback = definitions[fallbackProfileId] ?: emergencyProfile
+        val requested = definitions[requestedProfileId] ?: fallback
+        return if (assetExists(requested.assets.logo)) requested else fallback
+    }
+
+    companion object {
+        private val json = Json {
+            ignoreUnknownKeys = false
+        }
+
+        fun load(context: Context): MobileBrandCatalog = runCatching {
+            decode(
+                indexJson = context.readBrandAsset("brand-pack-index-v1.json"),
+                configurationJson = { context.readBrandAsset(it) },
+                assetExists = { context.hasBrandAsset(it) },
+            )
+        }.getOrElse { emergency }
+
+        internal fun decode(
+            indexJson: String,
+            configurationJson: (String) -> String,
+            assetExists: (String) -> Boolean,
+        ): MobileBrandCatalog {
+            val document = json.decodeFromString<MobileBrandCatalogDocument>(indexJson)
+            require(document.schemaVersion == 1)
+            val profiles = document.profiles.map { entry ->
+                json.decodeFromString<MobileBrandPack>(
+                    configurationJson(entry.configuration),
+                ).also {
+                    require(it.schemaVersion == 1)
+                    require(it.id == entry.id)
+                }
+            }
+            require(profiles.map(MobileBrandPack::id).distinct().size == profiles.size)
+            require(profiles.any { it.id == document.defaultProfileId })
+            require(profiles.any { it.id == document.fallbackProfileId })
+            return MobileBrandCatalog(
+                defaultProfileId = document.defaultProfileId,
+                fallbackProfileId = document.fallbackProfileId,
+                profiles = profiles,
+                assetExists = assetExists,
+            )
+        }
+
+        private val emergencyProfile = MobileBrandPack(
+            schemaVersion = 1,
+            id = "emergency-svc",
+            displayName = "SVC",
+            theme = "svc-dark",
+            manufacturer = "SVC",
+            model = "Mobile",
+            generation = "Fallback",
+            year = 0,
+            manufacturerWordmark = "SVC",
+            vehicleModel = "SVC",
+            vehicleGeneration = "",
+            brandTagline = "",
+            accentColor = "#1C69D4",
+            assets = MobileBrandAssets(logo = ""),
+        )
+
+        private val emergency = MobileBrandCatalog(
+            defaultProfileId = emergencyProfile.id,
+            fallbackProfileId = emergencyProfile.id,
+            profiles = listOf(emergencyProfile),
+            assetExists = { false },
+        )
+    }
+}
+
+@Serializable
+internal data class MobileStartupPhases(
+    val screenOnEndMs: Int,
+    val logoEndMs: Int,
+    val identityEndMs: Int,
+    val taglineEndMs: Int,
+    val dashboardEndMs: Int,
+)
+
+@Serializable
+internal data class MobileStartupTimeline(
+    val schemaVersion: Int,
+    val durationMs: Int,
+    val criticalDurationMs: Int,
+    val phases: MobileStartupPhases,
+) {
+    fun durationMs(
+        enabled: Boolean,
+        reduceMotion: Boolean,
+        critical: Boolean,
+    ): Int = when {
+        !enabled -> 0
+        reduceMotion || critical -> criticalDurationMs
+        else -> durationMs
+    }
+
+    fun progress(milliseconds: Int): Float = milliseconds.toFloat() / durationMs
+
+    companion object {
+        fun load(context: Context): MobileStartupTimeline = runCatching {
+            Json.decodeFromString<MobileStartupTimeline>(
+                context.readBrandAsset("startup-animation-v1.json"),
+            ).also {
+                require(it.schemaVersion == 1)
+                require(it.phases.dashboardEndMs == it.durationMs)
+            }
+        }.getOrElse {
+            MobileStartupTimeline(
+                schemaVersion = 1,
+                durationMs = 300,
+                criticalDurationMs = 300,
+                phases = MobileStartupPhases(50, 100, 160, 220, 300),
+            )
+        }
+    }
+}
 
 internal object MobileColors {
     val Background = androidx.compose.ui.graphics.Color(0xFF050505)
     val Surface = androidx.compose.ui.graphics.Color(0xFF111214)
     val PrimaryText = androidx.compose.ui.graphics.Color(0xFFF4F4F4)
     val SecondaryText = androidx.compose.ui.graphics.Color(0xFFA7A9AC)
-    val BmwBlue = androidx.compose.ui.graphics.Color(0xFF1C69D4)
+    val AccentBlue = androidx.compose.ui.graphics.Color(0xFF1C69D4)
     val LightBlue = androidx.compose.ui.graphics.Color(0xFF4AA3FF)
     val Divider = androidx.compose.ui.graphics.Color(0xFF303236)
     val Warning = androidx.compose.ui.graphics.Color(0xFFFFB000)
     val Critical = androidx.compose.ui.graphics.Color(0xFFE32636)
 }
 
-internal class AppearancePreferences(context: Context) {
+internal class AppearancePreferences(
+    context: Context,
+    private val catalog: MobileBrandCatalog,
+) {
     private val values = context.getSharedPreferences("svc-appearance", Context.MODE_PRIVATE)
 
     var profileId: String
-        get() = values.getString("vehicleProfile", BMW_PROFILE) ?: BMW_PROFILE
+        get() {
+            val stored = values.getString("vehicleProfile", catalog.defaultProfileId)
+                ?: catalog.defaultProfileId
+            return stored.takeIf { candidate ->
+                catalog.profiles.any { it.id == candidate }
+            } ?: catalog.fallbackProfileId
+        }
         set(value) = values.edit().putString("vehicleProfile", value).apply()
 
     var animationEnabled: Boolean
@@ -84,70 +241,7 @@ internal class AppearancePreferences(context: Context) {
         values.edit().putString("lastSelectedScreen", name).apply()
     }
 
-    fun brandPack(context: Context): MobileBrandPack {
-        return resolveBrandPack(
-            requestedProfile = profileId,
-            hasLogo = hasAsset(context, "bmw-roundel.svg"),
-            hasWordmark = hasAsset(context, "bmw-motorrad-wordmark.svg"),
-        )
-    }
-
-    private fun hasAsset(context: Context, name: String): Boolean =
-        runCatching { context.assets.open(name).use { } }.isSuccess
-
-    companion object {
-        const val BMW_PROFILE = "bmw-r1200gs-k25-personal"
-        const val GENERIC_PROFILE = "generic-automotive"
-    }
-}
-
-internal fun resolveBrandPack(
-    requestedProfile: String,
-    hasLogo: Boolean,
-    hasWordmark: Boolean,
-): MobileBrandPack {
-    if (requestedProfile != AppearancePreferences.BMW_PROFILE || !hasLogo || !hasWordmark) {
-        return genericBrandPack()
-    }
-    return MobileBrandPack(
-            id = AppearancePreferences.BMW_PROFILE,
-            theme = "svc-boxer-blue",
-            manufacturer = "BMW",
-            model = "R1200GS",
-            generation = "K25",
-            year = 2007,
-            logoAsset = "bmw-roundel.svg",
-            wordmarkAsset = "bmw-motorrad-wordmark.svg",
-            manufacturerWordmark = "BMW MOTORRAD",
-            vehicleModel = "R 1200 GS",
-            vehicleGeneration = "K25 · 2007",
-            brandTagline = "MAKE LIFE A RIDE",
-        )
-}
-
-internal fun genericBrandPack() = MobileBrandPack(
-            id = AppearancePreferences.GENERIC_PROFILE,
-            theme = "svc-boxer-blue",
-            manufacturer = "SVC",
-            model = "Smart Vehicle Controller",
-            generation = "Generic Automotive",
-            year = 2026,
-            logoAsset = null,
-            wordmarkAsset = null,
-            manufacturerWordmark = "SMART VEHICLE CONTROLLER",
-            vehicleModel = "SVC",
-            vehicleGeneration = "GENERIC AUTOMOTIVE",
-            brandTagline = "ENGINEERED FOR THE RIDE",
-        )
-
-internal fun startupDurationMs(
-    enabled: Boolean,
-    reduceMotion: Boolean,
-    critical: Boolean,
-): Int = when {
-    !enabled -> 0
-    critical || reduceMotion -> 500
-    else -> 2100
+    fun brandPack(): MobileBrandPack = catalog.resolve(profileId)
 }
 
 internal fun systemReduceMotion(context: Context): Boolean =
@@ -162,6 +256,7 @@ internal fun systemReduceMotion(context: Context): Boolean =
 @Composable
 internal fun StartupAnimation(
     brandPack: MobileBrandPack,
+    timeline: MobileStartupTimeline,
     enabled: Boolean,
     reduceMotion: Boolean,
     critical: Boolean,
@@ -169,7 +264,7 @@ internal fun StartupAnimation(
     onComplete: () -> Unit,
 ) {
     val progress = remember(replayKey) { Animatable(0f) }
-    val durationMs = startupDurationMs(enabled, reduceMotion, critical)
+    val durationMs = timeline.durationMs(enabled, reduceMotion, critical)
     LaunchedEffect(replayKey, enabled, durationMs) {
         if (durationMs > 0) {
             progress.animateTo(
@@ -181,25 +276,37 @@ internal fun StartupAnimation(
         }
         onComplete()
     }
-    StartupVisual(brandPack, progress.value)
+    StartupVisual(brandPack, timeline, progress.value)
 }
 
 @Composable
-private fun StartupVisual(brandPack: MobileBrandPack, progress: Float) {
-    val logo = phase(progress, 0.12f, 0.33f)
-    val identity = phase(progress, 0.33f, 0.57f)
-    val tagline = phase(progress, 0.57f, 0.76f)
-    val transition = phase(progress, 0.76f, 1f)
+private fun StartupVisual(
+    brandPack: MobileBrandPack,
+    timeline: MobileStartupTimeline,
+    progress: Float,
+) {
+    val screenOnEnd = timeline.progress(timeline.phases.screenOnEndMs)
+    val logoEnd = timeline.progress(timeline.phases.logoEndMs)
+    val identityEnd = timeline.progress(timeline.phases.identityEndMs)
+    val taglineEnd = timeline.progress(timeline.phases.taglineEndMs)
+    val logo = phase(progress, screenOnEnd, logoEnd)
+    val identity = phase(progress, logoEnd, identityEnd)
+    val tagline = phase(progress, identityEnd, taglineEnd)
+    val transition = phase(progress, taglineEnd, 1f)
+    val accent = brandPack.accentColor.toComposeColor()
     Box(
         Modifier
             .fillMaxSize()
             .background(MobileColors.Background.copy(alpha = 1f - transition)),
         contentAlignment = Alignment.Center,
     ) {
-        Canvas(Modifier.fillMaxSize().alpha(phase(progress, 0f, 0.16f))) {
+        Canvas(Modifier.fillMaxSize().alpha(phase(progress, 0f, screenOnEnd))) {
             drawCircle(
                 brush = Brush.radialGradient(
-                    listOf(MobileColors.LightBlue.copy(alpha = 0.12f), androidx.compose.ui.graphics.Color.Transparent),
+                    listOf(
+                        MobileColors.LightBlue.copy(alpha = 0.12f),
+                        androidx.compose.ui.graphics.Color.Transparent,
+                    ),
                     center = center,
                     radius = size.minDimension * 0.38f,
                 ),
@@ -221,8 +328,8 @@ private fun StartupVisual(brandPack: MobileBrandPack, progress: Float) {
                     Modifier
                         .fillMaxSize()
                         .alpha(
-                            phase(progress, 0.20f, 0.24f) *
-                                (1f - phase(progress, 0.24f, 0.29f)),
+                            phase(logo, 0.38f, 0.48f) *
+                                (1f - phase(logo, 0.48f, 0.72f)),
                         ),
                 ) {
                     drawArc(
@@ -235,9 +342,9 @@ private fun StartupVisual(brandPack: MobileBrandPack, progress: Float) {
                 }
             }
             Spacer(Modifier.height(15.dp))
-            if (brandPack.wordmarkAsset != null) {
+            if (brandPack.assets.wordmark != null) {
                 LocalSvgAsset(
-                    brandPack.wordmarkAsset,
+                    brandPack.assets.wordmark,
                     Modifier
                         .size(width = 210.dp, height = 28.dp)
                         .alpha(identity * (1f - transition)),
@@ -284,7 +391,7 @@ private fun StartupVisual(brandPack: MobileBrandPack, progress: Float) {
                 brush = Brush.horizontalGradient(
                     listOf(
                         androidx.compose.ui.graphics.Color.Transparent,
-                        MobileColors.BmwBlue,
+                        accent,
                         androidx.compose.ui.graphics.Color.White,
                         androidx.compose.ui.graphics.Color.Transparent,
                     ),
@@ -299,13 +406,16 @@ private fun StartupVisual(brandPack: MobileBrandPack, progress: Float) {
 
 @Composable
 private fun BrandLogo(brandPack: MobileBrandPack, modifier: Modifier) {
-    if (brandPack.logoAsset != null) {
-        LocalSvgAsset(brandPack.logoAsset, modifier)
+    if (brandPack.assets.logo.isNotEmpty()) {
+        LocalSvgAsset(brandPack.assets.logo, modifier)
     } else {
         Box(modifier, contentAlignment = Alignment.Center) {
             Canvas(Modifier.fillMaxSize()) {
                 drawCircle(MobileColors.Surface)
-                drawCircle(MobileColors.PrimaryText.copy(alpha = 0.72f), style = Stroke(2.dp.toPx()))
+                drawCircle(
+                    MobileColors.PrimaryText.copy(alpha = 0.72f),
+                    style = Stroke(2.dp.toPx()),
+                )
             }
             Text(
                 "SVC",
@@ -333,6 +443,15 @@ private fun LocalSvgAsset(asset: String, modifier: Modifier) {
         },
     )
 }
+
+private fun Context.readBrandAsset(path: String): String =
+    assets.open(path).bufferedReader().use { it.readText() }
+
+private fun Context.hasBrandAsset(path: String): Boolean =
+    runCatching { assets.open(path).use { } }.isSuccess
+
+internal fun String.toComposeColor(): androidx.compose.ui.graphics.Color =
+    androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(this))
 
 private fun phase(value: Float, start: Float, end: Float): Float =
     ((value - start) / (end - start)).coerceIn(0f, 1f)

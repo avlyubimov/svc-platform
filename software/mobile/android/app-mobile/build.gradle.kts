@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -21,7 +22,7 @@ android {
     }
 
     sourceSets {
-        getByName("main").assets.srcDir("../../branding/local")
+        getByName("main").assets.srcDir("../../branding")
     }
 
     compileOptions {

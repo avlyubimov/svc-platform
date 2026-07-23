@@ -4020,6 +4020,12 @@ remain mandatory before payment. Assembly, motorcycle use, PB-100 and the
 combined platform remain `NO-GO`; BLE enclosure range, FFC fit and all normal
 bench/production evidence remain open.
 
+Documentation follow-up: synchronize the MASTER lifecycle, final-readiness
+boundary, LB layout progress, fabrication review, and KiCad README on
+`EVT-FAB-AUTHORIZED`. The authorization remains limited to one segregated
+five-piece bare-PCB LB-100 Rev.1 EVT batch; LB assembly, PB/FB fabrication and
+the combined three-board order remain `NO-GO`.
+
 ## 2026-07-23 — Harden the OTA review pipeline before target signing exists
 
 Decision: replace the draft-release scaffold with a review-only workflow. The
@@ -4047,12 +4053,34 @@ remain mock-only. The allowlisted firmware-candidate producer, native target
 signing, production public-key provisioning and hardware validation remain
 explicit blockers.
 
+Follow-up: remove workflow-level token grants. Candidate validation now has
+read-only Actions/content access, while the protected signing job receives only
+the additional OIDC and attestation writes it uses. Signing is hard-blocked
+outside `refs/heads/master`; the `firmware-production` environment uses a
+custom `master` deployment-branch policy.
+
 ## 2026-07-23 — Add phone-only BrandPacks and deterministic startup
 
 Decision: use a common mobile BrandPack contract and a 2100 ms phone startup
-timeline. The BMW R1200GS K25 personal pack is selected only when both ignored
-owner-provided SVG assets are present; otherwise the apps use SVC fallback
-branding. Startup diagnostics run in parallel, never report fabricated `OK`
-states, and never delay the dashboard for BLE. CarPlay and Android Auto retain
-host-controlled launch behavior. This is presentation and local-navigation
-state only; BLE, OTA, CAN, Output Manager, and safety architecture are unchanged.
+timeline. The BMW R1200GS K25 personal pack is selected only when its ignored
+owner-provided logo is present; its wordmark is optional and falls back to
+configured text. Otherwise the apps use SVC fallback branding. Startup
+diagnostics run in parallel, never report fabricated `OK` states, and never
+delay the dashboard for BLE. CarPlay and Android Auto retain host-controlled
+launch behavior. This is presentation and local-navigation state only; BLE,
+OTA, CAN, Output Manager, and safety architecture are unchanged.
+
+## 2026-07-23 — Make shared BrandPack data authoritative and keep SVC as app identity
+
+Decision: load the BrandPack catalog, profile copy, accent, asset paths, and
+startup phase timing from the same versioned JSON in both phone clients.
+Manufacturer assets remain optional local profile content; they never become
+the phone, CarPlay, or Android Auto application icon. Commit an original SVC
+logo, wordmark, and app-icon source as the deterministic fallback and public
+application identity.
+
+Result: adding a licensed/local manufacturer profile requires JSON and assets,
+not parallel Swift and Kotlin edits. The BMW personal profile requires only its
+ignored local `logo.svg`; its optional wordmark falls back to configured text.
+The neutral black OS launch surface and all BLE, OTA, CAN, and safety behavior
+remain unchanged.

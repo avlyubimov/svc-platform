@@ -15,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -58,7 +59,9 @@ private enum class Screen(val title: String) {
 @OptIn(ExperimentalMaterial3Api::class)
 fun SVCMobileApp(repository: DeviceRepository) {
     val context = LocalContext.current
-    val appearance = remember { AppearancePreferences(context) }
+    val brandCatalog = remember { MobileBrandCatalog.load(context) }
+    val startupTimeline = remember { MobileStartupTimeline.load(context) }
+    val appearance = remember { AppearancePreferences(context, brandCatalog) }
     val device by repository.snapshot.collectAsStateWithLifecycle()
     var selectedScreen by remember {
         mutableStateOf<Screen?>(
@@ -74,13 +77,13 @@ fun SVCMobileApp(repository: DeviceRepository) {
     var startupReplayKey by remember { mutableStateOf(0) }
     var appearanceRevision by remember { mutableStateOf(0) }
     val coroutineScope = rememberCoroutineScope()
-    val brandPack = remember(appearanceRevision) { appearance.brandPack(context) }
+    val brandPack = remember(appearanceRevision) { appearance.brandPack() }
     val criticalWarning = device.telemetry.warnings.firstOrNull {
         it.active && it.severity.equals("critical", ignoreCase = true)
     }
 
     androidx.compose.runtime.LaunchedEffect(Unit) {
-        launch { appearance.brandPack(context) }
+        launch { appearance.brandPack() }
         launch { appearance.restoreScreen() }
         launch {
             discoveredDevices = repository.discover()
@@ -94,7 +97,7 @@ fun SVCMobileApp(repository: DeviceRepository) {
         colorScheme = androidx.compose.material3.darkColorScheme(
             background = MobileColors.Background,
             surface = MobileColors.Surface,
-            primary = MobileColors.BmwBlue,
+            primary = brandPack.accentColor.toComposeColor(),
             onBackground = MobileColors.PrimaryText,
             onSurface = MobileColors.PrimaryText,
             error = MobileColors.Critical,
@@ -180,8 +183,8 @@ fun SVCMobileApp(repository: DeviceRepository) {
                     )
                     Screen.SETTINGS -> SettingsScreen(
                         preferences = appearance,
-                        usingFallback = brandPack.id == AppearancePreferences.GENERIC_PROFILE &&
-                            appearance.profileId == AppearancePreferences.BMW_PROFILE,
+                        profiles = brandCatalog.profiles,
+                        usingFallback = brandPack.id != appearance.profileId,
                         modifier = modifier,
                         onChanged = { appearanceRevision += 1 },
                         onPreview = {
@@ -214,6 +217,7 @@ fun SVCMobileApp(repository: DeviceRepository) {
             if (showStartup) {
                 StartupAnimation(
                     brandPack = brandPack,
+                    timeline = startupTimeline,
                     enabled = appearance.animationEnabled,
                     reduceMotion = appearance.reduceMotionOverride ||
                         systemReduceMotion(context),
@@ -383,32 +387,32 @@ private fun FirmwareScreen(
 @Composable
 private fun SettingsScreen(
     preferences: AppearancePreferences,
+    profiles: List<MobileBrandPack>,
     usingFallback: Boolean,
     modifier: Modifier,
     onChanged: () -> Unit,
     onPreview: () -> Unit,
 ) {
-    var isBmw by remember {
-        mutableStateOf(preferences.profileId == AppearancePreferences.BMW_PROFILE)
-    }
+    var selectedProfile by remember { mutableStateOf(preferences.profileId) }
     var animationEnabled by remember { mutableStateOf(preferences.animationEnabled) }
     var reduceMotion by remember { mutableStateOf(preferences.reduceMotionOverride) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Text("Appearance", style = MaterialTheme.typography.titleLarge)
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("BMW R1200GS K25 · 2007")
-            Switch(
-                checked = isBmw,
-                onCheckedChange = {
-                    isBmw = it
-                    preferences.profileId = if (it) {
-                        AppearancePreferences.BMW_PROFILE
-                    } else {
-                        AppearancePreferences.GENERIC_PROFILE
-                    }
-                    onChanged()
-                },
-            )
+        profiles.forEach { profile ->
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(profile.displayName)
+                RadioButton(
+                    selected = selectedProfile == profile.id,
+                    onClick = {
+                        selectedProfile = profile.id
+                        preferences.profileId = profile.id
+                        onChanged()
+                    },
+                )
+            }
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text("Startup animation")
@@ -435,7 +439,7 @@ private fun SettingsScreen(
         }
         if (usingFallback) {
             Text(
-                "BMW assets are absent. SVC fallback branding is active.",
+                "Selected manufacturer logo is absent. SVC fallback branding is active.",
                 color = MobileColors.SecondaryText,
             )
         }
