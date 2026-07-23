@@ -19,7 +19,6 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.avlyubimov.svc.mobile
-        PRODUCT_NAME: SVC Mobile
         GENERATE_INFOPLIST_FILE: true
         INFOPLIST_KEY_CFBundleDisplayName: SVC Mobile
         INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription: SVC Mobile uses Bluetooth to read SVC telemetry and transfer confirmed firmware updates.

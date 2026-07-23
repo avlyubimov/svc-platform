@@ -25,15 +25,17 @@ jobs:
       - name: Set up Zephyr and ARM toolchain
         uses: zephyrproject-rtos/action-zephyr-setup@v1
         with:
-          app-path: app/firmware/radio/e73
+          base-path: app/firmware/radio
+          app-path: e73
           toolchains: arm-zephyr-eabi
       - name: Build MCUboot plus E73 application
+        working-directory: app/firmware/radio
         run: |
           west build \
             --sysbuild \
             -p always \
             -b nrf52840dk/nrf52840 \
-            app/firmware/radio/e73 \
+            e73 \
             -d build/e73
       - name: Record development-key boundary
         run: |
