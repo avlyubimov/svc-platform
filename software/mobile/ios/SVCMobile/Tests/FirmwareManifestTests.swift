@@ -28,5 +28,17 @@ final class FirmwareManifestTests: XCTestCase {
                 protocolVersion: 2
             )
         )
+        XCTAssertThrowsError(
+            try manifest.component(
+                target: "stm32-main",
+                hardwareRevision: "LB-100-REV1",
+                protocolVersion: 1
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? FirmwareManifestError,
+                .nonInstallableReviewImage
+            )
+        }
     }
 }

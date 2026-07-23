@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 import argparse
-import base64
 import hashlib
 import json
 import shutil
 from pathlib import Path
+
+from mobile_protocol_validation.ota_release import (
+    SIGNATURE_ALGORITHM,
+    validate_release_inputs,
+)
 
 
 def package_release(
@@ -17,29 +21,47 @@ def package_release(
     stm32_artifact: Path,
     e73_artifact: Path,
     output_directory: Path,
-    signature_directory: Path | None = None,
+    signature_directory: Path,
+    key_id: str,
 ) -> Path:
+    inputs = validate_release_inputs(release_version, "1", channel)
+    if not key_id or not key_id.replace("-", "").replace("_", "").isalnum():
+        raise ValueError("key_id must contain letters, digits, hyphens, or underscores")
+
     output_directory.mkdir(parents=True, exist_ok=True)
     components = []
-    inputs = (
+    checksum_entries: list[tuple[str, str]] = []
+    artifacts = (
         ("stm32-main", stm32_artifact),
         ("e73-radio", e73_artifact),
     )
-    for target, source in inputs:
+    for target, source in artifacts:
         if not source.is_file():
             raise FileNotFoundError(source)
-        filename = f"svc-{target}-{release_version}.signed.bin"
+        if source.name.endswith(".signed.bin"):
+            raise ValueError(
+                f"{source}: review input must not claim a native firmware signature"
+            )
+
+        filename = f"svc-{target}-{release_version}.review.bin"
         destination = output_directory / filename
         shutil.copyfile(source, destination)
         data = destination.read_bytes()
-        signature = "SIGNATURE-DISABLED-NO-PRODUCTION-SECRET"
-        if signature_directory is not None:
-            signature_path = signature_directory / f"{target}.sig"
-            if not signature_path.is_file():
-                raise FileNotFoundError(signature_path)
-            signature = "openssl-sha256:" + base64.b64encode(
-                signature_path.read_bytes()
-            ).decode("ascii")
+        digest = hashlib.sha256(data).hexdigest()
+        checksum_entries.append((digest, filename))
+
+        source_signature = signature_directory / f"{target}.release.sig"
+        if not source_signature.is_file():
+            raise FileNotFoundError(source_signature)
+        signature = source_signature.read_bytes()
+        if not signature:
+            raise ValueError(f"{source_signature}: detached signature is empty")
+        signature_filename = f"{filename}.release.sig"
+        signature_destination = output_directory / signature_filename
+        signature_destination.write_bytes(signature)
+        signature_digest = hashlib.sha256(signature).hexdigest()
+        checksum_entries.append((signature_digest, signature_filename))
+
         components.append(
             {
                 "target": target,
@@ -48,8 +70,16 @@ def package_release(
                 "protocolVersion": 1,
                 "file": filename,
                 "size": len(data),
-                "sha256": hashlib.sha256(data).hexdigest(),
-                "signature": signature,
+                "sha256": digest,
+                "imageFormat": "review-raw",
+                "installable": False,
+                "releaseSignature": {
+                    "algorithm": SIGNATURE_ALGORITHM,
+                    "file": signature_filename,
+                    "size": len(signature),
+                    "sha256": signature_digest,
+                    "keyId": key_id,
+                },
                 "minimumBootloader": "0.1.0",
             }
         )
@@ -60,6 +90,7 @@ def package_release(
             {
                 "schemaVersion": 1,
                 "releaseVersion": release_version,
+                "releaseTag": inputs.release_tag,
                 "channel": channel,
                 "minimumMobileVersion": minimum_mobile_version,
                 "components": components,
@@ -68,14 +99,16 @@ def package_release(
         )
         + "\n"
     )
-    checksums = output_directory / "SHA256SUMS"
-    checksum_lines = [
-        f"{component['sha256']}  {component['file']}" for component in components
-    ]
-    checksum_lines.append(
-        f"{hashlib.sha256(manifest_path.read_bytes()).hexdigest()}  {manifest_path.name}"
+    checksum_entries.append(
+        (
+            hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+            manifest_path.name,
+        )
     )
-    checksums.write_text("\n".join(checksum_lines) + "\n")
+    checksums = output_directory / "SHA256SUMS"
+    checksums.write_text(
+        "".join(f"{digest}  {filename}\n" for digest, filename in checksum_entries)
+    )
     return manifest_path
 
 
@@ -87,7 +120,8 @@ def main() -> int:
     parser.add_argument("--stm32", type=Path, required=True)
     parser.add_argument("--e73", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--signature-directory", type=Path)
+    parser.add_argument("--signature-directory", type=Path, required=True)
+    parser.add_argument("--key-id", required=True)
     args = parser.parse_args()
 
     manifest = package_release(
@@ -98,6 +132,7 @@ def main() -> int:
         e73_artifact=args.e73,
         output_directory=args.output,
         signature_directory=args.signature_directory,
+        key_id=args.key_id,
     )
     print(manifest)
     return 0

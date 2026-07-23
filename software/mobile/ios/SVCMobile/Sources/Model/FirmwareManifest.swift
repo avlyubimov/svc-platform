@@ -3,6 +3,7 @@ import Foundation
 struct FirmwareManifest: Codable, Equatable {
     let schemaVersion: Int
     let releaseVersion: String
+    let releaseTag: String
     let channel: String
     let minimumMobileVersion: String
     let components: [FirmwareComponent]
@@ -24,8 +25,22 @@ struct FirmwareManifest: Codable, Equatable {
         guard component.protocolVersion == protocolVersion else {
             throw FirmwareManifestError.protocolMismatch
         }
+        let expectedFormat = target == "e73-radio"
+            ? "mcuboot-signed"
+            : "oemirot-signed"
+        guard component.installable, component.imageFormat == expectedFormat else {
+            throw FirmwareManifestError.nonInstallableReviewImage
+        }
         return component
     }
+}
+
+struct FirmwareReleaseSignature: Codable, Equatable {
+    let algorithm: String
+    let file: String
+    let size: Int
+    let sha256: String
+    let keyId: String
 }
 
 struct FirmwareComponent: Codable, Equatable {
@@ -36,13 +51,16 @@ struct FirmwareComponent: Codable, Equatable {
     let file: String
     let size: Int
     let sha256: String
-    let signature: String
+    let imageFormat: String
+    let installable: Bool
+    let releaseSignature: FirmwareReleaseSignature
     let minimumBootloader: String
 }
 
-enum FirmwareManifestError: Error {
+enum FirmwareManifestError: Error, Equatable {
     case unsupportedSchema
     case targetUnavailable
     case hardwareMismatch
     case protocolMismatch
+    case nonInstallableReviewImage
 }

@@ -35,7 +35,7 @@ final class AppViewModel: ObservableObject {
     func checkFirmware() {
         Task {
             do {
-                let manifest = try await releaseRepository.fetchManifest()
+                let manifest = try await releaseRepository.fetchManifest(channel: .stable)
                 firmwareStatus = "\(manifest.channel) release \(manifest.releaseVersion) available"
             } catch {
                 firmwareStatus = "Release check failed: \(error.localizedDescription)"

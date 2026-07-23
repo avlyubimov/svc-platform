@@ -4019,3 +4019,30 @@ repository validation. Supplier DFM, exact stack and impedance confirmation
 remain mandatory before payment. Assembly, motorcycle use, PB-100 and the
 combined platform remain `NO-GO`; BLE enclosure range, FFC fit and all normal
 bench/production evidence remain open.
+
+## 2026-07-23 — Harden the OTA review pipeline before target signing exists
+
+Decision: replace the draft-release scaffold with a review-only workflow. The
+workflow accepts only strict channel-specific SemVer, validates a successful
+same-repository allowlisted candidate run whose commit is reachable from
+`master`, and verifies GitHub artifact attestations before protected signing.
+All Actions are pinned to full commit SHAs. Production signing material is
+limited to `OTA_PROD_SIGNING_KEY_B64` and
+`OTA_PROD_SIGNING_KEY_PASSWORD` in one step of the
+`firmware-production` environment; no private key is added or generated in the
+repository.
+
+Decision: distinguish three independent states in the manifest. A detached
+RSA-PSS/SHA-256 release signature authenticates a downloaded asset but does not
+make it bootable. E73 installation requires a native MCUboot-signed image and
+STM32 installation requires a native OEMiRoT-signed image. Until both target
+builds exist, packaged files are named `*.review.bin`, carry
+`imageFormat=review-raw` and `installable=false`, and no GitHub Release can be
+created by the workflow.
+
+Result: the mobile clients can discover public stable/beta/test GitHub
+Releases without PAT credentials and verify size, SHA-256 and detached
+signatures with an injected public key. Firmware installation and BLE transfer
+remain mock-only. The allowlisted firmware-candidate producer, native target
+signing, production public-key provisioning and hardware validation remain
+explicit blockers.
