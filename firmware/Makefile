@@ -29,6 +29,7 @@ RULE_TEXT_TEST := $(BUILD_DIR)/test_rule_text
 RUNTIME_BOOT_TEST := $(BUILD_DIR)/test_runtime_boot
 TELEMETRY_TEST := $(BUILD_DIR)/test_telemetry
 THERMAL_SERVICE_TEST := $(BUILD_DIR)/test_thermal_service
+UPDATE_STATE_TEST := $(BUILD_DIR)/test_update_state
 CONFIG_VALIDATOR_SRCS := \
 	core/svc_config_defaults.c \
 	services/battery_service.c \
@@ -235,6 +236,9 @@ THERMAL_SERVICE_SRCS := \
 	services/telemetry.c \
 	services/thermal_service.c \
 	tests/test_thermal_service.c
+UPDATE_STATE_SRCS := \
+	update/update_state.c \
+	update/tests/test_update_state.c
 HOST_TESTS := \
 	$(CONFIG_VALIDATOR_TEST) \
 	$(CONFIG_ACCEPTANCE_TEST) \
@@ -260,7 +264,8 @@ HOST_TESTS := \
 	$(RULE_TEXT_TEST) \
 	$(RUNTIME_BOOT_TEST) \
 	$(TELEMETRY_TEST) \
-	$(THERMAL_SERVICE_TEST)
+	$(THERMAL_SERVICE_TEST) \
+	$(UPDATE_STATE_TEST)
 
 .PHONY: test clean
 
@@ -290,6 +295,7 @@ test: $(HOST_TESTS)
 	$(RUNTIME_BOOT_TEST)
 	$(TELEMETRY_TEST)
 	$(THERMAL_SERVICE_TEST)
+	$(UPDATE_STATE_TEST)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
@@ -368,6 +374,9 @@ $(TELEMETRY_TEST): $(TELEMETRY_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 
 $(THERMAL_SERVICE_TEST): $(THERMAL_SERVICE_SRCS) $(FIRMWARE_HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(filter %.c,$^) -o $@
+
+$(UPDATE_STATE_TEST): $(UPDATE_STATE_SRCS) update/update_state.h | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) -Iupdate $(CFLAGS) $(filter %.c,$^) -o $@
 
 clean:
 	rm -rf $(BUILD_DIR)

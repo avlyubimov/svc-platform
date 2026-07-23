@@ -34,7 +34,8 @@ tests. The same command runs in GitHub Actions on push and pull request.
 
 Current host checks cover PB-100 schematic-planning artifacts, config/schema
 consistency, output safety, battery cutoff, CAN1 TX denial, event dispatch,
-role-based rules, and PWM duty-cycle ownership.
+role-based rules, PWM duty-cycle ownership, mobile protocol fixtures, resumable
+update transfer, OTA admission, trial boot, and rollback.
 
 ## Repository structure
 
@@ -57,3 +58,10 @@ production/           BOM, Gerber, Pick&Place, assembly docs
 
 **Power Board is sacred.**  
 New features should not require Power Board redesign unless all configuration/plugin/firmware/Logic Board options are exhausted.
+
+## Mobile and OTA scaffolds
+
+See `software/mobile/README.md` for iOS, Android, Android Auto, CarPlay feature
+flag, mock data, and protocol validation commands. See
+`docs/architecture/firmware-update.md` for the phone-mediated BLE update trust
+boundary.

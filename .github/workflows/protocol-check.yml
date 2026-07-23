@@ -1,0 +1,38 @@
+name: Mobile Protocol Check
+
+on:
+  push:
+    paths:
+      - "software/mobile/protocol/**"
+      - "software/mobile/mock-data/**"
+      - "tools/mobile_protocol_validation/**"
+      - "tools/validate_mobile_protocol.py"
+      - "tools/package_firmware_release.py"
+      - ".github/workflows/protocol-check.yml"
+  pull_request:
+    paths:
+      - "software/mobile/protocol/**"
+      - "software/mobile/mock-data/**"
+      - "tools/mobile_protocol_validation/**"
+      - "tools/validate_mobile_protocol.py"
+      - "tools/package_firmware_release.py"
+      - ".github/workflows/protocol-check.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/mobile_protocol_validation/requirements.txt
+      - name: Install schema validator
+        run: pip install -r tools/mobile_protocol_validation/requirements.txt
+      - name: Validate schemas, fixtures, and parser
+        run: |
+          python3 tools/validate_mobile_protocol.py
+          PYTHONPATH=tools python3 -m unittest discover \
+            -s tools/mobile_protocol_validation/tests \
+            -v

@@ -1,0 +1,45 @@
+name: SVCMobile
+options:
+  bundleIdPrefix: com.avlyubimov.svc
+  deploymentTarget:
+    iOS: "17.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.10"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+targets:
+  SVCMobile:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+      - path: ../../mock-data/device-v1.json
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.avlyubimov.svc.mobile
+        GENERATE_INFOPLIST_FILE: true
+        INFOPLIST_KEY_CFBundleDisplayName: SVC Mobile
+        INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription: SVC Mobile uses Bluetooth to read SVC telemetry and transfer confirmed firmware updates.
+        INFOPLIST_KEY_NSLocalNetworkUsageDescription: Reserved for development diagnostics; SVC device connectivity uses Bluetooth.
+        SUPPORTS_MACCATALYST: false
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited)"
+    scheme:
+      testTargets:
+        - SVCMobileTests
+  SVCMobileTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+      - path: ../../mock-data/device-v1.json
+        buildPhase: resources
+      - path: ../../protocol/examples/firmware-manifest.dev.json
+        buildPhase: resources
+    dependencies:
+      - target: SVCMobile
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.avlyubimov.svc.mobile.tests
+        GENERATE_INFOPLIST_FILE: true

@@ -1,0 +1,43 @@
+name: E73 Zephyr Firmware
+
+on:
+  push:
+    paths:
+      - "firmware/radio/e73/**"
+      - "firmware/update/**"
+      - ".github/workflows/firmware-e73.yml"
+  pull_request:
+    paths:
+      - "firmware/radio/e73/**"
+      - "firmware/update/**"
+      - ".github/workflows/firmware-e73.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: app
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Set up Zephyr and ARM toolchain
+        uses: zephyrproject-rtos/action-zephyr-setup@v1
+        with:
+          base-path: app/firmware/radio
+          app-path: e73
+          toolchains: arm-zephyr-eabi
+      - name: Build MCUboot plus E73 application
+        working-directory: app/firmware/radio
+        run: |
+          west build \
+            --sysbuild \
+            -p always \
+            -b nrf52840dk/nrf52840 \
+            e73 \
+            -d build/e73
+      - name: Record development-key boundary
+        run: |
+          echo "Build validation may use the upstream MCUboot development key."
+          echo "No artifact from this job is production-authorized."
