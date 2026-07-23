@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "defaultProfileId": "bmw-r1200gs-k25-2007",
+  "fallbackProfileId": "generic-motorcycle",
+  "profiles": [
+    {
+      "id": "bmw-r1200gs-k25-2007",
+      "configuration": "bmw-r1200gs-k25-2007.json"
+    },
+    {
+      "id": "generic-motorcycle",
+      "configuration": "generic-motorcycle.json"
+    }
+  ]
+}

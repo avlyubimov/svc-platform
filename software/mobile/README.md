@@ -7,6 +7,7 @@ host, not an installation target.
 
 ```text
 protocol/   Versioned JSON and BLE contracts
+vehicle-profiles/ Shared technical dashboard profiles
 ios/        SwiftUI/CoreBluetooth application scaffold
 android/    Kotlin/Compose/Android BLE/Car App scaffold
 mock-data/  Hardware-free application data
@@ -14,6 +15,12 @@ mock-data/  Hardware-free application data
 
 Both phone applications start with `MockDeviceRepository`. No mobile or
 projected-display action controls a physical power channel.
+
+Vehicle performance configuration is separate from visual branding. The shared
+`vehicle-profiles/vehicle-profile-index-v1.json` catalog contains confirmed
+dashboard scales and reference values; unknown values remain explicit `null`.
+The Generic Motorcycle fallback intentionally defines no red zone or engine
+limits.
 
 ## Startup and personal branding
 
