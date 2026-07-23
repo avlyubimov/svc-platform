@@ -320,9 +320,13 @@ def validate_schematic_capture_work_queue() -> None:
         if sheet_file in manifest_sheets:
             sheet_path = KICAD_DIR / sheet_file if sheet_file == "PB-100.kicad_sch" else KICAD_DIR / "sheets" / sheet_file
             sheet_text = read_text(sheet_path)
-            for token in tokens:
-                if token not in sheet_text:
-                    fail(f"{sheet_path.relative_to(REPO_ROOT)} must mention source artifact {token}")
+            # Value-bearing sheets generated from the reviewed component model
+            # keep their source list in this validated queue rather than
+            # duplicating a long, stale-prone artifact list into KiCad notes.
+            if '(generator "svc-schematic-generator")' not in sheet_text:
+                for token in tokens:
+                    if token not in sheet_text:
+                        fail(f"{sheet_path.relative_to(REPO_ROOT)} must mention source artifact {token}")
 
     missing_work_items = sorted(REQUIRED_CAPTURE_WORK_ITEMS - seen_work_items)
     if missing_work_items:

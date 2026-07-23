@@ -7,4 +7,11 @@
     (options "")
     (descr "PB-100 preliminary project-local symbols")
   )
+  (lib
+    (name "PB100Gen")
+    (type "KiCad")
+    (uri "${KIPRJMOD}/lib/PB100Gen.kicad_sym")
+    (options "")
+    (descr "Deterministically generated PB-100 Rev.1 EVT sheet symbols")
+  )
 )
