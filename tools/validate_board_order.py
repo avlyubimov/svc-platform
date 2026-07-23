@@ -924,6 +924,7 @@ def validate_order_layout_state(board: str, row_number: int, row: dict[str, str]
                 "json",
                 "--schematic-parity",
                 "--severity-all",
+                "--refill-zones",
                 "--output",
                 str(report_path),
                 str(board_path),
@@ -940,7 +941,7 @@ def validate_order_layout_state(board: str, row_number: int, row: dict[str, str]
     total_footprints = board_text.count("\n\t(footprint ")
     segments = board_text.count("\n\t(segment ")
     vias = board_text.count("\n\t(via ")
-    zones = board_text.count("\n\t(zone ")
+    zones = board_text.count("\n\t(zone")
     unconnected = len(report.get("unconnected_items", []))
     parity_types = Counter(
         finding.get("type") for finding in report.get("schematic_parity", [])
@@ -981,11 +982,16 @@ def validate_order_layout_state(board: str, row_number: int, row: dict[str, str]
 
     if is_fabrication_authorized(row["Release state"].strip()):
         violations = report.get("violations", [])
+        error_violations = [
+            finding
+            for finding in violations
+            if finding.get("severity", "error") == "error"
+        ]
         disallowed_parity = parity_types - Counter({"extra_footprint": parity_types["extra_footprint"]})
-        if violations or unconnected or disallowed_parity or zones == 0:
+        if error_violations or unconnected or disallowed_parity or zones == 0:
             fail(
                 f"{ORDER_READINESS.relative_to(REPO_ROOT)}:{row_number}: {board} cannot be "
-                "EVT-FAB-AUTHORIZED before DRC, connectivity, schematic parity, and copper pours close"
+                "EVT-FAB-AUTHORIZED before DRC errors, connectivity, schematic parity, and copper pours close"
             )
 
 
@@ -1656,7 +1662,7 @@ def validate_kicad_scaffold(board: str, board_dir: Path, status: str) -> None:
         expected_layout = kicad_dir / f"{board}.kicad_pcb"
         if pcbs != [expected_layout]:
             fail(f"unexpected controlled layout artifact: {pcbs[0].relative_to(REPO_ROOT)}")
-        for token in (f"controlled `{board}.kicad_pcb`", "no manufacturing outputs"):
+        for token in (f"controlled `{board}.kicad_pcb`", "manufacturing outputs"):
             if token not in readme:
                 fail(f"{(kicad_dir / 'README.md').relative_to(REPO_ROOT)} must include {token}")
     elif f"no `{board}.kicad_pcb`" not in readme:

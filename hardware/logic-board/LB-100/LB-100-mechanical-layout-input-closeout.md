@@ -58,7 +58,7 @@ the first controlled KiCad board import under `EVT-LAYOUT-AUTHORIZED`:
   separation from service USB.
 - microSD: right-edge card access with local ESD and card-detect clearance.
 - BLE: U7 at `(72,59)` with the ceramic antenna facing the `+Y` edge and the
-  project-derived four-copper-layer keepout documented in
+  project-derived six-copper-layer keepout documented in
   `LB-100-e73-antenna-keepout.md`.
 - Sensors: documented board axes plus quiet IMU and lux/aperture zones.
 - Expansion/service: generic DNP/service keepouts while CAN1_TX_ROUTE remains

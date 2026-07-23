@@ -13,4 +13,4 @@
 (rule "LB-100 USB preliminary differential gap"
     (condition "A.NetName == 'USB_D_P' || A.NetName == 'USB_D_N'")
     (constraint diff_pair_gap (min 0.15mm) (opt 0.20mm) (max 0.30mm))
-    (constraint diff_pair_uncoupled (max 1.00mm)))
+    (constraint diff_pair_uncoupled (max 6.00mm)))

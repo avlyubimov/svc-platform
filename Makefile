@@ -1,6 +1,6 @@
-.PHONY: check validate-pb100 validate-q2-coupon validate-board-schematics validate-pb100-layout validate-lb100-layout validate-fb100-layout validate-board-order validate-readiness-consistency validate-config firmware-test pb100-release-status pb100-release-gate board-order-status board-order-gate clean
+.PHONY: check validate-pb100 validate-q2-coupon validate-board-schematics validate-pb100-layout validate-lb100-layout validate-lb100-evt-package validate-fb100-layout validate-board-order validate-readiness-consistency validate-config firmware-test pb100-release-status pb100-release-gate board-order-status board-order-gate lb100-evt-package clean
 
-check: validate-pb100 validate-q2-coupon validate-board-schematics validate-pb100-layout validate-lb100-layout validate-fb100-layout validate-board-order validate-readiness-consistency validate-config firmware-test
+check: validate-pb100 validate-q2-coupon validate-board-schematics validate-pb100-layout validate-lb100-layout validate-lb100-evt-package validate-fb100-layout validate-board-order validate-readiness-consistency validate-config firmware-test
 
 validate-pb100:
 	python3 tools/validate_pb100.py
@@ -16,6 +16,12 @@ validate-pb100-layout:
 
 validate-lb100-layout:
 	python3 tools/validate_lb100_layout.py
+
+validate-lb100-evt-package:
+	python3 tools/generate_lb100_evt_package.py --check
+
+lb100-evt-package:
+	python3 tools/generate_lb100_evt_package.py
 
 validate-fb100-layout:
 	python3 tools/validate_fb100_layout.py

@@ -24,7 +24,7 @@ hardware/logic-board/LB-100/LB-100-component-sourcing-precheck.csv,Production,LB
 hardware/logic-board/LB-100/LB-100-communication-safety-precheck.csv,Safety,CAN and expansion safety closeout,Required,validate_board_order,Ready
 hardware/logic-board/LB-100/LB-100-service-storage-sensor-precheck.csv,Service,Service storage sensor closeout,Required,validate_board_order,Ready
 hardware/logic-board/LB-100/LB-100-e73-recovery-interface.md,Service,E73 first-programming and recovery interface evidence,Required,validate_board_schematics,Closed
-hardware/logic-board/LB-100/LB-100-e73-antenna-keepout.md,RF,E73 four-copper-layer antenna keepout geometry and residual RF validation boundary,Required,validate_lb100_layout,Ready
+hardware/logic-board/LB-100/LB-100-e73-antenna-keepout.md,RF,E73 six-copper-layer antenna keepout geometry and residual RF validation boundary,Required,validate_lb100_layout,Ready
 hardware/logic-board/LB-100/LB-100-component-decision-record.md,Engineering,LB active component decision record,Required,validate_board_schematics,Closed
 hardware/power-board/PB-100/PB-100-fx18-paired-stack-closeout.md,Mechanical,Corrected PB/LB FX18 paired-stack closeout,Required,validate_board_order,Closed
 tools/generate_lb_fb_schematics.py,KiCad schematic,Deterministic LB/FB schematic generator,Required,validate_board_schematics,Ready

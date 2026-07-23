@@ -10,6 +10,8 @@ from .stages import (
     allowed_release_states,
     derive_blocker_authorization,
     derive_pb_release_state,
+    is_fabrication_authorized,
+    is_fabrication_review,
 )
 
 
@@ -476,8 +478,18 @@ def validate_evt_fab_and_production_boundaries() -> None:
 
     for board, path in EVT_FAB_CHECKLISTS.items():
         rows = read_csv(path)
-        if any(row.get("Status", "").strip() != "Open" for row in rows):
-            raise ValidationError(f"{relative(path)} must remain open before routed fab review")
+        statuses = {row.get("Status", "").strip() for row in rows}
+        if not statuses <= {"Open", "Conditional", "Closed"}:
+            raise ValidationError(f"{relative(path)} has an invalid review status")
+        board_state = aggregate_states[board]
+        if is_fabrication_authorized(board_state) and statuses != {"Closed"}:
+            raise ValidationError(
+                f"{relative(path)} must be fully Closed at {board_state}"
+            )
+        if not is_fabrication_review(board_state) and statuses != {"Open"}:
+            raise ValidationError(
+                f"{relative(path)} must remain Open before routed fab review"
+            )
         text = " ".join(" ".join(row.values()) for row in rows)
         for token in ("DRC", "EVT-FAB-AUTHORIZED", "Product Owner", "no second developer required"):
             if token not in text:

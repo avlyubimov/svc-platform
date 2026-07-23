@@ -3949,3 +3949,51 @@ restart, media recovery with an unconsumed frame, v1 rollover, header identity,
 and UndefinedBehaviorSanitizer pass. The STM32 FatFs `diskio` binding remains
 open before motorcycle logging tests. No hardware architecture or CAN1
 read-only policy changes.
+
+## 2026-07-22 — Complete LB-100 routing and authorize a limited bare-PCB EVT batch
+
+Decision: close the remaining LB-100 connectivity on six copper layers using
+only conventional 0.50/0.30 mm F.Cu-to-B.Cu plated through vias. Use the
+JLCPCB `JLC06161H-3313` 1.6 mm construction with F.Cu/In1.Cu/In3.Cu/B.Cu as
+signal-capable layers and uninterrupted GND references on In2.Cu and In4.Cu.
+F.Cu and B.Cu also receive GND pours. Extend the existing project-derived E73
+rule area across all six copper layers.
+
+Why: repeated four-layer DRC-guided and autorouter trials could not reduce the
+53-item congestion without shorts or clearance regressions. A six-layer
+standard-through-via solution closes connectivity with generous 0.15 mm
+signal rules while retaining two continuous return planes. Alternative A was
+continued four-layer local re-placement; it was rejected for Rev.1 because the
+MCU/JPB1 fan-out had already demonstrated an unstable routing bottleneck.
+Alternative B was HDI with blind or buried vias; it was rejected because it
+adds prototype cost, process risk, inspection difficulty and no required
+capability. The selected stack raises bare-board cost relative to four layers
+but remains inside the platform's 500 USD prototype budget and improves return
+paths, EMC margin and layout maintainability. It has no material thermal
+penalty; the added planes improve heat spreading. Production impact is limited
+to a common six-layer process and supplier stack selection. Field reliability
+benefits from ordinary through vias and avoids stacked/microvia failure modes.
+
+Decision: route USB Full Speed on In3.Cu over In2.Cu using 0.20 mm width and an
+approximately 0.157 mm long-section edge gap. Total P/N skew is 1.112 mm and
+the committed analytical regression guard is approximately 85 ohm. This is
+not qualification evidence: the order must request 90-ohm differential
+control on the exact stack and stop if the supplier proposes an unreviewed
+geometry or layer substitution.
+
+Decision: change the two 1.00 mm TF-015 locating features from plated pads to
+NPTH holes, matching the official SOFNG drawing. Retain JUSHUO
+`AFC07-S24ECA-00` / LCSC C262643 as the 24-position 0.5 mm top-contact,
+slide-lock, 0.3 mm FFC connector. Electrical pin ordering is closed; physical
+cable contact face, fold, bend radius and latch access are first-article
+unpowered fit checks rather than claims inferred from PCB coordinates.
+
+Result: the deterministic LB-100 board has 2,274 segments, 409 standard
+through vias, four GND zones, zero refilled DRC errors and zero unconnected
+items. The remaining 27 findings are locked non-electrical silkscreen/library
+warnings. The Product Owner instruction to finish LB-100 and prepare test
+boards authorizes one segregated five-board bare-PCB Rev.1 EVT package after
+repository validation. Supplier DFM, exact stack and impedance confirmation
+remain mandatory before payment. Assembly, motorcycle use, PB-100 and the
+combined platform remain `NO-GO`; BLE enclosure range, FFC fit and all normal
+bench/production evidence remain open.

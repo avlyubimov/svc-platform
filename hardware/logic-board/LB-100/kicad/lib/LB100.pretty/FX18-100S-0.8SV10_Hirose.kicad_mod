@@ -217,6 +217,7 @@
 				(size 0.800 0.800)
 				(thickness 0.100)
 			)
+			(justify mirror)
 		)
 	)
 	(fp_text user "MF A/B: 6 TH / 4 GND circuits"

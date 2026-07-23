@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import csv
 import json
+import math
 import re
 import shutil
 import subprocess
@@ -15,9 +16,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BOARD_PATH = ROOT / "hardware" / "logic-board" / "LB-100" / "kicad" / "LB-100.kicad_pcb"
 REQUIRED_KICAD_VERSION = "10.0.4"
-EXPECTED_UNCONNECTED_ITEMS = 53
-EXPECTED_SEGMENTS = 1844
-EXPECTED_VIAS = 188
+EXPECTED_UNCONNECTED_ITEMS = 0
+EXPECTED_SEGMENTS = 2274
+EXPECTED_VIAS = 409
 EXPECTED_GND_ZONES = 4
 EXPECTED_ANTENNA_KEEPOUTS = 1
 EXPECTED_SCHEMATIC_FOOTPRINTS = 104
@@ -25,19 +26,16 @@ BOARD_ONLY_FOOTPRINTS = {f"H{index}" for index in range(1, 9)}
 ALLOWED_VIOLATIONS = Counter(
     {
         "silk_over_copper": 10,
-        "track_dangling": 7,
         "lib_footprint_issues": 8,
         "silk_edge_clearance": 6,
-        "silk_overlap": 6,
-        "starved_thermal": 3,
         "lib_footprint_mismatch": 3,
-        "annular_width": 2,
-        "padstack": 2,
-        "diff_pair_uncoupled_length_too_long": 1,
-        "via_dangling": 1,
-        "nonmirrored_text_on_back_layer": 1,
     }
 )
+MAX_USB_DATA_SKEW_MM = 1.20
+USB_TRACE_WIDTH_MM = 0.20
+USB_REFERENCE_HEIGHT_MM = 0.1088
+USB_INNER_COPPER_MM = 0.0152
+USB_PREPREG_ER = 4.16
 
 
 def fail(message: str) -> None:
@@ -110,7 +108,7 @@ def validate_documented_decisions() -> None:
         "project-derived Rev.1 rule",
         "65.35..78.65 mm",
         "66.61 mm",
-        "F.Cu`, `In1.Cu`, `In2.Cu`, and `B.Cu",
+        "F.Cu`, `In1.Cu`, `In2.Cu`, `In3.Cu`, `In4.Cu`, and `B.Cu",
     ):
         if token not in keepout_doc:
             fail(f"LB-100 E73 keepout evidence is missing {token}")
@@ -125,6 +123,7 @@ def validate_board_milestone() -> None:
         '(gr_rect (start 0 0) (end 100 70)',
         'LB-100 REV.1 EVT - NOT FOR PRODUCTION',
         'E73 ANTENNA - ALL-COPPER KEEPOUT',
+        'STACKUP JLC06161H-3313 / 6L / 1.6 mm',
         'FOG A/B INPUT PROTECTION',
         '(property "Reference" "JPB1"',
         '(property "Reference" "U1"',
@@ -137,8 +136,17 @@ def validate_board_milestone() -> None:
         '(net 25 "E73_SWDCLK")',
         '(net 26 "E73_SWDIO")',
         '(property "Reference" "H8"',
-        '(2 "In1.Cu" power)',
-        '(4 "In2.Cu" power)',
+        '(4 "In1.Cu" signal)',
+        '(6 "In2.Cu" power)',
+        '(8 "In3.Cu" signal)',
+        '(10 "In4.Cu" power)',
+        '(13 "F.Paste" user)',
+        '(15 "B.Paste" user)',
+        '(1 "F.Mask" user)',
+        '(3 "B.Mask" user)',
+        '(layer "dielectric 1" (type "prepreg") (thickness 0.0994)',
+        '(layer "dielectric 2" (type "core") (thickness 0.55)',
+        '(layer "dielectric 3" (type "prepreg") (thickness 0.1088)',
     ):
         if token not in board_text:
             fail(f"LB-100 controlled layout is missing {token}")
@@ -161,10 +169,10 @@ def validate_board_milestone() -> None:
             board_text,
         )
     )
-    if gnd_zone_layers != {"F.Cu", "In1.Cu", "In2.Cu", "B.Cu"}:
+    if gnd_zone_layers != {"F.Cu", "In2.Cu", "In4.Cu", "B.Cu"}:
         fail(f"unexpected LB-100 GND zone layers: {sorted(gnd_zone_layers)}")
     for token in (
-        '(layers "F.Cu" "In1.Cu" "In2.Cu" "B.Cu")',
+        '(layers "F.Cu" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "B.Cu")',
         '(keepout (tracks not_allowed) (vias not_allowed) (pads not_allowed) '
         '(copperpour not_allowed) (footprints allowed))',
         '(xy 65.35 66.61)',
@@ -172,6 +180,107 @@ def validate_board_milestone() -> None:
     ):
         if token not in board_text:
             fail(f"LB-100 E73 antenna keepout is missing {token}")
+
+
+def validate_routing_geometry() -> None:
+    lengths: dict[str, float] = {}
+    controlled_segments: dict[str, dict[str, str]] = {}
+    ground_vias: list[tuple[float, float]] = []
+    segment_count = 0
+    via_count = 0
+    with (BOARD_PATH.parent / "LB-100-routing.csv").open(
+        newline="", encoding="utf-8"
+    ) as routing_file:
+        for row in csv.DictReader(routing_file):
+            if row["kind"] == "via":
+                via_count += 1
+                if row["start_layer"] != "F.Cu" or row["end_layer"] != "B.Cu":
+                    fail("LB-100 EVT routing must use standard through vias only")
+                if not math.isclose(float(row["diameter_mm"]), 0.50, abs_tol=1e-9):
+                    fail("LB-100 via diameter changed from 0.50 mm")
+                if not math.isclose(float(row["drill_mm"]), 0.30, abs_tol=1e-9):
+                    fail("LB-100 via drill changed from 0.30 mm")
+                if row["net"] == "GND":
+                    ground_vias.append(
+                        (float(row["start_x_mm"]), float(row["start_y_mm"]))
+                    )
+                continue
+            if row["kind"] != "segment":
+                fail(f"unsupported LB-100 routing item {row['kind']!r}")
+            segment_count += 1
+            if row["layer"] in {"In2.Cu", "In4.Cu"}:
+                fail(f"signal routing is not allowed on reference plane {row['layer']}")
+            start_x = float(row["start_x_mm"])
+            start_y = float(row["start_y_mm"])
+            end_x = float(row["end_x_mm"])
+            end_y = float(row["end_y_mm"])
+            length = math.hypot(end_x - start_x, end_y - start_y)
+            lengths[row["net"]] = lengths.get(row["net"], 0.0) + length
+            if (
+                row["net"] in {"USB_D_P", "USB_D_N"}
+                and row["layer"] == "In3.Cu"
+                and length > 20.0
+            ):
+                controlled_segments[row["net"]] = row
+
+    if segment_count != EXPECTED_SEGMENTS or via_count != EXPECTED_VIAS:
+        fail("LB-100 routing-manifest counts do not match the controlled board")
+    if set(controlled_segments) != {"USB_D_P", "USB_D_N"}:
+        fail("LB-100 must have one long controlled In3.Cu segment per USB polarity")
+    for net_name, row in controlled_segments.items():
+        if not math.isclose(float(row["width_mm"]), USB_TRACE_WIDTH_MM, abs_tol=1e-9):
+            fail(f"{net_name} controlled segment is not 0.20 mm wide")
+
+    p = controlled_segments["USB_D_P"]
+    n = controlled_segments["USB_D_N"]
+    p_vector = (
+        float(p["end_x_mm"]) - float(p["start_x_mm"]),
+        float(p["end_y_mm"]) - float(p["start_y_mm"]),
+    )
+    n_vector = (
+        float(n["end_x_mm"]) - float(n["start_x_mm"]),
+        float(n["end_y_mm"]) - float(n["start_y_mm"]),
+    )
+    if any(not math.isclose(a, b, abs_tol=1e-9) for a, b in zip(p_vector, n_vector)):
+        fail("LB-100 USB controlled segments are no longer parallel and length matched")
+    offset = (
+        float(n["start_x_mm"]) - float(p["start_x_mm"]),
+        float(n["start_y_mm"]) - float(p["start_y_mm"]),
+    )
+    vector_length = math.hypot(*p_vector)
+    centre_spacing = abs(p_vector[0] * offset[1] - p_vector[1] * offset[0]) / vector_length
+    edge_gap = centre_spacing - USB_TRACE_WIDTH_MM
+    if not 0.15 <= edge_gap <= 0.17:
+        fail(f"LB-100 USB controlled edge gap changed to {edge_gap:.4f} mm")
+    skew = abs(lengths["USB_D_P"] - lengths["USB_D_N"])
+    if skew > MAX_USB_DATA_SKEW_MM:
+        fail(f"LB-100 USB routed skew {skew:.4f} mm exceeds {MAX_USB_DATA_SKEW_MM:.2f} mm")
+
+    # IPC-style edge-coupled estimate is a regression guard, not supplier
+    # impedance evidence. The JLCPCB field solver remains an upload-time gate.
+    z0 = 87.0 / math.sqrt(USB_PREPREG_ER + 1.41) * math.log(
+        5.98 * USB_REFERENCE_HEIGHT_MM
+        / (0.8 * USB_TRACE_WIDTH_MM + USB_INNER_COPPER_MM)
+    )
+    estimated_differential_ohms = 2.0 * z0 * (
+        1.0 - 0.48 * math.exp(-0.96 * edge_gap / USB_REFERENCE_HEIGHT_MM)
+    )
+    if not 83.0 <= estimated_differential_ohms <= 95.0:
+        fail(
+            "LB-100 analytical USB impedance precheck changed to "
+            f"{estimated_differential_ohms:.1f} ohm"
+        )
+
+    for centre in ((8.0, 39.0), (41.25, 43.15)):
+        nearest_ground_via = min(
+            math.hypot(centre[0] - via[0], centre[1] - via[1])
+            for via in ground_vias
+        )
+        if nearest_ground_via > 4.0:
+            fail(
+                "LB-100 USB reference transition lacks a GND via within 4 mm "
+                f"at {centre}"
+            )
 
 
 def validate_drc() -> None:
@@ -246,13 +355,14 @@ def main() -> int:
     validate_generated_files()
     validate_documented_decisions()
     validate_board_milestone()
+    validate_routing_geometry()
     validate_drc()
     print(
         "LB-100 controlled routing validation passed "
         f"({EXPECTED_SCHEMATIC_FOOTPRINTS} schematic footprints, 8 mounting holes, {EXPECTED_SEGMENTS} segments, "
-        f"{EXPECTED_VIAS} vias, {EXPECTED_UNCONNECTED_ITEMS} connections open; "
-        f"{EXPECTED_GND_ZONES} GND zones and one four-layer E73 keepout; "
-        "no shorts, crossings, copper-clearance, or keepout violations after refill)."
+        f"{EXPECTED_VIAS} standard through vias, zero unconnected; "
+        f"{EXPECTED_GND_ZONES} GND zones and one six-layer E73 keepout; "
+        "zero DRC errors with reviewed fabrication warnings after refill)."
     )
     return 0
 

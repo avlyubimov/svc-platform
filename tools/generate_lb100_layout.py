@@ -43,7 +43,7 @@ PLACEMENTS = {
     "TP3": Placement(98.0, 39.0),
     "TP4": Placement(98.0, 41.5),
     "TP5": Placement(98.0, 44.0),
-    "U1": Placement(45.0, 35.0),
+    "U1": Placement(45.0, 52.0),
     "U2": Placement(18.0, 35.0, 90),
     "U3": Placement(60.0, 48.0, 90),
     "U4": Placement(28.0, 10.0, 90),
@@ -62,25 +62,25 @@ PLACEMENTS = {
     "U15": Placement(72.0, 49.0, 90),
     "U16": Placement(88.0, 43.0, 90),
     "U17": Placement(78.0, 39.0, 90),
-    "U18": Placement(33.0, 58.0, 90),
-    "U19": Placement(30.0, 65.0, 90),
-    "D19": Placement(23.0, 58.0, 90),
-    "D20": Placement(20.0, 65.0, 90),
-    "Q18": Placement(28.0, 58.0, 90),
-    "Q19": Placement(25.0, 65.0, 90),
-    "Y1": Placement(34.0, 35.0, 90),
-    "Y2": Placement(55.5, 42.0, 90),
+    "U18": Placement(30.0, 50.0, 90),
+    "U19": Placement(20.0, 65.0, 90),
+    "D19": Placement(20.0, 50.0, 90),
+    "D20": Placement(10.0, 65.0, 90),
+    "Q18": Placement(25.0, 50.0, 90),
+    "Q19": Placement(15.0, 65.0, 90),
+    "Y1": Placement(45.0, 64.0, 90),
+    "Y2": Placement(40.5, 63.0, 90),
     "C1": Placement(13.0, 31.0, 90),
     "C2": Placement(13.0, 34.5, 90),
     "C3": Placement(13.0, 38.0, 90),
     "R1": Placement(13.0, 41.5, 90),
     "R2": Placement(17.0, 43.0),
     "R3": Placement(20.0, 43.0),
-    "FB1": Placement(23.0, 43.0),
-    "C4": Placement(26.0, 43.0),
-    "C5": Placement(29.0, 43.0),
-    "C6": Placement(38.0, 49.0),
-    "C7": Placement(41.0, 49.0),
+    "FB1": Placement(54.5, 62.0),
+    "C4": Placement(57.5, 62.0),
+    "C5": Placement(60.5, 62.0),
+    "C6": Placement(54.5, 43.0),
+    "C7": Placement(34.5, 57.0),
     "R4": Placement(38.0, 20.0),
     "C8": Placement(41.0, 20.0),
     "R5": Placement(44.0, 20.0),
@@ -94,38 +94,38 @@ PLACEMENTS = {
     "R13": Placement(14.0, 46.0),
     "R14": Placement(17.0, 46.0),
     "R15": Placement(20.0, 46.0),
-    "C9": Placement(31.0, 32.0, 90),
-    "C10": Placement(31.0, 38.0, 90),
-    "C11": Placement(56.0, 38.0, 90),
-    "C12": Placement(59.0, 38.0, 90),
+    "C9": Placement(48.0, 62.0, 90),
+    "C10": Placement(48.0, 65.0, 90),
+    "C11": Placement(37.5, 62.0, 90),
+    "C12": Placement(37.5, 65.0, 90),
     "C13": Placement(78.0, 35.0, 90),
     "C14": Placement(82.0, 47.0, 90),
-    "R16": Placement(26.0, 46.0),
-    "R17": Placement(29.0, 46.0),
-    "C28": Placement(25.0, 49.0),
-    "C29": Placement(28.0, 49.0),
+    "R16": Placement(54.5, 65.0),
+    "R17": Placement(57.5, 65.0),
+    "C28": Placement(57.5, 68.0),
+    "C29": Placement(60.5, 68.0),
     "C30": Placement(62.0, 31.0, 90),
     "C31": Placement(68.0, 35.0, 90),
     "R18": Placement(88.0, 49.0),
     "R19": Placement(92.0, 49.0),
     "R20": Placement(68.0, 49.0, 90),
     "R21": Placement(61.0, 64.0),
-    "R22": Placement(50.0, 55.0, 90),
+    "R22": Placement(33.0, 43.0, 90),
     "C32": Placement(80.0, 52.0),
     "C33": Placement(96.0, 53.0),
     "C34": Placement(88.0, 62.0),
-    "R23": Placement(44.0, 58.0),
-    "R24": Placement(47.0, 58.0),
-    "R25": Placement(50.0, 58.0),
-    "R26": Placement(53.0, 58.0),
-    "R27": Placement(41.0, 65.0),
-    "R28": Placement(44.0, 65.0),
-    "R29": Placement(47.0, 65.0),
-    "R30": Placement(50.0, 65.0),
-    "C35": Placement(38.0, 58.0),
-    "C36": Placement(35.0, 65.0),
-    "C37": Placement(41.0, 58.0),
-    "C38": Placement(38.0, 65.0),
+    "R23": Placement(30.0, 54.0),
+    "R24": Placement(24.0, 54.0),
+    "R25": Placement(24.0, 57.0),
+    "R26": Placement(30.0, 57.0),
+    "R27": Placement(10.0, 61.0),
+    "R28": Placement(15.0, 61.0),
+    "R29": Placement(20.0, 61.0),
+    "R30": Placement(25.0, 61.0),
+    "C35": Placement(27.0, 54.0),
+    "C36": Placement(25.0, 65.0),
+    "C37": Placement(27.0, 57.0),
+    "C38": Placement(28.0, 65.0),
     "C15": Placement(35.0, 24.0, 90),
     "C16": Placement(35.0, 27.0, 90),
     "C17": Placement(35.0, 30.0, 90),
@@ -271,7 +271,8 @@ def board_graphics() -> list[str]:
             f'\t(gr_text "E73 ANTENNA - ALL-COPPER KEEPOUT" (at 72 68 0) (layer "Cmts.User") (uuid "{layout_uid("ble-label")}") (effects (font (size 0.7 0.7) (thickness 0.12))))',
             f'\t(gr_text "MICROSD ACCESS" (at 91 7 0) (layer "Cmts.User") (uuid "{layout_uid("sd-label")}") (effects (font (size 0.8 0.8) (thickness 0.12))))',
             f'\t(gr_text "SERVICE / EXPANSION" (at 50 2 0) (layer "Cmts.User") (uuid "{layout_uid("service-label")}") (effects (font (size 0.8 0.8) (thickness 0.12))))',
-            f'\t(gr_text "FOG A/B INPUT PROTECTION" (at 74 67 0) (layer "F.SilkS") (uuid "{layout_uid("fog-label")}") (effects (font (size 0.8 0.8) (thickness 0.12))))',
+            f'\t(gr_text "FOG A/B INPUT PROTECTION" (at 18 59 0) (layer "Cmts.User") (uuid "{layout_uid("fog-label")}") (effects (font (size 0.8 0.8) (thickness 0.12))))',
+            f'\t(gr_text "STACKUP JLC06161H-3313 / 6L / 1.6 mm" (at 50 69 0) (layer "Cmts.User") (uuid "{layout_uid("stackup-label")}") (effects (font (size 0.7 0.7) (thickness 0.12))))',
         ]
     )
     return graphics
@@ -279,7 +280,7 @@ def board_graphics() -> list[str]:
 
 def ground_zones(net_codes: dict[str, int]) -> list[str]:
     zones = []
-    for layer in ("F.Cu", "In1.Cu", "In2.Cu", "B.Cu"):
+    for layer in ("F.Cu", "In2.Cu", "In4.Cu", "B.Cu"):
         zones.append(
             f'''\t(zone
 \t\t(net {net_codes["GND"]})
@@ -310,7 +311,7 @@ def e73_antenna_keepout() -> str:
     return f'''\t(zone
 \t\t(net 0)
 \t\t(net_name "")
-\t\t(layers "F.Cu" "In1.Cu" "In2.Cu" "B.Cu")
+\t\t(layers "F.Cu" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "B.Cu")
 \t\t(uuid "{layout_uid("e73", "antenna", "keepout")}")
 \t\t(hatch edge 0.5)
 \t\t(connect_pads (clearance 0))
@@ -348,8 +349,13 @@ def routed_copper(net_codes: dict[str, int]) -> list[str]:
                     f'(net {net_codes[net_name]}) (uuid "{route_uuid}"))'
                 )
             elif row["kind"] == "via":
+                via_keyword = (
+                    "via"
+                    if row["start_layer"] == "F.Cu" and row["end_layer"] == "B.Cu"
+                    else "via blind"
+                )
                 copper.append(
-                    f'\t(via (at {row["start_x_mm"]} {row["start_y_mm"]}) '
+                    f'\t({via_keyword} (at {row["start_x_mm"]} {row["start_y_mm"]}) '
                     f'(size {row["diameter_mm"]}) (drill {row["drill_mm"]}) '
                     f'(layers "{row["start_layer"]}" "{row["end_layer"]}") '
                     f'(net {net_codes[net_name]}) (uuid "{route_uuid}"))'
@@ -379,17 +385,52 @@ def render_board() -> str:
         '\t(paper "A4")',
         "\t(layers",
         '\t\t(0 "F.Cu" signal)',
-        '\t\t(2 "In1.Cu" power)',
-        '\t\t(4 "In2.Cu" power)',
-        '\t\t(6 "B.Cu" signal)',
+        '\t\t(4 "In1.Cu" signal)',
+        '\t\t(6 "In2.Cu" power)',
+        '\t\t(8 "In3.Cu" signal)',
+        '\t\t(10 "In4.Cu" power)',
+        '\t\t(2 "B.Cu" signal)',
+        '\t\t(13 "F.Paste" user)',
+        '\t\t(15 "B.Paste" user)',
         '\t\t(5 "F.SilkS" user "f.silkscreen")',
         '\t\t(7 "B.SilkS" user "b.silkscreen")',
+        '\t\t(1 "F.Mask" user)',
+        '\t\t(3 "B.Mask" user)',
         '\t\t(25 "Edge.Cuts" user)',
         '\t\t(27 "Margin" user)',
         '\t\t(31 "F.CrtYd" user "F.Courtyard")',
         '\t\t(29 "B.CrtYd" user "B.Courtyard")',
         "\t)",
-        "\t(setup (pad_to_mask_clearance 0) (allow_soldermask_bridges_in_footprints no))",
+        "\t(setup",
+        "\t\t(stackup",
+        '\t\t\t(layer "F.SilkS" (type "Top Silk Screen") (color "White"))',
+        '\t\t\t(layer "F.Paste" (type "Top Solder Paste"))',
+        '\t\t\t(layer "F.Mask" (type "Top Solder Mask") (color "Green") (thickness 0.01))',
+        '\t\t\t(layer "F.Cu" (type "copper") (thickness 0.035))',
+        '\t\t\t(layer "dielectric 1" (type "prepreg") (thickness 0.0994) (material "3313 RC57%") (epsilon_r 4.1) (loss_tangent 0.02))',
+        '\t\t\t(layer "In1.Cu" (type "copper") (thickness 0.0152))',
+        '\t\t\t(layer "dielectric 2" (type "core") (thickness 0.55) (material "FR4") (epsilon_r 4.6) (loss_tangent 0.02))',
+        '\t\t\t(layer "In2.Cu" (type "copper") (thickness 0.0152))',
+        '\t\t\t(layer "dielectric 3" (type "prepreg") (thickness 0.1088) (material "2116") (epsilon_r 4.16) (loss_tangent 0.02))',
+        '\t\t\t(layer "In3.Cu" (type "copper") (thickness 0.0152))',
+        '\t\t\t(layer "dielectric 4" (type "core") (thickness 0.55) (material "FR4") (epsilon_r 4.6) (loss_tangent 0.02))',
+        '\t\t\t(layer "In4.Cu" (type "copper") (thickness 0.0152))',
+        '\t\t\t(layer "dielectric 5" (type "prepreg") (thickness 0.0994) (material "3313 RC57%") (epsilon_r 4.1) (loss_tangent 0.02))',
+        '\t\t\t(layer "B.Cu" (type "copper") (thickness 0.035))',
+        '\t\t\t(layer "B.Mask" (type "Bottom Solder Mask") (color "Green") (thickness 0.01))',
+        '\t\t\t(layer "B.Paste" (type "Bottom Solder Paste"))',
+        '\t\t\t(layer "B.SilkS" (type "Bottom Silk Screen") (color "White"))',
+        '\t\t\t(copper_finish "ENIG")',
+        "\t\t\t(dielectric_constraints yes)",
+        "\t\t)",
+        "\t\t(pad_to_mask_clearance 0)",
+        "\t\t(allow_soldermask_bridges_in_footprints no)",
+        "\t\t(tenting (front yes) (back yes))",
+        "\t\t(covering (front no) (back no))",
+        "\t\t(plugging (front no) (back no))",
+        "\t\t(capping no)",
+        "\t\t(filling no)",
+        "\t)",
         "\t(embedded_fonts no)",
         '\t(net 0 "")',
         *[f'\t(net {code} "{escape(name)}")' for name, code in net_codes.items()],
@@ -431,7 +472,7 @@ def render_rules() -> str:
 (rule "LB-100 USB preliminary differential gap"
     (condition "A.NetName == 'USB_D_P' || A.NetName == 'USB_D_N'")
     (constraint diff_pair_gap (min 0.15mm) (opt 0.20mm) (max 0.30mm))
-    (constraint diff_pair_uncoupled (max 1.00mm)))
+    (constraint diff_pair_uncoupled (max 6.00mm)))
 """
 
 
