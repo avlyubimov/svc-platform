@@ -53,7 +53,7 @@ private class StatusScreen(
             )
         }
         return ListTemplate.Builder()
-            .setTitle("SVC Status")
+            .setTitle("BMW R1200GS · SVC")
             .setSingleList(list.build())
             .build()
     }

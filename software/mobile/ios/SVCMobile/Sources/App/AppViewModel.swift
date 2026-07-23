@@ -6,6 +6,7 @@ final class AppViewModel: ObservableObject {
     @Published private(set) var device: DeviceSnapshot
     @Published private(set) var discoveredDevices: [DiscoveredDevice] = []
     @Published private(set) var firmwareStatus = "Not checked"
+    @Published private(set) var isConnecting = false
 
     private let repository: DeviceRepository
     private let releaseRepository: FirmwareReleaseRepository
@@ -30,6 +31,31 @@ final class AppViewModel: ObservableObject {
 
     func refresh() {
         device = repository.currentSnapshot()
+    }
+
+    func beginStartupTasks() {
+        isConnecting = device.connectionState != .connected
+        Task {
+            async let profileLoad: Void = simulatedLoad(milliseconds: 40)
+            async let themeLoad: Void = simulatedLoad(milliseconds: 40)
+            async let telemetryLoad: Void = simulatedLoad(milliseconds: 80)
+            async let connection: Void = restoreConnection()
+            _ = await (profileLoad, themeLoad, telemetryLoad, connection)
+        }
+    }
+
+    private func simulatedLoad(milliseconds: Int) async {
+        try? await Task.sleep(for: .milliseconds(milliseconds))
+    }
+
+    private func restoreConnection() async {
+        let devices = repository.discover()
+        try? await Task.sleep(for: .seconds(3))
+        if let device = devices.first {
+            repository.connect(to: device.id)
+            self.device = repository.currentSnapshot()
+        }
+        isConnecting = false
     }
 
     func checkFirmware() {

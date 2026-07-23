@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "durationMs": 2100,
+  "criticalDurationMs": 500,
+  "phases": {
+    "screenOnEndMs": 250,
+    "logoEndMs": 700,
+    "identityEndMs": 1200,
+    "taglineEndMs": 1600,
+    "dashboardEndMs": 2100
+  }
+}

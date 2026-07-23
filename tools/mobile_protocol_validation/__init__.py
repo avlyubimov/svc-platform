@@ -1,3 +1,9 @@
+from .branding import (
+    load_startup_timeline,
+    restore_primary_screen,
+    selected_brand_pack,
+    startup_duration_ms,
+)
 from .validation import (
     ArtifactValidationError,
     CompatibilityError,
@@ -44,4 +50,8 @@ __all__ = [
     "validate_release_workflow",
     "validate_tag_version_channel",
     "verify_detached",
+    "load_startup_timeline",
+    "restore_primary_screen",
+    "selected_brand_pack",
+    "startup_duration_ms",
 ]

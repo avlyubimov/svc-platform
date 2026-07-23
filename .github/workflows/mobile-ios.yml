@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "software/mobile/ios/**"
+      - "software/mobile/branding/**"
       - "software/mobile/mock-data/**"
       - "software/mobile/protocol/examples/**"
       - "tools/select_ios_simulator.py"
@@ -11,6 +12,7 @@ on:
   pull_request:
     paths:
       - "software/mobile/ios/**"
+      - "software/mobile/branding/**"
       - "software/mobile/mock-data/**"
       - "software/mobile/protocol/examples/**"
       - "tools/select_ios_simulator.py"

@@ -1,6 +1,8 @@
 package com.avlyubimov.svc.mobile
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +16,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -24,6 +27,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.avlyubimov.svc.core.model.ChannelTelemetry
@@ -33,6 +39,7 @@ import com.avlyubimov.svc.core.model.Measurement
 import com.avlyubimov.svc.core.model.TelemetrySnapshot
 import com.avlyubimov.svc.core.update.OtaPolicy
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 private enum class Screen(val title: String) {
     PAIRING("Search and pairing"),
@@ -40,6 +47,7 @@ private enum class Screen(val title: String) {
     CHANNELS("Power channels"),
     DIAGNOSTICS("Diagnostics"),
     CAN("CAN telemetry"),
+    NAVIGATION("Navigation status"),
     EVENTS("Event log"),
     DEVICE("Device information"),
     FIRMWARE("Firmware update"),
@@ -49,14 +57,52 @@ private enum class Screen(val title: String) {
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun SVCMobileApp(repository: DeviceRepository) {
+    val context = LocalContext.current
+    val appearance = remember { AppearancePreferences(context) }
     val device by repository.snapshot.collectAsStateWithLifecycle()
-    var selectedScreen by remember { mutableStateOf<Screen?>(null) }
+    var selectedScreen by remember {
+        mutableStateOf<Screen?>(
+            Screen.entries.firstOrNull { it.name == appearance.restoreScreen() }
+                ?.takeIf { it.isRestorable }
+                ?: Screen.DASHBOARD,
+        )
+    }
     var confirmInstall by remember { mutableStateOf(false) }
     var discoveredDevices by remember { mutableStateOf<List<DiscoveredDevice>>(emptyList()) }
+    var isConnecting by remember { mutableStateOf(device.connectionState.name != "CONNECTED") }
+    var showStartup by remember { mutableStateOf(true) }
+    var startupReplayKey by remember { mutableStateOf(0) }
+    var appearanceRevision by remember { mutableStateOf(0) }
     val coroutineScope = rememberCoroutineScope()
+    val brandPack = remember(appearanceRevision) { appearance.brandPack(context) }
+    val criticalWarning = device.telemetry.warnings.firstOrNull {
+        it.active && it.severity.equals("critical", ignoreCase = true)
+    }
 
-    MaterialTheme {
-        Scaffold(
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        launch { appearance.brandPack(context) }
+        launch { appearance.restoreScreen() }
+        launch {
+            discoveredDevices = repository.discover()
+            delay(3_000)
+            discoveredDevices.firstOrNull()?.let { repository.connect(it.id) }
+            isConnecting = false
+        }
+    }
+
+    MaterialTheme(
+        colorScheme = androidx.compose.material3.darkColorScheme(
+            background = MobileColors.Background,
+            surface = MobileColors.Surface,
+            primary = MobileColors.BmwBlue,
+            onBackground = MobileColors.PrimaryText,
+            onSurface = MobileColors.PrimaryText,
+            error = MobileColors.Critical,
+        ),
+    ) {
+        Box(Modifier.fillMaxSize().background(MobileColors.Background)) {
+            Scaffold(
+                containerColor = MobileColors.Background,
             topBar = {
                 TopAppBar(
                     title = {
@@ -82,7 +128,10 @@ fun SVCMobileApp(repository: DeviceRepository) {
                 ) {
                     items(Screen.entries) { screen ->
                         Button(
-                            onClick = { selectedScreen = screen },
+                            onClick = {
+                                selectedScreen = screen
+                                if (screen.isRestorable) appearance.storeScreen(screen.name)
+                            },
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text(screen.title)
@@ -110,10 +159,18 @@ fun SVCMobileApp(repository: DeviceRepository) {
                             }
                         },
                     )
-                    Screen.DASHBOARD -> DashboardScreen(device.telemetry, modifier)
+                    Screen.DASHBOARD -> DashboardScreen(
+                        device.telemetry,
+                        isConnecting,
+                        modifier,
+                    )
                     Screen.CHANNELS -> ChannelsScreen(device.telemetry.channels, modifier)
                     Screen.DIAGNOSTICS -> DiagnosticsScreen(device.telemetry, modifier)
                     Screen.CAN -> CanScreen(device.telemetry, modifier)
+                    Screen.NAVIGATION -> StringListScreen(
+                        listOf("Navigation provider unavailable"),
+                        modifier,
+                    )
                     Screen.EVENTS -> StringListScreen(device.events, modifier)
                     Screen.DEVICE -> DeviceScreen(device.telemetry, modifier)
                     Screen.FIRMWARE -> FirmwareScreen(
@@ -121,13 +178,52 @@ fun SVCMobileApp(repository: DeviceRepository) {
                         modifier = modifier,
                         onInstall = { confirmInstall = true },
                     )
-                    Screen.SETTINGS -> SettingsScreen(modifier)
+                    Screen.SETTINGS -> SettingsScreen(
+                        preferences = appearance,
+                        usingFallback = brandPack.id == AppearancePreferences.GENERIC_PROFILE &&
+                            appearance.profileId == AppearancePreferences.BMW_PROFILE,
+                        modifier = modifier,
+                        onChanged = { appearanceRevision += 1 },
+                        onPreview = {
+                            startupReplayKey += 1
+                            showStartup = true
+                        },
+                    )
                     null -> Unit
                 }
             }
-        }
+            }
 
-        if (confirmInstall) {
+            if (!showStartup && criticalWarning != null) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                ) {
+                    Text(
+                        "Critical: ${criticalWarning.message}",
+                        color = Color.White,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MobileColors.Critical)
+                            .padding(16.dp),
+                    )
+                }
+            }
+
+            if (showStartup) {
+                StartupAnimation(
+                    brandPack = brandPack,
+                    enabled = appearance.animationEnabled,
+                    reduceMotion = appearance.reduceMotionOverride ||
+                        systemReduceMotion(context),
+                    critical = criticalWarning != null,
+                    replayKey = startupReplayKey,
+                    onComplete = { showStartup = false },
+                )
+            }
+
+            if (confirmInstall) {
             AlertDialog(
                 onDismissRequest = { confirmInstall = false },
                 title = { Text("Confirm firmware installation") },
@@ -145,9 +241,19 @@ fun SVCMobileApp(repository: DeviceRepository) {
                     }
                 },
             )
+            }
         }
     }
 }
+
+private val Screen.isRestorable: Boolean
+    get() = this in setOf(
+        Screen.DASHBOARD,
+        Screen.CHANNELS,
+        Screen.CAN,
+        Screen.NAVIGATION,
+        Screen.DIAGNOSTICS,
+    )
 
 @Composable
 private fun PairingScreen(
@@ -175,9 +281,13 @@ private fun PairingScreen(
 }
 
 @Composable
-private fun DashboardScreen(telemetry: TelemetrySnapshot, modifier: Modifier) {
+private fun DashboardScreen(
+    telemetry: TelemetrySnapshot,
+    isConnecting: Boolean,
+    modifier: Modifier,
+) {
     StringListScreen(
-        listOf(
+        (if (isConnecting) listOf("Connecting to SVC") else emptyList()) + listOf(
             "Battery: ${telemetry.batteryVoltage.display()}",
             "Total current: ${telemetry.totalCurrent.display()}",
             "Speed: ${telemetry.vehicle.speed.display()}",
@@ -271,15 +381,66 @@ private fun FirmwareScreen(
 }
 
 @Composable
-private fun SettingsScreen(modifier: Modifier) {
-    StringListScreen(
-        listOf(
-            "Telemetry rate: mock",
-            "Calibration: staged only",
-            "No hardware value is changed",
-        ),
-        modifier,
-    )
+private fun SettingsScreen(
+    preferences: AppearancePreferences,
+    usingFallback: Boolean,
+    modifier: Modifier,
+    onChanged: () -> Unit,
+    onPreview: () -> Unit,
+) {
+    var isBmw by remember {
+        mutableStateOf(preferences.profileId == AppearancePreferences.BMW_PROFILE)
+    }
+    var animationEnabled by remember { mutableStateOf(preferences.animationEnabled) }
+    var reduceMotion by remember { mutableStateOf(preferences.reduceMotionOverride) }
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Text("Appearance", style = MaterialTheme.typography.titleLarge)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("BMW R1200GS K25 · 2007")
+            Switch(
+                checked = isBmw,
+                onCheckedChange = {
+                    isBmw = it
+                    preferences.profileId = if (it) {
+                        AppearancePreferences.BMW_PROFILE
+                    } else {
+                        AppearancePreferences.GENERIC_PROFILE
+                    }
+                    onChanged()
+                },
+            )
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("Startup animation")
+            Switch(
+                checked = animationEnabled,
+                onCheckedChange = {
+                    animationEnabled = it
+                    preferences.animationEnabled = it
+                },
+            )
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("Reduce Motion preview")
+            Switch(
+                checked = reduceMotion,
+                onCheckedChange = {
+                    reduceMotion = it
+                    preferences.reduceMotionOverride = it
+                },
+            )
+        }
+        Button(onClick = onPreview, modifier = Modifier.fillMaxWidth()) {
+            Text("Preview Startup Animation")
+        }
+        if (usingFallback) {
+            Text(
+                "BMW assets are absent. SVC fallback branding is active.",
+                color = MobileColors.SecondaryText,
+            )
+        }
+        Text("Calibration remains staged; no hardware value is changed.")
+    }
 }
 
 @Composable
@@ -287,7 +448,7 @@ private fun StringListScreen(values: List<String>, modifier: Modifier) {
     LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         items(values) { value ->
             Row(Modifier.fillMaxWidth()) {
-                Text(value)
+                Text(value, fontFamily = FontFamily.Monospace)
             }
         }
     }

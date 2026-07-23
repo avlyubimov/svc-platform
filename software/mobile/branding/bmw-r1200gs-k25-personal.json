@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "bmw-r1200gs-k25-personal",
+  "theme": "svc-boxer-blue",
+  "manufacturer": "BMW",
+  "model": "R1200GS",
+  "generation": "K25",
+  "year": 2007,
+  "brandLogo": "bmw-roundel.svg",
+  "manufacturerWordmark": "BMW MOTORRAD",
+  "vehicleModel": "R 1200 GS",
+  "vehicleGeneration": "K25 · 2007",
+  "brandTagline": "MAKE LIFE A RIDE",
+  "accentColor": "#1C69D4",
+  "localAssets": {
+    "logo": "bmw-roundel.svg",
+    "wordmark": "bmw-motorrad-wordmark.svg"
+  }
+}

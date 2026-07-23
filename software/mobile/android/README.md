@@ -10,6 +10,11 @@ Modules:
 - `core-update` — OTA admission and transfer state;
 - `core-mock` — mock device repository.
 
+The phone target adds `software/mobile/branding/local` as an ignored asset
+source. Its startup uses one linear `Animatable` timeline, an always-dark
+surface, system animator-scale detection, and the same 2100/500 ms timing as
+iOS. Appearance settings provide profile/fallback selection and replay.
+
 ## Build and test
 
 ```bash
