@@ -27,6 +27,9 @@ targets:
       - path: ../../branding/svc
         type: folder
         buildPhase: resources
+      - path: ../../branding/vehicle-brands
+        type: folder
+        buildPhase: resources
       - path: ../../branding/local
         type: folder
         buildPhase: resources
@@ -62,6 +65,9 @@ targets:
       - path: ../../branding/startup-animation-v1.json
         buildPhase: resources
       - path: ../../branding/svc
+        type: folder
+        buildPhase: resources
+      - path: ../../branding/vehicle-brands
         type: folder
         buildPhase: resources
       - path: ../../branding/local

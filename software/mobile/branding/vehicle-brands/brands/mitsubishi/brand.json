@@ -1,0 +1,17 @@
+{
+  "id": "mitsubishi",
+  "name": "Mitsubishi",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#E60012",
+  "simpleIconSlug": "mitsubishi",
+  "source": "https://www.mitsubishi.com",
+  "simpleIcons": {
+    "slug": "mitsubishi",
+    "title": "Mitsubishi",
+    "source": "https://www.mitsubishi.com",
+    "guidelines": null,
+    "license": null
+  }
+}

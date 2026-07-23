@@ -2,13 +2,16 @@ import XCTest
 @testable import SVCMobile
 
 final class BrandingTests: XCTestCase {
-    func testMissingBMWAssetsUseSVCFallback() {
+    func testBMWProfileUsesCatalogPeriodRoundel() {
         let bundle = Bundle(for: Self.self)
         let catalog = BrandCatalog.load(bundle: bundle)
         let pack = catalog.resolve(profileId: catalog.defaultProfileId)
         XCTAssertEqual(catalog.profiles.count, 2)
-        XCTAssertEqual(pack.id, "generic-automotive")
-        XCTAssertTrue(pack.usesFallback)
+        XCTAssertEqual(pack.id, "bmw-r1200gs-k25-personal")
+        XCTAssertEqual(pack.manufacturerWordmark, "BMW")
+        XCTAssertEqual(pack.logoResource?.lastPathComponent, "bmw-roundel-1997-2020.svg")
+        XCTAssertNil(pack.wordmarkResource)
+        XCTAssertFalse(pack.usesFallback)
         XCTAssertNotNil(pack.logoResource)
     }
 

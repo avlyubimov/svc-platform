@@ -1,0 +1,17 @@
+{
+  "id": "volvo",
+  "name": "Volvo",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#003057",
+  "simpleIconSlug": "volvo",
+  "source": "https://www.volvocars.com",
+  "simpleIcons": {
+    "slug": "volvo",
+    "title": "Volvo",
+    "source": "https://www.media.volvocars.com/global/en-gb/logos",
+    "guidelines": null,
+    "license": null
+  }
+}

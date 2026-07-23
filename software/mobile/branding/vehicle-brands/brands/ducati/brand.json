@@ -1,0 +1,17 @@
+{
+  "id": "ducati",
+  "name": "Ducati",
+  "categories": [
+    "motorcycle"
+  ],
+  "accentColor": "#CC0000",
+  "simpleIconSlug": "ducati",
+  "source": "https://www.ducati.com",
+  "simpleIcons": {
+    "slug": "ducati",
+    "title": "Ducati",
+    "source": "https://brandlogos.net/ducati-logo-vector-svg-92931.html",
+    "guidelines": null,
+    "license": null
+  }
+}

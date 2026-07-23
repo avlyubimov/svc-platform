@@ -1,0 +1,17 @@
+{
+  "id": "peugeot",
+  "name": "Peugeot",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#FFFFFF",
+  "simpleIconSlug": "peugeot",
+  "source": "https://www.peugeot.com",
+  "simpleIcons": {
+    "slug": "peugeot",
+    "title": "Peugeot",
+    "source": "https://www.peugeot.co.uk",
+    "guidelines": null,
+    "license": null
+  }
+}

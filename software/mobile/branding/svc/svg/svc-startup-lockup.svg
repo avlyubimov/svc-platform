@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400" role="img" aria-labelledby="title desc">
+  <title id="title">SVC startup lockup</title>
+  <desc id="desc">Centered SVC identity for a dark startup screen.</desc>
+  <g transform="translate(190 100) scale(.8)">
+    <g fill="#F5F8FC">
+      <path d="M176 304 424 144v154l-112 74v244l112 72-94 126-154-104z"/>
+      <path d="m848 304-248-160v154l112 74v244l-112 72 94 126 154-104z"/>
+    </g>
+    <g fill="#41C8FF">
+      <path d="m454 718-144 224h172V718z"/>
+      <path d="m570 718 144 224H542V718z"/>
+    </g>
+    <path d="M350 510h104l42-92 52 184 46-92h80" fill="none" stroke="#1C69D4" stroke-width="42"/>
+  </g>
+  <text x="600" y="1052" text-anchor="middle" fill="#F5F8FC" font-family="Inter,Arial,Helvetica,sans-serif" font-size="220" font-weight="800" letter-spacing="24">SVC</text>
+  <rect x="285" y="1110" width="630" height="8" rx="4" fill="#41C8FF"/>
+  <text x="600" y="1195" text-anchor="middle" fill="#A7B1BD" font-family="Inter,Arial,Helvetica,sans-serif" font-size="42" font-weight="600" letter-spacing="7">SMART VEHICLE CONTROLLER</text>
+  <text x="600" y="1284" text-anchor="middle" fill="#F5F8FC" font-family="Inter,Arial,Helvetica,sans-serif" font-size="32" font-weight="500" letter-spacing="9">ENGINEERED FOR THE RIDE</text>
+</svg>

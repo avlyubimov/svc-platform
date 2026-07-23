@@ -1,0 +1,17 @@
+{
+  "id": "ford",
+  "name": "Ford",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#00274E",
+  "simpleIconSlug": "ford",
+  "source": "https://www.ford.com",
+  "simpleIcons": {
+    "slug": "ford",
+    "title": "Ford",
+    "source": "https://secure.ford.com/brochures/",
+    "guidelines": null,
+    "license": null
+  }
+}

@@ -4084,3 +4084,26 @@ not parallel Swift and Kotlin edits. The BMW personal profile requires only its
 ignored local `logo.svg`; its optional wordmark falls back to configured text.
 The neutral black OS launch surface and all BLE, OTA, CAN, and safety behavior
 remain unchanged.
+
+## 2026-07-23 — Integrate the versioned vehicle-brand and SVC artwork packs
+
+Decision: make `vehicle-brands-v1.json` the shared manufacturer catalog for
+both phone clients. Vehicle profiles reference a stable `brandId` and retain
+`model`, `generation`, and `year` as independent fields. The standard dark
+startup uses `logo-on-dark.svg`; an optional catalog `preferredAsset` may select
+a period-specific mark, including the 1997–2020 BMW roundel for the owner's
+2007 K25. Wordmarks remain optional and fall back to the catalog display name.
+Clients never download manufacturer artwork at runtime.
+
+Decision: use the project-owned SVC brand pack for the phone launcher, store
+artwork, CarPlay, Android Auto, and generic fallback. Manufacturer marks remain
+limited to phone-only startup/profile decoration. Preserve all third-party
+notices, the pinned Simple Icons license/disclaimer, and the source URL in every
+brand record. Public redistribution remains subject to a separate trademark
+and rights review.
+
+Result: iOS and Android resolve the same 29-brand catalog without duplicated
+brand constants. Automated validation requires the per-brand metadata and four
+standard SVG variants, parses every SVG as XML, verifies the SVC pack
+checksums, and confirms that platform launcher assets are exported from the SVC
+pack. BLE, OTA, CAN, Output Manager, and safety behavior remain unchanged.

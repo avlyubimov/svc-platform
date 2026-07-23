@@ -30,17 +30,18 @@ struct BrandPackDefinition: Codable, Equatable, Identifiable {
     let schemaVersion: Int
     let id: String
     let displayName: String
+    let brandId: String
     let theme: String
-    let manufacturer: String
+    let manufacturer: String?
     let model: String
     let generation: String
     let year: Int
-    let manufacturerWordmark: String
+    let manufacturerWordmark: String?
     let vehicleModel: String
     let vehicleGeneration: String
     let brandTagline: String
     let accentColor: String
-    let assets: BrandAssets
+    let assets: BrandAssets?
 }
 
 private struct BrandCatalogEntry: Codable {
@@ -55,23 +56,40 @@ private struct BrandCatalogDocument: Codable {
     let profiles: [BrandCatalogEntry]
 }
 
+struct VehicleBrandDefinition: Codable, Equatable, Identifiable {
+    let id: String
+    let name: String
+    let categories: [String]
+    let accentColor: String
+    let source: String
+    let preferredAsset: String?
+}
+
+private struct VehicleBrandCatalogDocument: Codable {
+    let schemaVersion: Int
+    let simpleIconsVersion: String
+    let brands: [VehicleBrandDefinition]
+}
+
 struct BrandPack: Equatable {
     let definition: BrandPackDefinition
     let logoResource: URL?
     let wordmarkResource: URL?
     let requestedProfileId: String
+    let resolvedManufacturerName: String
+    let resolvedAccentColor: String
 
     var id: String { definition.id }
     var theme: String { definition.theme }
-    var manufacturer: String { definition.manufacturer }
+    var manufacturer: String { resolvedManufacturerName }
     var model: String { definition.model }
     var generation: String { definition.generation }
     var year: Int { definition.year }
-    var manufacturerWordmark: String { definition.manufacturerWordmark }
+    var manufacturerWordmark: String { resolvedManufacturerName }
     var vehicleModel: String { definition.vehicleModel }
     var vehicleGeneration: String { definition.vehicleGeneration }
     var brandTagline: String { definition.brandTagline }
-    var accentColor: Color { Color(svcHex: definition.accentColor) }
+    var accentColor: Color { Color(svcHex: resolvedAccentColor) }
     var usesFallback: Bool { requestedProfileId != id }
 }
 
@@ -81,18 +99,23 @@ struct BrandCatalog {
     let profiles: [BrandPackDefinition]
 
     private let definitions: [String: BrandPackDefinition]
+    private let vehicleBrands: [String: VehicleBrandDefinition]
     private let resourceURL: (String) -> URL?
 
     init(
         defaultProfileId: String,
         fallbackProfileId: String,
         profiles: [BrandPackDefinition],
+        vehicleBrands: [VehicleBrandDefinition],
         resourceURL: @escaping (String) -> URL?
     ) {
         self.defaultProfileId = defaultProfileId
         self.fallbackProfileId = fallbackProfileId
         self.profiles = profiles
         definitions = Dictionary(uniqueKeysWithValues: profiles.map { ($0.id, $0) })
+        self.vehicleBrands = Dictionary(
+            uniqueKeysWithValues: vehicleBrands.map { ($0.id, $0) }
+        )
         self.resourceURL = resourceURL
     }
 
@@ -124,10 +147,27 @@ struct BrandCatalog {
                 }
                 return definition
             }
+            let vehicleBrandData = try resourceData(
+                named: "vehicle-brands/vehicle-brands-v1.json",
+                bundle: bundle
+            )
+            let vehicleBrandDocument = try decoder.decode(
+                VehicleBrandCatalogDocument.self,
+                from: vehicleBrandData
+            )
             guard
+                vehicleBrandDocument.schemaVersion == 1,
                 Set(profiles.map(\.id)).count == profiles.count,
+                Set(vehicleBrandDocument.brands.map(\.id)).count
+                    == vehicleBrandDocument.brands.count,
                 profiles.contains(where: { $0.id == document.defaultProfileId }),
-                profiles.contains(where: { $0.id == document.fallbackProfileId })
+                profiles.contains(where: { $0.id == document.fallbackProfileId }),
+                profiles.allSatisfy { profile in
+                    profile.brandId == "svc"
+                        || vehicleBrandDocument.brands.contains { brand in
+                            brand.id == profile.brandId
+                        }
+                }
             else {
                 throw BrandCatalogError.missingRequiredProfile
             }
@@ -135,6 +175,7 @@ struct BrandCatalog {
                 defaultProfileId: document.defaultProfileId,
                 fallbackProfileId: document.fallbackProfileId,
                 profiles: profiles,
+                vehicleBrands: vehicleBrandDocument.brands,
                 resourceURL: { assetURL(path: $0, bundle: bundle) }
             )
         } catch {
@@ -145,28 +186,59 @@ struct BrandCatalog {
     func resolve(profileId: String) -> BrandPack {
         let fallback = definitions[fallbackProfileId] ?? Self.emergencyDefinition
         let requested = definitions[profileId] ?? fallback
-        let selected = resourceURL(requested.assets.logo) == nil
-            ? fallback
-            : requested
+        if requested.brandId != "svc", let brand = vehicleBrands[requested.brandId] {
+            let standardLogo = vehicleBrandAsset(
+                brandId: brand.id,
+                fileName: "logo-on-dark.svg"
+            )
+            let preferredLogo = brand.preferredAsset.flatMap {
+                resourceURL(vehicleBrandAsset(brandId: brand.id, fileName: $0))
+            }
+            let logoResource = preferredLogo ?? resourceURL(standardLogo)
+            if let logoResource {
+                return BrandPack(
+                    definition: requested,
+                    logoResource: logoResource,
+                    wordmarkResource: requested.assets?.wordmark.flatMap(resourceURL),
+                    requestedProfileId: profileId,
+                    resolvedManufacturerName: brand.name,
+                    resolvedAccentColor: brand.accentColor
+                )
+            }
+        }
+        return resolveSVC(definition: fallback, requestedProfileId: profileId)
+    }
+
+    private func resolveSVC(
+        definition: BrandPackDefinition,
+        requestedProfileId: String
+    ) -> BrandPack {
+        let assets = definition.assets
         return BrandPack(
-            definition: selected,
-            logoResource: resourceURL(selected.assets.logo),
-            wordmarkResource: selected.assets.wordmark.flatMap(resourceURL),
-            requestedProfileId: profileId
+            definition: definition,
+            logoResource: assets.flatMap { resourceURL($0.logo) },
+            wordmarkResource: assets?.wordmark.flatMap(resourceURL),
+            requestedProfileId: requestedProfileId,
+            resolvedManufacturerName: definition.manufacturerWordmark
+                ?? definition.manufacturer
+                ?? "SVC",
+            resolvedAccentColor: definition.accentColor
         )
+    }
+
+    private func vehicleBrandAsset(brandId: String, fileName: String) -> String {
+        "vehicle-brands/brands/\(brandId)/\(fileName)"
     }
 
     private static func resourceData(
         named fileName: String,
         bundle: Bundle
     ) throws -> Data {
-        let path = fileName as NSString
-        let name = path.deletingPathExtension
-        let fileExtension = path.pathExtension
-        guard let url = bundle.url(
-            forResource: name,
-            withExtension: fileExtension.isEmpty ? nil : fileExtension
-        ) else {
+        guard let resourceURL = bundle.resourceURL else {
+            throw BrandCatalogError.missingResource
+        }
+        let url = resourceURL.appendingPathComponent(fileName)
+        guard FileManager.default.fileExists(atPath: url.path) else {
             throw BrandCatalogError.missingResource
         }
         return try Data(contentsOf: url)
@@ -184,6 +256,7 @@ struct BrandCatalog {
         schemaVersion: 1,
         id: "emergency-svc",
         displayName: "SVC",
+        brandId: "svc",
         theme: "svc-dark",
         manufacturer: "SVC",
         model: "Mobile",
@@ -201,6 +274,7 @@ struct BrandCatalog {
         defaultProfileId: emergencyDefinition.id,
         fallbackProfileId: emergencyDefinition.id,
         profiles: [emergencyDefinition],
+        vehicleBrands: [],
         resourceURL: { _ in nil }
     )
 }

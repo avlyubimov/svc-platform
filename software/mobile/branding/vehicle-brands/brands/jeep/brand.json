@@ -1,0 +1,17 @@
+{
+  "id": "jeep",
+  "name": "Jeep",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#FFFFFF",
+  "simpleIconSlug": "jeep",
+  "source": "https://www.jeep.com",
+  "simpleIcons": {
+    "slug": "jeep",
+    "title": "Jeep",
+    "source": "https://commons.wikimedia.org/wiki/File:Jeep_logo.svg",
+    "guidelines": null,
+    "license": null
+  }
+}

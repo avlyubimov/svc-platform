@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title">
+  <title id="title">SVC monochrome emblem</title>
+  <g fill="#FFFFFF">
+    <path d="M176 304 424 144v154l-112 74v244l112 72-94 126-154-104z"/>
+    <path d="m848 304-248-160v154l112 74v244l-112 72 94 126 154-104z"/>
+    <path d="m454 718-144 224h172V718z"/>
+    <path d="m570 718 144 224H542V718z"/>
+  </g>
+  <path
+    d="M350 510h104l42-92 52 184 46-92h80"
+    fill="none"
+    stroke="#FFFFFF"
+    stroke-width="42"
+    stroke-linecap="square"
+    stroke-linejoin="miter"
+  />
+</svg>

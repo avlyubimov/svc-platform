@@ -1,0 +1,13 @@
+{
+  "id": "harley-davidson",
+  "name": "Harley-Davidson",
+  "categories": [
+    "motorcycle"
+  ],
+  "accentColor": "#FF6600",
+  "recolorFrom": [
+    "#0A0B09"
+  ],
+  "commonsFile": "Harley-Davidson_logo.svg",
+  "source": "https://commons.wikimedia.org/wiki/File:Harley-Davidson_logo.svg"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "honda",
+  "name": "Honda",
+  "categories": [
+    "motorcycle",
+    "car"
+  ],
+  "accentColor": "#E40521",
+  "simpleIconSlug": "honda",
+  "source": "https://www.honda.com",
+  "simpleIcons": {
+    "slug": "honda",
+    "title": "Honda",
+    "source": "https://www.honda.ie",
+    "guidelines": null,
+    "license": null
+  }
+}

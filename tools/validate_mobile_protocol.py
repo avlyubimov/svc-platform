@@ -8,6 +8,7 @@ from mobile_protocol_validation import (
     load_brand_catalog,
     load_firmware_manifest,
     load_telemetry,
+    load_vehicle_brand_catalog,
     validate_all_action_pins,
     validate_release_workflow,
 )
@@ -103,6 +104,7 @@ def main() -> int:
 
     from mobile_protocol_validation import load_startup_timeline
 
+    load_vehicle_brand_catalog(BRANDING)
     load_brand_catalog(BRANDING)
     load_startup_timeline(BRANDING / "startup-animation-v1.json")
 
