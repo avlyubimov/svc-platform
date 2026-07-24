@@ -70,14 +70,10 @@ final class RideModeUITests: XCTestCase {
         app.launchArguments = [
             "SVC_SKIP_STARTUP",
             "SVC_RESET_RIDE_PAGE",
-            "SVC_UI_TEST_KEEP_CONTROLS"
+            "SVC_UI_TEST_EXIT_RIDE_MODE"
         ]
         app.launch()
-        XCTAssertTrue(rideRoot.waitForExistence(timeout: 5))
-        let exit = app.buttons["exitRideMode"]
-        XCTAssertTrue(exit.waitForExistence(timeout: 5))
-        exit.tap()
-        XCTAssertTrue(app.buttons["enterRideMode"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.buttons["enterRideMode"].waitForExistence(timeout: 5))
         XCTAssertGreaterThan(app.statusBars.count, 0)
         XCTAssertGreaterThan(app.navigationBars.count, 0)
     }

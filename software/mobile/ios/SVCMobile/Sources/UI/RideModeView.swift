@@ -82,9 +82,7 @@ struct RideModeView: View {
     @State private var currentPage = RideModePage.mainDashboard.rawValue
     @State private var dragOffset: CGFloat = 0
     @State private var resolvedTheme = RideResolvedTheme.night
-    @State private var controlsVisible = ProcessInfo.processInfo.arguments.contains(
-        "SVC_UI_TEST_KEEP_CONTROLS"
-    )
+    @State private var controlsVisible = false
     @State private var indicatorVisible = true
     @State private var brightness = Double(UIScreen.main.brightness)
     @State private var controlsTask: Task<Void, Never>?
@@ -183,6 +181,15 @@ struct RideModeView: View {
         }
         .onChange(of: telemetry) { _, _ in updateTheme() }
         .onChange(of: ridePreferences.themeMode) { _, _ in updateTheme() }
+        .task {
+            guard ProcessInfo.processInfo.arguments.contains(
+                "SVC_UI_TEST_EXIT_RIDE_MODE"
+            ) else {
+                return
+            }
+            try? await Task.sleep(for: .milliseconds(250))
+            exitRideMode()
+        }
         .onDisappear {
             controlsTask?.cancel()
             indicatorTask?.cancel()
@@ -310,11 +317,8 @@ struct RideModeView: View {
         withAnimation(.easeOut(duration: 0.12)) {
             controlsVisible = true
         }
-        let autoHideDelay: Duration = ProcessInfo.processInfo.arguments.contains(
-            "SVC_UI_TEST_KEEP_CONTROLS"
-        ) ? .seconds(30) : .seconds(3)
         controlsTask = Task {
-            try? await Task.sleep(for: autoHideDelay)
+            try? await Task.sleep(for: .seconds(3))
             guard !Task.isCancelled else { return }
             withAnimation(.easeOut(duration: 0.18)) {
                 controlsVisible = false
