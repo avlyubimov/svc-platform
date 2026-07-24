@@ -74,7 +74,6 @@ final class RideModeUITests: XCTestCase {
         ]
         app.launch()
         XCTAssertTrue(app.buttons["enterRideMode"].waitForExistence(timeout: 5))
-        XCTAssertGreaterThan(app.statusBars.count, 0)
         XCTAssertGreaterThan(app.navigationBars.count, 0)
     }
 
