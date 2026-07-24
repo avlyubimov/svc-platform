@@ -90,6 +90,29 @@ CarPlay/Android Auto templates expose only speed, gear, battery, SVC current,
 main warning, and connection state and currently render unavailable values
 rather than invented telemetry.
 
+### Debug-only 0–100 Demo Ride
+
+The Android debug variant contains `DemoRideActivity` and a
+`DemoRideRepository : DeviceRepository`. It emits normal `TelemetrySnapshot`
+updates on display frames and exercises the same dashboard mapping as the mock
+or future BLE repository; release builds do not contain the activity, manifest
+entry, scenario, or repository. Start or restart it with:
+
+```bash
+adb shell am start \
+  -n com.avlyubimov.svc.mobile/.DemoRideActivity \
+  --activity-single-top \
+  --ez restartDemoRide true
+```
+
+The nine-second K25 review scenario holds neutral at 0 km/h and 1100 RPM,
+engages first, accelerates nonlinearly to 70 km/h and 7200 RPM, completes a
+200 ms 1→2 shift without a speed discontinuity, reaches 100 km/h and 6100 RPM,
+then holds steady. ABS self-test clears after movement, BLE/CAN/REC remain
+healthy, and battery voltage rises smoothly from 12.7 V to 14.2 V. Gear remains
+a debug presentation companion because telemetry v1 intentionally has no gear
+measurement; the production wire contract is unchanged.
+
 The approved RideDashboard mock uses the Product Owner-provided Interface
 Display image only as a geometric reference and takes sporting color density
 from the

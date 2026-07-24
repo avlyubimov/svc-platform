@@ -101,6 +101,7 @@ internal fun RideModeScreen(
     reduceMotion: Boolean,
     pageIndicatorEnabled: Boolean,
     demoMode: Boolean,
+    dashboardDataOverride: TftDashboardData? = null,
     initialPage: Int,
     windowController: RideModeWindowController,
     onPageChanged: (Int) -> Unit,
@@ -122,8 +123,9 @@ internal fun RideModeScreen(
             profile = profile,
         )
     }
-    val tftData = remember(dashboard, telemetry, demoMode) {
-        TftDashboardData.resolve(dashboard, telemetry, demoMode)
+    val tftData = remember(dashboard, telemetry, demoMode, dashboardDataOverride) {
+        dashboardDataOverride
+            ?: TftDashboardData.resolve(dashboard, telemetry, demoMode)
     }
     var resolvedTheme by remember { mutableStateOf(RideResolvedTheme.NIGHT) }
     LaunchedEffect(themeMode, dashboard.ambientLight, themeThresholds) {

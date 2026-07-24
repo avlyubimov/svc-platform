@@ -64,7 +64,7 @@ struct DashboardView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let compact = geometry.size.height < 390 || geometry.size.width < 760
+            let scale = TFTLayoutScale.resolve(height: geometry.size.height)
             let edgePadding = geometry.size.width * 0.04
 
             ZStack {
@@ -73,7 +73,8 @@ struct DashboardView: View {
                 TFTRibbonTachometer(
                     data: data,
                     palette: palette,
-                    fillFraction: rpmFraction
+                    fillFraction: rpmFraction,
+                    scale: scale
                 )
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .animation(
@@ -82,25 +83,25 @@ struct DashboardView: View {
                 )
                 .accessibilityIdentifier("tftTachometer")
 
-                TFTTopLine(data: data, palette: palette, compact: compact)
+                TFTTopLine(data: data, palette: palette, scale: scale)
                     .frame(
                         width: geometry.size.width * 0.72,
-                        height: geometry.size.height * 0.15,
+                        height: geometry.size.height * 0.20,
                         alignment: .top
                     )
                     .position(
                         x: geometry.size.width * 0.5,
-                        y: geometry.size.height * 0.075
+                        y: geometry.size.height * 0.13
                     )
 
-                TFTSpeedCluster(data: data, palette: palette, compact: compact)
+                TFTSpeedCluster(data: data, palette: palette, scale: scale)
                     .frame(
-                        width: geometry.size.width * 0.31,
+                        width: geometry.size.width * 0.38,
                         height: geometry.size.height * 0.28,
                         alignment: .leading
                     )
                     .position(
-                        x: geometry.size.width * 0.325,
+                        x: geometry.size.width * 0.36,
                         y: geometry.size.height * 0.31
                     )
                     .accessibilityIdentifier("tftSpeed")
@@ -108,7 +109,7 @@ struct DashboardView: View {
                 TFTGear(
                     gear: data.gear,
                     palette: palette,
-                    compact: compact
+                    scale: scale
                 )
                 .frame(
                     width: geometry.size.width * 0.15,
@@ -121,12 +122,14 @@ struct DashboardView: View {
                 .accessibilityIdentifier("tftGear")
 
                 Text("\(data.engineRpm.wholeOrDash) rpm")
-                    .font(.system(size: compact ? 11 : 13, design: .monospaced))
+                    .font(.system(size: scale.digitalRpm, design: .monospaced))
                     .tracking(1.2)
                     .foregroundStyle(palette.secondaryText)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: true)
                     .position(
                         x: geometry.size.width * 0.50,
-                        y: geometry.size.height * 0.70
+                        y: geometry.size.height * 0.69
                     )
                     .accessibilityIdentifier("tftDigitalRpm")
 
@@ -134,47 +137,47 @@ struct DashboardView: View {
                     side: .left,
                     data: data,
                     palette: palette,
-                    compact: compact
+                    scale: scale
                 )
                 .frame(
-                    width: compact ? 30 : 36,
-                    height: geometry.size.height * 0.49
+                    width: scale.sideRailWidth,
+                    height: geometry.size.height * 0.61
                 )
                 .position(
-                    x: edgePadding + (compact ? 15 : 18),
-                    y: geometry.size.height * 0.445
+                    x: edgePadding + scale.sideRailWidth / 2,
+                    y: geometry.size.height * 0.475
                 )
 
                 TFTSideIndicators(
                     side: .right,
                     data: data,
                     palette: palette,
-                    compact: compact
+                    scale: scale
                 )
                 .frame(
-                    width: compact ? 30 : 36,
-                    height: geometry.size.height * 0.49
+                    width: scale.sideRailWidth,
+                    height: geometry.size.height * 0.61
                 )
                 .position(
-                    x: geometry.size.width - edgePadding - (compact ? 15 : 18),
-                    y: geometry.size.height * 0.445
+                    x: geometry.size.width - edgePadding - scale.sideRailWidth / 2,
+                    y: geometry.size.height * 0.475
                 )
 
                 TFTConnectionStatus(
                     data: data,
                     palette: palette,
-                    compact: compact
+                    scale: scale
                 )
                 .frame(width: geometry.size.width * 0.24)
                 .position(
                     x: geometry.size.width * 0.55,
-                    y: geometry.size.height * 0.78
+                    y: geometry.size.height * 0.765
                 )
                 .accessibilityIdentifier("tftConnectionIcons")
 
                 if let criticalMessage = data.criticalMessage {
                     Text(criticalMessage.uppercased())
-                        .font(.system(size: compact ? 10 : 12, weight: .bold))
+                        .font(.system(size: scale.status, weight: .bold))
                         .tracking(1.2)
                         .foregroundStyle(palette.primaryText)
                         .frame(maxWidth: .infinity)
@@ -187,7 +190,7 @@ struct DashboardView: View {
 
                 if toastVisible, let toastMessage = data.toastMessage {
                     Text("●  \(toastMessage)")
-                        .font(.system(size: compact ? 10 : 12))
+                        .font(.system(size: scale.status))
                         .foregroundStyle(palette.secondaryText)
                         .lineLimit(1)
                         .padding(.horizontal, 14)
@@ -205,15 +208,15 @@ struct DashboardView: View {
                 TFTBottomTelemetry(
                     data: data,
                     palette: palette,
-                    compact: compact
+                    scale: scale
                 )
                 .frame(
-                    width: geometry.size.width * 0.78,
-                    height: geometry.size.height * 0.135
+                    width: geometry.size.width * 0.80,
+                    height: geometry.size.height * 0.14
                 )
                 .position(
                     x: geometry.size.width * 0.5,
-                    y: geometry.size.height * 0.9325
+                    y: geometry.size.height * 0.89
                 )
                 .accessibilityIdentifier("tftBottomStrip")
             }
@@ -259,6 +262,7 @@ private struct TFTRibbonTachometer: View, Animatable {
     let data: TFTDashboardData
     let palette: RidePalette
     var fillFraction: Double
+    let scale: TFTLayoutScale
 
     var animatableData: Double {
         get { fillFraction }
@@ -371,16 +375,31 @@ private struct TFTRibbonTachometer: View, Animatable {
                 let point = geometry.upperPoint(CGFloat(index) / 9)
                 context.draw(
                     Text("\(index)")
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .font(
+                            .system(
+                                size: scale.tachometerNumber,
+                                weight: .bold,
+                                design: .monospaced
+                            )
+                        )
                         .foregroundStyle(palette.primaryText),
-                    at: CGPoint(x: point.x, y: point.y - 18),
+                    at: CGPoint(
+                        x: point.x,
+                        y: point.y - scale.tachometerLabelGap
+                    ),
                     anchor: .center
                 )
             }
 
             context.draw(
                 Text("×1000 RPM")
-                    .font(.system(size: 8, weight: .medium, design: .monospaced))
+                    .font(
+                        .system(
+                            size: scale.tachometerMultiplier,
+                            weight: .medium,
+                            design: .monospaced
+                        )
+                    )
                     .tracking(0.7)
                     .foregroundStyle(palette.secondaryText),
                 at: geometry.bandCenter(0.47),
@@ -393,7 +412,7 @@ private struct TFTRibbonTachometer: View, Animatable {
 private struct TFTTopLine: View {
     let data: TFTDashboardData
     let palette: RidePalette
-    let compact: Bool
+    let scale: TFTLayoutScale
 
     var body: some View {
         HStack(spacing: 0) {
@@ -414,16 +433,17 @@ private struct TFTTopLine: View {
         value: String,
         selected: Bool = false
     ) -> some View {
-        VStack(spacing: 3) {
+        VStack(spacing: scale.topStackSpacing) {
             Text(label)
-                .font(.system(size: compact ? 7 : 9))
+                .font(.system(size: scale.topLabel))
                 .tracking(1)
                 .foregroundStyle(palette.secondaryText)
                 .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: true)
             Text(value)
                 .font(
                     .system(
-                        size: compact ? 13 : 16,
+                        size: scale.topValue,
                         weight: .bold,
                         design: .monospaced
                     )
@@ -432,12 +452,14 @@ private struct TFTTopLine: View {
                     selected ? TFTRibbonColors.activeEnd : palette.primaryText
                 )
                 .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: true)
             if selected {
                 Rectangle()
                     .fill(palette.accent)
-                    .frame(width: compact ? 34 : 42, height: 2)
+                    .frame(width: scale.modeUnderlineWidth, height: 2)
             }
         }
+        .fixedSize(horizontal: false, vertical: true)
         .frame(maxWidth: .infinity, alignment: .top)
     }
 }
@@ -445,24 +467,27 @@ private struct TFTTopLine: View {
 private struct TFTSpeedCluster: View {
     let data: TFTDashboardData
     let palette: RidePalette
-    let compact: Bool
+    let scale: TFTLayoutScale
 
     var body: some View {
         HStack(alignment: .lastTextBaseline, spacing: 3) {
             Text(data.speedKmh.wholeOrDash)
                 .font(
                     .system(
-                        size: compact ? 78 : 102,
+                        size: scale.speed,
                         weight: .light,
                         design: .monospaced
                     )
                 )
                 .foregroundStyle(palette.primaryText)
                 .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: true)
             Text("km/h")
-                .font(.system(size: compact ? 14 : 18, design: .monospaced))
+                .font(.system(size: scale.speedUnit, design: .monospaced))
                 .foregroundStyle(palette.secondaryText)
-                .padding(.bottom, compact ? 10 : 14)
+                .padding(.bottom, scale.speedUnitBaseline)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: true)
         }
     }
 }
@@ -470,19 +495,20 @@ private struct TFTSpeedCluster: View {
 private struct TFTGear: View {
     let gear: String
     let palette: RidePalette
-    let compact: Bool
+    let scale: TFTLayoutScale
 
     var body: some View {
         Text(gear.isEmpty ? "—" : gear)
             .font(
                 .system(
-                    size: compact ? 74 : 94,
+                    size: scale.gear,
                     weight: .medium,
                     design: .monospaced
                 )
             )
             .foregroundStyle(gear == "N" ? palette.valid : palette.primaryText)
             .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: true)
     }
 }
 
@@ -490,13 +516,17 @@ private struct TFTSideIndicators: View {
     let side: TFTIndicatorSide
     let data: TFTDashboardData
     let palette: RidePalette
-    let compact: Bool
+    let scale: TFTLayoutScale
 
     private var indicators: [TFTSideIndicator] {
         switch side {
         case .left:
             return [
-                TFTSideIndicator(icon: .turnLeft, active: false, color: palette.valid),
+                TFTSideIndicator(
+                    icon: .turnLeft,
+                    active: data.activeIndicators.contains(.turnLeft),
+                    color: palette.valid
+                ),
                 TFTSideIndicator(
                     icon: .highBeam,
                     active: data.activeIndicators.contains(.highBeam),
@@ -511,7 +541,11 @@ private struct TFTSideIndicators: View {
             ]
         case .right:
             return [
-                TFTSideIndicator(icon: .turnRight, active: false, color: palette.valid),
+                TFTSideIndicator(
+                    icon: .turnRight,
+                    active: data.activeIndicators.contains(.turnRight),
+                    color: palette.valid
+                ),
                 TFTSideIndicator(
                     icon: .abs,
                     active: data.activeIndicators.contains(.abs),
@@ -542,7 +576,7 @@ private struct TFTSideIndicators: View {
                 TFTSideIndicatorGlyph(
                     indicator: indicator,
                     inactive: palette.disabledText.opacity(0.46),
-                    compact: compact
+                    scale: scale
                 )
                 .frame(maxHeight: .infinity)
             }
@@ -554,45 +588,77 @@ private struct TFTSideIndicators: View {
 private struct TFTSideIndicatorGlyph: View {
     let indicator: TFTSideIndicator
     let inactive: Color
-    let compact: Bool
+    let scale: TFTLayoutScale
+
+    @State private var turnSignalDimmed = false
 
     private var color: Color {
         indicator.active ? indicator.color : inactive
     }
 
+    private var isTurnSignal: Bool {
+        indicator.icon == .turnLeft || indicator.icon == .turnRight
+    }
+
     @ViewBuilder
     var body: some View {
-        switch indicator.icon {
-        case .turnLeft:
-            Image(systemName: "arrow.left")
-                .font(.system(size: compact ? 17 : 20, weight: .bold))
-                .foregroundStyle(color)
-        case .turnRight:
-            Image(systemName: "arrow.right")
-                .font(.system(size: compact ? 17 : 20, weight: .bold))
-                .foregroundStyle(color)
-        case .highBeam, .lowBeam, .fogLight:
-            TFTLampGlyph(icon: indicator.icon, color: color, compact: compact)
-        case .abs:
-            Text("ABS")
-                .font(.system(size: compact ? 6 : 7, weight: .bold))
-                .foregroundStyle(color)
-                .frame(width: compact ? 24 : 29, height: compact ? 24 : 29)
-                .overlay {
-                    Circle().stroke(color, lineWidth: 1.5)
-                }
-        case .engine:
-            Image(systemName: "engine.combustion.fill")
-                .font(.system(size: compact ? 17 : 20))
-                .foregroundStyle(color)
-        case .warning:
-            Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: compact ? 18 : 21))
-                .foregroundStyle(color)
-        case .recording:
-            Image(systemName: "record.circle")
-                .font(.system(size: compact ? 18 : 21))
-                .foregroundStyle(color)
+        Group {
+            switch indicator.icon {
+            case .turnLeft:
+                Image(systemName: "arrow.left")
+                    .font(.system(size: scale.turnIndicator, weight: .bold))
+                    .foregroundStyle(color)
+            case .turnRight:
+                Image(systemName: "arrow.right")
+                    .font(.system(size: scale.turnIndicator, weight: .bold))
+                    .foregroundStyle(color)
+            case .highBeam, .lowBeam, .fogLight:
+                TFTLampGlyph(icon: indicator.icon, color: color, scale: scale)
+            case .abs:
+                Text("ABS")
+                    .font(.system(size: scale.indicatorLabel, weight: .bold))
+                    .foregroundStyle(color)
+                    .frame(
+                        width: scale.standardIndicator,
+                        height: scale.standardIndicator
+                    )
+                    .overlay {
+                        Circle().stroke(color, lineWidth: 1.5)
+                    }
+            case .engine:
+                Image(systemName: "engine.combustion.fill")
+                    .font(.system(size: scale.standardIndicator * 0.72))
+                    .foregroundStyle(color)
+            case .warning:
+                Image(systemName: "exclamationmark.triangle")
+                    .font(.system(size: scale.standardIndicator * 0.76))
+                    .foregroundStyle(color)
+            case .recording:
+                Image(systemName: "record.circle")
+                    .font(.system(size: scale.standardIndicator * 0.76))
+                    .foregroundStyle(color)
+            }
+        }
+        .opacity(
+            indicator.active && isTurnSignal && turnSignalDimmed ? 0.22 : 1
+        )
+        .onAppear(perform: startTurnSignalAnimation)
+        .onChange(of: indicator.active) { _, active in
+            if active {
+                startTurnSignalAnimation()
+            } else {
+                turnSignalDimmed = false
+            }
+        }
+    }
+
+    private func startTurnSignalAnimation() {
+        guard indicator.active && isTurnSignal else { return }
+        turnSignalDimmed = false
+        withAnimation(
+            .easeInOut(duration: 0.44).repeatForever(autoreverses: true)
+        ) {
+            turnSignalDimmed = true
         }
     }
 }
@@ -600,7 +666,7 @@ private struct TFTSideIndicatorGlyph: View {
 private struct TFTLampGlyph: View {
     let icon: TFTSideIcon
     let color: Color
-    let compact: Bool
+    let scale: TFTLayoutScale
 
     var body: some View {
         Canvas { context, size in
@@ -657,8 +723,8 @@ private struct TFTLampGlyph: View {
             }
         }
         .frame(
-            width: compact ? 24 : 29,
-            height: compact ? 16 : 19
+            width: scale.standardIndicator,
+            height: scale.standardIndicator * 0.66
         )
     }
 }
@@ -666,7 +732,7 @@ private struct TFTLampGlyph: View {
 private struct TFTConnectionStatus: View {
     let data: TFTDashboardData
     let palette: RidePalette
-    let compact: Bool
+    let scale: TFTLayoutScale
 
     var body: some View {
         HStack {
@@ -682,9 +748,9 @@ private struct TFTConnectionStatus: View {
         HStack(spacing: 4) {
             Circle()
                 .fill(active ? palette.valid : palette.critical)
-                .frame(width: compact ? 5 : 6, height: compact ? 5 : 6)
+                .frame(width: scale.statusDot, height: scale.statusDot)
             Text(label)
-                .font(.system(size: compact ? 7 : 8, weight: .bold))
+                .font(.system(size: scale.status, weight: .bold))
                 .tracking(0.7)
                 .foregroundStyle(palette.secondaryText)
         }
@@ -694,7 +760,7 @@ private struct TFTConnectionStatus: View {
 private struct TFTBottomTelemetry: View {
     let data: TFTDashboardData
     let palette: RidePalette
-    let compact: Bool
+    let scale: TFTLayoutScale
 
     var body: some View {
         HStack(spacing: 0) {
@@ -710,24 +776,84 @@ private struct TFTBottomTelemetry: View {
     }
 
     private func metric(_ label: String, _ value: String) -> some View {
-        VStack(spacing: 3) {
+        VStack(spacing: scale.metricStackSpacing) {
             Text(label)
-                .font(.system(size: compact ? 7 : 9))
+                .font(.system(size: scale.metricLabel))
                 .tracking(0.9)
                 .foregroundStyle(palette.secondaryText)
                 .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: true)
             Text(value)
                 .font(
                     .system(
-                        size: compact ? 12 : 15,
+                        size: scale.metricValue,
                         weight: .semibold,
                         design: .monospaced
                     )
                 )
                 .foregroundStyle(palette.primaryText)
                 .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: true)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+private struct TFTLayoutScale {
+    let topLabel: CGFloat
+    let topValue: CGFloat
+    let tachometerNumber: CGFloat
+    let tachometerMultiplier: CGFloat
+    let digitalRpm: CGFloat
+    let metricLabel: CGFloat
+    let metricValue: CGFloat
+    let status: CGFloat
+    let indicatorLabel: CGFloat
+    let speed: CGFloat
+    let speedUnit: CGFloat
+    let gear: CGFloat
+    let tachometerLabelGap: CGFloat
+    let modeUnderlineWidth: CGFloat
+    let speedUnitBaseline: CGFloat
+    let turnIndicator: CGFloat
+    let standardIndicator: CGFloat
+    let sideRailWidth: CGFloat
+    let statusDot: CGFloat
+    let topStackSpacing: CGFloat
+    let metricStackSpacing: CGFloat
+
+    static func resolve(height: CGFloat) -> TFTLayoutScale {
+        TFTLayoutScale(
+            topLabel: clamp(height * 0.026, minimum: 8.5, maximum: 11),
+            topValue: clamp(height * 0.048, minimum: 15, maximum: 20),
+            tachometerNumber: clamp(height * 0.033, minimum: 11, maximum: 15),
+            tachometerMultiplier: clamp(height * 0.025, minimum: 8.5, maximum: 11),
+            digitalRpm: clamp(height * 0.043, minimum: 15, maximum: 19),
+            metricLabel: clamp(height * 0.026, minimum: 8.5, maximum: 11),
+            metricValue: clamp(height * 0.047, minimum: 15.5, maximum: 20),
+            status: clamp(height * 0.025, minimum: 8.5, maximum: 11),
+            indicatorLabel: clamp(height * 0.020, minimum: 7, maximum: 9),
+            speed: clamp(height * 0.245, minimum: 84, maximum: 118),
+            speedUnit: clamp(height * 0.050, minimum: 17, maximum: 22),
+            gear: clamp(height * 0.225, minimum: 80, maximum: 104),
+            tachometerLabelGap: clamp(height * 0.046, minimum: 18, maximum: 24),
+            modeUnderlineWidth: clamp(height * 0.12, minimum: 42, maximum: 54),
+            speedUnitBaseline: clamp(height * 0.038, minimum: 13, maximum: 18),
+            turnIndicator: clamp(height * 0.112, minimum: 32, maximum: 42),
+            standardIndicator: clamp(height * 0.098, minimum: 30, maximum: 40),
+            sideRailWidth: clamp(height * 0.128, minimum: 40, maximum: 52),
+            statusDot: clamp(height * 0.018, minimum: 6, maximum: 8),
+            topStackSpacing: clamp(height * 0.010, minimum: 3, maximum: 5),
+            metricStackSpacing: clamp(height * 0.010, minimum: 3, maximum: 5)
+        )
+    }
+
+    private static func clamp(
+        _ value: CGFloat,
+        minimum: CGFloat,
+        maximum: CGFloat
+    ) -> CGFloat {
+        min(max(value, minimum), maximum)
     }
 }
 

@@ -4305,3 +4305,35 @@ upper-left speed, lower-right gear, `ROAD` mode, edge pictograms, BLE/CAN/REC
 state, and transparent five-value lower edge. This remains mobile presentation
 state only and changes no hardware, firmware, CAN decoder, BLE wire contract,
 channel mapping, or Power Board architecture.
+
+## 2026-07-24 — Scale RideDashboard and add debug-only 0–100 Demo Ride
+
+Decision: preserve the approved Interface Display ribbon geometry and palette,
+but calculate all secondary typography, icon sizes, and clearances from screen
+height with bounded minimum/maximum values. Move the top telemetry down into a
+minimum four-percent safe zone, make its containers tall enough for full font
+metrics, keep text overflow unclipped, enlarge both telltale rails, and move the
+five-value lower row four percent above the display edge. Widen only the speed
+container so `100 km/h` remains on one line at 16:9; speed, gear, and ribbon
+anchors remain unchanged.
+
+Decision: add an Android debug-source-set-only `DemoRideRepository` implementing
+the existing `DeviceRepository` interface and emitting normal
+`TelemetrySnapshot` values on display frames. The nine-second K25 review
+scenario is N→1→2, 0→70→100 km/h, 1100→7200→4200→6100 RPM, includes a 200 ms
+shift, clears ABS self-test after movement, holds BLE/CAN/REC healthy, and ramps
+battery voltage from 12.7 V to 14.2 V. Gear is a debug presentation companion
+because telemetry v1 has no gear field; no production telemetry or wire schema
+is extended or bypassed.
+
+Evidence: Android debug/release compilation, JVM scenario tests, all nine
+connected Ride Mode/golden tests, and the updated 2048×921 golden pass. The
+recorded review artifact is a clean 1920×1080 H.264 MP4 at 60 FPS and is kept
+outside Git. SwiftUI mirrors the height-bounded typography and safe-zone
+changes; execution remains gated on an Xcode host.
+
+Result: the cluster remains the same approved composition but reads at
+motorcycle viewing distance, preserves full glyph bounds on CHIGEE and 16:9
+phone layouts, and provides a deterministic debug telemetry stream without
+changing hardware, firmware, CAN behavior, BLE contracts, channel mapping, or
+Power Board architecture.

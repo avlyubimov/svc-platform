@@ -2,7 +2,11 @@ package com.avlyubimov.svc.mobile
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -22,6 +26,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -43,11 +48,15 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
@@ -80,13 +89,14 @@ internal fun RideDashboardScreen(
             .background(dashboardPalette.background)
             .testTag("tftDashboard"),
     ) {
-        val compact = maxHeight < 390.dp || maxWidth < 760.dp
+        val scale = TftLayoutScale.resolve(maxHeight)
         val edgePadding = maxWidth * 0.04f
 
         TftRibbonTachometer(
             data = data,
             palette = dashboardPalette,
             reduceMotion = reduceMotion,
+            scale = scale,
             modifier = Modifier
                 .fillMaxSize()
                 .testTag("tftTachometer"),
@@ -95,26 +105,26 @@ internal fun RideDashboardScreen(
         TftTopLine(
             data = data,
             palette = dashboardPalette,
-            compact = compact,
+            scale = scale,
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .fillMaxWidth()
-                .height(maxHeight * 0.15f)
+                .height(maxHeight * 0.20f)
                 .padding(
                     start = maxWidth * 0.14f,
                     end = maxWidth * 0.14f,
-                    top = maxHeight * 0.035f,
+                    top = maxHeight * 0.058f,
                 ),
         )
 
         TftSpeedCluster(
             data = data,
             palette = dashboardPalette,
-            compact = compact,
+            scale = scale,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .offset(x = maxWidth * 0.17f, y = maxHeight * 0.17f)
-                .width(maxWidth * 0.31f)
+                .width(maxWidth * 0.38f)
                 .height(maxHeight * 0.28f)
                 .testTag("tftSpeed"),
         )
@@ -122,7 +132,7 @@ internal fun RideDashboardScreen(
         TftGear(
             gear = data.gear,
             palette = dashboardPalette,
-            compact = compact,
+            scale = scale,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .offset(x = maxWidth * 0.74f, y = maxHeight * 0.54f)
@@ -134,12 +144,17 @@ internal fun RideDashboardScreen(
         Text(
             text = "${data.engineRpm.wholeOrDash()} rpm",
             color = dashboardPalette.secondaryText,
-            fontSize = if (compact) 11.sp else 13.sp,
+            fontSize = scale.digitalRpm,
+            lineHeight = scale.digitalRpm * 1.18f,
             fontFamily = FontFamily.Monospace,
             letterSpacing = 1.2.sp,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Visible,
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .offset(x = maxWidth * 0.45f, y = maxHeight * 0.68f)
+                .offset(x = maxWidth * 0.45f, y = maxHeight * 0.67f)
+                .wrapContentHeight(unbounded = true)
                 .testTag("tftDigitalRpm"),
         )
 
@@ -147,32 +162,32 @@ internal fun RideDashboardScreen(
             side = TftIndicatorSide.LEFT,
             data = data,
             palette = dashboardPalette,
-            compact = compact,
+            scale = scale,
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .offset(x = edgePadding, y = maxHeight * 0.20f)
-                .width(if (compact) 30.dp else 36.dp)
-                .height(maxHeight * 0.49f),
+                .offset(x = edgePadding, y = maxHeight * 0.17f)
+                .width(scale.sideRailWidth)
+                .height(maxHeight * 0.61f),
         )
         TftSideIndicators(
             side = TftIndicatorSide.RIGHT,
             data = data,
             palette = dashboardPalette,
-            compact = compact,
+            scale = scale,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .offset(x = -edgePadding, y = maxHeight * 0.20f)
-                .width(if (compact) 30.dp else 36.dp)
-                .height(maxHeight * 0.49f),
+                .offset(x = -edgePadding, y = maxHeight * 0.17f)
+                .width(scale.sideRailWidth)
+                .height(maxHeight * 0.61f),
         )
 
         TftConnectionStatus(
             data = data,
             palette = dashboardPalette,
-            compact = compact,
+            scale = scale,
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .offset(x = maxWidth * 0.43f, y = maxHeight * 0.76f)
+                .offset(x = maxWidth * 0.43f, y = maxHeight * 0.755f)
                 .width(maxWidth * 0.24f)
                 .testTag("tftConnectionIcons"),
         )
@@ -181,7 +196,7 @@ internal fun RideDashboardScreen(
             Text(
                 text = message.uppercase(),
                 color = dashboardPalette.primaryText,
-                fontSize = if (compact) 10.sp else 12.sp,
+                fontSize = scale.status,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.2.sp,
                 textAlign = TextAlign.Center,
@@ -206,7 +221,7 @@ internal fun RideDashboardScreen(
             Text(
                 text = "●  ${data.toastMessage.orEmpty()}",
                 color = dashboardPalette.secondaryText,
-                fontSize = if (compact) 10.sp else 12.sp,
+                fontSize = scale.status,
                 maxLines = 1,
                 modifier = Modifier
                     .background(
@@ -221,12 +236,13 @@ internal fun RideDashboardScreen(
         TftBottomTelemetry(
             data = data,
             palette = dashboardPalette,
-            compact = compact,
+            scale = scale,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
+                .offset(y = -(maxHeight * 0.04f))
                 .fillMaxWidth()
-                .height(maxHeight * 0.135f)
-                .padding(horizontal = maxWidth * 0.11f)
+                .height(maxHeight * 0.14f)
+                .padding(horizontal = maxWidth * 0.10f)
                 .testTag("tftBottomStrip"),
         )
     }
@@ -237,6 +253,7 @@ private fun TftRibbonTachometer(
     data: TftDashboardData,
     palette: RidePalette,
     reduceMotion: Boolean,
+    scale: TftLayoutScale,
     modifier: Modifier,
 ) {
     val maximumRpm = data.tachometerMaximumRpm ?: 9_000.0
@@ -257,13 +274,14 @@ private fun TftRibbonTachometer(
     val numberStyle = TextStyle(
         color = palette.primaryText,
         fontFamily = FontFamily.Monospace,
-        fontSize = 10.sp,
+        fontSize = scale.tachometerNumber,
         fontWeight = FontWeight.Bold,
+        platformStyle = PlatformTextStyle(includeFontPadding = true),
     )
     val multiplierStyle = TextStyle(
         color = palette.secondaryText,
         fontFamily = FontFamily.Monospace,
-        fontSize = 8.sp,
+        fontSize = scale.tachometerMultiplier,
         fontWeight = FontWeight.Medium,
         letterSpacing = 0.7.sp,
     )
@@ -326,7 +344,7 @@ private fun TftRibbonTachometer(
                 textLayoutResult = label,
                 topLeft = Offset(
                     x = point.x - label.size.width / 2f,
-                    y = point.y - label.size.height - 10.dp.toPx(),
+                    y = point.y - label.size.height - scale.tachometerLabelGap.toPx(),
                 ),
             )
         }
@@ -347,7 +365,7 @@ private fun TftRibbonTachometer(
 private fun TftTopLine(
     data: TftDashboardData,
     palette: RidePalette,
-    compact: Boolean,
+    scale: TftLayoutScale,
     modifier: Modifier,
 ) {
     Row(
@@ -358,20 +376,20 @@ private fun TftTopLine(
             label = "TRIP",
             value = data.tripDistanceKm.valueOrDash("km", 1),
             palette = palette,
-            compact = compact,
+            scale = scale,
         )
         TftTopValue(
             label = "MODE",
             value = "ROAD",
             palette = palette,
-            compact = compact,
+            scale = scale,
             selected = true,
         )
         TftTopValue(
             label = "RANGE",
             value = data.rangeKm.valueOrDash("km", 0),
             palette = palette,
-            compact = compact,
+            scale = scale,
         )
     }
 }
@@ -381,33 +399,43 @@ private fun RowScope.TftTopValue(
     label: String,
     value: String,
     palette: RidePalette,
-    compact: Boolean,
+    scale: TftLayoutScale,
     selected: Boolean = false,
 ) {
     Column(
-        modifier = Modifier.weight(1f),
+        modifier = Modifier
+            .weight(1f)
+            .wrapContentHeight(unbounded = true),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = label,
             color = palette.secondaryText,
-            fontSize = if (compact) 7.sp else 9.sp,
+            fontSize = scale.topLabel,
+            lineHeight = scale.topLabel * 1.20f,
             letterSpacing = 1.sp,
             maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Visible,
+            modifier = Modifier.wrapContentHeight(unbounded = true),
         )
         Text(
             text = value,
             color = if (selected) TftRibbonColors.activeEnd else palette.primaryText,
-            fontSize = if (compact) 13.sp else 16.sp,
+            fontSize = scale.topValue,
+            lineHeight = scale.topValue * 1.18f,
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Visible,
+            modifier = Modifier.wrapContentHeight(unbounded = true),
         )
         if (selected) {
             Spacer(
                 Modifier
                     .padding(top = 3.dp)
-                    .width(if (compact) 34.dp else 42.dp)
+                    .width(scale.modeUnderlineWidth)
                     .height(2.dp)
                     .background(palette.accent),
             )
@@ -419,7 +447,7 @@ private fun RowScope.TftTopValue(
 private fun TftSpeedCluster(
     data: TftDashboardData,
     palette: RidePalette,
-    compact: Boolean,
+    scale: TftLayoutScale,
     modifier: Modifier,
 ) {
     Column(
@@ -431,20 +459,25 @@ private fun TftSpeedCluster(
             Text(
                 text = data.speedKmh.wholeOrDash(),
                 color = palette.primaryText,
-                fontSize = if (compact) 78.sp else 102.sp,
+                fontSize = scale.speed,
                 fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight.Light,
-                lineHeight = if (compact) 78.sp else 102.sp,
+                lineHeight = scale.speed,
                 maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Visible,
             )
             Text(
                 text = "km/h",
                 color = palette.secondaryText,
-                fontSize = if (compact) 14.sp else 18.sp,
+                fontSize = scale.speedUnit,
                 fontFamily = FontFamily.Monospace,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Visible,
                 modifier = Modifier.padding(
                     start = 3.dp,
-                    bottom = if (compact) 10.dp else 14.dp,
+                    bottom = scale.speedUnitBaseline,
                 ),
             )
         }
@@ -455,18 +488,20 @@ private fun TftSpeedCluster(
 private fun TftGear(
     gear: String,
     palette: RidePalette,
-    compact: Boolean,
+    scale: TftLayoutScale,
     modifier: Modifier,
 ) {
     Box(contentAlignment = Alignment.Center, modifier = modifier) {
         Text(
             text = gear.ifBlank { "—" },
             color = if (gear == "N") palette.valid else palette.primaryText,
-            fontSize = if (compact) 74.sp else 94.sp,
+            fontSize = scale.gear,
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Medium,
-            lineHeight = if (compact) 74.sp else 94.sp,
+            lineHeight = scale.gear,
             maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Visible,
         )
     }
 }
@@ -476,12 +511,16 @@ private fun TftSideIndicators(
     side: TftIndicatorSide,
     data: TftDashboardData,
     palette: RidePalette,
-    compact: Boolean,
+    scale: TftLayoutScale,
     modifier: Modifier,
 ) {
     val entries = if (side == TftIndicatorSide.LEFT) {
         listOf(
-            TftSideIndicator(TftSideIcon.TURN_LEFT, false, palette.valid),
+            TftSideIndicator(
+                TftSideIcon.TURN_LEFT,
+                TftIndicator.TURN_LEFT in data.activeIndicators,
+                palette.valid,
+            ),
             TftSideIndicator(
                 TftSideIcon.HIGH_BEAM,
                 TftIndicator.HIGH_BEAM in data.activeIndicators,
@@ -496,7 +535,11 @@ private fun TftSideIndicators(
         )
     } else {
         listOf(
-            TftSideIndicator(TftSideIcon.TURN_RIGHT, false, palette.valid),
+            TftSideIndicator(
+                TftSideIcon.TURN_RIGHT,
+                TftIndicator.TURN_RIGHT in data.activeIndicators,
+                palette.valid,
+            ),
             TftSideIndicator(
                 TftSideIcon.ABS,
                 TftIndicator.ABS in data.activeIndicators,
@@ -529,7 +572,7 @@ private fun TftSideIndicators(
             TftSideIndicatorGlyph(
                 indicator = indicator,
                 inactive = palette.disabledText.copy(alpha = 0.46f),
-                compact = compact,
+                scale = scale,
             )
         }
     }
@@ -539,10 +582,25 @@ private fun TftSideIndicators(
 private fun TftSideIndicatorGlyph(
     indicator: TftSideIndicator,
     inactive: Color,
-    compact: Boolean,
+    scale: TftLayoutScale,
 ) {
-    val color = if (indicator.active) indicator.color else inactive
-    val iconSize = if (compact) 24.dp else 29.dp
+    val isTurnSignal = indicator.icon == TftSideIcon.TURN_LEFT ||
+        indicator.icon == TftSideIcon.TURN_RIGHT
+    val blinkTransition = rememberInfiniteTransition(label = "turn-signal")
+    val blinkAlpha by blinkTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0.22f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(440),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "turn-signal-alpha",
+    )
+    val baseColor = if (indicator.active) indicator.color else inactive
+    val color = baseColor.copy(
+        alpha = if (indicator.active && isTurnSignal) blinkAlpha else baseColor.alpha,
+    )
+    val iconSize = if (isTurnSignal) scale.turnIndicator else scale.standardIndicator
     when (indicator.icon) {
         TftSideIcon.TURN_LEFT,
         TftSideIcon.TURN_RIGHT,
@@ -588,7 +646,7 @@ private fun TftSideIndicatorGlyph(
             Text(
                 "ABS",
                 color = color,
-                fontSize = if (compact) 6.sp else 7.sp,
+                fontSize = scale.indicatorLabel,
                 fontWeight = FontWeight.Bold,
             )
         }
@@ -728,7 +786,7 @@ private fun TftRecordingGlyph(
 private fun TftConnectionStatus(
     data: TftDashboardData,
     palette: RidePalette,
-    compact: Boolean,
+    scale: TftLayoutScale,
     modifier: Modifier,
 ) {
     Row(
@@ -736,9 +794,9 @@ private fun TftConnectionStatus(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        TftStatusDot("BLE", data.bleConnected, palette, compact)
-        TftStatusDot("CAN", data.canConnected, palette, compact)
-        TftStatusDot("REC", data.canRecording, palette, compact)
+        TftStatusDot("BLE", data.bleConnected, palette, scale)
+        TftStatusDot("CAN", data.canConnected, palette, scale)
+        TftStatusDot("REC", data.canRecording, palette, scale)
     }
 }
 
@@ -747,19 +805,19 @@ private fun TftStatusDot(
     label: String,
     active: Boolean,
     palette: RidePalette,
-    compact: Boolean,
+    scale: TftLayoutScale,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Canvas(Modifier.size(if (compact) 5.dp else 6.dp)) {
+        Canvas(Modifier.size(scale.statusDot)) {
             drawCircle(if (active) palette.valid else palette.critical)
         }
         Text(
             text = label,
             color = palette.secondaryText,
-            fontSize = if (compact) 7.sp else 8.sp,
+            fontSize = scale.status,
             fontWeight = FontWeight.Bold,
             letterSpacing = 0.7.sp,
         )
@@ -770,23 +828,23 @@ private fun TftStatusDot(
 private fun TftBottomTelemetry(
     data: TftDashboardData,
     palette: RidePalette,
-    compact: Boolean,
+    scale: TftLayoutScale,
     modifier: Modifier,
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        TftMetric("FUEL", data.fuelPercent.valueOrDash("%", 0), palette, compact)
-        TftMetric("BAT", data.batteryVoltage.valueOrDash("V", 1), palette, compact)
-        TftMetric("SVC", data.svcCurrentA.valueOrDash("A", 1), palette, compact)
+        TftMetric("FUEL", data.fuelPercent.valueOrDash("%", 0), palette, scale)
+        TftMetric("BAT", data.batteryVoltage.valueOrDash("V", 1), palette, scale)
+        TftMetric("SVC", data.svcCurrentA.valueOrDash("A", 1), palette, scale)
         TftMetric(
             "ENGINE",
             data.engineTemperatureCelsius.valueOrDash("°C", 0),
             palette,
-            compact,
+            scale,
         )
-        TftMetric("TIME", data.currentTime, palette, compact)
+        TftMetric("TIME", data.currentTime, palette, scale)
     }
 }
 
@@ -795,7 +853,7 @@ private fun RowScope.TftMetric(
     label: String,
     value: String,
     palette: RidePalette,
-    compact: Boolean,
+    scale: TftLayoutScale,
 ) {
     Column(
         modifier = Modifier
@@ -807,18 +865,73 @@ private fun RowScope.TftMetric(
         Text(
             text = label,
             color = palette.secondaryText,
-            fontSize = if (compact) 7.sp else 9.sp,
+            fontSize = scale.metricLabel,
+            lineHeight = scale.metricLabel * 1.18f,
             letterSpacing = 0.9.sp,
             maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Visible,
         )
         Text(
             text = value,
             color = palette.primaryText,
-            fontSize = if (compact) 12.sp else 15.sp,
+            fontSize = scale.metricValue,
+            lineHeight = scale.metricValue * 1.18f,
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Visible,
         )
+    }
+}
+
+private data class TftLayoutScale(
+    val topLabel: TextUnit,
+    val topValue: TextUnit,
+    val tachometerNumber: TextUnit,
+    val tachometerMultiplier: TextUnit,
+    val digitalRpm: TextUnit,
+    val metricLabel: TextUnit,
+    val metricValue: TextUnit,
+    val status: TextUnit,
+    val indicatorLabel: TextUnit,
+    val speed: TextUnit,
+    val speedUnit: TextUnit,
+    val gear: TextUnit,
+    val tachometerLabelGap: Dp,
+    val modeUnderlineWidth: Dp,
+    val speedUnitBaseline: Dp,
+    val turnIndicator: Dp,
+    val standardIndicator: Dp,
+    val sideRailWidth: Dp,
+    val statusDot: Dp,
+) {
+    companion object {
+        fun resolve(height: Dp): TftLayoutScale {
+            val value = height.value
+            return TftLayoutScale(
+                topLabel = (value * 0.026f).coerceIn(8.5f, 11f).sp,
+                topValue = (value * 0.048f).coerceIn(15f, 20f).sp,
+                tachometerNumber = (value * 0.033f).coerceIn(11f, 15f).sp,
+                tachometerMultiplier = (value * 0.025f).coerceIn(8.5f, 11f).sp,
+                digitalRpm = (value * 0.043f).coerceIn(15f, 19f).sp,
+                metricLabel = (value * 0.026f).coerceIn(8.5f, 11f).sp,
+                metricValue = (value * 0.047f).coerceIn(15.5f, 20f).sp,
+                status = (value * 0.025f).coerceIn(8.5f, 11f).sp,
+                indicatorLabel = (value * 0.020f).coerceIn(7f, 9f).sp,
+                speed = (value * 0.245f).coerceIn(84f, 118f).sp,
+                speedUnit = (value * 0.050f).coerceIn(17f, 22f).sp,
+                gear = (value * 0.225f).coerceIn(80f, 104f).sp,
+                tachometerLabelGap = (value * 0.028f).coerceIn(10f, 14f).dp,
+                modeUnderlineWidth = (value * 0.12f).coerceIn(42f, 54f).dp,
+                speedUnitBaseline = (value * 0.038f).coerceIn(13f, 18f).dp,
+                turnIndicator = (value * 0.112f).coerceIn(32f, 42f).dp,
+                standardIndicator = (value * 0.098f).coerceIn(30f, 40f).dp,
+                sideRailWidth = (value * 0.128f).coerceIn(40f, 52f).dp,
+                statusDot = (value * 0.018f).coerceIn(6f, 8f).dp,
+            )
+        }
     }
 }
 

@@ -11,6 +11,7 @@
 - temporary zero-speed-gated controls and optional fading page indicator;
 - continuous Bézier-ribbon 0–9000 RPM tachometer through the main cluster;
 - explicit gear presentation with telemetry v1 fixed to unavailable;
+- debug-only frame-driven 0–100 km/h Demo Ride through `DeviceRepository`;
 - SVC-estimated lean presentation and stationary-only trip-maximum reset;
 - telemetry quality-state mapping;
 - SVC Day, SVC Night, and automatic ambient-light themes;
@@ -32,12 +33,13 @@ official instrument-panel press imagery only as a high-level reference. It
 copies no manufacturer artwork or logos; public Ride Mode output uses only the
 SVC identity.
 
-## Pull request 3 — Dashboard Demo Mode
+## Pull request 3 — Expand Dashboard Demo Mode
 
-Add the approved ignition-off, idle, city, highway, corner, night, reserve,
-ice, high-RPM, overcurrent, CAN-unavailable, and BLE-disconnected scenarios.
-Demo data must be visibly labelled and remain outside the wire protocol. Gear
-simulation and local level calibration are permitted only in this mode.
+Expand the current debug-only acceleration scenario with the approved
+ignition-off, city, highway, corner, night, reserve, ice, high-RPM,
+overcurrent, CAN-unavailable, and BLE-disconnected scenarios. Demo data must
+remain outside the wire protocol. Gear simulation and local level calibration
+are permitted only in this mode.
 
 ## Pull request 4 — Telemetry protocol v2
 
