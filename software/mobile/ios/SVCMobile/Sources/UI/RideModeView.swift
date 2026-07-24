@@ -308,8 +308,11 @@ struct RideModeView: View {
         withAnimation(.easeOut(duration: 0.12)) {
             controlsVisible = true
         }
+        let autoHideDelay: Duration = ProcessInfo.processInfo.arguments.contains(
+            "SVC_UI_TEST_KEEP_CONTROLS"
+        ) ? .seconds(30) : .seconds(3)
         controlsTask = Task {
-            try? await Task.sleep(for: .seconds(3))
+            try? await Task.sleep(for: autoHideDelay)
             guard !Task.isCancelled else { return }
             withAnimation(.easeOut(duration: 0.18)) {
                 controlsVisible = false

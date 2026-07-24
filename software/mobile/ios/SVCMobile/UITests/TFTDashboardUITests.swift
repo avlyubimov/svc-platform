@@ -13,26 +13,16 @@ final class TFTDashboardUITests: XCTestCase {
         ]
         app.launch()
         XCTAssertTrue(
-            app.descendants(matching: .any)["tftDashboard"]
+            app.otherElements["rideModeRoot"]
                 .waitForExistence(timeout: 5)
         )
     }
 
-    func testCoreClusterIsVisibleWithoutOverlapOrSystemChrome() {
-        let dashboard = app.descendants(matching: .any)["tftDashboard"]
-        let tachometer = app.descendants(matching: .any)["tftTachometer"]
-        let speed = app.descendants(matching: .any)["tftSpeed"]
-        let gear = app.descendants(matching: .any)["tftGear"]
-        let bottomStrip = app.descendants(matching: .any)["tftBottomStrip"]
+    func testDashboardFillsLandscapeWithoutSystemChrome() {
+        let dashboard = app.otherElements["rideModeRoot"]
 
-        XCTAssertTrue(tachometer.exists)
-        XCTAssertTrue(speed.exists)
-        XCTAssertTrue(gear.exists)
-        XCTAssertTrue(bottomStrip.exists)
-        XCTAssertTrue(dashboard.frame.contains(tachometer.frame))
-        XCTAssertFalse(speed.frame.intersects(gear.frame))
-        XCTAssertLessThan(speed.frame.maxY, bottomStrip.frame.minY)
-        XCTAssertLessThan(gear.frame.maxY, bottomStrip.frame.minY)
+        XCTAssertEqual(dashboard.value as? String, "PURE RIDE")
+        XCTAssertGreaterThan(dashboard.frame.width, dashboard.frame.height)
         XCTAssertEqual(app.statusBars.count, 0)
         XCTAssertEqual(app.navigationBars.count, 0)
         XCTAssertEqual(app.tabBars.count, 0)

@@ -6,7 +6,11 @@ final class RideModeUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        app.launchArguments = ["SVC_SKIP_STARTUP", "SVC_RESET_RIDE_PAGE"]
+        app.launchArguments = [
+            "SVC_SKIP_STARTUP",
+            "SVC_RESET_RIDE_PAGE",
+            "SVC_UI_TEST_KEEP_CONTROLS"
+        ]
         app.launch()
         XCTAssertTrue(
             app.otherElements["rideModeRoot"].waitForExistence(timeout: 5)
