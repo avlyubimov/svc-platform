@@ -9,9 +9,9 @@ PB-100, motorcycle use or production.
 |---|---|---|---|
 | FB-100 | [top](FB-100-rev1-evt-top.png) | [bottom](FB-100-rev1-evt-bottom.png) | Four-layer connectivity-complete routing with stackup-derived USB pair and GND zones; fab review and supplier DFM remain open |
 | LB-100 | [top](LB-100-rev1-evt-top.png), [isometric](LB-100-rev1-evt-isometric.png) | [bottom](LB-100-rev1-evt-bottom.png) | Connectivity-complete six-layer EVT board with 2,274 segments, 409 standard through vias, four GND zones, six-layer E73 keepout and zero refilled DRC errors/unconnected items |
-| PB-100 | [top](PB-100-rev1-evt-top.png), [isometric](PB-100-rev1-evt-isometric.png) | [bottom](PB-100-rev1-evt-bottom.png) | Eight-layer deterministic routed baseline with 5,049 segments, 874 conventional through vias, 38 zones and 36 explicit connectivity blockers; fabrication remains blocked |
+| PB-100 | [top](PB-100-rev1-evt-top.png), [isometric](PB-100-rev1-evt-isometric.png) | [bottom](PB-100-rev1-evt-bottom.png) | Connectivity-complete eight-layer deterministic EVT layout with 5,677 segments, 910 conventional through vias, 39 adjacent-layer microvias, 38 zones and zero refilled DRC errors/unconnected items; fabrication remains blocked pending EVT-FAB review and supplier HDI DFM acceptance |
 
-The images were generated on 2026-07-23 from the tracked `.kicad_pcb` files
+The images were generated on 2026-07-24 from the tracked `.kicad_pcb` files
 with KiCad CLI 10.0.4. KiCad renders the FB-100 GND zones from the tracked zone
 definitions; the tracked board is not modified only for rendering. Regenerate
 the board renders from the repository root with:

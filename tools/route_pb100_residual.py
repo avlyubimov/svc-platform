@@ -27,6 +27,7 @@ VIA_SIZE_MM = 0.60
 VIA_DRILL_MM = 0.30
 CLEARANCE_MARGIN_MM = 0.00
 MAX_EXPANDED_STATES = 300_000
+VIA_COST = 8.0
 BOARD_X_MIN = 0.50
 BOARD_X_MAX = 149.50
 BOARD_Y_MIN = 0.50
@@ -439,7 +440,7 @@ def multi_layer_a_star(
         dx = abs(cell[0] - goal[0])
         dy = abs(cell[1] - goal[1])
         distance = max(dx, dy) + (math.sqrt(2) - 1) * min(dx, dy)
-        return distance + (8.0 if layer != goal_layer else 0.0)
+        return distance + (VIA_COST if layer != goal_layer else 0.0)
 
     queue: list[tuple[float, float, LayerCell]] = [
         (heuristic(start_state), 0.0, start_state)
@@ -496,7 +497,7 @@ def multi_layer_a_star(
                 if next_layer == layer:
                     continue
                 next_state = (next_layer, cell)
-                next_cost = cost + 8.0
+                next_cost = cost + VIA_COST
                 if next_cost >= best.get(next_state, math.inf):
                     continue
                 best[next_state] = next_cost

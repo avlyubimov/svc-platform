@@ -1,63 +1,98 @@
 # PB-100 Controlled Layout Progress
 
-Status: `EVT-LAYOUT-AUTHORIZED` — routed baseline exists; `EVT-FAB-REVIEW` remains blocked
+Status: `EVT-LAYOUT-AUTHORIZED` — connectivity-complete routed baseline;
+`EVT-FAB-REVIEW` remains blocked
 
-## Completed Milestone
+## Completed milestone
 
-- Generated the controlled eight-layer `kicad/PB-100.kicad_pcb` with the
-  reviewed 150 mm x 90 mm outline, four local M3 holes and four shared M2.5
-  PB/LB stack holes. The stack keeps In2.Cu as the continuous GND reference
-  and In5.Cu as the protected-battery distribution plane.
-- Imported and placed all 414 footprint-bound schematic parts plus eight
-  board-only mounting holes. Schematic parity is closed except for the eight
-  intentional mounting-hole footprints.
-- Preserved the accepted architecture: ten generic outputs, configuration-
-  mapped channel roles, the 40 A board target, removable input isolation,
-  factory/DNP alternatives, and the physically default-disabled CAN1 TX path.
-- Added explicit battery-entry and output-current zones, protected-bus
-  transitions and conventional through-via fields. The broad generated
-  segments and zones remain the only copper credited to the high-current path;
-  preliminary 0.20 mm attachment traces are not current-capacity evidence.
-- Recorded 5,778 deterministic routing-manifest items in
-  `kicad/PB-100-routing.csv`: 5,016 segments and 762 conventional through
-  vias. Together with generator-owned power copper, the board contains 5,049
-  segments, 874 vias and 38 zones.
-- Added deterministic route export, residual-route handling and validation.
-  A clean regeneration followed by KiCad 10.0.4 zone refill reports no shorts,
-  track crossings, copper-clearance, edge-clearance, drill or keepout
-  violations introduced by this routing baseline.
-- Reduced open connectivity from 499 to 36. The DRC-clean closeout includes
-  the previously trapped `LB_3V3_IO`, `PB_I2C_INT`, `OUT1_IWRN` and
-  `OUT2_IWRN` branches. Dense controller fan-out was recovered with local
-  signal-layer jogs and 0.60/0.30 mm filled/capped conventional through vias;
-  no blind or buried vias were introduced. The remaining items are explicit
-  blockers rather than hidden or waived connections.
+- The deterministic eight-layer `kicad/PB-100.kicad_pcb` retains the reviewed
+  150 mm x 90 mm outline, four local M3 holes and four shared M2.5 PB/LB stack
+  holes. In2.Cu remains the continuous GND reference and In5.Cu remains the
+  protected-battery distribution plane.
+- All 414 footprint-bound schematic parts and eight intentional board-only
+  mounting holes are placed. Schematic parity contains only H1-H8.
+- The accepted architecture is unchanged: ten generic configuration-mapped
+  outputs, the 40 A board target, removable input isolation, all factory/DNP
+  alternatives and the physically default-disabled CAN1 TX path remain
+  present.
+- `kicad/PB-100-routing.csv` now contains 6,481 deterministic manifest items:
+  5,644 segments, 798 conventional `0.60/0.30 mm` through vias and 39
+  `0.30/0.10 mm` adjacent-layer microvias. With the generator-owned
+  high-current copper, the board contains 5,677 segments, 910 conventional
+  through vias, 39 microvias, 949 total vias and 38 zones.
+- A clean regeneration reproduces the accepted copper item-for-item. KiCad
+  10.0.4 zone-refill DRC reports zero unconnected items and no errors. The
+  locked 188-warning baseline is limited to 136 silk-over-copper findings, 27
+  project-library footprint mismatches, 17 silkscreen overlaps and eight
+  project-library footprint issues.
+- Connectivity fell from the original 499 open items, through the former
+  36-item checkpoint, to zero. The closeout includes the dense TPS48110
+  fan-outs, all switched-output and FET-drain clusters, protected-battery
+  attachments, input-controller pins and ten isolated GND pour fragments.
+- Broad generated segments, zones and `1.00/0.50 mm` power-via fields remain
+  the only copper credited to high-current capacity. The `0.20 mm`
+  attachments and HDI transitions are connectivity evidence only.
 
-## EVT-FAB Blockers
+## HDI manufacturing decision record
 
-- Close all 36 remaining connections. The largest groups are 14 GND
-  pad/pour/plane fragments, four `OUT7_SWITCHED` branches, three
-  `VBAT_PROT` attachments, two `VBAT_REV_PROT` branches and two
-  `OUT4_SWITCHED` branches. Eleven single residuals remain across controller
-  support, timing/sense, output-zone and power-option nets.
-- Replace preliminary attachment routing where required by the final
-  current/thermal model. In particular, close the protected 5 V and 3.3 V rail
-  widths, buck switch loop, clamp-current returns, CAN1 coupled-pair geometry
-  and all high-current zone neck/current-density evidence before fabrication.
-- Resolve the current project-context refilled warning baseline: 27
-  project-library footprint mismatches, eight project-library footprint
-  issues, 136 silk-over-copper findings, nine starved thermals and 17
-  silkscreen overlaps.
-- Close 40 A electrothermal extraction, Q1/Q2 and output clamp-loop parasitics,
-  connector fit, probe/safety fixture access, supplier stack/DFM review and
-  Product Owner pre-fabrication approval.
+This is a layout/manufacturing constraint under ADR-0020, not a Power Board
+requirements or architecture change.
 
-This routed baseline is not suitable for fabrication. No Gerbers, drills,
-pick-place, manufacturing ZIP or order package is authorized or generated.
-`PBREL-007` remains a separate `PRODUCTION-RELEASE` blocker.
+- **Why this construction:** ordinary through vias cannot fit the 0.50 mm
+  controller fan-out or pass between overlapping F.Cu/B.Cu power zones without
+  clearance or shorting violations. Adjacent-layer `0.30/0.10 mm` laser
+  microvias preserve the frozen placement, nets, variants and DNP footprints.
+- **Why not alternative A:** continuing with `0.60/0.30 mm` through vias
+  produced hole, pad-pitch or opposite-side power-zone conflicts.
+- **Why not alternative B:** moving controller/power-stage placement or
+  changing the layer/functional architecture would invalidate reviewed
+  mechanical, thermal and interface work and is not authorized.
+- **Construction:** 21 B.Cu-In6.Cu, five In6.Cu-In5.Cu, eight F.Cu-In1.Cu,
+  three In1.Cu-In2.Cu and two In2.Cu-In3.Cu microvias. The deepest stacks are
+  F.Cu-to-In3.Cu and B.Cu-to-In5.Cu. The nominal annular ring is 0.10 mm.
+  Dielectric traversal is 0.10 mm or 0.18 mm, so the nominal laser-via aspect
+  ratio is 1.0:1 or 1.8:1 and requires explicit supplier acceptance.
+- **Lifetime and operating margin:** prototype lifetime is not yet qualified.
+  Stacked-microvia fatigue, voiding, registration and thermal-cycle margin
+  remain supplier/EVT evidence items. No microvia receives high-current
+  capacity credit.
+- **Thermal and junction limit:** junction temperature is not applicable to a
+  passive interconnect. Local current/temperature-rise extraction remains
+  open, and the board may not be fabricated from connectivity evidence alone.
+- **Availability and qualification:** component availability, automotive
+  qualification and LCSC availability are not applicable. Actual
+  JLCPCB/PCBWay process compatibility, sequential-lamination count, filled and
+  capped via-in-pad capability, inspection plan, lead time and quote are open.
+- **Assembly requirement:** U3 pads 2 and 9 contain conventional through
+  via-in-pad features and require filled/capped processing. All stacked
+  microvias require supplier DFM plus first-article registration/void
+  inspection; solder-wicking disposition is mandatory.
+- **Cost and risk:** sequential lamination and via filling will increase PCB
+  cost. A supplier quote must demonstrate that the complete prototype remains
+  within the project `<=500 USD` target. No cost, yield or lifecycle claim is
+  accepted until that evidence exists.
 
-Reason: ADR-0020 authorizes placement, routing and pours, but not fabrication.
-The current milestone preserves the accepted architecture and gives the
-remaining work a deterministic, DRC-checked starting point without treating
-autorouter connectivity or thin attachment traces as 40 A, EMC, thermal or
-production evidence.
+## Remaining EVT-FAB blockers
+
+- Complete 40 A current-density, temperature-rise and margin extraction for
+  the input path, protected bus, shunts, MOSFET fields, output exits and
+  connector transitions.
+- Review the buck switch loop, clamp-current returns, Kelvin paths, protected
+  5 V/3.3 V rails, CAN1 coupled-pair geometry and all safety/probe access.
+- Obtain supplier stack/HDI DFM acceptance, impedance/process limits, filled
+  and capped via-in-pad confirmation, microsection/inspection plan, yield and
+  prototype quote.
+- Close connector fit, enclosure/thermal-interface extraction, solder-void
+  controls, laboratory safety review and Product Owner pre-fabrication
+  approval.
+- Disposition the locked non-electrical library/silkscreen warning set during
+  fabrication review.
+
+This connectivity-complete routed baseline is not yet suitable for
+fabrication. No Gerbers, drills, pick-place, manufacturing ZIP or order package
+is authorized or generated. `PBREL-007` remains a separate
+`PRODUCTION-RELEASE` blocker.
+
+ADR-0020 authorizes placement, routing, pours and extraction, but not
+fabrication. Zero unconnected items closes the routing-connectivity milestone;
+it does not replace electrothermal, EMC, DFM, safety or Product Owner evidence.

@@ -15,10 +15,10 @@ ROOT = Path(__file__).resolve().parents[1]
 KICAD_DIR = ROOT / "hardware" / "power-board" / "PB-100" / "kicad"
 BOARD_PATH = KICAD_DIR / "PB-100.kicad_pcb"
 REQUIRED_KICAD_VERSION = "10.0.4"
-EXPECTED_UNCONNECTED_ITEMS = 36
+EXPECTED_UNCONNECTED_ITEMS = 0
 EXPECTED_FOOTPRINTS = 422
-EXPECTED_SEGMENTS = 5049
-EXPECTED_VIAS = 874
+EXPECTED_SEGMENTS = 5677
+EXPECTED_VIAS = 949
 EXPECTED_ZONES = 38
 BOARD_ONLY_FOOTPRINTS = {f"H{index}" for index in range(1, 9)}
 
@@ -139,7 +139,6 @@ def validate_drc() -> None:
             "lib_footprint_mismatch": 27,
             "lib_footprint_issues": 8,
             "silk_over_copper": 136,
-            "starved_thermal": 9,
             "silk_overlap": 17,
         }
     )
@@ -191,7 +190,7 @@ def main() -> int:
         f"({EXPECTED_FOOTPRINTS} footprints, {EXPECTED_SEGMENTS} segments, "
         f"{EXPECTED_VIAS} vias, {EXPECTED_ZONES} zones, "
         f"{EXPECTED_UNCONNECTED_ITEMS} remaining connectivity blockers; "
-        "fabrication remains blocked)."
+        "fabrication remains blocked pending EVT-FAB-REVIEW)."
     )
     return 0
 
