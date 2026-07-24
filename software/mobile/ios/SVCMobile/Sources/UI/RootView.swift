@@ -5,7 +5,9 @@ struct RootView: View {
     @StateObject private var appearance = AppearanceStore()
     @StateObject private var ridePreferences = RidePreferences()
     @State private var selectedScreen: PrimaryScreen = .dashboard
-    @State private var rideModePresented = true
+    @State private var rideModePresented = !ProcessInfo.processInfo.arguments.contains(
+        "SVC_UI_TEST_EXIT_RIDE_MODE"
+    )
     @State private var rideSessionID = UUID()
     @State private var showSettings = false
     @State private var showStartup = !ProcessInfo.processInfo.arguments.contains(

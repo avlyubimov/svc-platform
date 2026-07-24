@@ -181,15 +181,6 @@ struct RideModeView: View {
         }
         .onChange(of: telemetry) { _, _ in updateTheme() }
         .onChange(of: ridePreferences.themeMode) { _, _ in updateTheme() }
-        .task {
-            guard ProcessInfo.processInfo.arguments.contains(
-                "SVC_UI_TEST_EXIT_RIDE_MODE"
-            ) else {
-                return
-            }
-            try? await Task.sleep(for: .milliseconds(250))
-            exitRideMode()
-        }
         .onDisappear {
             controlsTask?.cancel()
             indicatorTask?.cancel()
