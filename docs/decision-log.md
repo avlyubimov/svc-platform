@@ -4186,3 +4186,173 @@ and switched-output attachments, controller/timing/sense connections, rail and
 CAN geometry, filled/capped-via supplier capability and cost, 40 A
 electrothermal extraction, supplier DFM and Product Owner pre-fabrication
 review all remain open.
+## 2026-07-24 — Make Ride Mode a reversible full-screen phone session
+
+Decision: run the full graphical dashboard only inside a dedicated
+landscape-only Ride Mode container. SwiftUI uses a full-screen hosting
+controller that hides the status bar, persistent overlays, and Home Indicator;
+Compose uses edge-to-edge immersive sticky mode through
+`WindowInsetsController`. Both platforms preserve display-cutout safe areas,
+keep the display awake only while Ride Mode is active, apply brightness only to
+the active screen/window, and restore ordinary system behavior on exit.
+
+Decision: use the same non-cyclic page order on both platforms: `PURE RIDE`,
+`SPORT / LEAN`, `SVC POWER`, and `TRIP / DIAGNOSTICS`. Horizontal transitions
+use a 250 ms animation, vertical movement is rejected, and protected system
+gesture edges are not captured. The current page survives a short background
+cycle but a new Ride Mode session starts on `PURE RIDE`. Permanent navigation
+controls remain prohibited; a fading page indicator and a three-second
+temporary control overlay are the only Ride Mode chrome.
+
+Result: exit and Settings remain gated by confirmed zero speed, while page
+changes and brightness/theme controls remain available during motion. Android
+system Back always exits Ride Mode, iOS provides an explicit temporary Exit,
+and critical warnings do not replace either system escape path. This is a
+phone presentation/lifecycle decision only; it changes no telemetry contract,
+CAN behavior, output control, hardware, firmware, or projection-host behavior.
+
+## 2026-07-24 — Replace the Ride Mode card grid with a motorcycle TFT
+
+Decision: supersede the original Ride Mode page presentation with the same
+five-page, non-cyclic motorcycle TFT on SwiftUI and Compose: `MAIN DASHBOARD`,
+`LEAN / IMU`, `ENGINE / FUEL / RDC`, `SVC POWER`, and `CAN / DIAGNOSTICS`.
+The primary screen uses a full-width 0–9000 RPM tachometer with 7000–8000 RPM
+orange and 8000–9000 RPM red presentation zones, central speed, a large
+right-side gear, active-only telltales, corner connection state, and one
+continuous compact lower data strip. The previous rectangular information-card
+grid is no longer a Ride Mode entry screen.
+
+Decision: keep absent telemetry fail-closed as `--`, show SD absence only as a
+temporary toast, keep critical warnings in a narrow strip, and expose
+`LISTEN-ONLY` only on `CAN / DIAGNOSTICS`. A review-only presentation dataset
+contains the Product Owner-approved 87 km/h, 4200 RPM, gear 4, 18° right lean,
+62% fuel, 14.2 V, 2.3/2.6 bar RDC, and +16 °C values. It is reachable only by
+preview/test launch flags and does not modify telemetry v1 or mock repository
+semantics.
+
+Result: both phone implementations now include the same SVC/lamp/tachometer
+sweep startup sequence and the same five-page instrumentation hierarchy.
+Golden/UI tests verify core geometry, scaling, swipe behavior, system chrome,
+cutout bounds, and Ride Mode lifecycle. This is a presentation-only change; it
+adds no CAN IDs, signal inference, channel control, hardware behavior, firmware
+behavior, or persistent system-brightness change.
+
+## 2026-07-24 — Adopt the independent SVC Sport/Core Ride visual system
+
+Decision: supersede the blue decorative tachometer treatment with one flat
+red/white SVC sporting system on SwiftUI and Compose. Ride Mode uses
+`#050607` background, `#111418` surfaces, white primary telemetry,
+`#E21B2D` active red, `#FFB000` warning amber, and green only for
+Neutral/valid state. Blue/cyan are limited to high-beam, fog-light, and small
+system indicators. The 0–9000 RPM presentation is a heavy 45-segment linear
+scale: active 0–7000 white, 7000–8000 amber, 8000–9000 red, with dark inactive
+segments. No gradients, glow, BMW/M logo, or copied manufacturer artwork is
+used.
+
+Decision: keep the five capability-driven pages but rename their presentation
+order to `PURE RIDE`, `SPORT / CORE`, `VEHICLE`, `SVC POWER`, and
+`DIAGNOSTICS`. Pure Ride shows only fuel, range, battery voltage, engine
+temperature, and time in its lower strip. RDC, lean, output current, CAN
+logging, LISTEN-ONLY state, and unavailable-detail reporting remain on their
+dedicated pages. Healthy BLE/CAN state is hidden outside Diagnostics; a failed
+link becomes a small exception indicator. Configured output role labels remain
+unbound and show `--` when role mapping is unavailable, preserving the rule
+that channel roles are configuration-owned.
+
+Decision: persist the selected page across app process launches, while a clean
+installation defaults to Pure Ride. Presentation-only launch flags can select
+Pure Ride or Sport for deterministic review capture. The SVC startup uses a
+flat logo, indicator check, segmented RPM sweep, and thin red/white/blue lines.
+
+Evidence: official BMW S1000RR product material describes one Pure Ride and
+three Core screens and restoration of the last-used display; official BMW
+Group press imagery provides the high-level sporting instrument reference.
+The implementation is an independent SVC layout and asset set.
+
+Result: Android JVM/debug/release tests pass, eight Ride Mode instrumentation
+tests pass, and both 2048×921 Pure Ride/Sport framebuffer goldens pass. SwiftUI
+contains matching page order, persistence, palette, geometry, and UI-test
+attachments; execution remains gated on an Xcode host. This is presentation
+and local preference state only and changes no hardware, firmware, CAN
+decoder, BLE wire contract, or Power Board architecture.
+
+## 2026-07-24 — Limit visual approval to the Interface Display RideDashboard
+
+Decision: supersede the horizontal/segmented Pure Ride tachometers and the
+proposed Sport/Core review screen. The only screen in the current visual
+approval scope is `RideDashboard`. Its strict geometry reference is the
+Product Owner-provided Interface Display image: upper-left speed, a broad
+central ribbon rising left-to-right, lower-right gear, top trip/mode/range,
+edge telltale rails, and compact SVC data along the lower edge.
+
+Decision: render the tachometer as one closed area between two continuous
+Bézier curves, not as a line, rectangles, segments, dashes, or gaps. The band
+widens left-to-right; inactive fill is `#14253A`, current RPM fills smoothly
+from `#0066B1` to `#2D9CFF`, 7000–8000 RPM is solid `#F2A900`, and 8000–9000
+RPM is solid `#E21B2D`. At the review value, blue fill ends at exactly 4200
+RPM. The S1000RR reference contributes only sporting color density. No BMW/M
+artwork or literal manufacturer instrument screen is copied.
+
+Decision: keep the existing secondary pages functional and unchanged while the
+primary composition is reviewed. Remove Sport/Core presentation screenshots
+and golden approval claims until the Product Owner approves a separate
+redesign. The primary golden retains the fixed 87 km/h, 4200 RPM, gear 4,
+227.8 km trip, 214 km range, 62% fuel, 14.2 V, 8.4 A SVC current, 92 °C, and
+10:42 review values.
+
+Result: SwiftUI and Compose now share the same continuous 0–9000 RPM ribbon,
+upper-left speed, lower-right gear, `ROAD` mode, edge pictograms, BLE/CAN/REC
+state, and transparent five-value lower edge. This remains mobile presentation
+state only and changes no hardware, firmware, CAN decoder, BLE wire contract,
+channel mapping, or Power Board architecture.
+
+## 2026-07-24 — Scale RideDashboard and add debug-only 0–100 Demo Ride
+
+Decision: preserve the approved Interface Display ribbon geometry and palette,
+but calculate all secondary typography, icon sizes, and clearances from screen
+height with bounded minimum/maximum values. Move the top telemetry down into a
+minimum four-percent safe zone, make its containers tall enough for full font
+metrics, keep text overflow unclipped, enlarge both telltale rails, and move the
+five-value lower row four percent above the display edge. Widen only the speed
+container so `100 km/h` remains on one line at 16:9; speed, gear, and ribbon
+anchors remain unchanged.
+
+Decision: add an Android debug-source-set-only `DemoRideRepository` implementing
+the existing `DeviceRepository` interface and emitting normal
+`TelemetrySnapshot` values on display frames. The nine-second K25 review
+scenario is N→1→2, 0→70→100 km/h, 1100→7200→4200→6100 RPM, includes a 200 ms
+shift, clears ABS self-test after movement, holds BLE/CAN/REC healthy, and ramps
+battery voltage from 12.7 V to 14.2 V. Gear is a debug presentation companion
+because telemetry v1 has no gear field; no production telemetry or wire schema
+is extended or bypassed.
+
+Evidence: Android debug/release compilation, JVM scenario tests, all nine
+connected Ride Mode/golden tests, and the updated 2048×921 golden pass. The
+recorded review artifact is a clean 1920×1080 H.264 MP4 at 60 FPS and is kept
+outside Git. SwiftUI mirrors the height-bounded typography and safe-zone
+changes; execution remains gated on an Xcode host.
+
+Result: the cluster remains the same approved composition but reads at
+motorcycle viewing distance, preserves full glyph bounds on CHIGEE and 16:9
+phone layouts, and provides a deterministic debug telemetry stream without
+changing hardware, firmware, CAN behavior, BLE contracts, channel mapping, or
+Power Board architecture.
+
+## 2026-07-24 — Run Demo Ride after the production startup sequence
+
+Decision: the Android debug-only Demo Ride reuses the production
+`StartupAnimation` and SVC fallback brand pack, holds its telemetry at
+0 km/h, neutral, and 1100 RPM during startup, and starts the nine-second
+0–100 scenario only after the startup completion callback. Restarting the
+demo replays both phases deterministically.
+
+Decision: make the SwiftUI TFT review nodes explicit accessibility containers
+and handle the temporary Ride Mode overlay tap at the fullscreen root. This
+does not alter dashboard geometry; it restores stable UI automation access to
+the dashboard, tachometer, speed, gear, bottom telemetry, and exit control.
+
+Result: the review recording can include the same SVC logo, lamp check,
+tachometer sweep, cluster reveal, and live acceleration that users see in the
+application. The change remains debug/presentation and UI-test behavior only;
+it changes no hardware, firmware, CAN behavior, BLE contract, channel mapping,
+or Power Board architecture.

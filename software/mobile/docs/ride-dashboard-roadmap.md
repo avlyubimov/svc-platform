@@ -4,24 +4,42 @@
 
 - shared versioned performance profiles independent from BrandPacks;
 - SwiftUI and Jetpack Compose phone dashboards;
-- adaptive landscape/portrait layouts and platform previews;
-- profile-driven tachometer scale/zones with display hysteresis;
+- dedicated landscape-only, edge-to-edge Ride Mode containers;
+- hidden status/navigation bars and iOS Home Indicator with cutout-safe content;
+- Ride Mode-only keep-screen-on and reversible per-window brightness;
+- non-cyclic five-page horizontal paging with protected system gesture edges;
+- temporary zero-speed-gated controls and optional fading page indicator;
+- continuous Bézier-ribbon 0–9000 RPM tachometer through the main cluster;
 - explicit gear presentation with telemetry v1 fixed to unavailable;
+- debug-only frame-driven 0–100 km/h Demo Ride through `DeviceRepository`;
 - SVC-estimated lean presentation and stationary-only trip-maximum reset;
 - telemetry quality-state mapping;
 - SVC Day, SVC Night, and automatic ambient-light themes;
 - Reduce Motion behavior;
 - reduced information-only CarPlay and Android Auto scaffolds.
 
-No manufacturer artwork is required by the Dashboard. Public documentation
-uses only the SVC identity.
+The implemented page order is `PURE RIDE`, `SPORT / CORE`, `VEHICLE`,
+`SVC POWER`, then `DIAGNOSTICS`. A new installation starts on `PURE RIDE`;
+background/foreground and later launches restore the selected page. The primary
+Ride Mode screen is a continuous motorcycle TFT,
+not the former rectangular card grid. Platform UI tests cover system-bar
+lifecycle, paging in both directions, vertical-gesture rejection, session
+restoration, clean-install launch page, keep-screen-on cleanup, core-element
+geometry, and one 2048×921 RideDashboard CHIGEE golden. The existing secondary
+pages remain functional but are outside the current visual approval boundary.
 
-## Pull request 3 — Dashboard Demo Mode
+The sporting layout uses official BMW S1000RR Pure Ride/Core descriptions and
+official instrument-panel press imagery only as a high-level reference. It
+copies no manufacturer artwork or logos; public Ride Mode output uses only the
+SVC identity.
 
-Add the approved ignition-off, idle, city, highway, corner, night, reserve,
-ice, high-RPM, overcurrent, CAN-unavailable, and BLE-disconnected scenarios.
-Demo data must be visibly labelled and remain outside the wire protocol. Gear
-simulation and local level calibration are permitted only in this mode.
+## Pull request 3 — Expand Dashboard Demo Mode
+
+Expand the current debug-only acceleration scenario with the approved
+ignition-off, city, highway, corner, night, reserve, ice, high-RPM,
+overcurrent, CAN-unavailable, and BLE-disconnected scenarios. Demo data must
+remain outside the wire protocol. Gear simulation and local level calibration
+are permitted only in this mode.
 
 ## Pull request 4 — Telemetry protocol v2
 

@@ -1,9 +1,7 @@
 package com.avlyubimov.svc.mobile
 
 import android.content.Context
-import android.graphics.Color
 import android.provider.Settings
-import android.webkit.WebView
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -12,9 +10,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,13 +25,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -231,7 +230,7 @@ internal class MobileBrandCatalog private constructor(
             vehicleModel = "SVC",
             vehicleGeneration = "",
             brandTagline = "",
-            accentColor = "#1C69D4",
+            accentColor = "#E21B2D",
             assets = MobileBrandAssets(logo = ""),
         )
 
@@ -293,15 +292,15 @@ internal data class MobileStartupTimeline(
 }
 
 internal object MobileColors {
-    val Background = androidx.compose.ui.graphics.Color(0xFF050505)
-    val Surface = androidx.compose.ui.graphics.Color(0xFF111214)
-    val PrimaryText = androidx.compose.ui.graphics.Color(0xFFF4F4F4)
-    val SecondaryText = androidx.compose.ui.graphics.Color(0xFFA7A9AC)
-    val AccentBlue = androidx.compose.ui.graphics.Color(0xFF1C69D4)
-    val LightBlue = androidx.compose.ui.graphics.Color(0xFF4AA3FF)
-    val Divider = androidx.compose.ui.graphics.Color(0xFF303236)
+    val Background = androidx.compose.ui.graphics.Color(0xFF050607)
+    val Surface = androidx.compose.ui.graphics.Color(0xFF111418)
+    val PrimaryText = androidx.compose.ui.graphics.Color(0xFFF4F6F8)
+    val SecondaryText = androidx.compose.ui.graphics.Color(0xFFAEB5BD)
+    val ActiveRed = androidx.compose.ui.graphics.Color(0xFFE21B2D)
+    val LightBlue = androidx.compose.ui.graphics.Color(0xFF3DA5FF)
+    val Divider = androidx.compose.ui.graphics.Color(0xFF343A42)
     val Warning = androidx.compose.ui.graphics.Color(0xFFFFB000)
-    val Critical = androidx.compose.ui.graphics.Color(0xFFE32636)
+    val Critical = androidx.compose.ui.graphics.Color(0xFFFF3B30)
 }
 
 internal class AppearancePreferences(
@@ -379,163 +378,186 @@ private fun StartupVisual(
     timeline: MobileStartupTimeline,
     progress: Float,
 ) {
-    val screenOnEnd = timeline.progress(timeline.phases.screenOnEndMs)
-    val logoEnd = timeline.progress(timeline.phases.logoEndMs)
-    val identityEnd = timeline.progress(timeline.phases.identityEndMs)
-    val taglineEnd = timeline.progress(timeline.phases.taglineEndMs)
-    val logo = phase(progress, screenOnEnd, logoEnd)
-    val identity = phase(progress, logoEnd, identityEnd)
-    val tagline = phase(progress, identityEnd, taglineEnd)
-    val transition = phase(progress, taglineEnd, 1f)
-    val accent = brandPack.accentColor.toComposeColor()
+    val logo = phase(progress, 0.02f, 0.20f) *
+        (1f - phase(progress, 0.25f, 0.36f))
+    val lampCheck = phase(progress, 0.16f, 0.28f) *
+        (1f - phase(progress, 0.38f, 0.48f))
+    val sweep = if (progress < 0.62f) {
+        phase(progress, 0.28f, 0.62f)
+    } else {
+        1f - phase(progress, 0.62f, 0.80f)
+    }
+    val cluster = phase(progress, 0.72f, 0.90f)
+    val transition = phase(
+        progress,
+        timeline.progress(timeline.phases.taglineEndMs),
+        1f,
+    )
+    val accent = MobileColors.ActiveRed
     Box(
         Modifier
             .fillMaxSize()
-            .background(MobileColors.Background.copy(alpha = 1f - transition)),
-        contentAlignment = Alignment.Center,
+            .background(
+                MobileColors.Background
+                    .copy(alpha = 1f - transition),
+            ),
     ) {
-        Canvas(Modifier.fillMaxSize().alpha(phase(progress, 0f, screenOnEnd))) {
-            drawCircle(
-                brush = Brush.radialGradient(
-                    listOf(
-                        MobileColors.LightBlue.copy(alpha = 0.12f),
-                        androidx.compose.ui.graphics.Color.Transparent,
-                    ),
-                    center = center,
-                    radius = size.minDimension * 0.38f,
-                ),
-            )
-        }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.scale(1f - 0.04f * transition),
-        ) {
-            Box(
-                Modifier
-                    .size(112.dp)
-                    .scale(0.92f + 0.08f * logo - 0.06f * transition)
-                    .alpha(logo * (1f - transition)),
-            ) {
-                BrandLogo(brandPack, Modifier.fillMaxSize())
-                Canvas(
-                    Modifier
-                        .fillMaxSize()
-                        .alpha(
-                            phase(logo, 0.38f, 0.48f) *
-                                (1f - phase(logo, 0.48f, 0.72f)),
-                        ),
-                ) {
-                    drawArc(
-                        color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.82f),
-                        startAngle = 205f,
-                        sweepAngle = 70f,
-                        useCenter = false,
-                        style = Stroke(1.dp.toPx()),
-                    )
-                }
-            }
-            Spacer(Modifier.height(15.dp))
-            if (brandPack.wordmarkAsset != null) {
-                LocalSvgAsset(
-                    brandPack.wordmarkAsset,
-                    Modifier
-                        .size(width = 210.dp, height = 28.dp)
-                        .alpha(identity * (1f - transition)),
-                )
-            } else {
-                Text(
-                    brandPack.manufacturerDisplayName,
-                    color = MobileColors.PrimaryText,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    letterSpacing = 4.5.sp,
-                    modifier = Modifier.alpha(identity * (1f - transition)),
-                )
-            }
-            Spacer(Modifier.height(7.dp))
-            Text(
-                brandPack.vehicleModel,
-                color = MobileColors.PrimaryText,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = 2.2.sp,
-                modifier = Modifier.alpha(identity * (1f - transition)),
-            )
-            Text(
-                brandPack.vehicleGeneration,
-                color = MobileColors.SecondaryText,
-                fontSize = 12.sp,
-                letterSpacing = 1.8.sp,
-                modifier = Modifier.alpha(identity * (1f - transition)),
-            )
-            Spacer(Modifier.height(15.dp))
-            Text(
-                brandPack.brandTagline,
-                color = MobileColors.PrimaryText,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = 2.8.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.alpha(tagline * (1f - transition)),
-            )
-        }
-        Canvas(Modifier.fillMaxSize().alpha(transition * (1f - transition))) {
+        Canvas(Modifier.fillMaxSize().alpha(phase(progress, 0f, 0.18f))) {
+            val centerY = size.height * 0.5f
             drawLine(
-                brush = Brush.horizontalGradient(
-                    listOf(
-                        androidx.compose.ui.graphics.Color.Transparent,
-                        accent,
-                        androidx.compose.ui.graphics.Color.White,
-                        androidx.compose.ui.graphics.Color.Transparent,
-                    ),
-                ),
-                start = center.copy(x = center.x * (1f - transition)),
-                end = center.copy(x = center.x * (1f + transition)),
+                MobileColors.ActiveRed,
+                start = androidx.compose.ui.geometry.Offset(size.width * 0.12f, centerY - 14.dp.toPx()),
+                end = androidx.compose.ui.geometry.Offset(size.width * 0.43f, centerY - 14.dp.toPx()),
+                strokeWidth = 2.dp.toPx(),
+            )
+            drawLine(
+                MobileColors.PrimaryText,
+                start = androidx.compose.ui.geometry.Offset(size.width * 0.10f, centerY),
+                end = androidx.compose.ui.geometry.Offset(size.width * 0.40f, centerY),
+                strokeWidth = 1.dp.toPx(),
+            )
+            drawLine(
+                MobileColors.LightBlue,
+                start = androidx.compose.ui.geometry.Offset(size.width * 0.15f, centerY + 14.dp.toPx()),
+                end = androidx.compose.ui.geometry.Offset(size.width * 0.34f, centerY + 14.dp.toPx()),
+                strokeWidth = 1.dp.toPx(),
+            )
+            drawLine(
+                MobileColors.ActiveRed,
+                start = androidx.compose.ui.geometry.Offset(size.width * 0.57f, centerY - 14.dp.toPx()),
+                end = androidx.compose.ui.geometry.Offset(size.width * 0.88f, centerY - 14.dp.toPx()),
+                strokeWidth = 2.dp.toPx(),
+            )
+            drawLine(
+                MobileColors.PrimaryText,
+                start = androidx.compose.ui.geometry.Offset(size.width * 0.60f, centerY),
+                end = androidx.compose.ui.geometry.Offset(size.width * 0.90f, centerY),
+                strokeWidth = 1.dp.toPx(),
+            )
+            drawLine(
+                MobileColors.LightBlue,
+                start = androidx.compose.ui.geometry.Offset(size.width * 0.66f, centerY + 14.dp.toPx()),
+                end = androidx.compose.ui.geometry.Offset(size.width * 0.85f, centerY + 14.dp.toPx()),
                 strokeWidth = 1.dp.toPx(),
             )
         }
-    }
-}
-
-@Composable
-private fun BrandLogo(brandPack: ResolvedMobileBrandPack, modifier: Modifier) {
-    if (brandPack.logoAsset != null) {
-        LocalSvgAsset(brandPack.logoAsset, modifier)
-    } else {
-        Box(modifier, contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .size(116.dp)
+                .scale(0.88f + logo * 0.12f)
+                .alpha(logo),
+            contentAlignment = Alignment.Center,
+        ) {
             Canvas(Modifier.fillMaxSize()) {
                 drawCircle(MobileColors.Surface)
                 drawCircle(
-                    MobileColors.PrimaryText.copy(alpha = 0.72f),
+                    color = accent,
                     style = Stroke(2.dp.toPx()),
                 )
             }
             Text(
                 "SVC",
                 color = MobileColors.PrimaryText,
-                fontSize = 26.sp,
+                fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                letterSpacing = 1.5.sp,
+                letterSpacing = 2.sp,
             )
         }
-    }
-}
 
-@Composable
-private fun LocalSvgAsset(asset: String, modifier: Modifier) {
-    AndroidView(
-        modifier = modifier,
-        factory = { context ->
-            WebView(context).apply {
-                setBackgroundColor(Color.TRANSPARENT)
-                settings.allowFileAccess = true
-                isVerticalScrollBarEnabled = false
-                isHorizontalScrollBarEnabled = false
-                loadUrl("file:///android_asset/$asset")
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 18.dp)
+                .alpha(lampCheck),
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+        ) {
+            listOf(
+                "←" to androidx.compose.ui.graphics.Color(0xFF4AC27E),
+                "HIGH" to MobileColors.LightBlue,
+                "ABS" to MobileColors.Warning,
+                "ENGINE" to MobileColors.Warning,
+                "SVC" to MobileColors.Critical,
+                "→" to androidx.compose.ui.graphics.Color(0xFF4AC27E),
+            ).forEach { (label, color) ->
+                Text(
+                    label,
+                    color = color,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp,
+                )
             }
-        },
-    )
+        }
+
+        Canvas(
+            Modifier
+                .fillMaxSize()
+                .alpha(phase(progress, 0.24f, 0.34f) * (1f - transition)),
+        ) {
+            val segmentCount = 45
+            val left = size.width * 0.06f
+            val right = size.width * 0.94f
+            val width = right - left
+            val gap = 4.dp.toPx()
+            val segmentWidth = (width - gap * (segmentCount - 1)) / segmentCount
+            val top = size.height * 0.08f
+            val height = 20.dp.toPx()
+            repeat(segmentCount) { segment ->
+                val ratio = (segment + 1f) / segmentCount
+                val inactive = when {
+                    ratio > 8f / 9f -> accent.copy(alpha = 0.42f)
+                    ratio > 7f / 9f -> MobileColors.Warning.copy(alpha = 0.34f)
+                    else -> MobileColors.Divider
+                }
+                val active = when {
+                    ratio > 8f / 9f -> accent
+                    ratio > 7f / 9f -> MobileColors.Warning
+                    else -> MobileColors.PrimaryText
+                }
+                drawRect(
+                    color = if (segment.toFloat() / segmentCount < sweep) active else inactive,
+                    topLeft = androidx.compose.ui.geometry.Offset(
+                        left + segment * (segmentWidth + gap),
+                        top,
+                    ),
+                    size = androidx.compose.ui.geometry.Size(segmentWidth, height),
+                )
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxWidth(0.46f)
+                .alpha(cluster * (1f - transition)),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    "0",
+                    color = MobileColors.PrimaryText,
+                    fontSize = 82.sp,
+                    fontWeight = FontWeight.Light,
+                )
+                Text(
+                    "km/h",
+                    color = MobileColors.SecondaryText,
+                    fontSize = 14.sp,
+                    letterSpacing = 1.2.sp,
+                )
+            }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    "N",
+                    color = androidx.compose.ui.graphics.Color(0xFF35D07F),
+                    fontSize = 58.sp,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
+        }
+    }
 }
 
 private fun Context.readBrandAsset(path: String): String =

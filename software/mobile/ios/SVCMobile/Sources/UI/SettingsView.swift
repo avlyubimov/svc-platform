@@ -44,6 +44,10 @@ struct SettingsView: View {
                         Text(mode.title).tag(mode)
                     }
                 }
+                Toggle(
+                    "Ride page indicator",
+                    isOn: $ridePreferences.pageIndicatorEnabled
+                )
                 if ridePreferences.themeMode == .automatic {
                     VStack(alignment: .leading) {
                         Text(
