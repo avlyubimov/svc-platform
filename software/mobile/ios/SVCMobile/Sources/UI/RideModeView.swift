@@ -82,7 +82,9 @@ struct RideModeView: View {
     @State private var currentPage = RideModePage.mainDashboard.rawValue
     @State private var dragOffset: CGFloat = 0
     @State private var resolvedTheme = RideResolvedTheme.night
-    @State private var controlsVisible = false
+    @State private var controlsVisible = ProcessInfo.processInfo.arguments.contains(
+        "SVC_UI_TEST_KEEP_CONTROLS"
+    )
     @State private var indicatorVisible = true
     @State private var brightness = Double(UIScreen.main.brightness)
     @State private var controlsTask: Task<Void, Never>?

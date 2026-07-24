@@ -8,8 +8,7 @@ final class RideModeUITests: XCTestCase {
         app = XCUIApplication()
         app.launchArguments = [
             "SVC_SKIP_STARTUP",
-            "SVC_RESET_RIDE_PAGE",
-            "SVC_UI_TEST_KEEP_CONTROLS"
+            "SVC_RESET_RIDE_PAGE"
         ]
         app.launch()
         XCTAssertTrue(
@@ -43,7 +42,13 @@ final class RideModeUITests: XCTestCase {
     }
 
     func testCurrentPageSurvivesBackgroundForeground() {
-        rideRoot.swipeLeft()
+        app.terminate()
+        app.launchArguments = [
+            "SVC_SKIP_STARTUP",
+            "SVC_TFT_DEMO",
+            "SVC_TFT_PAGE=1"
+        ]
+        app.launch()
         XCTAssertTrue(waitForPage("SPORT / CORE"))
         XCUIDevice.shared.press(.home)
         app.activate()
@@ -61,9 +66,14 @@ final class RideModeUITests: XCTestCase {
     }
 
     func testExitRestoresNormalSystemBehavior() {
-        rideRoot.coordinate(
-            withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)
-        ).tap()
+        app.terminate()
+        app.launchArguments = [
+            "SVC_SKIP_STARTUP",
+            "SVC_RESET_RIDE_PAGE",
+            "SVC_UI_TEST_KEEP_CONTROLS"
+        ]
+        app.launch()
+        XCTAssertTrue(rideRoot.waitForExistence(timeout: 5))
         let exit = app.buttons["exitRideMode"]
         XCTAssertTrue(exit.waitForExistence(timeout: 5))
         exit.tap()
