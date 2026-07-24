@@ -46,8 +46,10 @@ struct TFTDashboardData: Equatable {
     let accelerationG: Double?
     let brakingG: Double?
     let fuelPercent: Double?
+    let tripDistanceKm: Double?
     let rangeKm: Double?
     let batteryVoltage: Double?
+    let svcCurrentA: Double?
     let engineTemperatureCelsius: Double?
     let ambientTemperatureCelsius: Double?
     let frontPressureBar: Double?
@@ -128,8 +130,12 @@ struct TFTDashboardData: Equatable {
             accelerationG: longitudinalAcceleration.map { max($0, 0) },
             brakingG: longitudinalAcceleration.map { max(-$0, 0) },
             fuelPercent: dashboard.fuelLevel.displayValue,
+            tripDistanceKm: nil,
             rangeKm: nil,
             batteryVoltage: dashboard.batteryVoltage.displayValue,
+            svcCurrentA: telemetry.totalCurrent.isUsable
+                ? telemetry.totalCurrent.value
+                : nil,
             engineTemperatureCelsius: dashboard.engineTemperature.displayValue,
             ambientTemperatureCelsius: dashboard.ambientTemperature.displayValue,
             frontPressureBar: nil,
@@ -160,8 +166,10 @@ struct TFTDashboardData: Equatable {
         accelerationG: 0.32,
         brakingG: 0.08,
         fuelPercent: 62,
+        tripDistanceKm: 227.8,
         rangeKm: 214,
         batteryVoltage: 14.2,
+        svcCurrentA: 8.4,
         engineTemperatureCelsius: 92,
         ambientTemperatureCelsius: 16,
         frontPressureBar: 2.3,

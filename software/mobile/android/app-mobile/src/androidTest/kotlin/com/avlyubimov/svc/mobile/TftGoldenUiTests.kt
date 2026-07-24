@@ -77,40 +77,6 @@ class TftGoldenUiTests {
         )
     }
 
-    @Test
-    fun sportGoldenMatchesWithoutOverlappingTelemetry() {
-        activity.finish()
-        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
-        activity = InstrumentationRegistry.getInstrumentation().startActivitySync(
-            Intent(context, MainActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra("skipStartup", true)
-                .putExtra("presentationDemo", true)
-                .putExtra("presentationPage", 1),
-        ) as MainActivity
-        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-        Thread.sleep(1_500)
-        Thread.sleep(3_500)
-
-        val actual = InstrumentationRegistry
-            .getInstrumentation()
-            .uiAutomation
-            .takeScreenshot()
-        val expected = InstrumentationRegistry
-            .getInstrumentation()
-            .context
-            .assets
-            .open("goldens/tft-sport-2048x921.png")
-            .use(BitmapFactory::decodeStream)
-
-        assertEquals(2048, actual.width)
-        assertEquals(921, actual.height)
-        assertEquals(expected.width, actual.width)
-        assertEquals(expected.height, actual.height)
-        assertTrue(meanPixelDifference(expected, actual) < 0.045)
-    }
-
     private fun meanPixelDifference(expected: Bitmap, actual: Bitmap): Double {
         var difference = 0L
         var samples = 0L

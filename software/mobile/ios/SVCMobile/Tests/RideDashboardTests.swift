@@ -308,10 +308,15 @@ final class RideDashboardTests: XCTestCase {
         XCTAssertEqual(demo.leanDegrees, 18)
         XCTAssertEqual(demo.accelerationG, 0.32)
         XCTAssertEqual(demo.brakingG, 0.08)
+        XCTAssertEqual(demo.tripDistanceKm, 227.8)
+        XCTAssertEqual(demo.rangeKm, 214)
         XCTAssertEqual(demo.fuelPercent, 62)
         XCTAssertEqual(demo.batteryVoltage, 14.2)
+        XCTAssertEqual(demo.svcCurrentA, 8.4)
+        XCTAssertEqual(demo.engineTemperatureCelsius, 92)
         XCTAssertEqual(demo.frontPressureBar, 2.3)
         XCTAssertEqual(demo.rearPressureBar, 2.6)
         XCTAssertEqual(demo.ambientTemperatureCelsius, 16)
+        XCTAssertEqual(demo.currentTime, "10:42")
     }
 }

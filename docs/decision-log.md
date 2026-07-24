@@ -4275,3 +4275,33 @@ contains matching page order, persistence, palette, geometry, and UI-test
 attachments; execution remains gated on an Xcode host. This is presentation
 and local preference state only and changes no hardware, firmware, CAN
 decoder, BLE wire contract, or Power Board architecture.
+
+## 2026-07-24 — Limit visual approval to the Interface Display RideDashboard
+
+Decision: supersede the horizontal/segmented Pure Ride tachometers and the
+proposed Sport/Core review screen. The only screen in the current visual
+approval scope is `RideDashboard`. Its strict geometry reference is the
+Product Owner-provided Interface Display image: upper-left speed, a broad
+central ribbon rising left-to-right, lower-right gear, top trip/mode/range,
+edge telltale rails, and compact SVC data along the lower edge.
+
+Decision: render the tachometer as one closed area between two continuous
+Bézier curves, not as a line, rectangles, segments, dashes, or gaps. The band
+widens left-to-right; inactive fill is `#14253A`, current RPM fills smoothly
+from `#0066B1` to `#2D9CFF`, 7000–8000 RPM is solid `#F2A900`, and 8000–9000
+RPM is solid `#E21B2D`. At the review value, blue fill ends at exactly 4200
+RPM. The S1000RR reference contributes only sporting color density. No BMW/M
+artwork or literal manufacturer instrument screen is copied.
+
+Decision: keep the existing secondary pages functional and unchanged while the
+primary composition is reviewed. Remove Sport/Core presentation screenshots
+and golden approval claims until the Product Owner approves a separate
+redesign. The primary golden retains the fixed 87 km/h, 4200 RPM, gear 4,
+227.8 km trip, 214 km range, 62% fuel, 14.2 V, 8.4 A SVC current, 92 °C, and
+10:42 review values.
+
+Result: SwiftUI and Compose now share the same continuous 0–9000 RPM ribbon,
+upper-left speed, lower-right gear, `ROAD` mode, edge pictograms, BLE/CAN/REC
+state, and transparent five-value lower edge. This remains mobile presentation
+state only and changes no hardware, firmware, CAN decoder, BLE wire contract,
+channel mapping, or Power Board architecture.

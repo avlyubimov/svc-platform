@@ -9,7 +9,7 @@
 - Ride Mode-only keep-screen-on and reversible per-window brightness;
 - non-cyclic five-page horizontal paging with protected system gesture edges;
 - temporary zero-speed-gated controls and optional fading page indicator;
-- flat segmented 0–9000 RPM TFT tachometer with white/amber/red zones;
+- continuous Bézier-ribbon 0–9000 RPM tachometer through the main cluster;
 - explicit gear presentation with telemetry v1 fixed to unavailable;
 - SVC-estimated lean presentation and stationary-only trip-maximum reset;
 - telemetry quality-state mapping;
@@ -24,7 +24,8 @@ Ride Mode screen is a continuous motorcycle TFT,
 not the former rectangular card grid. Platform UI tests cover system-bar
 lifecycle, paging in both directions, vertical-gesture rejection, session
 restoration, clean-install launch page, keep-screen-on cleanup, core-element
-geometry, and 2048×921 Pure Ride/Sport CHIGEE goldens.
+geometry, and one 2048×921 RideDashboard CHIGEE golden. The existing secondary
+pages remain functional but are outside the current visual approval boundary.
 
 The sporting layout uses official BMW S1000RR Pure Ride/Core descriptions and
 official instrument-panel press imagery only as a high-level reference. It

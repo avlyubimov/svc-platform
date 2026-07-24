@@ -48,17 +48,18 @@ Auto/Day/Night, and Settings; exit and Settings require confirmed zero speed.
 The former rectangular card layout is not used in Ride Mode. The primary TFT
 provides:
 
-- central speed, a smaller `km/h` unit, an unsmoothed numeric RPM value, and a
-  large right-side gear presentation (`N`, `1`–`6`, `BETWEEN`, `—`);
-- a flat, segmented 0–9000 RPM tachometer: inactive dark gray, active
-  0–7000 white, 7000–8000 amber, and 8000–9000 red;
-- compact fuel, range, battery, engine temperature, and time values in one
-  five-group lower strip rather than cards;
-- active-only pictographic telltales, BLE/CAN only on connection loss or
-  Diagnostics, transient SD toast, and a narrow persistent area reserved for
-  critical warnings;
-- dedicated full-screen pages for Sport/lean telemetry, Vehicle/RDC, SVC
-  power, and listen-only CAN diagnostics;
+- upper-left speed, a smaller `km/h` unit, a smoothed numeric RPM value, and a
+  large lower-right gear presentation (`N`, `1`–`6`, `BETWEEN`, `—`);
+- one continuous 0–9000 RPM ribbon enclosed by two Bézier curves: inactive
+  `#14253A`, active blue `#0066B1`–`#2D9CFF`, 7000–8000 amber, and 8000–9000
+  red, with no segments, rectangular bars, or gaps;
+- compact fuel, battery, SVC current, engine temperature, and time values along
+  the lower edge rather than cards;
+- pictographic telltales in two edge rails, small BLE/CAN/REC state, transient
+  SD toast, and a narrow persistent area reserved for critical warnings;
+- existing full-screen pages for Sport/lean telemetry, Vehicle/RDC, SVC power,
+  and listen-only CAN diagnostics; their visual redesign is intentionally
+  outside the current RideDashboard review;
 - separate `SVC Day`, `SVC Night`, and ambient-light `Automatic` themes with
   configurable 250/650 lux hysteresis defaults;
 - system Reduce Motion support and shared 180/300 ms motion tokens.
@@ -78,16 +79,9 @@ outside the future Demo Mode.
   >
 </p>
 
-<p align="center">
-  <img
-    src="docs/screenshots/svc-tft-sport-landscape.png"
-    alt="SVC TFT Sport Core screen at 18 degrees right lean"
-    width="900"
-  >
-</p>
-
 The explicit review-only presentation dataset contains 87 km/h, 4200 RPM,
-gear 4, 18° right lean, 62% fuel, 14.2 V, 2.3/2.6 bar RDC values, and +16 °C.
+gear 4, 227.8 km trip, 214 km range, 62% fuel, 14.2 V, 8.4 A SVC current,
+92 °C engine temperature, and 10:42.
 It is selected only by test/preview launch flags and never enters the telemetry
 wire contract. The 2048×921 review screenshot is captured from the full-screen container and
 contains no status bar, navigation bar, Home Indicator, Menu, TabBar, or
@@ -96,11 +90,13 @@ CarPlay/Android Auto templates expose only speed, gear, battery, SVC current,
 main warning, and connection state and currently render unavailable values
 rather than invented telemetry.
 
-The sporting hierarchy is an independent SVC interpretation of the
+The approved RideDashboard mock uses the Product Owner-provided Interface
+Display image only as a geometric reference and takes sporting color density
+from the
 [official BMW S1000RR Pure Ride/Core screen taxonomy](https://www.bmw-motorrad.co.uk/en/models/sport/s1000rr.html)
 and [official instrument-panel press imagery](https://www.press.bmwgroup.com/global/photo/detail/P90327373/BMW-S-1000-RR-instrument-panel-with-6-5-inch-TFT-screen-11-2018).
 No BMW/M logo, artwork, type asset, or screen bitmap is included or copied; SVC
-retains its own palette, icons, layout geometry, and startup mark.
+retains its own K25 scale, SVC data, icons, rendered geometry, and startup mark.
 
 ## Startup and personal branding
 

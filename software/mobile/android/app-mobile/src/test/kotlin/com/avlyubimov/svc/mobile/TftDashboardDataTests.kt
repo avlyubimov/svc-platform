@@ -17,10 +17,15 @@ class TftDashboardDataTests {
         assertEquals(18.0, demo.leanDegrees)
         assertEquals(0.32, demo.accelerationG)
         assertEquals(0.08, demo.brakingG)
+        assertEquals(227.8, demo.tripDistanceKm)
+        assertEquals(214.0, demo.rangeKm)
         assertEquals(62.0, demo.fuelPercent)
         assertEquals(14.2, demo.batteryVoltage)
+        assertEquals(8.4, demo.svcCurrentA)
+        assertEquals(92.0, demo.engineTemperatureCelsius)
         assertEquals(2.3, demo.frontPressureBar)
         assertEquals(2.6, demo.rearPressureBar)
         assertEquals(16.0, demo.ambientTemperatureCelsius)
+        assertEquals("10:42", demo.currentTime)
     }
 }

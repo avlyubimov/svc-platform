@@ -42,26 +42,4 @@ final class TFTDashboardUITests: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
     }
-
-    func testSportCoreScreenshotHasNoSystemChrome() {
-        app.terminate()
-        app.launchArguments = [
-            "SVC_SKIP_STARTUP",
-            "SVC_TFT_DEMO",
-            "SVC_TFT_PAGE=1"
-        ]
-        app.launch()
-
-        let root = app.otherElements["rideModeRoot"]
-        XCTAssertTrue(root.waitForExistence(timeout: 5))
-        XCTAssertEqual(root.value as? String, "SPORT / CORE")
-        XCTAssertEqual(app.statusBars.count, 0)
-        XCTAssertEqual(app.navigationBars.count, 0)
-        XCTAssertEqual(app.tabBars.count, 0)
-
-        let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
-        attachment.name = "SVC-TFT-sport-core"
-        attachment.lifetime = .keepAlways
-        add(attachment)
-    }
 }
