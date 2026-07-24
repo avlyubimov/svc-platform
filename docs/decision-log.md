@@ -4148,3 +4148,41 @@ retain reduced SVC information templates and no longer show invented mock
 values. Demo scenarios, protocol v2, real BLE telemetry and verified BMW CAN
 signals are documented as separate pull requests. This change adds no CAN IDs
 to a decoder, no channel control, and no hardware or firmware behavior.
+
+## 2026-07-23 — Establish PB-100 deterministic routed baseline
+
+Decision: retain the accepted eight-layer PB-100 architecture and promote a
+DRC-checked routing baseline through `PB-100-routing.csv`, not by committing an
+opaque externally routed board. In2.Cu remains the uninterrupted GND reference,
+In5.Cu remains the protected-battery plane, the four other inner layers remain
+signal-capable, and all added layer changes use conventional F.Cu-to-B.Cu
+through vias. Generator-owned broad segments, via fields and zones remain the
+only copper credited to the 40 A path; preliminary 0.20 mm attachment traces
+are connectivity evidence only.
+
+Why: the full 414-part schematic import started with 499 open connections.
+Repeated six-signal-layer routing, controller fan-out reordering and local
+recovery reduced this to 36 without adding short, crossing, copper-clearance,
+edge-clearance, drill or keepout violations after KiCad 10.0.4 zone refill.
+The final local recovery closed `LB_3V3_IO`, both `PB_I2C_INT` branches and the
+trapped `OUT1_IWRN`/`OUT2_IWRN` controller pins. It uses only 0.60/0.30 mm
+filled/capped conventional through vias plus reviewable signal-layer jogs; no
+blind or buried vias were introduced. Alternative A was to accept widened
+generic autorouter power traces; it was rejected because the trial introduced
+199 clearance violations and cannot substitute for current-density evidence.
+An independent 20-pass route reported 69 open items in the external router,
+but the authoritative KiCad refill found 118; it was therefore rejected
+instead of replacing the DRC-clean baseline.
+Alternative B was to change the approved placement or power architecture; it
+was rejected because local placement-priority trials did not provide a
+material routing improvement and no architecture change was authorized.
+
+Result: the deterministic board now contains 422 footprints, 5,049 segments,
+874 conventional through vias and 38 zones. The routing manifest contributes
+5,016 segments and 762 vias. Refilled DRC has 36 remaining connection blockers
+and only the recorded library, silkscreen and starved-thermal warning classes.
+No fabrication output is authorized: 14 GND fragments, residual protected-bus
+and switched-output attachments, controller/timing/sense connections, rail and
+CAN geometry, filled/capped-via supplier capability and cost, 40 A
+electrothermal extraction, supplier DFM and Product Owner pre-fabrication
+review all remain open.

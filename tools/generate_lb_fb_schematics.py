@@ -49,9 +49,21 @@ class Component:
 
 
 class Schematic:
-    def __init__(self, board: str, title: str, notes: str, paper: str = "A0") -> None:
+    def __init__(
+        self,
+        board: str,
+        title: str,
+        notes: str,
+        paper: str = "A0",
+        *,
+        identity: str | None = None,
+        library_name: str | None = None,
+        symbol_prefix: str | None = None,
+    ) -> None:
         self.board = board
-        self.prefix = board.replace("-", "")
+        self.identity = identity or board
+        self.prefix = symbol_prefix or board.replace("-", "")
+        self.library_name = library_name or self.prefix
         self.title = title
         self.notes = notes
         self.paper = paper
@@ -83,7 +95,7 @@ class Schematic:
     def _library_symbol(self, component: Component, qualified: bool) -> str:
         symbol_name = self._symbol_name(component)
         if qualified:
-            symbol_name = f"{self.prefix}:{symbol_name}"
+            symbol_name = f"{self.library_name}:{symbol_name}"
         half_width, layout = self._pin_layout(component)
         per_side = (len(component.pins) + 1) // 2
         half_height = max(5.08, ((per_side - 1) * PITCH / 2) + 2.54)
@@ -131,7 +143,7 @@ class Schematic:
         return positions
 
     def render(self) -> str:
-        root_uuid = uid(self.board, "root")
+        root_uuid = uid(self.identity, "root")
         lines = [
             "(kicad_sch",
             "  (version 20230121)",
@@ -156,7 +168,7 @@ class Schematic:
                 f'  (text "{esc(self.notes)}"',
                 "    (at 20 20 0)",
                 "    (effects (font (size 1.6 1.6)) (justify left top))",
-                f'    (uuid "{uid(self.board, "notes")}")',
+                f'    (uuid "{uid(self.identity, "notes")}")',
                 "  )",
             ]
         )
@@ -164,12 +176,12 @@ class Schematic:
         positions = self._positions()
         for component in self.components:
             x, y = positions[component.ref]
-            symbol_uuid = uid(self.board, component.ref, "symbol")
+            symbol_uuid = uid(self.identity, component.ref, "symbol")
             _, layout = self._pin_layout(component)
             lines.extend(
                 [
                     "  (symbol",
-                    f'    (lib_id "{self.prefix}:{self._symbol_name(component)}")',
+                    f'    (lib_id "{self.library_name}:{self._symbol_name(component)}")',
                     f"    (at {x:.2f} {y:.2f} 0)",
                     "    (unit 1)",
                     "    (exclude_from_sim no)",
@@ -184,7 +196,7 @@ class Schematic:
                 ]
             )
             for pin in component.pins:
-                lines.append(f'    (pin "{esc(pin.number)}" (uuid "{uid(self.board, component.ref, pin.number, "pin")}"))')
+                lines.append(f'    (pin "{esc(pin.number)}" (uuid "{uid(self.identity, component.ref, pin.number, "pin")}"))')
             lines.extend(
                 [
                     "    (instances",
@@ -203,13 +215,13 @@ class Schematic:
                 # library symbol is placed on a schematic sheet.
                 px, py = x + dx, y - dy
                 if pin.net is None:
-                    lines.append(f'  (no_connect (at {px:.2f} {py:.2f}) (uuid "{uid(self.board, component.ref, pin.number, "nc")}"))')
+                    lines.append(f'  (no_connect (at {px:.2f} {py:.2f}) (uuid "{uid(self.identity, component.ref, pin.number, "nc")}"))')
                     continue
                 justify = "right" if side == "left" else "left"
                 lines.append(
                     f'  (global_label "{esc(pin.net)}" (shape bidirectional) (at {px:.2f} {py:.2f} 0) '
                     f'(fields_autoplaced) (effects (font (size 1.00 1.00)) (justify {justify})) '
-                    f'(uuid "{uid(self.board, component.ref, pin.number, "label")}") '
+                    f'(uuid "{uid(self.identity, component.ref, pin.number, "label")}") '
                     f'(property "Intersheetrefs" "${{INTERSHEET_REFS}}" (at {px:.2f} {py:.2f} 0) '
                     f'(effects (font (size 1.00 1.00)) hide)))'
                 )

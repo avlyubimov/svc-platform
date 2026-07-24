@@ -220,8 +220,9 @@ def validate_five_blocker_release_evidence() -> None:
 
     output_sheet = read_text(PB100_DIR / "kicad" / "sheets" / "outputs-1-10.kicad_sch")
     input_sheet = read_text(PB100_DIR / "kicad" / "sheets" / "input-protection.kicad_sch")
-    if output_sheet.count(f'(property "Value" "{SELECTED_MOSFET}"') != 11:
-        # One local lib-symbol property plus ten instances.
+    if output_sheet.count(f'(property "Value" "{SELECTED_MOSFET}"') != 20:
+        # The deterministic PB generator emits one local lib symbol and one
+        # placed instance for each of Q101-Q110.
         fail("outputs sheet must contain exact selected TOLL value in its local symbol and Q101-Q110")
     if input_sheet.count(f'(property "Value" "{SELECTED_MOSFET}"') != 2:
         fail("input sheet must contain exact selected TOLL value in its local symbol and Q1")

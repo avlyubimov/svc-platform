@@ -253,7 +253,11 @@ def validate_can1_netlist_topology(kicad_cli: str, temp_dir: Path) -> None:
             ("R_CAN1_TX_BIAS", "2"),
             ("U_CAN1_PHY", "1"),
         },
-        "CAN1_RX_ROUTE": {("JPB1", "69"), ("U_CAN1_PHY", "4")},
+        "CAN1_RX_ROUTE": {
+            ("JPB1", "69"),
+            ("TP021", "1"),
+            ("U_CAN1_PHY", "4"),
+        },
         "CAN1_PHY_SILENT": {
             ("JP_CAN1_NORMAL", "1"),
             ("R_CAN1_SILENT", "2"),
@@ -273,12 +277,14 @@ def validate_can1_netlist_topology(kicad_cli: str, temp_dir: Path) -> None:
             ("JPB1", "68"),
             ("R_CAN1_STATUS_SER", "2"),
             ("R_CAN1_STATUS_PULL", "2"),
+            ("TP020", "1"),
         },
         "CAN1_TX_DISABLE_CMD": {
             ("JPB1", "67"),
             ("U_CAN1", "1"),
             ("R_CAN1_OE", "2"),
             ("R_CAN1_STATUS_SER", "1"),
+            ("TP019", "1"),
         },
     }
     for net_name, expected_nodes in exact_nets.items():
@@ -347,7 +353,7 @@ def validate_can1_netlist_topology(kicad_cli: str, temp_dir: Path) -> None:
 
 def validate_input_power_netlist_topology(components, nets) -> None:
     """Keep the active cutoff and total-current shunt in the only load path."""
-    for reference in ("D1", "U1", "Q1", "Q2", "RSH1", "U2", "U3"):
+    for reference in ("D1", "U1", "Q1", "Q2", "RSH1", "JISO1", "U2", "U3"):
         if reference not in components:
             fail(f"input power topology is missing physical component {reference}")
     if components["D1"].find("./property[@name='dnp']") is None:
@@ -369,14 +375,20 @@ def validate_input_power_netlist_topology(components, nets) -> None:
             ("U1", "20"),
             ("U1", "24"),
         },
-        "VBAT_PROT": {
+        "VBAT_PROT_PRELINK": {
             ("RSH1", "2"),
-            ("U2", "8"),
+            ("JISO1", "1"),
+        },
+        "VBAT_PROT": {
+            ("JISO1", "2"),
             ("U3", "2"),
             ("U101", "20"),
         },
-        "IIN_SHUNT_IN": {("RSH1", "3"), ("U2", "10")},
-        "IIN_SHUNT_OUT": {("RSH1", "4"), ("U2", "9")},
+        "IIN_SHUNT_HI": {("RSH1", "3"), ("R20", "1")},
+        "IIN_SHUNT_LO": {("RSH1", "4"), ("R21", "1")},
+        "IIN_MON_P": {("R20", "2"), ("C20", "1"), ("U2", "10")},
+        "IIN_MON_N": {("R21", "2"), ("C20", "2"), ("U2", "9")},
+        "IIN_VBUS_FILTERED": {("R22", "2"), ("C21", "1"), ("U2", "8")},
     }
     for net_name, expected_subset in required_nodes.items():
         missing_nodes = expected_subset - nets.get(net_name, set())
@@ -385,7 +397,14 @@ def validate_input_power_netlist_topology(components, nets) -> None:
 
     forbidden_nodes = {
         "VBAT_RAW": {("Q1", "Tab"), ("RSH1", "1"), ("RSH1", "2")},
-        "VBAT_REV_PROT": {("RSH1", "2"), ("U2", "8"), ("U3", "2"), ("U101", "20")},
+        "VBAT_REV_PROT": {
+            ("RSH1", "2"),
+            ("JISO1", "1"),
+            ("JISO1", "2"),
+            ("U2", "8"),
+            ("U3", "2"),
+            ("U101", "20"),
+        },
         "VBAT_PROT": {("Q1", "Tab"), ("RSH1", "1")},
     }
     for net_name, forbidden_subset in forbidden_nodes.items():

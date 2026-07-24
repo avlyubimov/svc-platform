@@ -1,0 +1,13 @@
+(footprint "C0603"
+  (version 20260206)
+  (generator "codex")
+  (layer "F.Cu")
+  (descr "0603 1608 metric capacitor")
+  (property "Reference" "REF**" (at 0 -1.35 0) (layer "F.SilkS") (uuid "64aa47f1-3a95-44d7-93b2-ad76c49a0001") (effects (font (size 0.65 0.65) (thickness 0.1))))
+  (property "Value" "C0603" (at 0 1.35 0) (layer "F.Fab") (uuid "64aa47f1-3a95-44d7-93b2-ad76c49a0002") (effects (font (size 0.65 0.65) (thickness 0.1))))
+  (attr smd)
+  (fp_rect (start -0.8 -0.4) (end 0.8 0.4) (stroke (width 0.08) (type default)) (fill none) (layer "F.Fab") (uuid "64aa47f1-3a95-44d7-93b2-ad76c49a0003"))
+  (fp_rect (start -1.45 -0.75) (end 1.45 0.75) (stroke (width 0.05) (type default)) (fill none) (layer "F.CrtYd") (uuid "64aa47f1-3a95-44d7-93b2-ad76c49a0004"))
+  (pad "1" smd roundrect (at -0.85 0) (size 1.05 0.95) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.18) (uuid "64aa47f1-3a95-44d7-93b2-ad76c49a0005"))
+  (pad "2" smd roundrect (at 0.85 0) (size 1.05 0.95) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.18) (uuid "64aa47f1-3a95-44d7-93b2-ad76c49a0006"))
+)
