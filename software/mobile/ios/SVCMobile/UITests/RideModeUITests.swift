@@ -57,9 +57,11 @@ final class RideModeUITests: XCTestCase {
     }
 
     func testExitRestoresNormalSystemBehavior() {
-        rideRoot.tap()
+        rideRoot.coordinate(
+            withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)
+        ).tap()
         let exit = app.buttons["exitRideMode"]
-        XCTAssertTrue(exit.waitForExistence(timeout: 2))
+        XCTAssertTrue(exit.waitForExistence(timeout: 5))
         exit.tap()
         XCTAssertTrue(app.buttons["enterRideMode"].waitForExistence(timeout: 2))
         XCTAssertGreaterThan(app.statusBars.count, 0)

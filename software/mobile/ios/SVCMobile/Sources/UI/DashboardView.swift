@@ -81,9 +81,6 @@ struct DashboardView: View {
                     .easeInOut(duration: reduceMotion ? 0 : 0.28),
                     value: rpmFraction
                 )
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel("Tachometer")
-                .accessibilityIdentifier("tftTachometer")
 
                 TFTTopLine(data: data, palette: palette, scale: scale)
                     .frame(
@@ -106,8 +103,6 @@ struct DashboardView: View {
                         x: geometry.size.width * 0.36,
                         y: geometry.size.height * 0.31
                     )
-                    .accessibilityElement(children: .combine)
-                    .accessibilityIdentifier("tftSpeed")
 
                 TFTGear(
                     gear: data.gear,
@@ -122,8 +117,6 @@ struct DashboardView: View {
                     x: geometry.size.width * 0.815,
                     y: geometry.size.height * 0.665
                 )
-                .accessibilityElement(children: .combine)
-                .accessibilityIdentifier("tftGear")
 
                 Text("\(data.engineRpm.wholeOrDash) rpm")
                     .font(.system(size: scale.digitalRpm, design: .monospaced))
@@ -222,13 +215,79 @@ struct DashboardView: View {
                     x: geometry.size.width * 0.5,
                     y: geometry.size.height * 0.89
                 )
-                .accessibilityElement(children: .combine)
-                .accessibilityIdentifier("tftBottomStrip")
+
+                TFTAccessibilityRegion(
+                    identifier: "tftDashboard",
+                    label: "Ride dashboard",
+                    value: "ROAD"
+                )
+                .frame(
+                    width: geometry.size.width,
+                    height: geometry.size.height
+                )
+                .position(
+                    x: geometry.size.width * 0.5,
+                    y: geometry.size.height * 0.5
+                )
+
+                TFTAccessibilityRegion(
+                    identifier: "tftTachometer",
+                    label: "Tachometer",
+                    value: "\(data.engineRpm.wholeOrDash) rpm"
+                )
+                .frame(
+                    width: geometry.size.width,
+                    height: geometry.size.height
+                )
+                .position(
+                    x: geometry.size.width * 0.5,
+                    y: geometry.size.height * 0.5
+                )
+
+                TFTAccessibilityRegion(
+                    identifier: "tftSpeed",
+                    label: "Speed",
+                    value: "\(data.speedKmh.wholeOrDash) km/h"
+                )
+                .frame(
+                    width: geometry.size.width * 0.38,
+                    height: geometry.size.height * 0.28
+                )
+                .position(
+                    x: geometry.size.width * 0.36,
+                    y: geometry.size.height * 0.31
+                )
+
+                TFTAccessibilityRegion(
+                    identifier: "tftGear",
+                    label: "Gear",
+                    value: data.gear
+                )
+                .frame(
+                    width: geometry.size.width * 0.15,
+                    height: geometry.size.height * 0.25
+                )
+                .position(
+                    x: geometry.size.width * 0.815,
+                    y: geometry.size.height * 0.665
+                )
+
+                TFTAccessibilityRegion(
+                    identifier: "tftBottomStrip",
+                    label: "Vehicle telemetry",
+                    value: "Fuel \(data.fuelPercent.wholeOrDash) percent"
+                )
+                .frame(
+                    width: geometry.size.width * 0.80,
+                    height: geometry.size.height * 0.14
+                )
+                .position(
+                    x: geometry.size.width * 0.5,
+                    y: geometry.size.height * 0.89
+                )
             }
         }
         .background(palette.background)
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("tftDashboard")
         .onAppear {
             updateTheme()
             scheduleToast()
@@ -261,6 +320,21 @@ struct DashboardView: View {
                 toastVisible = false
             }
         }
+    }
+}
+
+private struct TFTAccessibilityRegion: View {
+    let identifier: String
+    let label: String
+    let value: String
+
+    var body: some View {
+        Color.clear
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(label)
+            .accessibilityValue(value)
+            .accessibilityIdentifier(identifier)
+            .allowsHitTesting(false)
     }
 }
 
