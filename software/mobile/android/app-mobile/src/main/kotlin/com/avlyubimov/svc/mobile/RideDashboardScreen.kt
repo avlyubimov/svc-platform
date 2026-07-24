@@ -1,8 +1,10 @@
 package com.avlyubimov.svc.mobile
 
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -10,22 +12,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,877 +34,618 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.avlyubimov.svc.core.model.ConnectionState
-import com.avlyubimov.svc.core.model.LeanExtrema
-import com.avlyubimov.svc.core.model.RideAlert
-import com.avlyubimov.svc.core.model.RideAlertSeverity
-import com.avlyubimov.svc.core.model.RideDashboardState
-import com.avlyubimov.svc.core.model.RideDataState
-import com.avlyubimov.svc.core.model.RideGear
-import com.avlyubimov.svc.core.model.RideMotionPolicy
-import com.avlyubimov.svc.core.model.RideResolvedTheme
-import com.avlyubimov.svc.core.model.RideThemeMode
-import com.avlyubimov.svc.core.model.RideThemeResolver
-import com.avlyubimov.svc.core.model.RideThemeThresholds
-import com.avlyubimov.svc.core.model.RideValue
-import com.avlyubimov.svc.core.model.TachometerZone
-import com.avlyubimov.svc.core.model.TachometerZoneResolver
-import com.avlyubimov.svc.core.model.TelemetrySnapshot
-import com.avlyubimov.svc.core.model.VehiclePerformanceProfile
+import kotlinx.coroutines.delay
 import java.util.Locale
-import kotlin.math.cos
-import kotlin.math.sin
+import kotlin.math.min
+import kotlin.math.roundToInt
 
 @Composable
 internal fun RideDashboardScreen(
-    telemetry: TelemetrySnapshot,
-    connectionState: ConnectionState,
-    isConnecting: Boolean,
-    profile: VehiclePerformanceProfile,
-    themeMode: RideThemeMode,
-    themeThresholds: RideThemeThresholds,
+    data: TftDashboardData,
+    palette: RidePalette,
     reduceMotion: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val state = remember(
-        telemetry,
-        connectionState,
-        isConnecting,
-        profile,
-    ) {
-        RideDashboardState.build(
-            telemetry = telemetry,
-            connectionState = connectionState,
-            isConnecting = isConnecting,
-            profile = profile,
-        )
+    var toastVisible by remember(data.toastMessage) {
+        mutableStateOf(data.toastMessage != null)
     }
-    RideDashboardContent(
-        state = state,
-        themeMode = themeMode,
-        themeThresholds = themeThresholds,
-        reduceMotion = reduceMotion,
-        modifier = modifier,
-    )
-}
-
-@Composable
-private fun RideDashboardContent(
-    state: RideDashboardState,
-    themeMode: RideThemeMode,
-    themeThresholds: RideThemeThresholds,
-    reduceMotion: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    var resolvedTheme by remember(themeMode) {
-        mutableStateOf(
-            if (themeMode == RideThemeMode.DAY) {
-                RideResolvedTheme.DAY
-            } else {
-                RideResolvedTheme.NIGHT
-            },
-        )
+    LaunchedEffect(data.toastMessage) {
+        toastVisible = data.toastMessage != null
+        if (data.toastMessage != null) {
+            delay(TftDashboardPolicy.toastDurationMillis)
+            toastVisible = false
+        }
     }
-    LaunchedEffect(themeMode, state.ambientLight, themeThresholds) {
-        resolvedTheme = RideThemeResolver.resolve(
-            mode = themeMode,
-            ambientLight = state.ambientLight,
-            previous = resolvedTheme,
-            thresholds = themeThresholds,
-        )
-    }
-    val targetPalette = RidePalette.resolve(resolvedTheme)
-    val background by animateColorAsState(
-        targetValue = targetPalette.background,
-        animationSpec = tween(
-            RideMotionPolicy.durationMillis(
-                reduceMotion,
-                RideDesignTokens.themeAnimationMillis,
-            ),
-        ),
-        label = "ride-background",
-    )
-    val palette = targetPalette.copy(background = background)
 
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(palette.background)
-            .padding(RideDesignTokens.contentPadding),
+            .testTag("tftDashboard"),
     ) {
-        val landscape = maxWidth > maxHeight
-        if (landscape) {
-            LandscapeDashboard(
-                state = state,
-                palette = palette,
-                reduceMotion = reduceMotion,
-            )
-        } else {
-            PortraitDashboard(
-                state = state,
-                palette = palette,
-                reduceMotion = reduceMotion,
+        val compact = maxHeight < 390.dp || maxWidth < 760.dp
+        val horizontalPadding = if (compact) 16.dp else 24.dp
+
+        TftTachometer(
+            data = data,
+            palette = palette,
+            reduceMotion = reduceMotion,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .fillMaxWidth()
+                .height(if (compact) 108.dp else 138.dp)
+                .padding(horizontal = horizontalPadding)
+                .testTag("tftTachometer"),
+        )
+
+        TftActiveIndicators(
+            indicators = data.activeIndicators,
+            palette = palette,
+            compact = compact,
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = horizontalPadding, bottom = 8.dp),
+        )
+        TftConnectionIcons(
+            data = data,
+            palette = palette,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = horizontalPadding, top = 10.dp),
+        )
+
+        TftSpeedCluster(
+            data = data,
+            palette = palette,
+            compact = compact,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(top = if (compact) 24.dp else 34.dp)
+                .testTag("tftSpeed"),
+        )
+        TftGear(
+            gear = data.gear,
+            palette = palette,
+            compact = compact,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(
+                    end = if (compact) 62.dp else 94.dp,
+                    top = if (compact) 18.dp else 30.dp,
+                )
+                .testTag("tftGear"),
+        )
+
+        data.criticalMessage?.let { message ->
+            Text(
+                text = message.uppercase(),
+                color = palette.primaryText,
+                fontSize = if (compact) 10.sp else 12.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.2.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(bottom = if (compact) 72.dp else 86.dp)
+                    .background(palette.critical.copy(alpha = 0.86f))
+                    .padding(vertical = 5.dp)
+                    .testTag("tftCriticalStrip"),
             )
         }
-    }
-}
 
-@Composable
-private fun LandscapeDashboard(
-    state: RideDashboardState,
-    palette: RidePalette,
-    reduceMotion: Boolean,
-) {
-    Column(
-        Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(RideDesignTokens.spacing),
-    ) {
-        RideStatusStrip(state, palette)
-        Row(
-            modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(RideDesignTokens.spacing),
+        AnimatedVisibility(
+            visible = toastVisible,
+            enter = fadeIn(tween(140)),
+            exit = fadeOut(tween(220)),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = if (compact) 80.dp else 96.dp),
         ) {
-            LeanGauge(
-                state = state,
-                palette = palette,
-                reduceMotion = reduceMotion,
+            Text(
+                text = "●  ${data.toastMessage.orEmpty()}",
+                color = palette.secondaryText,
+                fontSize = if (compact) 10.sp else 12.sp,
+                maxLines = 1,
                 modifier = Modifier
-                    .weight(0.27f)
-                    .fillMaxHeight(),
-            )
-            CenterCluster(
-                state = state,
-                palette = palette,
-                reduceMotion = reduceMotion,
-                modifier = Modifier
-                    .weight(0.46f)
-                    .fillMaxHeight(),
-            )
-            MetricColumn(
-                state = state,
-                palette = palette,
-                modifier = Modifier
-                    .weight(0.27f)
-                    .fillMaxHeight(),
+                    .background(
+                        Color.Black.copy(alpha = 0.86f),
+                        RoundedCornerShape(18.dp),
+                    )
+                    .padding(horizontal = 14.dp, vertical = 7.dp)
+                    .testTag("tftToast"),
             )
         }
-        state.activeAlert?.let { ActiveWarning(it, palette) }
-    }
-}
 
-@Composable
-private fun PortraitDashboard(
-    state: RideDashboardState,
-    palette: RidePalette,
-    reduceMotion: Boolean,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(RideDesignTokens.spacing),
-    ) {
-        RideStatusStrip(state, palette)
-        CenterCluster(
-            state = state,
+        TftBottomTelemetry(
+            data = data,
             palette = palette,
-            reduceMotion = reduceMotion,
+            compact = compact,
+            horizontalPadding = horizontalPadding,
             modifier = Modifier
+                .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .height(430.dp),
-        )
-        LeanGauge(
-            state = state,
-            palette = palette,
-            reduceMotion = reduceMotion,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(250.dp),
-        )
-        MetricColumn(
-            state = state,
-            palette = palette,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(360.dp),
-        )
-        state.activeAlert?.let { ActiveWarning(it, palette) }
-    }
-}
-
-@Composable
-private fun RideStatusStrip(
-    state: RideDashboardState,
-    palette: RidePalette,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(RideDesignTokens.statusHeight),
-        horizontalArrangement = Arrangement.spacedBy(RideDesignTokens.compactSpacing),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            "SVC RIDE",
-            color = palette.primaryText,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 2.sp,
-        )
-        Text(
-            state.profile.displayName.uppercase(),
-            color = palette.secondaryText,
-            fontSize = 11.sp,
-            modifier = Modifier.weight(1f),
-            maxLines = 1,
-        )
-        StatusChip(state.bleLabel, state.bleState, palette)
-        StatusChip(
-            label = state.canState.displayValue?.let { "CAN ${it.uppercase()}" }
-                ?: "CAN —",
-            state = state.canState.state,
-            palette = palette,
+                .height(if (compact) 68.dp else 82.dp)
+                .testTag("tftBottomStrip"),
         )
     }
 }
 
 @Composable
-private fun StatusChip(
-    label: String,
-    state: RideDataState,
-    palette: RidePalette,
-) {
-    Row(
-        modifier = Modifier
-            .background(
-                colorForState(state, palette).copy(alpha = 0.16f),
-                shape = RoundedCornerShape(50),
-            )
-            .padding(horizontal = 10.dp, vertical = 5.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        Box(
-            Modifier
-                .size(7.dp)
-                .background(colorForState(state, palette), RoundedCornerShape(50)),
-        )
-        Text(
-            label,
-            color = palette.primaryText,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.SemiBold,
-        )
-    }
-}
-
-@Composable
-private fun CenterCluster(
-    state: RideDashboardState,
+private fun TftTachometer(
+    data: TftDashboardData,
     palette: RidePalette,
     reduceMotion: Boolean,
     modifier: Modifier,
 ) {
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(RideDesignTokens.cornerRadius),
-        colors = CardDefaults.cardColors(containerColor = palette.surface),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(RideDesignTokens.spacing),
-        ) {
-            TachometerGauge(
-                rpm = state.engineRpm,
-                profile = state.profile,
-                initialZone = state.tachometerZone,
-                palette = palette,
-                reduceMotion = reduceMotion,
-                modifier = Modifier.fillMaxSize(),
-            )
-            Row(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .offset(y = (-22).dp),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        state.speed.number(0),
-                        color = palette.primaryText,
-                        fontSize = 70.sp,
-                        lineHeight = 70.sp,
-                        fontWeight = FontWeight.Light,
-                        fontFamily = FontFamily.Monospace,
-                    )
-                    Text(
-                        "km/h",
-                        color = palette.secondaryText,
-                        fontSize = 13.sp,
-                        letterSpacing = 2.sp,
-                    )
-                    QualityLabel(state.speed.state, palette)
-                }
-                Column(
-                    modifier = Modifier.padding(start = 24.dp, bottom = 7.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        state.gear.displayValue,
-                        color = palette.accentBright,
-                        fontSize = if (state.gear == RideGear.BETWEEN) 30.sp else 60.sp,
-                        lineHeight = 64.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace,
-                    )
-                    Text(
-                        "GEAR",
-                        color = palette.secondaryText,
-                        fontSize = 10.sp,
-                        letterSpacing = 2.sp,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun TachometerGauge(
-    rpm: RideValue<Double>,
-    profile: VehiclePerformanceProfile,
-    initialZone: TachometerZone,
-    palette: RidePalette,
-    reduceMotion: Boolean,
-    modifier: Modifier,
-) {
-    var activeZone by remember(profile.id) { mutableStateOf(initialZone) }
-    LaunchedEffect(rpm.displayValue, profile) {
-        activeZone = TachometerZoneResolver.zoneWithHysteresis(
-            rpm = rpm.displayValue,
-            profile = profile,
-            previous = activeZone,
-        )
-    }
-    val scaleMax = profile.tachometerScaleMaxRpm?.toFloat()
-    val targetProgress = if (scaleMax != null) {
-        ((rpm.displayValue?.toFloat() ?: 0f) / scaleMax).coerceIn(0f, 1f)
+    val maximumRpm = data.tachometerMaximumRpm
+    val targetFraction = if (maximumRpm != null && maximumRpm > 0) {
+        ((data.engineRpm ?: 0.0) / maximumRpm).coerceIn(0.0, 1.0).toFloat()
     } else {
         0f
     }
-    val progress by animateFloatAsState(
-        targetValue = targetProgress,
-        animationSpec = tween(
-            RideMotionPolicy.durationMillis(
-                reduceMotion,
-                RideDesignTokens.standardAnimationMillis,
+    val activeFraction by animateFloatAsState(
+        targetValue = targetFraction,
+        animationSpec = tween(if (reduceMotion) 0 else 220),
+        label = "tft-rpm-fill",
+    )
+    val textMeasurer = rememberTextMeasurer()
+    val labelStyle = TextStyle(
+        color = palette.secondaryText,
+        fontFamily = FontFamily.Monospace,
+        fontSize = 11.sp,
+        fontWeight = FontWeight.SemiBold,
+    )
+    val multiplierStyle = TextStyle(
+        color = palette.secondaryText.copy(alpha = 0.78f),
+        fontFamily = FontFamily.Monospace,
+        fontSize = 8.sp,
+        fontWeight = FontWeight.Medium,
+        letterSpacing = 0.8.sp,
+    )
+
+    Canvas(modifier) {
+        val maximum = maximumRpm ?: 0.0
+        val warningRatio = data.warningStartRpm
+            ?.takeIf { maximum > 0 }
+            ?.div(maximum)
+            ?.coerceIn(0.0, 1.0)
+            ?.toFloat()
+            ?: 1f
+        val redRatio = data.redStartRpm
+            ?.takeIf { maximum > 0 }
+            ?.div(maximum)
+            ?.coerceIn(warningRatio.toDouble(), 1.0)
+            ?.toFloat()
+            ?: 1f
+        val segmentCount = 45
+        val left = size.width * 0.035f
+        val right = size.width * 0.965f
+        val width = right - left
+        val gap = min(4.dp.toPx(), width * 0.004f)
+        val segmentWidth = (width - gap * (segmentCount - 1)) / segmentCount
+        val barTop = size.height * 0.22f
+        val barHeight = min(23.dp.toPx(), size.height * 0.24f)
+
+        repeat(segmentCount) { segment ->
+            val startRatio = segment.toFloat() / segmentCount
+            val endRatio = (segment + 1).toFloat() / segmentCount
+            val x = left + segment * (segmentWidth + gap)
+            val inactiveColor = when {
+                endRatio > redRatio ->
+                    palette.accent.copy(alpha = 0.42f)
+                endRatio > warningRatio ->
+                    palette.warning.copy(alpha = 0.34f)
+                else -> palette.divider
+            }
+            val activeColor = when {
+                endRatio > redRatio -> palette.accent
+                endRatio > warningRatio -> palette.warning
+                else -> palette.primaryText
+            }
+            drawRect(
+                color = if (startRatio < activeFraction) activeColor else inactiveColor,
+                topLeft = Offset(x, barTop),
+                size = Size(segmentWidth, barHeight),
+            )
+        }
+
+        val maximumLabel = if (maximum > 0) {
+            (maximum / 1_000.0).roundToInt()
+        } else {
+            9
+        }
+        for (index in 1..maximumLabel) {
+            val label = textMeasurer.measure(index.toString(), labelStyle)
+            val labelX = left + width * (index.toFloat() / maximumLabel)
+            drawText(
+                textLayoutResult = label,
+                topLeft = Offset(
+                    labelX - label.size.width / 2f,
+                    barTop + barHeight + 7.dp.toPx(),
+                ),
+            )
+        }
+        val multiplier = textMeasurer.measure("×1000  RPM", multiplierStyle)
+        drawText(
+            textLayoutResult = multiplier,
+            topLeft = Offset(
+                size.width / 2f - multiplier.size.width / 2f,
+                1.dp.toPx(),
             ),
-        ),
-        label = "tachometer-progress",
-    )
-    val activeColor = when (activeZone) {
-        TachometerZone.NORMAL -> palette.accentBright
-        TachometerZone.WARNING -> palette.warning
-        TachometerZone.RED -> palette.critical
-        TachometerZone.UNAVAILABLE -> palette.divider
-    }
-
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Canvas(
-            Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .aspectRatio(2.1f),
-        ) {
-            val strokeWidth = RideDesignTokens.gaugeLineWidth.toPx()
-            val inset = strokeWidth
-            val arcSize = Size(size.minDimension - inset * 2, size.minDimension - inset * 2)
-            val topLeft = Offset(
-                (size.width - arcSize.width) / 2,
-                (size.height - arcSize.height) / 2,
-            )
-            val warningFraction = profile.warningStartRpm
-                ?.toFloat()
-                ?.div(scaleMax ?: 1f)
-                ?.coerceIn(0f, 1f)
-                ?: 1f
-            val redFraction = profile.redZoneStartRpm
-                ?.toFloat()
-                ?.div(scaleMax ?: 1f)
-                ?.coerceIn(warningFraction, 1f)
-                ?: 1f
-            drawArc(
-                color = if (scaleMax == null) {
-                    palette.divider
-                } else {
-                    palette.accent.copy(alpha = 0.35f)
-                },
-                startAngle = 135f,
-                sweepAngle = 270f * warningFraction,
-                useCenter = false,
-                topLeft = topLeft,
-                size = arcSize,
-                style = Stroke(strokeWidth),
-            )
-            if (warningFraction < redFraction) {
-                drawArc(
-                    color = palette.warning.copy(alpha = 0.55f),
-                    startAngle = 135f + 270f * warningFraction,
-                    sweepAngle = 270f * (redFraction - warningFraction),
-                    useCenter = false,
-                    topLeft = topLeft,
-                    size = arcSize,
-                    style = Stroke(strokeWidth),
-                )
-            }
-            if (redFraction < 1f) {
-                drawArc(
-                    color = palette.critical.copy(alpha = 0.58f),
-                    startAngle = 135f + 270f * redFraction,
-                    sweepAngle = 270f * (1f - redFraction),
-                    useCenter = false,
-                    topLeft = topLeft,
-                    size = arcSize,
-                    style = Stroke(strokeWidth),
-                )
-            }
-            drawArc(
-                color = activeColor,
-                startAngle = 135f,
-                sweepAngle = 270f * progress,
-                useCenter = false,
-                topLeft = topLeft,
-                size = arcSize,
-                style = Stroke(strokeWidth, cap = StrokeCap.Round),
-            )
-            val center = Offset(size.width / 2, size.height / 2)
-            val radius = arcSize.width / 2 - strokeWidth * 0.8f
-            (0..9).forEach { tick ->
-                val fraction = tick / 9f
-                val angle = Math.toRadians((135 + 270 * fraction).toDouble())
-                val outer = Offset(
-                    center.x + cos(angle).toFloat() * radius,
-                    center.y + sin(angle).toFloat() * radius,
-                )
-                val inner = Offset(
-                    center.x + cos(angle).toFloat() * (radius - 10.dp.toPx()),
-                    center.y + sin(angle).toFloat() * (radius - 10.dp.toPx()),
-                )
-                drawLine(palette.secondaryText, inner, outer, 1.5.dp.toPx())
-            }
-        }
-        Row(
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(end = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(
-                rpm.number(0),
-                color = activeColor,
-                fontSize = 27.sp,
-                lineHeight = 29.sp,
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Text(
-                "RPM",
-                color = palette.secondaryText,
-                fontSize = 11.sp,
-                letterSpacing = 2.sp,
-            )
-            QualityLabel(rpm.state, palette)
-        }
+        )
     }
 }
 
 @Composable
-private fun LeanGauge(
-    state: RideDashboardState,
+private fun TftSpeedCluster(
+    data: TftDashboardData,
     palette: RidePalette,
-    reduceMotion: Boolean,
-    modifier: Modifier,
-) {
-    var extrema by remember { mutableStateOf(LeanExtrema()) }
-    LaunchedEffect(state.leanAngle.displayValue) {
-        extrema = extrema.observe(state.leanAngle.displayValue)
-    }
-    val targetLean = state.leanAngle.displayValue
-        ?.coerceIn(-60.0, 60.0)
-        ?.toFloat()
-        ?: 0f
-    val lean by animateFloatAsState(
-        targetValue = targetLean,
-        animationSpec = tween(
-            if (reduceMotion) 0 else RideDesignTokens.standardAnimationMillis,
-        ),
-        label = "lean-angle",
-    )
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(RideDesignTokens.cornerRadius),
-        colors = CardDefaults.cardColors(containerColor = palette.surface),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(RideDesignTokens.spacing),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(RideDesignTokens.compactSpacing),
-        ) {
-            Text(
-                "SVC ESTIMATED LEAN",
-                color = palette.secondaryText,
-                fontSize = 10.sp,
-                letterSpacing = 1.5.sp,
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.Center,
-            ) {
-                Canvas(Modifier.fillMaxSize()) {
-                    val center = Offset(size.width / 2, size.height * 0.58f)
-                    val radius = minOf(size.width, size.height) * 0.34f
-                    listOf(0, 10, 20, 30, 45, 60).forEach { mark ->
-                        listOf(-mark, mark).distinct().forEach { signed ->
-                            val angle = Math.toRadians((270 + signed).toDouble())
-                            val outer = Offset(
-                                center.x + cos(angle).toFloat() * radius,
-                                center.y + sin(angle).toFloat() * radius,
-                            )
-                            val inner = Offset(
-                                center.x + cos(angle).toFloat() * (radius - 8.dp.toPx()),
-                                center.y + sin(angle).toFloat() * (radius - 8.dp.toPx()),
-                            )
-                            drawLine(palette.divider, inner, outer, 1.dp.toPx())
-                        }
-                    }
-                    val horizonAngle = Math.toRadians(lean.toDouble())
-                    val dx = cos(horizonAngle).toFloat() * radius
-                    val dy = sin(horizonAngle).toFloat() * radius
-                    drawLine(
-                        color = palette.accentBright,
-                        start = Offset(center.x - dx, center.y - dy),
-                        end = Offset(center.x + dx, center.y + dy),
-                        strokeWidth = 3.dp.toPx(),
-                        cap = StrokeCap.Round,
-                    )
-                    drawLine(
-                        color = palette.primaryText,
-                        start = Offset(center.x, center.y - 20.dp.toPx()),
-                        end = Offset(center.x, center.y + 20.dp.toPx()),
-                        strokeWidth = 5.dp.toPx(),
-                        cap = StrokeCap.Round,
-                    )
-                }
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(7.dp),
-            ) {
-                Text(
-                    state.leanAngle.number(1, signed = true),
-                    color = palette.primaryText,
-                    fontSize = 24.sp,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Text("°", color = palette.secondaryText, fontSize = 12.sp)
-                QualityLabel(state.leanAngle.state, palette)
-            }
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    "L ${extrema.maximumLeftDegrees.oneDecimal()}°",
-                    color = palette.secondaryText,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 11.sp,
-                )
-                Text(
-                    "R ${extrema.maximumRightDegrees.oneDecimal()}°",
-                    color = palette.secondaryText,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 11.sp,
-                )
-            }
-            TextButton(
-                enabled = state.speed.displayValue == 0.0,
-                onClick = { extrema = extrema.resetIfStationary(state.speed) },
-            ) {
-                Text("RESET MAX", fontSize = 10.sp, letterSpacing = 1.sp)
-            }
-        }
-    }
-}
-
-@Composable
-private fun MetricColumn(
-    state: RideDashboardState,
-    palette: RidePalette,
+    compact: Boolean,
     modifier: Modifier,
 ) {
     Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(RideDesignTokens.compactSpacing),
     ) {
-        MetricCard(
-            "ENGINE / OIL",
-            state.engineTemperature.format(0),
-            state.engineTemperature.state,
-            palette,
-            Modifier.weight(1f),
-        )
-        MetricCard(
-            "FUEL",
-            state.fuelLevel.format(0),
-            state.fuelLevel.state,
-            palette,
-            Modifier.weight(1f),
-        )
-        MetricCard(
-            "BATTERY",
-            state.batteryVoltage.format(1),
-            state.batteryVoltage.state,
-            palette,
-            Modifier.weight(1f),
-        )
-        MetricCard(
-            "SVC CURRENT",
-            state.totalCurrent.format(1),
-            state.totalCurrent.state,
-            palette,
-            Modifier.weight(1f),
+        Row(verticalAlignment = Alignment.Bottom) {
+            Text(
+                text = data.speedKmh.wholeOrDash(),
+                color = palette.primaryText,
+                fontSize = if (compact) 84.sp else 104.sp,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Light,
+                lineHeight = if (compact) 84.sp else 104.sp,
+                maxLines = 1,
+            )
+            Text(
+                text = "km/h",
+                color = palette.secondaryText,
+                fontSize = if (compact) 15.sp else 18.sp,
+                fontFamily = FontFamily.Monospace,
+                modifier = Modifier.padding(
+                    start = 2.dp,
+                    bottom = if (compact) 12.dp else 15.dp,
+                ),
+            )
+        }
+        Text(
+            text = "${data.engineRpm.wholeOrDash()} rpm",
+            color = palette.secondaryText,
+            fontSize = if (compact) 11.sp else 13.sp,
+            fontFamily = FontFamily.Monospace,
+            letterSpacing = 1.2.sp,
+            modifier = Modifier.testTag("tftDigitalRpm"),
         )
     }
 }
 
 @Composable
-private fun MetricCard(
-    label: String,
-    value: String,
-    state: RideDataState,
+private fun TftGear(
+    gear: String,
     palette: RidePalette,
+    compact: Boolean,
     modifier: Modifier,
 ) {
-    Card(
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
+        Text(
+            text = gear.ifBlank { "—" },
+            color = if (gear == "N") palette.valid else palette.primaryText,
+            fontSize = if (compact) 68.sp else 88.sp,
+            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Medium,
+            lineHeight = if (compact) 68.sp else 88.sp,
+            maxLines = 1,
+        )
+    }
+}
+
+@Composable
+private fun TftBottomTelemetry(
+    data: TftDashboardData,
+    palette: RidePalette,
+    compact: Boolean,
+    horizontalPadding: Dp,
+    modifier: Modifier,
+) {
+    Row(
         modifier = modifier
-            .fillMaxWidth()
-            .widthIn(min = RideDesignTokens.metricMinimumWidth),
-        shape = RoundedCornerShape(RideDesignTokens.compactCornerRadius),
-        colors = CardDefaults.cardColors(containerColor = palette.raisedSurface),
+            .background(palette.surface)
+            .padding(horizontal = horizontalPadding),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
+        TftMetric(
+            "FUEL",
+            data.fuelPercent.valueOrDash("%", 0),
+            palette,
+            compact,
+            selected = true,
+        )
+        TftMetric("RANGE", data.rangeKm.valueOrDash("km", 0), palette, compact)
+        TftMetric("BAT", data.batteryVoltage.valueOrDash("V", 1), palette, compact)
+        TftMetric(
+            "ENGINE",
+            data.engineTemperatureCelsius.valueOrDash("°C", 0),
+            palette,
+            compact,
+        )
+        TftMetric("TIME", data.currentTime, palette, compact, drawDivider = false)
+    }
+}
+
+@Composable
+private fun RowScope.TftMetric(
+    label: String,
+    value: String,
+    palette: RidePalette,
+    compact: Boolean,
+    degraded: Boolean = false,
+    selected: Boolean = false,
+    drawDivider: Boolean = true,
+) {
+    Row(
+        modifier = Modifier
+            .weight(1f)
+            .fillMaxHeight(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+                .weight(1f)
+                .fillMaxHeight(),
         ) {
-            Text(
-                if (state == RideDataState.VALID) {
-                    label
-                } else {
-                    "$label · ${state.name}"
-                },
-                color = colorForState(state, palette),
-                fontSize = 7.sp,
-                letterSpacing = 0.8.sp,
-                maxLines = 1,
-            )
-            Text(
-                value,
-                color = palette.primaryText,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = FontFamily.Monospace,
-                maxLines = 1,
+            if (selected) {
+                Spacer(
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxWidth()
+                        .height(3.dp)
+                        .background(palette.accent),
+                )
+            }
+            Column(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    text = label,
+                    color = palette.secondaryText.copy(alpha = 0.86f),
+                    fontSize = if (compact) 8.sp else 10.sp,
+                    letterSpacing = 0.9.sp,
+                    maxLines = 1,
+                )
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = value,
+                        color = palette.primaryText,
+                        fontSize = if (compact) 13.sp else 17.sp,
+                        fontFamily = FontFamily.Monospace,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                    )
+                    if (degraded) {
+                        Text(
+                            text = " ▲",
+                            color = palette.degraded,
+                            fontSize = if (compact) 7.sp else 8.sp,
+                        )
+                    }
+                }
+            }
+        }
+        if (drawDivider) {
+            Spacer(
+                Modifier
+                    .width(1.dp)
+                    .fillMaxHeight(0.54f)
+                    .background(palette.divider.copy(alpha = 0.7f)),
             )
         }
     }
 }
 
 @Composable
-private fun QualityLabel(
-    state: RideDataState,
+private fun TftActiveIndicators(
+    indicators: List<TftIndicator>,
     palette: RidePalette,
+    compact: Boolean,
+    modifier: Modifier,
 ) {
-    if (state != RideDataState.VALID) {
-        Text(
-            state.name,
-            color = colorForState(state, palette),
-            fontSize = 8.sp,
-            letterSpacing = 1.sp,
-            fontWeight = FontWeight.Bold,
-        )
-    }
-}
-
-@Composable
-private fun ActiveWarning(
-    warning: RideAlert,
-    palette: RidePalette,
-) {
-    val color = when (warning.severity) {
-        RideAlertSeverity.CRITICAL -> palette.critical
-        RideAlertSeverity.WARNING -> palette.warning
-        RideAlertSeverity.INFO -> palette.accentBright
-    }
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                color.copy(alpha = 0.18f),
-                RoundedCornerShape(RideDesignTokens.compactCornerRadius),
-            )
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = modifier.testTag("tftActiveIndicators"),
     ) {
-        Box(
-            Modifier
-                .size(9.dp)
-                .background(color, RoundedCornerShape(50)),
-        )
-        Text(
-            warning.title,
-            color = palette.primaryText,
-            fontSize = 13.sp,
+        indicators.forEach { indicator ->
+            TftIndicatorGlyph(indicator, palette, compact)
+        }
+    }
+}
+
+@Composable
+private fun TftIndicatorGlyph(
+    indicator: TftIndicator,
+    palette: RidePalette,
+    compact: Boolean,
+) {
+    val color = indicator.color(palette)
+    when (indicator) {
+        TftIndicator.HIGH_BEAM,
+        TftIndicator.FOG_LIGHTS,
+        -> Canvas(
+            Modifier.size(
+                width = if (compact) 28.dp else 34.dp,
+                height = if (compact) 18.dp else 22.dp,
+            ),
+        ) {
+            val stroke = 1.8.dp.toPx()
+            drawArc(
+                color = color,
+                startAngle = 90f,
+                sweepAngle = 180f,
+                useCenter = false,
+                topLeft = Offset(1.dp.toPx(), size.height * 0.18f),
+                size = Size(size.width * 0.36f, size.height * 0.64f),
+                style = Stroke(stroke, cap = StrokeCap.Round),
+            )
+            drawLine(
+                color,
+                Offset(size.width * 0.30f, size.height * 0.18f),
+                Offset(size.width * 0.30f, size.height * 0.82f),
+                stroke,
+            )
+            repeat(3) { index ->
+                val y = size.height * (0.29f + index * 0.21f)
+                val start = Offset(size.width * 0.48f, y)
+                val end = Offset(size.width * 0.96f, y)
+                if (indicator == TftIndicator.FOG_LIGHTS) {
+                    val path = Path().apply {
+                        moveTo(start.x, start.y)
+                        quadraticTo(
+                            size.width * 0.61f,
+                            y - size.height * 0.08f,
+                            size.width * 0.73f,
+                            y,
+                        )
+                        quadraticTo(
+                            size.width * 0.85f,
+                            y + size.height * 0.08f,
+                            end.x,
+                            end.y,
+                        )
+                    }
+                    drawPath(path, color, style = Stroke(stroke, cap = StrokeCap.Round))
+                } else {
+                    drawLine(color, start, end, stroke, cap = StrokeCap.Round)
+                }
+            }
+            if (indicator == TftIndicator.FOG_LIGHTS) {
+                drawLine(
+                    color,
+                    Offset(size.width * 0.70f, size.height * 0.12f),
+                    Offset(size.width * 0.60f, size.height * 0.88f),
+                    stroke,
+                )
+            }
+        }
+        TftIndicator.ABS -> Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.size(if (compact) 26.dp else 31.dp),
+        ) {
+            Canvas(Modifier.fillMaxSize()) {
+                drawCircle(color, style = Stroke(1.6.dp.toPx()))
+            }
+            Text(
+                "ABS",
+                color = color,
+                fontSize = if (compact) 7.sp else 8.sp,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+        else -> Text(
+            text = indicator.label,
+            color = color,
+            fontSize = if (indicator.label.length > 3) {
+                if (compact) 9.sp else 11.sp
+            } else {
+                if (compact) 15.sp else 18.sp
+            },
             fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
+            letterSpacing = 0.8.sp,
         )
     }
 }
 
-private fun RideValue<Double>.format(
-    decimals: Int,
-): String {
-    val number = displayValue ?: return "—"
-    val rendered = String.format(Locale.US, "%.${decimals}f", number)
-    return "$rendered ${unit.symbol()}".trim()
-}
-
-private fun RideValue<Double>.number(
-    decimals: Int,
-    signed: Boolean = false,
-): String {
-    val number = displayValue ?: return "—"
-    val format = if (signed) "%+.${decimals}f" else "%.${decimals}f"
-    return String.format(Locale.US, format, number)
-}
-
-private fun String.symbol(): String = when (this) {
-    "degC" -> "°C"
-    "deg" -> "°"
-    "%" -> "%"
-    else -> this
-}
-
-private fun Double.oneDecimal(): String = String.format(Locale.US, "%.1f", this)
-
-private fun colorForState(
-    state: RideDataState,
+@Composable
+private fun TftConnectionIcons(
+    data: TftDashboardData,
     palette: RidePalette,
-): Color = when (state) {
-    RideDataState.VALID -> palette.valid
-    RideDataState.DEGRADED, RideDataState.STALE -> palette.degraded
-    RideDataState.INVALID -> palette.critical
-    RideDataState.UNAVAILABLE -> palette.secondaryText
+    modifier: Modifier,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.testTag("tftConnectionIcons"),
+    ) {
+        if (!data.bleConnected) TftConnectionIcon("BLE", false, palette)
+        if (!data.canConnected) TftConnectionIcon("CAN", false, palette)
+    }
 }
 
-private val previewProfile = VehiclePerformanceProfile(
-    schemaVersion = 1,
-    id = "svc-ride-preview",
-    manufacturer = "SVC",
-    model = "Ride",
-    generation = "Preview",
-    yearFrom = null,
-    yearTo = null,
-    engineName = null,
-    engineDisplacementCc = null,
-    maximumTorqueNm = null,
-    nominalPowerKw = null,
-    gearboxGears = 6,
-    fuelCapacityLiters = 20.0,
-    fuelReserveLiters = 4.0,
-    iceWarningTemperatureCelsius = 3.0,
-    idleRpm = 1150,
-    idleToleranceRpm = 50,
-    torquePeakRpm = 5500,
-    powerPeakRpm = 7000,
-    tachometerScaleMinRpm = 0,
-    tachometerScaleMaxRpm = 9000,
-    warningStartRpm = 7000,
-    redZoneStartRpm = 7800,
-    revLimiterRpm = null,
-    source = "Preview only",
-    reference = "Preview only",
-    confidence = "preview",
-)
-
-private val previewState = RideDashboardState(
-    speed = RideValue(86.0, "km/h", RideDataState.VALID),
-    engineRpm = RideValue(4620.0, "rpm", RideDataState.VALID),
-    gear = RideGear.UNAVAILABLE,
-    leanAngle = RideValue(-24.6, "deg", RideDataState.DEGRADED),
-    engineTemperature = RideValue(92.0, "degC", RideDataState.VALID),
-    fuelLevel = RideValue(64.0, "%", RideDataState.VALID),
-    ambientTemperature = RideValue(16.0, "degC", RideDataState.VALID),
-    ambientLight = RideValue(800.0, "lux", RideDataState.VALID),
-    batteryVoltage = RideValue(14.1, "V", RideDataState.VALID),
-    totalCurrent = RideValue(8.4, "A", RideDataState.VALID),
-    canState = RideValue("listen-only", "state", RideDataState.VALID),
-    bleLabel = "BLE",
-    bleState = RideDataState.VALID,
-    tachometerZone = TachometerZone.NORMAL,
-    alerts = listOf(
-        RideAlert("preview", "SVC PREVIEW DATA", RideAlertSeverity.INFO),
-    ),
-    profile = previewProfile,
-)
-
-@Preview(
-    name = "SVC Ride Landscape",
-    widthDp = 960,
-    heightDp = 540,
-    showBackground = true,
-)
 @Composable
-private fun RideDashboardLandscapePreview() {
-    RideDashboardContent(
-        state = previewState,
-        themeMode = RideThemeMode.DAY,
-        themeThresholds = RideThemeThresholds.DEFAULT,
-        reduceMotion = false,
-    )
+private fun TftConnectionIcon(
+    label: String,
+    connected: Boolean,
+    palette: RidePalette,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Canvas(Modifier.size(6.dp)) {
+            drawCircle(if (connected) palette.valid else palette.critical)
+        }
+        Text(
+            text = label,
+            color = palette.secondaryText,
+            fontSize = 8.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 0.8.sp,
+        )
+    }
 }
 
-@Preview(
-    name = "SVC Ride Portrait",
-    widthDp = 430,
-    heightDp = 900,
-    showBackground = true,
-)
-@Composable
-private fun RideDashboardPortraitPreview() {
-    RideDashboardContent(
-        state = previewState,
-        themeMode = RideThemeMode.NIGHT,
-        themeThresholds = RideThemeThresholds.DEFAULT,
-        reduceMotion = true,
-    )
+private object TftDashboardPolicy {
+    const val toastDurationMillis = 4_000L
 }
+
+private fun TftIndicator.color(palette: RidePalette): Color = when (this) {
+    TftIndicator.TURN_LEFT,
+    TftIndicator.TURN_RIGHT,
+    TftIndicator.NEUTRAL,
+    -> palette.valid
+    TftIndicator.HIGH_BEAM -> palette.highBeam
+    TftIndicator.FOG_LIGHTS -> palette.fogLight
+    TftIndicator.ABS,
+    TftIndicator.ENGINE_WARNING,
+    TftIndicator.TIRE_PRESSURE,
+    TftIndicator.LOW_VOLTAGE,
+    -> palette.warning
+    TftIndicator.SVC_ERROR -> palette.critical
+}
+
+private fun Double?.wholeOrDash(): String =
+    this?.roundToInt()?.toString() ?: "—"
+
+private fun Double?.numberOrDash(decimals: Int): String = if (this == null) {
+    "—"
+} else {
+    String.format(Locale.US, "%.${decimals}f", this)
+}
+
+private fun Double?.valueOrDash(unit: String, decimals: Int): String =
+    if (this == null) "—" else "${numberOrDash(decimals)} $unit"
+
+private fun Double?.signedValueOrDash(unit: String, decimals: Int): String =
+    if (this == null) {
+        "—"
+    } else {
+        "${String.format(Locale.US, "%+.${decimals}f", this)} $unit"
+    }

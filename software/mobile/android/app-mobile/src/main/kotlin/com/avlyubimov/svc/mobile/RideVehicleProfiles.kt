@@ -159,6 +159,21 @@ internal class RidePreferences(
             values.edit().putFloat("rideDayEnterLux", value.toFloat()).apply()
         }
 
+    var pageIndicatorEnabled: Boolean
+        get() = values.getBoolean("ridePageIndicatorEnabled", true)
+        set(value) {
+            values.edit().putBoolean("ridePageIndicatorEnabled", value).apply()
+        }
+
+    var lastRidePage: Int
+        get() = values.getInt("rideLastPage", 0)
+            .coerceIn(0, RideModePage.entries.lastIndex)
+        set(value) {
+            values.edit()
+                .putInt("rideLastPage", value.coerceIn(0, RideModePage.entries.lastIndex))
+                .apply()
+        }
+
     fun vehicleProfile(): VehiclePerformanceProfile =
         catalog.resolve(vehicleProfileId)
 

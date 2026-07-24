@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 
 struct DashboardView: View {
@@ -7,11 +8,11 @@ struct DashboardView: View {
     let profile: VehiclePerformanceProfile
     let themeMode: RideThemeMode
     let themeThresholds: RideThemeThresholds
+    var demoMode = false
 
-    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var resolvedTheme = RideResolvedTheme.night
-    @State private var tachometerZone = TachometerZone.unavailable
-    @State private var leanExtrema = LeanExtrema()
+    @State private var toastVisible = false
 
     private var dashboard: RideDashboardState {
         RideDashboardState.build(
@@ -22,687 +23,578 @@ struct DashboardView: View {
         )
     }
 
+    private var data: TFTDashboardData {
+        TFTDashboardData.resolve(
+            dashboard: dashboard,
+            telemetry: telemetry,
+            demoMode: demoMode
+        )
+    }
+
     private var palette: RidePalette {
         RidePalette.resolve(resolvedTheme)
     }
 
     var body: some View {
         GeometryReader { geometry in
-            Group {
-                if geometry.size.width > geometry.size.height * 1.12 {
-                    landscapeContent
-                } else {
-                    portraitContent
+            let compact = geometry.size.height < 390 || geometry.size.width < 760
+            let horizontalPadding: CGFloat = compact ? 16 : 24
+
+            ZStack {
+                palette.background
+
+                TFTTachometer(data: data, palette: palette)
+                    .frame(
+                        width: geometry.size.width - horizontalPadding * 2,
+                        height: compact ? 108 : 138
+                    )
+                    .position(
+                        x: geometry.size.width / 2,
+                        y: compact ? 54 : 69
+                    )
+                    .animation(
+                        .easeOut(duration: reduceMotion ? 0 : 0.22),
+                        value: data.engineRpm
+                    )
+                    .accessibilityIdentifier("tftTachometer")
+
+                TFTActiveIndicators(
+                    indicators: data.activeIndicators,
+                    palette: palette,
+                    compact: compact
+                )
+                .frame(
+                    maxWidth: .infinity,
+                    maxHeight: .infinity,
+                    alignment: .leading
+                )
+                .padding(.leading, horizontalPadding)
+                .padding(.bottom, 8)
+
+                TFTConnectionIcons(data: data, palette: palette)
+                    .frame(
+                        maxWidth: .infinity,
+                        maxHeight: .infinity,
+                        alignment: .topTrailing
+                    )
+                    .padding(.trailing, horizontalPadding)
+                    .padding(.top, 10)
+
+                TFTSpeedCluster(data: data, palette: palette, compact: compact)
+                    .position(
+                        x: geometry.size.width * 0.5,
+                        y: geometry.size.height * 0.55
+                    )
+                    .accessibilityIdentifier("tftSpeed")
+
+                TFTGear(
+                    gear: data.gear,
+                    palette: palette,
+                    compact: compact
+                )
+                .position(
+                    x: geometry.size.width * 0.85,
+                    y: geometry.size.height * 0.55
+                )
+                .accessibilityIdentifier("tftGear")
+
+                if let criticalMessage = data.criticalMessage {
+                    Text(criticalMessage.uppercased())
+                        .font(.system(size: compact ? 10 : 12, weight: .bold))
+                        .tracking(1.2)
+                        .foregroundStyle(palette.primaryText)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 5)
+                        .background(palette.critical.opacity(0.86))
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                        .padding(.bottom, compact ? 72 : 86)
+                        .accessibilityIdentifier("tftCriticalStrip")
                 }
+
+                if toastVisible, let toastMessage = data.toastMessage {
+                    Text("●  \(toastMessage)")
+                        .font(.system(size: compact ? 10 : 12))
+                        .foregroundStyle(palette.secondaryText)
+                        .lineLimit(1)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 7)
+                        .background(
+                            Color.black.opacity(0.86),
+                            in: Capsule()
+                        )
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                        .padding(.bottom, compact ? 80 : 96)
+                        .transition(.opacity)
+                        .accessibilityIdentifier("tftToast")
+                }
+
+                TFTBottomTelemetry(
+                    data: data,
+                    palette: palette,
+                    compact: compact
+                )
+                .frame(height: compact ? 68 : 82)
+                .frame(maxHeight: .infinity, alignment: .bottom)
+                .accessibilityIdentifier("tftBottomStrip")
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(palette.background)
-        }
-        .toolbarBackground(palette.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
-        .navigationTitle("SVC Ride")
-        .navigationBarTitleDisplayMode(.inline)
-        .onAppear(perform: updateDerivedState)
-        .onChange(of: telemetry) { _, _ in updateDerivedState() }
-        .onChange(of: themeMode) { _, _ in updateDerivedState() }
-        .onChange(of: profile.id) { _, _ in
-            tachometerZone = .unavailable
-            updateDerivedState()
-        }
-    }
-
-    private var landscapeContent: some View {
-        VStack(spacing: RideDesignTokens.compactSpacing) {
-            RideStatusBar(dashboard: dashboard, palette: palette)
-            HStack(spacing: RideDesignTokens.spacing) {
-                LeanPanel(
-                    lean: dashboard.leanAngle,
-                    extrema: leanExtrema,
-                    speed: dashboard.speed,
-                    palette: palette,
-                    reset: resetLeanExtrema
-                )
-                .frame(maxWidth: 220)
-
-                RideCenterPanel(
-                    dashboard: dashboard,
-                    zone: tachometerZone,
-                    palette: palette,
-                    reduceMotion: systemReduceMotion
-                )
-                .frame(maxWidth: .infinity)
-
-                RideMetricPanel(dashboard: dashboard, palette: palette)
-                    .frame(maxWidth: 220)
-            }
-            RideAlertBanner(alert: dashboard.activeAlert, palette: palette)
-        }
-        .padding(RideDesignTokens.contentPadding)
-    }
-
-    private var portraitContent: some View {
-        ScrollView {
-            VStack(spacing: RideDesignTokens.spacing) {
-                RideStatusBar(dashboard: dashboard, palette: palette)
-                RideCenterPanel(
-                    dashboard: dashboard,
-                    zone: tachometerZone,
-                    palette: palette,
-                    reduceMotion: systemReduceMotion
-                )
-                .frame(minHeight: 360)
-                RideAlertBanner(alert: dashboard.activeAlert, palette: palette)
-                LeanPanel(
-                    lean: dashboard.leanAngle,
-                    extrema: leanExtrema,
-                    speed: dashboard.speed,
-                    palette: palette,
-                    reset: resetLeanExtrema
-                )
-                .frame(minHeight: 185)
-                RideMetricPanel(dashboard: dashboard, palette: palette)
-            }
-            .padding(RideDesignTokens.contentPadding)
         }
         .background(palette.background)
+        .accessibilityIdentifier("tftDashboard")
+        .onAppear {
+            updateTheme()
+            scheduleToast()
+        }
+        .onChange(of: telemetry) { _, _ in
+            updateTheme()
+            scheduleToast()
+        }
+        .onChange(of: themeMode) { _, _ in updateTheme() }
     }
 
-    private func updateDerivedState() {
-        let nextTheme = RideThemeResolver.resolve(
+    private func updateTheme() {
+        resolvedTheme = RideThemeResolver.resolve(
             mode: themeMode,
             ambientLight: dashboard.ambientLight,
             previous: resolvedTheme,
             thresholds: themeThresholds
         )
-        let nextZone = TachometerZoneResolver.zoneWithHysteresis(
-            rpm: dashboard.engineRpm.displayValue,
-            profile: profile,
-            previous: tachometerZone
-        )
-        if systemReduceMotion {
-            resolvedTheme = nextTheme
-            tachometerZone = nextZone
-        } else {
-            withAnimation(
-                .easeOut(
-                    duration: RideMotionPolicy.duration(
-                        reduceMotion: systemReduceMotion,
-                        standardDuration: RideDesignTokens.themeAnimation
-                    )
-                )
-            ) {
-                resolvedTheme = nextTheme
-                tachometerZone = nextZone
+    }
+
+    private func scheduleToast() {
+        guard data.toastMessage != nil else {
+            toastVisible = false
+            return
+        }
+        toastVisible = true
+        Task {
+            try? await Task.sleep(for: .seconds(4))
+            withAnimation(.easeOut(duration: 0.22)) {
+                toastVisible = false
             }
         }
-        leanExtrema.observe(dashboard.leanAngle.displayValue)
-    }
-
-    private func resetLeanExtrema() {
-        _ = leanExtrema.resetIfStationary(speed: dashboard.speed)
     }
 }
 
-private struct RideStatusBar: View {
-    let dashboard: RideDashboardState
+private struct TFTTachometer: View {
+    let data: TFTDashboardData
     let palette: RidePalette
+
+    private var maximumRpm: Double {
+        data.tachometerMaximumRpm ?? 0
+    }
+
+    private var activeFraction: Double {
+        guard maximumRpm > 0 else { return 0 }
+        return min(max((data.engineRpm ?? 0) / maximumRpm, 0), 1)
+    }
+
+    private var warningRatio: Double {
+        guard maximumRpm > 0, let warning = data.warningStartRpm else { return 1 }
+        return min(max(warning / maximumRpm, 0), 1)
+    }
+
+    private var redRatio: Double {
+        guard maximumRpm > 0, let red = data.redStartRpm else { return 1 }
+        return min(max(red / maximumRpm, warningRatio), 1)
+    }
 
     var body: some View {
-        HStack(spacing: RideDesignTokens.compactSpacing) {
-            Text(dashboard.profile.displayName.uppercased())
-                .font(.caption.weight(.semibold))
-                .tracking(1.4)
-                .foregroundStyle(palette.secondaryText)
-                .lineLimit(1)
-            Spacer()
-            StatusPill(
-                label: dashboard.bleLabel,
-                state: dashboard.bleState,
-                palette: palette
-            )
-            StatusPill(
-                label: dashboard.canState.displayValue?.uppercased() ?? "CAN —",
-                state: dashboard.canState.state,
-                palette: palette
-            )
+        GeometryReader { geometry in
+            let segmentCount = 45
+            let left = geometry.size.width * 0.035
+            let right = geometry.size.width * 0.965
+            let availableWidth = right - left
+            let gap = min(4, availableWidth * 0.004)
+            let segmentWidth =
+                (availableWidth - gap * CGFloat(segmentCount - 1))
+                / CGFloat(segmentCount)
+            let barTop = geometry.size.height * 0.22
+            let barHeight = min(23, geometry.size.height * 0.24)
+
+            Canvas { context, size in
+                for segment in 0..<segmentCount {
+                    let startRatio = Double(segment) / Double(segmentCount)
+                    let endRatio = Double(segment + 1) / Double(segmentCount)
+                    let inactiveColor: Color = if endRatio > redRatio {
+                        palette.accent.opacity(0.42)
+                    } else if endRatio > warningRatio {
+                        palette.warning.opacity(0.34)
+                    } else {
+                        palette.divider
+                    }
+                    let activeColor: Color = if endRatio > redRatio {
+                        palette.accent
+                    } else if endRatio > warningRatio {
+                        palette.warning
+                    } else {
+                        palette.primaryText
+                    }
+                    let color = startRatio < activeFraction
+                        ? activeColor
+                        : inactiveColor
+                    context.fill(
+                        Path(
+                            CGRect(
+                                x: left + CGFloat(segment) * (segmentWidth + gap),
+                                y: barTop,
+                                width: segmentWidth,
+                                height: barHeight
+                            )
+                        ),
+                        with: .color(color)
+                    )
+                }
+
+                let maximumLabel = maximumRpm > 0
+                    ? max(Int((maximumRpm / 1_000).rounded()), 1)
+                    : 9
+                for index in 1...maximumLabel {
+                    context.draw(
+                        Text("\(index)")
+                            .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                            .foregroundStyle(palette.secondaryText),
+                        at: CGPoint(
+                            x: left + availableWidth
+                                * CGFloat(index) / CGFloat(maximumLabel),
+                            y: barTop + barHeight + 14
+                        ),
+                        anchor: .center
+                    )
+                }
+                context.draw(
+                    Text("×1000  RPM")
+                        .font(.system(size: 8, weight: .medium, design: .monospaced))
+                        .tracking(0.8)
+                        .foregroundStyle(palette.secondaryText.opacity(0.78)),
+                    at: CGPoint(x: size.width / 2, y: 7),
+                    anchor: .center
+                )
+            }
         }
-        .frame(minHeight: RideDesignTokens.statusHeight)
     }
 }
 
-private struct StatusPill: View {
-    let label: String
-    let state: RideDataState
+private struct TFTSpeedCluster: View {
+    let data: TFTDashboardData
     let palette: RidePalette
-
-    var body: some View {
-        HStack(spacing: 6) {
-            Circle()
-                .fill(state.color(palette: palette))
-                .frame(width: 7, height: 7)
-            Text(label)
-                .font(.caption2.weight(.bold))
-                .tracking(0.7)
-        }
-        .foregroundStyle(palette.primaryText)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 7)
-        .background(palette.surface, in: Capsule())
-        .overlay(Capsule().stroke(palette.divider, lineWidth: 1))
-    }
-}
-
-private struct RideCenterPanel: View {
-    let dashboard: RideDashboardState
-    let zone: TachometerZone
-    let palette: RidePalette
-    let reduceMotion: Bool
+    let compact: Bool
 
     var body: some View {
         VStack(spacing: 0) {
-            ZStack {
-                TachometerDial(
-                    rpm: dashboard.engineRpm.displayValue,
-                    profile: dashboard.profile,
-                    zone: zone,
-                    palette: palette,
-                    reduceMotion: reduceMotion
-                )
-                HStack(alignment: .firstTextBaseline, spacing: 20) {
-                    VStack(spacing: 0) {
-                        Text(speedText)
-                            .font(.system(size: 82, weight: .semibold, design: .rounded))
-                            .monospacedDigit()
-                            .minimumScaleFactor(0.55)
-                            .lineLimit(1)
-                        Text("km/h")
-                            .font(.caption.weight(.semibold))
-                            .tracking(1.3)
-                            .foregroundStyle(palette.secondaryText)
-                    }
-                    VStack(spacing: 0) {
-                        Text(dashboard.gear.displayValue)
-                            .font(.system(size: 58, weight: .bold, design: .rounded))
-                            .monospacedDigit()
-                        Text("GEAR")
-                            .font(.caption2.weight(.semibold))
-                            .tracking(1.4)
-                            .foregroundStyle(palette.secondaryText)
-                    }
-                }
-                .foregroundStyle(palette.primaryText)
-                .offset(y: 14)
-            }
-            .frame(minHeight: 250)
-
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text("RPM")
-                    .font(.caption.weight(.semibold))
-                    .tracking(1.2)
-                    .foregroundStyle(palette.secondaryText)
-                Text(rpmText)
-                    .font(.title2.weight(.bold))
-                    .monospacedDigit()
-                    .foregroundStyle(zone.color(palette: palette))
-            }
-            if dashboard.engineRpm.state != .valid {
-                Text(dashboard.engineRpm.state.label)
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(dashboard.engineRpm.state.color(palette: palette))
-            }
-        }
-        .padding(.horizontal, RideDesignTokens.compactSpacing)
-    }
-
-    private var speedText: String {
-        dashboard.speed.displayValue.map {
-            $0.formatted(.number.precision(.fractionLength(0)))
-        } ?? "—"
-    }
-
-    private var rpmText: String {
-        dashboard.engineRpm.displayValue.map {
-            $0.formatted(.number.precision(.fractionLength(0)))
-        } ?? "—"
-    }
-}
-
-private struct TachometerDial: View {
-    let rpm: Double?
-    let profile: VehiclePerformanceProfile
-    let zone: TachometerZone
-    let palette: RidePalette
-    let reduceMotion: Bool
-
-    @State private var displayedFraction = 0.0
-
-    private let startDegrees = 150.0
-    private let sweepDegrees = 240.0
-
-    var body: some View {
-        Canvas { context, size in
-            let radius = min(size.width, size.height) * 0.43
-            let center = CGPoint(x: size.width / 2, y: size.height / 2 + 18)
-            drawArc(
-                context: &context,
-                center: center,
-                radius: radius,
-                startFraction: 0,
-                endFraction: 1,
-                color: palette.divider,
-                width: RideDesignTokens.gaugeLineWidth
-            )
-            if let maximum = profile.tachometerScaleMaxRpm, maximum > 0 {
-                drawProfileZones(
-                    context: &context,
-                    center: center,
-                    radius: radius,
-                    maximum: Double(maximum)
-                )
-                drawArc(
-                    context: &context,
-                    center: center,
-                    radius: radius - 1,
-                    startFraction: 0,
-                    endFraction: displayedFraction,
-                    color: zone.color(palette: palette),
-                    width: RideDesignTokens.gaugeLineWidth - 5
-                )
-                drawTicks(
-                    context: &context,
-                    center: center,
-                    radius: radius,
-                    maximum: maximum
-                )
-            } else {
-                context.draw(
-                    Text("PROFILE SCALE —")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundColor(palette.secondaryText),
-                    at: CGPoint(x: center.x, y: center.y - radius)
-                )
-            }
-        }
-        .onAppear(perform: updateFraction)
-        .onChange(of: rpm) { _, _ in updateFraction() }
-        .onChange(of: profile.id) { _, _ in updateFraction() }
-    }
-
-    private func drawProfileZones(
-        context: inout GraphicsContext,
-        center: CGPoint,
-        radius: CGFloat,
-        maximum: Double
-    ) {
-        if let warning = profile.warningStartRpm {
-            let warningStart = min(max(Double(warning) / maximum, 0), 1)
-            let redStart = profile.redZoneStartRpm
-                .map { min(max(Double($0) / maximum, warningStart), 1) }
-                ?? 1
-            drawArc(
-                context: &context,
-                center: center,
-                radius: radius,
-                startFraction: warningStart,
-                endFraction: redStart,
-                color: palette.warning.opacity(0.55),
-                width: RideDesignTokens.gaugeLineWidth
-            )
-        }
-        if let red = profile.redZoneStartRpm {
-            drawArc(
-                context: &context,
-                center: center,
-                radius: radius,
-                startFraction: min(max(Double(red) / maximum, 0), 1),
-                endFraction: 1,
-                color: palette.critical.opacity(0.65),
-                width: RideDesignTokens.gaugeLineWidth
-            )
-        }
-    }
-
-    private func drawTicks(
-        context: inout GraphicsContext,
-        center: CGPoint,
-        radius: CGFloat,
-        maximum: Int
-    ) {
-        let finalTick = max(maximum / 1_000, 1)
-        for tick in 0...finalTick {
-            let fraction = Double(tick) / Double(finalTick)
-            let radians = (startDegrees + sweepDegrees * fraction) * .pi / 180
-            let labelRadius = radius - 28
-            let point = CGPoint(
-                x: center.x + CGFloat(cos(radians)) * labelRadius,
-                y: center.y + CGFloat(sin(radians)) * labelRadius
-            )
-            context.draw(
-                Text("\(tick)")
-                    .font(.caption2.weight(.bold))
-                    .foregroundColor(palette.secondaryText),
-                at: point
-            )
-        }
-    }
-
-    private func drawArc(
-        context: inout GraphicsContext,
-        center: CGPoint,
-        radius: CGFloat,
-        startFraction: Double,
-        endFraction: Double,
-        color: Color,
-        width: CGFloat
-    ) {
-        guard endFraction > startFraction else { return }
-        var path = Path()
-        path.addArc(
-            center: center,
-            radius: radius,
-            startAngle: .degrees(startDegrees + sweepDegrees * startFraction),
-            endAngle: .degrees(startDegrees + sweepDegrees * endFraction),
-            clockwise: false
-        )
-        context.stroke(path, with: .color(color), lineWidth: width)
-    }
-
-    private func updateFraction() {
-        let target: Double
-        if let rpm, let maximum = profile.tachometerScaleMaxRpm, maximum > 0 {
-            target = min(max(rpm / Double(maximum), 0), 1)
-        } else {
-            target = 0
-        }
-        if reduceMotion {
-            displayedFraction = target
-        } else {
-            withAnimation(
-                .easeOut(
-                    duration: RideMotionPolicy.duration(reduceMotion: reduceMotion)
-                )
-            ) {
-                displayedFraction = target
-            }
-        }
-    }
-}
-
-private struct LeanPanel: View {
-    let lean: RideValue<Double>
-    let extrema: LeanExtrema
-    let speed: RideValue<Double>
-    let palette: RidePalette
-    let reset: () -> Void
-
-    private var leanDegrees: Double? {
-        lean.displayValue.map { min(max($0, -60), 60) }
-    }
-
-    var body: some View {
-        VStack(spacing: RideDesignTokens.compactSpacing) {
-            HStack {
-                Text("SVC LEAN")
-                    .font(.caption.weight(.semibold))
-                    .tracking(1.2)
-                Spacer()
-                Text(lean.state.label)
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(lean.state.color(palette: palette))
-            }
-            .foregroundStyle(palette.secondaryText)
-
-            ZStack {
-                Circle()
-                    .stroke(palette.divider, lineWidth: 1)
-                ForEach([-60, -45, -30, -20, -10, 0, 10, 20, 30, 45, 60], id: \.self) {
-                    angle in
-                    Capsule()
-                        .fill(angle == 0 ? palette.primaryText : palette.divider)
-                        .frame(width: angle == 0 ? 2 : 1, height: angle == 0 ? 13 : 8)
-                        .offset(y: -68)
-                        .rotationEffect(.degrees(Double(angle)))
-                }
-                Rectangle()
-                    .fill(palette.accentBright)
-                    .frame(width: 112, height: 3)
-                    .rotationEffect(.degrees(leanDegrees ?? 0))
-                Image(systemName: "motorcycle")
-                    .font(.system(size: 34, weight: .medium))
-                    .foregroundStyle(
-                        leanDegrees == nil ? palette.secondaryText : palette.primaryText
+            HStack(alignment: .lastTextBaseline, spacing: 2) {
+                Text(data.speedKmh.wholeOrDash)
+                    .font(
+                        .system(
+                            size: compact ? 84 : 104,
+                            weight: .light,
+                            design: .monospaced
+                        )
                     )
-                    .rotationEffect(.degrees(leanDegrees ?? 0))
-                Text(leanText)
-                    .font(.title3.weight(.bold))
-                    .monospacedDigit()
                     .foregroundStyle(palette.primaryText)
-                    .offset(y: 50)
-            }
-            .frame(width: 150, height: 150)
-
-            HStack {
-                Text("L \(extrema.maximumLeftDegrees, specifier: "%.0f")°")
-                Spacer()
-                Text("R \(extrema.maximumRightDegrees, specifier: "%.0f")°")
-            }
-            .font(.caption.monospacedDigit())
-            .foregroundStyle(palette.secondaryText)
-
-            Button("Reset maxima", action: reset)
-                .buttonStyle(.borderless)
-                .font(.caption.weight(.semibold))
-                .disabled(speed.displayValue != 0)
-        }
-        .padding(RideDesignTokens.spacing)
-        .background(palette.surface, in: RoundedRectangle(cornerRadius: RideDesignTokens.cornerRadius))
-        .overlay(
-            RoundedRectangle(cornerRadius: RideDesignTokens.cornerRadius)
-                .stroke(palette.divider, lineWidth: 1)
-        )
-    }
-
-    private var leanText: String {
-        guard let leanDegrees else { return "LEAN —" }
-        let direction = leanDegrees < 0 ? "L" : leanDegrees > 0 ? "R" : ""
-        return "\(direction) \(abs(leanDegrees).formatted(.number.precision(.fractionLength(0))))°"
-            .trimmingCharacters(in: .whitespaces)
-    }
-}
-
-private struct RideMetricPanel: View {
-    let dashboard: RideDashboardState
-    let palette: RidePalette
-
-    var body: some View {
-        VStack(spacing: RideDesignTokens.compactSpacing) {
-            RideMetricCard(
-                title: "ENGINE",
-                value: dashboard.engineTemperature.number(fractionDigits: 0),
-                unit: "°C",
-                state: dashboard.engineTemperature.state,
-                palette: palette
-            )
-            RideMetricCard(
-                title: "FUEL",
-                value: dashboard.fuelLevel.number(fractionDigits: 0),
-                unit: "%",
-                state: dashboard.fuelLevel.state,
-                palette: palette
-            )
-            RideMetricCard(
-                title: "BATTERY",
-                value: dashboard.batteryVoltage.number(fractionDigits: 1),
-                unit: "V",
-                state: dashboard.batteryVoltage.state,
-                palette: palette
-            )
-            RideMetricCard(
-                title: "SVC CURRENT",
-                value: dashboard.totalCurrent.number(fractionDigits: 1),
-                unit: "A",
-                state: dashboard.totalCurrent.state,
-                palette: palette
-            )
-        }
-    }
-}
-
-private struct RideMetricCard: View {
-    let title: String
-    let value: String
-    let unit: String
-    let state: RideDataState
-    let palette: RidePalette
-
-    var body: some View {
-        HStack(alignment: .firstTextBaseline) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title)
-                    .font(.caption2.weight(.semibold))
-                    .tracking(1)
+                    .lineLimit(1)
+                Text("km/h")
+                    .font(.system(size: compact ? 15 : 18, design: .monospaced))
                     .foregroundStyle(palette.secondaryText)
-                Text(state.label)
-                    .font(.caption2)
-                    .foregroundStyle(state.color(palette: palette))
+                    .padding(.bottom, compact ? 12 : 15)
             }
-            Spacer()
-            Text(value)
-                .font(.title3.weight(.bold))
-                .monospacedDigit()
-                .foregroundStyle(palette.primaryText)
-            Text(value == "—" ? "" : unit)
-                .font(.caption.weight(.semibold))
+            Text("\(data.engineRpm.wholeOrDash) rpm")
+                .font(.system(size: compact ? 11 : 13, design: .monospaced))
+                .tracking(1.2)
                 .foregroundStyle(palette.secondaryText)
+                .accessibilityIdentifier("tftDigitalRpm")
         }
-        .padding(.horizontal, 12)
-        .frame(maxWidth: .infinity, minHeight: 58)
-        .background(palette.surface, in: RoundedRectangle(cornerRadius: RideDesignTokens.compactCornerRadius))
-        .overlay(
-            RoundedRectangle(cornerRadius: RideDesignTokens.compactCornerRadius)
-                .stroke(palette.divider, lineWidth: 1)
-        )
     }
 }
 
-private struct RideAlertBanner: View {
-    let alert: RideAlert?
+private struct TFTGear: View {
+    let gear: String
+    let palette: RidePalette
+    let compact: Bool
+
+    var body: some View {
+        Text(gear.isEmpty ? "—" : gear)
+            .font(
+                .system(
+                    size: compact ? 68 : 88,
+                    weight: .medium,
+                    design: .monospaced
+                )
+            )
+            .foregroundStyle(gear == "N" ? palette.valid : palette.primaryText)
+            .lineLimit(1)
+    }
+}
+
+private struct TFTBottomTelemetry: View {
+    let data: TFTDashboardData
+    let palette: RidePalette
+    let compact: Bool
+
+    var body: some View {
+        HStack(spacing: 0) {
+            TFTMetric(
+                "FUEL",
+                data.fuelPercent.valueOrDash("%", decimals: 0),
+                selected: true
+            )
+            TFTMetric("RANGE", data.rangeKm.valueOrDash("km", decimals: 0))
+            TFTMetric("BAT", data.batteryVoltage.valueOrDash("V", decimals: 1))
+            TFTMetric(
+                "ENGINE",
+                data.engineTemperatureCelsius.valueOrDash("°C", decimals: 0)
+            )
+            TFTMetric("TIME", data.currentTime, divider: false)
+        }
+        .padding(.horizontal, compact ? 16 : 24)
+        .background(palette.surface)
+    }
+
+    @ViewBuilder
+    private func TFTMetric(
+        _ label: String,
+        _ value: String,
+        degraded: Bool = false,
+        selected: Bool = false,
+        divider: Bool = true
+    ) -> some View {
+        HStack(spacing: 0) {
+            ZStack(alignment: .top) {
+                if selected {
+                    Rectangle()
+                        .fill(palette.accent)
+                        .frame(height: 3)
+                }
+                VStack(spacing: 3) {
+                    Text(label)
+                        .font(.system(size: compact ? 8 : 10))
+                        .tracking(0.9)
+                        .foregroundStyle(palette.secondaryText.opacity(0.86))
+                        .lineLimit(1)
+                    HStack(spacing: 2) {
+                        Text(value)
+                            .font(
+                                .system(
+                                    size: compact ? 13 : 17,
+                                    weight: .semibold,
+                                    design: .monospaced
+                                )
+                            )
+                            .foregroundStyle(palette.primaryText)
+                            .lineLimit(1)
+                        if degraded {
+                            Text("▲")
+                                .font(.system(size: compact ? 7 : 8))
+                                .foregroundStyle(palette.degraded)
+                        }
+                    }
+                }
+                .frame(maxHeight: .infinity)
+            }
+            .frame(maxWidth: .infinity)
+            if divider {
+                Rectangle()
+                    .fill(palette.divider.opacity(0.7))
+                    .frame(width: 1)
+                    .padding(.vertical, 10)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+private struct TFTActiveIndicators: View {
+    let indicators: [TFTIndicator]
+    let palette: RidePalette
+    let compact: Bool
+
+    var body: some View {
+        HStack(spacing: compact ? 8 : 12) {
+            ForEach(indicators) { indicator in
+                TFTIndicatorGlyph(
+                    indicator: indicator,
+                    palette: palette,
+                    compact: compact
+                )
+            }
+        }
+        .accessibilityIdentifier("tftActiveIndicators")
+    }
+}
+
+private struct TFTConnectionIcons: View {
+    let data: TFTDashboardData
     let palette: RidePalette
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: alert == nil ? "shield.lefthalf.filled" : "exclamationmark.triangle.fill")
-            Text(alert?.title ?? "NO ACTIVE WARNING DATA")
-                .font(.subheadline.weight(.bold))
-                .tracking(0.6)
-            Spacer()
+            if !data.bleConnected {
+                connection("BLE", connected: false)
+            }
+            if !data.canConnected {
+                connection("CAN", connected: false)
+            }
         }
-        .foregroundStyle(alert == nil ? palette.secondaryText : .white)
-        .padding(.horizontal, 14)
-        .frame(maxWidth: .infinity, minHeight: 44)
-        .background(backgroundColor, in: RoundedRectangle(cornerRadius: RideDesignTokens.compactCornerRadius))
-        .overlay(
-            RoundedRectangle(cornerRadius: RideDesignTokens.compactCornerRadius)
-                .stroke(alert == nil ? palette.divider : backgroundColor, lineWidth: 1)
-        )
+        .accessibilityIdentifier("tftConnectionIcons")
     }
 
-    private var backgroundColor: Color {
-        switch alert?.severity {
-        case .critical:
-            palette.critical
-        case .warning:
-            palette.warning.opacity(0.88)
-        case .info:
-            palette.accent
-        case nil:
-            palette.surface
+    private func connection(_ label: String, connected: Bool) -> some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(connected ? palette.valid : palette.critical)
+                .frame(width: 6, height: 6)
+            Text(label)
+                .font(.system(size: 8, weight: .bold))
+                .tracking(0.8)
+                .foregroundStyle(palette.secondaryText)
         }
     }
 }
 
-private extension RideValue where Value == Double {
-    func number(fractionDigits: Int) -> String {
-        displayValue?.formatted(
-            .number.precision(.fractionLength(fractionDigits))
-        ) ?? "—"
-    }
-}
+private struct TFTIndicatorGlyph: View {
+    let indicator: TFTIndicator
+    let palette: RidePalette
+    let compact: Bool
 
-private extension RideDataState {
-    var label: String {
-        switch self {
-        case .valid: "VALID"
-        case .stale: "STALE"
-        case .degraded: "DEGRADED"
-        case .invalid: "INVALID"
-        case .unavailable: "UNAVAILABLE"
-        }
-    }
-
-    func color(palette: RidePalette) -> Color {
-        switch self {
-        case .valid:
-            palette.valid
-        case .degraded, .stale:
-            palette.degraded
-        case .invalid:
-            palette.critical
-        case .unavailable:
-            palette.secondaryText
-        }
-    }
-}
-
-private extension TachometerZone {
-    func color(palette: RidePalette) -> Color {
-        switch self {
-        case .normal:
-            palette.accentBright
-        case .warning:
-            palette.warning
-        case .red:
-            palette.critical
-        case .unavailable:
-            palette.secondaryText
-        }
-    }
-}
-
-#Preview("SVC Ride Landscape", traits: .landscapeLeft) {
-    NavigationStack {
-        DashboardPreview()
-    }
-}
-
-#Preview("SVC Ride Portrait") {
-    NavigationStack {
-        DashboardPreview()
-    }
-}
-
-private struct DashboardPreview: View {
     var body: some View {
-        DashboardView(
-            telemetry: PreviewFixtures.telemetry,
-            connectionState: .connected,
-            isConnecting: false,
-            profile: VehiclePerformanceCatalog.load().resolve(
-                profileId: "bmw-r1200gs-k25-2007"
-            ),
-            themeMode: .night,
-            themeThresholds: .default
-        )
+        switch indicator {
+        case .highBeam, .fogLights:
+            Canvas { context, size in
+                let color = indicator.color(palette)
+                var lamp = Path()
+                lamp.addArc(
+                    center: CGPoint(x: size.width * 0.16, y: size.height * 0.5),
+                    radius: size.height * 0.32,
+                    startAngle: .degrees(90),
+                    endAngle: .degrees(270),
+                    clockwise: false
+                )
+                context.stroke(
+                    lamp,
+                    with: .color(color),
+                    style: StrokeStyle(lineWidth: 1.8, lineCap: .round)
+                )
+                var edge = Path()
+                edge.move(to: CGPoint(x: size.width * 0.30, y: size.height * 0.18))
+                edge.addLine(to: CGPoint(x: size.width * 0.30, y: size.height * 0.82))
+                context.stroke(edge, with: .color(color), lineWidth: 1.8)
+
+                for index in 0..<3 {
+                    let y = size.height * (0.29 + CGFloat(index) * 0.21)
+                    var beam = Path()
+                    beam.move(to: CGPoint(x: size.width * 0.48, y: y))
+                    if indicator == .fogLights {
+                        beam.addCurve(
+                            to: CGPoint(x: size.width * 0.96, y: y),
+                            control1: CGPoint(x: size.width * 0.62, y: y - size.height * 0.08),
+                            control2: CGPoint(x: size.width * 0.82, y: y + size.height * 0.08)
+                        )
+                    } else {
+                        beam.addLine(to: CGPoint(x: size.width * 0.96, y: y))
+                    }
+                    context.stroke(
+                        beam,
+                        with: .color(color),
+                        style: StrokeStyle(lineWidth: 1.8, lineCap: .round)
+                    )
+                }
+                if indicator == .fogLights {
+                    var slash = Path()
+                    slash.move(to: CGPoint(x: size.width * 0.70, y: size.height * 0.12))
+                    slash.addLine(to: CGPoint(x: size.width * 0.60, y: size.height * 0.88))
+                    context.stroke(slash, with: .color(color), lineWidth: 1.8)
+                }
+            }
+            .frame(width: compact ? 28 : 34, height: compact ? 18 : 22)
+        case .abs:
+            Text("ABS")
+                .font(.system(size: compact ? 7 : 8, weight: .bold))
+                .foregroundStyle(indicator.color(palette))
+                .frame(width: compact ? 26 : 31, height: compact ? 26 : 31)
+                .overlay {
+                    Circle()
+                        .stroke(indicator.color(palette), lineWidth: 1.6)
+                }
+        default:
+            Text(indicator.label)
+                .font(
+                    .system(
+                        size: indicator.label.count > 3
+                            ? (compact ? 9 : 11)
+                            : (compact ? 15 : 18),
+                        weight: .bold
+                    )
+                )
+                .tracking(0.8)
+                .foregroundStyle(indicator.color(palette))
+        }
     }
 }
 
-private enum PreviewFixtures {
+private extension TFTIndicator {
+    func color(_ palette: RidePalette) -> Color {
+        switch self {
+        case .turnLeft, .turnRight, .neutral:
+            palette.valid
+        case .highBeam:
+            palette.highBeam
+        case .fogLights:
+            palette.fogLight
+        case .abs, .engineWarning, .tirePressure, .lowVoltage:
+            palette.warning
+        case .svcError:
+            palette.critical
+        }
+    }
+}
+
+private extension Optional where Wrapped == Double {
+    var wholeOrDash: String {
+        guard let self else { return "—" }
+        return String(Int(self.rounded()))
+    }
+
+    func numberOrDash(decimals: Int) -> String {
+        guard let self else { return "—" }
+        return String(format: "%.\(decimals)f", self)
+    }
+
+    func valueOrDash(_ unit: String, decimals: Int) -> String {
+        guard let self else { return "—" }
+        return "\(String(format: "%.\(decimals)f", self)) \(unit)"
+    }
+
+    func signedValueOrDash(_ unit: String, decimals: Int) -> String {
+        guard let self else { return "—" }
+        return "\(String(format: "%+.\(decimals)f", self)) \(unit)"
+    }
+}
+
+#Preview("SVC TFT Landscape", traits: .landscapeLeft) {
+    DashboardView(
+        telemetry: DashboardPreviewFixtures.telemetry,
+        connectionState: .connected,
+        isConnecting: false,
+        profile: VehiclePerformanceCatalog.load().resolve(
+            profileId: "bmw-r1200gs-k25-2007"
+        ),
+        themeMode: .night,
+        themeThresholds: .default,
+        demoMode: true
+    )
+}
+
+private enum DashboardPreviewFixtures {
     static var telemetry: TelemetrySnapshot {
-        let bundle = Bundle.main
         guard
-            let url = bundle.url(forResource: "device-v1", withExtension: "json"),
+            let url = Bundle.main.url(
+                forResource: "device-v1",
+                withExtension: "json"
+            ),
             let data = try? Data(contentsOf: url),
-            let snapshot = try? JSONDecoder().decode(TelemetrySnapshot.self, from: data)
+            let snapshot = try? JSONDecoder().decode(
+                TelemetrySnapshot.self,
+                from: data
+            )
         else {
             fatalError("Missing SVC preview telemetry")
         }

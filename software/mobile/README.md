@@ -22,19 +22,43 @@ dashboard scales and reference values; unknown values remain explicit `null`.
 The Generic Motorcycle fallback intentionally defines no red zone or engine
 limits.
 
-## SVC Ride Dashboard v1
+## SVC TFT Ride Dashboard
 
-The phone targets contain the same adaptive dashboard contract in SwiftUI and
-Jetpack Compose. Landscape is primary; portrait rearranges the same information
-without changing its meaning. The dashboard provides:
+The phone targets contain the same Ride Mode contract in SwiftUI and Jetpack
+Compose. Ride Mode is a dedicated landscape-only full-screen container; the
+ordinary application navigation remains outside it. While active, it hides
+application and system navigation chrome, renders edge-to-edge with cutout-safe
+content, keeps the display awake, and restores orientation, system bars,
+brightness, and idle-timer behavior on exit.
 
-- central speed and explicit gear presentation (`N`, `1`–`6`, `BETWEEN`, `—`);
-- profile-driven tachometer scale, warning/red zones, 80 rpm color hysteresis,
-  smooth arc motion, and an unsmoothed numeric RPM value;
-- SVC-estimated lean angle with left/right trip maxima and stationary-only
-  reset;
-- engine temperature, fuel, battery voltage, total SVC current, BLE/CAN state,
-  and the highest-priority active warning;
+Ride Mode uses the same non-cyclic swipe order on both platforms:
+
+1. `PURE RIDE`
+2. `SPORT / CORE`
+3. `VEHICLE`
+4. `SVC POWER`
+5. `DIAGNOSTICS`
+
+Horizontal swipes animate for 250 ms, vertical movement does not change pages,
+and the system gesture edges remain available. The selected page is restored
+after a later app launch; a new installation starts on `PURE RIDE`. A small
+page indicator fades after three seconds and can be disabled in Settings.
+Tapping free space shows a three-second overlay for exit, brightness,
+Auto/Day/Night, and Settings; exit and Settings require confirmed zero speed.
+The former rectangular card layout is not used in Ride Mode. The primary TFT
+provides:
+
+- central speed, a smaller `km/h` unit, an unsmoothed numeric RPM value, and a
+  large right-side gear presentation (`N`, `1`–`6`, `BETWEEN`, `—`);
+- a flat, segmented 0–9000 RPM tachometer: inactive dark gray, active
+  0–7000 white, 7000–8000 amber, and 8000–9000 red;
+- compact fuel, range, battery, engine temperature, and time values in one
+  five-group lower strip rather than cards;
+- active-only pictographic telltales, BLE/CAN only on connection loss or
+  Diagnostics, transient SD toast, and a narrow persistent area reserved for
+  critical warnings;
+- dedicated full-screen pages for Sport/lean telemetry, Vehicle/RDC, SVC
+  power, and listen-only CAN diagnostics;
 - separate `SVC Day`, `SVC Night`, and ambient-light `Automatic` themes with
   configurable 250/650 lux hysteresis defaults;
 - system Reduce Motion support and shared 180/300 ms motion tokens.
@@ -49,15 +73,34 @@ outside the future Demo Mode.
 <p align="center">
   <img
     src="docs/screenshots/svc-ride-dashboard-v1-landscape.png"
-    alt="SVC Ride Dashboard v1 using mock telemetry and only SVC visual identity"
+    alt="SVC TFT Ride Dashboard at 87 km/h and 4200 RPM"
     width="900"
   >
 </p>
 
-The screenshot contains no vehicle-manufacturer artwork. Full graphics are
-phone-only. The experimental CarPlay/Android Auto templates expose only speed,
-gear, battery, SVC current, main warning, and connection state and currently
-render unavailable values rather than invented telemetry.
+<p align="center">
+  <img
+    src="docs/screenshots/svc-tft-sport-landscape.png"
+    alt="SVC TFT Sport Core screen at 18 degrees right lean"
+    width="900"
+  >
+</p>
+
+The explicit review-only presentation dataset contains 87 km/h, 4200 RPM,
+gear 4, 18° right lean, 62% fuel, 14.2 V, 2.3/2.6 bar RDC values, and +16 °C.
+It is selected only by test/preview launch flags and never enters the telemetry
+wire contract. The 2048×921 review screenshot is captured from the full-screen container and
+contains no status bar, navigation bar, Home Indicator, Menu, TabBar, or
+vehicle-manufacturer artwork. Full graphics are phone-only. The experimental
+CarPlay/Android Auto templates expose only speed, gear, battery, SVC current,
+main warning, and connection state and currently render unavailable values
+rather than invented telemetry.
+
+The sporting hierarchy is an independent SVC interpretation of the
+[official BMW S1000RR Pure Ride/Core screen taxonomy](https://www.bmw-motorrad.co.uk/en/models/sport/s1000rr.html)
+and [official instrument-panel press imagery](https://www.press.bmwgroup.com/global/photo/detail/P90327373/BMW-S-1000-RR-instrument-panel-with-6-5-inch-TFT-screen-11-2018).
+No BMW/M logo, artwork, type asset, or screen bitmap is included or copied; SVC
+retains its own palette, icons, layout geometry, and startup mark.
 
 ## Startup and personal branding
 
@@ -76,7 +119,9 @@ The default personal profile is `bmw-r1200gs-k25-personal` with theme
 wordmarks are optional and fall back to the catalog display name as text. If a
 profile or required logo is unavailable, the apps show the committed SVC mark,
 `SMART VEHICLE CONTROLLER`, and `ENGINEERED FOR THE RIDE`. No brand artwork is
-downloaded at runtime. Preview the result from
+downloaded at runtime. Manufacturer artwork remains outside Ride Mode; the Ride
+startup sequence always uses the original SVC mark and thin red/white/blue
+lines. Preview the result from
 `Settings → Appearance → Preview Startup Animation`.
 
 The public application identity is always SVC. The phone launcher, App
@@ -93,11 +138,12 @@ catalog entry to contain `brand.json`, `logo-source.svg`, `logo-on-dark.svg`,
 `logo-on-light.svg`, and `logo-accent.svg`, and parses every SVG as XML.
 
 Profile/theme loading, mock BLE restoration, telemetry refresh, and screen
-restoration start in parallel. The animation never waits for BLE; Dashboard
-shows `Connecting to SVC` until restoration completes. Critical warnings use a
-500 ms startup and render as a red card after it. Reduced motion also uses a
-500 ms fade, while disabled animation enters the selected screen immediately.
-No POST statuses or fabricated `OK` values appear in startup.
+restoration start in parallel. The animation never waits for BLE: it presents
+the SVC mark, illuminates the telltales, sweeps the tachometer to 9000 RPM and
+back, then reveals speed, gear, and live data in 2.1 seconds. Critical warnings
+use a 500 ms startup and render in the narrow warning area after it. Reduced
+motion also uses a 500 ms fade, while disabled animation enters the selected
+screen immediately. No fabricated POST result enters telemetry.
 
 The animation is phone-only. CarPlay and Android Auto retain host-controlled
 launch transitions and show only the SVC app identity, profile name, permitted
@@ -163,6 +209,7 @@ Requirements: JDK 21, Android SDK 36, and Gradle 8.11.1.
 ```bash
 gradle -p software/mobile/android \
   :app-mobile:assembleDebug \
+  :app-mobile:connectedDebugAndroidTest \
   test
 ```
 

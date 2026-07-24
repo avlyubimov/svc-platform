@@ -185,6 +185,17 @@ final class RidePreferences: ObservableObject {
     @Published var dayEnterLux: Double {
         didSet { defaults.set(dayEnterLux, forKey: Keys.dayEnterLux) }
     }
+    @Published var pageIndicatorEnabled: Bool {
+        didSet { defaults.set(pageIndicatorEnabled, forKey: Keys.pageIndicatorEnabled) }
+    }
+    @Published var lastRidePage: Int {
+        didSet {
+            defaults.set(
+                min(max(lastRidePage, 0), RideModePage.allCases.count - 1),
+                forKey: Keys.lastRidePage
+            )
+        }
+    }
 
     private let defaults: UserDefaults
     private let catalog: VehiclePerformanceCatalog
@@ -213,6 +224,13 @@ final class RidePreferences: ObservableObject {
         let storedDay = defaults.object(forKey: Keys.dayEnterLux) as? Double
         nightEnterLux = storedNight ?? RideThemeThresholds.default.nightEnterLux
         dayEnterLux = storedDay ?? RideThemeThresholds.default.dayEnterLux
+        pageIndicatorEnabled = defaults.object(
+            forKey: Keys.pageIndicatorEnabled
+        ) as? Bool ?? true
+        lastRidePage = min(
+            max(defaults.integer(forKey: Keys.lastRidePage), 0),
+            RideModePage.allCases.count - 1
+        )
     }
 
     var availableProfiles: [VehiclePerformanceProfile] { catalog.profiles }
@@ -232,5 +250,7 @@ final class RidePreferences: ObservableObject {
         static let themeMode = "rideThemeMode"
         static let nightEnterLux = "rideNightEnterLux"
         static let dayEnterLux = "rideDayEnterLux"
+        static let pageIndicatorEnabled = "ridePageIndicatorEnabled"
+        static let lastRidePage = "rideLastPage"
     }
 }

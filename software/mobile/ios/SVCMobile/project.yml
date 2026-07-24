@@ -47,12 +47,17 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: SVC Mobile
         INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription: SVC Mobile uses Bluetooth to read SVC telemetry and transfer confirmed firmware updates.
         INFOPLIST_KEY_NSLocalNetworkUsageDescription: Reserved for development diagnostics; SVC device connectivity uses Bluetooth.
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         SUPPORTS_MACCATALYST: false
         SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited)"
     scheme:
       testTargets:
         - SVCMobileTests
+        - SVCMobileUITests
   SVCMobileTests:
     type: bundle.unit-test
     platform: iOS
@@ -90,4 +95,15 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.avlyubimov.svc.mobile.tests
+        GENERATE_INFOPLIST_FILE: true
+  SVCMobileUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+    dependencies:
+      - target: SVCMobile
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.avlyubimov.svc.mobile.uitests
         GENERATE_INFOPLIST_FILE: true

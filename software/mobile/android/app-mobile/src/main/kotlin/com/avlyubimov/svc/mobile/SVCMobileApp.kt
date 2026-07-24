@@ -1,5 +1,7 @@
 package com.avlyubimov.svc.mobile
 
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -25,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +39,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.avlyubimov.svc.core.model.ChannelTelemetry
 import com.avlyubimov.svc.core.model.DeviceRepository
 import com.avlyubimov.svc.core.model.DiscoveredDevice
@@ -62,7 +68,10 @@ private enum class Screen(val title: String) {
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun SVCMobileApp(repository: DeviceRepository) {
+internal fun SVCMobileApp(
+    repository: DeviceRepository,
+    rideModeWindowController: RideModeWindowController,
+) {
     val context = LocalContext.current
     val brandCatalog = remember { MobileBrandCatalog.load(context) }
     val performanceCatalog = remember {
@@ -74,17 +83,19 @@ fun SVCMobileApp(repository: DeviceRepository) {
         RidePreferences(context, performanceCatalog)
     }
     val device by repository.snapshot.collectAsStateWithLifecycle()
-    var selectedScreen by remember {
-        mutableStateOf<Screen?>(
-            Screen.entries.firstOrNull { it.name == appearance.restoreScreen() }
-                ?.takeIf { it.isRestorable }
-                ?: Screen.DASHBOARD,
-        )
-    }
+    var selectedScreen by remember { mutableStateOf<Screen?>(null) }
+    var rideModeActive by remember { mutableStateOf(true) }
     var confirmInstall by remember { mutableStateOf(false) }
     var discoveredDevices by remember { mutableStateOf<List<DiscoveredDevice>>(emptyList()) }
     var isConnecting by remember { mutableStateOf(device.connectionState.name != "CONNECTED") }
-    var showStartup by remember { mutableStateOf(true) }
+    var showStartup by remember {
+        mutableStateOf(
+            !(context as? Activity)?.intent?.getBooleanExtra(
+                "skipStartup",
+                false,
+            ).orFalse(),
+        )
+    }
     var startupReplayKey by remember { mutableStateOf(0) }
     var appearanceRevision by remember { mutableStateOf(0) }
     var rideRevision by remember { mutableStateOf(0) }
@@ -97,13 +108,21 @@ fun SVCMobileApp(repository: DeviceRepository) {
     val rideThemeThresholds = remember(rideRevision) {
         ridePreferences.themeThresholds()
     }
+    val pageIndicatorEnabled = remember(rideRevision) {
+        ridePreferences.pageIndicatorEnabled
+    }
+    val presentationDemo = remember {
+        (context as? Activity)?.intent?.getBooleanExtra(
+            "presentationDemo",
+            false,
+        ).orFalse()
+    }
     val criticalWarning = device.telemetry.warnings.firstOrNull {
         it.active && it.severity.equals("critical", ignoreCase = true)
     }
 
     androidx.compose.runtime.LaunchedEffect(Unit) {
         launch { appearance.brandPack() }
-        launch { appearance.restoreScreen() }
         launch {
             discoveredDevices = repository.discover()
             delay(3_000)
@@ -123,115 +142,160 @@ fun SVCMobileApp(repository: DeviceRepository) {
         ),
     ) {
         Box(Modifier.fillMaxSize().background(MobileColors.Background)) {
-            Scaffold(
-                containerColor = MobileColors.Background,
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            if (selectedScreen == Screen.DASHBOARD) {
-                                "SVC Ride"
-                            } else {
-                                selectedScreen?.title ?: "SVC Mobile"
+            if (rideModeActive) {
+                RideModeSystemEffect(rideModeWindowController)
+                BackHandler {
+                    rideModeActive = false
+                    selectedScreen = null
+                }
+                RideModeScreen(
+                    telemetry = device.telemetry,
+                    connectionState = device.connectionState,
+                    isConnecting = isConnecting,
+                    profile = vehicleProfile,
+                    themeMode = rideThemeMode,
+                    themeThresholds = rideThemeThresholds,
+                    reduceMotion = appearance.reduceMotionOverride ||
+                        systemReduceMotion(context),
+                    pageIndicatorEnabled = pageIndicatorEnabled,
+                    demoMode = presentationDemo,
+                    initialPage = if (presentationDemo) {
+                        (context as? Activity)?.intent
+                            ?.getIntExtra("presentationPage", 0)
+                            ?: 0
+                    } else {
+                        ridePreferences.lastRidePage
+                    },
+                    windowController = rideModeWindowController,
+                    onPageChanged = { page ->
+                        if (!presentationDemo) ridePreferences.lastRidePage = page
+                    },
+                    onThemeModeChanged = { mode ->
+                        ridePreferences.themeMode = mode
+                        rideRevision += 1
+                    },
+                    onExit = {
+                        rideModeActive = false
+                        selectedScreen = null
+                    },
+                    onOpenSettings = {
+                        rideModeActive = false
+                        selectedScreen = Screen.SETTINGS
+                    },
+                )
+            } else {
+                Scaffold(
+                    containerColor = MobileColors.Background,
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text(selectedScreen?.title ?: "SVC Mobile")
+                            },
+                            navigationIcon = {
+                                if (selectedScreen != null) {
+                                    TextButton(onClick = { selectedScreen = null }) {
+                                        Text("Menu")
+                                    }
+                                }
                             },
                         )
                     },
-                    navigationIcon = {
-                        if (selectedScreen != null) {
-                            TextButton(onClick = { selectedScreen = null }) {
-                                Text("Menu")
+                ) { padding ->
+                    if (selectedScreen == null) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(padding)
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            items(Screen.entries) { screen ->
+                                Button(
+                                    onClick = {
+                                        if (screen == Screen.DASHBOARD) {
+                                            rideModeActive = true
+                                        } else {
+                                            selectedScreen = screen
+                                            if (screen.isRestorable) {
+                                                appearance.storeScreen(screen.name)
+                                            }
+                                        }
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                ) {
+                                    Text(
+                                        if (screen == Screen.DASHBOARD) {
+                                            "Enter Ride Mode"
+                                        } else {
+                                            screen.title
+                                        },
+                                    )
+                                }
                             }
                         }
-                    },
-                )
-            },
-        ) { padding ->
-            if (selectedScreen == null) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    items(Screen.entries) { screen ->
-                        Button(
-                            onClick = {
-                                selectedScreen = screen
-                                if (screen.isRestorable) appearance.storeScreen(screen.name)
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Text(screen.title)
+                    } else {
+                        val modifier = Modifier
+                            .fillMaxSize()
+                            .padding(padding)
+                            .padding(16.dp)
+                        when (selectedScreen) {
+                            Screen.PAIRING -> PairingScreen(
+                                state = device.connectionState.name,
+                                devices = discoveredDevices,
+                                modifier = modifier,
+                                onScan = {
+                                    coroutineScope.launch {
+                                        discoveredDevices = repository.discover()
+                                    }
+                                },
+                                onConnect = { selected ->
+                                    coroutineScope.launch {
+                                        repository.connect(selected.id)
+                                    }
+                                },
+                            )
+                            Screen.DASHBOARD -> Unit
+                            Screen.CHANNELS -> ChannelsScreen(
+                                device.telemetry.channels,
+                                modifier,
+                            )
+                            Screen.DIAGNOSTICS -> DiagnosticsScreen(
+                                device.telemetry,
+                                modifier,
+                            )
+                            Screen.CAN -> CanScreen(device.telemetry, modifier)
+                            Screen.NAVIGATION -> StringListScreen(
+                                listOf("Navigation provider unavailable"),
+                                modifier,
+                            )
+                            Screen.EVENTS -> StringListScreen(device.events, modifier)
+                            Screen.DEVICE -> DeviceScreen(device.telemetry, modifier)
+                            Screen.FIRMWARE -> FirmwareScreen(
+                                telemetry = device.telemetry,
+                                modifier = modifier,
+                                onInstall = { confirmInstall = true },
+                            )
+                            Screen.SETTINGS -> SettingsScreen(
+                                preferences = appearance,
+                                profiles = brandCatalog.profiles,
+                                ridePreferences = ridePreferences,
+                                vehicleProfiles = performanceCatalog.profiles,
+                                usingFallback = brandPack.id != appearance.profileId,
+                                modifier = modifier,
+                                onAppearanceChanged = { appearanceRevision += 1 },
+                                onRideChanged = { rideRevision += 1 },
+                                onPreview = {
+                                    startupReplayKey += 1
+                                    showStartup = true
+                                },
+                            )
+                            null -> Unit
                         }
                     }
                 }
-            } else {
-                val modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(16.dp)
-                when (selectedScreen) {
-                    Screen.PAIRING -> PairingScreen(
-                        state = device.connectionState.name,
-                        devices = discoveredDevices,
-                        modifier = modifier,
-                        onScan = {
-                            coroutineScope.launch {
-                                discoveredDevices = repository.discover()
-                            }
-                        },
-                        onConnect = { selected ->
-                            coroutineScope.launch {
-                                repository.connect(selected.id)
-                            }
-                        },
-                    )
-                    Screen.DASHBOARD -> RideDashboardScreen(
-                        telemetry = device.telemetry,
-                        connectionState = device.connectionState,
-                        isConnecting = isConnecting,
-                        profile = vehicleProfile,
-                        themeMode = rideThemeMode,
-                        themeThresholds = rideThemeThresholds,
-                        reduceMotion = appearance.reduceMotionOverride ||
-                            systemReduceMotion(context),
-                        modifier = modifier,
-                    )
-                    Screen.CHANNELS -> ChannelsScreen(device.telemetry.channels, modifier)
-                    Screen.DIAGNOSTICS -> DiagnosticsScreen(device.telemetry, modifier)
-                    Screen.CAN -> CanScreen(device.telemetry, modifier)
-                    Screen.NAVIGATION -> StringListScreen(
-                        listOf("Navigation provider unavailable"),
-                        modifier,
-                    )
-                    Screen.EVENTS -> StringListScreen(device.events, modifier)
-                    Screen.DEVICE -> DeviceScreen(device.telemetry, modifier)
-                    Screen.FIRMWARE -> FirmwareScreen(
-                        telemetry = device.telemetry,
-                        modifier = modifier,
-                        onInstall = { confirmInstall = true },
-                    )
-                    Screen.SETTINGS -> SettingsScreen(
-                        preferences = appearance,
-                        profiles = brandCatalog.profiles,
-                        ridePreferences = ridePreferences,
-                        vehicleProfiles = performanceCatalog.profiles,
-                        usingFallback = brandPack.id != appearance.profileId,
-                        modifier = modifier,
-                        onAppearanceChanged = { appearanceRevision += 1 },
-                        onRideChanged = { rideRevision += 1 },
-                        onPreview = {
-                            startupReplayKey += 1
-                            showStartup = true
-                        },
-                    )
-                    null -> Unit
-                }
-            }
             }
 
-            if (!showStartup && criticalWarning != null) {
+            if (!rideModeActive && !showStartup && criticalWarning != null) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -262,27 +326,49 @@ fun SVCMobileApp(repository: DeviceRepository) {
             }
 
             if (confirmInstall) {
-            AlertDialog(
-                onDismissRequest = { confirmInstall = false },
-                title = { Text("Confirm firmware installation") },
-                text = {
-                    Text("The mock scaffold performs no real device action.")
-                },
-                confirmButton = {
-                    TextButton(onClick = { confirmInstall = false }) {
-                        Text("Install")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { confirmInstall = false }) {
-                        Text("Cancel")
-                    }
-                },
-            )
+                AlertDialog(
+                    onDismissRequest = { confirmInstall = false },
+                    title = { Text("Confirm firmware installation") },
+                    text = {
+                        Text("The mock scaffold performs no real device action.")
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { confirmInstall = false }) {
+                            Text("Install")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { confirmInstall = false }) {
+                            Text("Cancel")
+                        }
+                    },
+                )
             }
         }
     }
 }
+
+@Composable
+private fun RideModeSystemEffect(
+    controller: RideModeWindowController,
+) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(controller, lifecycleOwner) {
+        controller.enter()
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                controller.reassertImmersiveMode()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            controller.exit()
+        }
+    }
+}
+
+private fun Boolean?.orFalse(): Boolean = this ?: false
 
 private val Screen.isRestorable: Boolean
     get() = this in setOf(
@@ -417,6 +503,9 @@ private fun SettingsScreen(
         mutableStateOf(ridePreferences.vehicleProfileId)
     }
     var selectedTheme by remember { mutableStateOf(ridePreferences.themeMode) }
+    var pageIndicatorEnabled by remember {
+        mutableStateOf(ridePreferences.pageIndicatorEnabled)
+    }
     var nightEnterLux by remember { mutableStateOf(ridePreferences.nightEnterLux) }
     var dayEnterLux by remember { mutableStateOf(ridePreferences.dayEnterLux) }
     var animationEnabled by remember { mutableStateOf(preferences.animationEnabled) }
@@ -510,6 +599,17 @@ private fun SettingsScreen(
                     },
                 )
             }
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("Ride page indicator")
+            Switch(
+                checked = pageIndicatorEnabled,
+                onCheckedChange = {
+                    pageIndicatorEnabled = it
+                    ridePreferences.pageIndicatorEnabled = it
+                    onRideChanged()
+                },
+            )
         }
         Text("Night below ${nightEnterLux.toInt()} lux")
         Slider(

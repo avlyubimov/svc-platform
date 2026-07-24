@@ -5,8 +5,17 @@ struct RootView: View {
     @StateObject private var appearance = AppearanceStore()
     @StateObject private var ridePreferences = RidePreferences()
     @State private var selectedScreen: PrimaryScreen = .dashboard
-    @State private var showStartup = true
+    @State private var rideModePresented = true
+    @State private var rideSessionID = UUID()
+    @State private var showSettings = false
+    @State private var showStartup = !ProcessInfo.processInfo.arguments.contains(
+        "SVC_SKIP_STARTUP"
+    )
     @State private var replayToken = UUID()
+
+    private var presentationDemo: Bool {
+        ProcessInfo.processInfo.arguments.contains("SVC_TFT_DEMO")
+    }
 
     private var criticalWarning: DeviceWarning? {
         viewModel.device.telemetry.warnings.first {
@@ -42,7 +51,7 @@ struct RootView: View {
                         }
                     }
                     .overlay(alignment: .top) {
-                        if !showStartup, let criticalWarning {
+                        if !rideModePresented, let criticalWarning {
                             CriticalWarningCard(warning: criticalWarning)
                                 .padding()
                         }
@@ -50,23 +59,56 @@ struct RootView: View {
             }
             .tint(appearance.brandPack.accentColor)
             .preferredColorScheme(.dark)
-
-            if showStartup {
-                StartupAnimationView(
-                    brandPack: appearance.brandPack,
-                    timeline: appearance.startupTimeline,
-                    animationEnabled: appearance.animationEnabled,
-                    reduceMotion: appearance.forceReduceMotion,
-                    critical: criticalWarning != nil,
-                    replayToken: replayToken
-                ) {
-                    showStartup = false
-                }
-                .transition(.identity)
-                .zIndex(10)
-            }
         }
         .background(SVCTheme.background)
+        .background {
+            RideModePresenter(isPresented: $rideModePresented) {
+                ZStack {
+                    RideModeView(
+                        telemetry: viewModel.device.telemetry,
+                        connectionState: viewModel.device.connectionState,
+                        isConnecting: viewModel.isConnecting,
+                        profile: ridePreferences.vehicleProfile,
+                        ridePreferences: ridePreferences,
+                        reduceMotion: appearance.forceReduceMotion,
+                        demoMode: presentationDemo,
+                        exitRideMode: exitRideMode,
+                        openSettings: openRideSettings
+                    )
+                    .id(rideSessionID)
+
+                    if showStartup {
+                        StartupAnimationView(
+                            brandPack: appearance.brandPack,
+                            timeline: appearance.startupTimeline,
+                            animationEnabled: appearance.animationEnabled,
+                            reduceMotion: appearance.forceReduceMotion,
+                            critical: criticalWarning != nil,
+                            replayToken: replayToken
+                        ) {
+                            showStartup = false
+                        }
+                        .transition(.identity)
+                        .zIndex(10)
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showSettings) {
+            NavigationStack {
+                SettingsView(
+                    appearance: appearance,
+                    ridePreferences: ridePreferences,
+                    telemetry: viewModel.device.telemetry,
+                    previewStartup: previewStartup
+                )
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") { showSettings = false }
+                    }
+                }
+            }
+        }
         .onAppear {
             selectedScreen = appearance.restoredScreen()
             viewModel.beginStartupTasks()
@@ -77,14 +119,19 @@ struct RootView: View {
     private var destination: some View {
         switch selectedScreen {
         case .dashboard:
-            DashboardView(
-                telemetry: viewModel.device.telemetry,
-                connectionState: viewModel.device.connectionState,
-                isConnecting: viewModel.isConnecting,
-                profile: ridePreferences.vehicleProfile,
-                themeMode: ridePreferences.themeMode,
-                themeThresholds: ridePreferences.themeThresholds
-            )
+            VStack(spacing: 18) {
+                Image(systemName: "gauge.with.dots.needle.67percent")
+                    .font(.system(size: 54))
+                    .foregroundStyle(appearance.brandPack.accentColor)
+                Text("Ride Mode is closed")
+                    .font(.title2.weight(.semibold))
+                Button("Enter Ride Mode", action: enterRideMode)
+                    .buttonStyle(.borderedProminent)
+                    .accessibilityIdentifier("enterRideMode")
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(SVCTheme.background)
+            .navigationTitle("SVC Mobile")
         case .channels:
             ChannelsView(channels: viewModel.device.telemetry.channels)
         case .canTelemetry:
@@ -102,6 +149,10 @@ struct RootView: View {
     }
 
     private func select(_ screen: PrimaryScreen) {
+        if screen == .dashboard {
+            enterRideMode()
+            return
+        }
         selectedScreen = screen
         appearance.select(screen)
     }
@@ -109,6 +160,28 @@ struct RootView: View {
     private func previewStartup() {
         replayToken = UUID()
         showStartup = true
+        showSettings = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            enterRideMode()
+        }
+    }
+
+    private func enterRideMode() {
+        selectedScreen = .dashboard
+        appearance.select(.dashboard)
+        rideSessionID = UUID()
+        rideModePresented = true
+    }
+
+    private func exitRideMode() {
+        rideModePresented = false
+    }
+
+    private func openRideSettings() {
+        rideModePresented = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            showSettings = true
+        }
     }
 }
 

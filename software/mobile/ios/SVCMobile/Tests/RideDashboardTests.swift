@@ -1,3 +1,5 @@
+import SwiftUI
+import UIKit
 import XCTest
 @testable import SVCMobile
 
@@ -206,5 +208,110 @@ final class RideDashboardTests: XCTestCase {
             RideMotionPolicy.duration(reduceMotion: false),
             RideDesignTokens.standardAnimation
         )
+    }
+
+    func testRideModePageOrderAndSwipeBoundaries() {
+        XCTAssertEqual(
+            RideModePage.allCases.map(\.title),
+            [
+                "PURE RIDE",
+                "SPORT / CORE",
+                "VEHICLE",
+                "SVC POWER",
+                "DIAGNOSTICS"
+            ]
+        )
+        XCTAssertEqual(
+            RideSwipePolicy.targetPage(
+                currentPage: 0,
+                pageCount: 5,
+                translation: CGSize(width: -180, height: 8),
+                predictedTranslation: CGSize(width: -240, height: 10)
+            ),
+            1
+        )
+        XCTAssertEqual(
+            RideSwipePolicy.targetPage(
+                currentPage: 1,
+                pageCount: 5,
+                translation: CGSize(width: 180, height: 8),
+                predictedTranslation: CGSize(width: 240, height: 10)
+            ),
+            0
+        )
+        XCTAssertEqual(
+            RideSwipePolicy.targetPage(
+                currentPage: 0,
+                pageCount: 5,
+                translation: CGSize(width: 180, height: 8),
+                predictedTranslation: CGSize(width: 240, height: 10)
+            ),
+            0
+        )
+        XCTAssertEqual(
+            RideSwipePolicy.targetPage(
+                currentPage: 4,
+                pageCount: 5,
+                translation: CGSize(width: -180, height: 8),
+                predictedTranslation: CGSize(width: -240, height: 10)
+            ),
+            4
+        )
+    }
+
+    func testVerticalAndSystemEdgeGesturesDoNotChangeRidePage() {
+        XCTAssertEqual(
+            RideSwipePolicy.targetPage(
+                currentPage: 1,
+                pageCount: 5,
+                translation: CGSize(width: -25, height: 180),
+                predictedTranslation: CGSize(width: -30, height: 220)
+            ),
+            1
+        )
+        XCTAssertFalse(
+            RideSwipePolicy.startsOutsideSystemEdges(x: 8, width: 900)
+        )
+        XCTAssertTrue(
+            RideSwipePolicy.startsOutsideSystemEdges(x: 450, width: 900)
+        )
+        XCTAssertFalse(
+            RideSwipePolicy.startsOutsideSystemEdges(x: 892, width: 900)
+        )
+    }
+
+    @MainActor
+    func testRideModeKeepScreenOnIsRestoredOnExit() {
+        let originalValue = UIApplication.shared.isIdleTimerDisabled
+        let controller = RideModeHostingController(rootView: AnyView(EmptyView()))
+        controller.loadViewIfNeeded()
+
+        controller.viewWillAppear(false)
+        XCTAssertTrue(UIApplication.shared.isIdleTimerDisabled)
+
+        controller.viewWillDisappear(false)
+        XCTAssertEqual(
+            UIApplication.shared.isIdleTimerDisabled,
+            originalValue
+        )
+    }
+
+    func testTFTPresentationDemoContainsApprovedReviewValues() {
+        let demo = TFTDashboardData.demo
+
+        XCTAssertEqual(demo.speedKmh, 87)
+        XCTAssertEqual(demo.engineRpm, 4_200)
+        XCTAssertEqual(demo.tachometerMaximumRpm, 9_000)
+        XCTAssertEqual(demo.warningStartRpm, 7_000)
+        XCTAssertEqual(demo.redStartRpm, 8_000)
+        XCTAssertEqual(demo.gear, "4")
+        XCTAssertEqual(demo.leanDegrees, 18)
+        XCTAssertEqual(demo.accelerationG, 0.32)
+        XCTAssertEqual(demo.brakingG, 0.08)
+        XCTAssertEqual(demo.fuelPercent, 62)
+        XCTAssertEqual(demo.batteryVoltage, 14.2)
+        XCTAssertEqual(demo.frontPressureBar, 2.3)
+        XCTAssertEqual(demo.rearPressureBar, 2.6)
+        XCTAssertEqual(demo.ambientTemperatureCelsius, 16)
     }
 }

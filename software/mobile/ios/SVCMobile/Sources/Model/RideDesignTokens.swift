@@ -76,6 +76,7 @@ struct RidePalette {
     let raisedSurface: Color
     let primaryText: Color
     let secondaryText: Color
+    let disabledText: Color
     let divider: Color
     let accent: Color
     let accentBright: Color
@@ -83,38 +84,46 @@ struct RidePalette {
     let critical: Color
     let valid: Color
     let degraded: Color
+    let highBeam: Color
+    let fogLight: Color
 
     static func resolve(_ theme: RideResolvedTheme) -> RidePalette {
         switch theme {
         case .day:
             RidePalette(
-                background: Color(red: 11 / 255, green: 17 / 255, blue: 24 / 255),
-                surface: Color(red: 20 / 255, green: 29 / 255, blue: 39 / 255),
-                raisedSurface: Color(red: 28 / 255, green: 39 / 255, blue: 51 / 255),
-                primaryText: .white,
-                secondaryText: Color(red: 190 / 255, green: 201 / 255, blue: 212 / 255),
-                divider: Color(red: 64 / 255, green: 78 / 255, blue: 92 / 255),
-                accent: Color(red: 28 / 255, green: 105 / 255, blue: 212 / 255),
-                accentBright: Color(red: 74 / 255, green: 163 / 255, blue: 1),
+                background: Color(red: 5 / 255, green: 6 / 255, blue: 7 / 255),
+                surface: Color(red: 17 / 255, green: 20 / 255, blue: 24 / 255),
+                raisedSurface: Color(red: 23 / 255, green: 29 / 255, blue: 36 / 255),
+                primaryText: Color(red: 244 / 255, green: 246 / 255, blue: 248 / 255),
+                secondaryText: Color(red: 174 / 255, green: 181 / 255, blue: 189 / 255),
+                disabledText: Color(red: 98 / 255, green: 107 / 255, blue: 118 / 255),
+                divider: Color(red: 52 / 255, green: 58 / 255, blue: 66 / 255),
+                accent: Color(red: 226 / 255, green: 27 / 255, blue: 45 / 255),
+                accentBright: Color(red: 226 / 255, green: 27 / 255, blue: 45 / 255),
                 warning: Color(red: 1, green: 176 / 255, blue: 0),
-                critical: Color(red: 227 / 255, green: 38 / 255, blue: 54 / 255),
-                valid: Color(red: 91 / 255, green: 214 / 255, blue: 144 / 255),
-                degraded: Color(red: 1, green: 176 / 255, blue: 0)
+                critical: Color(red: 1, green: 59 / 255, blue: 48 / 255),
+                valid: Color(red: 53 / 255, green: 208 / 255, blue: 127 / 255),
+                degraded: Color(red: 1, green: 176 / 255, blue: 0),
+                highBeam: Color(red: 61 / 255, green: 165 / 255, blue: 1),
+                fogLight: Color(red: 102 / 255, green: 214 / 255, blue: 232 / 255)
             )
         case .night:
             RidePalette(
-                background: Color(red: 3 / 255, green: 5 / 255, blue: 8 / 255),
-                surface: Color(red: 10 / 255, green: 14 / 255, blue: 19 / 255),
-                raisedSurface: Color(red: 17 / 255, green: 23 / 255, blue: 30 / 255),
-                primaryText: Color(red: 244 / 255, green: 247 / 255, blue: 250 / 255),
-                secondaryText: Color(red: 151 / 255, green: 165 / 255, blue: 179 / 255),
-                divider: Color(red: 40 / 255, green: 50 / 255, blue: 61 / 255),
-                accent: Color(red: 20 / 255, green: 84 / 255, blue: 177 / 255),
-                accentBright: Color(red: 57 / 255, green: 139 / 255, blue: 232 / 255),
+                background: Color(red: 5 / 255, green: 6 / 255, blue: 7 / 255),
+                surface: Color(red: 17 / 255, green: 20 / 255, blue: 24 / 255),
+                raisedSurface: Color(red: 23 / 255, green: 29 / 255, blue: 36 / 255),
+                primaryText: Color(red: 244 / 255, green: 246 / 255, blue: 248 / 255),
+                secondaryText: Color(red: 174 / 255, green: 181 / 255, blue: 189 / 255),
+                disabledText: Color(red: 98 / 255, green: 107 / 255, blue: 118 / 255),
+                divider: Color(red: 52 / 255, green: 58 / 255, blue: 66 / 255),
+                accent: Color(red: 226 / 255, green: 27 / 255, blue: 45 / 255),
+                accentBright: Color(red: 226 / 255, green: 27 / 255, blue: 45 / 255),
                 warning: Color(red: 1, green: 176 / 255, blue: 0),
-                critical: Color(red: 227 / 255, green: 38 / 255, blue: 54 / 255),
-                valid: Color(red: 74 / 255, green: 194 / 255, blue: 126 / 255),
-                degraded: Color(red: 1, green: 176 / 255, blue: 0)
+                critical: Color(red: 1, green: 59 / 255, blue: 48 / 255),
+                valid: Color(red: 53 / 255, green: 208 / 255, blue: 127 / 255),
+                degraded: Color(red: 1, green: 176 / 255, blue: 0),
+                highBeam: Color(red: 61 / 255, green: 165 / 255, blue: 1),
+                fogLight: Color(red: 102 / 255, green: 214 / 255, blue: 232 / 255)
             )
         }
     }

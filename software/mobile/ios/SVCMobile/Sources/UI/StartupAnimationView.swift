@@ -1,5 +1,4 @@
 import SwiftUI
-import WebKit
 
 struct StartupAnimationView: View {
     let brandPack: BrandPack
@@ -52,97 +51,109 @@ private struct StartupVisual: View {
     let timeline: StartupTimeline
     let progress: Double
 
-    private var screenOnEnd: Double {
-        timeline.progress(milliseconds: timeline.phases.screenOnEndMs)
+    private var logoPhase: Double {
+        phase(progress, 0.02, 0.20) * (1 - phase(progress, 0.25, 0.36))
     }
-    private var logoEnd: Double {
-        timeline.progress(milliseconds: timeline.phases.logoEndMs)
+    private var lampCheckPhase: Double {
+        phase(progress, 0.16, 0.28) * (1 - phase(progress, 0.38, 0.48))
     }
-    private var identityEnd: Double {
-        timeline.progress(milliseconds: timeline.phases.identityEndMs)
+    private var sweepPhase: Double {
+        progress < 0.62
+            ? phase(progress, 0.28, 0.62)
+            : 1 - phase(progress, 0.62, 0.80)
     }
-    private var taglineEnd: Double {
-        timeline.progress(milliseconds: timeline.phases.taglineEndMs)
+    private var clusterPhase: Double { phase(progress, 0.72, 0.90) }
+    private var transitionPhase: Double {
+        phase(
+            progress,
+            timeline.progress(milliseconds: timeline.phases.taglineEndMs),
+            1
+        )
     }
-    private var logoPhase: Double { phase(progress, screenOnEnd, logoEnd) }
-    private var identityPhase: Double { phase(progress, logoEnd, identityEnd) }
-    private var taglinePhase: Double { phase(progress, identityEnd, taglineEnd) }
-    private var transitionPhase: Double { phase(progress, taglineEnd, 1) }
 
     var body: some View {
-        ZStack {
-            SVCTheme.background
-                .opacity(1 - transitionPhase)
-            RadialGradient(
-                colors: [SVCTheme.lightBlue.opacity(0.12), .clear],
-                center: .center,
-                startRadius: 0,
-                endRadius: 220
-            )
-            .opacity(phase(progress, 0, screenOnEnd) * (1 - transitionPhase))
+        GeometryReader { geometry in
+            ZStack {
+                Color(red: 5 / 255, green: 6 / 255, blue: 7 / 255)
+                    .opacity(1 - transitionPhase)
+                StartupBrandLines()
+                .opacity(phase(progress, 0, 0.14))
 
-            VStack(spacing: 15) {
-                BrandLogoView(brandPack: brandPack)
-                    .frame(width: 112, height: 112)
-                    .scaleEffect(0.92 + 0.08 * logoPhase - 0.06 * transitionPhase)
-                    .opacity(logoPhase * (1 - transitionPhase))
-                    .overlay {
-                        Circle()
-                            .stroke(
-                                LinearGradient(
-                                    colors: [.clear, .white.opacity(0.8), .clear],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                ),
-                                lineWidth: 1
-                            )
-                            .rotationEffect(.degrees(-30))
-                            .opacity(
-                                phase(logoPhase, 0.38, 0.48)
-                                    * (1 - phase(logoPhase, 0.48, 0.72))
-                            )
-                    }
-
-                VStack(spacing: 7) {
-                    if let wordmark = brandPack.wordmarkResource {
-                        LocalSVGView(url: wordmark)
-                            .frame(width: 210, height: 28)
-                    } else {
-                        Text(brandPack.manufacturerWordmark)
-                            .font(.system(size: 18, weight: .semibold, design: .default))
-                            .tracking(4.5)
-                    }
-                    Text(brandPack.vehicleModel)
-                        .font(.system(size: 15, weight: .medium))
-                        .tracking(2.2)
-                    Text(brandPack.vehicleGeneration)
-                        .font(.system(size: 12, weight: .regular))
-                        .tracking(1.8)
-                        .foregroundStyle(SVCTheme.secondaryText)
+                ZStack {
+                    Circle()
+                        .fill(Color(red: 17 / 255, green: 20 / 255, blue: 24 / 255))
+                    Circle()
+                        .stroke(
+                            Color(red: 226 / 255, green: 27 / 255, blue: 45 / 255),
+                            lineWidth: 2
+                        )
+                    Text("SVC")
+                        .font(.system(size: 28, weight: .bold))
+                        .tracking(2)
+                        .foregroundStyle(SVCTheme.primaryText)
                 }
-                .foregroundStyle(SVCTheme.primaryText)
-                .opacity(identityPhase * (1 - transitionPhase))
+                .frame(width: 116, height: 116)
+                .scaleEffect(0.88 + logoPhase * 0.12)
+                .opacity(logoPhase)
 
-                Text(brandPack.brandTagline)
-                    .font(.system(size: 12, weight: .medium))
-                    .tracking(2.8)
-                    .foregroundStyle(SVCTheme.primaryText)
-                    .opacity(taglinePhase * (1 - transitionPhase))
-            }
-            .scaleEffect(1 - 0.04 * transitionPhase)
-
-            Rectangle()
-                .fill(
-                    LinearGradient(
-                        colors: [.clear, brandPack.accentColor, .white, .clear],
-                        startPoint: .leading,
-                        endPoint: .trailing
+                HStack(spacing: 20) {
+                    indicator(
+                        "←",
+                        color: Color(red: 74 / 255, green: 194 / 255, blue: 126 / 255)
                     )
+                    indicator("HIGH", color: SVCTheme.lightBlue)
+                    indicator("ABS", color: SVCTheme.warning)
+                    indicator("ENGINE", color: SVCTheme.warning)
+                    indicator("SVC", color: SVCTheme.critical)
+                    indicator(
+                        "→",
+                        color: Color(red: 74 / 255, green: 194 / 255, blue: 126 / 255)
+                    )
+                }
+                .opacity(lampCheckPhase)
+                .frame(maxHeight: .infinity, alignment: .top)
+                .padding(.top, 18)
+
+                StartupTFTSegments(progress: sweepPhase)
+                .frame(
+                    width: geometry.size.width * 0.92,
+                    height: geometry.size.height * 0.28
                 )
-                .frame(height: 1)
-                .scaleEffect(x: transitionPhase, anchor: .center)
-                .opacity(transitionPhase * (1 - transitionPhase))
+                .frame(maxHeight: .infinity, alignment: .top)
+                .opacity(phase(progress, 0.24, 0.34) * (1 - transitionPhase))
+
+                HStack {
+                    VStack(spacing: 0) {
+                        Text("0")
+                            .font(.system(size: 82, weight: .light))
+                            .foregroundStyle(SVCTheme.primaryText)
+                        Text("km/h")
+                            .font(.system(size: 14))
+                            .tracking(1.2)
+                            .foregroundStyle(SVCTheme.secondaryText)
+                    }
+                    Spacer()
+                    Text("N")
+                        .font(.system(size: 58, weight: .medium))
+                        .foregroundStyle(
+                            Color(
+                                red: 53 / 255,
+                                green: 208 / 255,
+                                blue: 127 / 255
+                            )
+                        )
+                }
+                .frame(width: geometry.size.width * 0.46)
+                .opacity(clusterPhase * (1 - transitionPhase))
+            }
         }
+    }
+
+    private func indicator(_ label: String, color: Color) -> some View {
+        Text(label)
+            .font(.system(size: 13, weight: .bold))
+            .tracking(1)
+            .foregroundStyle(color)
     }
 
     private func phase(_ value: Double, _ start: Double, _ end: Double) -> Double {
@@ -150,40 +161,124 @@ private struct StartupVisual: View {
     }
 }
 
-private struct BrandLogoView: View {
-    let brandPack: BrandPack
-
+private struct StartupBrandLines: View {
     var body: some View {
-        if let url = brandPack.logoResource {
-            LocalSVGView(url: url)
-                .clipShape(Circle())
-        } else {
-            ZStack {
-                Circle().fill(SVCTheme.surface)
-                Circle().stroke(SVCTheme.primaryText.opacity(0.72), lineWidth: 2)
-                Text("SVC")
-                    .font(.system(size: 26, weight: .bold, design: .rounded))
-                    .tracking(1.5)
-                    .foregroundStyle(SVCTheme.primaryText)
+        GeometryReader { geometry in
+            Canvas { context, size in
+                let centerY = size.height / 2
+                let red = Color(red: 226 / 255, green: 27 / 255, blue: 45 / 255)
+                let white = Color(red: 244 / 255, green: 246 / 255, blue: 248 / 255)
+                let blue = Color(red: 61 / 255, green: 165 / 255, blue: 1)
+
+                context.stroke(
+                    line(
+                        from: CGPoint(x: size.width * 0.12, y: centerY - 14),
+                        to: CGPoint(x: size.width * 0.43, y: centerY - 14)
+                    ),
+                    with: .color(red),
+                    lineWidth: 2
+                )
+                context.stroke(
+                    line(
+                        from: CGPoint(x: size.width * 0.10, y: centerY),
+                        to: CGPoint(x: size.width * 0.40, y: centerY)
+                    ),
+                    with: .color(white),
+                    lineWidth: 1
+                )
+                context.stroke(
+                    line(
+                        from: CGPoint(x: size.width * 0.15, y: centerY + 14),
+                        to: CGPoint(x: size.width * 0.34, y: centerY + 14)
+                    ),
+                    with: .color(blue),
+                    lineWidth: 1
+                )
+                context.stroke(
+                    line(
+                        from: CGPoint(x: size.width * 0.57, y: centerY - 14),
+                        to: CGPoint(x: size.width * 0.88, y: centerY - 14)
+                    ),
+                    with: .color(red),
+                    lineWidth: 2
+                )
+                context.stroke(
+                    line(
+                        from: CGPoint(x: size.width * 0.60, y: centerY),
+                        to: CGPoint(x: size.width * 0.90, y: centerY)
+                    ),
+                    with: .color(white),
+                    lineWidth: 1
+                )
+                context.stroke(
+                    line(
+                        from: CGPoint(x: size.width * 0.66, y: centerY + 14),
+                        to: CGPoint(x: size.width * 0.85, y: centerY + 14)
+                    ),
+                    with: .color(blue),
+                    lineWidth: 1
+                )
             }
         }
     }
+
+    private func line(from: CGPoint, to: CGPoint) -> Path {
+        var path = Path()
+        path.move(to: from)
+        path.addLine(to: to)
+        return path
+    }
 }
 
-private struct LocalSVGView: UIViewRepresentable {
-    let url: URL
+private struct StartupTFTSegments: View {
+    let progress: Double
 
-    func makeUIView(context: Context) -> WKWebView {
-        let configuration = WKWebViewConfiguration()
-        configuration.suppressesIncrementalRendering = false
-        let view = WKWebView(frame: .zero, configuration: configuration)
-        view.isOpaque = false
-        view.backgroundColor = .clear
-        view.scrollView.backgroundColor = .clear
-        view.scrollView.isScrollEnabled = false
-        view.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
-        return view
+    var body: some View {
+        GeometryReader { geometry in
+            let segmentCount = 45
+            let left = geometry.size.width * 0.06
+            let right = geometry.size.width * 0.94
+            let width = right - left
+            let gap: CGFloat = 4
+            let segmentWidth =
+                (width - gap * CGFloat(segmentCount - 1))
+                / CGFloat(segmentCount)
+
+            Canvas { context, _ in
+                for segment in 0..<segmentCount {
+                    let ratio = Double(segment + 1) / Double(segmentCount)
+                    let inactive: Color = if ratio > 8 / 9 {
+                        Color(red: 226 / 255, green: 27 / 255, blue: 45 / 255)
+                            .opacity(0.42)
+                    } else if ratio > 7 / 9 {
+                        SVCTheme.warning.opacity(0.34)
+                    } else {
+                        Color(red: 52 / 255, green: 58 / 255, blue: 66 / 255)
+                    }
+                    let active: Color = if ratio > 8 / 9 {
+                        Color(red: 226 / 255, green: 27 / 255, blue: 45 / 255)
+                    } else if ratio > 7 / 9 {
+                        SVCTheme.warning
+                    } else {
+                        Color(red: 244 / 255, green: 246 / 255, blue: 248 / 255)
+                    }
+                    context.fill(
+                        Path(
+                            CGRect(
+                                x: left + CGFloat(segment) * (segmentWidth + gap),
+                                y: geometry.size.height * 0.08,
+                                width: segmentWidth,
+                                height: 20
+                            )
+                        ),
+                        with: .color(
+                            Double(segment) / Double(segmentCount) < progress
+                                ? active
+                                : inactive
+                        )
+                    )
+                }
+            }
+        }
     }
-
-    func updateUIView(_ view: WKWebView, context: Context) {}
 }
