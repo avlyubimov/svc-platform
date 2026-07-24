@@ -1,0 +1,17 @@
+{
+  "id": "audi",
+  "name": "Audi",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#BB0A30",
+  "simpleIconSlug": "audi",
+  "source": "https://www.audi.com/ci/en/intro/basics/rings.html",
+  "simpleIcons": {
+    "slug": "audi",
+    "title": "Audi",
+    "source": "https://www.audi.com/ci/en/intro/basics/rings.html",
+    "guidelines": "https://www.audi.com/ci/en/intro/basics/rings.html",
+    "license": null
+  }
+}

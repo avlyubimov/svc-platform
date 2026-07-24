@@ -1,0 +1,463 @@
+{
+  "schemaVersion": 1,
+  "simpleIconsVersion": "16.27.0",
+  "brands": [
+    {
+      "id": "bmw",
+      "name": "BMW",
+      "categories": [
+        "motorcycle",
+        "car"
+      ],
+      "accentColor": "#0066B1",
+      "simpleIconSlug": "bmw",
+      "source": "https://bmw.com",
+      "preferredAsset": "bmw-roundel-1997-2020.svg",
+      "simpleIcons": {
+        "slug": "bmw",
+        "title": "BMW",
+        "source": "https://bmw.com",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "honda",
+      "name": "Honda",
+      "categories": [
+        "motorcycle",
+        "car"
+      ],
+      "accentColor": "#E40521",
+      "simpleIconSlug": "honda",
+      "source": "https://www.honda.com",
+      "simpleIcons": {
+        "slug": "honda",
+        "title": "Honda",
+        "source": "https://www.honda.ie",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "yamaha-motor",
+      "name": "Yamaha Motor",
+      "categories": [
+        "motorcycle"
+      ],
+      "accentColor": "#E60012",
+      "simpleIconSlug": "yamahamotorcorporation",
+      "source": "https://global.yamaha-motor.com",
+      "simpleIcons": {
+        "slug": "yamahamotorcorporation",
+        "title": "Yamaha Motor Corporation",
+        "source": "https://commons.wikimedia.org/wiki/File:Yamaha_Motor_Logo_(full).svg",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "kawasaki",
+      "name": "Kawasaki",
+      "categories": [
+        "motorcycle"
+      ],
+      "accentColor": "#E60012",
+      "commonsFile": "Kawasaki_Motors_logo.svg",
+      "source": "https://commons.wikimedia.org/wiki/File:Kawasaki_Motors_logo.svg"
+    },
+    {
+      "id": "suzuki",
+      "name": "Suzuki",
+      "categories": [
+        "motorcycle",
+        "car"
+      ],
+      "accentColor": "#E30613",
+      "simpleIconSlug": "suzuki",
+      "source": "https://www.globalsuzuki.com",
+      "simpleIcons": {
+        "slug": "suzuki",
+        "title": "Suzuki",
+        "source": "https://www.suzuki.ie",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "ktm",
+      "name": "KTM",
+      "categories": [
+        "motorcycle"
+      ],
+      "accentColor": "#FF6600",
+      "simpleIconSlug": "ktm",
+      "source": "https://www.ktm.com",
+      "simpleIcons": {
+        "slug": "ktm",
+        "title": "KTM",
+        "source": "https://ktm.com",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "ducati",
+      "name": "Ducati",
+      "categories": [
+        "motorcycle"
+      ],
+      "accentColor": "#CC0000",
+      "simpleIconSlug": "ducati",
+      "source": "https://www.ducati.com",
+      "simpleIcons": {
+        "slug": "ducati",
+        "title": "Ducati",
+        "source": "https://brandlogos.net/ducati-logo-vector-svg-92931.html",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "triumph",
+      "name": "Triumph",
+      "categories": [
+        "motorcycle"
+      ],
+      "accentColor": "#FFFFFF",
+      "recolorFrom": [
+        "#010202"
+      ],
+      "commonsFile": "Logo_Triumph.svg",
+      "source": "https://commons.wikimedia.org/wiki/File:Logo_Triumph.svg"
+    },
+    {
+      "id": "harley-davidson",
+      "name": "Harley-Davidson",
+      "categories": [
+        "motorcycle"
+      ],
+      "accentColor": "#FF6600",
+      "recolorFrom": [
+        "#0A0B09"
+      ],
+      "commonsFile": "Harley-Davidson_logo.svg",
+      "source": "https://commons.wikimedia.org/wiki/File:Harley-Davidson_logo.svg"
+    },
+    {
+      "id": "aprilia",
+      "name": "Aprilia",
+      "categories": [
+        "motorcycle"
+      ],
+      "accentColor": "#ED1C24",
+      "commonsFile": "Aprilia-logo.svg",
+      "source": "https://commons.wikimedia.org/wiki/File:Aprilia-logo.svg"
+    },
+    {
+      "id": "royal-enfield",
+      "name": "Royal Enfield",
+      "categories": [
+        "motorcycle"
+      ],
+      "accentColor": "#D1292E",
+      "commonsFile": "Royal_Enfield_logo_new.svg",
+      "source": "https://commons.wikimedia.org/wiki/File:Royal_Enfield_logo_new.svg"
+    },
+    {
+      "id": "indian-motorcycle",
+      "name": "Indian Motorcycle",
+      "categories": [
+        "motorcycle"
+      ],
+      "accentColor": "#A3110D",
+      "commonsFile": "Indian_Motorcycle_logo.svg",
+      "source": "https://commons.wikimedia.org/wiki/File:Indian_Motorcycle_logo.svg"
+    },
+    {
+      "id": "husqvarna",
+      "name": "Husqvarna",
+      "categories": [
+        "motorcycle"
+      ],
+      "accentColor": "#273A60",
+      "simpleIconSlug": "husqvarna",
+      "source": "https://www.husqvarna.com",
+      "simpleIcons": {
+        "slug": "husqvarna",
+        "title": "Husqvarna",
+        "source": "https://www.husqvarna.com",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "volkswagen",
+      "name": "Volkswagen",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#151F5D",
+      "simpleIconSlug": "volkswagen",
+      "source": "https://www.volkswagen.com",
+      "simpleIcons": {
+        "slug": "volkswagen",
+        "title": "Volkswagen",
+        "source": "https://www.vw.com",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "toyota",
+      "name": "Toyota",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#EB0A1E",
+      "simpleIconSlug": "toyota",
+      "source": "https://www.toyota.com/brandguidelines/",
+      "simpleIcons": {
+        "slug": "toyota",
+        "title": "Toyota",
+        "source": "https://www.toyota.com/brandguidelines/logo/",
+        "guidelines": "https://www.toyota.com/brandguidelines/",
+        "license": null
+      }
+    },
+    {
+      "id": "mercedes-benz",
+      "name": "Mercedes-Benz",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#B7BDC5",
+      "recolorFrom": [
+        "#000"
+      ],
+      "commonsFile": "Mercedes-Benz_Star_(1969-1986,_2025-).svg",
+      "source": "https://commons.wikimedia.org/wiki/File:Mercedes-Benz_Star_(1969-1986,_2025-).svg"
+    },
+    {
+      "id": "audi",
+      "name": "Audi",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#BB0A30",
+      "simpleIconSlug": "audi",
+      "source": "https://www.audi.com/ci/en/intro/basics/rings.html",
+      "simpleIcons": {
+        "slug": "audi",
+        "title": "Audi",
+        "source": "https://www.audi.com/ci/en/intro/basics/rings.html",
+        "guidelines": "https://www.audi.com/ci/en/intro/basics/rings.html",
+        "license": null
+      }
+    },
+    {
+      "id": "ford",
+      "name": "Ford",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#00274E",
+      "simpleIconSlug": "ford",
+      "source": "https://www.ford.com",
+      "simpleIcons": {
+        "slug": "ford",
+        "title": "Ford",
+        "source": "https://secure.ford.com/brochures/",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "hyundai",
+      "name": "Hyundai",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#002C5E",
+      "simpleIconSlug": "hyundai",
+      "source": "https://www.hyundai.com",
+      "simpleIcons": {
+        "slug": "hyundai",
+        "title": "Hyundai",
+        "source": "https://www.hyundai.com",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "kia",
+      "name": "Kia",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#05141F",
+      "simpleIconSlug": "kia",
+      "source": "https://www.kia.com",
+      "simpleIcons": {
+        "slug": "kia",
+        "title": "Kia",
+        "source": "https://www.kia.com",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "nissan",
+      "name": "Nissan",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#C3002F",
+      "simpleIconSlug": "nissan",
+      "source": "https://www.nissan-global.com",
+      "simpleIcons": {
+        "slug": "nissan",
+        "title": "Nissan",
+        "source": "https://www.nissan.ie",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "mitsubishi",
+      "name": "Mitsubishi",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#E60012",
+      "simpleIconSlug": "mitsubishi",
+      "source": "https://www.mitsubishi.com",
+      "simpleIcons": {
+        "slug": "mitsubishi",
+        "title": "Mitsubishi",
+        "source": "https://www.mitsubishi.com",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "mazda",
+      "name": "Mazda",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#101010",
+      "simpleIconSlug": "mazda",
+      "source": "https://www.mazda.com",
+      "simpleIcons": {
+        "slug": "mazda",
+        "title": "Mazda",
+        "source": "https://www.mazda.com/en/about/profile/library/",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "renault",
+      "name": "Renault",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#FFCC33",
+      "simpleIconSlug": "renault",
+      "source": "https://www.renaultgroup.com",
+      "simpleIcons": {
+        "slug": "renault",
+        "title": "Renault",
+        "source": "https://media.renaultgroup.com",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "peugeot",
+      "name": "Peugeot",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#FFFFFF",
+      "simpleIconSlug": "peugeot",
+      "source": "https://www.peugeot.com",
+      "simpleIcons": {
+        "slug": "peugeot",
+        "title": "Peugeot",
+        "source": "https://www.peugeot.co.uk",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "skoda",
+      "name": "ŠKODA",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#0E3A2F",
+      "simpleIconSlug": "skoda",
+      "source": "https://www.skoda-auto.com",
+      "simpleIcons": {
+        "slug": "skoda",
+        "title": "ŠKODA",
+        "source": "https://www.skoda-connect.com",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "jeep",
+      "name": "Jeep",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#FFFFFF",
+      "simpleIconSlug": "jeep",
+      "source": "https://www.jeep.com",
+      "simpleIcons": {
+        "slug": "jeep",
+        "title": "Jeep",
+        "source": "https://commons.wikimedia.org/wiki/File:Jeep_logo.svg",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "porsche",
+      "name": "Porsche",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#B12B28",
+      "simpleIconSlug": "porsche",
+      "source": "https://www.porsche.com",
+      "simpleIcons": {
+        "slug": "porsche",
+        "title": "Porsche",
+        "source": "https://www.porsche.com",
+        "guidelines": null,
+        "license": null
+      }
+    },
+    {
+      "id": "volvo",
+      "name": "Volvo",
+      "categories": [
+        "car"
+      ],
+      "accentColor": "#003057",
+      "simpleIconSlug": "volvo",
+      "source": "https://www.volvocars.com",
+      "simpleIcons": {
+        "slug": "volvo",
+        "title": "Volvo",
+        "source": "https://www.media.volvocars.com/global/en-gb/logos",
+        "guidelines": null,
+        "license": null
+      }
+    }
+  ]
+}

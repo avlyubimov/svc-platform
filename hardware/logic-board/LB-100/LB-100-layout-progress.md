@@ -1,6 +1,6 @@
 # LB-100 Controlled Layout Progress
 
-Status: `EVT-FAB-REVIEW` — connectivity complete; limited five-board EVT release is under final package review
+Status: `EVT-FAB-AUTHORIZED` — one segregated five-board bare-PCB Rev.1 EVT package is authorized
 
 ## Completed milestone
 

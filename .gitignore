@@ -10,6 +10,11 @@ Thumbs.db
 build/
 dist/
 __pycache__/
+.gradle/
+local.properties
+software/mobile/branding/local/*
+!software/mobile/branding/local/.gitkeep
+*.xcodeproj/
 *.py[cod]
 *.elf
 *.bin

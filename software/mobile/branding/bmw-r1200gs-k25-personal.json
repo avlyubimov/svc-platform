@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "bmw-r1200gs-k25-personal",
+  "displayName": "BMW R1200GS K25 · 2007",
+  "brandId": "bmw",
+  "theme": "svc-boxer-blue",
+  "model": "R1200GS",
+  "generation": "K25",
+  "year": 2007,
+  "vehicleModel": "R 1200 GS",
+  "vehicleGeneration": "K25 · 2007",
+  "brandTagline": "MAKE LIFE A RIDE",
+  "accentColor": "#1C69D4"
+}

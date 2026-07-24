@@ -1,7 +1,7 @@
 # LB-100 Rev.1 EVT Fabrication Review — 2026-07-22
 
-Status: technical routing review complete; five-board bare-PCB package may be
-released only through the recorded EVT controls below
+Status: `EVT-FAB-AUTHORIZED`; five-board bare-PCB package may be released only
+through the recorded EVT controls below
 
 ## Release scope
 

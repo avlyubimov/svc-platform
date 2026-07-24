@@ -1,0 +1,17 @@
+{
+  "id": "porsche",
+  "name": "Porsche",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#B12B28",
+  "simpleIconSlug": "porsche",
+  "source": "https://www.porsche.com",
+  "simpleIcons": {
+    "slug": "porsche",
+    "title": "Porsche",
+    "source": "https://www.porsche.com",
+    "guidelines": null,
+    "license": null
+  }
+}

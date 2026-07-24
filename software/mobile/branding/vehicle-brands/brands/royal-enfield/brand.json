@@ -1,0 +1,10 @@
+{
+  "id": "royal-enfield",
+  "name": "Royal Enfield",
+  "categories": [
+    "motorcycle"
+  ],
+  "accentColor": "#D1292E",
+  "commonsFile": "Royal_Enfield_logo_new.svg",
+  "source": "https://commons.wikimedia.org/wiki/File:Royal_Enfield_logo_new.svg"
+}

@@ -1,0 +1,168 @@
+name: Firmware Review Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_run_id:
+        description: Successful allowlisted firmware-candidate workflow run
+        required: true
+        type: string
+      release_version:
+        description: Strict channel-compatible semantic version
+        required: true
+        type: string
+      channel:
+        description: Release channel
+        required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+          - beta
+          - stable
+
+permissions: {}
+
+jobs:
+  validate-candidate:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      attestations: read
+      contents: read
+    outputs:
+      artifact_run_id: ${{ steps.release-inputs.outputs.artifact_run_id }}
+      release_version: ${{ steps.release-inputs.outputs.release_version }}
+      release_tag: ${{ steps.release-inputs.outputs.release_tag }}
+      channel: ${{ steps.release-inputs.outputs.channel }}
+      head_sha: ${{ steps.candidate-run.outputs.head_sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Install release validators
+        run: pip install -r tools/mobile_protocol_validation/requirements.txt
+      - name: Validate workflow-dispatch inputs
+        id: release-inputs
+        env:
+          INPUT_RELEASE_VERSION: ${{ inputs.release_version }}
+          INPUT_ARTIFACT_RUN_ID: ${{ inputs.artifact_run_id }}
+          INPUT_CHANNEL: ${{ inputs.channel }}
+        run: |
+          python3 tools/validate_ota_release.py inputs \
+            --release-version "$INPUT_RELEASE_VERSION" \
+            --artifact-run-id "$INPUT_ARTIFACT_RUN_ID" \
+            --channel "$INPUT_CHANNEL" \
+            --github-output "$GITHUB_OUTPUT"
+      - name: Validate candidate run identity
+        id: candidate-run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_ARTIFACT_RUN_ID: ${{ steps.release-inputs.outputs.artifact_run_id }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+        run: |
+          gh api \
+            "/repos/$EXPECTED_REPOSITORY/actions/runs/$INPUT_ARTIFACT_RUN_ID" \
+            > "$RUNNER_TEMP/candidate-run.json"
+          python3 tools/validate_ota_release.py candidate \
+            --metadata "$RUNNER_TEMP/candidate-run.json" \
+            --artifact-run-id "$INPUT_ARTIFACT_RUN_ID" \
+            --repository "$EXPECTED_REPOSITORY" \
+            --github-output "$GITHUB_OUTPUT"
+      - name: Require candidate commit on master history
+        env:
+          CANDIDATE_HEAD_SHA: ${{ steps.candidate-run.outputs.head_sha }}
+        run: |
+          git fetch --no-tags origin master:refs/remotes/origin/master
+          git merge-base --is-ancestor \
+            "$CANDIDATE_HEAD_SHA" \
+            refs/remotes/origin/master
+      - name: Download allowlisted candidate artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_ARTIFACT_RUN_ID: ${{ steps.release-inputs.outputs.artifact_run_id }}
+        run: |
+          gh run download "$INPUT_ARTIFACT_RUN_ID" \
+            --name firmware-candidates \
+            --dir incoming
+          test -f incoming/stm32-main.bin
+          test -f incoming/e73-radio.bin
+          test "$(find incoming -type f | wc -l)" -eq 2
+          test -z "$(find incoming -type f -name '*.signed.bin' -print -quit)"
+      - name: Verify candidate artifact attestations
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_HEAD_SHA: ${{ steps.candidate-run.outputs.head_sha }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+        run: |
+          for candidate in incoming/stm32-main.bin incoming/e73-radio.bin; do
+            gh attestation verify "$candidate" \
+              --repo "$EXPECTED_REPOSITORY" \
+              --signer-workflow "$EXPECTED_REPOSITORY/.github/workflows/firmware-candidates.yml" \
+              --source-digest "$CANDIDATE_HEAD_SHA" \
+              --deny-self-hosted-runners
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: verified-firmware-candidates
+          path: incoming/
+          if-no-files-found: error
+          retention-days: 1
+
+  sign-review:
+    needs: validate-candidate
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment: firmware-production
+    permissions:
+      actions: read
+      attestations: write
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: verified-firmware-candidates
+          path: incoming
+      - name: Install release validators
+        run: pip install -r tools/mobile_protocol_validation/requirements.txt
+      - name: Create and verify detached review signatures
+        env:
+          OTA_PROD_SIGNING_KEY_B64: ${{ secrets.OTA_PROD_SIGNING_KEY_B64 }}
+          OTA_PROD_SIGNING_KEY_PASSWORD: ${{ secrets.OTA_PROD_SIGNING_KEY_PASSWORD }}
+          OTA_PROD_PUBLIC_KEY_SHA256: ${{ vars.OTA_PROD_PUBLIC_KEY_SHA256 }}
+          RELEASE_VERSION: ${{ needs.validate-candidate.outputs.release_version }}
+          RELEASE_CHANNEL: ${{ needs.validate-candidate.outputs.channel }}
+        run: |
+          python3 tools/sign_firmware_review.py \
+            --release-version "$RELEASE_VERSION" \
+            --channel "$RELEASE_CHANNEL" \
+            --stm32 incoming/stm32-main.bin \
+            --e73 incoming/e73-radio.bin \
+            --expected-public-key-sha256 "$OTA_PROD_PUBLIC_KEY_SHA256" \
+            --output dist/firmware
+      - name: Validate review package
+        run: |
+          python3 tools/validate_mobile_protocol.py \
+            --release \
+            --manifest dist/firmware/firmware-manifest.json
+          (cd dist/firmware && sha256sum --check SHA256SUMS)
+      - name: Attest review package
+        uses: actions/attest-build-provenance@43d14bc2b83dec42d39ecae14e916627a18bb661 # v3
+        with:
+          subject-path: dist/firmware/*
+          show-summary: false
+      - name: Upload non-installable review package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: firmware-review-${{ needs.validate-candidate.outputs.release_tag }}
+          path: dist/firmware/
+          if-no-files-found: error
+          retention-days: 7

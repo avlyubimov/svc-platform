@@ -1,6 +1,6 @@
-.PHONY: check validate-pb100 validate-q2-coupon validate-board-schematics validate-pb100-layout validate-lb100-layout validate-lb100-evt-package validate-fb100-layout validate-board-order validate-readiness-consistency validate-config firmware-test pb100-release-status pb100-release-gate board-order-status board-order-gate lb100-evt-package clean
+.PHONY: check validate-pb100 validate-q2-coupon validate-board-schematics validate-pb100-layout validate-lb100-layout validate-lb100-evt-package validate-fb100-layout validate-board-order validate-readiness-consistency validate-config validate-mobile-protocol firmware-test pb100-release-status pb100-release-gate board-order-status board-order-gate lb100-evt-package clean
 
-check: validate-pb100 validate-q2-coupon validate-board-schematics validate-pb100-layout validate-lb100-layout validate-lb100-evt-package validate-fb100-layout validate-board-order validate-readiness-consistency validate-config firmware-test
+check: validate-pb100 validate-q2-coupon validate-board-schematics validate-pb100-layout validate-lb100-layout validate-lb100-evt-package validate-fb100-layout validate-board-order validate-readiness-consistency validate-config validate-mobile-protocol firmware-test
 
 validate-pb100:
 	python3 tools/validate_pb100.py
@@ -34,6 +34,10 @@ validate-readiness-consistency:
 
 validate-config:
 	python3 tools/validate_config.py
+
+validate-mobile-protocol:
+	python3 tools/validate_mobile_protocol.py
+	PYTHONPATH=tools python3 -m unittest discover -s tools/mobile_protocol_validation/tests
 
 firmware-test:
 	$(MAKE) -C firmware test

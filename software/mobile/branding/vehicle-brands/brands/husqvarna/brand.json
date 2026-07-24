@@ -1,0 +1,17 @@
+{
+  "id": "husqvarna",
+  "name": "Husqvarna",
+  "categories": [
+    "motorcycle"
+  ],
+  "accentColor": "#273A60",
+  "simpleIconSlug": "husqvarna",
+  "source": "https://www.husqvarna.com",
+  "simpleIcons": {
+    "slug": "husqvarna",
+    "title": "Husqvarna",
+    "source": "https://www.husqvarna.com",
+    "guidelines": null,
+    "license": null
+  }
+}

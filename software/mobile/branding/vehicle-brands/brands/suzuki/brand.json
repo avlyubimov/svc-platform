@@ -1,0 +1,18 @@
+{
+  "id": "suzuki",
+  "name": "Suzuki",
+  "categories": [
+    "motorcycle",
+    "car"
+  ],
+  "accentColor": "#E30613",
+  "simpleIconSlug": "suzuki",
+  "source": "https://www.globalsuzuki.com",
+  "simpleIcons": {
+    "slug": "suzuki",
+    "title": "Suzuki",
+    "source": "https://www.suzuki.ie",
+    "guidelines": null,
+    "license": null
+  }
+}

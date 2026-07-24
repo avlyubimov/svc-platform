@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "protocolVersion": 1,
+  "deviceId": "SVC-MOCK-001",
+  "sequence": 42,
+  "timestamp": "2026-07-23T10:00:00Z",
+  "batteryVoltage": {
+    "value": 12.7,
+    "unit": "V",
+    "timestamp": "2026-07-23T10:00:00Z",
+    "valid": true,
+    "stale": false,
+    "source": "adc",
+    "quality": "good"
+  },
+  "totalCurrent": {
+    "value": 8.4,
+    "unit": "A",
+    "timestamp": "2026-07-23T10:00:00Z",
+    "valid": true,
+    "stale": false,
+    "source": "adc",
+    "quality": "good"
+  },
+  "channels": [
+    {
+      "id": "OUT1",
+      "current": { "value": 1.2, "unit": "A", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "adc", "quality": "good" },
+      "state": { "value": "on", "unit": "state", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" },
+      "fault": { "value": "none", "unit": "fault", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" }
+    },
+    {
+      "id": "OUT2",
+      "current": { "value": 0.0, "unit": "A", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "adc", "quality": "good" },
+      "state": { "value": "off", "unit": "state", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" },
+      "fault": { "value": "none", "unit": "fault", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" }
+    },
+    {
+      "id": "OUT3",
+      "current": { "value": 3.6, "unit": "A", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "adc", "quality": "good" },
+      "state": { "value": "on", "unit": "state", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" },
+      "fault": { "value": "none", "unit": "fault", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" }
+    },
+    {
+      "id": "OUT4",
+      "current": { "value": 3.6, "unit": "A", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "adc", "quality": "good" },
+      "state": { "value": "on", "unit": "state", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" },
+      "fault": { "value": "none", "unit": "fault", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" }
+    },
+    {
+      "id": "OUT5",
+      "current": { "value": 0.0, "unit": "A", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "adc", "quality": "good" },
+      "state": { "value": "off", "unit": "state", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" },
+      "fault": { "value": "none", "unit": "fault", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" }
+    },
+    {
+      "id": "OUT6",
+      "current": { "value": 0.0, "unit": "A", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "adc", "quality": "good" },
+      "state": { "value": "off", "unit": "state", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" },
+      "fault": { "value": "none", "unit": "fault", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" }
+    },
+    {
+      "id": "OUT7",
+      "current": { "value": 0.0, "unit": "A", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "adc", "quality": "good" },
+      "state": { "value": "off", "unit": "state", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" },
+      "fault": { "value": "none", "unit": "fault", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" }
+    },
+    {
+      "id": "OUT8",
+      "current": { "value": 0.0, "unit": "A", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "adc", "quality": "good" },
+      "state": { "value": "off", "unit": "state", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" },
+      "fault": { "value": "none", "unit": "fault", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" }
+    },
+    {
+      "id": "OUT9",
+      "current": { "value": 0.0, "unit": "A", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "adc", "quality": "good" },
+      "state": { "value": "off", "unit": "state", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" },
+      "fault": { "value": "none", "unit": "fault", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" }
+    },
+    {
+      "id": "OUT10",
+      "current": { "value": 0.0, "unit": "A", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "adc", "quality": "good" },
+      "state": { "value": "off", "unit": "state", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" },
+      "fault": { "value": "none", "unit": "fault", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "output-manager", "quality": "good" }
+    }
+  ],
+  "powerZoneTemperatures": [
+    { "id": "pcb", "value": 37.0, "unit": "degC", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "sensor", "quality": "good" },
+    { "id": "power-a", "value": 48.0, "unit": "degC", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "sensor", "quality": "good" },
+    { "id": "power-b", "value": 45.0, "unit": "degC", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "sensor", "quality": "good" }
+  ],
+  "ambientLight": { "value": 820.0, "unit": "lux", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "sensor", "quality": "good" },
+  "accelerometer": {
+    "x": { "value": 0.03, "unit": "g", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "imu", "quality": "good" },
+    "y": { "value": -0.01, "unit": "g", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "imu", "quality": "good" },
+    "z": { "value": 0.99, "unit": "g", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "imu", "quality": "good" }
+  },
+  "gyroscope": {
+    "x": { "value": 0.2, "unit": "deg/s", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "imu", "quality": "good" },
+    "y": { "value": -0.1, "unit": "deg/s", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "imu", "quality": "good" },
+    "z": { "value": 0.0, "unit": "deg/s", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "imu", "quality": "good" }
+  },
+  "leanAngle": { "value": 0.8, "unit": "deg", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "derived", "quality": "good" },
+  "vehicle": {
+    "speed": { "value": 0.0, "unit": "km/h", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "can1", "quality": "good" },
+    "engineRpm": { "value": 0.0, "unit": "rpm", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "can1", "quality": "good" },
+    "engineTemperature": { "value": null, "unit": "degC", "timestamp": "2026-07-23T10:00:00Z", "valid": false, "stale": false, "source": "can1", "quality": "unavailable" },
+    "instantFuelConsumption": { "value": null, "unit": "L/100km", "timestamp": "2026-07-23T10:00:00Z", "valid": false, "stale": false, "source": "can1", "quality": "unavailable" },
+    "averageFuelConsumption": { "value": null, "unit": "L/100km", "timestamp": "2026-07-23T10:00:00Z", "valid": false, "stale": false, "source": "can1", "quality": "unavailable" },
+    "fuelLevel": { "value": null, "unit": "%", "timestamp": "2026-07-23T10:00:00Z", "valid": false, "stale": false, "source": "can1", "quality": "unavailable" },
+    "ambientTemperature": { "value": null, "unit": "degC", "timestamp": "2026-07-23T10:00:00Z", "valid": false, "stale": false, "source": "can1", "quality": "unavailable" }
+  },
+  "can1": {
+    "state": { "value": "listen-only", "unit": "state", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "firmware", "quality": "good" },
+    "rxFrames": { "value": 1204, "unit": "frames", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "firmware", "quality": "good" },
+    "droppedFrames": { "value": 0, "unit": "frames", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "firmware", "quality": "good" },
+    "lastFrameTimestamp": { "value": "2026-07-23T09:59:59.950Z", "unit": "timestamp", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "firmware", "quality": "good" }
+  },
+  "storage": {
+    "sdCardState": { "value": "missing", "unit": "state", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "storage", "quality": "degraded" },
+    "canLoggerState": { "value": "unavailable", "unit": "state", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "storage", "quality": "degraded" },
+    "freeBytes": { "value": null, "unit": "bytes", "timestamp": "2026-07-23T10:00:00Z", "valid": false, "stale": false, "source": "storage", "quality": "unavailable" }
+  },
+  "versions": {
+    "stm32": { "value": "0.1.0-mock", "unit": "semver", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "firmware", "quality": "good" },
+    "e73": { "value": "0.1.0-mock", "unit": "semver", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "firmware", "quality": "good" },
+    "protocol": { "value": "1", "unit": "version", "timestamp": "2026-07-23T10:00:00Z", "valid": true, "stale": false, "source": "firmware", "quality": "good" }
+  },
+  "warnings": [
+    {
+      "code": "sd_card_missing",
+      "severity": "warning",
+      "message": "SD card is not installed; CAN logging is unavailable.",
+      "timestamp": "2026-07-23T10:00:00Z",
+      "active": true
+    }
+  ]
+}

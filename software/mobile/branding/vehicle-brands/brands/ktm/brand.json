@@ -1,0 +1,17 @@
+{
+  "id": "ktm",
+  "name": "KTM",
+  "categories": [
+    "motorcycle"
+  ],
+  "accentColor": "#FF6600",
+  "simpleIconSlug": "ktm",
+  "source": "https://www.ktm.com",
+  "simpleIcons": {
+    "slug": "ktm",
+    "title": "KTM",
+    "source": "https://ktm.com",
+    "guidelines": null,
+    "license": null
+  }
+}

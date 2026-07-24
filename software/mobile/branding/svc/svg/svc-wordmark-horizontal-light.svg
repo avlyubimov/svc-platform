@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 480" role="img" aria-labelledby="title desc">
+  <title id="title">SVC horizontal light logo</title>
+  <desc id="desc">SVC Smart Vehicle Controller horizontal logo for dark backgrounds.</desc>
+  <g transform="translate(28 -8) scale(.47)">
+    <g fill="#F5F8FC">
+      <path d="M176 304 424 144v154l-112 74v244l112 72-94 126-154-104z"/>
+      <path d="m848 304-248-160v154l112 74v244l-112 72 94 126 154-104z"/>
+    </g>
+    <g fill="#41C8FF">
+      <path d="m454 718-144 224h172V718z"/>
+      <path d="m570 718 144 224H542V718z"/>
+    </g>
+    <path d="M350 510h104l42-92 52 184 46-92h80" fill="none" stroke="#1C69D4" stroke-width="42"/>
+  </g>
+  <text x="535" y="274" fill="#F5F8FC" font-family="Inter,Arial,Helvetica,sans-serif" font-size="230" font-weight="800" letter-spacing="22">SVC</text>
+  <rect x="548" y="315" width="850" height="8" rx="4" fill="#41C8FF"/>
+  <text x="548" y="382" fill="#A7B1BD" font-family="Inter,Arial,Helvetica,sans-serif" font-size="46" font-weight="600" letter-spacing="9">SMART VEHICLE CONTROLLER</text>
+</svg>

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "svc-core",
+  "theme": "svc-electric-blue",
+  "manufacturer": "SVC",
+  "model": "Smart Vehicle Controller",
+  "generation": "Universal Automotive",
+  "year": 2026,
+  "brandLogo": "svc-emblem-color.svg",
+  "manufacturerWordmark": "SMART VEHICLE CONTROLLER",
+  "vehicleModel": "SVC",
+  "vehicleGeneration": "UNIVERSAL AUTOMOTIVE",
+  "brandTagline": "ENGINEERED FOR THE RIDE",
+  "accentColor": "#1C69D4"
+}

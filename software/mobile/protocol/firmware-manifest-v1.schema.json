@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://svc-platform.example/schema/firmware-manifest-v1.schema.json",
+  "title": "SVC firmware release manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "releaseVersion",
+    "releaseTag",
+    "channel",
+    "minimumMobileVersion",
+    "components"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "releaseVersion": { "$ref": "#/$defs/version" },
+    "releaseTag": {
+      "type": "string",
+      "pattern": "^svc-v[0-9]+\\.[0-9]+\\.[0-9]+(?:-(?:beta|test)\\.[0-9]+)?$"
+    },
+    "channel": { "enum": ["dev", "beta", "stable"] },
+    "minimumMobileVersion": { "$ref": "#/$defs/version" },
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": { "$ref": "#/$defs/component" }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "channel": { "const": "stable" } } },
+      "then": {
+        "properties": {
+          "releaseVersion": {
+            "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+          },
+          "releaseTag": {
+            "pattern": "^svc-v(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "channel": { "const": "beta" } } },
+      "then": {
+        "properties": {
+          "releaseVersion": {
+            "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)-beta\\.(?:0|[1-9][0-9]*)$"
+          },
+          "releaseTag": {
+            "pattern": "^svc-v(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)-beta\\.(?:0|[1-9][0-9]*)$"
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "channel": { "const": "dev" } } },
+      "then": {
+        "properties": {
+          "releaseVersion": {
+            "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)-test\\.(?:0|[1-9][0-9]*)$"
+          },
+          "releaseTag": {
+            "pattern": "^svc-v(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)-test\\.(?:0|[1-9][0-9]*)$"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "releaseSignature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "file", "size", "sha256", "keyId"],
+      "properties": {
+        "algorithm": { "const": "rsa-pss-sha256" },
+        "file": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^(placeholder|[0-9a-f]{64})$"
+        },
+        "keyId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        }
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "version",
+        "hardware",
+        "protocolVersion",
+        "file",
+        "size",
+        "sha256",
+        "imageFormat",
+        "installable",
+        "releaseSignature",
+        "minimumBootloader"
+      ],
+      "properties": {
+        "target": { "enum": ["stm32-main", "e73-radio"] },
+        "version": { "$ref": "#/$defs/version" },
+        "hardware": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9][A-Z0-9._-]{0,31}$"
+          }
+        },
+        "protocolVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "file": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^(placeholder|[0-9a-f]{64})$"
+        },
+        "imageFormat": {
+          "enum": ["review-raw", "mcuboot-signed", "oemirot-signed"]
+        },
+        "installable": { "type": "boolean" },
+        "releaseSignature": { "$ref": "#/$defs/releaseSignature" },
+        "minimumBootloader": { "$ref": "#/$defs/version" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "imageFormat": { "const": "review-raw" } } },
+          "then": { "properties": { "installable": { "const": false } } }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": { "const": "e73-radio" },
+              "installable": { "const": true }
+            },
+            "required": ["target", "installable"]
+          },
+          "then": { "properties": { "imageFormat": { "const": "mcuboot-signed" } } }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": { "const": "stm32-main" },
+              "installable": { "const": true }
+            },
+            "required": ["target", "installable"]
+          },
+          "then": { "properties": { "imageFormat": { "const": "oemirot-signed" } } }
+        }
+      ]
+    }
+  }
+}

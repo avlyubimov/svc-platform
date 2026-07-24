@@ -1,0 +1,13 @@
+{
+  "brand": "SVC",
+  "fullName": "Smart Vehicle Controller",
+  "tagline": "ENGINEERED FOR THE RIDE",
+  "colors": {
+    "graphite": "#111820",
+    "electricBlue": "#1C69D4",
+    "brightCyan": "#41C8FF",
+    "background": "#05080C",
+    "primaryText": "#F5F8FC",
+    "secondaryText": "#A7B1BD"
+  }
+}

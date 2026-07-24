@@ -1,0 +1,17 @@
+{
+  "id": "kia",
+  "name": "Kia",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#05141F",
+  "simpleIconSlug": "kia",
+  "source": "https://www.kia.com",
+  "simpleIcons": {
+    "slug": "kia",
+    "title": "Kia",
+    "source": "https://www.kia.com",
+    "guidelines": null,
+    "license": null
+  }
+}

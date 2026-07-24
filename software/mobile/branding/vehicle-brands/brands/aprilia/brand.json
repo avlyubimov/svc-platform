@@ -1,0 +1,10 @@
+{
+  "id": "aprilia",
+  "name": "Aprilia",
+  "categories": [
+    "motorcycle"
+  ],
+  "accentColor": "#ED1C24",
+  "commonsFile": "Aprilia-logo.svg",
+  "source": "https://commons.wikimedia.org/wiki/File:Aprilia-logo.svg"
+}

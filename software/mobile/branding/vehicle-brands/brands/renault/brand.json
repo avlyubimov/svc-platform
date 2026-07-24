@@ -1,0 +1,17 @@
+{
+  "id": "renault",
+  "name": "Renault",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#FFCC33",
+  "simpleIconSlug": "renault",
+  "source": "https://www.renaultgroup.com",
+  "simpleIcons": {
+    "slug": "renault",
+    "title": "Renault",
+    "source": "https://media.renaultgroup.com",
+    "guidelines": null,
+    "license": null
+  }
+}

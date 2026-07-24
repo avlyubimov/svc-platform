@@ -1,5 +1,27 @@
 # Decision Log
 
+## 2026-07-23 — Phone-mediated BLE connectivity and signed OTA
+
+Decision: accept ADR-0022. SVC Mobile runs on iPhone or Android, downloads
+GitHub release artifacts over HTTPS, and transfers them through authenticated
+BLE to E73. E73 forwards STM32 candidates over framed UART. The current LB-100
+has no Wi-Fi and cannot access GitHub directly.
+
+Decision: treat CHIGEE AIO-6 as a CarPlay/Android Auto projection host only.
+Projected surfaces are experimental, information-only, expose neither OTA nor
+power-output control, and do not assume Apple entitlement or Google category
+approval. Automatic selection of SVC on reconnect is not guaranteed.
+
+Decision: use MCUboot/MCUmgr for the E73 direction and ST OEMiRoT for
+STM32H563. Both targets verify signed candidates, use trial boot and confirmation,
+and roll back on failure. SWD remains the hardware recovery path for each target;
+E73 is not an STM32 recovery programmer.
+
+Result: mobile, protocol, mock, CI, and host-test scaffolds may proceed without
+changing PB-100, LB-100, FB-100, generic-output mapping, CAN1 read-only policy,
+or Output Manager ownership. Production keys and automatic updates remain
+prohibited.
+
 ## 2026-06-30 — Project start
 
 SVC Platform started from BMW R1200GS K25 OEM+ accessory power project.
@@ -3997,6 +4019,135 @@ repository validation. Supplier DFM, exact stack and impedance confirmation
 remain mandatory before payment. Assembly, motorcycle use, PB-100 and the
 combined platform remain `NO-GO`; BLE enclosure range, FFC fit and all normal
 bench/production evidence remain open.
+
+Documentation follow-up: synchronize the MASTER lifecycle, final-readiness
+boundary, LB layout progress, fabrication review, and KiCad README on
+`EVT-FAB-AUTHORIZED`. The authorization remains limited to one segregated
+five-piece bare-PCB LB-100 Rev.1 EVT batch; LB assembly, PB/FB fabrication and
+the combined three-board order remain `NO-GO`.
+
+## 2026-07-23 — Harden the OTA review pipeline before target signing exists
+
+Decision: replace the draft-release scaffold with a review-only workflow. The
+workflow accepts only strict channel-specific SemVer, validates a successful
+same-repository allowlisted candidate run whose commit is reachable from
+`master`, and verifies GitHub artifact attestations before protected signing.
+All Actions are pinned to full commit SHAs. Production signing material is
+limited to `OTA_PROD_SIGNING_KEY_B64` and
+`OTA_PROD_SIGNING_KEY_PASSWORD` in one step of the
+`firmware-production` environment; no private key is added or generated in the
+repository.
+
+Decision: distinguish three independent states in the manifest. A detached
+RSA-PSS/SHA-256 release signature authenticates a downloaded asset but does not
+make it bootable. E73 installation requires a native MCUboot-signed image and
+STM32 installation requires a native OEMiRoT-signed image. Until both target
+builds exist, packaged files are named `*.review.bin`, carry
+`imageFormat=review-raw` and `installable=false`, and no GitHub Release can be
+created by the workflow.
+
+Result: the mobile clients can discover public stable/beta/test GitHub
+Releases without PAT credentials and verify size, SHA-256 and detached
+signatures with an injected public key. Firmware installation and BLE transfer
+remain mock-only. The allowlisted firmware-candidate producer, native target
+signing, production public-key provisioning and hardware validation remain
+explicit blockers.
+
+Follow-up: remove workflow-level token grants. Candidate validation now has
+read-only Actions/content access, while the protected signing job receives only
+the additional OIDC and attestation writes it uses. Signing is hard-blocked
+outside `refs/heads/master`; the `firmware-production` environment uses a
+custom `master` deployment-branch policy.
+
+## 2026-07-23 — Add phone-only BrandPacks and deterministic startup
+
+Decision: use a common mobile BrandPack contract and a 2100 ms phone startup
+timeline. The BMW R1200GS K25 personal pack is selected only when its ignored
+owner-provided logo is present; its wordmark is optional and falls back to
+configured text. Otherwise the apps use SVC fallback branding. Startup
+diagnostics run in parallel, never report fabricated `OK` states, and never
+delay the dashboard for BLE. CarPlay and Android Auto retain host-controlled
+launch behavior. This is presentation and local-navigation state only; BLE,
+OTA, CAN, Output Manager, and safety architecture are unchanged.
+
+## 2026-07-23 — Make shared BrandPack data authoritative and keep SVC as app identity
+
+Decision: load the BrandPack catalog, profile copy, accent, asset paths, and
+startup phase timing from the same versioned JSON in both phone clients.
+Manufacturer assets remain optional local profile content; they never become
+the phone, CarPlay, or Android Auto application icon. Commit an original SVC
+logo, wordmark, and app-icon source as the deterministic fallback and public
+application identity.
+
+Result: adding a licensed/local manufacturer profile requires JSON and assets,
+not parallel Swift and Kotlin edits. The BMW personal profile requires only its
+ignored local `logo.svg`; its optional wordmark falls back to configured text.
+The neutral black OS launch surface and all BLE, OTA, CAN, and safety behavior
+remain unchanged.
+
+## 2026-07-23 — Integrate the versioned vehicle-brand and SVC artwork packs
+
+Decision: make `vehicle-brands-v1.json` the shared manufacturer catalog for
+both phone clients. Vehicle profiles reference a stable `brandId` and retain
+`model`, `generation`, and `year` as independent fields. The standard dark
+startup uses `logo-on-dark.svg`; an optional catalog `preferredAsset` may select
+a period-specific mark, including the 1997–2020 BMW roundel for the owner's
+2007 K25. Wordmarks remain optional and fall back to the catalog display name.
+Clients never download manufacturer artwork at runtime.
+
+Decision: use the project-owned SVC brand pack for the phone launcher, store
+artwork, CarPlay, Android Auto, and generic fallback. Manufacturer marks remain
+limited to phone-only startup/profile decoration. Preserve all third-party
+notices, the pinned Simple Icons license/disclaimer, and the source URL in every
+brand record. Public redistribution remains subject to a separate trademark
+and rights review.
+
+Result: iOS and Android resolve the same 29-brand catalog without duplicated
+brand constants. Automated validation requires the per-brand metadata and four
+standard SVG variants, parses every SVG as XML, verifies the SVC pack
+checksums, and confirms that platform launcher assets are exported from the SVC
+pack. BLE, OTA, CAN, Output Manager, and safety behavior remain unchanged.
+
+## 2026-07-23 — Separate vehicle performance profiles from mobile branding
+
+Decision: add a shared versioned vehicle performance catalog for phone
+dashboard limits and reference values. BrandPacks continue to own presentation
+only. The BMW R1200GS K25 2007 profile defines the approved 0–9000 rpm scale,
+7000 rpm warning boundary, 7800 rpm red-zone boundary, idle band, six-speed
+gearbox, fuel capacity/reserve, and ice threshold. The unknown rev limiter is
+null and must not be drawn.
+
+Decision: make Generic Motorcycle a no-assumption fallback. Unknown engine,
+gearbox, fuel, year, tachometer, warning-zone, and red-zone values stay null
+instead of receiving plausible-looking defaults.
+
+Result: validators enforce profile identity, references, year/fuel consistency,
+tachometer ordering, scale bounds, and the no-limits fallback. This
+configuration does not confirm CAN signals and changes no hardware, firmware,
+wire protocol, or safety behavior.
+
+## 2026-07-23 — Add the phone-only SVC Ride Dashboard v1
+
+Decision: implement one shared presentation contract in SwiftUI and Jetpack
+Compose while keeping platform-native rendering. Landscape is primary and
+portrait is adaptive. Performance limits come only from the versioned vehicle
+profile; BrandPacks remain presentation-only. Telemetry maps through explicit
+valid, stale, degraded, invalid and unavailable states. Stale/invalid/missing
+values render as dashes, and telemetry v1 gear remains unavailable rather than
+being inferred.
+
+Decision: use the Product Owner-approved 0–9000 rpm scale and 7000/7800 zone
+boundaries with 80 rpm display-color hysteresis. The visual arc may animate for
+180 ms, but the numeric RPM is not delayed. `telemetry.leanAngle` is labelled
+as an SVC estimate, becomes degraded without calibration, and records left/right
+trip maxima with reset gated by confirmed zero speed. Day/Night switching uses
+ambient-light hysteresis; Reduce Motion removes dashboard animation duration.
+
+Result: the full graphical dashboard is phone-only. CarPlay and Android Auto
+retain reduced SVC information templates and no longer show invented mock
+values. Demo scenarios, protocol v2, real BLE telemetry and verified BMW CAN
+signals are documented as separate pull requests. This change adds no CAN IDs
+to a decoder, no channel control, and no hardware or firmware behavior.
 
 ## 2026-07-23 — Establish PB-100 deterministic routed baseline
 

@@ -10,6 +10,15 @@ Target architecture:
 - logger
 - BLE/USB API
 
+Update scaffolds:
+
+- `radio/e73/` — Zephyr/nRF52840, MCUboot, MCUmgr/SMP over BLE, UART bridge,
+  SWD recovery instructions.
+- `bootloader/stm32h5/` — host-buildable OEMiRoT integration boundary for
+  STM32H563; it is not an ad-hoc production bootloader.
+- `update/` — target-neutral chunk/resume/admission/trial-boot state machine and
+  the E73-to-STM32 UART framing contract.
+
 No direct feature-to-hardware coupling. Use Output Manager and role mapping.
 
 ## Host validation
@@ -95,3 +104,7 @@ Current host tests cover:
 - Thermal Protection allow/derate/cutoff decisions for PB-100 thermal zones.
 - Thermal System Safety derating through Output Manager at warning threshold and
   shutdown through Output Manager on cutoff/stale telemetry.
+- Firmware-update protocol mismatch, hardware mismatch, corrupt/repeated chunks,
+  interruption/resume, incomplete file, hash/signature denial, parked-state
+  admission, power loss before confirmation, rollback, and E73/STM32 version
+  compatibility.

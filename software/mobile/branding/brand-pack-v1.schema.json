@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://svc-platform.local/schemas/brand-pack-v1.schema.json",
+  "title": "SVC Mobile BrandPack v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "displayName",
+    "brandId",
+    "theme",
+    "model",
+    "generation",
+    "year",
+    "vehicleModel",
+    "vehicleGeneration",
+    "brandTagline",
+    "accentColor"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$" },
+    "displayName": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "brandId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$" },
+    "theme": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$" },
+    "manufacturer": { "type": "string", "minLength": 1, "maxLength": 40 },
+    "model": { "type": "string", "minLength": 1, "maxLength": 40 },
+    "generation": { "type": "string", "minLength": 1, "maxLength": 40 },
+    "year": { "type": "integer", "minimum": 1886, "maximum": 2200 },
+    "manufacturerWordmark": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "vehicleModel": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "vehicleGeneration": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "brandTagline": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "accentColor": { "type": "string", "pattern": "^#[0-9A-F]{6}$" },
+    "assets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["logo"],
+      "properties": {
+        "logo": {
+          "type": "string",
+          "pattern": "^(svc|local|vehicle-brands)/[A-Za-z0-9._/-]+\\.svg$"
+        },
+        "wordmark": {
+          "type": "string",
+          "pattern": "^(svc|local|vehicle-brands)/[A-Za-z0-9._/-]+\\.svg$"
+        }
+      }
+    }
+  }
+}

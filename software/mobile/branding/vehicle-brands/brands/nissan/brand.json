@@ -1,0 +1,17 @@
+{
+  "id": "nissan",
+  "name": "Nissan",
+  "categories": [
+    "car"
+  ],
+  "accentColor": "#C3002F",
+  "simpleIconSlug": "nissan",
+  "source": "https://www.nissan-global.com",
+  "simpleIcons": {
+    "slug": "nissan",
+    "title": "Nissan",
+    "source": "https://www.nissan.ie",
+    "guidelines": null,
+    "license": null
+  }
+}
