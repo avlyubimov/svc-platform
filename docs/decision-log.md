@@ -4186,3 +4186,52 @@ and switched-output attachments, controller/timing/sense connections, rail and
 CAN geometry, filled/capped-via supplier capability and cost, 40 A
 electrothermal extraction, supplier DFM and Product Owner pre-fabrication
 review all remain open.
+
+## 2026-07-24 — Close PB-100 connectivity with controlled HDI transitions
+
+Decision: preserve the frozen eight-layer PB-100 architecture, placement,
+generic output model, DNP variants and CAN1 physical-disable path while closing
+the remaining 36 connections. Promote the accepted copper only through the
+deterministic routing manifest. Use `0.60/0.30 mm` conventional through vias
+where drill clearance permits and `0.30/0.10 mm` adjacent-layer laser
+microvias where 0.50 mm controller fan-out or overlapping F.Cu/B.Cu power
+zones make a through via impossible.
+
+Why: a conventional-via-only closeout failed at fine-pitch controller pins and
+would short opposite-side switched/drain zones. Alternative A was to move the
+controllers or power stages; it was rejected because it would invalidate
+reviewed placement, mechanical, Kelvin and thermal work and no architecture
+change is authorized. Alternative B was to waive the residual connections or
+delete disconnected pours; it was rejected because every remaining cluster
+contained required pads or functional copper. No capability, option footprint
+or DNP site was removed.
+
+Manufacturing decision record: the board uses 39 adjacent-layer microvias:
+21 B.Cu-In6.Cu, five In6.Cu-In5.Cu, eight F.Cu-In1.Cu, three
+In1.Cu-In2.Cu and two In2.Cu-In3.Cu. The deepest stacks are F.Cu-In3.Cu and
+B.Cu-In5.Cu. The nominal annular ring is 0.10 mm; dielectric traversal is
+0.10 mm or 0.18 mm, for nominal 1.0:1 or 1.8:1 laser-via aspect ratio.
+Expected lifetime and thermal-cycle margin are not yet qualified. Maximum
+junction temperature, automotive component qualification and LCSC availability
+are not applicable to a passive PCB interconnect. JLCPCB/PCBWay process
+availability, sequential-lamination count, registration/void limits,
+filled/capped via-in-pad capability, microsection/inspection plan, yield,
+lead-time and quote remain open. U3 pads 2 and 9 contain conventional
+through-via-in-pad features and require filled/capped processing. The HDI
+features receive no high-current capacity credit.
+
+Cost and risk: sequential lamination, stacked microvias and via filling increase
+fabrication cost and introduce registration, voiding, solder-wicking and
+thermal-cycle risks. Supplier DFM and a quote proving the complete prototype
+remains within the `<=500 USD` target are mandatory. Failure of that review
+returns the layout for an approved redesign; it is not an automatic waiver.
+
+Result: deterministic regeneration now reproduces 422 footprints, 5,677
+segments, 910 conventional through vias, 39 microvias and 38 zones item for
+item. KiCad 10.0.4 refill reports zero errors and zero unconnected items. The
+188 locked warnings are only the existing library/silkscreen classes.
+Implementation and connectivity evidence for `PB-EVT-FAB-001` and
+`PB-EVT-FAB-002` is complete, but both checklist rows remain Open until formal
+EVT-FAB review. Electrothermal, parasitic, connector, safety, supplier HDI/DFM
+and Product Owner review gates remain open. No Gerber, drill, manufacturing ZIP
+or fabrication authorization is created by this connectivity closeout.

@@ -30,6 +30,7 @@ FIELDNAMES = (
     "drill_mm",
     "start_layer",
     "end_layer",
+    "via_type",
 )
 PROTECTED_NETS = {
     "AGND",
@@ -78,6 +79,7 @@ def item_identity(
             net_name,
             position.x,
             position.y,
+            item.GetViaType(),
             item.GetWidth(top_layer),
             item.GetDrillValue(),
             board.GetLayerName(top_layer),
@@ -103,6 +105,11 @@ def routing_row(board: pcbnew.BOARD, item: pcbnew.PCB_TRACK) -> dict[str, str]:
         position = item.GetPosition()
         top_layer = item.TopLayer()
         bottom_layer = item.BottomLayer()
+        via_type = {
+            pcbnew.VIATYPE_MICROVIA: "micro",
+            pcbnew.VIATYPE_BLIND: "blind",
+            pcbnew.VIATYPE_BURIED: "blind",
+        }.get(item.GetViaType(), "through")
         return {
             "kind": "via",
             "net": item.GetNetname(),
@@ -116,6 +123,7 @@ def routing_row(board: pcbnew.BOARD, item: pcbnew.PCB_TRACK) -> dict[str, str]:
             "drill_mm": mm(item.GetDrillValue()),
             "start_layer": board.GetLayerName(top_layer),
             "end_layer": board.GetLayerName(bottom_layer),
+            "via_type": via_type,
         }
     start = item.GetStart()
     end = item.GetEnd()
@@ -132,6 +140,7 @@ def routing_row(board: pcbnew.BOARD, item: pcbnew.PCB_TRACK) -> dict[str, str]:
         "drill_mm": "",
         "start_layer": "",
         "end_layer": "",
+        "via_type": "",
     }
 
 
@@ -150,11 +159,25 @@ def normalized_protected_row(
     """
 
     if isinstance(item, pcbnew.PCB_VIA):
-        if item.GetWidth(item.TopLayer()) != pcbnew.FromMM(0.60):
+        is_reviewed_through_via = (
+            item.GetViaType() != pcbnew.VIATYPE_MICROVIA
+            and item.GetWidth(item.TopLayer()) == pcbnew.FromMM(0.60)
+            and item.GetDrillValue() == pcbnew.FromMM(0.30)
+        )
+        is_reviewed_microvia = (
+            item.GetViaType() == pcbnew.VIATYPE_MICROVIA
+            and item.GetWidth(item.TopLayer()) == pcbnew.FromMM(0.30)
+            and item.GetDrillValue() == pcbnew.FromMM(0.10)
+        )
+        if not is_reviewed_through_via and not is_reviewed_microvia:
             return None
         row = routing_row(board, item)
-        row["diameter_mm"] = "0.600000"
-        row["drill_mm"] = "0.300000"
+        if is_reviewed_through_via:
+            row["diameter_mm"] = "0.600000"
+            row["drill_mm"] = "0.300000"
+        else:
+            row["diameter_mm"] = "0.300000"
+            row["drill_mm"] = "0.100000"
         return row
     if item.GetWidth() != pcbnew.FromMM(0.20):
         return None
@@ -205,7 +228,11 @@ def main() -> int:
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("w", newline="", encoding="utf-8") as routing_file:
-        writer = csv.DictWriter(routing_file, fieldnames=FIELDNAMES)
+        writer = csv.DictWriter(
+            routing_file,
+            fieldnames=FIELDNAMES,
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(rows)
     print(f"exported {len(rows)} PB-100 routing items to {args.output}")

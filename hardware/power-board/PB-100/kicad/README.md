@@ -1,30 +1,35 @@
 # PB-100 KiCad Project
 
-Status: `EVT-LAYOUT-AUTHORIZED`; board import may begin; fabrication blocked
+Status: `EVT-LAYOUT-AUTHORIZED`; connectivity-complete layout; fabrication blocked
 
-This directory contains the preliminary KiCad project for PB-100.
+This directory contains the controlled Rev.1 EVT KiCad project for PB-100.
 
 ## Current boundary
 
 - `PB-100.kicad_pro`: project metadata scaffold.
-- `PB-100.kicad_sch`: top-level schematic note sheet with linked child sheets.
-- `sheets/*.kicad_sch`: preliminary child schematic capture sheets with
-  role-agnostic `OUT1`..`OUT10` nets, CAN1 DNP/open notes, and ERC-clean
-  abstract class instances.
+- `PB-100.kicad_sch`: value-bearing top-level schematic with linked child
+  sheets.
+- `sheets/*.kicad_sch`: child sheets with role-agnostic `OUT1`..`OUT10` nets
+  and the reviewed CAN1 DNP/open safety path.
 - `sym-lib-table`: project-local symbol library table.
 - `fp-lib-table`: project-local footprint library table.
-- `lib/PB100.kicad_sym`: preliminary abstract block symbols, first
-  project-local concrete MPN symbols, and non-final class symbols for passive
-  or garage-installed schematic elements.
-- `lib/PB100.pretty/`: empty preliminary local footprint library.
+- `lib/PB100.kicad_sym` and `lib/PB100Gen.kicad_sym`: controlled project-local
+  symbols.
+- `lib/PB100.pretty/`: controlled project-local footprints.
+- `PB-100-routing.csv`: complete deterministic routing manifest.
 
-The controlled `PB-100.kicad_pcb` is now a partial board-import milestone. It
-places all 28 schematic components that currently have reviewed Footprint
-properties, the eight mechanical holes, functional zones and the 150 mm x
-90 mm outline. It intentionally reports 46 missing footprints and six U1
-unconnected-pin parity findings because the preliminary schematic has not yet
-promoted every power-stage passive, terminal and exact package. It contains no
-routing or copper pours and cannot enter fabrication review in this state.
+The controlled `PB-100.kicad_pcb` places all 414 footprint-bound schematic
+parts plus eight mechanical holes on the reviewed 150 mm x 90 mm, eight-layer
+outline. It contains 5,677 segments, 910 conventional through vias, 39
+adjacent-layer microvias and 38 zones. KiCad 10.0.4 refill reports zero
+unconnected items; schematic parity contains only the eight intentional
+board-only mounting holes.
+
+The 39 `0.30/0.10 mm` microvias are explicit HDI manufacturing constraints.
+They include stacked F.Cu-to-In3.Cu and B.Cu-to-In5.Cu transitions. U3 pads 2
+and 9 also contain filled/capped conventional through via-in-pad features.
+Supplier sequential-lamination, aspect-ratio, registration, filling/capping,
+inspection, yield and quote acceptance remain mandatory.
 
 ADR-0019 and ADR-0020 permit controlled board import, placement, routing,
 copper pours and extraction while the final EVT schematic review remains open.
@@ -77,25 +82,18 @@ DFM, connector fit and laboratory safety review.
 - `../../../../production/board-order/three_board_mechanical_envelope_status.csv`
 - `../../../../firmware/configs/hardware/pb-100-capabilities.json`
 
-## Next KiCad work
+## Next controlled work
 
-1. Review `../PB-100-pcb-layout-start-checklist.csv`, ADR-0019 and
-   `../PB-100-evt-prototype-plan.md`.
+1. Review `../PB-100-evt-fab-review-checklist.csv`, ADR-0020 and
+   `../PB-100-layout-progress.md`.
 2. Open `PB-100.kicad_pro` in KiCad.
-3. Let KiCad normalize project settings if needed.
-4. Review linked child schematic sheets listed in
-   `PB-100-schematic-capture-plan.md` against the trace and freeze-review
-   artifacts.
-5. Review preliminary concrete MPN symbols against the official data sheets
-   listed in `PB-100-symbol-capture-worklist.csv`.
-6. Replace abstract class instances with final electrical symbols, values, and
-   footprints only after package drawings, pinouts, SOA, and sourcing gates are
-   checked.
-7. Continue the controlled `PB-100.kicad_pcb` import by promoting the missing
-   output-stage passives, terminals, test points, DNP alternative sites,
-   replaceable gate elements, isolation links, safe-off provisions and EVT
-   serial field before routing is declared complete.
-8. Do not create Gerbers, drills, pick-place, BOM/CPL, manufacturing ZIP files,
+3. Perform the 40 A electrothermal, switch/clamp-loop, Kelvin, rail, CAN1,
+   connector and safety review against the tracked layout.
+4. Obtain supplier HDI stack/DFM acceptance and filled/capped via-in-pad
+   confirmation before any fabrication authorization.
+5. Preserve all generic outputs, option footprints and DNP variants during
+   review changes.
+6. Do not create Gerbers, drills, pick-place, BOM/CPL, manufacturing ZIP files,
    fabrication packages or PCBA orders until `EVT-FAB-AUTHORIZED`.
 
 ## Validation

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the controlled partial PB-100 EVT board-import milestone."""
+"""Generate the controlled connectivity-complete PB-100 Rev.1 EVT layout."""
 
 from __future__ import annotations
 
@@ -41,8 +41,17 @@ ROUTING_PATH = KICAD_DIR / "PB-100-routing.csv"
 # and reviewable; applying it to every GND pad would unnecessarily increase
 # tombstoning risk for ordinary small passives.
 SOLID_GND_PADS = {
-    "U1": {"9", "11", "16"},
+    "U1": {"9", "11", "13", "16"},
+    "U2": {"7"},
+    "U3": {"1"},
     "U_CAN1_PHY": {"2"},
+    "RT1": {"2"},
+    "C1705": {"2"},
+    "R1703": {"2"},
+    "R1705": {"2"},
+    "R1707": {"2"},
+    "U101": {"6"},
+    **{f"U{channel}": {"6"} for channel in range(105, 110)},
     **{f"DCL{channel}": {"1", "3"} for channel in range(101, 111)},
 }
 LAYOUT_UUID_NS = uuid.UUID("da7a3cb6-cb16-4a92-9c70-18496b0ccff1")
@@ -927,8 +936,16 @@ def routed_copper(net_codes: dict[str, int]) -> list[str]:
                     f'(net {net_codes[net_name]}) (uuid "{route_uuid}"))'
                 )
             elif row["kind"] == "via":
+                via_type = row.get("via_type", "through")
+                via_keyword = (
+                    "via micro"
+                    if via_type == "micro"
+                    else "via blind"
+                    if via_type == "blind"
+                    else "via"
+                )
                 copper.append(
-                    f'\t(via (at {row["start_x_mm"]} {row["start_y_mm"]}) '
+                    f'\t({via_keyword} (at {row["start_x_mm"]} {row["start_y_mm"]}) '
                     f'(size {row["diameter_mm"]}) (drill {row["drill_mm"]}) '
                     f'(layers "{row["start_layer"]}" "{row["end_layer"]}") '
                     f'(net {net_codes[net_name]}) (uuid "{route_uuid}"))'
@@ -1233,9 +1250,10 @@ def high_current_transitions(net_codes: dict[str, int]) -> list[str]:
         )
 
     # Q1 is on F.Cu while the four-terminal 40 A input shunt is on B.Cu.
-    # Twelve plated, filled/capped through vias per side make both layer
-    # changes explicit.  They are not blind/buried vias: the selected EVT
-    # supplier process supports only through vias for this construction.
+    # Twelve plated, filled/capped through vias per side make both high-current
+    # layer changes explicit.  These power fields remain conventional through
+    # vias; the manifest's HDI microvias are low-energy connectivity
+    # attachments and are not credited for current capacity.
     for net_name, columns, rows, identity in (
         (
             "VBAT_REV_PROT",
