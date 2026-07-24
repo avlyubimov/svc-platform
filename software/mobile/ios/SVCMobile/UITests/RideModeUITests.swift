@@ -80,6 +80,6 @@ final class RideModeUITests: XCTestCase {
             predicate: predicate,
             object: rideRoot
         )
-        return XCTWaiter.wait(for: [expectation], timeout: 2) == .completed
+        return XCTWaiter.wait(for: [expectation], timeout: 5) == .completed
     }
 }

@@ -47,4 +47,18 @@ class DemoRideScenarioTests {
         )
         assertEquals("recording", telemetry.storage.canLoggerState.value)
     }
+
+    @Test
+    fun staleAnimationGenerationCannotOverwriteRestartFrame() {
+        val repository = DemoRideRepository()
+        val previousGeneration = repository.restartGeneration.value
+
+        repository.seek(9.0, previousGeneration)
+        repository.restart()
+        repository.seek(9.0, previousGeneration)
+
+        assertEquals(0.0, repository.frame.value.sample.speedKmh, 0.001)
+        assertEquals(RideGear.NEUTRAL, repository.frame.value.sample.gear)
+        assertEquals(1_100.0, repository.frame.value.sample.engineRpm, 0.001)
+    }
 }

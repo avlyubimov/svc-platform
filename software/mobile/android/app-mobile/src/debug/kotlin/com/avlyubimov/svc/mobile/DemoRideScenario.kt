@@ -120,7 +120,13 @@ internal class DemoRideRepository(
     val restartGeneration: StateFlow<Int> = mutableRestartGeneration.asStateFlow()
     override val snapshot: StateFlow<DeviceSnapshot> = mutableSnapshot.asStateFlow()
 
-    fun seek(elapsedSeconds: Double) {
+    fun seek(
+        elapsedSeconds: Double,
+        generation: Int? = null,
+    ) {
+        if (generation != null && generation != mutableRestartGeneration.value) {
+            return
+        }
         val next = createFrame(DemoRideScenario.sampleAt(elapsedSeconds))
         mutableFrame.value = next
         mutableSnapshot.value = next.snapshot

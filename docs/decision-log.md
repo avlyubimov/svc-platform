@@ -4337,3 +4337,22 @@ motorcycle viewing distance, preserves full glyph bounds on CHIGEE and 16:9
 phone layouts, and provides a deterministic debug telemetry stream without
 changing hardware, firmware, CAN behavior, BLE contracts, channel mapping, or
 Power Board architecture.
+
+## 2026-07-24 — Run Demo Ride after the production startup sequence
+
+Decision: the Android debug-only Demo Ride reuses the production
+`StartupAnimation` and SVC fallback brand pack, holds its telemetry at
+0 km/h, neutral, and 1100 RPM during startup, and starts the nine-second
+0–100 scenario only after the startup completion callback. Restarting the
+demo replays both phases deterministically.
+
+Decision: make the SwiftUI TFT review nodes explicit accessibility containers
+and handle the temporary Ride Mode overlay tap at the fullscreen root. This
+does not alter dashboard geometry; it restores stable UI automation access to
+the dashboard, tachometer, speed, gear, bottom telemetry, and exit control.
+
+Result: the review recording can include the same SVC logo, lamp check,
+tachometer sweep, cluster reveal, and live acceleration that users see in the
+application. The change remains debug/presentation and UI-test behavior only;
+it changes no hardware, firmware, CAN behavior, BLE contract, channel mapping,
+or Power Board architecture.

@@ -81,6 +81,8 @@ struct DashboardView: View {
                     .easeInOut(duration: reduceMotion ? 0 : 0.28),
                     value: rpmFraction
                 )
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Tachometer")
                 .accessibilityIdentifier("tftTachometer")
 
                 TFTTopLine(data: data, palette: palette, scale: scale)
@@ -104,6 +106,7 @@ struct DashboardView: View {
                         x: geometry.size.width * 0.36,
                         y: geometry.size.height * 0.31
                     )
+                    .accessibilityElement(children: .combine)
                     .accessibilityIdentifier("tftSpeed")
 
                 TFTGear(
@@ -119,6 +122,7 @@ struct DashboardView: View {
                     x: geometry.size.width * 0.815,
                     y: geometry.size.height * 0.665
                 )
+                .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("tftGear")
 
                 Text("\(data.engineRpm.wholeOrDash) rpm")
@@ -218,10 +222,12 @@ struct DashboardView: View {
                     x: geometry.size.width * 0.5,
                     y: geometry.size.height * 0.89
                 )
+                .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("tftBottomStrip")
             }
         }
         .background(palette.background)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("tftDashboard")
         .onAppear {
             updateTheme()

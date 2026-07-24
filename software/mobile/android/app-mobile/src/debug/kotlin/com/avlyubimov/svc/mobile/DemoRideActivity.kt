@@ -12,7 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -70,10 +72,17 @@ private fun DemoRideApp(
     val frame by repository.frame.collectAsStateWithLifecycle()
     val restartGeneration by repository.restartGeneration.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val brandCatalog = remember { MobileBrandCatalog.load(context) }
+    val brandPack = remember {
+        brandCatalog.resolve(brandCatalog.fallbackProfileId)
+    }
+    val startupTimeline = remember { MobileStartupTimeline.load(context) }
     val profile = remember {
         val catalog = MobileVehiclePerformanceCatalog.load(context)
         catalog.resolve(catalog.defaultProfileId)
     }
+    var startupVisible by remember { mutableStateOf(true) }
+    var rideGeneration by remember { mutableStateOf<Int?>(null) }
     val dashboardData = remember(frame, profile) {
         val telemetry = frame.snapshot.telemetry
         val dashboard = RideDashboardState.build(
@@ -98,11 +107,17 @@ private fun DemoRideApp(
     }
 
     LaunchedEffect(restartGeneration) {
+        rideGeneration = null
+        startupVisible = true
+    }
+    LaunchedEffect(rideGeneration) {
+        val activeGeneration = rideGeneration ?: return@LaunchedEffect
         val startedAt = withFrameNanos { it }
         while (isActive) {
             withFrameNanos { frameTime ->
                 repository.seek(
                     (frameTime - startedAt).coerceAtLeast(0L) / 1_000_000_000.0,
+                    activeGeneration,
                 )
             }
         }
@@ -145,6 +160,20 @@ private fun DemoRideApp(
                 onExit = onExit,
                 onOpenSettings = {},
             )
+            if (startupVisible) {
+                StartupAnimation(
+                    brandPack = brandPack,
+                    timeline = startupTimeline,
+                    enabled = true,
+                    reduceMotion = false,
+                    critical = false,
+                    replayKey = restartGeneration,
+                    onComplete = {
+                        startupVisible = false
+                        rideGeneration = restartGeneration
+                    },
+                )
+            }
         }
     }
 }

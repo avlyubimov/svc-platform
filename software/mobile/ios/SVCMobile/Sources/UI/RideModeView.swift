@@ -125,9 +125,6 @@ struct RideModeView: View {
                 )
                 .padding(.leading, geometry.safeAreaInsets.leading)
                 .padding(.trailing, geometry.safeAreaInsets.trailing)
-                .simultaneousGesture(
-                    TapGesture().onEnded { _ in showControls() }
-                )
 
                 if ridePreferences.pageIndicatorEnabled {
                     RidePageIndicator(
@@ -157,6 +154,10 @@ struct RideModeView: View {
                     .accessibilityIdentifier("rideControlsOverlay")
                 }
             }
+            .contentShape(Rectangle())
+            .simultaneousGesture(
+                TapGesture().onEnded { _ in showControls() }
+            )
         }
         .ignoresSafeArea(.container, edges: [.top, .bottom])
         .statusBarHidden(true)
